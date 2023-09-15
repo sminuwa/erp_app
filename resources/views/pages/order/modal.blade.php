@@ -1,0 +1,46 @@
+@isset($order)
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Order Details: {{ optional($order)->customer->name }} | Invoice:
+                    {{ optional($order)->invoice_no }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{{ route('sales_products.verify') }}" id="ledger_form">
+                    @csrf
+                    @if ($order?->issued_by > 0)
+                    <span class="fa fa-check text text-success">Confirmed by {{App\Models\User::find($order->issued_by)->name}}</span>
+                    @endif
+                    <div class="display">
+
+                    </div>
+                    <div class="form-row">
+                        <textarea name="comment" class="form-control"  placeholder="If you are in doubt of the invoice,  type your comment here">{{$order?->comment}}</textarea>
+                    </div>
+                    <input type="hidden" name="print" value="print" />
+                    <input type="hidden" name="modal" value="modal" />
+                    <input type="hidden" name="order_id" value="{{$order?->id}}" />
+                    <input type="hidden" name="invoice" value="{{$order?->invoice_no}}" />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-dark" data-dismiss="modal"><i class="fa fa-times"></i>
+                            Close
+                        </button>
+                        @if (!$order?->issued_by > 0)
+                        @can('verify.invoice')
+                        <button type="submit" class="btn btn-success"><i class="fa fa-ticket"></i>
+                            Confirm
+                        </button>
+                        @endcan
+                        @else
+                            <span class="fa fa-check text text-success">Already Confirmed</span>
+                        @endif
+                    </div>
+                    @method('post')
+                </form>
+            </div>
+        </div>
+    </div>
+@endisset

@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Http\Requests\Banks;
+
+use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Bank;
+class Store extends FormRequest 
+{
+
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize() 
+    {
+        return $this->user()->can('create.bank', Bank::class);
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules() 
+    {
+        return [
+			'name' => 'required|unique:banks,name|max:100',
+			'abbreviation' => 'required|unique:banks,abbreviation|max:10',
+        ];
+    }
+
+    /**
+    * Get the error messages for the defined validation rules.
+    *
+    * @return array
+    */
+    public function messages()
+    {
+        return [
+     
+        ];
+    }
+
+}

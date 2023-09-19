@@ -6,7 +6,7 @@
         <span class="brand-text font-weight-light"
             style="color:#FFF;font-size:20px;text-shadow: 2px 2px 4px #000000;font-weight:900;
 
-        ">ALBABELLO</span>
+        "><b>ALBABELLO</b></span>
     </a>
 
     <!-- Sidebar -->
@@ -189,7 +189,7 @@
                         </a>
                     </li>
                 @endcan
-                @can('make.whole.sale')
+                {{-- @can('make.whole.sale')
                     <li class="nav-item has-treeview">
                         <a href="{{ route('pos.whole.sale') }}"
                             class="nav-link {{ Request::is('pos/whole-sale*') ? 'active' : '' }}">
@@ -199,7 +199,7 @@
                             </p>
                         </a>
                     </li>
-                @endcan
+                @endcan --}}
                 @can('view.daily.sale.report')
                     <li class="nav-item">
                         <a href="{{ route('daily.report') }}"

@@ -18,7 +18,7 @@ class Store extends Model
     /**
      * Mass assignable columns
      */
-    protected $fillable = ['name', 'branch_id', 'status'];
+    protected $fillable = ['name','code', 'branch_id', 'status'];
 
     /**
      * Date time columns.

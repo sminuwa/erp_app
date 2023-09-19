@@ -3,6 +3,8 @@
 @section('title', 'Supplier')
 
 @push('css')
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
 @endpush
 
 @section('content')

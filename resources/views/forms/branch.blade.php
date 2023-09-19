@@ -11,8 +11,18 @@
             </div>
         @endif
     </div>
-
     <div class="form-group">
+        <label for="code">Code</label>
+        <input type="text" class="form-control {{ $errors->has('code') ? ' is-invalid' : '' }}" name="code" id="code"
+            value="{{ old('code', $model->code) }}" placeholder="" maxlength="5" minlength="4" required="required">
+        @if ($errors->has(' code'))
+            <div class="invalid-feedback">
+                <strong>{{ $errors->first('code') }}</strong>
+            </div>
+        @endif
+    </div>
+
+    {{-- <div class="form-group">
         <label for="phone">Phone</label>
         <input type="text" class="form-control {{ $errors->has('phone') ? ' is-invalid' : '' }}" name="phone"
             id="phone" value="{{ old('phone', $model->phone) }}" placeholder="" maxlength="191" required="required">
@@ -43,7 +53,7 @@
                 <strong>{{ $errors->first('address') }}</strong>
             </div>
         @endif
-    </div>
+    </div> --}}
 
     <div class="form-check">
         <input class="form-check-input {{ $errors->has('status') ? ' is-invalid' : '' }}" type="radio" value="1"

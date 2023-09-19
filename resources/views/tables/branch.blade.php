@@ -2,9 +2,10 @@
     <thead>
         <tr>
             <th>Name </th>
-            <th>Phone </th>
+            <th>Code </th>
+            {{-- <th>Phone </th>
             <th>Email </th>
-            <th>Address </th>
+            <th>Address </th> --}}
             <th>Status </th>
             <th>&nbsp;</th>
         </tr>
@@ -13,9 +14,10 @@
         @foreach ($records as $record)
             <tr>
                 <td> {{ $record->name }} </td>
-                <td> {{ $record->phone }} </td>
+                <td> {{ $record->code }} </td>
+                {{-- <td> {{ $record->phone }} </td>
                 <td> {{ $record->email }} </td>
-                <td> {{ $record->address }} </td>
+                <td> {{ $record->address }} </td> --}}
                 <td> {{ $record->status == 1 ? 'Active' : 'Inactive' }} </td>
                 <td>
                     @can('edit.office.branch')

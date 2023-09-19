@@ -3,6 +3,8 @@
 @section('title', 'Users')
 
 @push('css')
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
 @endpush
 
 @section('content')
@@ -34,7 +36,7 @@
             </a>
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-sm-10 table-responsive">
+                    <div class="col-sm-12 table-responsive">
                         @include('tables.user')
                     </div>
                 </div>
@@ -47,9 +49,12 @@
 @endsection
 
 @push('js')
+    <!-- DataTables -->
+    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-
-
+        $(function() {
+            $("#record1").DataTable();
+        });
     </script>
 @endpush

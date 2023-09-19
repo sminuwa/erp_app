@@ -34,7 +34,7 @@ class StoreController extends Controller
      */
     public function index(Index $request)
     {
-        return view('pages.stores.index', ['records' => Store::paginate(10)]);
+        return view('pages.stores.index', ['records' => Store::orderBy('code')->get()]);
     } /**
   * Display the specified resource.
   *

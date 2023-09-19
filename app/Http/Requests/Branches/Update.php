@@ -27,9 +27,10 @@ class Update extends FormRequest
     {
         return [
 			'name' => 'required|max:191',
-			'phone' => 'required|max:191',
-			'email' => 'nullable|max:191',
-			'address' => 'nullable|max:191',
+            'code' => 'required|max:6|min:4',
+			// 'phone' => 'required|max:191',
+			// 'email' => 'nullable|max:191',
+			// 'address' => 'nullable|max:191',
 			'status' => 'required',
         ];
     }

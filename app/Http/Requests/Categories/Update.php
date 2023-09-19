@@ -27,6 +27,7 @@ class Update extends FormRequest
     {
         return [
 			'name' => 'required|max:191',
+			'code' => 'required|max:10',
         ];
     }
 

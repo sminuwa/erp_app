@@ -1,12 +1,9 @@
 <table class="table table-bordered table-striped" id="record1">
     <thead>
         <tr>
+            <th>Code </th>
             <th>Brand Name </th>
-            <th>Genetic Name </th>
-            <th>Strength </th>
-            <th>Company </th>
             <th>Category</th>
-            <th>Dosage Form</th>
             <th>Barcode</th>
             <th>Status </th>
             <th>&nbsp;</th>
@@ -15,12 +12,9 @@
     <tbody>
         @foreach ($records as $record)
             <tr>
+                <td> {{ $record->code }} </td>
                 <td> {{ $record->name }} </td>
-                <td> {{ $record->generic_name }} </td>
-                <td> {{ $record->strength }} </td>
-                <td> {{ $record->company?->name }} </td>
                 <td> {{ $record->category?->name }} </td>
-                <td> {{ $record->dosage?->name }} </td>
                 <td><span style="font-size: 10pt;">{{$record->barcode}}</span>
                     {{-- @if ($record->barcode != null)
                         {!! DNS1D::getBarcodeHTML($record->barcode, 'CODABAR') !!}

@@ -25,7 +25,7 @@ class PosController extends Controller
         $user_branch = User::userBranchAction();
         $category_id = 0;
         $store_id = 0;
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name','products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('products', 'products.id', 'store_products.product_id')
             ->join('store_product_prices', function ($join) {
@@ -65,7 +65,7 @@ class PosController extends Controller
         $user_branch = User::userBranchAction();
         $category_id = 0;
         $store_id = 0;
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code','stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('products', 'products.id', 'store_products.product_id')
             ->join('store_product_prices', function ($join) {
@@ -105,7 +105,7 @@ class PosController extends Controller
         $category_id = 0;
         $store_id = 0;
         $user_branch = User::userBranchAction();
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code','stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('products', 'products.id', 'store_products.product_id')
             ->join('store_product_prices', function ($join) {
@@ -158,7 +158,7 @@ class PosController extends Controller
     {
         $barcode = $request->barcode;
         $user_branch = User::userBranchAction();
-        $store = StoreProduct::select('store_products.id', 'products.name', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
+        $store = StoreProduct::select('store_products.id', 'products.name', 'products.code','stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('products', 'products.id', 'store_products.product_id')
             ->join('store_product_prices', function ($join) {

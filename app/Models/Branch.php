@@ -18,7 +18,7 @@ class Branch extends Model
     /**
      * Mass assignable columns
      */
-    protected $fillable = ['name', 'phone', 'email', 'address', 'status'];
+    protected $fillable = ['name', 'code', 'status'];
 
     /**
      * Date time columns.

@@ -284,7 +284,7 @@ class InvoiceController extends Controller
                 curl_setopt($ch, CURLOPT_URL, "$url");
                 curl_setopt($ch, CURLOPT_POST, 1);
                 curl_setopt($ch, CURLOPT_POSTFIELDS,
-                    "username=engrabusadik@gmail.com&password=Aisha123&message=$msg&sender=Novomed&mobiles=$customer_phone");
+                    "username=engrabusadik@gmail.com&password=Aisha123&message=$msg&sender=ALBABELLO&mobiles=$customer_phone");
 
                 // Receive server response
                 $server_output = curl_exec($ch);

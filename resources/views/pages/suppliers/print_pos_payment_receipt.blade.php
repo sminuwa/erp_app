@@ -256,7 +256,7 @@
         </p>
     </section>
     <footer style="text-align:center">
-        <p>Novomed</p>
+        <p>ALBABELLO TRADING COMPANY NIG LTD</p>
         @php
             $uc = $payment->ref;
         @endphp

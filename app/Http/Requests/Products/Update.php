@@ -27,11 +27,8 @@ class Update extends FormRequest
     {
         return [
 			'name' => "required|max:191|unique:products,name,{$this->product->id}",
-			'generic_name' => 'required|max:191',
-			'strength' => 'required|max:191',
-			'category_id' => 'required|numeric',
-			'company_id' => 'required|numeric',
-			'dosage_form_id' => 'required|numeric',
+			'code' => 'required|max:191',
+			'category_id' => 'required|numeric|exists:categories,id',
             'barcode' => 'required|max:191|unique:products,barcode,{$this->product->id}',
 			'status' => 'required',
         ];

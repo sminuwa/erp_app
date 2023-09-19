@@ -3,6 +3,7 @@
         <tr>
             <th>SN</th>
             <th>Name </th>
+            <th>Code </th>
             <th>Branch </th>
             <th>Phone </th>
             <th>Address </th>
@@ -17,6 +18,7 @@
             <tr>
                 <td> {{ $loop->index + 1 }} </td>
                 <td> {{ $record->name }} </td>
+                <td> {{ $record->code }} </td>
                 <td> {{ $record->branch?->name }} </td>
                 <td> {{ $record->phone }} </td>
                 <td> {{ $record->address }} </td>

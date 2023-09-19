@@ -3,6 +3,8 @@
 @section('title', 'Stores')
 
 @push('css')
+ <!-- DataTables -->
+ <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
 @endpush
 
 @section('content')
@@ -47,9 +49,20 @@
 @endsection
 
 @push('js')
+    <!-- DataTables -->
+    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-
-
+        $(function() {
+            $("#record1").DataTable();
+            $('#record2').DataTable({
+                "paging": true,
+                "lengthChange": false,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false
+            });
+        });
     </script>
 @endpush

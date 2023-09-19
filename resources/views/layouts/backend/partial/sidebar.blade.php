@@ -6,7 +6,7 @@
         <span class="brand-text font-weight-light"
             style="color:#FFF;font-size:20px;text-shadow: 2px 2px 4px #000000;font-weight:900;
 
-        ">Novomed</span>
+        ">ALBABELLO</span>
     </a>
 
     <!-- Sidebar -->

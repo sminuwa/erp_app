@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <!--  This file has been downloaded from bootdey.com @bootdey on twitter -->
     <!--  All snippets are MIT license http://bootdey.com/license -->
-    <title>Payment Receipt - Novomed</title>
+    <title>Payment Receipt - ALBABELLO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
@@ -135,7 +135,7 @@
 
                                 <p><b>Signatire :</b> ______________________________________</p>
                                 <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For:
-                                    Novomed Integrate</span>
+                                    ALBABELLO TRADING COMPANY NIG LTD</span>
                                 <br /><br />
                                 <h5 style="color: rgb(140, 140, 140);text-align:center;">Thanks for Patronage!</h5>
                             </div>

@@ -44,12 +44,12 @@
                                     <form action="{{ route('pos.index') }}" method="get">
                                         @csrf
                                         Product Category
-                                        <select name="category_id" id="category_id" class="form-control">
+                                        <select name="category_id" id="category_id" class="form-control select2-single">
                                             <option value="all">All categories</option>
                                             @foreach ($categories as $data)
                                                 <option value="{{ $data->id }}"
                                                     {{ $data->id == $category_id ? 'selected' : '' }}>
-                                                    {{ $data->name }}</option>
+                                                    {{ $data->code }}-{{ $data->name }}</option>
                                             @endforeach
                                         </select>
                                         Store
@@ -57,7 +57,7 @@
                                             <option value="all">All stores</option>
                                             @foreach ($store as $data)
                                                 <option value="{{ $data->id }}"
-                                                    {{ $data->id == $store_id ? 'selected' : '' }}>{{ $data->name }}
+                                                    {{ $data->id == $store_id ? 'selected' : '' }}>{{ $data->code }}-{{ $data->name }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -110,8 +110,8 @@
                                                         <input type="hidden" name="cost_price"
                                                             value="{{ $store->cost_price }}">
 
-                                                        <td>{{ $store->store }}</td>
-                                                        <td>{{ $store->name }}</td>
+                                                        <td>{{ ucwords($store->store) }}</td>
+                                                        <td>{{ $store->code }}-{{ $store->name }}</td>
                                                         <td align="center">{{ $store->qty_available }}</td>
                                                         <td align="right">
                                                             {{ number_format($store->selling_price, 2) }}
@@ -215,7 +215,7 @@
                                                 @foreach ($customers as $customer)
                                                     <option value="{{ old('customer_id', $customer->id) }}"
                                                         {{ old('customer_id', $customer->id) == $customer->id ? 'selected' : '' }}>
-                                                        {{ $customer->name }}</option>
+                                                        {{ $customer->code }}-{{ $customer->name }}</option>
                                                 @endforeach
                                             </select>
                                             <div class="form-group" id="display_due_date"

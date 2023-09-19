@@ -32,7 +32,7 @@ class BranchController extends Controller
      */
     public function index(Index $request)
     {
-        return view('pages.branches.index', ['records' => Branch::paginate(10)]);
+        return view('pages.branches.index', ['records' => Branch::orderBy('code')->get()]);
     } /**
   * Display the specified resource.
   *

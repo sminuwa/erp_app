@@ -2,6 +2,7 @@
     <thead>
         <tr>
             <th>Name </th>
+            <th>Code </th>
             <th>&nbsp;</th>
         </tr>
     </thead>
@@ -9,6 +10,7 @@
         @foreach ($records as $record)
             <tr>
                 <td> {{ $record->name }} </td>
+                <td> {{ $record->code }} </td>
                 <td>
                     @can('edit.product.group')
                         <a class="btn btn-secondary btn-sm" href="{{ route('categories.edit', $record->id) }}">

@@ -32,7 +32,7 @@
                         value="{{ $store->cost_price }}">
 
                     <td>{{ $store->store }}</td>
-                    <td>{{ $store->name }}</td>
+                    <td>{{ $store->code }}-{{ $store->name }}</td>
                     <td align="center">{{ $store->qty_available }}</td>
                     <td align="right">
                         {{ number_format($store->selling_price) }}

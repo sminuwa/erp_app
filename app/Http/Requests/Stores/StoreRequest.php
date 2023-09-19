@@ -27,6 +27,7 @@ class StoreRequest extends FormRequest
     {
         return [
 			'name' => 'required|max:191',
+			'code' => 'required|max:10',
 			'branch_id' => 'required|numeric',
 			'status' => 'required',
         ];

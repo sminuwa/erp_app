@@ -18,7 +18,7 @@ class Category extends Model
     /**
      * Mass assignable columns
      */
-    protected $fillable = ['name'];
+    protected $fillable = ['name','code'];
 
     /**
      * Date time columns.

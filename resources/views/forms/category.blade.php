@@ -11,6 +11,16 @@
             </div>
         @endif
     </div>
+    <div class="form-group">
+        <label for="code">Code</label>
+        <input type="text" class="form-control {{ $errors->has('code') ? ' is-invalid' : '' }}" name="code" id="code"
+            value="{{ old('code', $model->code) }}" placeholder="" maxlength="191" required="required">
+        @if ($errors->has('code'))
+            <div class="invalid-feedback">
+                <strong>{{ $errors->first('code') }}</strong>
+            </div>
+        @endif
+    </div>
     <div class="form-group text-right ">
         <input type="submit" class="btn btn-primary" value="Save" />
 

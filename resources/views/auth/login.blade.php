@@ -11,9 +11,9 @@
 
                     <div class="card-body">
                         <div style="text-align: center">
-                            <img src="{{ asset('assets/backend/img/logo.png') }}" alt="Novomed Logo"
+                            <img src="{{ asset('assets/backend/img/logo.png') }}" alt="Albabello Logo"
                             class="" style="opacity: .8;text-align: center;width:80px;heoght:80px"><br />
-                        <h5 class="brand-text;color:#da251c !important;">Novomed Pharmaceutical<br />
+                        <h5 class="brand-text;color:#da251c !important;">ALBABELLO TRADING COMPANY NIG LTD<br />
                              
                         </h5>
                         </div>

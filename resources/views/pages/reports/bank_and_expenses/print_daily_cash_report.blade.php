@@ -35,7 +35,7 @@
                         <div class="col-12" style="text-align: center">
 
                             <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:80px;height:80px;"
-                                alt="Novomed logo" class="img-circle elevation-3" style="opacity: .8">
+                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
                             <h3>
                                 {{App\Models\User::UserBranchName()->long_name}}
                             </h3>

@@ -5,7 +5,7 @@
         {{-- Header and search bar --}}
         <div class="m-header">
             <nav>
-                <img src="{{ asset('assets/backend/img/logo.png') }}" style="width: 30px;height:30px;" alt="Novomed Logo"
+                <img src="{{ asset('assets/backend/img/logo.png') }}" style="width: 30px;height:30px;" alt="Albabello Logo"
                     class="brand-image img-circle elevation-3" style="opacity: .8"><a href="#"><i class="fas fa-inbox"></i> <span class="messenger-headTitle">Chat Messages</span> </a>
                 {{-- header buttons --}}
                 <nav class="m-header-right">

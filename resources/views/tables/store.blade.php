@@ -1,8 +1,8 @@
 <table class="table table-bordered table-striped" id="record1">
     <thead>
         <tr>
-            <th>Name </th>
             <th>Code </th>
+            <th>Name </th>
             <th>Branch</th>
             <th>Status </th>
             <th>&nbsp;</th>
@@ -11,8 +11,8 @@
     <tbody>
         @foreach ($records as $record)
             <tr>
-                <td> {{ $record->name }} </td>
                 <td> {{ $record->code }} </td>
+                <td> {{ $record->name }} </td>
                 <td> {{ $record->branch->name }} </td>
                 <td> {{ $record->status == 1 ? 'Active' : 'Inactive' }} </td>
                 <td>

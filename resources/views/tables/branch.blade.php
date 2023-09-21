@@ -1,8 +1,8 @@
 <table class="table table-bordered table-striped" id="record1">
     <thead>
         <tr>
-            <th>Name </th>
             <th>Code </th>
+            <th>Name </th>
             {{-- <th>Phone </th>
             <th>Email </th>
             <th>Address </th> --}}
@@ -13,8 +13,8 @@
     <tbody>
         @foreach ($records as $record)
             <tr>
-                <td> {{ $record->name }} </td>
                 <td> {{ $record->code }} </td>
+                <td> {{ $record->name }} </td>
                 {{-- <td> {{ $record->phone }} </td>
                 <td> {{ $record->email }} </td>
                 <td> {{ $record->address }} </td> --}}

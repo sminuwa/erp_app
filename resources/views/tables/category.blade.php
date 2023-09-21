@@ -1,16 +1,16 @@
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
-            <th>Name </th>
             <th>Code </th>
+            <th>Name </th>
             <th>&nbsp;</th>
         </tr>
     </thead>
     <tbody>
         @foreach ($records as $record)
             <tr>
-                <td> {{ $record->name }} </td>
                 <td> {{ $record->code }} </td>
+                <td> {{ $record->name }} </td>
                 <td>
                     @can('edit.product.group')
                         <a class="btn btn-secondary btn-sm" href="{{ route('categories.edit', $record->id) }}">

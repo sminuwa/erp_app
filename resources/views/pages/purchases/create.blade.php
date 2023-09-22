@@ -94,8 +94,7 @@
                                 {{-- <option value="all">All</option> --}}
                                 <option value="">Select...</option>
                                 @foreach (App\Models\Supplier::orderBy('name')->get() as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name }}-{{ $data->phone }}
-                                    </option>
+                                    <option value="{{ $data->id }}">{{ $data->name }}-{{ $data->phone }}</option>
                                 @endforeach
                             </select>
                         </div>

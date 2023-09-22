@@ -40,8 +40,8 @@ class SupplierController extends Controller
      */
     public function index(Index $request)
     {
-        $user_branch = User::userBranchAction();
-        return view('pages.suppliers.index', ['records' => Supplier::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get()]);
+//        $user_branch = User::userBranchAction();
+        return view('pages.suppliers.index', ['records' => Supplier::orderBy('name')->get()]);
     } /**
   * Display the specified resource.
   *
@@ -173,7 +173,7 @@ class SupplierController extends Controller
 
     public function createSupplierPayment()
     {
-        
+
         $user_branch = User::userBranchAction();
         $bank_accounts = BankAccount::where('branch_id', 'LIKE', $user_branch)->orderBy('account_name')->get();
         $suppliers = Supplier::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();

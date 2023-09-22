@@ -9,8 +9,8 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>@yield('title') - {{ config('app.name', 'Albabello') }}</title>
+    <link rel="icon" href="{{ app_logo() }}" type="image/x-icon">
+    <title>@yield('title') - {{ config('app.name', app_name('short')) }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">

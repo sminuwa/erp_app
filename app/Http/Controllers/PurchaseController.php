@@ -47,7 +47,7 @@ class PurchaseController extends Controller
         return view('pages.purchases.index', [
             'records' => Purchase::select('purchases.*')->orderBy('purchase_date', 'DESC')
                 ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
-                ->where('branch_id', 'LIKE', User::userBranchAction())
+//                ->where('branch_id', 'LIKE', User::userBranchAction())
                 ->take(10)->get()
         ]);
     }

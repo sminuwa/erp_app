@@ -190,36 +190,36 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ route('orders.approved') }}"
-                               class="nav-link {{ Request::is('orders/approved') ? 'active' : '' }}">
+                            <a href="#"
+                               class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Receipts</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('expenses.index') }}"
-                               class="nav-link {{ Request::is('expenses/expenditures*') ? 'active' : '' }}">
+                            <a href="#"
+                               class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Payments</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('expenses.index') }}"
-                               class="nav-link {{ Request::is('expenses/expenditures*') ? 'active' : '' }}">
+                            <a href="#"
+                               class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Expenses</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('expenses.index') }}"
-                               class="nav-link {{ Request::is('expenses/expenditures*') ? 'active' : '' }}">
+                            <a href="#"
+                               class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Interbanks</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('expenses.index') }}"
-                               class="nav-link {{ Request::is('expenses/expenditures*') ? 'active' : '' }}">
+                            <a href="#"
+                               class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Journals</p>
                             </a>

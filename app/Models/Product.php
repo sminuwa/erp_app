@@ -17,9 +17,8 @@ class Product extends Model
     /**
      * Mass assignable columns
      */
-    protected $fillable = ['name', 'generic_name', 
-    'strength', 'company_id', 
-    'dosage_form_id', 'category_id',
+    protected $fillable = ['name', 'code', 
+    'category_id',
      'barcode','status'];
 
     /**

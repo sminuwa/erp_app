@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Category;
@@ -18,6 +19,7 @@ use App\Models\Loan;
 use App\Models\StoreProductPrice;
 use GuzzleHttp\Psr7\Response;
 use App\Models\User;
+
 class MisController extends Controller
 {
     public function loadproducts(Request $request)
@@ -81,8 +83,7 @@ class MisController extends Controller
         if ($request->payment_mode != "Cash") {
             $types = $types->where('account_type', 'like', '%')->where('account_type', '<>', 'Cash')
                 ->orderBy('account_no', 'asc')->get();
-        }
-        else if ($request->payment_mode == "Cash") {
+        } else if ($request->payment_mode == "Cash") {
             $types = $types->where('account_type', '=', 'Cash')
                 ->orderBy('account_no', 'asc')->get();
         }
@@ -302,5 +303,12 @@ class MisController extends Controller
         }
         //return \json_encode($prices);
         return $prices != null ? $oldprice . "," . $newprice : "xx," . "yy";
+    }
+    public function generateProductCode(Request $request)
+    {
+        $category = Category::find($request->category_id);
+        $length = strlen($category->code);
+        $current = DB::table('products')->select(DB::raw("MAX(SUBSTR(code,$length+1)) as max"))->where('category_id', $category->id)->first();
+        return $category->code . str_pad(($current->max + 1), 4, "0", STR_PAD_LEFT);
     }
 }

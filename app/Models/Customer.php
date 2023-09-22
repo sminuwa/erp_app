@@ -9,7 +9,6 @@ use PhpParser\Builder\Function_;
  
  */
 class Customer extends Model
-
 {
 
     /**
@@ -20,7 +19,7 @@ class Customer extends Model
     /**
      * Mass assignable columns
      */
-    protected $fillable = ['name','code', 'email', 'phone', 'address', 'credit_limit'];
+    protected $fillable = ['name', 'code', 'email', 'phone', 'address', 'credit_limit'];
 
     /**
      * Date time columns.
@@ -28,7 +27,7 @@ class Customer extends Model
     protected $dates = [];
     public function ledgers()
     {
-        return $this->hasMany(CustomerLedger::class , 'customer_id');
+        return $this->hasMany(CustomerLedger::class, 'customer_id');
     }
     public function amount()
     {
@@ -40,10 +39,15 @@ class Customer extends Model
     }
     public function runningBalance()
     {
-        return $this->ledgers()->sum('cr')-$this->ledgers->sum('dr');
+        return $this->ledgers()->sum('cr') - $this->ledgers->sum('dr');
     }
     public function branch()
     {
-        return $this->belongsTo(Branch::class,'branch_id');
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
+    public static function nextCustomerCode()
+    {
+        $query = Customer::orderBy('code', 'DESC')->first();
+        return $query == null ? 1 : $query->first()->code + 1;
     }
 }

@@ -796,4 +796,7 @@ Route::middleware('auth')->group(function () {
     Route::post('customer/search', 'CustomerController@search')->name('customer.search');
     Route::get('/notification', [NotificationController::class , 'notify'])->name('notification');
     Route::post('/notification/send', [NotificationController::class , 'send'])->name('notification.send');
+
+
+    Route::get('generate/product_code',[MisController::class,'generateProductCode'])->name('generate.productCode');
 });

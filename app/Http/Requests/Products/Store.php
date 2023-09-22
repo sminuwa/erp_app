@@ -27,7 +27,7 @@ class Store extends FormRequest
     {
         return [
 			'name' => 'required|max:191|unique:products,name',
-			'code' => 'required|max:191',
+			'code' => 'required|max:30|unique:products,column,code',
 			'category_id' => 'required|numeric|exists:categories,id',
             'barcode' => 'required|max:191|unique:products,barcode',
 			'status' => 'required',

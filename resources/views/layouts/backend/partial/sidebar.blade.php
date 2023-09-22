@@ -1,3 +1,4 @@
+@php $r = request(); @endphp
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="{{ route('home') }}" class="brand-link">
@@ -6,7 +7,7 @@
         <span class="brand-text font-weight-light"
             style="color:#FFF;font-size:20px;text-shadow: 2px 2px 4px #000000;font-weight:900;
 
-        "><b>ALBABELLO</b></span>
+        "><b>{{ app_name('short', 'uppercase') }}</b></span>
     </a>
 
     <!-- Sidebar -->
@@ -177,6 +178,52 @@
                                 </a>
                             </li>
                         @endcan
+                    </ul>
+                </li>
+                <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
+                        <i class="ion-android-list"></i>
+                        <p>
+                            AP-AR Accounting
+                            <i class="right fa fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('orders.approved') }}"
+                               class="nav-link {{ Request::is('orders/approved') ? 'active' : '' }}">
+                                <i class="nav-icon ion-cash"></i>
+                                <p>Receipts</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('expenses.index') }}"
+                               class="nav-link {{ Request::is('expenses/expenditures*') ? 'active' : '' }}">
+                                <i class="ion-card"></i>
+                                <p>Payments</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('expenses.index') }}"
+                               class="nav-link {{ Request::is('expenses/expenditures*') ? 'active' : '' }}">
+                                <i class="ion-card"></i>
+                                <p>Expenses</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('expenses.index') }}"
+                               class="nav-link {{ Request::is('expenses/expenditures*') ? 'active' : '' }}">
+                                <i class="ion-card"></i>
+                                <p>Interbanks</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('expenses.index') }}"
+                               class="nav-link {{ Request::is('expenses/expenditures*') ? 'active' : '' }}">
+                                <i class="ion-card"></i>
+                                <p>Journals</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 @can('make.daily.sale')

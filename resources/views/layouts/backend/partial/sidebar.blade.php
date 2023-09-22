@@ -192,7 +192,7 @@
                         <li class="nav-item">
                             <a href="{{ route('orders.approved') }}"
                                class="nav-link {{ Request::is('orders/approved') ? 'active' : '' }}">
-                                <i class="nav-icon ion-cash"></i>
+                                <i class="ion-card"></i>
                                 <p>Receipts</p>
                             </a>
                         </li>

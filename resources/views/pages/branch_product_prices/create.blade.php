@@ -1,6 +1,5 @@
 @extends('layouts.backend.app')
-
-@section('title', 'Products')
+@section('title', 'Manage Prices')
 
 @push('css')
 @endpush
@@ -15,12 +14,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Edit Price: <small>{{ $model->product->name }}</small></h1>
+                        <h4>Manage Product Prices</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                            <li class="breadcrumb-item active">Price</li>
+                            <li class="breadcrumb-item active">Product Price</li>
                         </ol>
                     </div>
                 </div>
@@ -29,24 +28,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('store_product_prices.create') }}">
+            <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.create') }}">
                 <span class="fa fa-plus-circle"></span>
             </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('store_product_prices.index') }}">
+            <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.index') }}">
                 <span class="fa fa-list"></span>
             </a>
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>
-                        <div class='card'>
-
-                            <div class="card-body">
-                                @include('forms.store_product_price', [
-                                    'route' => route('store_product_prices.update', $model->id),
-                                    'method' => 'PUT',
-                                ])
-                            </div>
-                        </div>
+                        @include('forms.branch_product_price')
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
@@ -56,23 +47,38 @@
     <!-- /.content-wrapper -->
 
 @endsection
-
 @push('js')
-    <script script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}">
-    </script>
+    <!-- DataTables -->
+    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         $(function() {
-            $(document).on("change", "#category_id", function(event) {
+            $(document).on("change", "#branch_id,#category_id", function(event) {
                 $("#product_id").html(" < option value = '' > Loading... < /option>");
                 $.ajax({
-                    url: "{{ route('ajax.loadproducts') }}",
+                    url: "{{ route('ajax.load.available.products') }}",
                     type: 'GET',
                     data: {
-                        category_id: $("#category_id").val()
+                        category_id: $("#category_id").val(),
+                        branch_id: $("#branch_id").val()
                     }
                 }).done(function(msg) {
                     $("#product_id").html("<option value=''>--select--</option>" + msg);
+                });
+            });
+            
+            $(document).on("change", "#branch_id,#product_id", function(event) {
+                branch_id = $('#branch_id').val();
+                product_id = $('#product_id').val();
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('ajax.load.product.selling_price') }}",
+                    data: {
+                        branch_id: branch_id,
+                        product_id: product_id
+                    }
+                }).done(function(data) {
+                    $("#selling_price").val(data);
                 });
             });
         });

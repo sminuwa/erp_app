@@ -129,7 +129,7 @@ class OrderController extends Controller
 
     public function destroy(Request $request, Order $order)
     {
-
+        
         DB::beginTransaction();
         try {
             $amount_paid = $order->pay;

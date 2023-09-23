@@ -31,13 +31,13 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('store_product_prices.create') }}">
+            <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.create') }}">
                 <span class="fa fa-plus-circle"></span>
             </a>
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-sm-10 table-responsive">
-                        @include('tables.store_product_price')
+                    <div class="col-sm-12 table-responsive">
+                        @include('tables.branch_product_price')
                     </div>
                 </div>
             </div><!-- /.container-fluid -->

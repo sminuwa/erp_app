@@ -16,7 +16,7 @@
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
                 @if (Auth::check() && file_exists(public_path() . '/staffpics/' . Auth::user()->photo))
-                    <img alt="Photo" src="{{ url('staffpics/' . Auth::user()->photo) }}"
+                    <img alt="Photo" src="{{ url('staffpics/' . Auth::user()->photo_url) }}"
                         class="img-circle elevation-2" alt="User Image">
                 @else
                     <img alt="Photo" src="{{ asset('staffpics/man.png') }}" class="img-circle elevation-2"
@@ -413,7 +413,7 @@
                             @endcan
                             @can('view.product.price')
                                 <li class="nav-item">
-                                    <a href="{{ route('store_product_prices.create') }}"
+                                    <a href="{{ route('branch_product_prices.create') }}"
                                         class="nav-link {{ Request::is('settings/products/manage/prices*') ? 'active' : '' }}">
                                         <i class="ion-ios-cart-outline"></i>
                                         <p>Product Selling Prices</p>

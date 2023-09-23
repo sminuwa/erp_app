@@ -12,9 +12,22 @@
         @endif
     </div>
     <div class="form-group">
+        <label for="account_type">Account Type</label>
+        <select class="form-control {{ $errors->has('account_type') ? ' is-invalid' : '' }}" name="account_type" id="account_type" required>
+            <option value="">Select...</option>
+            <option value="R" {{old('account_type', $model->account_type)=="Retail"?'selected':''}}>Retail</option>
+            <option value="W" {{old('account_type', $model->account_type)=="Wholesale"?'selected':''}}>Whole Sale</option>
+        </select>
+        @if ($errors->has('account_type'))
+            <div class="invalid-feedback">
+                <strong>{{ $errors->first('account_type') }}</strong>
+            </div>
+        @endif
+    </div>
+    <div class="form-group">
         <label for="code">Code</label>
-        <input type="text" class="form-control {{ $errors->has('code') ? ' is-invalid' : '' }}" name="code"
-            id="code" value="{{ isset($code)?$code:old('code', $model->code) }}" placeholder="" maxlength="15" minlength="6">
+        <input type="text" class="form-control {{ $errors->has('code') ? ' is-invalid' : '' }}" name="code" readonly
+            id="code" value="{{ isset($code)?$code:old('code', $model->code) }}" placeholder="" maxlength="20" minlength="6">
         @if ($errors->has(' code'))
             <div class="invalid-feedback">
                 <strong>{{ $errors->first('code') }}</strong>

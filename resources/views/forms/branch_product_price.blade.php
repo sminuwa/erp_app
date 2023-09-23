@@ -1,19 +1,14 @@
-<form action="{{ isset($route) ? $route : route('store_product_prices.store') }}" method="POST">
+<form action="{{ isset($route) ? $route : route('branch_product_prices.store') }}" method="POST">
     {{ csrf_field() }}
     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
     <div class="form-group">
-        <label for="store_id">Branch</label>
+        <label for="branch_id">Branch</label>
         <select type="number" class="form-control {{ $errors->has('branch_id') ? ' is-invalid' : '' }}" name="branch_id"
             id="branch_id" required="required">
-            <option value="">Select...</option>
-            @if ($model->store_id != null)
-                <option value="{{ $model->store->branch_id }}" selected>
-                    {{ $model->store->branch->name }}</option>
-            @endif
             @if (isset($branches))
                 @foreach ($branches as $data)
                     <option value="{{ $data->id }}" {{ $data->id == $model->branch_id ? 'selected' : '' }}>
-                        {{ $data->name }}</option>
+                        {{ $data->code }}-{{ $data->name }}</option>
                 @endforeach
             @endif
         </select>
@@ -24,31 +19,15 @@
         @endif
     </div>
     <div class="form-group">
-        <label for="store_id">Store</label>
-        <select type="number" class="form-control {{ $errors->has('store_id') ? ' is-invalid' : '' }}" name="store_id"
-            id="store_id" required="required">
-            @if ($model->store_id != null)
-                <option value="all">All stores</option>
-                <option value="{{ $model->store_id }}" selected>
-                    {{ $model->store->name }}</option>
-            @endif
-        </select>
-        @if ($errors->has('store_id'))
-            <div class="invalid-feedback">
-                <strong>{{ $errors->first('store_id') }}</strong>
-            </div>
-        @endif
-    </div>
-    <div class="form-group">
         <label for="category_id">Category</label>
-        <select class="form-control {{ $errors->has('category_id') ? ' is-invalid' : '' }}" name="category_id"
+        <select class="form-control select2-single {{ $errors->has('category_id') ? ' is-invalid' : '' }}" name="category_id"
             id="category_id" required="required">
             <option value="">Select...</option>
             @if (isset($categories))
                 @foreach ($categories as $data)
                     <option value="{{ $data->id }}"
                         {{ $data->id == optional($model->product)->category_id ? 'selected' : '' }}>
-                        {{ $data->name }}</option>
+                        {{ $data->code }}-{{ $data->name }}</option>
                 @endforeach
             @endif
         </select>
@@ -60,13 +39,13 @@
     </div>
     <div class="form-group">
         <label for="product_id">Product</label>
-        <select class="form-control {{ $errors->has('product_id') ? ' is-invalid' : '' }}" name="product_id"
+        <select class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}" name="product_id"
             id="product_id" required="required">
             <option value="">Select...</option>
             @if (isset($products))
                 @foreach ($products as $data)
                     <option value="{{ $data->id }}" {{ $data->id == $model->product_id ? 'selected' : '' }}>
-                        {{ $data->name }}</option>
+                        {{ $data->code }}-{{ $data->name }}</option>
                 @endforeach
             @endif
         </select>

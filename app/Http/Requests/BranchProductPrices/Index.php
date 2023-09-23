@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\StoreProductPrices;
+namespace App\Http\Requests\BranchProductPrices;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\StoreProductPrice;
+use App\Models\BranchProductPrice;
 
-class Destroy extends FormRequest 
+class Index extends FormRequest 
 {
 
     /**
@@ -15,7 +15,7 @@ class Destroy extends FormRequest
      */
     public function authorize() 
     {
-        return $this->user()->can('delete.product.price', StoreProductPrice::class);
+        return $this->user()->can('view.product.price', BranchProductPrice::class);
     }
 
     /**

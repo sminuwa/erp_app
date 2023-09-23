@@ -23,7 +23,7 @@ use App\Models\PurchaseProduct;
 use App\Models\Setting;
 use App\Models\Utility;
 use App\Models\StoreProduct;
-use App\Models\StoreProductPrice;
+use App\Models\BranchProductPrice;
 use App\Models\AuditLog;
 use App\Models\User;
 
@@ -127,7 +127,7 @@ class PurchaseController extends Controller
 
                 $selling_price = $product->price + (($product->price * $cart_attributes['selling_price']) / 100);
                 //This will be uncommented later if the logic has changed
-                //$selling_price = optional(StoreProductPrice::find($product->id))->selling_price;
+                //$selling_price = optional(BranchProductPrice::find($product->id))->selling_price;
                 DB::table('purchase_products')->insert([
                     'purchase_id' => $purchase_id,
                     'product_id' => $product->id,
@@ -154,7 +154,7 @@ class PurchaseController extends Controller
                     ]);
                 }
 
-                StoreProductPrice::updateOrCreate(
+                BranchProductPrice::updateOrCreate(
                     ['product_id' => $product->id, 'store_id' => $request->source_store_id],
                     [
                         'cost_price' => $product->price,
@@ -308,7 +308,7 @@ class PurchaseController extends Controller
                     //dd( $cart_attributes);
                     $selling_price = $product->price + (($product->price * $cart_attributes['selling_price']) / 100);
                     //This will be uncommented later if the logic has changed
-                    //$selling_price = optional(StoreProductPrice::find($product->id))->selling_price;
+                    //$selling_price = optional(BranchProductPrice::find($product->id))->selling_price;
                     DB::table('purchase_products')->insert([
                         'purchase_id' => $purchase_id,
                         'product_id' => $product->id,
@@ -324,7 +324,7 @@ class PurchaseController extends Controller
                         'product_id' => $product->id
                     ])->increment('qty_available', $product->quantity);
 
-                    /*StoreProductPrice::updateOrCreate(
+                    /*BranchProductPrice::updateOrCreate(
                     ['store_id' => $request->source_store_id,
                     'product_id' => $product->id, 'selling_price' => $selling_price], ['cost_price' => $product->price, 'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(), 'updated_by' => Auth::id()]

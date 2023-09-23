@@ -37,7 +37,7 @@ class Product extends Model
     }
     public function price()
     {
-        return $this->hasOne(StoreProductPrice::class, 'product_id', 'id');
+        return $this->hasOne(BranchProductPrice::class, 'product_id', 'id');
     }
     public function storeProducts()
     {

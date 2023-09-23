@@ -25,17 +25,18 @@ class PosController extends Controller
         $user_branch = User::userBranchAction();
         $category_id = 0;
         $store_id = 0;
-        $stores = StoreProduct::select('store_products.id', 'products.name','products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name','products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price','unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
+            ->join('branches', 'branches.id', 'stores.branch_id')
             ->join('products', 'products.id', 'store_products.product_id')
-            ->join('store_product_prices', function ($join) {
-                $join->on('store_product_prices.product_id', '=', 'products.id')
-                    ->on('store_product_prices.store_id', '=', 'stores.id');
+            ->join('branch_product_prices', function ($join) {
+                $join->on('branch_product_prices.product_id', '=', 'products.id')
+                    ->on('branch_product_prices.branch_id', '=', 'branches.id');
 
             })
-            ->join('branches', 'branches.id', 'stores.branch_id')
+            
             ->where('stores.branch_id', 'LIKE', $user_branch)
-            ->where('store_product_prices.status', 1);
+            ->where('branch_product_prices.status', 1);
         if ($request->has('category_id') && $request->has('store_id')) {
             $category_id = $request->category_id;
             $store_id = $request->store_id;
@@ -50,7 +51,7 @@ class PosController extends Controller
         $stores = $stores->where('store_products.qty_available', '>', 0)
             ->orderBy('products.name')->orderBy('stores.name')->get();
 
-        $customers = Customer::where('type', 'credit')->where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
+        $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name');
         $cart_products = \Cart::getContent();
         $categories = Category::orderBy('name', 'ASC')->get();
         $store = Store::where('id', 'LIKE', $user_branch)->get();
@@ -58,46 +59,7 @@ class PosController extends Controller
         $receipt_no = $debtor->generateReceiptNo();
         return view('pages.pos.index', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no'));
     }
-    public function wholeSale(Request $request)
-    {
-        if (!strpos(url()->previous(), 'pos')) //Clear the cart after leaving the POS page
-            \Cart::clear();
-        $user_branch = User::userBranchAction();
-        $category_id = 0;
-        $store_id = 0;
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code','stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
-            ->join('stores', 'stores.id', 'store_products.store_id')
-            ->join('products', 'products.id', 'store_products.product_id')
-            ->join('store_product_prices', function ($join) {
-                $join->on('store_product_prices.product_id', '=', 'products.id')
-                    ->on('store_product_prices.store_id', '=', 'stores.id');
-
-            })
-            ->join('branches', 'branches.id', 'stores.branch_id')
-            ->where('stores.branch_id', 'LIKE', $user_branch)
-            ->where('store_product_prices.status', 1);
-        if ($request->has('category_id') && $request->has('store_id')) {
-            $category_id = $request->category_id;
-            $store_id = $request->store_id;
-            if ($request->category_id == 'all')
-                $category_id = '%';
-            if ($request->store_id == 'all')
-                $store_id = '%';
-            $stores = $stores->where('store_products.store_id', 'LIKE', $store_id)
-                ->where('products.category_id', 'LIKE', $category_id);
-        }
-
-        $stores = $stores->where('store_products.qty_available', '>', 0)
-            ->orderBy('products.name')->orderBy('stores.name')->get();
-
-        $customers = Customer::where('type', 'credit')->where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
-        $cart_products = \Cart::getContent();
-        $categories = Category::orderBy('name', 'ASC')->get();
-        $store = Store::where('id', 'LIKE', $user_branch)->get();
-        $debtor = new CustomerController();
-        $receipt_no = $debtor->generateReceiptNo();
-        return view('pages.pos.whole_sale', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no'));
-    }
+   
     //This is no longer used but keep it
     public function edit(Request $request, Order $order)
     {
@@ -108,14 +70,14 @@ class PosController extends Controller
         $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code','stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('products', 'products.id', 'store_products.product_id')
-            ->join('store_product_prices', function ($join) {
-                $join->on('store_product_prices.product_id', '=', 'products.id')
-                    ->on('store_product_prices.store_id', '=', 'stores.id');
+            ->join('branch_product_prices', function ($join) {
+                $join->on('branch_product_prices.product_id', '=', 'products.id')
+                    ->on('branch_product_prices.branch_id', '=', 'branches.id');
 
             })
             ->join('branches', 'branches.id', 'stores.branch_id')
             ->where('stores.branch_id', 'LIKE', $user_branch)
-            ->where('store_product_prices.status', 1);
+            ->where('branch_product_prices.status', 1);
         if ($request->has('category_id') && $request->has('store_id')) {
             $category_id = $request->category_id;
             $store_id = $request->store_id;
@@ -161,15 +123,15 @@ class PosController extends Controller
         $store = StoreProduct::select('store_products.id', 'products.name', 'products.code','stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('products', 'products.id', 'store_products.product_id')
-            ->join('store_product_prices', function ($join) {
-                $join->on('store_product_prices.product_id', '=', 'products.id')
-                    ->on('store_product_prices.store_id', '=', 'stores.id');
+            ->join('branch_product_prices', function ($join) {
+                $join->on('branch_product_prices.product_id', '=', 'products.id')
+                    ->on('branch_product_prices.branch_id', '=', 'branches.id');
 
             })
             ->join('branches', 'branches.id', 'stores.branch_id')
             ->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('products.barcode', $barcode)
-            ->where('store_product_prices.status', 1)
+            ->where('branch_product_prices.status', 1)
             ->where('store_products.qty_available', '>', 0)
             ->orderBy('products.name')->orderBy('stores.name')->first();
 

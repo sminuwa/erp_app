@@ -65,7 +65,6 @@ class CustomerController extends Controller
 
         return view('pages.customers.create', [
             'model' => new Customer,
-            'code'=>Customer::nextCustomerCode(),
 
         ]);
     } /**

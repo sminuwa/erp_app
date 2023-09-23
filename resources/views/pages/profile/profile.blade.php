@@ -26,7 +26,7 @@
                         <div class="row">
                             <div class="col-sm-2">
                                 @if (Auth::check() && file_exists(public_path() . '/staffpics/' . Auth::user()->photo))
-                                    <img alt="Photo" src="{{ url('staffpics/' . Auth::user()->photo) }}"
+                                    <img alt="Photo" src="{{ url('staffpics/' . Auth::user()->photo_url) }}"
                                         class="rounded-full">
                                 @else
                                     <img alt="Photo" src="{{ asset('staffpics/man.png') }}" style="width: 180px;height:213px;" class="rounded-full">

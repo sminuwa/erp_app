@@ -10,7 +10,7 @@ use App\Http\Controllers\PaymentModeController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\StoreController;
-use App\Http\Controllers\StoreProductPriceController;
+use App\Http\Controllers\BranchProductPriceController;
 use App\Http\Controllers\MisController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\TransferProductController;
@@ -164,15 +164,15 @@ Route::group(['prefix' => 'settings', 'middleware' => 'auth'], function () {
                 }
                 );
                 Route::group(['prefix' => 'prices'], function () {
-                    Route::get('/index', [StoreProductPriceController::class , 'index'])->name('store_product_prices.index');
-                    Route::get('/create', [StoreProductPriceController::class , 'create'])->name('store_product_prices.create');
-                    Route::get('/show/{storeproductprice}', [StoreProductPriceController::class , 'show'])->name('store_product_prices.show');
-                    Route::post('/store', [StoreProductPriceController::class , 'store'])->name('store_product_prices.store');
-                    Route::get('/edit/{storeproductprice}', [StoreProductPriceController::class , 'edit'])->name('store_product_prices.edit');
-                    Route::put('/update/{storeproductprice}', [StoreProductPriceController::class , 'update'])->name('store_product_prices.update');
-                    Route::delete('/delete/{storeproductprice}', [StoreProductPriceController::class , 'destroy'])->name('store_product_prices.destroy');
-                    Route::get('/update/cost_price', [StoreProductPriceController::class , 'editCostPrice'])->name('store_product_cost_prices.edit');
-                    Route::post('/update/cost_price/store', [StoreProductPriceController::class , 'updateCostPrice'])->name('store_product_cost_prices.store');
+                    Route::get('/index', [BranchProductPriceController::class , 'index'])->name('branch_product_prices.index');
+                    Route::get('/create', [BranchProductPriceController::class , 'create'])->name('branch_product_prices.create');
+                    Route::get('/show/{BranchProductPrice}', [BranchProductPriceController::class , 'show'])->name('branch_product_prices.show');
+                    Route::post('/store', [BranchProductPriceController::class , 'store'])->name('branch_product_prices.store');
+                    Route::get('/edit/{BranchProductPrice}', [BranchProductPriceController::class , 'edit'])->name('branch_product_prices.edit');
+                    Route::put('/update/{BranchProductPrice}', [BranchProductPriceController::class , 'update'])->name('branch_product_prices.update');
+                    Route::delete('/delete/{BranchProductPrice}', [BranchProductPriceController::class , 'destroy'])->name('branch_product_prices.destroy');
+                    Route::get('/update/cost_price', [BranchProductPriceController::class , 'editCostPrice'])->name('store_product_cost_prices.edit');
+                    Route::post('/update/cost_price/store', [BranchProductPriceController::class , 'updateCostPrice'])->name('store_product_cost_prices.store');
                     Route::get('/cost/price', [MisController::class , 'getCostPrice'])->name('ajax.load.product.price'); //This is cost price
                     Route::get('/cost/selling_price', [MisController::class , 'getSellingPrice'])->name('ajax.load.product.selling_price');
                     Route::get('/selling/price', [MisController::class , 'getLastTwoSellingPrice'])->name('ajax.load.selling.price');
@@ -189,8 +189,8 @@ Route::group(['prefix' => 'settings', 'middleware' => 'auth'], function () {
                 }
                 );
 
-                Route::get('/create/stock/balance', [StoreProductPriceController::class , 'openingBalance'])->name('stock_opening_balance.create');
-                Route::post('/store/stock/balance', [StoreProductPriceController::class , 'storeStockBalance'])->name('stock_opening_balance.store');
+                Route::get('/create/stock/balance', [BranchProductPriceController::class , 'openingBalance'])->name('stock_opening_balance.create');
+                Route::post('/store/stock/balance', [BranchProductPriceController::class , 'storeStockBalance'])->name('stock_opening_balance.store');
             }
             );
 
@@ -799,4 +799,5 @@ Route::middleware('auth')->group(function () {
 
 
     Route::get('generate/product_code',[MisController::class,'generateProductCode'])->name('generate.productCode');
+    Route::get('generate/customer_code',[MisController::class,'nextCustomerCode'])->name('generate.customerCode');
 });

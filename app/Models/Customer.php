@@ -45,9 +45,4 @@ class Customer extends Model
     {
         return $this->belongsTo(Branch::class, 'branch_id');
     }
-    public static function nextCustomerCode()
-    {
-        $query = Customer::orderBy('code', 'DESC')->first();
-        return $query == null ? 1 : $query->first()->code + 1;
-    }
 }

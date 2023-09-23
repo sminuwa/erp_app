@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Requests\StoreProductPrices;
+namespace App\Http\Requests\BranchProductPrices;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\StoreProductPrice;
-class Update extends FormRequest 
+use App\Models\BranchProductPrice;
+
+class Create extends FormRequest 
 {
 
     /**
@@ -14,7 +15,7 @@ class Update extends FormRequest
      */
     public function authorize() 
     {
-        return $this->user()->can('edit.product.price', StoreProductPrice::class);
+        return $this->user()->can('set.product.price', BranchProductPrice::class);
     }
 
     /**
@@ -25,11 +26,7 @@ class Update extends FormRequest
     public function rules() 
     {
         return [
-			'store_id' => 'required',
-			'product_id' => 'required|numeric',
-			'selling_price' => 'required|numeric',
-			'status' => 'required',
-			'updated_by' => 'required|numeric',
+
         ];
     }
 

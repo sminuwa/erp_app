@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('breadcrumb')
 <li class="breadcrumb-item">
-    <a href="{{route('store_product_prices.index')}}">store_product_prices</a>
+    <a href="{{route('branch_product_prices.index')}}">branch_product_prices</a>
 </li>
 <li class="breadcrumb-item">
     {{$record->id}}
@@ -14,14 +14,14 @@
 @section('tools')
 <div class="btn-group">
     
-<a class="btn btn-secondary" href="{{route('store_product_prices.create')}}">
+<a class="btn btn-secondary" href="{{route('branch_product_prices.create')}}">
     <span class="fa fa-plus"></span>
 </a>
-<a class="btn btn-secondary" href="{{route('store_product_prices.edit',$record->id)}}">
+<a class="btn btn-secondary" href="{{route('branch_product_prices.edit',$record->id)}}">
     <span class="fa fa-pencil"></span>
 </a>
 <form onsubmit="return confirm('Are you sure you want to delete?')"
-      action="{{route('store_product_prices.destroy',$record->id)}}"
+      action="{{route('branch_product_prices.destroy',$record->id)}}"
       method="post"
       style="display: inline">
     {{csrf_field()}}

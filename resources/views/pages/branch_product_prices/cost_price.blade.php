@@ -28,10 +28,10 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('store_product_prices.create') }}">
+            <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.create') }}">
                 <span class="fa fa-plus-circle"></span>
             </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('store_product_prices.index') }}">
+            <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.index') }}">
                 <span class="fa fa-list"></span>
             </a>
             <div class="container-fluid">

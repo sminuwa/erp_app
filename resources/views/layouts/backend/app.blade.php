@@ -30,7 +30,7 @@
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datepicker/datepicker3.css') }}">
 
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datepicker/jquery.datetimepicker.css') }}">
-
+    <script src="{{ asset('commons/css/custom-style.js') }}"></script>
 
 
     @stack('css')
@@ -74,6 +74,7 @@
     {{--<script src="{{ asset('assets/backend/plugins/datepicker/datepicker-bootstrap.min.js') }}"></script> --}}
     <script src="{{ asset('assets/backend/plugins/datepicker/moment-with-locales.js') }}"></script>
     <script src="{{ asset('assets/backend/plugins/datepicker/jquery.datetimepicker.js') }}"></script>
+    <script src="{{ asset('commons/js/custom-ajax.js') }}"></script>
     <script>
         @if ($errors->any())
             @foreach ($errors->all() as $error)

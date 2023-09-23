@@ -60,12 +60,12 @@
                                 <input type="radio" name="type" value="Walked In" id="type2" class="form-control type" />
                                 &nbsp;&nbsp;Walked In
                             </div>
-
+                            <br>
                             <div class="form-group">
                                 &nbsp;&nbsp;
                                 <label for="customer_id">Customer</label>
                                 <select
-                                    class="form-control select2-single {{ $errors->has('customer_id') ? ' is-invalid' : '' }}"
+                                    class="form-control select2-single ajax-customers {{ $errors->has('customer_id') ? ' is-invalid' : '' }}"
                                     name="customer_id" id="customer_id" required>
                                     {{--<option value="all">All</option>--}}
                                     <option value="">Select...</option>
@@ -150,7 +150,7 @@
                         type: type
                     }
                 }).done(function(data) {
-                    
+
                     $("#load").html(data);
                     $('#example1').DataTable({
                         lengthMenu: [25, 50, 75, 100],

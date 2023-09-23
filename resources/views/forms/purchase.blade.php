@@ -12,16 +12,16 @@
                     <div class="form-group">
                         <label for="category_id">Category</label>
                         <select type="number"
-                            class="form-control {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
+                            class="form-control ajax-categories {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
                             name="category_id" id="category_id" required="required">
-                            <option value="">Select...</option>
+<!--                            <option value="">Select...</option>
                             @if (isset($categories))
                                 @foreach ($categories as $data)
                                     <option value="{{ $data->id }}"
                                         {{ $data->id == old('category_id', optional($model->product)->category_id) ? 'selected' : '' }}>
                                         {{ $data->name }}</option>
                                 @endforeach
-                            @endif
+                            @endif-->
                         </select>
                         @if ($errors->has('category_id'))
                             <div class="invalid-feedback">

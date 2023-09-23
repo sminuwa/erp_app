@@ -11,7 +11,17 @@
             </div>
         @endif
     </div>
-
+    <div class="form-group">
+        <label for="user_code">User Code</label>
+        <input type="text" class="form-control {{ $errors->has('user_code') ? ' is-invalid' : '' }}" name="user_code"
+            id="user_code" value="{{ old('user_code', $model->user_code) }}" placeholder="" maxlength="3"
+            required="required">
+        @if ($errors->has('user_code'))
+            <div class="invalid-feedback">
+                <strong>{{ $errors->first('user_code') }}</strong>
+            </div>
+        @endif
+    </div>
     <div class="form-group">
         <label for="email">Email</label>
         <input type="text" class="form-control {{ $errors->has('email') ? ' is-invalid' : '' }}" name="email"
@@ -47,19 +57,6 @@
             </div>
         @endif
     </div>
-
-    <div class="form-group">
-        <label for="user_code">User Code</label>
-        <input type="text" class="form-control {{ $errors->has('user_code') ? ' is-invalid' : '' }}" name="user_code"
-            id="user_code" value="{{ old('user_code', $model->user_code) }}" placeholder="" maxlength="3"
-            required="required">
-        @if ($errors->has('user_code'))
-            <div class="invalid-feedback">
-                <strong>{{ $errors->first('user_code') }}</strong>
-            </div>
-        @endif
-    </div>
-
     <div class="form-group">
         <label for="branch_id">Branch</label>
         <select class="form-control {{ $errors->has('branch_id') ? ' is-invalid' : '' }}" name="branch_id"

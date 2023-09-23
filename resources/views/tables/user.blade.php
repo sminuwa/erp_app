@@ -1,11 +1,11 @@
 <table class="table table-bordered table-striped" id="record1">
     <thead>
         <tr>
+            <th>Code </th>
             <th>Name </th>
             <th>Email </th>
             <th>Phone </th>
             <th>Gender </th>
-            <th>User Code </th>
             <th>Branch</th>
             <th>Account Status </th>
             <th>&nbsp;</th>
@@ -14,11 +14,12 @@
     <tbody>
         @foreach ($records as $record)
             <tr>
+                <td> {{ $record->user_code }} </td>
                 <td> {{ $record->name }} </td>
                 <td> {{ $record->email }} </td>
                 <td> {{ $record->phone }} </td>
                 <td> {{ $record->gender }} </td>
-                <td> {{ $record->user_code }} </td>
+                
                 <td> {{ optional($record->branch)->name }} </td>
                 <td> {{ $record->status == 1 ? 'Active' : 'Blocked' }} </td>
                 <td>

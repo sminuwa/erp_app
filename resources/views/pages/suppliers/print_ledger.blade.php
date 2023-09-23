@@ -39,7 +39,7 @@
                             <h3>
                                 {{App\Models\User::UserBranchName()->long_name}}
                             </h3>
-                            <h5 style="text-align: center;">{{ strtoupper($supplier->name) }} LEDGER LISTING BETWEEN
+                            <h5 style="text-align: center;">{{ strtoupper($supplier->code) }}-{{ strtoupper($supplier->name) }} LEDGER LISTING BETWEEN
                                 {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                                 AND
                                 {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}<br /> Runining Balance B/d Before this date {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}

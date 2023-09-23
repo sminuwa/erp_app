@@ -159,7 +159,8 @@
             <div style="float:left">
                 <div class="receipt-right">
                     <h5>Payment To</h5>
-                    <p><b>{{ $payment->supplier->name }} </b></p>
+                    <p><b>Code: {{ $payment->supplier->code }} </b></p>
+                    <p><b>Name: {{ $payment->supplier->name }} </b></p>
                     <p><b>Mobile :</b> {{ $payment->supplier->phone }}</p>
                     <p><b>Address :</b> {{ $payment->supplier->address }}</p>
                 </div>

@@ -6,7 +6,7 @@
 </div>
 <table class="table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
-        <h5 style="text-align: center;">{{ strtoupper($supplier->name) }} LEDGER LISTING BETWEEN {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
+        <h5 style="text-align: center;">{{ strtoupper($supplier->code) }}-{{ strtoupper($supplier->name) }} LEDGER LISTING BETWEEN {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
             AND
             {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}<br /> Runining Balance B/d Before this date {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }} was = @if ($balance_b_d < 0)
                 &#8358;({{ number_format(abs($balance_b_d), 2) }})

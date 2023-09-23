@@ -51,7 +51,7 @@
                                         @foreach ($suppliers as $data)
                                             <option value="{{ $data->id }}"
                                                 {{ $data->id == optional($model)->supplier_id ? 'selected' : '' }}>
-                                                {{ $data->name }}</option>
+                                                {{ $data->code }}-{{ $data->name }}</option>
                                         @endforeach
                                     @endif
                                 </select>

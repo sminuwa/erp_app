@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ChartOfAccountController;
+use App\Http\Controllers\GeneralAccountController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\CategoryController;
@@ -91,6 +93,7 @@ Route::group(['prefix' => 'settings', 'middleware' => 'auth'], function () {
             Route::delete('/delete/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
         }
     );
+
     Route::group(
         ['prefix' => 'bank_branches'],
         function () {
@@ -201,9 +204,9 @@ Route::group(['prefix' => 'settings', 'middleware' => 'auth'], function () {
                     Route::get('/cost/price', [MisController::class, 'getCostPrice'])->name('ajax.load.product.price'); //This is cost price
                     Route::get('/cost/selling_price', [MisController::class, 'getSellingPrice'])->name('ajax.load.product.selling_price');
                     Route::get('/selling/price', [MisController::class, 'getLastTwoSellingPrice'])->name('ajax.load.selling.price');
-                    
-                    Route::get('/import', [BranchProductPriceController::class,'importForm'])->name('price.import.form');
-                    Route::post('/import', [BranchProductPriceController::class,'import'])->name('price.import');
+
+                    Route::get('/import', [BranchProductPriceController::class, 'importForm'])->name('price.import.form');
+                    Route::post('/import', [BranchProductPriceController::class, 'import'])->name('price.import');
                 }
             );
             Route::group(
@@ -843,6 +846,36 @@ Route::group(
         Route::get('/us/user/loan/history/print/{collector_id}', [ReportController::class, 'printLoanHistory'])->name('ajax.user.loan.history.report.print');
     }
 );
+Route::group(['prefix' => 'ap_ar_account', 'middleware' => 'auth'], function () {
+    Route::group(
+        ['prefix' => 'chart_of_accounts'],
+        function () {
+            Route::get('/index', [ChartOfAccountController::class, 'index'])->name('chart_of_accounts.index');
+            Route::get('/create', [ChartOfAccountController::class, 'create'])->name('chart_of_accounts.create');
+            Route::post('/store', [ChartOfAccountController::class, 'store'])->name('chart_of_accounts.store');
+            Route::get('/edit/{chartofaccount}', [ChartOfAccountController::class, 'edit'])->name('chart_of_accounts.edit');
+            Route::put('/update/{chartofaccount}', [ChartOfAccountController::class, 'update'])->name('chart_of_accounts.update');
+            Route::delete('/delete/{chartofaccount}', [ChartOfAccountController::class, 'destroy'])->name('chart_of_accounts.destroy');
+
+            Route::get('/import', [ChartOfAccountController::class, 'importForm'])->name('chart_of_accounts.import.form');
+            Route::post('/import', [ChartOfAccountController::class, 'import'])->name('chart_of_accounts.import');
+        }
+    );
+    Route::group(
+        ['prefix' => 'general_accounts'],
+        function () {
+            Route::get('/index', [GeneralAccountController::class, 'index'])->name('general_accounts.index');
+            Route::get('/create', [GeneralAccountController::class, 'create'])->name('general_accounts.create');
+            Route::post('/store', [GeneralAccountController::class, 'store'])->name('general_accounts.store');
+            Route::get('/edit/{generalaccount}', [GeneralAccountController::class, 'edit'])->name('general_accounts.edit');
+            Route::put('/update/{generalaccount}', [GeneralAccountController::class, 'update'])->name('general_accounts.update');
+            Route::delete('/delete/{generalaccount}', [GeneralAccountController::class, 'destroy'])->name('general_accounts.destroy');
+
+            Route::get('/import', [GeneralAccountController::class, 'importForm'])->name('general_accounts.import.form');
+            Route::post('/import', [GeneralAccountController::class, 'import'])->name('general_accounts.import');
+        }
+    );
+});
 Route::middleware('auth')->group(function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::post('customer/search', 'CustomerController@search')->name('customer.search');

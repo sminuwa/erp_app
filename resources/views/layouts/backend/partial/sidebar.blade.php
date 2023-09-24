@@ -190,6 +190,20 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
+                            <a href="{{route('chart_of_accounts.index')}}"
+                               class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>Chart of Accounts</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{route('general_accounts.index')}}"
+                               class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>General Accounts</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="#"
                                class="nav-link ">
                                 <i class="ion-card"></i>

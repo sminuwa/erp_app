@@ -22,7 +22,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\AuditLog;
 use StoreProduct;
 use App\Models\User;
-
+use App\Imports\ProductPriceImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 /**
  * Description of BranchProductPriceController
@@ -180,7 +181,7 @@ class BranchProductPriceController extends Controller
         }
         return redirect()->back();
     } /**
- 
+
 * Delete a  resource from  storage.
 *
 * @param  Destroy  $request
@@ -309,5 +310,50 @@ class BranchProductPriceController extends Controller
             }
         }
         return redirect()->back();
+    }
+    public function importForm()
+    {
+        return view('pages.branch_product_prices.import');
+    }
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx',
+        ]);
+
+        $file = $request->file('file');
+        $import = new ProductPriceImport();
+        $rows = Excel::toCollection($import, $file)->first();
+        $user_branch = User::userBranchAction();
+        $faileds = [];
+        $count = 0;
+        $data = array();
+        try {
+            foreach ($rows as $row) {
+                $product_id = Product::product(trim($row['product_code']))->first() != null ? Product::product(trim($row['product_code']))->first()->id : 0;
+                if ($product_id != 0) {
+                    BranchProductPrice::updateOrInsert(
+                        ['branch_id' => $user_branch, 'product_id' => $product_id],
+                        [
+                            'branch_id' => $user_branch,
+                            'product_id' => $product_id,
+                            'selling_price' => $row['selling_price'],
+                            'cost_price' => $row['cost_price'],
+                            'updated_by' => Auth::id(),
+                            'updated_at' => Carbon::now(),
+                        ]
+                    );
+                    $count++;
+                } else {
+                    $faileds[] = [$row['product_code'], $row['selling_price'], $row['cost_price']];
+                }
+
+            }
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
+        //dd($faileds);
+        session()->flash('app_message', 'File imported and records updated/inserted successfully!');
+        return view('pages.branch_product_prices.import', ['faileds' => $faileds, 'count' => $count]);
     }
 }

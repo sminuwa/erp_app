@@ -58,8 +58,8 @@ class Product extends Model
     {
         return $this->belongsTo(Company::class);
     }
-    public function dosage()
+    public static function product($code)
     {
-        return $this->belongsTo(DosageForm::class,'dosage_form_id','id');
+        return Product::where('code', $code);
     }
 }

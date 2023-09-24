@@ -34,6 +34,9 @@
             <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.index') }}">
                 <span class="fa fa-list"></span>
             </a>
+            <a class="btn btn-secondary btn-sm" href="{{ route('price.import.form') }}">
+                <span class="fa fa-upload"></span>
+            </a>
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>

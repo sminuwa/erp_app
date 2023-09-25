@@ -1,6 +1,6 @@
 @extends('layouts.backend.app')
 
-@section('title', 'Prices')
+@section('title', 'Import Chart of Account')
 
 @push('css')
     <!-- DataTables -->
@@ -57,5 +57,5 @@
 @endsection
 
 @push('js')
-    
+
 @endpush

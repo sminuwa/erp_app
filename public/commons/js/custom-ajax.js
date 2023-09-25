@@ -21,7 +21,7 @@ function ajerks(method, url, cssClass ){
 }
 
 function mySelect2(){
-    $(".select2-single, .select2-multiple").select2({
+    $(".select2-single, .select2-multiple, .select2").select2({
         theme: "bootstrap",
         maximumSelectionSize: 6,
         containerCssClass: ':all:'

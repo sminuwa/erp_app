@@ -70,8 +70,20 @@ class GeneralAccountController extends Controller
 
     public function store(Request $request)
     {
-        return $request;
-        $model = new GeneralAccount;
+        $class = $request->class;
+        $description = $request->description;
+        $is_control = $request->is_control;
+        $status = $request->status;
+        if($record = GeneralAccount::createRecord($class, $description, $is_control, $status)){
+            AuditLog::auditLog(auth()->id(), "Added General account $record->number");
+            session()->flash('app_message', 'General Account create successfully ('.$record->number.')');
+            return redirect()->route('general_accounts.index');
+        }else {
+            session()->flash('app_message', 'Something is wrong while saving GeneralAccount');
+            return back()->with('app_message', 'Something is wrong while saving GeneralAccount');
+        }
+
+        /*$model = new GeneralAccount;
         $model->fill($request->all());
 
         if ($model->save()) {
@@ -81,7 +93,7 @@ class GeneralAccountController extends Controller
         } else {
             session()->flash('app_message', 'Something is wrong while saving GeneralAccount');
         }
-        return redirect()->back();
+        return redirect()->back();*/
     } /**
       * Show the form for editing the specified resource.
       *

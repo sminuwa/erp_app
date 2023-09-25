@@ -240,6 +240,49 @@
                         </li>
                     </ul>
                 </li>
+                <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
+                        <i class="ion-android-list"></i>
+                        <p>
+                            Inventory
+                            <i class="right fa fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="#"
+                               class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>Purchases (GRN)</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#"
+                               class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>Intersite Transfer</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#"
+                               class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>Interstore Transfer</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#"
+                               class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>Stock Adjustment</p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
                 @can('make.daily.sale')
                     <li class="nav-item has-treeview">
                         <a href="{{ route('pos.index') }}" class="nav-link {{ Request::is('pos/*') ? 'active' : '' }}">

@@ -754,7 +754,7 @@ Route::group(
 
 
         //Begin Customer Sales Analysis Report
-    
+
         //Customer Debt Report
         Route::get('/ca/customer/debt', [ReportController::class, 'customerDebtReport'])->name('customer.total.debt.reports');
         Route::get('/ca/customer/debt/load', [ReportController::class, 'loadCustomerDebtReport'])->name('ajax.load.customer.total.debt.reports');
@@ -793,7 +793,7 @@ Route::group(
         Route::get('/ca/customer/ageing-report/print/{from_date}/{to_date}/{customer_id}/', [ReportController::class, 'printAgeingReport'])->name('ajax.customer.ageing.report.print');
 
         //Begin Supplier Ledger Analysis
-        //Supplier Balance Detail Report            
+        //Supplier Balance Detail Report
         Route::get('/sp/supplier/running-balance', [ReportController::class, 'supplierBalanceReport'])->name('supplier.balance.reports');
         Route::get('/sp/supplier/running-balance/load', [ReportController::class, 'loadSupplierBalanceReport'])->name('ajax.load.supplier.balance.reports');
         Route::get('/sp/supplier/running-balance/print/{from_date}/{to_date}/{supplier_id}/', [ReportController::class, 'printSupplierBalanceReport'])->name('ajax.supplier.balance.report.print');
@@ -834,7 +834,7 @@ Route::group(
         Route::get('/activity/load/logs/print/{from_date}/{to_date}/{user_id}', [ReportController::class, 'printLogs'])->name('user.activity.logs.print');
 
         //User Ledger and Loans
-    
+
         //Loan Balances
         Route::get('/us/user/balance', [ReportController::class, 'loanBalance'])->name('user.loan.balance.report');
         Route::get('/us/user/balance/load', [ReportController::class, 'loadLoanBalance'])->name('ajax.load.user.loan.balance.report');
@@ -876,7 +876,21 @@ Route::group(['prefix' => 'ap_ar_account', 'middleware' => 'auth'], function () 
         }
     );
 });
+
 Route::middleware('auth')->group(function () {
+
+    //inventory
+    Route::prefix('inventory')->group(function(){
+
+        Route::prefix('purchases')->group(function(){
+            Route::get('/',[App\Http\Controllers\Inventory\PurchaseController::class, 'index'])->name('inventories.purchases.index');
+            Route::get('/create',[App\Http\Controllers\Inventory\PurchaseController::class, 'create'])->name('inventories.purchases.create');
+            Route::post('/store',[App\Http\Controllers\Inventory\PurchaseController::class, 'store'])->name('inventories.purchases.store');
+        });
+
+    });
+
+
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::post('customer/search', 'CustomerController@search')->name('customer.search');
     Route::get('/notification', [NotificationController::class, 'notify'])->name('notification');

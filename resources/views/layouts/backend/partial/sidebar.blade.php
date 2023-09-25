@@ -250,8 +250,7 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="#"
-                               class="nav-link ">
+                            <a href="{{ route('inventories.purchases.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Purchases (GRN)</p>
                             </a>
@@ -278,6 +277,22 @@
                                class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Stock Adjustment</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#"
+                               class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>Return and Debit</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#"
+                               class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>Debit Note</p>
                             </a>
                         </li>
 

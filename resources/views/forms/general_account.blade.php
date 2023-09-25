@@ -3,7 +3,7 @@
     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
     <div class="form-group">
         <label for="class">Class</label>
-        <select type="text" class="form-control select2-single ajax-chart_of_accounts {{ $errors->has('class') ? ' is-invalid' : '' }}" name="class"
+        <select type="text" class="form-control select2-single ajax-chart-of-accounts {{ $errors->has('class') ? ' is-invalid' : '' }}" name="class"
             id="class" value="{{ old('class', $model->class) }}" placeholder="" maxlength="30" required="required">
 
         </select>

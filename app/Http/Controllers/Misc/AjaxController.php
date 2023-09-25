@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\ChartOfAccount;
 use App\Models\Customer;
+use App\Models\GeneralAccount;
 use App\Models\Product;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
@@ -34,6 +35,11 @@ class AjaxController extends Controller
 
     public function chart_of_accounts(){
         $records = ChartOfAccount::orderBy('class','asc')->get();
-        return view('misc.ajax.chart_of_accounts', compact('records'));
+        return view('misc.ajax.chart-of-accounts', compact('records'));
+    }
+
+    public function general_accounts(){
+        $records = GeneralAccount::orderBy('number','asc')->get();
+        return view('misc.ajax.general-accounts', compact('records'));
     }
 }

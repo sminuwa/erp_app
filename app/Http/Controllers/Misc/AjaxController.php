@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Misc;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Customer;
+use App\Models\Product;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 
@@ -23,5 +24,10 @@ class AjaxController extends Controller
     public function suppliers(){
         $records = Supplier::orderBy('name','asc')->get();
         return view('misc.ajax.suppliers', compact('records'));
+    }
+
+    public function products(){
+        $records = Product::orderBy('name','asc')->get();
+        return view('misc.ajax.products', compact('records'));
     }
 }

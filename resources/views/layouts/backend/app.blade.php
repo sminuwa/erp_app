@@ -117,6 +117,7 @@
             toastr.warning("{{ session('warning') }}");
         @endif
 
+
         $(".select2-single, .select2-multiple").select2({
             theme: "bootstrap",
             maximumSelectionSize: 6,

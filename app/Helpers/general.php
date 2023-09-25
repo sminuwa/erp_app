@@ -27,3 +27,5 @@ function app_name($type = 'full', $style = 'uppercase')
 function app_logo(){
     return asset('assets/backend/img/logo.png');
 }
+
+

@@ -11,18 +11,7 @@
                     @csrf
                     <div class="form-group">
                         <label for="category_id">Category</label>
-                        <select type="number"
-                            class="form-control ajax-categories {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
-                            name="category_id" id="category_id" required="required">
-<!--                            <option value="">Select...</option>
-                            @if (isset($categories))
-                                @foreach ($categories as $data)
-                                    <option value="{{ $data->id }}"
-                                        {{ $data->id == old('category_id', optional($model->product)->category_id) ? 'selected' : '' }}>
-                                        {{ $data->name }}</option>
-                                @endforeach
-                            @endif-->
-                        </select>
+                        <select type="number" class="form-control ajax-categories  {{ $errors->has('category_id') ? ' is-invalid' : '' }}" name="category_id" id="category_id" required="required"></select>
                         @if ($errors->has('category_id'))
                             <div class="invalid-feedback">
                                 <strong>{{ $errors->first('category_id') }}</strong>
@@ -34,7 +23,7 @@
                     <div class="form-group">
                         <label for="product_id">Product Name</label>
                         <select
-                            class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
+                            class="form-control select2-single ajax-products {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
                             name="product_id" id="product_id" required="required">
                             <option value="">Select...</option>
                             @if (isset($products))

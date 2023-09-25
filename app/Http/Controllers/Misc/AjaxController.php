@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Misc;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\ChartOfAccount;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Supplier;
@@ -29,5 +30,10 @@ class AjaxController extends Controller
     public function products(){
         $records = Product::orderBy('name','asc')->get();
         return view('misc.ajax.products', compact('records'));
+    }
+
+    public function chart_of_accounts(){
+        $records = ChartOfAccount::orderBy('class','asc')->get();
+        return view('misc.ajax.chart_of_accounts', compact('records'));
     }
 }

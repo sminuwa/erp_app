@@ -27,6 +27,7 @@ class Store extends FormRequest
     {
         return [
 			'name' => 'required|max:191',
+			'code' => 'required|max:10|unique:suppliers,code',
 			'phone' => 'required|max:191',
 			'code' => 'required|max:4',
 			'email' => 'nullable|max:191',

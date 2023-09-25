@@ -2,15 +2,15 @@
     <div class="card-header">
         <div class="row">
             <div class="col-sm-9">
-                <a href="{{route('store_product_prices.show',$record->id)}}"> {{$record->id}}</a>
+                <a href="{{route('branch_product_prices.show',$record->id)}}"> {{$record->id}}</a>
             </div>
             <div class="col-sm-3 text-right">
                 <div class="btn-group">
-                    <a class="btn btn-secondary" href="{{route('store_product_prices.edit',$record->id)}}">
+                    <a class="btn btn-secondary" href="{{route('branch_product_prices.edit',$record->id)}}">
     <span class="fa fa-pencil"></span>
 </a>
                     <form onsubmit="return confirm('Are you sure you want to delete?')"
-      action="{{route('store_product_prices.destroy',$record->id)}}"
+      action="{{route('branch_product_prices.destroy',$record->id)}}"
       method="post"
       style="display: inline">
     {{csrf_field()}}

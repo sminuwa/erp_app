@@ -65,6 +65,19 @@
                     $("#bank_branch_id").html("<option value=''>--select--</option>" + msg);
                 });
             });
+
+            $(document).on("change", "#account_type", function(event) {
+                $("#code").val("Loading...");
+                $.ajax({
+                    url: "{{ route('generate.customerCode') }}",
+                    type: 'GET',
+                    data: {
+                        account_type: $("#account_type").val()
+                    }
+                }).done(function(msg) {
+                    $("#code").val(msg);
+                });
+            });
         });
     </script>
 @endpush

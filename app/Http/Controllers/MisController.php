@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Branch;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Category;
@@ -15,9 +17,10 @@ use App\Models\SupplierLedger;
 use Carbon\Carbon;
 use App\Models\LoanCollector;
 use App\Models\Loan;
-use App\Models\StoreProductPrice;
+use App\Models\BranchProductPrice;
 use GuzzleHttp\Psr7\Response;
 use App\Models\User;
+
 class MisController extends Controller
 {
     public function loadproducts(Request $request)
@@ -43,7 +46,7 @@ class MisController extends Controller
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->where('stores.branch_id', 'LIKE', User::userBranchAction())
             ->where('category_id', 'like', $request->query->get('category_id'))
-            ->where('store_products.store_id', $request->query->get('store_id'))
+            ->where('stores.branch_id', $request->query->get('branch_id'))
             ->where('qty_available', '>', 0)
             ->orderBy('name', 'asc')
             ->get();
@@ -81,8 +84,7 @@ class MisController extends Controller
         if ($request->payment_mode != "Cash") {
             $types = $types->where('account_type', 'like', '%')->where('account_type', '<>', 'Cash')
                 ->orderBy('account_no', 'asc')->get();
-        }
-        else if ($request->payment_mode == "Cash") {
+        } else if ($request->payment_mode == "Cash") {
             $types = $types->where('account_type', '=', 'Cash')
                 ->orderBy('account_no', 'asc')->get();
         }
@@ -102,7 +104,7 @@ class MisController extends Controller
             ->select('products.name', 'stores.name as store', 'store_products.qty_available', 'selling_price', 'cost_price', 'store_products.id')
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
-            ->join('store_product_prices', 'store_product_prices.id', '=', 'products.id')
+            ->join('branch_product_prices', 'branch_product_prices.id', '=', 'products.id')
             ->where('store_products.qty_available', '>', 0)
             ->where('stores.branch_id', 'LIKE', User::userBranchAction())
             ->where('products.category_id', '=', $categor_id)->get();
@@ -195,7 +197,7 @@ class MisController extends Controller
             ->where('purchase_products.product_id', $product_id)
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->orderBy('purchase_products.updated_at', 'DESC')->first();
-        $old_price = StoreProductPrice::where(['store_id' => $store_id, 'product_id' => $product_id, 'status' => 1])->first();
+        $old_price = BranchProductPrice::where(['store_id' => $store_id, 'product_id' => $product_id, 'status' => 1])->first();
         return $price != null ? $price->unit_price : ($old_price != null ? $old_price->cost_price : 0);
     }
     public function loadStoreProductQuantity(Request $request)
@@ -277,8 +279,8 @@ class MisController extends Controller
     public function getSellingPrice(Request $request)
     {
         $product_id = $request->product_id;
-        $store_id = $request->store_id;
-        $price = StoreProductPrice::select('selling_price')->where('store_id', $store_id)
+        $branch_id = $request->branch_id;
+        $price = BranchProductPrice::select('selling_price')->where('branch_id', $branch_id)
             ->where('product_id', $product_id)
             ->orderBy('updated_at', 'DESC')->first();
         return $price != null ? $price->selling_price : 0;
@@ -286,10 +288,10 @@ class MisController extends Controller
     public function getLastTwoSellingPrice(Request $request)
     {
         $product_id = $request->product_id;
-        $store_id = $request->store_id;
+        $branch_id = $request->branch_id;
         $oldprice = 0;
         $newprice = 0;
-        $prices = StoreProductPrice::select('selling_price')->where('store_id', $store_id)
+        $prices = BranchProductPrice::select('selling_price')->where('branch_id', $branch_id)
             ->where('product_id', $product_id)
             ->orderBy('updated_at', 'ASC')->take(2)->get();
         $count = 1;
@@ -302,5 +304,22 @@ class MisController extends Controller
         }
         //return \json_encode($prices);
         return $prices != null ? $oldprice . "," . $newprice : "xx," . "yy";
+    }
+    public function generateProductCode(Request $request)
+    {
+        $category = Category::find($request->category_id);
+        $length = strlen($category->code);
+        $current = DB::table('products')->select(DB::raw("MAX(SUBSTR(code,$length+1)) as max"))->where('category_id', $category->id)->first();
+        return $category->code . str_pad(($current->max + 1), 4, "0", STR_PAD_LEFT);
+    }
+    public static function nextCustomerCode(Request $request)
+    {
+        $account_type = $request->account_type;
+        $user_branch = User::userBranchAction();
+        $branch_code = Branch::find($user_branch)->code;
+        $prefix_code = $branch_code . $account_type;
+        $length = strlen($prefix_code);
+        $query = DB::table('customers')->select(DB::raw("MAX(SUBSTR(code,$length+1)) as max"))->where('branch_id', $user_branch)->first();
+        return $query == null ? $prefix_code . str_pad(1, 6, '0', STR_PAD_LEFT) : $prefix_code . str_pad($query->max + 1, 6, '0', STR_PAD_LEFT);
     }
 }

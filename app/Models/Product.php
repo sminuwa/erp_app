@@ -17,9 +17,8 @@ class Product extends Model
     /**
      * Mass assignable columns
      */
-    protected $fillable = ['name', 'generic_name', 
-    'strength', 'company_id', 
-    'dosage_form_id', 'category_id',
+    protected $fillable = ['name', 'code', 
+    'category_id',
      'barcode','status'];
 
     /**
@@ -38,7 +37,7 @@ class Product extends Model
     }
     public function price()
     {
-        return $this->hasOne(StoreProductPrice::class, 'product_id', 'id');
+        return $this->hasOne(BranchProductPrice::class, 'product_id', 'id');
     }
     public function storeProducts()
     {
@@ -59,8 +58,8 @@ class Product extends Model
     {
         return $this->belongsTo(Company::class);
     }
-    public function dosage()
+    public static function product($code)
     {
-        return $this->belongsTo(DosageForm::class,'dosage_form_id','id');
+        return Product::where('code', $code);
     }
 }

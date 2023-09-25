@@ -60,7 +60,7 @@
                                     name="supplier_id" id="supplier_id" required>
                                     <option value="">Select...</option>
                                     @foreach ($suppliers as $data)
-                                        <option value="{{ $data->id }}">{{ $data->name }}-{{ $data->phone }}
+                                        <option value="{{ $data->id }}">{{ $data->code }}-{{ $data->name }}
                                         </option>
                                     @endforeach
                                 </select>

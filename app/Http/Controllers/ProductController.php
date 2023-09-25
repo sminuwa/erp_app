@@ -16,7 +16,7 @@ use App\Http\Requests\Products\Update;
 use App\Http\Requests\Products\Destroy;
 use GrahamCampbell\ResultType\Success;
 use App\Models\Category;
-use App\Models\StoreProductPrice;
+use App\Models\BranchProductPrice;
 use Illuminate\Support\Facades\Auth;
 use App\Models\AuditLog;
 

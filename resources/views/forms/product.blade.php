@@ -2,6 +2,24 @@
     {{ csrf_field() }}
     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
     <div class="form-group">
+        <label for="category_id">Category</label>
+        <select type="number" class="form-control select2-single {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
+            name="category_id" id="category_id" required="required">
+            <option value="">Select...</option>
+            @if (isset($categories))
+                @foreach ($categories as $data)
+                    <option value="{{ $data->id }}" {{ $data->id == $model->category_id ? 'selected' : '' }}>
+                        {{ $data->code }}-{{ $data->name }}</option>
+                @endforeach
+            @endif
+        </select>
+        @if ($errors->has('category_id'))
+            <div class="invalid-feedback">
+                <strong>{{ $errors->first('category_id') }}</strong>
+            </div>
+        @endif
+    </div>
+    <div class="form-group">
         <label for="name">Name</label>
         <input type="text" class="form-control {{ $errors->has('name') ? ' is-invalid' : '' }}" name="name"
             id="name" value="{{ old('name', $model->name) }}" placeholder="" maxlength="191" required="required">
@@ -13,29 +31,11 @@
     </div>
     <div class="form-group">
         <label for="code">Code</label>
-        <input type="text" class="form-control {{ $errors->has('code') ? ' is-invalid' : '' }}" name="code"
-            id="code" value="{{ old('code', $model->code) }}" placeholder="" maxlength="191" required="required">
+        <input type="text" class="form-control {{ $errors->has('code') ? ' is-invalid' : '' }}" name="code" readonly
+            id="code" value="{{ old('code', $model->code) }}" placeholder="" maxlength="2o" required="required">
         @if ($errors->has('code'))
             <div class="invalid-feedback">
                 <strong>{{ $errors->first('code') }}</strong>
-            </div>
-        @endif
-    </div>
-    <div class="form-group">
-        <label for="category_id">Category</label>
-        <select type="number" class="form-control {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
-            name="category_id" id="category_id" required="required">
-            <option value="">Select...</option>
-            @if (isset($categories))
-                @foreach ($categories as $data)
-                    <option value="{{ $data->id }}" {{ $data->id == $model->category_id ? 'selected' : '' }}>
-                        {{ $data->name }}</option>
-                @endforeach
-            @endif
-        </select>
-        @if ($errors->has('category_id'))
-            <div class="invalid-feedback">
-                <strong>{{ $errors->first('category_id') }}</strong>
             </div>
         @endif
     </div>

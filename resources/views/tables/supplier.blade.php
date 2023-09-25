@@ -2,6 +2,7 @@
     <thead>
         <tr>
             <th>SN</th>
+            <th>Code </th>
             <th>Name </th>
             <th>Branch </th>
             <th>Phone </th>
@@ -19,6 +20,7 @@
         @foreach ($records as $record)
             <tr>
                 <td> {{ $loop->index + 1 }} </td>
+                <td> {{ $record->code }} </td>
                 <td> {{ $record->name }} </td>
                 <td> {{ $record->branch?->name }} </td>
                 <td> {{ $record->phone }} </td>

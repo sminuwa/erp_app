@@ -40,7 +40,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">POS</h3>
-                                @can('view.sale.products')
+                                {{-- @can('view.sale.products')
                                     <form action="{{ route('pos.index') }}" method="get">
                                         @csrf
                                         Product Category
@@ -64,7 +64,7 @@
                                         <input type="submit" name="btnLoad" id="btnLoad" value="Load"
                                             class="btn btn-sm btn-secondary" />
                                     </form>
-                                @endcan
+                                @endcan --}}
                                 @can('make.daily.sale')
                                     <input type="text" id="barcode" class="form-control" name="barcode"
                                         placeholder="Scan barcode">
@@ -73,22 +73,27 @@
                             <!-- /.card-header -->
                             @can('view.sale.products')
                                 <div class="card-body table-responsive" id="load">
-                                    <table id="example1" class="table table-bordered table-striped text-left">
+                                    <table id="example1" class="table table-bordered table-striped text-left"
+                                        style="font-size: 12px;">
                                         <thead>
-                                            <tr style="font-size: 14px;">
+                                            <tr>
                                                 <th>Store</th>
-                                                <th>Item Description</th>
-                                                <th>QTY Avail.</th>
-                                                <th>Price</th>
+                                                <th>Code</th>
+                                                <th>Item</th>
+                                                <th>Unit</th>
+                                                <th>QTY</th>
+                                                {{-- <th>Price</th> --}}
                                                 <th>Add To Cart</th>
                                             </tr>
                                         </thead>
                                         <tfoot>
-                                            <tr style="font-size: 14px;">
+                                            <tr>
                                                 <th>Store</th>
+                                                <th>Code</th>
                                                 <th>Name</th>
-                                                <th>QTY Avail.</th>
-                                                <th>Price</th>
+                                                <th>Unit</th>
+                                                <th>QTY</th>
+                                                {{-- <th>Price</th> --}}
                                                 <th>Add To Cart</th>
                                             </tr>
                                         </tfoot>
@@ -100,6 +105,7 @@
                                                         @csrf
                                                         <input type="hidden" name="id" value="{{ $store->id }}">
                                                         <input type="hidden" name="name" value="{{ $store->name }}">
+                                                        <input type="hidden" name="store" value="{{ $store->store }}">
                                                         <input type="hidden" name="qty" value="1">
                                                         <input type="hidden" name="selling_price"
                                                             value="{{ $store->selling_price }}">
@@ -111,11 +117,13 @@
                                                             value="{{ $store->cost_price }}">
 
                                                         <td>{{ ucwords($store->store) }}</td>
-                                                        <td>{{ $store->code }}-{{ $store->name }}</td>
+                                                        <td>{{ $store->code }}</td>
+                                                        <td>{{ $store->name }}</td>
+                                                        <td>{{ $store->unit }}</td>
                                                         <td align="center">{{ $store->qty_available }}</td>
-                                                        <td align="right">
+                                                        {{-- <td align="right">
                                                             {{ number_format($store->selling_price, 2) }}
-                                                        </td>
+                                                        </td> --}}
                                                         @if ($store->qty_available > 0 && $store->selling_price > 0)
                                                             <td align="center">
                                                                 <button type="submit" class="btn btn-sm btn-success px-2">
@@ -154,7 +162,7 @@
                                                 <a href="javascript:void(0)" data-toggle="modal"
                                                     data-target="#debtor_payment_form"
                                                     class="btn btn-sm btn-secondary float-md-right"
-                                                    style="margin-left: 2px;">Debtor Payment </a>
+                                                    style="margin-left: 2px;">Payment </a>
                                             @endcan
                                             @can('view.customer.ledger')
                                                 <a href="javascript:void(0)" data-toggle="modal"
@@ -163,8 +171,7 @@
                                                     style="margin-left: 2px;">Customer Ledger </a>
                                             @endcan
                                             @can('increase.customer.credit.limit')
-                                                <a href="javascript:void(0)" data-toggle="modal"
-                                                    data-target="#credit_limitform"
+                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#credit_limitform"
                                                     class="btn btn-sm btn-success float-md-right"
                                                     style="margin-left: 2px;">Increase Limit </a>
                                             @endcan
@@ -190,40 +197,58 @@
                                             value="{{ date('Y-m-d') }}" />
                                     @endhasanyrole
                                     <div class="form-group">
-                                        <label>Sales Mode</label>
-                                        <select name="sale_mode" id="sale_mode" class="form-control" required>
+                                        <label>Customer Type</label>
+                                        <select name="account_type" id="account_type" class="form-control" required>
                                             <option value="" disabled selected>Select...</option>
-                                            <option value="Cash">Cash Sales</option>
-                                            <option value="Credit">Credit Sales</option>
+                                            <option value="Retail">Retail</option>
+                                            <option value="Wholesale">WholeSale</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
                                         <label>Customer</label>
-                                        <div class="form-group" id="walk_customer"
-                                            style="border: 1px solid rgba(64, 44, 45, 0.4)">
-                                            <input type="text" class="form-control" name="customer" id="customer"
-                                                placeholder="Customer name" />
-                                            <input type="text" class="form-control" name="phone" id="phone"
-                                                placeholder="Phone number" />
-                                            <input type="text" class="form-control" name="address" id="address"
-                                                placeholder="Address" />
-                                        </div>
-                                        <div class="form-group" id="credit_customer_div">
-                                            <select name="customer_id" id="credit_customer"
+                                        @php
+                                            $wholer_customers = clone $customers;
+                                        @endphp
+                                        <div class="form-group" id="wholesale_customer_div">
+                                            <select name="customer_id" id="wholesale_customer"
                                                 class="form-control ct select2-single">
                                                 <option value="">Select...</option>
-                                                @foreach ($customers as $customer)
+                                                @foreach ($wholer_customers->where('type', 'Wholesale')->get() as $customer)
                                                     <option value="{{ old('customer_id', $customer->id) }}"
-                                                        {{ old('customer_id', $customer->id) == $customer->id ? 'selected' : '' }}>
+                                                        {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
                                                         {{ $customer->code }}-{{ $customer->name }}</option>
                                                 @endforeach
-                                            </select>
+                                            </select><br/>
                                             <div class="form-group" id="display_due_date"
                                                 style="border: 1px solid rgba(64, 44, 45, 0.4)">
 
                                                 <input type="text" class="form-control datepicker" name="due_date"
                                                     id="due_date" placeholder="Due Date" value="{{ old('due_date') }}"
                                                     autocomplete="off" />
+                                            </div>
+                                            <div class="form-group">
+                                                <span class="text text-danger ion-android-alert"
+                                                    id="credit_balance"></span>
+                                            </div>
+
+                                        </div>
+                                        @php
+                                            $retail_customers = clone $customers;
+                                        @endphp
+                                        <div class="form-group" id="retail_customer_div">
+                                            <select name="customer_id" id="retail_customer"
+                                                class="form-control ct select2-single">
+                                                <option value="">Select...</option>
+                                                @foreach ($retail_customers->where('type', 'Retail')->get() as $customer)
+                                                    <option value="{{ old('customer_id', $customer->id) }}"
+                                                        {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
+                                                        {{ $customer->code }}-{{ $customer->name }}</option>
+                                                @endforeach
+                                            </select><br/>
+                                            <div class="form-group" id="ratail_customer"
+                                                style="border: 1px solid rgba(64, 44, 45, 0.4)">
+                                                <input type="text" class="form-control" name="ref"
+                                                    id="refno" placeholder="Reference" />
                                             </div>
                                             <div class="form-group">
                                                 <span class="text text-danger ion-android-alert"
@@ -253,10 +278,12 @@
                                         No Product Added
                                     </div>
                                 @else
-                                    <table class="table table-bordered table-striped text-center">
+                                    <table class="table table-bordered table-striped text-center"
+                                        style="font-size: 12px;">
                                         <thead>
-                                            <tr style="font-size: 14px;">
-                                                <th>S.N</th>
+                                            <tr>
+                                                {{-- <th>S.N</th> --}}
+                                                <th>Store</th>
                                                 <th style="width:30%">Item Description</th>
                                                 <th>Price</th>
                                                 <th>Qty</th>
@@ -268,7 +295,8 @@
                                         <tbody>
                                             @foreach ($cart_products as $product)
                                                 <tr>
-                                                    <td>{{ $loop->iteration }}</td>
+                                                    {{-- <td>{{ $loop->iteration }}</td> --}}
+                                                    <td class="text-left">{{ $product->attributes['store'] }}</td>
                                                     <td class="text-left">{{ $product->name }}</td>
 
                                                     <form action="{{ route('cart.update') }}" method="post"
@@ -346,11 +374,11 @@
                                     </table>
                                 @endif
 
-                                <div class="alert alert-info">
-                                    {{-- <p>Quantity : {{ Cart::getTotalQuantity() }}</p> --}}
+                                {{-- <div class="alert alert-info">
+                                    <p>Quantity : {{ Cart::getTotalQuantity() }}</p>
                                     <p>Sub Total : &#8358; <span
                                             id="subtotal">{{ number_format(Cart::getSubTotal(), 2) }}</span></p>
-                                </div>
+                                </div> --}}
                                 <div class="alert alert-success">
                                     Total : &#8358; <span id="total">{{ number_format(Cart::getTotal()) }}</span>
                                 </div>
@@ -493,10 +521,12 @@
                             &nbsp;&nbsp;
                             <label for="customer_id">Customer</label>
                             <select class="form-control select2-single" name="customer_id" id="customer_id" required>
-                                {{-- <option value="all">All</option> --}}
+                                @php
+                                    $customers = clone $customers;
+                                @endphp
                                 <option value="">Select...</option>
-                                @foreach (App\Models\Customer::where('type', 'credit')->where('branch_id', 'LIKE', App\Models\User::userBranchAction())->get() as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name }}-{{ $data->phone }}
+                                @foreach ($customers->where('branch_id', 'LIKE', App\Models\User::userBranchAction())->get() as $data)
+                                    <option value="{{ $data->id }}">{{ $data->code }}-{{ $data->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -534,14 +564,17 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="customer_id2">Customer</label>
+                                    @php
+                                    $customers = clone $customers;
+                                @endphp
                                     <select
                                         class="form-control select2-single {{ $errors->has('customer_id2') ? ' is-invalid' : '' }}"
                                         name="customer_id2" id="customer_id2" required="required">
                                         <option value="">Select...</option>
                                         @if (isset($customers))
-                                            @foreach ($customers as $data)
+                                            @foreach ($customers->where('branch_id', 'LIKE', App\Models\User::userBranchAction())->get() as $data)
                                                 <option value="{{ $data->id }}">
-                                                    {{ $data->name }}</option>
+                                                    {{ $data->code }}-{{ $data->name }}</option>
                                             @endforeach
                                         @endif
                                     </select>
@@ -699,19 +732,22 @@
     <script>
         $(function() {
             $("#example1").DataTable();
-            $('#credit_customer_div').hide();
-            $('#walk_customer').hide();
-            $('#sale_mode').on("change", function() {
-                if ($(this).val() == "Credit" || $(this).val() == "Cash/Credit") {
-                    $('#walk_customer').hide();
-                    $('#display_due_date').show();
-                    $('#credit_customer_div').show();
+            $('#retail_customer_div').hide();
+            $('#wholesale_customer_div').hide();
+            $('#ref_customer').hide();
+            $('#account_type').on("change", function() {
+                if ($(this).val() == "Retail" || $(this).val() == "R") {
+                    $('#ref_customer').show();
+                    // $('#display_due_date').hide();
+                    $('#retail_customer_div').show();
+                    $('#wholesale_customer_div').hide();
                 }
-                if ($(this).val() == "Cash") {
-                    $('#walk_customer').show();
-                    $('#display_due_date').val("");
-                    $('#display_due_date').hide();
-                    $('#credit_customer_div').hide();
+                if ($(this).val() == "Wholesale") {
+                    $('#ref_customer').hide();
+                    // $('#display_due_date').val("");
+                    // $('#display_due_date').hide();
+                    $('#wholesale_customer_div').show();
+                    $('#retail_customer_div').hide();
                 }
             });
 

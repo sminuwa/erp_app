@@ -29,7 +29,7 @@ class Update extends FormRequest
 			'name' => "required|max:191|unique:products,name,{$this->product->id}",
 			'code' => 'required|max:191',
 			'category_id' => 'required|numeric|exists:categories,id',
-            'barcode' => 'required|max:191|unique:products,barcode,{$this->product->id}',
+            'barcode' => "required|max:191|unique:products,barcode,{$this->product->id}",
 			'status' => 'required',
         ];
     }

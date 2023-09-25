@@ -24,7 +24,7 @@ use App\Models\Purchase;
 use App\Models\PurchaseProduct;
 use App\Models\StoreProduct;
 use App\Models\StockAdjustment;
-use StoreProductPrice;
+use BranchProductPrice;
 use App\Models\OrderDetail;
 use App\Models\StockCard;
 use App\Models\Customer;
@@ -468,13 +468,12 @@ class ReportController extends Controller
             ->select('products.name', 'stores.name as store', 'store_products.qty_available', 'selling_price', 'cost_price', 'store_products.id')
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
-            ->join('store_product_prices', 'store_product_prices.product_id', '=', 'products.id')
+            ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
             ->where('store_products.qty_available', '>', 0)
             ->where('products.category_id', 'LIKE', $categor_id)
             ->where('store_products.product_id', 'LIKE', $product_id)
             ->where('store_products.store_id', 'LIKE', $store_id)
-            ->where('store_product_prices.store_id', 'LIKE', $store_id)
-            ->where('store_product_prices.product_id', 'LIKE', $product_id)
+            ->where('branch_product_prices.product_id', 'LIKE', $product_id)
             ->where('stores.branch_id', 'LIKE', User::userBranchAction())
             ->orderBy('products.name')
             ->get();
@@ -498,13 +497,13 @@ class ReportController extends Controller
             ->select('products.name', 'stores.name as store', 'store_products.qty_available', 'selling_price', 'cost_price', 'store_products.id')
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
-            ->join('store_product_prices', 'store_product_prices.product_id', '=', 'products.id')
+            ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
             ->where('store_products.qty_available', '>', 0)
             ->where('products.category_id', 'LIKE', $categor_id)
             ->where('store_products.product_id', 'LIKE', $product_id)
             ->where('store_products.store_id', 'LIKE', $store_id)
-            ->where('store_product_prices.store_id', 'LIKE', $store_id)
-            ->where('store_product_prices.product_id', 'LIKE', $product_id)
+            ->where('store_products.store_id', 'LIKE', $store_id)
+            ->where('branch_product_prices.product_id', 'LIKE', $product_id)
             ->where('stores.branch_id', 'LIKE', User::userBranchAction())
             ->orderBy('products.name')
             ->get();
@@ -667,14 +666,13 @@ class ReportController extends Controller
             ->select('products.name', 'stores.name as store', 'store_products.qty_available', 'selling_price', 'cost_price', 'store_products.id', 'categories.name AS category')
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
-            ->join('store_product_prices', 'store_product_prices.product_id', '=', 'products.id')
+            ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
             ->join('categories', 'categories.id', 'products.category_id')
             ->where('store_products.qty_available', '>', 0)
             ->where('products.category_id', 'LIKE', $category_id)
             ->where('store_products.product_id', 'LIKE', $product_id)
             ->where('store_products.store_id', 'LIKE', $store_id)
-            ->where('store_product_prices.store_id', 'LIKE', $store_id)
-            ->where('store_product_prices.product_id', 'LIKE', $product_id)
+            ->where('branch_product_prices.product_id', 'LIKE', $product_id)
             ->where('stores.branch_id', 'LIKE', User::userBranchAction())
             ->get();
         if ($category_id == "%")
@@ -704,14 +702,14 @@ class ReportController extends Controller
             ->select('products.name', 'stores.name as store', 'store_products.qty_available', 'selling_price', 'cost_price', 'store_products.id', 'categories.name AS category')
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
-            ->join('store_product_prices', 'store_product_prices.product_id', '=', 'products.id')
+            ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
             ->join('categories', 'categories.id', 'products.category_id')
             ->where('store_products.qty_available', '>', 0)
             ->where('products.category_id', 'LIKE', $category_id)
             ->where('store_products.product_id', 'LIKE', $product_id)
             ->where('store_products.store_id', 'LIKE', $store_id)
-            ->where('store_product_prices.store_id', 'LIKE', $store_id)
-            ->where('store_product_prices.product_id', 'LIKE', $product_id)
+            ->where('branch_product_prices.branch_id', 'LIKE', $store_id)
+            ->where('branch_product_prices.product_id', 'LIKE', $product_id)
             ->where('stores.branch_id', 'LIKE', User::userBranchAction())
             ->get();
         if ($category_id == "%")
@@ -2771,10 +2769,10 @@ class ReportController extends Controller
             ->distinct()
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
-            ->join('store_product_prices', 'store_product_prices.product_id', '=', 'store_products.product_id')
+            ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'store_products.product_id')
             ->where('store_products.qty_available', '>', 0)
             ->where('products.category_id', 'LIKE', $categor_id)
-            ->where('store_product_prices.store_id', 'LIKE', $store)
+            ->where('store_products.store_id', 'LIKE', $store)
             ->where('store_products.qty_available', '>=', $number)
             ->where('branch_id', 'LIKE', User::userBranchAction())
             ->orderBy('products.name');

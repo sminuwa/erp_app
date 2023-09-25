@@ -78,7 +78,7 @@ class ProfileController extends Controller
                 $img = Image::make(public_path() . '/staffpics/' . $filename);
                 $id = Auth::user()->id;
                 $user = User::find($id);
-                $user->photo = $filename;
+                $user->photo_url = $filename;
                 $user->save();
                 if ($request->session()->has('backurl')) {
                     return redirect($request->session()->get('backurl'));

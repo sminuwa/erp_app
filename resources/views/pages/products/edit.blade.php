@@ -60,11 +60,20 @@
 @endsection
 
 @push('js')
-    
-	<script type="text/javascript">
-
-
-	</script>
+<script type="text/javascript">
+	$('#category_id').on('change', function(event) {
+		category_id = $(this).val();
+		$.ajax({
+			type: 'GET',
+			url: "{{ route('generate.productCode') }}",
+			data: {
+				category_id: category_id
+			}
+		}).done(function(data) {
+			$('#code').val(data);
+		});
+	});
+</script>
 
 @endpush
 

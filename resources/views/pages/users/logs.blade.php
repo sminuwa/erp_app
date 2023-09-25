@@ -58,7 +58,7 @@
                                 name="user_id" id="user_id" required>
                                 <option value="">Select...</option>
                                 @foreach ($users as $data)
-                                    <option value="{{ $data->id }}" {{$user->id == $data->id?"selected":""}}>{{ $data->name }}
+                                    <option value="{{ $data->id }}" {{$user->id == $data->id?"selected":""}}>{{ $data->user_code }}-{{ $data->name }}
                                     </option>
                                 @endforeach
                             </select>

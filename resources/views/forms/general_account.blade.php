@@ -37,7 +37,7 @@
         Yes
         &nbsp;&nbsp;
         &nbsp;&nbsp;
-        <input class="form-check-input {{ $errors->has('is_control') ? ' is-invalid' : '' }}" type="radio"
+        <input checked class="form-check-input {{ $errors->has('is_control') ? ' is-invalid' : '' }}" type="radio"
             value="0" name="is_control" id="status_no"
             {{ $model->is_control != null && $model->is_control == 0 ? 'checked' : '' }}>
         No

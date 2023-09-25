@@ -36,7 +36,7 @@ class GeneralAccountController extends Controller
     public function index(Index $request)
     {
         $user_branch = User::userBranchAction();
-        return view('pages.general_accounts.index', ['records' => GeneralAccount::where('branch_id', $user_branch)->orderby('number')->get()]);
+        return view('pages.general_accounts.index', ['records' => GeneralAccount::orderby('number')->get()]);
     } /**
       * Display the specified resource.
       *
@@ -66,14 +66,11 @@ class GeneralAccountController extends Controller
 
 
         ]);
-    } /**
-      * Store a newly created resource in storage.
-      *
-      * @param  Store  $request
-      * @return \Illuminate\Http\Response
-      */
-    public function store(Store $request)
+    }
+
+    public function store(Request $request)
     {
+        return $request;
         $model = new GeneralAccount;
         $model->fill($request->all());
 

@@ -36,63 +36,18 @@
                         </a>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-3">
                     <div class='col-md-12'>
                         <div class="row">
-                            <div class="col-sm-3">
-                                <div class="card">
-                                    <div class="card-header">
-                                        Products
-                                    </div>
-                                    <div class="card-body">
-                                        <form action="{{ route('purchases.cart.store') }}" method="POST">
-                                            @csrf
-                                            <div class="form-group">
-                                                <label for="product_id">Product Name</label>
-                                                <select name="product_id" id="product_id" class="form-control select2-single ajax-products" required></select>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="qty_supplied">Quantity</label>
-                                                <input type="number"
-                                                       class="form-control {{ $errors->has('qty_supplied') ? ' is-invalid' : '' }}"
-                                                       name="qty_supplied" id="qty_supplied" placeholder="" required="required">
-                                                @if ($errors->has('qty_supplied'))
-                                                    <div class="invalid-feedback">
-                                                        <strong>{{ $errors->first('qty_supplied') }}</strong>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="unit_price">Unit Price</label>
-                                                <input type="text"
-                                                       class="form-control {{ $errors->has('unit_price') ? ' is-invalid' : '' }}"
-                                                       name="unit_price" id="unit_price" placeholder="" required="required">
-                                                @if ($errors->has('unit_price'))
-                                                    <div class="invalid-feedback">
-                                                        <strong>{{ $errors->first('unit_price') }}</strong>
-                                                    </div>
-                                                @endif
-                                            </div>
-
-                                            <div class="form-group text-right ">
-                                                <button type="submit" class="btn btn-primary"><span class="ion-android-cart"> </span>Add to
-                                                    Cart</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-4">
                                 <div class="card">
                                     <div class="card-header">
                                         Purchase Details
                                     </div>
                                     <div class="card-body">
                                         <h5 class="card-title"></h5>
-                                        <form action="{{ isset($route) ? $route : route('purchases.store') }}" method="POST">
+                                        <form action="{{ route('inventories.purchases.store') }}" method="POST">
                                             {{ csrf_field() }}
-                                            <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
 
                                             <div class="form-group">
                                                 <label for="supplier_id">Supplier Name</label>
@@ -167,25 +122,18 @@
                                                     name="source_store_id" id="source_store_id" required="required">
                                                 </select>
                                             </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input {{ $errors->has('status') ? ' is-invalid' : '' }}"
-                                                       type="radio" value="1" name="status" id="status_yes">
-                                                Active
-                                                &nbsp;&nbsp;
-                                                &nbsp;&nbsp;
-                                                <input class="form-check-input {{ $errors->has('status') ? ' is-invalid' : '' }}"
-                                                       type="radio" value="0" name="status" id="status_no"> Not
-                                                Active
+                                            <input type="hidden" name="updated_by" value="{{ Auth::id() }}" />
+                                            <div class="form-group text-right ">
+                                                <input type="submit" class="btn btn-primary" value="Save" />
                                             </div>
+                                        </form>
                                     </div>
-                                    <input type="hidden" name="updated_by" value="{{ Auth::id() }}" />
-                                    <div class="form-group text-right ">
-                                        <input type="submit" class="btn btn-primary" value="Save" />
-                                    </div>
-                                    </form>
+
+
+
                                 </div>
                             </div>
-                            <div class="col-sm-6">
+                            <div class="col-sm-8">
                                 <div class="card">
                                     <div class="card-header">
                                         <i class="ion-android-cart"></i> Supplier Cart: <small>Purchased Products</small>
@@ -292,7 +240,50 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-sm-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        Products
+                                    </div>
+                                    <div class="card-body">
+                                        <form action="{{ route('purchases.cart.store') }}" method="POST">
+                                            @csrf
+                                            <div class="form-group">
+                                                <label for="product_id">Product Name</label>
+                                                <select name="product_id" id="product_id" class="form-control select2-single ajax-products" required></select>
+                                            </div>
 
+                                            <div class="form-group">
+                                                <label for="qty_supplied">Quantity</label>
+                                                <input type="number"
+                                                       class="form-control {{ $errors->has('qty_supplied') ? ' is-invalid' : '' }}"
+                                                       name="qty_supplied" id="qty_supplied" placeholder="" required="required">
+                                                @if ($errors->has('qty_supplied'))
+                                                    <div class="invalid-feedback">
+                                                        <strong>{{ $errors->first('qty_supplied') }}</strong>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="unit_price">Unit Price</label>
+                                                <input type="text"
+                                                       class="form-control {{ $errors->has('unit_price') ? ' is-invalid' : '' }}"
+                                                       name="unit_price" id="unit_price" placeholder="" required="required">
+                                                @if ($errors->has('unit_price'))
+                                                    <div class="invalid-feedback">
+                                                        <strong>{{ $errors->first('unit_price') }}</strong>
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            <div class="form-group text-right ">
+                                                <button type="submit" class="btn btn-primary"><span class="ion-android-cart"> </span>Add to
+                                                    Cart</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

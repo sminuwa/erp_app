@@ -117,14 +117,14 @@ class InvoiceController extends Controller
         }
         $customer_id = $request->input('customer_id');
         //Check to make sure that the amount has not exceeded the credit limit set for the customer
-        if ($request->input('sale_mode') == "Credit" && (\Cart::getTotal() + Customer::find($customer_id)->runningBalance()) > Customer::find($customer_id)->credit_limit) {
+        if ((\Cart::getTotal() + Customer::find($customer_id)->runningBalance()) > Customer::find($customer_id)->credit_limit) {
             session()->flash('app_error', 'The amount has exceeded the customer credit limit');
             return redirect()->back();
         }
 
-        if ($request->has('customer') && ($request->customer != "")) {
-            $customer_id = Customer::insertGetId(['name' => $request->customer, 'phone' => $request->phone, 'address' => $request->address, 'branch_id' => User::userBranchAction()]);
-        }
+        // if ($request->has('customer') && ($request->customer != "")) {
+        //     $customer_id = Customer::insertGetId(['name' => $request->customer, 'phone' => $request->phone, 'address' => $request->address, 'branch_id' => User::userBranchAction()]);
+        // }
         $customer = Customer::findOrFail($customer_id);
 
 
@@ -237,7 +237,7 @@ class InvoiceController extends Controller
                         'order_id' => $order_id,
                         'systemid' => $invoice,
                         'description' => 'Credit sales',
-                        'Ref' => 'Nil',
+                        'Ref' => $invoice,
                         'cr' => $total,
                         'payment_mode' => $payment_mode,
                         'date' => $request->order_date, //date('Y-m-d'),

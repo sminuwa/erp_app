@@ -22,6 +22,7 @@ class CartController extends Controller
         $validated = $request->validate([
             'id' => 'required',
             'name' => 'required',
+            'code' => 'required',
             'sold_price' => 'required',
             'qty' => 'required',
             'cost_price' => 'required'
@@ -36,7 +37,7 @@ class CartController extends Controller
             'name' => $request->name,
             'price' => $request->sold_price,
             'quantity' => $qty == 0 ? 1 : $qty,
-            'attributes' => array('cost_price' => $cost_price, 'selling_price' => $selling_price, 'qty_available' => $qty_available, 'discount' => 0,'store'=>$store),
+            'attributes' => array('cost_price' => $cost_price, 'code'=>$request->code,'selling_price' => $selling_price, 'qty_available' => $qty_available, 'discount' => 0,'store'=>$store),
         ]);
         //dd(\Cart::getContent());
         if ($add) {

@@ -296,6 +296,14 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a href="#"
+                               class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>Credit Note</p>
+                            </a>
+                        </li>
+
                     </ul>
                 </li>
                 @can('make.daily.sale')

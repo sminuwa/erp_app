@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Inventory;
 
+use App\Classes\Transaction;
 use App\Http\Controllers\Controller;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
@@ -22,5 +23,6 @@ class PurchaseController extends Controller
 
     public function create(){
         return  view('pages.inventories.purchases.create');
+
     }
 }

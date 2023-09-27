@@ -127,9 +127,35 @@ class Transaction
 
     }
 
+    public static function receipt(){
 
+    }
 
-    public static function ledger(){
+    public static function payment(){
+
+    }
+
+    public static function journal(){
+
+    }
+
+    public static function credit_note(){
+
+    }
+
+    public static function debit_note(){
+
+    }
+
+    public static function return_debit(){
+
+    }
+
+    public static function expense(){
+
+    }
+
+    public static function interbank(){
 
     }
 

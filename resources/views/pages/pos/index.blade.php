@@ -254,7 +254,7 @@
                                         </div>
                                         <div class="form-group"
                                             style="border: 1px solid rgba(64, 44, 45, 0.4)">
-                                            <input type="text" class="form-control" name="ref" id="refno"
+                                            <input type="text" class="form-control" name="reference" id="reference"
                                                 placeholder="Reference" />
                                         </div>
                                         <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create

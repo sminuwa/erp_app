@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Transaction;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -126,7 +127,8 @@ class InvoiceController extends Controller
         //     $customer_id = Customer::insertGetId(['name' => $request->customer, 'phone' => $request->phone, 'address' => $request->address, 'branch_id' => User::userBranchAction()]);
         // }
         $customer = Customer::findOrFail($customer_id);
-
+        $items = $this->orderItems();
+        $status = Transaction::sale($items, $customer->id, $request->reference, $request->order_date);
 
         $sub_total = str_replace(',', '', \Cart::getSubTotal());
         $tax = 0;
@@ -140,7 +142,7 @@ class InvoiceController extends Controller
         //$customer_id = $request->input('customer_id');
         DB::beginTransaction();
         try {
-            $payment_mode = $request->input('sale_mode');
+            $payment_mode = 'Cash';
             $due_date = $request->input('due_date');
             $running_balance = $this->runninigBalance($customer_id);
             if ($running_balance < 0) { // in case the company owes a customer 
@@ -151,123 +153,111 @@ class InvoiceController extends Controller
                     $amount_paid = abs($running_balance) - $total;
 
             }
-            $order_id = DB::table('orders')->insertGetId([
-                'customer_id' => $customer_id,
-                'payment_mode' => $payment_mode,
-                'due_date' => $due_date,
-                'pay' => $payment_mode == "Credit" ? $amount_paid : $total,
-                'due' => $payment_mode == "Credit" ? ($total - $amount_paid) : 0,
-                'order_date' => $request->order_date, //date('Y-m-d'),
-                'order_status' => 'approved',
-                'total_products' => \Cart::getTotalQuantity(),
-                'sub_total' => $sub_total,
-                'vat' => $tax,
-                'total' => $total,
-                'invoice_no' => $invoice,
-                'sold_by' => Auth::id(),
-                'system_id' => gethostname(),
-                'branch_id' => User::userBranchAction(),
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ]);
-
-            $contents = \Cart::getContent();
-            $products = [];
-            $total_discount = 0;
-            foreach ($contents as $content) {
-                $total_discount += $content->attributes['discount'] * $content->quantity;
-                $store = StoreProduct::find($content->id);
-                $qtyAval = $store->qty_available;
-                //$store->qty_available = $qtyAval - $content->quantity;
-                $order_detail = new OrderDetail();
-                DB::table('order_details')->insert([
-                    'order_id' => $order_id,
-                    'store_product_id' => $content->id,
-                    'quantity' => $content->quantity,
-                    'original_quantity_sold' => $content->quantity,
-                    'selling_price' => $content->attributes['selling_price'],
-                    'sold_price' => $content->price,
-                    'cost_price' => $content->attributes['cost_price'],
-                    'total' => $content->getPriceSum(),
-                    'avail_qty_before_sale' => $qtyAval, //get available product in stock before sale
+            if ($status) {
+                $order_id = DB::table('orders')->insertGetId([
+                    'customer_id' => $customer_id,
+                    'payment_mode' => $payment_mode,
+                    'due_date' => $due_date,
+                    'pay' => $payment_mode == "Credit" ? $amount_paid : $total,
+                    'due' => $payment_mode == "Credit" ? ($total - $amount_paid) : 0,
+                    'order_date' => $request->order_date,
+                    //date('Y-m-d'),
+                    'order_status' => 'approved',
+                    'total_products' => \Cart::getTotalQuantity(),
+                    'sub_total' => $sub_total,
+                    'vat' => $tax,
+                    'total' => $total,
+                    'invoice_no' => $invoice,
+                    'sold_by' => Auth::id(),
+                    'system_id' => gethostname(),
+                    'branch_id' => User::userBranchAction(),
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now()
                 ]);
 
-                DB::table('store_products')->where('id', $content->id)->update([
-                    'qty_available' => $qtyAval - $content->quantity,
-                    'updated_at' => Carbon::now()
-                ]);
-
-                DB::table('transfer_products')->insert([
-                    'source_store_id' => $store->store->id,
-                    'product_id' => $store->product->id,
-                    'destination_store_id' => $store->store->id,
-                    'qty_transfered' => $content->quantity,
-                    'qty_available' => $qtyAval, //Before Sale
-                    'transfered_by' => Auth::id(),
-                    'status' => 'Completed',
-                    'nature' => 'Sale',
-                    'stock_in_out' => 'out',
-                    'refno' => $invoice,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ]);
-                DB::table('stock_cards')->insert([
-                    'store_id' => $store->store->id,
-                    'product_id' => $store->product->id,
-                    'cr' => 0,
-                    'dr' => $content->quantity,
-                    'refno' => $invoice,
-                    'type' => 'Sale',
-                    'date' => $request->order_date,
-                    'user_id' => Auth::id(),
-                    'priority' => 2,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ]);
-            }
-            //Upate the Order table with the discount
-            DB::table('orders')->where('id', $order_id)->increment('discount', $total_discount);
-            //DB::table('orders')->where('id', $order_id)->decrement('due', $total_discount);
-
-            if ($payment_mode != "Cash") {
-                if ($payment_mode == "Credit") {
-                    DB::table('customer_ledgers')->insert(['customer_id' => $customer_id,
+                $contents = \Cart::getContent();
+                $products = [];
+                $total_discount = 0;
+                foreach ($contents as $content) {
+                    $total_discount += $content->attributes['discount'] * $content->quantity;
+                    $store = StoreProduct::find($content->id);
+                    $qtyAval = $store->qty_available;
+                    //$store->qty_available = $qtyAval - $content->quantity;
+                    $order_detail = new OrderDetail();
+                    DB::table('order_details')->insert([
                         'order_id' => $order_id,
-                        'systemid' => $invoice,
-                        'description' => 'Credit sales',
-                        'Ref' => $invoice,
-                        'cr' => $total,
-                        'payment_mode' => $payment_mode,
-                        'date' => $request->order_date, //date('Y-m-d'),
+                        'store_product_id' => $content->id,
+                        'quantity' => $content->quantity,
+                        'original_quantity_sold' => $content->quantity,
+                        'selling_price' => $content->attributes['selling_price'],
+                        'sold_price' => $content->price,
+                        'cost_price' => $content->attributes['cost_price'],
+                        'total' => $content->getPriceSum(),
+                        'avail_qty_before_sale' => $qtyAval,
+                        //get available product in stock before sale
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now()
                     ]);
-                    DB::table('customers')->where(['id' => $customer_id])->increment('opening_balance', ($total - $total_discount));
-                }
 
-            }
-            if ($payment_mode == "Cash") {
+                    DB::table('store_products')->where('id', $content->id)->update([
+                        'qty_available' => $qtyAval - $content->quantity,
+                        'updated_at' => Carbon::now()
+                    ]);
+
+                    DB::table('transfer_products')->insert([
+                        'source_store_id' => $store->store->id,
+                        'product_id' => $store->product->id,
+                        'destination_store_id' => $store->store->id,
+                        'qty_transfered' => $content->quantity,
+                        'qty_available' => $qtyAval,
+                        //Before Sale
+                        'transfered_by' => Auth::id(),
+                        'status' => 'Completed',
+                        'nature' => 'Sale',
+                        'stock_in_out' => 'out',
+                        'refno' => $invoice,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now()
+                    ]);
+                    DB::table('stock_cards')->insert([
+                        'store_id' => $store->store->id,
+                        'product_id' => $store->product->id,
+                        'cr' => 0,
+                        'dr' => $content->quantity,
+                        'refno' => $invoice,
+                        'type' => 'Sale',
+                        'date' => $request->order_date,
+                        'user_id' => Auth::id(),
+                        'priority' => 2,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now()
+                    ]);
+                }
+                //Upate the Order table with the discount
+                DB::table('orders')->where('id', $order_id)->increment('discount', $total_discount);
                 DB::table('bank_accounts')->where(['account_type' => 'Cash'])->where('branch_id', 'LIKE', User::userBranchAction())->increment('account_balance', ($total - $total_discount));
 
                 $bank_account = DB::table('bank_accounts')->where(['account_type' => 'Cash'])->where('branch_id', 'LIKE', User::userBranchAction())->first();
-                DB::table('customer_ledgers')->insert(['customer_id' => $customer_id,
+                DB::table('customer_ledgers')->insert([
+                    'customer_id' => $customer_id,
                     'order_id' => $order_id,
                     'systemid' => $invoice,
                     'description' => 'Cash sales',
                     'Ref' => 'Nil',
                     'cr' => $total,
-                    'dr' => $total,
+                    'dr' => 0,
                     'payment_mode' => $payment_mode,
                     'bank_account_id' => $bank_account->id,
-                    'date' => $request->order_date, //date('Y-m-d'),
+                    'date' => $request->order_date,
+                    //date('Y-m-d'),
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now()
                 ]);
                 //Bank Deposit
-                DB::table('bank_transactions')->insert(['bank_account_id' => $bank_account->id,
-                    'trans_date' => $request->order_date, //date('Y-m-d'),
+                DB::table('bank_transactions')->insert([
+                    'bank_account_id' => $bank_account->id,
+                    'trans_date' => $request->order_date,
+                    //date('Y-m-d'),
                     'cr' => $total,
                     'dr' => 0,
                     'ref_no' => $invoice,
@@ -276,26 +266,82 @@ class InvoiceController extends Controller
                 ]);
 
             }
-            if ($request->has('sms')) { //SEND SMS NOTIFICATION
-                $customer_phone = $customer->phone;
-                $msg = "Dear $customer->name, %0a$invoice has been raised in your account valued N" . number_format($total, 2) . ".%0aYour new account balance is N" . number_format($customer->runningBalance(), 2, '.', ',');
-                $url = "http://portal.nigeriabulksms.com/api/";
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, "$url");
-                curl_setopt($ch, CURLOPT_POST, 1);
-                curl_setopt($ch, CURLOPT_POSTFIELDS,
-                    "username=engrabusadik@gmail.com&password=Aisha123&message=$msg&sender=ALBABELLO&mobiles=$customer_phone");
 
-                // Receive server response
-                $server_output = curl_exec($ch);
-                curl_close($ch);
-            //return $server_output;
-            }
+            //DB::table('orders')->where('id', $order_id)->decrement('due', $total_discount);
+
+            // if ($payment_mode != "Cash") {
+            //     if ($payment_mode == "Credit") {
+            //         DB::table('customer_ledgers')->insert([
+            //             'customer_id' => $customer_id,
+            //             'order_id' => $order_id,
+            //             'systemid' => $invoice,
+            //             'description' => 'Credit sales',
+            //             'Ref' => $invoice,
+            //             'cr' => $total,
+            //             'payment_mode' => $payment_mode,
+            //             'date' => $request->order_date,
+            //             //date('Y-m-d'),
+            //             'created_at' => Carbon::now(),
+            //             'updated_at' => Carbon::now()
+            //         ]);
+            //         DB::table('customers')->where(['id' => $customer_id])->increment('opening_balance', ($total - $total_discount));
+            //     }
+
+            // }
+            // if ($payment_mode == "Cash") {
+            //     DB::table('bank_accounts')->where(['account_type' => 'Cash'])->where('branch_id', 'LIKE', User::userBranchAction())->increment('account_balance', ($total - $total_discount));
+
+            //     $bank_account = DB::table('bank_accounts')->where(['account_type' => 'Cash'])->where('branch_id', 'LIKE', User::userBranchAction())->first();
+            //     DB::table('customer_ledgers')->insert([
+            //         'customer_id' => $customer_id,
+            //         'order_id' => $order_id,
+            //         'systemid' => $invoice,
+            //         'description' => 'Cash sales',
+            //         'Ref' => 'Nil',
+            //         'cr' => $total,
+            //         'dr' => $total,
+            //         'payment_mode' => $payment_mode,
+            //         'bank_account_id' => $bank_account->id,
+            //         'date' => $request->order_date,
+            //         //date('Y-m-d'),
+            //         'created_at' => Carbon::now(),
+            //         'updated_at' => Carbon::now()
+            //     ]);
+            //     //Bank Deposit
+            //     DB::table('bank_transactions')->insert([
+            //         'bank_account_id' => $bank_account->id,
+            //         'trans_date' => $request->order_date,
+            //         //date('Y-m-d'),
+            //         'cr' => $total,
+            //         'dr' => 0,
+            //         'ref_no' => $invoice,
+            //         'created_at' => Carbon::now(),
+            //         'updated_at' => Carbon::now(),
+            //     ]);
+
+            // }
+            // if ($request->has('sms')) { //SEND SMS NOTIFICATION
+            //     $customer_phone = $customer->phone;
+            //     $msg = "Dear $customer->name, %0a$invoice has been raised in your account valued N" . number_format($total, 2) . ".%0aYour new account balance is N" . number_format($customer->runningBalance(), 2, '.', ',');
+            //     $url = "http://portal.nigeriabulksms.com/api/";
+            //     $ch = curl_init();
+            //     curl_setopt($ch, CURLOPT_URL, "$url");
+            //     curl_setopt($ch, CURLOPT_POST, 1);
+            //     curl_setopt(
+            //         $ch,
+            //         CURLOPT_POSTFIELDS,
+            //         "username=engrabusadik@gmail.com&password=Aisha123&message=$msg&sender=ALBABELLO&mobiles=$customer_phone"
+            //     );
+
+            //     // Receive server response
+            //     $server_output = curl_exec($ch);
+            //     curl_close($ch);
+            //     //return $server_output;
+            // }
             $action = "Made a sell of $invoice: $total";
             AuditLog::auditLog(Auth::id(), $action);
             DB::commit();
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             DB::rollBack();
             throw $ex;
         }
@@ -343,10 +389,10 @@ class InvoiceController extends Controller
     }
     public function updateInvoice(Request $request, Order $order)
     {
-        
+
         $invoice = $order->invoice_no;
         $inputs = $request->except('_token');
-        
+
         $rules = [];
         if ($request->has('customer') && $request->customer == "" && $request->customer_id == "") {
             $rules = [
@@ -376,12 +422,12 @@ class InvoiceController extends Controller
         }
 
         if ($request->has('customer') && ($request->customer != "")) {
-           Customer::where('id', $order->customer_id)->update(['name' => $request->customer, 'phone' => $request->phone, 'address' => $request->address, 'branch_id' => User::userBranchAction()]);
+            Customer::where('id', $order->customer_id)->update(['name' => $request->customer, 'phone' => $request->phone, 'address' => $request->address, 'branch_id' => User::userBranchAction()]);
             $customer_id = $order->customer_id;
         }
-        
+
         DB::table('customers')->where('id', $customer_id)->update(['name' => $request->customer, 'phone' => $request->phone, 'address' => $request->address]);
-        
+
         //$customer = Customer::findOrFail($customer_id);
 
 
@@ -415,7 +461,8 @@ class InvoiceController extends Controller
                 'due_date' => $due_date,
                 'pay' => $payment_mode == "Credit" ? $amount_paid : $total,
                 'due' => $payment_mode == "Credit" ? ($total - $amount_paid) : 0,
-                'order_date' => $request->order_date, //date('Y-m-d'),
+                'order_date' => $request->order_date,
+                //date('Y-m-d'),
                 'order_status' => 'approved',
                 'total_products' => \Cart::getTotalQuantity(),
                 'sub_total' => $sub_total,
@@ -431,10 +478,10 @@ class InvoiceController extends Controller
             $contents = \Cart::getContent();
             $products = [];
             $total_discount = 0;
-    
+
             //Put back the previous quantity
-            $sales = OrderDetail::where('order_id',$order_id)->where('status','=',1)->get();
-            foreach($sales as $sale){
+            $sales = OrderDetail::where('order_id', $order_id)->where('status', '=', 1)->get();
+            foreach ($sales as $sale) {
                 $qty = DB::table('store_products')->where('id', $sale->store_product_id)->first();
                 DB::table('store_products')->where('id', $sale->store_product_id)->update([
                     'qty_available' => $qty->qty_available + $sale->quantity,
@@ -442,45 +489,52 @@ class InvoiceController extends Controller
                 ]);
             }
             DB::table('order_details')->where('order_id', $order_id)->update(['status' => 0]);
-            
+
             DB::table('transfer_products')->where('refno', $invoice)->update(['status' => 'Cancelled']);
             DB::table('stock_cards')->where('refno', $invoice)->update(['status' => 0]);
             foreach ($contents as $content) {
                 //Put back the previous quantity
-                 /*$restored_qty = $order->order_items()->where('store_product_id', $content->id)->first();
-                 
-                if($restored_qty?->quantity >0)
-                    DB::table('store_products')->where('id', $content->id)->increment('qty_available', $restored_qty->$restored_qty?->quantity);*/
+                /*$restored_qty = $order->order_items()->where('store_product_id', $content->id)->first();
+                
+               if($restored_qty?->quantity >0)
+                   DB::table('store_products')->where('id', $content->id)->increment('qty_available', $restored_qty->$restored_qty?->quantity);*/
                 $total_discount += $content->attributes['discount'] * $content->quantity;
                 $store = StoreProduct::find($content->id);
                 $qtyAval = $store->qty_available;
 
                 $order_detail = new OrderDetail();
-                DB::table('order_details')->insert(['store_product_id' => $content->id, 'order_id' => $order->id,
+                DB::table('order_details')->insert([
+                    'store_product_id' => $content->id,
+                    'order_id' => $order->id,
                     'quantity' => $content->quantity,
                     'selling_price' => $content->attributes['selling_price'],
                     'sold_price' => $content->price,
                     'cost_price' => $content->attributes['cost_price'],
                     'total' => $content->getPriceSum(),
-                    'avail_qty_before_sale' => $qtyAval, //get available product in stock before sale
+                    'avail_qty_before_sale' => $qtyAval,
+                    //get available product in stock before sale
                     'status' => 1,
                     'last_modified_by' => Auth::id(),
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now()
                 ]);
-                
+
                 DB::table('store_products')->where('id', $content->id)->update([
                     'qty_available' => $qtyAval - $content->quantity,
                     'updated_at' => Carbon::now()
                 ]);
 
-                DB::table('transfer_products')->updateOrInsert(['source_store_id' => $store->store->id,
-                    'product_id' => $store->product->id, 'refno' => $invoice], [
+                DB::table('transfer_products')->updateOrInsert([
+                    'source_store_id' => $store->store->id,
+                    'product_id' => $store->product->id,
+                    'refno' => $invoice
+                ], [
                     'source_store_id' => $store->store->id,
                     'product_id' => $store->product->id,
                     'destination_store_id' => $store->store->id,
                     'qty_transfered' => $content->quantity,
-                    'qty_available' => $qtyAval, //Before Sale
+                    'qty_available' => $qtyAval,
+                    //Before Sale
                     'transfered_by' => Auth::id(),
                     'status' => 'Completed',
                     'nature' => 'Sale',
@@ -489,8 +543,11 @@ class InvoiceController extends Controller
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now()
                 ]);
-                DB::table('stock_cards')->updateOrInsert(['store_id' => $store->store->id,
-                    'product_id' => $store->product->id, 'refno' => $invoice], [
+                DB::table('stock_cards')->updateOrInsert([
+                    'store_id' => $store->store->id,
+                    'product_id' => $store->product->id,
+                    'refno' => $invoice
+                ], [
                     'store_id' => $store->store->id,
                     'product_id' => $store->product->id,
                     'cr' => 0,
@@ -511,14 +568,16 @@ class InvoiceController extends Controller
 
             if ($payment_mode != "Cash") {
                 if ($payment_mode == "Credit") {
-                    DB::table('customer_ledgers')->where('order_id', $order->id)->update(['customer_id' => $customer_id,
+                    DB::table('customer_ledgers')->where('order_id', $order->id)->update([
+                        'customer_id' => $customer_id,
                         'order_id' => $order_id,
                         'systemid' => $invoice,
                         'description' => 'Credit sales',
                         'Ref' => 'Nil',
                         'cr' => $total,
                         'payment_mode' => $payment_mode,
-                        'date' => $request->order_date, //date('Y-m-d'),
+                        'date' => $request->order_date,
+                        //date('Y-m-d'),
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now()
                     ]);
@@ -536,8 +595,11 @@ class InvoiceController extends Controller
                 DB::table('bank_accounts')->where(['account_type' => 'Cash'])->where('branch_id', 'LIKE', User::userBranchAction())->increment('account_balance', ($total - $total_discount));
 
                 $bank_account = DB::table('bank_accounts')->where(['account_type' => 'Cash'])->where('branch_id', 'LIKE', User::userBranchAction())->first();
-                DB::table('customer_ledgers')->updateOrInsert(['order_id' => $order_id,
-                    'systemid' => $invoice], ['customer_id' => $customer_id,
+                DB::table('customer_ledgers')->updateOrInsert([
+                    'order_id' => $order_id,
+                    'systemid' => $invoice
+                ], [
+                    'customer_id' => $customer_id,
                     'order_id' => $order_id,
                     'systemid' => $invoice,
                     'description' => 'Cash sales',
@@ -546,13 +608,16 @@ class InvoiceController extends Controller
                     'dr' => $total,
                     'payment_mode' => $payment_mode,
                     'bank_account_id' => $bank_account->id,
-                    'date' => $request->order_date, //date('Y-m-d'),
+                    'date' => $request->order_date,
+                    //date('Y-m-d'),
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now()
                 ]);
                 //Bank Deposit
-                DB::table('bank_transactions')->updateOrInsert(['ref_no' => $invoice], ['bank_account_id' => $bank_account->id,
-                    'trans_date' => $request->order_date, //date('Y-m-d'),
+                DB::table('bank_transactions')->updateOrInsert(['ref_no' => $invoice], [
+                    'bank_account_id' => $bank_account->id,
+                    'trans_date' => $request->order_date,
+                    //date('Y-m-d'),
                     'cr' => $total,
                     'dr' => 0,
                     'ref_no' => $invoice,
@@ -564,15 +629,23 @@ class InvoiceController extends Controller
             $action = "Updated invoice $invoice: $total";
             AuditLog::auditLog(Auth::id(), $action);
             DB::commit();
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             DB::rollBack();
             throw $ex;
         }
         \Cart::clear();
 
         session()->flash('Invoice created successfully');
-        
+
         return redirect()->route('orders.show', $order_id);
+    }
+    public static function orderItems()
+    {
+        $items = [];
+        $contents = \Cart::getContent();
+        foreach ($contents as $content) {
+            $items[$content->id] = $content->quantity;
+        }
+        return $items;
     }
 }

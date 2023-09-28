@@ -8,6 +8,7 @@ use App\Models\ChartOfAccount;
 use App\Models\Customer;
 use App\Models\GeneralAccount;
 use App\Models\Product;
+use App\Models\Store;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 
@@ -31,6 +32,11 @@ class AjaxController extends Controller
     public function products(){
         $records = Product::orderBy('name','asc')->get();
         return view('misc.ajax.products', compact('records'));
+    }
+
+    public function stores(){
+        $records = Store::orderBy('name','asc')->get();
+        return view('misc.ajax.stores', compact('records'));
     }
 
     public function chart_of_accounts(){

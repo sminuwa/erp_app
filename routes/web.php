@@ -885,6 +885,7 @@ Route::middleware('auth')->group(function () {
         Route::prefix('purchases')->group(function(){
             Route::get('/',[App\Http\Controllers\Inventory\PurchaseController::class, 'index'])->name('inventories.purchases.index');
             Route::get('/create',[App\Http\Controllers\Inventory\PurchaseController::class, 'create'])->name('inventories.purchases.create');
+            Route::post('/ajax/create',[App\Http\Controllers\Inventory\PurchaseController::class, 'createAjax'])->name('inventories.purchases.ajax.create');
             Route::post('/store',[App\Http\Controllers\Inventory\PurchaseController::class, 'store'])->name('inventories.purchases.store');
         });
 

@@ -95,10 +95,10 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="source_store_id">Store/Shop</label>
+                                                <label for="source_store_id">Store</label>
                                                 <select
-                                                    class="form-control select2-single {{ $errors->has('source_store_id') ? ' is-invalid' : '' }}"
-                                                    name="source_store_id" id="source_store_id" required="required">
+                                                    class="form-control ajax-stores select2-single {{ $errors->has('source_store_id') ? ' is-invalid' : '' }}"
+                                                    name="store_id" id="source_store_id" required="required">
                                                 </select>
                                             </div>
                                             <input type="hidden" name="updated_by" value="{{ Auth::id() }}" />
@@ -121,79 +121,8 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="card-body table-responsive">
-                                        @if (Cart::getTotal() < 1)
-                                            <div class="alert alert-danger">
-                                                No Product Added
-                                            </div>
-                                        @else
-                                            <table class="table table-bordered table-striped text-center mb-3">
-                                                <thead>
-                                                <tr>
-                                                    <th>S.N</th>
-                                                    <th>Name</th>
-                                                    <th>Unit Price</th>
-                                                    <th>Qty</th>
-                                                    <th>Sub Total</th>
-                                                    <th><span class="ion-ios-trash"></span></th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                @foreach ($cart_products as $product)
-                                                    <tr>
-                                                        <td>{{ $loop->iteration }}</td>
-                                                        <td class="text-left">{{ $product->name }}</td>
-
-
-                                                        <form action="{{ route('inventories.purchases.store') }}" method="post"
-                                                              id="p{{ $product->id }}">
-                                                            @csrf
-                                                            @method('PUT')
-                                                            <td>
-                                                                <input type="text" name="cost_price" id="price{{ $product->id }}"
-                                                                       class="form-control price" style="min-width:65px;"
-                                                                       onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
-                                                                       value="{{ $product->price }}" data-val="{{ $product->price }}"
-                                                                       data-value="p{{ $product->id }}">
-                                                                <input type="hidden" name="selling_price" class="form-control"
-                                                                       value="{{ $product->attributes['selling_price'] }}">
-                                                                <input type="hidden" name="expire_date" class="form-control"
-                                                                       value="{{ $product->attributes['expire_date'] }}">
-                                                            </td>
-                                                            <td>
-                                                                <input type="text" name="quantity" id="quantity{{ $product->id }}"
-                                                                       class="form-control quantity" data-value="p{{ $product->id }}"
-                                                                       style="min-width:58px;" value="{{ $product->quantity }}"
-                                                                       min="1" required>
-                                                            </td>
-                                                            <td><span
-                                                                    class="subtotal{{ $product->id }}">{{ number_format($product->price * $product->quantity, 2) }}</span>
-                                                            </td>
-                                                            <input type="hidden" name="id" class="form-control"
-                                                                   value="{{ $product->id }}">
-
-                                                        </form>
-
-                                                        <td>
-                                                            <button class="btn btn-danger btn-sm" type="button"
-                                                                    onclick="deleteItem({{ $product->id }})">
-                                                                <i class="fa fa-trash" aria-hidden="true"></i>
-                                                            </button>
-                                                            <form id="delete-form-{{ $product->id }}"
-                                                                  action="{{ route('cart.remove', $product->id) }}" method="post"
-                                                                  style="display:none;">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                            </form>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                                </tbody>
-                                            </table>
-                                        @endif
-                                        <div class="alert alert-success" id="total">
-                                            Total : <span id="total">{{ number_format(Cart::getTotal()) }}</span>
-                                        </div>
+                                    <div class="card-body product-details table-responsive">
+                                        No product added
                                     </div>
                                 </div>
                             </div>
@@ -212,30 +141,30 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add Product</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('purchases.cart.store') }}" method="POST">
+                    <form class="create-form" action="{{ route('inventories.purchases.ajax.create') }}" method="POST">
                         @csrf
                         <div class="row">
                             <div class="col-12">
                                 <div class="form-group">
                                     <label for="product_id">Product Name</label>
-                                    <select name="product_id[]" id="product_id" class="form-control select2-single ajax-products" required></select>
+                                    <select name="product_id" id="product_id" class="form-control select2-single ajax-products" required></select>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="quantity">Quantity</label>
-                                    <input type="number" class="form-control" name="quantity[]" id="quantity" placeholder="Quantity" required>
+                                    <input type="number" class="form-control" name="quantity" id="quantity" placeholder="Quantity" required>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="unit_price">Unit Price</label>
-                                    <input type="number" class="form-control" name="unit_price[]" id="unit_price" placeholder="Unit Price" required>
+                                    <input type="number" class="form-control" name="unit_price" id="unit_price" placeholder="Unit Price" required>
                                 </div>
                             </div>
                         </div>
@@ -272,6 +201,22 @@
                     $("#product_id").html("<option value=''>--select--</option>" + msg);
                 });
             });
+
+            $('body').on('submit','.create-form', function(e){
+                e.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
+                    beforeSend: function(){
+                        $('.close-modal').trigger('click')
+                    },
+                    success: function(response){
+                        $('.product-details').html(response)
+                        console.log(response)
+                    }
+                })
+            })
         });
 
         function deleteItem(id) {

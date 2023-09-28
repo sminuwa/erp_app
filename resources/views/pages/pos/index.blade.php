@@ -105,6 +105,7 @@
                                                         @csrf
                                                         <input type="hidden" name="id" value="{{ $store->id }}">
                                                         <input type="hidden" name="name" value="{{ $store->name }}">
+                                                        <input type="hidden" name="code" value="{{ $store->code }}">
                                                         <input type="hidden" name="store" value="{{ $store->store }}">
                                                         <input type="hidden" name="qty" value="1">
                                                         <input type="hidden" name="selling_price"
@@ -218,7 +219,7 @@
                                                         {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
                                                         {{ $customer->code }}-{{ $customer->name }}</option>
                                                 @endforeach
-                                            </select><br/>
+                                            </select><br />
                                             <div class="form-group" id="display_due_date"
                                                 style="border: 1px solid rgba(64, 44, 45, 0.4)">
 
@@ -244,17 +245,17 @@
                                                         {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
                                                         {{ $customer->code }}-{{ $customer->name }}</option>
                                                 @endforeach
-                                            </select><br/>
-                                            <div class="form-group" id="ratail_customer"
-                                                style="border: 1px solid rgba(64, 44, 45, 0.4)">
-                                                <input type="text" class="form-control" name="ref"
-                                                    id="refno" placeholder="Reference" />
-                                            </div>
+                                            </select><br />
                                             <div class="form-group">
                                                 <span class="text text-danger ion-android-alert"
                                                     id="credit_balance"></span>
                                             </div>
 
+                                        </div>
+                                        <div class="form-group"
+                                            style="border: 1px solid rgba(64, 44, 45, 0.4)">
+                                            <input type="text" class="form-control" name="reference" id="reference"
+                                                placeholder="Reference" />
                                         </div>
                                         <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create
                                             Invoice</button>
@@ -284,7 +285,7 @@
                                             <tr>
                                                 {{-- <th>S.N</th> --}}
                                                 <th>Store</th>
-                                                <th style="width:30%">Item Description</th>
+                                                <th style="width:30%">Code</th>
                                                 <th>Price</th>
                                                 <th>Qty</th>
                                                 <th>Total</th>
@@ -297,7 +298,7 @@
                                                 <tr>
                                                     {{-- <td>{{ $loop->iteration }}</td> --}}
                                                     <td class="text-left">{{ $product->attributes['store'] }}</td>
-                                                    <td class="text-left">{{ $product->name }}</td>
+                                                    <td class="text-left">{{ $product->attributes['code'] }}</td>
 
                                                     <form action="{{ route('cart.update') }}" method="post"
                                                         id="p{{ $product->id }}">
@@ -565,8 +566,8 @@
                                 <div class="form-group">
                                     <label for="customer_id2">Customer</label>
                                     @php
-                                    $customers = clone $customers;
-                                @endphp
+                                        $customers = clone $customers;
+                                    @endphp
                                     <select
                                         class="form-control select2-single {{ $errors->has('customer_id2') ? ' is-invalid' : '' }}"
                                         name="customer_id2" id="customer_id2" required="required">

@@ -207,56 +207,23 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Customer</label>
-                                        @php
-                                            $wholer_customers = clone $customers;
-                                        @endphp
-                                        <div class="form-group" id="wholesale_customer_div">
-                                            <select name="customer_id" id="wholesale_customer"
-                                                class="form-control ct select2-single">
-                                                <option value="">Select...</option>
-                                                @foreach ($wholer_customers->where('type', 'Wholesale')->get() as $customer)
-                                                    <option value="{{ old('customer_id', $customer->id) }}"
-                                                        {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
-                                                        {{ $customer->code }}-{{ $customer->name }}</option>
-                                                @endforeach
+                                        <div class="form-group" >
+                                            <select name="customer_id" id="customer_record" class="form-control select2-single">
+                                                
                                             </select><br />
-                                            <div class="form-group" id="display_due_date"
-                                                style="border: 1px solid rgba(64, 44, 45, 0.4)">
-
-                                                <input type="text" class="form-control datepicker" name="due_date"
-                                                    id="due_date" placeholder="Due Date" value="{{ old('due_date') }}"
-                                                    autocomplete="off" />
+                                            <div class="form-group" id="display_due_date" style="border: 1px solid rgba(64, 44, 45, 0.4)">
+                                            
+                                                <input type="text" class="form-control datepicker" name="due_date" id="due_date" placeholder="Due Date"
+                                                    value="{{ old('due_date') }}" autocomplete="off" />
                                             </div>
                                             <div class="form-group">
-                                                <span class="text text-danger ion-android-alert"
-                                                    id="credit_balance"></span>
+                                                <span class="text text-danger ion-android-alert" id="credit_balance"></span>
                                             </div>
-
                                         </div>
-                                        @php
-                                            $retail_customers = clone $customers;
-                                        @endphp
-                                        <div class="form-group" id="retail_customer_div">
-                                            <select name="customer_id" id="retail_customer"
-                                                class="form-control ct select2-single">
-                                                <option value="">Select...</option>
-                                                @foreach ($retail_customers->where('type', 'Retail')->get() as $customer)
-                                                    <option value="{{ old('customer_id', $customer->id) }}"
-                                                        {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
-                                                        {{ $customer->code }}-{{ $customer->name }}</option>
-                                                @endforeach
-                                            </select><br />
-                                            <div class="form-group">
-                                                <span class="text text-danger ion-android-alert"
-                                                    id="credit_balance"></span>
-                                            </div>
-
-                                        </div>
-                                        <div class="form-group"
-                                            style="border: 1px solid rgba(64, 44, 45, 0.4)">
+                                        {{-- <div class="form-group" style="border: 1px solid rgba(64, 44, 45, 0.4)">
                                             <input type="text" class="form-control" name="reference" id="reference"
                                                 placeholder="Reference" />
-                                        </div>
+                                        </div> --}}
                                         <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create
                                             Invoice</button>
                                     </div>
@@ -733,23 +700,17 @@
     <script>
         $(function() {
             $("#example1").DataTable();
-            $('#retail_customer_div').hide();
-            $('#wholesale_customer_div').hide();
-            $('#ref_customer').hide();
+
             $('#account_type').on("change", function() {
-                if ($(this).val() == "Retail" || $(this).val() == "R") {
-                    $('#ref_customer').show();
-                    // $('#display_due_date').hide();
-                    $('#retail_customer_div').show();
-                    $('#wholesale_customer_div').hide();
-                }
-                if ($(this).val() == "Wholesale") {
-                    $('#ref_customer').hide();
-                    // $('#display_due_date').val("");
-                    // $('#display_due_date').hide();
-                    $('#wholesale_customer_div').show();
-                    $('#retail_customer_div').hide();
-                }
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('ajax.load.customers') }}",
+                    data: {
+                        type: $(this).val()
+                    }
+                }).done(function(data) {
+                    $("#customer_record").html(data);
+                });
             });
 
 
@@ -771,8 +732,9 @@
                 $("#" + tagg_id).html("Selling QTY is more than the available quantity");
             }
         }
-        $('#credit_customer').on("change", function() {
+        $('#customer_record').on("change", function() {
             customer_id = $(this).val();
+           
             $.ajax({
                 type: "GET",
                 url: "{{ route('ajax.load.customer.credit_limit') }}",
@@ -853,7 +815,7 @@
 
             });
 
-            $('#customer_id2').on("change", function() {
+            $('#customer_record').on("change", function() {
                 customer_id = $(this).val();
                 $.ajax({
                     type: "GET",

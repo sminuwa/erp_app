@@ -96,16 +96,10 @@ class InvoiceController extends Controller
 
 
         $rules = [];
-        if ($request->has('customer') && $request->customer == "" && $request->customer_id == "") {
+       
             $rules = [
-                'customer' => 'required',
+                'customer_id' => 'required|exists:customers,id',
             ];
-        }
-        if ($request->has('customer_id') && $request->customer_id == "" && $request->customer == "") {
-            $rules = [
-                'customer' => 'required',
-            ];
-        }
 
         $customMessages = [
             'customer_id.required' => 'Select a Customer first!.',
@@ -128,7 +122,7 @@ class InvoiceController extends Controller
         // }
         $customer = Customer::findOrFail($customer_id);
         $items = $this->orderItems();
-        $status = Transaction::sale($items, $customer->id, $request->reference, $request->order_date);
+        $status = Transaction::sale($items, $customer->id, $invoice, $request->order_date);
 
         $sub_total = str_replace(',', '', \Cart::getSubTotal());
         $tax = 0;
@@ -359,7 +353,7 @@ class InvoiceController extends Controller
     public function generateInvoice()
     {
         $invoice = DB::table('orders')->select(DB::raw('MAX(SUBSTR(invoice_no,8,11)) as max'))->where(DB::raw('YEAR(created_at)'), '=', date('Y'))->where(DB::raw('MONTH(created_at)'), '=', date('m'))->first();
-        return Auth::user()->user_code . date('y') . '' . date('m') . str_pad(($invoice->max + 1), 4, "0", STR_PAD_LEFT);
+        return Auth::user()->user_code . date('y') . '' . date('m') . str_pad(($invoice->max + 1), 6, "0", STR_PAD_LEFT);
     }
     public function runninigBalance($customer_id)
     {

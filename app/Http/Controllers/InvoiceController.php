@@ -145,7 +145,7 @@ class InvoiceController extends Controller
             $payment_mode = 'Cash';
             $due_date = $request->input('due_date');
             $running_balance = $this->runninigBalance($customer_id);
-            if ($running_balance < 0) { // in case the company owes a customer 
+            if ($running_balance < 0) { // in case the company owes a customer
 
                 if ($running_balance <= $total)
                     $amount_paid = abs($running_balance);
@@ -447,7 +447,7 @@ class InvoiceController extends Controller
             $payment_mode = $request->input('sale_mode');
             $due_date = $request->input('due_date');
             $running_balance = $this->runninigBalance($customer_id);
-            if ($running_balance < 0) { // in case the company owes a customer 
+            if ($running_balance < 0) { // in case the company owes a customer
 
                 if ($running_balance <= $total)
                     $amount_paid = abs($running_balance);
@@ -495,7 +495,7 @@ class InvoiceController extends Controller
             foreach ($contents as $content) {
                 //Put back the previous quantity
                 /*$restored_qty = $order->order_items()->where('store_product_id', $content->id)->first();
-                
+
                if($restored_qty?->quantity >0)
                    DB::table('store_products')->where('id', $content->id)->increment('qty_available', $restored_qty->$restored_qty?->quantity);*/
                 $total_discount += $content->attributes['discount'] * $content->quantity;

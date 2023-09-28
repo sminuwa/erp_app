@@ -1004,7 +1004,7 @@
 
         //       if (newUPC.length >= 6) {
         //         console.log('barcode scanned:  ', newUPC);
-        //       } 
+        //       }
         //    }
         // });
         let code = "";
@@ -1035,7 +1035,7 @@
                     });
                 }
             } else {
-                code += e.key; //while this is not an 'enter' it stores the every key            
+                code += e.key; //while this is not an 'enter' it stores the every key
             }
 
             //run a timeout of 200ms at the first read and clear everything

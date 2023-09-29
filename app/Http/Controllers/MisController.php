@@ -130,7 +130,7 @@ class MisController extends Controller
     public function loadCustomers(Request $request)
     { //return $request->type;
         $types = DB::table('customers')
-            ->select('customers.id', 'customers.name', 'customers.phone')
+            ->select('customers.id', 'customers.name', 'customers.code')
             ->where('type', '=', $request->type)
             ->where('branch_id', 'LIKE', User::userBranchAction())
             ->orderBy('name', 'asc')
@@ -139,9 +139,7 @@ class MisController extends Controller
         if ($types->count() > 1)
             $result .= "<option value=''>Select....</option>";
         foreach ($types as $type) {
-            $result .= "<option value='" . $type->id . "'>" . $type->name;
-            if ($type->phone != null)
-                $result .= "-" . $type->phone;
+            $result .= "<option value='" . $type->id . "'>" . $type->code.'-'.$type->name;
             $request .= "</option>";
         }
         return $result;

@@ -1,6 +1,7 @@
 <table class="table table-bordered table-striped" id="record1">
     <thead>
         <tr>
+            <th>Company </th>
             <th>Code </th>
             <th>Name </th>
             {{-- <th>Phone </th>
@@ -13,6 +14,7 @@
     <tbody>
         @foreach ($records as $record)
             <tr>
+                <td> {{ $record->company->name ?? null }} </td>
                 <td> {{ $record->code }} </td>
                 <td> {{ $record->name }} </td>
                 {{-- <td> {{ $record->phone }} </td>

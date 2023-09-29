@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Misc;
 
 use App\Http\Controllers\Controller;
+use App\Models\Branch;
 use App\Models\Category;
 use App\Models\ChartOfAccount;
+use App\Models\Company;
 use App\Models\Customer;
 use App\Models\GeneralAccount;
 use App\Models\Product;
@@ -40,6 +42,11 @@ class AjaxController extends Controller
         return view('misc.ajax.stores', compact('records'));
     }
 
+    public function branches(Request $request){
+        $records = Branch::orderBy('name','asc')->get();
+        return view('misc.ajax.branches', compact('records'));
+    }
+
     public function chart_of_accounts(){
         $records = ChartOfAccount::orderBy('class','asc')->get();
         return view('misc.ajax.chart-of-accounts', compact('records'));
@@ -48,5 +55,10 @@ class AjaxController extends Controller
     public function general_accounts(){
         $records = GeneralAccount::orderBy('number','asc')->get();
         return view('misc.ajax.general-accounts', compact('records'));
+    }
+
+    public function companies(Request $request){
+        $records = Company::orderBy('name','asc')->get();
+        return view('misc.ajax.companies', compact('records'));
     }
 }

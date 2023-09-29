@@ -4,7 +4,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 /**
  @property varchar $name name @property varchar $phone phone @property varchar $email email @property varchar $address address @property tinyint $status status @property timestamp $created_at created at @property timestamp $updated_at updated at
- 
+
  */
 class Branch extends Model
 
@@ -18,7 +18,7 @@ class Branch extends Model
     /**
      * Mass assignable columns
      */
-    protected $fillable = ['name', 'code', 'status'];
+    protected $fillable = ['company_id','name', 'code', 'status'];
 
     /**
      * Date time columns.
@@ -27,6 +27,10 @@ class Branch extends Model
 
     public function stores(){
         return $this->hasMany(Store::class,'branch_id','id');
+    }
+
+    public function company(){
+        return $this->belongsTo(Company::class, 'company_id');
     }
 
 

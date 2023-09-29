@@ -5,9 +5,18 @@ $(document).ready(function(){
     ajerks('GET','/misc/ajax/suppliers','ajax-suppliers')
     ajerks('GET','/misc/ajax/products','ajax-products')
     ajerks('GET','/misc/ajax/stores','ajax-stores')
+    ajerks('GET','/misc/ajax/branches','ajax-branches')
     ajerks('GET','/misc/ajax/chart-of-accounts','ajax-chart-of-accounts')
     ajerks('GET','/misc/ajax/general-accounts','ajax-general-accounts')
+    ajerks('GET','/misc/ajax/companies','ajax-companies')
 })
+
+
+
+    $('body').on('change', '.ajax-branches',function(){
+        $('.ajax-stores').attr('branch_id', $(this).val())
+        ajerks('GET','/misc/ajax/stores','ajax-stores')
+    })
 
 
 function ajerks(method, url, cssClass){

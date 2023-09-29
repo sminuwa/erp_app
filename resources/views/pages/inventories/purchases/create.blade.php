@@ -182,6 +182,10 @@
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script type="text/javascript">
         $(function() {
+
+
+
+
             $("#category_link,#product_link,#supplier_link").on('click', function() {
                 $('<input>').attr({
                     type: 'hidden',

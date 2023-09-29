@@ -98,7 +98,7 @@
                                                 <label for="source_store_id">Store</label>
                                                 <select
                                                     class="form-control ajax-stores select2-single {{ $errors->has('source_store_id') ? ' is-invalid' : '' }}"
-                                                    name="store_id" id="source_store_id" required="required">
+                                                    name="store_id" branch_id="{{ auth()->user()->branch->id }}" id="source_store_id" required="required">
                                                 </select>
                                             </div>
                                             <input type="hidden" name="updated_by" value="{{ Auth::id() }}" />

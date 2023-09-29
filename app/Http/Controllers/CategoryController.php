@@ -60,29 +60,29 @@ class CategoryController extends Controller
             'model' => new Category,
 
         ]);
-    } /**
-  * Store a newly created resource in storage.
-  *
-  * @param  Store  $request
-  * @return \Illuminate\Http\Response
-  */
+    }
+
     public function store(Store $request)
     {
-        $model = new Category;
-        $model->fill($request->all());
 
-        if ($model->save()) {
-            $action = "Added a new item group: " . $model->name;
-            AuditLog::auditLog(Auth::id(), $action);
-            session()->flash('app_message', 'Category saved successfully');
-            if ($request->has('shortcut'))
-                return redirect()->back();
-            return redirect()->route('categories.index');
+        /*$model = new Category;
+        $model->fill($request->all());*/
+        try{
+            if ($model = Category::createRecord($request->code, $request->name)) {
+                $action = "Added a new item group: " . $model->name;
+                AuditLog::auditLog(Auth::id(), $action);
+                session()->flash('app_message', 'Category saved successfully');
+                if ($request->has('shortcut'))
+                    return redirect()->back();
+                return redirect()->route('categories.index');
+            }
+            else {
+                session()->flash('app_error', 'Something is wrong while saving Category');
+            }
+            return redirect()->back();
+        }catch (\Exception $e){
+            return redirect()->back()->with('app_error', 'Something is wrong while saving Category.');
         }
-        else {
-            session()->flash('app_error', 'Something is wrong while saving Category');
-        }
-        return redirect()->back();
     } /**
   * Show the form for editing the specified resource.
   *
@@ -128,13 +128,15 @@ class CategoryController extends Controller
   */
     public function destroy(Destroy $request, Category $category)
     {
-        if ($category->delete()) {
-            $action = "Deleted an item group: " . $category->name;
-            AuditLog::auditLog(Auth::id(), $action);
-            session()->flash('app_message', 'Category successfully deleted');
+        if (!$category->has_record()) {
+            if($category->delete() && $category->deleteAccounts()) {
+                $action = "Deleted an item group: " . $category->name;
+                AuditLog::auditLog(Auth::id(), $action);
+                session()->flash('app_message', 'Category successfully deleted');
+            }
         }
         else {
-            session()->flash('app_error', 'Error occurred while deleting Category');
+            session()->flash('app_error', 'Cannot delete this record.');
         }
 
         return redirect()->back();

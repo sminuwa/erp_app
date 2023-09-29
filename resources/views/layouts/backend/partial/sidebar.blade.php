@@ -244,6 +244,40 @@
                     <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
                         <i class="ion-android-list"></i>
                         <p>
+                            Sales
+                            <i class="right fa fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('pos.index') }}" class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>Orders</p>
+                            </a>
+                        </li>
+                        @can('make.daily.sale')
+                        <li class="nav-item">
+                            <a href="{{ route('pos.index') }}"
+                               class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>Invoice (POS)</p>
+                            </a>
+                        </li>
+                        @endcan
+                        <li class="nav-item">
+                            <a href="{{ route('pos.index') }}"
+                               class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>Proformer Invoice</p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+                <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
+                        <i class="ion-android-list"></i>
+                        <p>
                             Inventory
                             <i class="right fa fa-angle-left"></i>
                         </p>
@@ -306,6 +340,7 @@
 
                     </ul>
                 </li>
+
                 @can('make.daily.sale')
                     <li class="nav-item has-treeview">
                         <a href="{{ route('pos.index') }}" class="nav-link {{ Request::is('pos/*') ? 'active' : '' }}">

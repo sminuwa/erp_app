@@ -34,8 +34,9 @@ class AjaxController extends Controller
         return view('misc.ajax.products', compact('records'));
     }
 
-    public function stores(){
-        $records = Store::orderBy('name','asc')->get();
+    public function stores(Request $request){
+        $branch_id = $request->branch_id;
+        $records = Store::forBranch($branch_id)->orderBy('name','asc')->get();
         return view('misc.ajax.stores', compact('records'));
     }
 

@@ -10,14 +10,21 @@ $(document).ready(function(){
 })
 
 
-function ajerks(method, url, cssClass ){
+function ajerks(method, url, cssClass){
+    let element = $('.'+cssClass);
+    let data;
+    if(element.attr('branch_id') && element.attr('name')==='store_id'){
+        let branch_id = element.attr('branch_id')
+        data = { branch_id : branch_id }
+    }
+
     $.ajax({
         url: url,
         type: method,
+        data,
         success:function(response){
-            $('.'+cssClass).html(response)
+            element.html(response)
             mySelect2()
-            // console.log(response)
         }
     })
 }

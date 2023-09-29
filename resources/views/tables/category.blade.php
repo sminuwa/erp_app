@@ -17,16 +17,18 @@
                             <span class="fa fa-pencil"></span>
                         </a>
                     @endcan
-                    @can('delete.product.group')
-                        <form onsubmit="return confirm('Are you sure you want to delete?')"
-                            action="{{ route('categories.destroy', $record->id) }}" method="post" style="display: inline">
-                            {{ csrf_field() }}
-                            {{ method_field('DELETE') }}
-                            <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
-                                <i class="text-danger fa fa-remove"></i>
-                            </button>
-                        </form>
-                    @endcan
+                    @if(!$record->has_record())
+                        @can('delete.product.group')
+                            <form onsubmit="return confirm('Are you sure you want to delete?')"
+                                action="{{ route('categories.destroy', $record->id) }}" method="post" style="display: inline">
+                                {{ csrf_field() }}
+                                {{ method_field('DELETE') }}
+                                <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
+                                    <i class="text-danger fa fa-remove"></i>
+                                </button>
+                            </form>
+                        @endcan
+                    @endif
                 </td>
             </tr>
         @endforeach

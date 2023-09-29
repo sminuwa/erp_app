@@ -5,7 +5,7 @@ namespace App\Http\Requests\Categories;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Category;
 
-class Store extends FormRequest 
+class Store extends FormRequest
 {
 
     /**
@@ -13,7 +13,7 @@ class Store extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
         return $this->user()->can('create.product.group', Category::class);
     }
@@ -23,11 +23,11 @@ class Store extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 			'name' => 'required|max:191',
-			'code' => 'required|max:10',
+			'code' => 'required|unique:categories,code|max:10',
         ];
     }
 
@@ -39,7 +39,7 @@ class Store extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

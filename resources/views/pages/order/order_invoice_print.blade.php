@@ -33,9 +33,11 @@
                     <!-- title row -->
                     <div class="row">
                         <div class="col-11">
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:80px;height:80px;"
-                                alt="logo" class="img-circle elevation-3" style="opacity: .8">
-                            <span style="font-size:24px;">&nbsp;{{App\Models\User::userBranchName()->long_name}}</span>
+                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
+                                style="width:80px;height:80px;" alt="logo" class="img-circle elevation-3"
+                                style="opacity: .8">
+                            <span
+                                style="font-size:24px;">&nbsp;{{ App\Models\User::userBranchName()->long_name }}</span>
 
                             <small class="float-right">Date: {{ date('l, d-M-Y h:i:s A') }}</small>
 
@@ -63,12 +65,12 @@
                         <div class="col-sm-4 offset-3">
                             <address>
                                 <h5>BRANCH OFFICE</h5>
-                                Address <span class="ion-ios-contact-outline"></span>: {{ $order->branch?->address }}
+                                Address <span class="ion-ios-contact-outline"></span>: {{ $order->branch?->address ?? ''}}
                                 <br>
                                 Phone <span class="ion-android-phone-portrait"></span>:
-                                {{ $order->branch->phone }}
+                                {{ $order->branch->phone ?? '' }}
                                 <br>
-                                Email <span class="ion-email"></span>: {{ $order->branch?->email }}
+                                Email <span class="ion-email"></span>: {{ $order->branch?->email ?? '' }}
                             </address>
                         </div>
                         <!-- /.col -->
@@ -76,11 +78,11 @@
                     <div class="row">
                         <div class="col-sm-4 invoice-col">
                             <address>
-                                <b>Customer Name:</b> {{ $order->customer->name }}<br />
+                                <b>Customer Name:</b> {{ $order->customer->name ?? '' }}<br />
                                 <b>Address:</b> <span class="ion-ios-contact-outline"></span>
-                                {{ $order->customer->address }}<br>
+                                {{ $order->customer->address ?? '' }}<br>
                                 <b>Phone:</b> <span class="ion-android-phone-portrait"></span>
-                                {{ $order->customer->phone }}<br>
+                                {{ $order->customer->phone ?? '' }}<br>
                             </address>
                         </div>
                         <div class="col-sm-3 invoice-col">
@@ -96,7 +98,8 @@
                         </div>
                         <div class="col-sm-4">
                             <b>Invoice No:</b> {{ $order->invoice_no }}<br>
-                            <b>Date and Time: {{ \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</b><br>
+                            <b>Date and Time:
+                                {{ \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</b><br>
                             <b>Prepared By</b> <span class="ion-card"></span> {{ $order->sold->name }}<br />
                             <b>Printed By <span class="ion-printer"></span>
                                 &nbsp;&nbsp;{{ Auth::user()->name }}</span><span>
@@ -126,9 +129,9 @@
                                     @foreach ($order_details as $order_detail)
                                         <tr>
                                             <td align="center">{{ $order_detail->quantity }}</td>
-                                            <td>{{ $order_detail->storeProduct->store->code }}</td>
-                                            <td>{{ $order_detail->storeProduct->product->code }}</td>
-                                            <td>{{ $order_detail->storeProduct->product->name }}</td>
+                                            <td>{{ $order_detail->storeProduct->store->code ?? ''}}</td>
+                                            <td>{{ $order_detail->storeProduct->product->code ?? ''}}</td>
+                                            <td>{{ $order_detail->storeProduct->product->name ?? ''}}</td>
                                             <td align="right">
                                                 &#8358;{{ number_format($order_detail->sold_price, 2) }}
                                             </td>
@@ -143,21 +146,21 @@
                             <table class="table table-bordered table-condensed">
                                 <tr>
                                     <td rowspan="5" style="text-align: left;vertical-align: bottom">
-                                       
+
                                     </td>
                                     <th style="text-align: right">Total Amount := </th>
                                     <th style="text-align: right;">
                                         &#8358;{{ number_format($total, 2, '.', ',') }}</th>
                                 </tr>
-                                {{--@if ($order->discount != 0)
+                                {{-- @if ($order->discount != 0)
                                     <tr>
                                         <th style="text-align: right">Discount := </th>
                                         <th style="text-align: right;">
                                             &#8358;{{ number_format($order->discount, 2, '.', ',') }}
                                         </th>
                                     </tr>
-                                @endif--}}
-                               
+                                @endif --}}
+
                                 </tbody>
                             </table>
 
@@ -177,7 +180,7 @@
                                             style='font-size:14px; border-style:none;'></span>
                                         Signature:
                                         _______________________________<br /><br />
-                                        for: {{App\Models\User::UserBranchName()->long_name}}
+                                        for: {{ App\Models\User::UserBranchName()->long_name }}
                                     </td>
                                 </tr>
                             </table>

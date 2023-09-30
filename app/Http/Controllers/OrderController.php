@@ -188,6 +188,10 @@ class OrderController extends Controller
     public function load(Request $request)
     {
         $order = Order::find($request->order_id);
+        if ($request->type == 'order')
+            $order = OrderInvoice::find($request->order_id);
+        if ($request->type == 'proformer')
+            $order = Proformer::find($request->order_id);
         return view('pages.order.view_orders', compact('order'));
     }
     public function loadEdit(Request $request)

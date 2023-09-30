@@ -292,7 +292,8 @@
                     type: 'get',
                     url: "{{ route('orders.load') }}",
                     data: {
-                        order_id: order_id
+                        order_id: order_id,
+                        type:'order'
                     }
                 }).done(function(data) {
                     $('.display').html();

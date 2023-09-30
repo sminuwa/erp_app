@@ -6,6 +6,8 @@ use App\Models\Customer;
 use App\Models\Expense;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\Proformer;
+use App\Models\ProformerDetail;
 use App\Models\Setting;
 use Barryvdh\DomPDF\Facade as PDF;
 use Brian2694\Toastr\Facades\Toastr;
@@ -31,6 +33,14 @@ class OrderController extends Controller
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         return view('pages.order.order_confirmation', compact('order_details', 'order', 'company'));
     }
+    public function proformer_show($id)
+    {
+        $order = Proformer::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
+        return $order_details = ProformerDetail::with('storeProduct')->where(['order_id' => $id, 'status' => 1])->get();
+        //return $order_details;
+        $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
+        return view('pages.order.show_proformer', compact('order_details', 'order', 'company'));
+    }
 
 
     public function pending_order()
@@ -52,27 +62,7 @@ class OrderController extends Controller
     public function search(Request $request)
     {
         $search_value = $request->refno;
-        /*$orders = Order::select('orders.*', 'customers.name')->latest('order_date')->with('customer')
-         ->join(
-         'customers',
-         'customers.id',
-         'orders.customer_id'
-         );
-         if (Auth::user()->hasRole('Sales-Manager'))
-         $orders = $orders->where('sold_by', Auth::id());
-         $orders = $orders->where('orders.branch_id', 'LIKE', User::userBranchAction())->where('order_status', 'approved')->where('invoice_no', 'LIKE', "%$search_value%")
-         ->orWhere(
-         'customers.name',
-         'LIKE',
-         "%$search_value%"
-         )
-         ->orWhere(
-         'customers.phone',
-         'LIKE',
-         "%$search_value%"
-         );
-         $orders = $orders->get();*/
-
+       
         $orders = Order::with('customer')->select('orders.*', 'customers.name')->latest('order_date')->join(
             'customers',
             'customers.id',
@@ -106,6 +96,44 @@ class OrderController extends Controller
             );
 
         return view('pages.order.approved_orders', compact('orders'));
+    }
+    public function proformer_search(Request $request)
+    {
+        $search_value = $request->refno;
+       
+        $orders = Proformer::with('customer')->select('orders.*', 'customers.name')->latest('order_date')->join(
+            'customers',
+            'customers.id',
+            'orders.customer_id'
+        );
+        if (Auth::user()->hasRole('Sales-Manager'))
+            $orders = $orders->where('sold_by', Auth::id());
+        $orders = $orders->where('proformers.branch_id', 'LIKE', User::userBranchAction())
+            ->where(
+                'proformers.branch_id',
+                'LIKE', User::userBranchAction()
+            )->where(
+                'order_status',
+                'approved'
+            )
+            ->where(
+                function ($query) use ($search_value) {
+                    $query->where('invoice_no', 'LIKE', "%$search_value%")
+                        ->orWhere(
+                            'customers.name',
+                            'LIKE',
+                            "%$search_value%"
+                        )
+                        ->orWhere(
+                            'customers.phone',
+                            'LIKE',
+                            "%$search_value%"
+                        );
+                }
+            )->get(
+            );
+
+        return view('pages.order.proformers', compact('orders'));
     }
     public function load(Request $request)
     {
@@ -589,5 +617,14 @@ class OrderController extends Controller
             session()->flash('app_error', 'Unauthorized access!!');
             return redirect()->route('orders.approved');
         }
+    }
+    public function proformer_list(){
+        \Cart::clear();
+        $user = Auth::user();
+        $orders = Proformer::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where(['order_status'=>'approved','status'=>1]);
+        if ($user->hasRole('Sales-Manager'))
+            $orders = $orders->where('sold_by', Auth::id());
+        $orders = $orders->whereDate('order_date', date('Y-m-d'))->get();
+        return view('pages.order.proformers', compact('orders'));
     }
 }

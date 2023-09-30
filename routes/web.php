@@ -295,10 +295,14 @@ Route::group(['prefix' => 'sales', 'middleware' => 'auth'], function () {
     Route::get('pos/edit/{order}', [PosController::class, 'edit'])->name('pos.edit');
     Route::get('barcode/search/product', [PosController::class, 'barcodeSearch'])->name('barcode.search.product');
 
+    Route::get('proformer', [PosController::class, 'index'])->name('proformer.index');
+
     Route::post('/invoice', [InvoiceController::class, 'final_invoice'])->name('invoice.create');
+    Route::post('/preformer/create', [InvoiceController::class, 'final_proformer'])->name('proformer.create');
     Route::put('/invoice/update/{order}', [InvoiceController::class, 'updateInvoice'])->name('invoice.update');
     Route::get('/print/{customer_id}', [InvoiceController::class, 'print'])->name('invoice.print');
     Route::get('/order-print/{order_id}', [InvoiceController::class, 'order_print'])->name('invoice.order_print');
+    Route::get('/proformer/print/{customer_id}', [InvoiceController::class, 'print_proformer'])->name('proformer.print');
     Route::post('/invoice-final', [InvoiceController::class, 'final_invoice'])->name('invoice.final_invoice');
     Route::get('/waybill/order-print/{order_id}', [InvoiceController::class, 'waybill_print'])->name('waybill.order_print');
     Route::get('/pos/order-print/{order_id}', [InvoiceController::class, 'pos_print'])->name('pos.order_print');
@@ -310,6 +314,7 @@ Route::group(['prefix' => 'sales', 'middleware' => 'auth'], function () {
     Route::get('load/store/products', [MisController::class, 'loadStoreProducts'])->name('ajax.load.store.products');
 
     Route::post('/product/search', [OrderController::class, 'search'])->name('sales_products.search');
+    Route::post('/proformer/search', [OrderController::class, 'proformer_search'])->name('proformer.search');
     Route::post('/product/verify', [OrderController::class, 'verify'])->name('sales_products.verify');
 
     Route::post('/transfer/to-user', [OrderController::class, 'transfer'])->name('transfer.sale.to.user');
@@ -318,9 +323,12 @@ Route::group(['prefix' => 'sales', 'middleware' => 'auth'], function () {
 });
 Route::group(['prefix' => 'orders', 'middleware' => 'auth'], function () {
     Route::get('/show/{id}', [OrderController::class, 'show'])->name('orders.show');
+    Route::get('/proformer/show/{id}', [OrderController::class, 'proformer_show'])->name('proformer.show');
     Route::get('/customers/{id}', [OrderController::class, 'customer_order'])->name('orders.customer');
     Route::get('/approved', [OrderController::class, 'approved_order'])->name('orders.approved');
+    Route::get('/proformer', [OrderController::class, 'proformer_list'])->name('proformer.list');
     Route::delete('/delete/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+    Route::delete('/proformer/delete/{order}', [OrderController::class, 'destroy_proformer'])->name('proformer.destroy');
     Route::get('/download/{id}', [OrderController::class, 'download'])->name('orders.download');
     Route::get('/payment/print/{id}', [OrderController::class, 'printPayment'])->name('payment.print');
     Route::post('/order/edit{order}', [OrderController::class, 'edit'])->name('orders.edit');

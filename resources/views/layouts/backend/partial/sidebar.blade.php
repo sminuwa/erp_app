@@ -265,7 +265,7 @@
                         </li>
                         @endcan
                         <li class="nav-item">
-                            <a href="{{ route('pos.index') }}"
+                            <a href="{{ route('proformer.index') }}"
                                class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Proformer Invoice</p>

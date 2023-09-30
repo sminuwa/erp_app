@@ -10,8 +10,8 @@
         @foreach ($order->order_items()->where('status',1)->get() as $item)
             <tr>
                 <td>{{ $item->quantity }}</td>
-                <td>{{ $item->storeProduct->product->name }}</td>
-                <td>{{ $item->storeProduct->store->name }}</td>
+                <td>{{ $item->storeProduct->product->name ?? '' }}</td>
+                <td>{{ $item->storeProduct->store->name ?? ''}}</td>
                 <td align="right">{{ number_format($item->sold_price, 2) }}</td>
                 <td align="right">{{ number_format($item->total, 2) }}</td>
             </tr>

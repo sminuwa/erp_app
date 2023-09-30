@@ -6,7 +6,11 @@ use App\Classes\Transaction;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\OrderInvoice;
+use App\Models\OrderInvoiceDetail;
 use App\Models\Product;
+use App\Models\Proformer;
+use App\Models\ProformerDetail;
 use Brian2694\Toastr\Facades\Toastr;
 use Darryldecode\Cart\Cart;
 use Illuminate\Http\Request;
@@ -75,6 +79,29 @@ class InvoiceController extends Controller
         $util = new Utility();
         return view('pages.pos.print', compact('customer', 'contents', 'company', 'util'));
     }
+    public function print_proformer($order_id)
+    {
+        $order = Proformer::with('customer')->where('id', $order_id)->first();
+        //return $order;
+        $order_details = ProformerDetail::with('storeProduct')->where(['order_id' => $order_id, 'status' => 1])->get();
+        //return $order_details;
+        //$company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('created_at')->first();
+        $company = Setting::find(1);
+        $utility = new Utility();
+        return view('pages.order.proformer_print', compact('order_details', 'order', 'company', 'utility'));
+    }
+    public function print_order_invoice($order_id)
+    {
+        $order = OrderInvoice::with('customer')->where('id', $order_id)->first();
+        //return $order;
+        $order_details = OrderInvoiceDetail::with('storeProduct')->where(['order_id' => $order_id, 'status' => 1])->get();
+        //return $order_details;
+        //$company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('created_at')->first();
+        $company = Setting::find(1);
+        $utility = new Utility();
+        return view('pages.order.order_invoice_print', compact('order_details', 'order', 'company', 'utility'));
+    }
+
 
     public function order_print($order_id)
     {
@@ -96,10 +123,10 @@ class InvoiceController extends Controller
 
 
         $rules = [];
-       
-            $rules = [
-                'customer_id' => 'required|exists:customers,id',
-            ];
+
+        $rules = [
+            'customer_id' => 'required|exists:customers,id',
+        ];
 
         $customMessages = [
             'customer_id.required' => 'Select a Customer first!.',
@@ -260,78 +287,6 @@ class InvoiceController extends Controller
                 ]);
 
             }
-
-            //DB::table('orders')->where('id', $order_id)->decrement('due', $total_discount);
-
-            // if ($payment_mode != "Cash") {
-            //     if ($payment_mode == "Credit") {
-            //         DB::table('customer_ledgers')->insert([
-            //             'customer_id' => $customer_id,
-            //             'order_id' => $order_id,
-            //             'systemid' => $invoice,
-            //             'description' => 'Credit sales',
-            //             'Ref' => $invoice,
-            //             'cr' => $total,
-            //             'payment_mode' => $payment_mode,
-            //             'date' => $request->order_date,
-            //             //date('Y-m-d'),
-            //             'created_at' => Carbon::now(),
-            //             'updated_at' => Carbon::now()
-            //         ]);
-            //         DB::table('customers')->where(['id' => $customer_id])->increment('opening_balance', ($total - $total_discount));
-            //     }
-
-            // }
-            // if ($payment_mode == "Cash") {
-            //     DB::table('bank_accounts')->where(['account_type' => 'Cash'])->where('branch_id', 'LIKE', User::userBranchAction())->increment('account_balance', ($total - $total_discount));
-
-            //     $bank_account = DB::table('bank_accounts')->where(['account_type' => 'Cash'])->where('branch_id', 'LIKE', User::userBranchAction())->first();
-            //     DB::table('customer_ledgers')->insert([
-            //         'customer_id' => $customer_id,
-            //         'order_id' => $order_id,
-            //         'systemid' => $invoice,
-            //         'description' => 'Cash sales',
-            //         'Ref' => 'Nil',
-            //         'cr' => $total,
-            //         'dr' => $total,
-            //         'payment_mode' => $payment_mode,
-            //         'bank_account_id' => $bank_account->id,
-            //         'date' => $request->order_date,
-            //         //date('Y-m-d'),
-            //         'created_at' => Carbon::now(),
-            //         'updated_at' => Carbon::now()
-            //     ]);
-            //     //Bank Deposit
-            //     DB::table('bank_transactions')->insert([
-            //         'bank_account_id' => $bank_account->id,
-            //         'trans_date' => $request->order_date,
-            //         //date('Y-m-d'),
-            //         'cr' => $total,
-            //         'dr' => 0,
-            //         'ref_no' => $invoice,
-            //         'created_at' => Carbon::now(),
-            //         'updated_at' => Carbon::now(),
-            //     ]);
-
-            // }
-            // if ($request->has('sms')) { //SEND SMS NOTIFICATION
-            //     $customer_phone = $customer->phone;
-            //     $msg = "Dear $customer->name, %0a$invoice has been raised in your account valued N" . number_format($total, 2) . ".%0aYour new account balance is N" . number_format($customer->runningBalance(), 2, '.', ',');
-            //     $url = "http://portal.nigeriabulksms.com/api/";
-            //     $ch = curl_init();
-            //     curl_setopt($ch, CURLOPT_URL, "$url");
-            //     curl_setopt($ch, CURLOPT_POST, 1);
-            //     curl_setopt(
-            //         $ch,
-            //         CURLOPT_POSTFIELDS,
-            //         "username=engrabusadik@gmail.com&password=Aisha123&message=$msg&sender=ALBABELLO&mobiles=$customer_phone"
-            //     );
-
-            //     // Receive server response
-            //     $server_output = curl_exec($ch);
-            //     curl_close($ch);
-            //     //return $server_output;
-            // }
             $action = "Made a sell of $invoice: $total";
             AuditLog::auditLog(Auth::id(), $action);
             DB::commit();
@@ -346,6 +301,232 @@ class InvoiceController extends Controller
 
     }
 
+    public function final_proformer(Request $request)
+    { 
+        $invoice = $this->generateProfomerInvoice('PFI');
+        $inputs = $request->except('_token');
+
+
+        $rules = [];
+
+        $rules = [
+            'customer_id' => 'required|exists:customers,id',
+        ];
+
+        $customMessages = [
+            'customer_id.required' => 'Select a Customer first!.',
+            //'customer_id.integer' => 'Invalid Customer!.'
+        ];
+
+        $validator = Validator::make($inputs, $rules, $customMessages);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $customer_id = $request->input('customer_id');
+
+        $customer = Customer::findOrFail($customer_id);
+        $items = $this->orderItems();
+
+        $sub_total = str_replace(',', '', \Cart::getSubTotal());
+        $tax = 0;
+        $total = str_replace(',', '', \Cart::getTotal());
+
+
+        $pay = $request->input('pay');
+        //$due = $total - $pay;
+        $order_id = 0;
+        $amount_paid = 0;
+        //$customer_id = $request->input('customer_id');
+        DB::beginTransaction();
+        try {
+            $payment_mode = 'Cash';
+            $due_date = $request->input('due_date');
+            $running_balance = $this->runninigBalance($customer_id);
+            if ($running_balance < 0) { // in case the company owes a customer
+
+                if ($running_balance <= $total)
+                    $amount_paid = abs($running_balance);
+                else
+                    $amount_paid = abs($running_balance) - $total;
+
+            }
+
+            $order_id = DB::table('proformers')->insertGetId([
+                'customer_id' => $customer_id,
+                'payment_mode' => $payment_mode,
+                'due_date' => $due_date,
+                'pay' => $payment_mode == "Credit" ? $amount_paid : $total,
+                'due' => $payment_mode == "Credit" ? ($total - $amount_paid) : 0,
+                'order_date' => $request->order_date,
+                //date('Y-m-d'),
+                'order_status' => 'approved',
+                'total_products' => \Cart::getTotalQuantity(),
+                'sub_total' => $sub_total,
+                'vat' => $tax,
+                'total' => $total,
+                'invoice_no' => $invoice,
+                'sold_by' => Auth::id(),
+                'system_id' => gethostname(),
+                'branch_id' => User::userBranchAction(),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ]);
+
+            $contents = \Cart::getContent();
+            $products = [];
+            $total_discount = 0;
+            foreach ($contents as $content) {
+                $total_discount += $content->attributes['discount'] * $content->quantity;
+                $store = StoreProduct::find($content->id);
+                $qtyAval = $store->qty_available;
+                //$store->qty_available = $qtyAval - $content->quantity;
+                $order_detail = new OrderDetail();
+                DB::table('proformer_details')->insert([
+                    'order_id' => $order_id,
+                    'store_product_id' => $content->id,
+                    'quantity' => $content->quantity,
+                    'original_quantity_sold' => $content->quantity,
+                    'selling_price' => $content->attributes['selling_price'],
+                    'sold_price' => $content->price,
+                    'cost_price' => $content->attributes['cost_price'],
+                    'total' => $content->getPriceSum(),
+                    'avail_qty_before_sale' => $qtyAval,
+                    //get available product in stock before sale
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]);
+            }
+            //Upate the Order table with the discount
+            DB::table('proformers')->where('id', $order_id)->increment('discount', $total_discount);
+
+            $action = "Issue proformer $invoice: $total";
+            AuditLog::auditLog(Auth::id(), $action);
+            DB::commit();
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            throw $ex;
+        }
+        \Cart::clear();
+
+        session()->flash('Proformer created successfully');
+        return redirect()->route('proformer.show', $order_id);
+
+    }
+    public function final_order_invoice(Request $request)
+    {
+        $invoice = $this->generateProfomerInvoice('ODR');
+        $inputs = $request->except('_token');
+
+
+        $rules = [];
+
+        $rules = [
+            'customer_id' => 'required|exists:customers,id',
+        ];
+
+        $customMessages = [
+            'customer_id.required' => 'Select a Customer first!.',
+            //'customer_id.integer' => 'Invalid Customer!.'
+        ];
+
+        $validator = Validator::make($inputs, $rules, $customMessages);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $customer_id = $request->input('customer_id');
+
+        if ((\Cart::getTotal() + Customer::find($customer_id)->runningBalance()) > Customer::find($customer_id)->credit_limit) {
+            session()->flash('app_error', 'The amount has exceeded the customer credit limit');
+            return redirect()->back();
+        }
+        $customer = Customer::findOrFail($customer_id);
+        $items = $this->orderItems();
+
+        $sub_total = str_replace(',', '', \Cart::getSubTotal());
+        $tax = 0;
+        $total = str_replace(',', '', \Cart::getTotal());
+
+
+        $pay = $request->input('pay');
+        //$due = $total - $pay;
+        $order_id = 0;
+        $amount_paid = 0;
+        //$customer_id = $request->input('customer_id');
+        DB::beginTransaction();
+        try {
+            $payment_mode = 'Cash';
+            $due_date = $request->input('due_date');
+            $running_balance = $this->runninigBalance($customer_id);
+            if ($running_balance < 0) { // in case the company owes a customer
+
+                if ($running_balance <= $total)
+                    $amount_paid = abs($running_balance);
+                else
+                    $amount_paid = abs($running_balance) - $total;
+
+            }
+
+            $order_id = DB::table('order_invoices')->insertGetId([
+                'customer_id' => $customer_id,
+                'payment_mode' => $payment_mode,
+                'due_date' => $due_date,
+                'pay' => $payment_mode == "Credit" ? $amount_paid : $total,
+                'due' => $payment_mode == "Credit" ? ($total - $amount_paid) : 0,
+                'order_date' => $request->order_date,
+                //date('Y-m-d'),
+                'order_status' => 'approved',
+                'total_products' => \Cart::getTotalQuantity(),
+                'sub_total' => $sub_total,
+                'vat' => $tax,
+                'total' => $total,
+                'invoice_no' => $invoice,
+                'sold_by' => Auth::id(),
+                'system_id' => gethostname(),
+                'branch_id' => User::userBranchAction(),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ]);
+
+            $contents = \Cart::getContent();
+            $products = [];
+            $total_discount = 0;
+            foreach ($contents as $content) {
+                $total_discount += $content->attributes['discount'] * $content->quantity;
+                $store = StoreProduct::find($content->id);
+                $qtyAval = $store->qty_available;
+                //$store->qty_available = $qtyAval - $content->quantity;
+                $order_detail = new OrderDetail();
+                DB::table('order_invoice_details')->insert([
+                    'order_id' => $order_id,
+                    'store_product_id' => $content->id,
+                    'quantity' => $content->quantity,
+                    'original_quantity_sold' => $content->quantity,
+                    'selling_price' => $content->attributes['selling_price'],
+                    'sold_price' => $content->price,
+                    'cost_price' => $content->attributes['cost_price'],
+                    'total' => $content->getPriceSum(),
+                    'avail_qty_before_sale' => $qtyAval,
+                    //get available product in stock before sale
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]);
+            }
+            //Upate the Order table with the discount
+            DB::table('order_invoices')->where('id', $order_id)->increment('discount', $total_discount);
+
+            $action = "Issue order invoice $invoice: $total";
+            AuditLog::auditLog(Auth::id(), $action);
+            DB::commit();
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            throw $ex;
+        }
+        \Cart::clear();
+
+        session()->flash('Order invoice created successfully');
+        return redirect()->route('order.invoice.show', $order_id);
+
+    }
     public function getTotalDiscount($order_id)
     {
         return OrderDetail::sum('discount_unit_price')->where(['order_id' => $order_id, 'status' => 1])->first();
@@ -354,6 +535,14 @@ class InvoiceController extends Controller
     {
         $invoice = DB::table('orders')->select(DB::raw('MAX(SUBSTR(invoice_no,8,11)) as max'))->where(DB::raw('YEAR(created_at)'), '=', date('Y'))->where(DB::raw('MONTH(created_at)'), '=', date('m'))->first();
         return Auth::user()->user_code . date('y') . '' . date('m') . str_pad(($invoice->max + 1), 6, "0", STR_PAD_LEFT);
+    }
+    public function generateProfomerInvoice($type)
+    {
+        if ($type == "PFI")
+            $invoice = DB::table('proformers')->select(DB::raw('MAX(SUBSTR(invoice_no,8,11)) as max'))->where(DB::raw('YEAR(created_at)'), '=', date('Y'))->where(DB::raw('MONTH(created_at)'), '=', date('m'))->first();
+        if ($type == "ODR")
+            $invoice = DB::table('order_invoices')->select(DB::raw('MAX(SUBSTR(invoice_no,8,11)) as max'))->where(DB::raw('YEAR(created_at)'), '=', date('Y'))->where(DB::raw('MONTH(created_at)'), '=', date('m'))->first();
+        return $type . date('y') . '' . date('m') . str_pad(($invoice->max + 1), 6, "0", STR_PAD_LEFT);
     }
     public function runninigBalance($customer_id)
     {

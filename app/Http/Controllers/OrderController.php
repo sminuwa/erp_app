@@ -6,6 +6,10 @@ use App\Models\Customer;
 use App\Models\Expense;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\OrderInvoice;
+use App\Models\OrderInvoiceDetail;
+use App\Models\Proformer;
+use App\Models\ProformerDetail;
 use App\Models\Setting;
 use Barryvdh\DomPDF\Facade as PDF;
 use Brian2694\Toastr\Facades\Toastr;
@@ -31,7 +35,22 @@ class OrderController extends Controller
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         return view('pages.order.order_confirmation', compact('order_details', 'order', 'company'));
     }
-
+    public function proformer_show($id)
+    {
+        $order = Proformer::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
+        $order_details = ProformerDetail::with('storeProduct')->where(['order_id' => $id, 'status' => 1])->get();
+        //return $order_details;
+        $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
+        return view('pages.order.show_proformer', compact('order_details', 'order', 'company'));
+    }
+    public function order_invoice_show($id)
+    {
+        $order = OrderInvoice::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
+        $order_details = OrderInvoiceDetail::with('storeProduct')->where(['order_id' => $id, 'status' => 1])->get();
+        //return $order_details;
+        $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
+        return view('pages.order.show_order_invoice', compact('order_details', 'order', 'company'));
+    }
 
     public function pending_order()
     {
@@ -43,7 +62,7 @@ class OrderController extends Controller
     {
         \Cart::clear();
         $user = Auth::user();
-        $orders = Order::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where(['order_status'=>'approved','status'=>1]);
+        $orders = Order::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where(['order_status' => 'approved', 'status' => 1]);
         if ($user->hasRole('Sales-Manager'))
             $orders = $orders->where('sold_by', Auth::id());
         $orders = $orders->whereDate('order_date', date('Y-m-d'))->get();
@@ -52,26 +71,6 @@ class OrderController extends Controller
     public function search(Request $request)
     {
         $search_value = $request->refno;
-        /*$orders = Order::select('orders.*', 'customers.name')->latest('order_date')->with('customer')
-         ->join(
-         'customers',
-         'customers.id',
-         'orders.customer_id'
-         );
-         if (Auth::user()->hasRole('Sales-Manager'))
-         $orders = $orders->where('sold_by', Auth::id());
-         $orders = $orders->where('orders.branch_id', 'LIKE', User::userBranchAction())->where('order_status', 'approved')->where('invoice_no', 'LIKE', "%$search_value%")
-         ->orWhere(
-         'customers.name',
-         'LIKE',
-         "%$search_value%"
-         )
-         ->orWhere(
-         'customers.phone',
-         'LIKE',
-         "%$search_value%"
-         );
-         $orders = $orders->get();*/
 
         $orders = Order::with('customer')->select('orders.*', 'customers.name')->latest('order_date')->join(
             'customers',
@@ -83,7 +82,8 @@ class OrderController extends Controller
         $orders = $orders->where('orders.branch_id', 'LIKE', User::userBranchAction())
             ->where(
                 'orders.branch_id',
-                'LIKE', User::userBranchAction()
+                'LIKE',
+                User::userBranchAction()
             )->where(
                 'order_status',
                 'approved'
@@ -107,9 +107,91 @@ class OrderController extends Controller
 
         return view('pages.order.approved_orders', compact('orders'));
     }
+    public function proformer_search(Request $request)
+    {
+        $search_value = $request->refno;
+
+        $orders = Proformer::with('customer')->select('orders.*', 'customers.name')->latest('order_date')->join(
+            'customers',
+            'customers.id',
+            'orders.customer_id'
+        );
+        if (Auth::user()->hasRole('Sales-Manager'))
+            $orders = $orders->where('sold_by', Auth::id());
+        $orders = $orders->where('proformers.branch_id', 'LIKE', User::userBranchAction())
+            ->where(
+                'proformers.branch_id',
+                'LIKE',
+                User::userBranchAction()
+            )->where(
+                'order_status',
+                'approved'
+            )
+            ->where(
+                function ($query) use ($search_value) {
+                    $query->where('invoice_no', 'LIKE', "%$search_value%")
+                        ->orWhere(
+                            'customers.name',
+                            'LIKE',
+                            "%$search_value%"
+                        )
+                        ->orWhere(
+                            'customers.phone',
+                            'LIKE',
+                            "%$search_value%"
+                        );
+                }
+            )->get(
+            );
+
+        return view('pages.order.proformers', compact('orders'));
+    }
+    public function order_invoice_search(Request $request)
+    {
+        $search_value = $request->refno;
+
+        $orders = Proformer::with('customer')->select('orders.*', 'customers.name')->latest('order_date')->join(
+            'customers',
+            'customers.id',
+            'orders.customer_id'
+        );
+        if (Auth::user()->hasRole('Sales-Manager'))
+            $orders = $orders->where('sold_by', Auth::id());
+        $orders = $orders->where('order_invoices.branch_id', 'LIKE', User::userBranchAction())
+            ->where(
+                'order_invoices.branch_id',
+                'LIKE',
+                User::userBranchAction()
+            )->where(
+                'order_status',
+                'approved'
+            )
+            ->where(
+                function ($query) use ($search_value) {
+                    $query->where('invoice_no', 'LIKE', "%$search_value%")
+                        ->orWhere(
+                            'customers.name',
+                            'LIKE',
+                            "%$search_value%"
+                        )
+                        ->orWhere(
+                            'customers.phone',
+                            'LIKE',
+                            "%$search_value%"
+                        );
+                }
+            )->get(
+            );
+
+        return view('pages.order.order_invoices', compact('orders'));
+    }
     public function load(Request $request)
     {
         $order = Order::find($request->order_id);
+        if ($request->type == 'order')
+            $order = OrderInvoice::find($request->order_id);
+        if ($request->type == 'proformer')
+            $order = Proformer::find($request->order_id);
         return view('pages.order.view_orders', compact('order'));
     }
     public function loadEdit(Request $request)
@@ -129,7 +211,7 @@ class OrderController extends Controller
 
     public function destroy(Request $request, Order $order)
     {
-        
+
         DB::beginTransaction();
         try {
             $amount_paid = $order->pay;
@@ -147,13 +229,13 @@ class OrderController extends Controller
             } else {
                 DB::table('customer_ledgers')->where('order_id', $order->id)->decrement('cr', $amount_paid);
             }
-            $order_details = DB::table('order_details')->where(['order_id'=>$order->id,'status'=>1])->get();
+            $order_details = DB::table('order_details')->where(['order_id' => $order->id, 'status' => 1])->get();
             foreach ($order_details as $order_detail) {
                 DB::table('store_products')->where('id', $order_detail->store_product_id)->increment('qty_available', $order_detail->quantity);
 
             }
             DB::table('transfer_products')->where(['refno' => $order->invoice_no, 'nature' => 'Sale'])->update(['status' => 'Cancelled']);
-            DB::table('stock_cards')->where(['refno' => $order->invoice_no, 'type' => 'Sale'])->update(['status' =>0]);
+            DB::table('stock_cards')->where(['refno' => $order->invoice_no, 'type' => 'Sale'])->update(['status' => 0]);
             DB::table('customer_ledgers')->where('order_id', $order->id)->delete();
             DB::table('orders')->where('id', $order->id)->update(['status' => 0]);
             DB::table('order_details')->where('order_id', $order->id)->update(['status' => 0]);
@@ -168,6 +250,46 @@ class OrderController extends Controller
         }
         if ($request->has('from_pos')) {
             return redirect()->route('orders.approved');
+        }
+        return redirect()->back();
+    }
+    public function destroy_order_invoice(Request $request, Order $order)
+    {
+
+        DB::beginTransaction();
+        try {
+
+            $invoice_no = $order->invoice_no;
+            DB::table('order_invoices')->where('id', $order->id)->delete();
+            DB::table('order_invoice_details')->where('order_id', $order->id)->delete();
+            session()->flash('app_message', 'Order deleted successfully');
+            $action = "Deleted order invoice  with invoice $invoice_no ";
+            AuditLog::auditLog(Auth::id(), $action);
+            DB::commit();
+        } catch (\Exception $e) {
+            session()->flash('app_error', 'Order could not be deleted!');
+            DB::rollBack();
+            throw $e;
+        }
+        return redirect()->back();
+    }
+    public function destroy_proformer(Request $request, Order $order)
+    {
+
+        DB::beginTransaction();
+        try {
+
+            $invoice_no = $order->invoice_no;
+            DB::table('proformers')->where('id', $order->id)->delete();
+            DB::table('proformer_details')->where('order_id', $order->id)->delete();
+            session()->flash('app_message', 'Order deleted successfully');
+            $action = "Deleted order invoice  with invoice $invoice_no ";
+            AuditLog::auditLog(Auth::id(), $action);
+            DB::commit();
+        } catch (\Exception $e) {
+            session()->flash('app_error', 'Order could not be deleted!');
+            DB::rollBack();
+            throw $e;
         }
         return redirect()->back();
     }
@@ -564,7 +686,6 @@ class OrderController extends Controller
         return view('pages.customer.print', compact('dates', 'customer', 'company'));
     }
     public function verify(Request $request) // to be verified by store keeper
-
     {
         $order_id = $request->order_id;
         $comment = $request->comment;
@@ -589,5 +710,25 @@ class OrderController extends Controller
             session()->flash('app_error', 'Unauthorized access!!');
             return redirect()->route('orders.approved');
         }
+    }
+    public function proformer_list()
+    {
+        \Cart::clear();
+        $user = Auth::user();
+        $orders = Proformer::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where(['order_status' => 'approved', 'status' => 1]);
+        if ($user->hasRole('Sales-Manager'))
+            $orders = $orders->where('sold_by', Auth::id());
+        $orders = $orders->whereDate('order_date', date('Y-m-d'))->get();
+        return view('pages.order.proformers', compact('orders'));
+    }
+    public function order_invoice_list()
+    {
+        \Cart::clear();
+        $user = Auth::user();
+        $orders = OrderInvoice::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where(['order_status' => 'approved', 'status' => 1]);
+        if ($user->hasRole('Sales-Manager'))
+            $orders = $orders->where('sold_by', Auth::id());
+        $orders = $orders->whereDate('order_date', date('Y-m-d'))->get();
+        return view('pages.order.order_invoices', compact('orders'));
     }
 }

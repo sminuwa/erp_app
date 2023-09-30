@@ -20,12 +20,12 @@ class PosController extends Controller
 {
     public function index(Request $request)
     {
-        if (!strpos(url()->previous(), 'pos')) //Clear the cart after leaving the POS page
+        if (!(strpos(url()->previous(), 'pos') || strpos(url()->previous(), 'proformer') || strpos(url()->previous(), 'order_invoice'))) //Clear the cart after leaving the POS page
             \Cart::clear();
         $user_branch = User::userBranchAction();
         $category_id = 0;
         $store_id = 0;
-        $stores = StoreProduct::select('store_products.id', 'products.name','products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price','unit')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
             ->join('products', 'products.id', 'store_products.product_id')
@@ -34,7 +34,7 @@ class PosController extends Controller
                     ->on('branch_product_prices.branch_id', '=', 'branches.id');
 
             })
-            
+
             ->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('branch_product_prices.status', 1);
         if ($request->has('category_id') && $request->has('store_id')) {
@@ -57,9 +57,13 @@ class PosController extends Controller
         $store = Store::where('id', 'LIKE', $user_branch)->get();
         $debtor = new CustomerController();
         $receipt_no = $debtor->generateReceiptNo();
+        if (request()->routeIs('proformer.index'))
+            return view('pages.pos.proformer', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no'));
+        if (request()->routeIs('order.invoice.index'))
+            return view('pages.pos.order_invoice', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no'));
         return view('pages.pos.index', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no'));
     }
-   
+
     //This is no longer used but keep it
     public function edit(Request $request, Order $order)
     {
@@ -67,7 +71,7 @@ class PosController extends Controller
         $category_id = 0;
         $store_id = 0;
         $user_branch = User::userBranchAction();
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code','stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('products', 'products.id', 'store_products.product_id')
             ->join('branch_product_prices', function ($join) {
@@ -120,7 +124,7 @@ class PosController extends Controller
     {
         $barcode = $request->barcode;
         $user_branch = User::userBranchAction();
-        $store = StoreProduct::select('store_products.id', 'products.name', 'products.code','stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
+        $store = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('products', 'products.id', 'store_products.product_id')
             ->join('branch_product_prices', function ($join) {

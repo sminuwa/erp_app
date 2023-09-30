@@ -250,7 +250,7 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ route('pos.index') }}" class="nav-link ">
+                            <a href="{{ route('order.invoice.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Orders</p>
                             </a>
@@ -265,7 +265,7 @@
                         </li>
                         @endcan
                         <li class="nav-item">
-                            <a href="{{ route('pos.index') }}"
+                            <a href="{{ route('proformer.index') }}"
                                class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Proformer Invoice</p>

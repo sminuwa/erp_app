@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 /**
  @property varchar $name name @property varchar $code code @property bigint $created_by created by @property timestamp $created_at created at @property timestamp $updated_at updated at
- 
+
  */
 class ExpenseItem extends Model
 
@@ -29,6 +29,7 @@ class ExpenseItem extends Model
     public function user(){
         return $this->belongsTo(User::class,'created_by','id');
     }
+
 
 
 

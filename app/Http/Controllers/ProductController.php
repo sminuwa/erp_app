@@ -146,4 +146,26 @@ class ProductController extends Controller
 
         return redirect()->back();
     }
+
+    public function purchasePrice(Request $request){
+        $method = $request->method();
+        switch($method){
+            case 'GET':
+                return view('pages.purchase_prices.create');
+            case 'POST':
+                $product_id = $request->purchase_price;
+                $purchase_price = $request->purchase_price;
+                $product = Product::find($product_id);
+                if (($product->purchase_price = $purchase_price) && $product->save()) {
+                    $action = "Updated product purchase price: " . $product->name;
+                    AuditLog::auditLog(Auth::id(), $action);
+                    session()->flash('app_message', 'Purchase price updated successfully');
+                } else {
+                    session()->flash('app_error', 'Error occurred while updating purchase price');
+                }
+                return back();
+
+            default: return back();
+        }
+    }
 }

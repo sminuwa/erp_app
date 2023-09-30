@@ -190,20 +190,6 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{route('chart_of_accounts.index')}}"
-                               class="nav-link ">
-                                <i class="ion-card"></i>
-                                <p>Chart of Accounts</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{route('general_accounts.index')}}"
-                               class="nav-link ">
-                                <i class="ion-card"></i>
-                                <p>General Accounts</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a href="#"
                                class="nav-link ">
                                 <i class="ion-card"></i>
@@ -535,19 +521,19 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{ route('store_product_cost_prices.edit') }}"
-                                        class="nav-link {{ Request::is('settings/products/manage/prices*') ? 'active' : '' }}">
+                                    <a href="{{ route('products.purchase_prices') }}"
+                                        class="nav-link {{ Request::is('settings/products/manage/purchase_price*') ? 'active' : '' }}">
                                         <i class="ion-ios-cart-outline"></i>
-                                        <p>Product Cost Prices</p>
+                                        <p>Product Purchase Prices</p>
                                     </a>
                                 </li>
-                                <li class="nav-item">
+<!--                                <li class="nav-item">
                                     <a href="{{ route('product_expire_settings.index') }}"
                                         class="nav-link {{ Request::is('settings/products/manage/expiration*') ? 'active' : '' }}">
                                         <i class="ion-ios-cart-outline"></i>
                                         <p>Product Expire Settings</p>
                                     </a>
-                                </li>
+                                </li>-->
                             @endcan
                             @can('set.stock.opening.balance')
                                 <li class="nav-item">
@@ -567,7 +553,7 @@
                                     </a>
                                 </li>
                             @endcan
-                            @can('view.bank')
+                            {{--@can('view.bank')
                                 <li class="nav-item">
                                     <a href="{{ route('banks.index') }}"
                                         class="nav-link {{ Request::is('settings/banks*') ? 'active' : '' }}">
@@ -575,7 +561,7 @@
                                         <p>Manage Banks</p>
                                     </a>
                                 </li>
-                            @endcan
+                            @endcan--}}
                             {{-- @can('view.bank.branch')
                                 <li class="nav-item">
                                     <a href="{{ route('bank_branches.index') }}"
@@ -597,7 +583,7 @@
                                     <a href="{{ route('branches.index') }}"
                                         class="nav-link {{ Request::is('settings/branches/*') ? 'active' : '' }}">
                                         <i class="ion-network"></i>
-                                        <p>Manage Office Branches</p>
+                                        <p>Manage Branches</p>
                                     </a>
                                 </li>
                             @endcan
@@ -610,6 +596,38 @@
                                     </a>
                                 </li>
                             @endcan
+
+                            <li class="nav-item">
+                                <a href="{{route('chart_of_accounts.index')}}"
+                                   class="nav-link ">
+                                    <i class="ion-card"></i>
+                                    <p>Manage Chart of Accounts</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{route('general_accounts.index')}}"
+                                   class="nav-link ">
+                                    <i class="ion-card"></i>
+                                    <p>Manage General Accounts</p>
+                                </a>
+                            </li>
+
+<!--                            <li class="nav-item">
+                                <a href="{{ route('bank_accounts.index') }}"
+                                   class="nav-link {{ Request::is('settings/bank_accounts/*') ? 'active' : '' }}">
+                                    <i class="ion-ios-pricetag-outline"></i>
+                                    <p>Manage Chart of Accounts</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('bank_accounts.index') }}"
+                                   class="nav-link {{ Request::is('settings/bank_accounts/*') ? 'active' : '' }}">
+                                    <i class="ion-ios-pricetag-outline"></i>
+                                    <p>Manage General Accounts</p>
+                                </a>
+                            </li>-->
+
                             @can('view.bank.account')
                                 <li class="nav-item">
                                     <a href="{{ route('bank_accounts.index') }}"
@@ -619,7 +637,7 @@
                                     </a>
                                 </li>
                             @endcan
-                            @can('view.loan.collector')
+                            {{--@can('view.loan.collector')
                                 <li class="nav-item">
                                     <a href="{{ route('loan_collectors.index') }}"
                                         class="nav-link {{ Request::is('settings/loan/collector/*') ? 'active' : '' }}">
@@ -627,7 +645,7 @@
                                         <p>Manage Loan Collectors</p>
                                     </a>
                                 </li>
-                            @endcan
+                            @endcan--}}
                             @can('view.product')
                                 <li class="nav-item">
                                     <a href="{{ route('companies.index') }}"
@@ -637,15 +655,7 @@
                                     </a>
                                 </li>
                             @endcan
-                            @can('view.product')
-                                <li class="nav-item">
-                                    <a href="{{ route('dosage_forms.index') }}"
-                                        class="nav-link {{ Request::is('dosage_form/*') ? 'active' : '' }}">
-                                        <i class="ion-person-stalker"></i>
-                                        <p>Manage Dosage Form</p>
-                                    </a>
-                                </li>
-                            @endcan
+
                         </ul>
                     </li>
                 @endcan

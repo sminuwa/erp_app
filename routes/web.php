@@ -187,6 +187,7 @@ Route::group(['prefix' => 'settings', 'middleware' => 'auth'], function () {
                     Route::get('/edit/{product}', [ProductController::class, 'edit'])->name('products.edit');
                     Route::put('/update/{product}', [ProductController::class, 'update'])->name('products.update');
                     Route::delete('/delete/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+                    Route::match(['GET', 'POST'],'/update/purchase_price', [ProductController::class, 'purchasePrice'])->name('products.purchase_prices');
                 }
             );
             Route::group(

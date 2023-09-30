@@ -18,7 +18,7 @@
                     <div class="col-sm-6 offset-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Proformers</li>
+                            <li class="breadcrumb-item active">Order Invoices</li>
                         </ol>
                     </div>
                 </div>
@@ -35,7 +35,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    Proformers
+                                    Orders
                                 </h3>
                             </div>
                             <div class="row">
@@ -45,14 +45,14 @@
                                             style="margin-left: 2px;"><span class="fa fa-list"> </span> View Sales </a>
                                     @endcan
                                     @can('make.daily.sale')
-                                        <a href="{{ route('proformer.index') }}" class="btn btn-sm btn-secondary"
-                                            style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Proformer</a>
+                                        <a href="{{ route('order.invoice.index') }}" class="btn btn-sm btn-secondary"
+                                            style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Order Invoice</a>
                                     @endcan
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <form action="{{ route('proformer.search') }}" method="POST">
+                                    <form action="{{ route('order.invoice.search') }}" method="POST">
                                         @csrf
                                         <div class="input-group">
                                             <input type="search" class="form-control rounded" required
@@ -115,7 +115,7 @@
                                                         </a>
                                                     @endcan
                                                     
-                                                    <a href="{{ route('proformer.print', $order->id) }}"
+                                                    <a href="{{ route('order.invoice.print', $order->id) }}"
                                                         target="_BLANK" class="btn btn-secondary btn-sm">
                                                         <i class="fa fa-print" aria-hidden="true"></i>
                                                     </a>
@@ -126,7 +126,7 @@
                                                             <i class="fa fa-trash" aria-hidden="true"></i>
                                                         </button>
                                                         <form id="delete-form-{{ $order->id }}"
-                                                            action="{{ route('proformer.destroy', $order->id) }}" method="post"
+                                                            action="{{ route('order.invoice.destroy', $order->id) }}" method="post"
                                                             style="display:none;">
                                                             @csrf
                                                             @method('DELETE')
@@ -136,7 +136,7 @@
                                             </tr>
                                             <div class="modal fade" id="order_detail_form{{ $order->id }}"
                                                 style="display: none;" aria-hidden="true">
-                                                @include('pages.order.proformer_modal')
+                                                @include('pages.order.order_invoice_modal')
                                             </div>
                                             
                                         @endforeach

@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Proformer Details: {{ optional($order)->customer->name }} | Invoice:
+                <h5 class="modal-title">Order Invoice Details: {{ optional($order)->customer->name }} | Invoice:
                     {{ optional($order)->invoice_no }}</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
@@ -10,6 +10,8 @@
             </div>
             <div class="modal-body">
                 <form method="post" action="{{ route('sales_products.verify') }}" id="ledger_form">
+                    @csrf
+                   
                     <div class="display">
 
                     </div>

@@ -18,12 +18,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Proformer Details</h1>
+                        <h1>Order Invoice Details</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Proformer Details</li>
+                            <li class="breadcrumb-item active">Order Invoice Details</li>
                         </ol>
                     </div>
                 </div>
@@ -96,7 +96,7 @@
                                             @foreach ($order_details as $order_detail)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $order_detail->storeProduct->product->name }}</td>
+                                                    <td>{{ $order_detail->storeProduct->product->name ?? "" }}</td>
                                                     <td align="center">{{ $order_detail->quantity }}</td>
                                                     <td align="right">{{ number_format($order_detail->selling_price, 2) }}
                                                     </td>
@@ -127,12 +127,12 @@
                         <div class="row no-print">
                             <div class="col-12">
                                 
-                                <a href="{{ route('proformer.list') }}" class="btn btn-primary btn-sm float-right"
+                                <a href="{{ route('order.invoice.list') }}" class="btn btn-primary btn-sm float-right"
                                     style="margin-right: 5px;">
-                                    <i class="fa fa-list"></i> View Sales
+                                    <i class="fa fa-list"></i> View Orders
                                 </a>
                                 &nbsp;
-                                <a href="{{ route('proformer.index') }}" class="btn btn-secondary btn-sm float-right">
+                                <a href="{{ route('order.invoice.index') }}" class="btn btn-secondary btn-sm float-right">
                                     <i class="fa fa-plus-circle" aria-hidden="true"> New Sales</i>
                                 </a>
                             </div>

@@ -20,7 +20,7 @@ class PosController extends Controller
 {
     public function index(Request $request)
     {
-        if (!(strpos(url()->previous(), 'pos') || strpos(url()->previous(), 'proformer'))) //Clear the cart after leaving the POS page
+        if (!(strpos(url()->previous(), 'pos') || strpos(url()->previous(), 'proformer') || strpos(url()->previous(), 'order_invoice'))) //Clear the cart after leaving the POS page
             \Cart::clear();
         $user_branch = User::userBranchAction();
         $category_id = 0;
@@ -59,6 +59,8 @@ class PosController extends Controller
         $receipt_no = $debtor->generateReceiptNo();
         if (request()->routeIs('proformer.index'))
             return view('pages.pos.proformer', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no'));
+        if (request()->routeIs('order.invoice.index'))
+            return view('pages.pos.order_invoice', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no'));
         return view('pages.pos.index', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no'));
     }
 

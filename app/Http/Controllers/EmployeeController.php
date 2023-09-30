@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
@@ -32,7 +33,7 @@ class EmployeeController extends Controller
      */
     public function index(Index $request)
     {
-        return view('pages.employees.index', ['records' => Employee::orderBy('name')->get()]);
+        return view('pages.users.index', ['records' => User::orderBy('name')->get()]);
     } /**
   * Display the specified resource.
   *

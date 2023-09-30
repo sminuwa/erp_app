@@ -86,12 +86,11 @@ class BranchProductPriceController extends Controller
       * Store a newly created resource in storage.
       *
       * @param  Store  $request
-      * @return \Illuminate\Http\Response
+      *
       */
     public function store(StoreRequest $request)
     {
         $count = 0;
-
         //$model = new BranchProductPrice;
         //$model->fill($request->all());
         $status = BranchProductPrice::updateOrCreate([
@@ -109,7 +108,8 @@ class BranchProductPriceController extends Controller
             $action = "Set a product price to $request->selling_price for " . Product::find($request->product_id)->name;
             AuditLog::auditLog(Auth::id(), $action);
             session()->flash('app_message', 'Branch product price saved successfully');
-            return redirect()->route('branch_product_prices.index');
+//            return redirect()->route('branch_product_prices.index');
+            return redirect()->back()->with('app_message','Branch product price saved successfully');
         } else {
             session()->flash('app_message', 'Something is wrong while saving branch product price');
         }

@@ -3,14 +3,11 @@
     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
     <div class="form-group">
         <label for="branch_id">Branch</label>
-        <select type="number" class="form-control {{ $errors->has('branch_id') ? ' is-invalid' : '' }}" name="branch_id"
-            id="branch_id" required="required">
-            @if (isset($branches))
-                @foreach ($branches as $data)
-                    <option value="{{ $data->id }}" {{ $data->id == $model->branch_id ? 'selected' : '' }}>
-                        {{ $data->code }}-{{ $data->name }}</option>
-                @endforeach
-            @endif
+        <select class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
+                name="branch_id"
+                id="branch_id"
+                selected_item="{{ $model->branch_id }}"
+                required>
         </select>
         @if ($errors->has('branch_id'))
             <div class="invalid-feedback">
@@ -20,16 +17,11 @@
     </div>
     <div class="form-group">
         <label for="category_id">Category</label>
-        <select class="form-control select2-single {{ $errors->has('category_id') ? ' is-invalid' : '' }}" name="category_id"
-            id="category_id" required="required">
-            <option value="">Select...</option>
-            @if (isset($categories))
-                @foreach ($categories as $data)
-                    <option value="{{ $data->id }}"
-                        {{ $data->id == optional($model->product)->category_id ? 'selected' : '' }}>
-                        {{ $data->code }}-{{ $data->name }}</option>
-                @endforeach
-            @endif
+        <select class="form-control ajax-categories select2-single {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
+                name="category_id"
+                id="category_id"
+
+                required="required">
         </select>
         @if ($errors->has('category_id'))
             <div class="invalid-feedback">
@@ -39,15 +31,11 @@
     </div>
     <div class="form-group">
         <label for="product_id">Product</label>
-        <select class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}" name="product_id"
-            id="product_id" required="required">
-            <option value="">Select...</option>
-            @if (isset($products))
-                @foreach ($products as $data)
-                    <option value="{{ $data->id }}" {{ $data->id == $model->product_id ? 'selected' : '' }}>
-                        {{ $data->code }}-{{ $data->name }}</option>
-                @endforeach
-            @endif
+        <select class="form-control ajax-products select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
+                name="product_id"
+                id="product_id"
+                category_id=""
+                required="required">
         </select>
         @if ($errors->has('product_id'))
             <div class="invalid-feedback">
@@ -55,17 +43,7 @@
             </div>
         @endif
     </div>
-    {{--<div class="form-group">
-        <label for="cost_price">Cost Price</label>
-        <input type="text" class="form-control {{ $errors->has('cost_price') ? ' is-invalid' : '' }}"
-            name="cost_price" id="cost_price" value="{{ old('cost_price', $model->cost_price) }}" placeholder=""
-            required="required">
-        @if ($errors->has('cost_price'))
-            <div class="invalid-feedback">
-                <strong>{{ $errors->first('cost_price') }}</strong>
-            </div>
-        @endif
-    </div>--}}
+
     <div class="form-group">
         <label for="selling_price">Selling Price</label>
         <input type="text" class="form-control {{ $errors->has('selling_price') ? ' is-invalid' : '' }}"
@@ -100,6 +78,5 @@
     </div>
     <div class="form-group text-right ">
         <input type="submit" class="btn btn-primary" value="Save" />
-
     </div>
 </form>

@@ -30,7 +30,8 @@
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datepicker/datepicker3.css') }}">
 
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datepicker/jquery.datetimepicker.css') }}">
-    <script src="{{ asset('commons/css/custom-style.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('commons/css/custom-style.css') }}">
+
 
 
     @stack('css')

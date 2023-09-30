@@ -11,12 +11,17 @@ $(document).ready(function(){
     ajerks('GET','/misc/ajax/companies','ajax-companies')
 })
 
+let bodi = $('body');
 
+bodi.on('change', '.ajax-branches',function(){
+    $('.ajax-stores').attr('branch_id', $(this).val())
+    ajerks('GET','/misc/ajax/stores','ajax-stores')
+})
 
-    $('body').on('change', '.ajax-branches',function(){
-        $('.ajax-stores').attr('branch_id', $(this).val())
-        ajerks('GET','/misc/ajax/stores','ajax-stores')
-    })
+bodi.on('change', '.ajax-categories',function(){
+    $('.ajax-products').attr('category_id', $(this).val())
+    ajerks('GET','/misc/ajax/products','ajax-products')
+})
 
 
 function ajerks(method, url, cssClass){
@@ -26,6 +31,10 @@ function ajerks(method, url, cssClass){
         let branch_id = element.attr('branch_id')
         data = { branch_id : branch_id }
     }
+    if(element.attr('category_id') && element.attr('name')==='product_id'){
+        let category_id = element.attr('category_id')
+        data = { category_id : category_id }
+    }
 
     $.ajax({
         url: url,
@@ -34,8 +43,15 @@ function ajerks(method, url, cssClass){
         success:function(response){
             element.html(response)
             mySelect2()
+            // select default item
+            if(element.attr('selected_item')){
+                let selected_item = element.attr('selected_item')
+                element.find("[value='"+selected_item+"']").attr('selected', 'selected')
+            }
+
         }
     })
+
 }
 
 function mySelect2(){

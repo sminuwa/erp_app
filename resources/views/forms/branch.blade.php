@@ -3,7 +3,11 @@
     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
     <div class="form-group">
         <label for="company_id">Company</label>
-        <select type="text" class="form-control ajax-companies {{ $errors->has('code') ? ' is-invalid' : '' }}" name="company_id" id="company_id" required></select>
+        <select type="text" class="form-control ajax-companies {{ $errors->has('code') ? ' is-invalid' : '' }}"
+                name="company_id"
+                id="company_id"
+                selected_item="{{$model->company->id ?? null}}"
+                required></select>
         @if ($errors->has(' company_id'))
             <div class="invalid-feedback">
                 <strong>{{ $errors->first('company_id') }}</strong>

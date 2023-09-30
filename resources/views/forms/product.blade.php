@@ -3,15 +3,8 @@
     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
     <div class="form-group">
         <label for="category_id">Category</label>
-        <select type="number" class="form-control select2-single {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
-            name="category_id" id="category_id" required="required">
-            <option value="">Select...</option>
-            @if (isset($categories))
-                @foreach ($categories as $data)
-                    <option value="{{ $data->id }}" {{ $data->id == $model->category_id ? 'selected' : '' }}>
-                        {{ $data->code }}-{{ $data->name }}</option>
-                @endforeach
-            @endif
+        <select type="number" class="form-control ajax-categories select2-single {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
+            name="category_id" id="category_id" selected_item="{{ $model->category_id }}" required="required">
         </select>
         @if ($errors->has('category_id'))
             <div class="invalid-feedback">
@@ -30,16 +23,6 @@
         @endif
     </div>
     <div class="form-group">
-        <label for="code">Code</label>
-        <input type="text" class="form-control {{ $errors->has('code') ? ' is-invalid' : '' }}" name="code" readonly
-            id="code" value="{{ old('code', $model->code) }}" placeholder="" maxlength="2o" required="required">
-        @if ($errors->has('code'))
-            <div class="invalid-feedback">
-                <strong>{{ $errors->first('code') }}</strong>
-            </div>
-        @endif
-    </div>
-    <div class="form-group">
         <label for="barcode">Barcode</label>
         <input type="text" class="form-control {{ $errors->has('barcode') ? ' is-invalid' : '' }}"
             name="barcode" id="barcode" value="{{ old('barcode', $model->barcode) }}"
@@ -50,21 +33,43 @@
             </div>
         @endif
     </div>
-    <div class="form-check">
-        <input class="form-check-input {{ $errors->has('status') ? ' is-invalid' : '' }}" type="radio" value="1"
-            name="status" id="status_yes" {{ $model->status == null || $model->status == 1 ? 'checked' : '' }}>
-        Active
-        &nbsp;&nbsp;
-        &nbsp;&nbsp;
-        <input class="form-check-input {{ $errors->has('status') ? ' is-invalid' : '' }}" type="radio" value="0"
-            name="status" id="status_no" {{ $model->status != null && $model->status == 0 ? 'checked' : '' }}> Not
-        Active
-        @if ($errors->has('status'))
-            <div class="invalid-feedback">
-                <strong>{{ $errors->first('status') }}</strong>
-            </div>
-        @endif
+    <div class="form-group">
+        <label for="barcode">This product can expire</label>
+        <div class="form-check">
+            <input class="form-check-input {{ $errors->has('status') ? ' is-invalid' : '' }}" type="radio" value="1"
+                   name="expiry_status" id="status_yes" {{ $model->expiry_status == null || $model->expiry_status == 1 ? 'checked' : '' }}>
+            Yes
+            &nbsp;&nbsp;
+            &nbsp;&nbsp;
+            <input class="form-check-input {{ $errors->has('status') ? ' is-invalid' : '' }}" type="radio" value="0"
+                   checked name="expiry_status" id="status_no" {{ $model->expiry_status != null && $model->expiry_status == 0 ? 'checked' : '' }}> No
+
+            @if ($errors->has('status'))
+                <div class="invalid-feedback">
+                    <strong>{{ $errors->first('status') }}</strong>
+                </div>
+            @endif
+        </div>
     </div>
+    <div class="form-group">
+        <label for="barcode">Status</label>
+        <div class="form-check">
+            <input class="form-check-input {{ $errors->has('status') ? ' is-invalid' : '' }}" type="radio" value="1"
+                name="status" id="status_yes" {{ $model->status == null || $model->status == 1 ? 'checked' : '' }}>
+            Active
+            &nbsp;&nbsp;
+            &nbsp;&nbsp;
+            <input class="form-check-input {{ $errors->has('status') ? ' is-invalid' : '' }}" type="radio" value="0"
+                name="status" id="status_no" {{ $model->status != null && $model->status == 0 ? 'checked' : '' }}> Not
+            Active
+            @if ($errors->has('status'))
+                <div class="invalid-feedback">
+                    <strong>{{ $errors->first('status') }}</strong>
+                </div>
+            @endif
+        </div>
+    </div>
+
     <div class="form-group text-right ">
         <input type="submit" class="btn btn-primary" value="Save" />
 

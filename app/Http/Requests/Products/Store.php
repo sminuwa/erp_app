@@ -5,7 +5,7 @@ namespace App\Http\Requests\Products;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Product;
 
-class Store extends FormRequest 
+class Store extends FormRequest
 {
 
     /**
@@ -13,7 +13,7 @@ class Store extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
         return $this->user()->can('create.product', Product::class);
     }
@@ -23,11 +23,11 @@ class Store extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 			'name' => 'required|max:191|unique:products,name',
-			'code' => 'required|max:30|unique:products,column,code',
+			'expiry_status' => 'required',
 			'category_id' => 'required|numeric|exists:categories,id',
             'barcode' => 'required|max:191|unique:products,barcode',
 			'status' => 'required',
@@ -42,7 +42,7 @@ class Store extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

@@ -61,28 +61,21 @@ class ProductController extends Controller
     {
         $categories = Category::orderBy('name')->get();
         $companies = Company::orderBy('name')->get();
-        $dosages = DosageForm::orderBy('name')->get();
         return view('pages.products.create', [
             'model' => new Product,
             'categories' => $categories,
             'companies' => $companies,
-            'dosages' => $dosages,
-
-
         ]);
-    } /**
-      * Store a newly created resource in storage.
-      *
-      * @param  Store  $request
-      * @return \Illuminate\Http\Response
-      */
+    }
+
     public function store(Store $request)
     {
-        $model = new Product;
-        $model->fill($request->except(['shortcut']));
 
-        if ($model->save()) {
-            $model->addStoreProduct();
+
+//        $model = new Product;
+//        $model->fill($request->except(['shortcut']));
+        if ($model = Product::createRecord($request->category_id, $request->name, $request->barcode, $request->expiry_status, $request->status)) {
+//            $model->addStoreProduct();
             $action = "Added a new product: " . $model->name;
             AuditLog::auditLog(Auth::id(), $action);
             session()->flash('app_message', 'Product saved successfully');
@@ -102,14 +95,10 @@ class ProductController extends Controller
       */
     public function edit(Edit $request, Product $product)
     {
-        $categories = Category::orderBy('name')->get();
         $companies = Company::orderBy('name')->get();
-        $dosages = DosageForm::orderBy('name')->get();
         return view('pages.products.edit', [
             'model' => $product,
-            'categories' => $categories,
             'companies' => $companies,
-            'dosages' => $dosages,
 
         ]);
     } /**

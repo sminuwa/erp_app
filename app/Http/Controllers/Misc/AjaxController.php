@@ -31,8 +31,9 @@ class AjaxController extends Controller
         return view('misc.ajax.suppliers', compact('records'));
     }
 
-    public function products(){
-        $records = Product::orderBy('name','asc')->get();
+    public function products(Request $request){
+        $category_id = $request->category_id;
+        $records = Product::forCategory($category_id)->orderBy('name','asc')->get();
         return view('misc.ajax.products', compact('records'));
     }
 

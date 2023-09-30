@@ -52,10 +52,10 @@
 @endsection
 @push('js')
     <!-- DataTables -->
-    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{{--    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>--}}
+{{--    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>--}}
     <script type="text/javascript">
-        $(function() {
+       /* $(function() {
             $(document).on("change", "#branch_id,#category_id", function(event) {
                 $("#product_id").html(" < option value = '' > Loading... < /option>");
                 $.ajax({
@@ -69,7 +69,7 @@
                     $("#product_id").html("<option value=''>--select--</option>" + msg);
                 });
             });
-            
+
             $(document).on("change", "#branch_id,#product_id", function(event) {
                 branch_id = $('#branch_id').val();
                 product_id = $('#product_id').val();
@@ -84,6 +84,6 @@
                     $("#selling_price").val(data);
                 });
             });
-        });
+        });*/
     </script>
 @endpush

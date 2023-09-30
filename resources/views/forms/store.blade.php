@@ -24,15 +24,15 @@
 
     <div class="form-group">
         <label for="branch_id">Branch</label>
-        <select type="number" class="form-control {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
-            name="branch_id" id="branch_id" required="required">
-            <option value="">Select...</option>
-            @if (isset($branches))
+        <select type="number" class="form-control ajax-branches select2-single {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
+            name="branch_id" id="branch_id" selected_item="{{$model->branch_id ?? null}}" required="required">
+{{--            <option value="">Select...</option>--}}
+            {{--@if (isset($branches))
                 @foreach ($branches as $data)
                     <option value="{{ $data->id }}" {{ $data->id == $model->branch_id ? 'selected' : '' }}>
                         {{ $data->name }}</option>
                 @endforeach
-            @endif
+            @endif--}}
         </select>
         @if ($errors->has('branch_id'))
             <div class="invalid-feedback">

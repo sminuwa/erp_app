@@ -105,17 +105,17 @@
                                                         {{-- <td align="right">
                                                             {{ number_format($store->selling_price, 2) }}
                                                         </td> --}}
-                                                        @if ($store->qty_available > 0 && $store->selling_price > 0)
+                                                        {{-- @if ($store->qty_available > 0 && $store->selling_price > 0) --}}
                                                             <td align="center">
                                                                 <button type="submit" class="btn btn-sm btn-success px-2">
                                                                     <i class="fa fa-cart-plus" aria-hidden="true"></i>
                                                                 </button>
                                                             </td>
-                                                        @else
+                                                        {{-- @else
                                                             <td align="center">
                                                                 <span class="fa fa-crosshairs text text-danger"></span>
                                                             </td>
-                                                        @endif
+                                                        @endif --}}
                                                     </form>
                                                 </tr>
                                             @endforeach
@@ -697,13 +697,13 @@
             }
         }
 
-        function validateQTY(sale_qty, avail_qty, tagg) {
-            tagg_id = "valid_" + tagg;
-            $("#" + tagg_id).html("");
-            if (sale_qty < avail_qty) {
-                $("#" + tagg_id).html("Selling QTY is more than the available quantity");
-            }
-        }
+        // function validateQTY(sale_qty, avail_qty, tagg) {
+        //     tagg_id = "valid_" + tagg;
+        //     $("#" + tagg_id).html("");
+        //     if (sale_qty < avail_qty) {
+        //         $("#" + tagg_id).html("Selling QTY is more than the available quantity");
+        //     }
+        // }
         $('#customer_record').on("change", function() {
             customer_id = $(this).val();
 
@@ -862,13 +862,7 @@
         $('.quantity,.price').keyup(function() {
             id = $(this).attr('data-value');
             $("#valid_qty" + id.substr(1)).html("");
-            if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
-                    'max-qty'))) {
-                $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $('#quantity' +
-                    id.substr(1)).attr('max-qty') + ")");
-                $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
-                return false;
-            }
+            
             delay(function() {
 
                 $.ajax({

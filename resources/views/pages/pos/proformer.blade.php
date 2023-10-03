@@ -44,11 +44,6 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">Proformer</h3>
-
-                                @can('make.daily.sale')
-                                    <input type="text" id="barcode" class="form-control" name="barcode"
-                                        placeholder="Scan barcode">
-                                @endcannot
                             </div>
                             <!-- /.card-header -->
                             @can('view.sale.products')
@@ -61,9 +56,7 @@
                                                 <th>Code</th>
                                                 <th>Item</th>
                                                 <th>Unit</th>
-                                                <th>QTY</th>
-                                                {{-- <th>Price</th> --}}
-                                                <th>Add To Cart</th>
+                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tfoot>
@@ -72,9 +65,7 @@
                                                 <th>Code</th>
                                                 <th>Name</th>
                                                 <th>Unit</th>
-                                                <th>QTY</th>
-                                                {{-- <th>Price</th> --}}
-                                                <th>Add To Cart</th>
+                                                <th></th>
                                             </tr>
                                         </tfoot>
                                         <tbody>
@@ -101,21 +92,11 @@
                                                         <td>{{ $store->code }}</td>
                                                         <td>{{ $store->name }}</td>
                                                         <td>{{ $store->unit }}</td>
-                                                        <td align="center">{{ $store->qty_available }}</td>
-                                                        {{-- <td align="right">
-                                                            {{ number_format($store->selling_price, 2) }}
-                                                        </td> --}}
-                                                        {{-- @if ($store->qty_available > 0 && $store->selling_price > 0) --}}
-                                                            <td align="center">
-                                                                <button type="submit" class="btn btn-sm btn-success px-2">
-                                                                    <i class="fa fa-cart-plus" aria-hidden="true"></i>
-                                                                </button>
-                                                            </td>
-                                                        {{-- @else
-                                                            <td align="center">
-                                                                <span class="fa fa-crosshairs text text-danger"></span>
-                                                            </td>
-                                                        @endif --}}
+                                                        <td align="center">
+                                                            <button type="submit" class="btn btn-sm btn-success px-2">
+                                                                <i class="fa fa-cart-plus" aria-hidden="true"></i>
+                                                            </button>
+                                                        </td>
                                                     </form>
                                                 </tr>
                                             @endforeach
@@ -137,32 +118,6 @@
                                 <div class="card-header">
                                     <h3 class="card-title">
                                         Customer
-                                        <span>
-                                            &nbsp;
-                                            @can('make.debtor.payment')
-                                                <a href="javascript:void(0)" data-toggle="modal"
-                                                    data-target="#debtor_payment_form"
-                                                    class="btn btn-sm btn-secondary float-md-right"
-                                                    style="margin-left: 2px;">Payment </a>
-                                            @endcan
-                                            @can('view.customer.ledger')
-                                                <a href="javascript:void(0)" data-toggle="modal"
-                                                    data-target="#customer_ledgerform"
-                                                    class="btn btn-sm btn-secondary float-md-right"
-                                                    style="margin-left: 2px;">Customer Ledger </a>
-                                            @endcan
-                                            @can('increase.customer.credit.limit')
-                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#credit_limitform"
-                                                    class="btn btn-sm btn-success float-md-right"
-                                                    style="margin-left: 2px;">Increase Limit </a>
-                                            @endcan
-                                            @can('add.customer')
-                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#customermodal"
-                                                    class="btn btn-sm btn-primary float-md-right">Add New</a>
-                                            @endcan
-                                            <span class="text text-danger fa fa-mobile">Send SMS: </span> <input
-                                                type="checkbox" name="sms" id="sms" />
-                                        </span>
                                     </h3>
 
                                 </div>
@@ -184,11 +139,10 @@
                                         <div class="form-group">
                                             <select name="customer_id" id="customer_record"
                                                 class="form-control select2-single">
-
                                             </select>
 
                                             <div class="form-group">
-                                                <span class="text text-danger ion-android-alert"
+                                                <span class="text text-danger "
                                                     id="credit_balance"></span>
                                             </div>
                                         </div>
@@ -862,7 +816,7 @@
         $('.quantity,.price').keyup(function() {
             id = $(this).attr('data-value');
             $("#valid_qty" + id.substr(1)).html("");
-            
+
             delay(function() {
 
                 $.ajax({

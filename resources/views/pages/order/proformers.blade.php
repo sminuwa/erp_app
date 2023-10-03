@@ -75,9 +75,6 @@
                                             <th>Invoice No</th>
                                             <th>Total</th>
                                             <th>Amount Paid</th>
-                                            <th>Amount Due</th>
-                                            <th>Due Date</th>
-                                            <th>Payment Mode</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -101,11 +98,6 @@
                                                 <td align="right">&#8358;{{ number_format($order->total, 2, '.', ',') }}
                                                 </td>
                                                 <td align="right">&#8358;{{ number_format($order->pay, 2, '.', ',') }}</td>
-                                                <td align="right">&#8358;{{ number_format($order->due, 2, '.', ',') }}
-                                                </td>
-                                                <td>{{ Carbon\Carbon::parse($order->due_date)->toFormattedDateString() }}
-                                                </td>
-                                                <td>{{ $order->payment_mode }}</td>
                                                 <td align="center">
                                                     @can("verify.invoice")
                                                         <a href="javascript:void(0)" data-toggle="modal"
@@ -114,12 +106,12 @@
                                                             <i class="fa fa-eye" aria-hidden="true"></i>
                                                         </a>
                                                     @endcan
-                                                    
+
                                                     <a href="{{ route('proformer.print', $order->id) }}"
                                                         target="_BLANK" class="btn btn-secondary btn-sm">
                                                         <i class="fa fa-print" aria-hidden="true"></i>
                                                     </a>
-                                            
+
                                                     @can('delete.daily.sale')
                                                         <button class="btn btn-danger btn-sm" type="button"
                                                             onclick="deleteItem({{ $order->id }})">
@@ -138,7 +130,7 @@
                                                 style="display: none;" aria-hidden="true">
                                                 @include('pages.order.proformer_modal')
                                             </div>
-                                            
+
                                         @endforeach
                                     </tbody>
                                     <tfoot>
@@ -150,10 +142,6 @@
                                             </th>
                                             <th style="text-align:right">
                                                 &#8358;{{ number_format($total_pay, 2, '.', ',') }}</th>
-                                            <th style="text-align:right">
-                                                &#8358;{{ number_format($total_due, 2, '.', ',') }}</th>
-                                            <th>Due Date</th>
-                                            <th>Payment Mode</th>
                                             <th>Actions</th>
                                         </tr>
                                     </tfoot>
@@ -315,7 +303,7 @@
                          id = $(this).attr('data-val');
                          //$('#'+id).submit();
                          qty = $('#qty' + id).val();
-                        
+
                          unit_cost = $('#unit_cost' + id).val();
                          alert(unit_cost)
                          store_product_id = $('#store_product_id' + id).val();

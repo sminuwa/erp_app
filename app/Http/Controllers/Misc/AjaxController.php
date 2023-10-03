@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 class AjaxController extends Controller
 {
     public function categories(){
-        $records = Category::orderBy('name','asc')->get();
+        $records = Category::orderBy('code','asc')->get();
         return view('misc.ajax.categories', compact('records'));
     }
 
@@ -33,18 +33,18 @@ class AjaxController extends Controller
 
     public function products(Request $request){
         $category_id = $request->category_id;
-        $records = Product::forCategory($category_id)->orderBy('name','asc')->get();
+        $records = Product::forCategory($category_id)->orderBy('code','asc')->get();
         return view('misc.ajax.products', compact('records'));
     }
 
     public function stores(Request $request){
         $branch_id = $request->branch_id;
-        $records = Store::forBranch($branch_id)->orderBy('name','asc')->get();
+        $records = Store::forBranch($branch_id)->orderBy('code','asc')->get();
         return view('misc.ajax.stores', compact('records'));
     }
 
     public function branches(Request $request){
-        $records = Branch::orderBy('name','asc')->get();
+        $records = Branch::orderBy('code','asc')->get();
         return view('misc.ajax.branches', compact('records'));
     }
 

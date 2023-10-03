@@ -61,9 +61,7 @@
                                                 <th>Code</th>
                                                 <th>Item</th>
                                                 <th>Unit</th>
-                                                <th>QTY</th>
-                                                {{-- <th>Price</th> --}}
-                                                <th>Add To Cart</th>
+                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tfoot>
@@ -72,9 +70,7 @@
                                                 <th>Code</th>
                                                 <th>Name</th>
                                                 <th>Unit</th>
-                                                <th>QTY</th>
-                                                {{-- <th>Price</th> --}}
-                                                <th>Add To Cart</th>
+                                                <th></th>
                                             </tr>
                                         </tfoot>
                                         <tbody>
@@ -101,10 +97,6 @@
                                                         <td>{{ $store->code }}</td>
                                                         <td>{{ $store->name }}</td>
                                                         <td>{{ $store->unit }}</td>
-                                                        <td align="center">{{ $store->qty_available }}</td>
-                                                        {{-- <td align="right">
-                                                            {{ number_format($store->selling_price, 2) }}
-                                                        </td> --}}
                                                         @if ($store->qty_available > 0 && $store->selling_price > 0)
                                                             <td align="center">
                                                                 <button type="submit" class="btn btn-sm btn-success px-2">

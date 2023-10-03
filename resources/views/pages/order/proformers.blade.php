@@ -74,7 +74,6 @@
                                             <th>Name</th>
                                             <th>Invoice No</th>
                                             <th>Total</th>
-                                            <th>Amount Paid</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -97,7 +96,6 @@
                                                 <td>{{ $order->invoice_no }}</td>
                                                 <td align="right">&#8358;{{ number_format($order->total, 2, '.', ',') }}
                                                 </td>
-                                                <td align="right">&#8358;{{ number_format($order->pay, 2, '.', ',') }}</td>
                                                 <td align="center">
                                                     @can("verify.invoice")
                                                         <a href="javascript:void(0)" data-toggle="modal"
@@ -140,8 +138,6 @@
                                             <th>Invoice No</th>
                                             <th style="text-align:right">&#8358;{{ number_format($total, 2, '.', ',') }}
                                             </th>
-                                            <th style="text-align:right">
-                                                &#8358;{{ number_format($total_pay, 2, '.', ',') }}</th>
                                             <th>Actions</th>
                                         </tr>
                                     </tfoot>

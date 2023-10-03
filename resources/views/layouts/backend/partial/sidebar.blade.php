@@ -272,6 +272,12 @@
                         <li class="nav-item">
                             <a href="{{ route('inventories.purchases.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
+                                <p>Purchases (Request)</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('inventories.purchases.index') }}" class="nav-link ">
+                                <i class="ion-card"></i>
                                 <p>Purchases (GRN)</p>
                             </a>
                         </li>

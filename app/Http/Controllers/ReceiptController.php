@@ -165,7 +165,7 @@ class ReceiptController extends Controller
     }
     public function generateReceiptNo()
     {
-        $invoice = DB::table('general_account_ledgers')->select(DB::raw('MAX(SUBSTR(receipt_no,1,7)) as max'))->where(DB::raw('SUBSTR(receipt_no,1,3)'), '=', 'RCT')->where(DB::raw('YEAR(created_at)'), '=', date('Y'))->first();
+        $invoice = DB::table('general_account_ledgers')->select(DB::raw('MAX(SUBSTR(receipt_no,8,17)) as max'))->where(DB::raw('SUBSTR(receipt_no,1,3)'), '=', 'RCT')->where(DB::raw('YEAR(created_at)'), '=', date('Y'))->first();
         $number = $invoice == null ? 1 : $invoice->max + 1;
         return 'RCT' . date('y') . str_pad($number, 10, "0", STR_PAD_LEFT);
     }

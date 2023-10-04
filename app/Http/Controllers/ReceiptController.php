@@ -21,9 +21,8 @@ class ReceiptController extends Controller
     public function receipts()
     {
         $user_branch = User::userBranchAction();
-        $payments = CustomerLedger::select('customer_ledgers.*')
-            ->where('dr', '>', 0)
-            ->join('customers', 'customers.id', 'customer_ledgers.customer_id')
+        $payments = GeneralAccountLedger::select('General_account_ledgers.*')
+            ->whereIn('model_id', GeneralAccount::where('class','A11')->get('id')->toArray())
             ->where('branch_id', 'LIKE', $user_branch)
             ->where('receipt_no', '<>', null)
             ->orderBy('date', 'DESC')->take(10)->get();
@@ -66,7 +65,7 @@ class ReceiptController extends Controller
                 $customer_id = $request->payer_id;
                 DB::table('general_account_ledgers')->insert([
                     'model_id' => $customer_id,
-                    'model_name' => 'Customer',
+                    'model_name' => 'GeneralAccount',
                     'branch_id' => User::userBranchAction(),
                     'description' => $request->payment_ref,
                     'reference' => $request->receipt_no,

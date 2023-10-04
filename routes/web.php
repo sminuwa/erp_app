@@ -404,6 +404,19 @@ Route::group(
         Route::get('/load/payers', [ReceiptController::class, 'loadPayers'])->name('ajax.load.payers');
     }
 );
+Route::group(
+    ['prefix' => '/payment'],
+    function () {
+        Route::get('/list', [ReceiptController::class, 'payments'])->name('payments.list');
+        Route::get('/create', [ReceiptController::class, 'makePayment'])->name('create.payment.reciept');
+        Route::post('/store', [ReceiptController::class, 'pay'])->name('receipt.payment.store');
+        Route::delete('/destroy/{ledger}', [ReceiptController::class, 'deletePayment'])->name('payment.destroy');
+        Route::put('/update/{ledger}', [ReceiptController::class, 'updateReceipt'])->name('payment.update');
+        Route::post('/search', [ReceiptController::class, 'search'])->name('receipt.payment.search');
+        Route::get('/print/receipt/{payment}', [ReceiptController::class, 'printPaymentReceipt'])->name('payment.print');
+        Route::get('/print/receipt/pos/{payment}', [ReceiptController::class, 'printPoSPaymentReceipt'])->name('payment.print.pos');
+    }
+);
 
 Route::group(
     ['prefix' => 'employees', 'middleware' => 'auth'],

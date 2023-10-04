@@ -15,13 +15,13 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Debtor's Payment</h4>
+                        <h4>Payment Receipt </h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('debtor.payments') }}">Payments</a></li>
-                            <li class="breadcrumb-item active">New Payment</li>
+                            <li class="breadcrumb-item"><a href="{{ route('receipt.payments') }}">Receipts</a></li>
+                            <li class="breadcrumb-item active">New Receipt</li>
                         </ol>
                     </div>
                 </div>
@@ -30,19 +30,19 @@
 
         <!-- Main content -->
         <section class="content">
-            <a href="{{ route('debtors.payment.create') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
+            <a href="{{ route('create.payment.reciept') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
                     class="fa fa-plus-circle"> </span> New
-                Payment</a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('debtor.payments') }}">
-                <span class="fa fa-list"> Payments</span>
+                Receipt</a>
+            <a class="btn btn-secondary btn-sm" href="{{ route('receipt.payments') }}">
+                <span class="fa fa-list"> Receipts</span>
             </a>
             <a href="javascript:void(0)" data-toggle="modal" data-target="#customer_ledgerform"
-                class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span class="fa fa-money"> Customer Ledger</span>
+                class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span class="fa fa-money"> General Ledger</span>
             </a>
             @if (Session::get('prev_id') != null)
-                <a href="{{ route('debtor.payment.print', Session::get('prev_id')) }}" target="_BLANK"
+                <a href="{{ route('receipt.payment.print', Session::get('prev_id')) }}" target="_BLANK"
                     class="btn btn-sm btn-primary" style="margin-left: 2px;"><span class="fa fa-print"> Print</span> </a>
-                <a href="{{ route('debtor.payment.print.pos', Session::get('prev_id')) }}" target="_BLANK"
+                <a href="{{ route('receipt.payment.print.pos', Session::get('prev_id')) }}" target="_BLANK"
                     class="btn btn-secondary btn-sm">
                     <i class="fa fa-print" aria-hidden="true">PoS</i>
                 </a>
@@ -50,7 +50,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 ">
-                        @include('forms.debtor_payment')
+                        @include('pages.receipts.receipt_payment_form')
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
@@ -113,68 +113,16 @@
 @push('js')
     <script>
         $(function() {
-            $('#account_number,#account_name').hide();
-            $('#payment_mode').on("change", function() {
-                if ($(this).val() != "Cash") {
-                    $('#bank_account_id,#account_name').removeAttr('disabled');
-                    $('#account_number,#account_name').show();
-                    $("#bank_account_id").html(" < option value = '' > Loading... < /option>");
-                    $.ajax({
-                        url: "{{ route('ajax.loadBankAccounts') }}",
-                        type: 'GET',
-                        data: {
-                            payment_mode: $("#payment_mode").val()
-                        }
-                    }).done(function(msg) {
-                        $("#bank_account_id").html("<option value=''>--select--</option>" + msg);
-                    });
-                } else {
-                    $('#bank_account_id,#account_name').attr('disabled', 'disabled');
-                    $('#account_number,#account_name').hide();
-                }
-
-            });
-
-            $('#customer_id').on("change", function() {
-                customer_id = $(this).val();
+            $('#type').on("change", function() {
+                $("#payer_id").html(" < option value = '' > Loading... < /option>");
                 $.ajax({
-                    type: "GET",
-                    url: "{{ route('ajax.load.customer.balance') }}",
+                    url: "{{ route('ajax.load.payers') }}",
+                    type: 'GET',
                     data: {
-                        customer_id: customer_id
+                        type: $(this).val()
                     }
-                }).done(function(data) {
-                    balance = 0;
-                    if (data < 0)
-                        balance = "(" + formatMoney(Math.abs(data)) + ")";
-                    else
-                        balance = formatMoney(data);
-                    $("#balance").val(balance);
-                });
-            });
-            $('#customer_id').on("change", function() {
-                customer_id = $(this).val();
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route('ajax.loadCustomerInvoices') }}",
-                    data: {
-                        customer_id: customer_id
-                    }
-                }).done(function(data) {
-                    $('#invoice').html(data);
-                });
-            });
-
-            $('#bank_account_id').on("change", function() {
-                bank_account_id = $(this).val();
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route('ajax.load.account.name') }}",
-                    data: {
-                        bank_account_id: bank_account_id
-                    }
-                }).done(function(data) {
-                    $("#account_name").val(data);
+                }).done(function(msg) {
+                    $("#payer_id").html(msg);
                 });
             });
 

@@ -8,6 +8,7 @@ use App\Models\BankAccount;
 use App\Models\Customer;
 use App\Models\GeneralAccount;
 use App\Models\GeneralAccountLedger;
+use App\Models\Receipt;
 use App\Models\Setting;
 use App\Models\Supplier;
 use App\Models\User;
@@ -21,33 +22,30 @@ class ReceiptController extends Controller
     public function receipts()
     {
         $user_branch = User::userBranchAction();
-        $payments = GeneralAccountLedger::select('General_account_ledgers.*')
+        $payments = Receipt::select('receipts.*')
             ->whereIn('model_id', GeneralAccount::where('class', 'A11')->get('id')->toArray())
             ->where('branch_id', 'LIKE', $user_branch)
-            ->where('receipt_no', '<>', null)
             ->orderBy('date', 'DESC')->take(10)->get();
-        $accounts = BankAccount::all();
-        return view('pages.receipts.receipt_payment', ['payments' => $payments, 'accounts' => $accounts]);
+        return view('pages.receipts.receipt_payment', ['payments' => $payments]);
     }
     public function search(Request $request)
     {
         $search_value = $request->refno;
-        $payments = CustomerLedger::select('customer_ledgers.*')
-            ->where('dr', '>', 0)
-            ->join('customers', 'customers.id', 'customer_ledgers.customer_id')
+        $payments = Receipt::select('receipts.*')
             ->where('branch_id', 'LIKE', User::userBranchAction())
-            ->where('receipt_no', 'LIKE', "%$search_value%")->orderBy('customer_id')
+            ->where('receipt_no', 'LIKE', "%$search_value%")
             ->orderBy('receipt_no', 'DESC')->take(10)->get();
-        $accounts = BankAccount::all();
-        return view('pages.receipts.receipt_payment', ['payments' => $payments, 'accounts' => $accounts]);
+        return view('pages.receipts.receipt_payment', ['payments' => $payments]);
     }
     public function payReciept(Request $request)
     {
 
         $amount = $request->amount_paid;
         $bank_account_id = $request->account_id;
-        $refence_no = $request->receipt_no;
+        $refence_no = $this->generateReceiptNo();
         $date = $request->payment_date;
+        $description = $request->payment_ref;
+        $user_branch = User::userBranchAction();
         $status = false;
         $insert_id = 0;
         $ledger_id = 0;
@@ -55,30 +53,46 @@ class ReceiptController extends Controller
         DB::beginTransaction();
         try {
 
-            DB::table('bank_transactions')->insert([
-                'bank_account_id' => $bank_account_id,
-                'trans_date' => $request->payment_date,
-                'cr' => $amount,
-                'dr' => 0,
-                'ref_no' => $refence_no,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
             if ($request->has('type') && $request->type == "Customer") {
                 $customer_id = $request->payer_id;
-                $status = Transaction::receipt($customer_id, 'Customer', $bank_account_id, 'GeneralLedger', $amount, $refence_no, $date);
+                $status = Transaction::receipt($customer_id, 'Customer', $bank_account_id, 'GeneralAccount', $amount, $refence_no, $date);
+                $ledger_id = DB::table('receipts')->insertGetId([
+                    'amount' => $amount,
+                    'date' => $date,
+                    'receipt_no' => $refence_no,
+                    'description' => $description,
+                    'recieved_by' => auth()->id(),
+                    'model_id' => $customer_id,
+                    'model_name' => 'Customer',
+                    'charged_account_id' => $bank_account_id,
+                    'charged_account_name' => 'GeneralAccount',
+                    'branch_id' => $user_branch,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]);
 
             }
             if ($request->has('type') && $request->type == "Supplier") {
                 $supplier_id = $request->payer_id;
-                $status = Transaction::receipt($supplier_id, 'Supplier', $bank_account_id, 'GeneralLedger', $amount, $refence_no, $date);
+                $status = Transaction::receipt($supplier_id, 'Supplier', $bank_account_id, 'GeneralAccount', $amount, $refence_no, $date);
+                $ledger_id = DB::table('receipts')->insertGetId([
+                    'amount' => $amount,
+                    'date' => $date,
+                    'receipt_no' => $refence_no,
+                    'description' => $description,
+                    'recieved_by' => auth()->id(),
+                    'model_id' => $supplier_id,
+                    'model_name' => 'Supplier',
+                    'charged_account_id' => $bank_account_id,
+                    'charged_account_name' => 'GeneralAccount',
+                    'branch_id' => $user_branch,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]);
             }
-
-
-
             DB::commit();
             if ($status == true) {
-                $action = "Generated receipt  $request->amount_paid for : " . $request->receipt_no;
+                $action = "Generated receipt of $amount for : " . $refence_no;
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Receipt generated successfully');
             }
@@ -108,28 +122,41 @@ class ReceiptController extends Controller
         $accounts = GeneralAccount::where('class', 'A11')->orderBy('description')->get();
         $customers = Customer::whereIn('type', ['Retail', 'Wholesale'])->where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
         $model = new GeneralAccountLedger;
-        $receipt_no = $this->generateReceiptNo();
-        return view('pages.receipts.create_receipt_payment', compact('accounts', 'receipt_no', 'customers', 'model'));
+        return view('pages.receipts.create_receipt_payment', compact('accounts', 'customers', 'model'));
     }
-    public function printPaymentReceipt(GeneralAccountLedger $payment)
+    public function printReceipt(Receipt $payment)
     {
         return view('pages.receipts.print_payment_receipt', ['payment' => $payment, 'setting' => Setting::first()]);
     }
-    public function printPoSPaymentReceipt(GeneralAccountLedger $payment)
+    public function printPoSPaymentReceipt(Receipt $payment)
     {
         return view('pages.receipts.print_pos_payment_receipt', ['payment' => $payment, 'setting' => Setting::first()]);
     }
-    public function updatePayment(Request $request, GeneralAccountLedger $ledger)
+    public function updatePayment(Request $request, Receipt $payment)
     {
+        $amount = $request->amount_paid;
+        $bank_account_id = $request->account_id;
+        $refence_no = $this->generateReceiptNo();
+        $date = $request->payment_date;
+        $description = $request->payment_ref;
+        $user_branch = User::userBranchAction();
+        $status = false;
+        $insert_id = 0;
+        $ledger_id = 0;
         DB::beginTransaction();
         try {
-            DB::table('general_account_ledgers')
-                ->where('id', $ledger->id)
-                ->update(['dr' => $request->amount_paid, 'updated_at' => Carbon::now()]);
 
-            DB::table('bank_transactions')->where(['ref_no' => $ledger->receipt_no])->update([
-                'cr' => $request->amount_paid,
-                'updated_at' => Carbon::now()
+            DB::table('receipts')->insert([
+                'amount' => $amount,
+                'date' => $date,
+                'receipt_no' => $refence_no,
+                'description' => $description,
+                'recieved_by' => auth()->id(),
+                'model_id' => $customer_id,
+                'model_name' => 'Supplier',
+                'branch_id' => $user_branch,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]);
             $action = "Modified $ledger->dr to $request->amount_paid for a credit customer  : " . $ledger->customer->name;
             AuditLog::auditLog(auth()->user()->id, $action);

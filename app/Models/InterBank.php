@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Payment extends Model
+class InterBank extends Model
 {
     use HasFactory;
-    public function received_by()
+    public function transfered_by()
     {
         return $this->belongsTo(User::class, 'recieved_by');
     }
@@ -19,5 +19,13 @@ class Payment extends Model
     public function supplier()
     {
         return $this->belongsTo(Supplier::class, 'model_id');
+    }
+    public function source()
+    {
+        return $this->belongsTo(GeneralAccount::class, 'source_account_id');
+    }
+    public function destination()
+    {
+        return $this->belongsTo(GeneralAccount::class, 'destination_account_id');
     }
 }

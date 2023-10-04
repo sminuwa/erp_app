@@ -18,7 +18,7 @@
                     <div class="col-sm-6 offset-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Reciept Payment List</li>
+                            <li class="breadcrumb-item active">Payment List</li>
                         </ol>
                     </div>
                 </div>
@@ -34,29 +34,20 @@
                         <!-- general form elements -->
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Reciept Payment List</h3>
+                                <h3 class="card-title">Payment List</h3>
                             </div>
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <a href="{{ route('receipt.payments') }}" class="btn btn-sm btn-secondary"
+                                    <a href="{{ route('payments.list') }}" class="btn btn-sm btn-secondary"
                                         style="margin-left: 2px;"><span class="fa fa-list"> </span> List</a>
-                                    <a href="{{ route('create.payment.reciept') }}" class="btn btn-sm btn-secondary"
-                                        style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Reciept
+                                    <a href="{{ route('create.payment') }}" class="btn btn-sm btn-secondary"
+                                        style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New
                                         Payment</a>
-                                    @if (Session::get('prev_id') != null)
-                                        <a href="{{ route('receipt.payment.print', Session::get('prev_id')) }}" target="_BLANK"
-                                            class="btn btn-sm btn-primary" style="margin-left: 2px;"><span
-                                                class="fa fa-print"> Print</span> </a>
-                                        <a href="{{ route('receipt.payment.print.pos', Session::get('prev_id')) }}" target="_BLANK"
-                                            class="btn btn-secondary btn-sm">
-                                            <i class="fa fa-print" aria-hidden="true">PoS</i>
-                                        </a>
-                                    @endif
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <form action="{{ route('receipt.payment.search') }}" method="POST">
+                                    <form action="{{ route('payment.search') }}" method="POST">
                                         @csrf
                                         <div class="input-group">
                                             <input type="search" class="form-control rounded" required
@@ -135,6 +126,7 @@
                                                     </form>
                                                 </td>
                                             </tr>
+                                           
                                         @endforeach
                                     </tbody>
 
@@ -154,6 +146,56 @@
         </section>
         <!-- /.content -->
     </div> <!-- Content Wrapper end -->
+    <div class="modal fade" id="customer_ledgerform" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Customer Ledger</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="get" action="{{ route('ajax.general.customer.ledger') }}" id="ledger_form"
+                        target="_BLANK">
+                        @csrf
+                        <div class="form-group">
+                            <label for="from_date">From Date</label>
+                            <input type="text" class="form-control datepicker" name="from_date" id="from_date"
+                                placeholder="" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label for="to_date">To Date</label>
+                            <input type="text" class="form-control datepicker" name="to_date" id="to_date"
+                                placeholder="" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            &nbsp;&nbsp;
+                            <label for="customer_id">Customer</label>
+                            <select class="form-control select2-single" name="customer_id" id="customer_id" required>
+                                {{-- <option value="all">All</option> --}}
+                                <option value="">Select...</option>
+                                @foreach (App\Models\Customer::where('type', 'credit')->get() as $data)
+                                    <option value="{{ $data->id }}">{{ $data->name }}-{{ $data->phone }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <input type="hidden" name="print" value="print" />
+                        <input type="hidden" name="modal" value="modal" />
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-dark" data-dismiss="modal"><i class="fa fa-times"></i>
+                                Close
+                            </button>
+                            <button type="submit" class="btn btn-info px-3"><i class="icon-trash"></i> Generate
+                            </button>
+                        </div>
+                        @method('post')
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('js')
     <!-- DataTables -->

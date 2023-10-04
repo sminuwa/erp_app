@@ -188,7 +188,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#"
+                            <a href="{{route('payments.list')}}"
                                class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Payments</p>
@@ -202,7 +202,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#"
+                            <a href="{{route('interbank.list')}}"
                                class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Interbanks</p>

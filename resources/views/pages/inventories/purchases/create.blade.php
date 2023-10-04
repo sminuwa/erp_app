@@ -183,7 +183,36 @@
     <script type="text/javascript">
         $(function() {
 
+            let body = $('body');
 
+            body.on('keyup', 'input[name=cost_price], input[name=quantity]', function(){
+                /*let element = $(this);
+                let item_id = element.attr('item_id')
+                let cost = 0; let quantity = 0;
+                $('[item_id="'+item_id+'"]').each(function() {
+                    if($(this).attr('name') === 'cost_price')
+                        cost = $(this).val()
+                    if($(this).attr('name') === 'quantity')
+                        quantity = $(this).val()
+                    console.log($(this).val())
+                });
+                console.log(cost * quantity)
+                $('span[item_id="'+item_id+'"]').html(cost * quantity)*/
+                let element = $(this);
+                let item_id = element.attr('item_id')
+                $('body').on('submit','.itemForm'+item_id, function(e){
+                    e.preventDefault();
+                    $.ajax({
+                        type: 'POST',
+                        url: $(this).attr('action'),
+                        data: $(this).serialize(),
+                        success: function(response){
+                            $('.product-details').html(response)
+                            console.log(response)
+                        }
+                    })
+                })
+            })
 
 
             $("#category_link,#product_link,#supplier_link").on('click', function() {
@@ -193,6 +222,7 @@
                     name: 'shortcut'
                 }).appendTo('form');
             });
+
             $(document).on("change", "#category_id", function(event) {
                 $("#product_id").html(" < option value = '' > Loading... < /option>");
                 $.ajax({

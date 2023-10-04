@@ -3,9 +3,11 @@
 namespace App\Classes;
 
 use App\Models\Customer;
+use App\Models\GeneralAccount;
 use App\Models\GeneralAccountLedger;
 use App\Models\Store;
 use App\Models\StoreProduct;
+use App\Models\Supplier;
 
 class Transaction
 {
@@ -127,12 +129,60 @@ class Transaction
 
     }
 
-    public static function receipt(){
+    public static function transaction($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date, $type='TRN'){
+        $user = auth()->user();
+        $branch = $user->branch;
+        if(!$branch)
+            return ['status'=>false, 'message'=>'This user does not have a branch.'];
+        $source_name == 'Customer' ?
+            $source_model = Customer::find($source_id) :
+            ($source_name == 'Supplier' ?
+                $source_model = Supplier::find($source_id) :
+                    ($source_model = GeneralAccount::find($source_id) ));
+        $destination_name == 'Customer' ?
+            $destination_model = Customer::find($destination_id) :
+            ($destination_name == 'Supplier' ?
+                $destination_model = Supplier::find($destination_id) :
+                ($destination_model = GeneralAccount::find($destination_id) ));
 
+        $source_account[] = [
+            'model_id' => $source_model->id,
+            'model_name' => class_basename($source_model),
+            'branch_id' => $branch->id,
+            'description' => 'Receipt on behalf of '.$reference,
+            'reference' => $reference,
+            'credit' => 0,
+            'debit' => $amount,
+            'date' => $date,
+            'user_id' => $user->id,
+            'receipt_no' => $type.$reference
+        ];
+        $destination_account[] = [
+            'model_id' => $destination_model->id,
+            'model_name' => class_basename($destination_model),
+            'branch_id' => $branch->id,
+            'description' => 'Receipt on behalf of '.$reference,
+            'reference' => $reference,
+            'credit' => $amount,
+            'debit' => 0,
+            'date' => $date,
+            'user_id' => $user->id,
+            'receipt_no' => $type.$reference
+        ];
+
+        $general_account_ledger = array_merge($source_account, $destination_account);
+        if(GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])){
+            return ['status'=>true, 'message'=>'success'];
+        }
+        return ['status'=>false, 'message'=>'Something went wrong.'];
     }
 
-    public static function payment(){
+    public static function receipt($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date){
+        return self::transaction($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date, 'RCT');
+    }
 
+    public static function payment($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date){
+        return self::transaction($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date, 'PAY');
     }
 
     public static function journal(){
@@ -151,12 +201,12 @@ class Transaction
 
     }
 
-    public static function expense(){
-
+    public static function expense($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date){
+        return self::transaction($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date, 'EXP');
     }
 
-    public static function interbank(){
-
+    public static function interbank($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date){
+        return self::transaction($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date, 'ITB');
     }
 
 

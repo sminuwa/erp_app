@@ -15,11 +15,12 @@
                 <td>{{ $loop->iteration }}</td>
                 <td class="text-left">{{ $item->product->name }}</td>
 
-                <form action="{{ route('purchase.cart.update') }}" method="post" id="p{{ $item->id }}">
+                <form class="itemForm{{ $item->id }}" action="{{ route('inventories.purchases.ajax.create') }}" method="post" id="p{{ $item->id }}">
                     @csrf
                     @method('PUT')
+                    <input type="hidden" id="item_id" value="{{ $item->id }}" name="item_id">
                     <td>
-                        <input type="text" name="cost_price" id="price{{ $item->id }}"
+                        <input item_id="{{ $item->id }}" type="text" name="cost_price" id="price{{ $item->id }}"
                                class="form-control price" style="min-width:65px;"
                                onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
                                value="{{ $item->unit_price }}" data-val="{{ $item->unit_price }}"
@@ -28,13 +29,13 @@
                                value="{{ $item->quantity }}">
                     </td>
                     <td>
-                        <input type="text" name="quantity" id="quantity{{ $item->id }}"
+                        <input item_id="{{ $item->id }}" type="text" name="quantity" id="quantity{{ $item->id }}"
                                class="form-control quantity" data-value="p{{ $item->id }}"
                                style="min-width:58px;" value="{{ $item->quantity }}"
                                min="1" required>
                     </td>
                     <td>
-                        <span class="subtotal{{ $item->id }}">{{ number_format($item->unit_price * $item->quantity, 2) }}</span>
+                        <span item_id="{{ $item->id }}" name="subtotal" class="subtotal{{ $item->id }}">{{ number_format($item->unit_price * $item->quantity, 2) }}</span>
                     </td>
                     <input type="hidden" name="id" class="form-control" value="{{ $item->id }}">
 

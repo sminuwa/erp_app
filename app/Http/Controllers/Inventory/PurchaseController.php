@@ -28,7 +28,9 @@ class PurchaseController extends Controller
     }
 
     public function createAjax(Request $request){
-        $temp = new TempPurchaseProduct();
+        $temp = TempPurchaseProduct::find($request->item_id);
+        if(!$temp)
+            $temp = new TempPurchaseProduct();
         $temp->product_id = $request->product_id;
         $temp->quantity = $request->quantity;
         $temp->unit_price = $request->unit_price;
@@ -36,4 +38,5 @@ class PurchaseController extends Controller
         $temp->save();
         return view('pages.inventories.purchases.ajax.create',['products'=>TempPurchaseProduct::products()]);
     }
+
 }

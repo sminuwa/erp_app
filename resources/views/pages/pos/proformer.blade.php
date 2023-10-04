@@ -19,7 +19,7 @@
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
                             <li class="breadcrumb-item"><a href="{{ route('pos.index') }}">PoS</a></li>
-                            <li class="breadcrumb-item active">Proformer</li>
+                            <li class="breadcrumb-item active">Proforma</li>
                         </ol>
                     </div>
                 </div>
@@ -30,7 +30,7 @@
                 <a href="{{ route('orders.approved') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
                         class="fa fa-list"> </span> Sales </a>
                 <a href="{{ route('proformer.list') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                        class="fa fa-list"> </span> Proformers </a>
+                        class="fa fa-list"> </span> Proforma </a>
 
             </div>
         </div>
@@ -43,7 +43,7 @@
                         <!-- general form elements -->
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Proformer</h3>
+                                <h3 class="card-title">Proforma</h3>
                             </div>
                             <!-- /.card-header -->
                             @can('view.sale.products')
@@ -52,7 +52,6 @@
                                         style="font-size: 12px;">
                                         <thead>
                                             <tr>
-                                                <th>Store</th>
                                                 <th>Code</th>
                                                 <th>Item</th>
                                                 <th>Unit</th>
@@ -61,7 +60,6 @@
                                         </thead>
                                         <tfoot>
                                             <tr>
-                                                <th>Store</th>
                                                 <th>Code</th>
                                                 <th>Name</th>
                                                 <th>Unit</th>
@@ -88,7 +86,6 @@
                                                         <input type="hidden" name="cost_price"
                                                             value="{{ $store->cost_price }}">
 
-                                                        <td>{{ ucwords($store->store) }}</td>
                                                         <td>{{ $store->code }}</td>
                                                         <td>{{ $store->name }}</td>
                                                         <td>{{ $store->unit }}</td>
@@ -177,7 +174,6 @@
                                         <thead>
                                             <tr>
                                                 {{-- <th>S.N</th> --}}
-                                                <th>Store</th>
                                                 <th style="width:30%">Code</th>
                                                 <th>Price</th>
                                                 <th>Qty</th>
@@ -190,8 +186,7 @@
                                             @foreach ($cart_products as $product)
                                                 <tr>
                                                     {{-- <td>{{ $loop->iteration }}</td> --}}
-                                                    <td class="text-left">{{ $product->attributes['store'] }}</td>
-                                                    <td class="text-left">{{ $product->attributes['code'] }}</td>
+                                                    <td class="text-left">{{ $product->attributes['code'] }} - {{ $product->name }}</td>
 
                                                     <form action="{{ route('cart.update') }}" method="post"
                                                         id="p{{ $product->id }}">

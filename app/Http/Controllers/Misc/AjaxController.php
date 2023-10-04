@@ -22,12 +22,12 @@ class AjaxController extends Controller
     }
 
     public function customers(){
-        $records = Customer::orderBy('name','asc')->get();
+        $records = Customer::orderBy('code','asc')->get();
         return view('misc.ajax.customers', compact('records'));
     }
 
     public function suppliers(){
-        $records = Supplier::orderBy('name','asc')->get();
+        $records = Supplier::orderBy('code','asc')->get();
         return view('misc.ajax.suppliers', compact('records'));
     }
 

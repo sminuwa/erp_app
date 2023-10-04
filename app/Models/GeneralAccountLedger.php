@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 @property varchar $receipt_no receipt no
 @property timestamp $created_at created at
 @property timestamp $updated_at updated at
-   
+
  */
 class GeneralAccountLedger extends Model
 {
@@ -50,6 +50,10 @@ class GeneralAccountLedger extends Model
     public function recievedBy()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function scopeForReference($query, string $reference){
+        return $query->where('general_account_ledgers.reference', $reference);
     }
 
 

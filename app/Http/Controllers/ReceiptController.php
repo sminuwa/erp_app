@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Transaction;
 use App\Models\AuditLog;
 use App\Models\BankAccount;
 use App\Models\Customer;
@@ -14,7 +15,6 @@ use App\Models\CustomerLedger;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use PaymentMode;
 
 class ReceiptController extends Controller
 {
@@ -22,7 +22,7 @@ class ReceiptController extends Controller
     {
         $user_branch = User::userBranchAction();
         $payments = GeneralAccountLedger::select('General_account_ledgers.*')
-            ->whereIn('model_id', GeneralAccount::where('class','A11')->get('id')->toArray())
+            ->whereIn('model_id', GeneralAccount::where('class', 'A11')->get('id')->toArray())
             ->where('branch_id', 'LIKE', $user_branch)
             ->where('receipt_no', '<>', null)
             ->orderBy('date', 'DESC')->take(10)->get();
@@ -46,6 +46,9 @@ class ReceiptController extends Controller
 
         $amount = $request->amount_paid;
         $bank_account_id = $request->account_id;
+        $refence_no = $request->receipt_no;
+        $date = $request->payment_date;
+        $status = false;
         $insert_id = 0;
         $ledger_id = 0;
 
@@ -57,75 +60,35 @@ class ReceiptController extends Controller
                 'trans_date' => $request->payment_date,
                 'cr' => $amount,
                 'dr' => 0,
-                'ref_no' => $request->receipt_no,
+                'ref_no' => $refence_no,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]);
             if ($request->has('type') && $request->type == "Customer") {
                 $customer_id = $request->payer_id;
-                DB::table('general_account_ledgers')->insert([
-                    'model_id' => $customer_id,
-                    'model_name' => 'GeneralAccount',
-                    'branch_id' => User::userBranchAction(),
-                    'description' => $request->payment_ref,
-                    'reference' => $request->receipt_no,
-                    'cr' => $request->amount,
-                    'date' => $request->payment_date,
-                    'user_id' => auth()->id(),
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ]);
-                $ledger_id = DB::table('customer_ledgers')->insertGetId([
-                    'customer_id' => $customer_id,
-                    'order_id' => 0,
-                    'systemid' => gethostname(),
-                    'description' => $request->payment_ref,
-                    'ref' => $request->payment_ref,
-                    'teller_no' => $request->teller_no,
-                    'receipt_no' => $request->receipt_no,
-                    'bank_account_id' => $bank_account_id,
-                    'date' => $request->payment_date,
-                    'cr' => $amount,
-                    'user_id' => auth()->id(),
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ]);
+                $status = Transaction::receipt($customer_id, 'Customer', $bank_account_id, 'GeneralLedger', $amount, $refence_no, $date);
+                
             }
-
             if ($request->has('type') && $request->type == "Supplier") {
                 $supplier_id = $request->payer_id;
-                $ledger_id = DB::table('supplier_ledgers')->insertGetId([
-                    'supplier_id' => $supplier_id,
-                    'purchase_id' => 0,
-                    'description' => $request->payment_ref,
-                    'ref' => $request->receipt_no,
-                    'teller_no' => $request->receipt_no,
-                    'bank_account_id' => $bank_account_id,
-                    'date' => $request->payment_date,
-                    'cr' => $amount,
-                    'user_id' => auth()->id(),
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ]);
+                $status = Transaction::receipt($supplier_id, 'Supplier', $bank_account_id, 'GeneralLedger', $amount, $refence_no, $date);
+            }
+        
+
+            
+            DB::commit();
+            if($status == true){
+                $action = "Generated receipt  $request->amount_paid for : " . $request->receipt_no;
+                AuditLog::auditLog(auth()->id(), $action);
+                session()->flash('app_message', 'Receipt generated successfully');
             }
 
-            $balance = 0;
-
-            $action = "Generated receipt  $request->amount_paid for : " . $request->receipt_no;
-            AuditLog::auditLog(auth()->id(), $action);
-            DB::commit();
-            session()->flash('app_message', 'Receipt generated successfully');
-            if ($request->has('customer_id2'))
-                return $insert_id;
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('app_error', 'Failed to generated receipt');
             throw $e;
         }
-        //$this->payForMoreInvoices($customer, $balance);
-
-        //return redirect()->route('customers.show', $customer)->with(['record' => Customer::find($customer_id)]);
-        //return redirect()->route('debtor.payment.print', $ledger_id);
+    
         return redirect()->back()->with(['prev_id' => $ledger_id]);
 
     }

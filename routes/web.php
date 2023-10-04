@@ -43,7 +43,8 @@ use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProductExpireSettingController;
 use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\DosageFormController;
+use App\Http\Controllers\PaymentController;
+
 
 /* |-------------------------------------------------------------------------- | Web Routes |-------------------------------------------------------------------------- | | Here is where you can register web routes for your application. These | routes are loaded by the RouteServiceProvider within a group which | contains the "web" middleware group. Now create something great! | */
 Auth::routes();
@@ -405,16 +406,16 @@ Route::group(
     }
 );
 Route::group(
-    ['prefix' => '/payment'],
+    ['prefix' => '/payment-invoice'],
     function () {
-        Route::get('/list', [ReceiptController::class, 'payments'])->name('payments.list');
-        Route::get('/create', [ReceiptController::class, 'makePayment'])->name('create.payment.reciept');
-        Route::post('/store', [ReceiptController::class, 'pay'])->name('receipt.payment.store');
-        Route::delete('/destroy/{ledger}', [ReceiptController::class, 'deletePayment'])->name('payment.destroy');
-        Route::put('/update/{ledger}', [ReceiptController::class, 'updateReceipt'])->name('payment.update');
-        Route::post('/search', [ReceiptController::class, 'search'])->name('receipt.payment.search');
-        Route::get('/print/receipt/{payment}', [ReceiptController::class, 'printPaymentReceipt'])->name('payment.print');
-        Route::get('/print/receipt/pos/{payment}', [ReceiptController::class, 'printPoSPaymentReceipt'])->name('payment.print.pos');
+        Route::get('/list', [PaymentController::class, 'payments'])->name('payments.list');
+        Route::get('/create', [PaymentController::class, 'makePayment'])->name('create.payment.reciept');
+        Route::post('/store', [PaymentController::class, 'pay'])->name('receipt.payment.store');
+        Route::delete('/destroy/{ledger}', [PaymentController::class, 'deletePayment'])->name('payment.destroy');
+        Route::put('/update/{ledger}', [PaymentController::class, 'updateReceipt'])->name('payment.update');
+        Route::post('/search', [PaymentController::class, 'search'])->name('receipt.payment.search');
+        Route::get('/print/receipt/{payment}', [PaymentController::class, 'printPaymentReceipt'])->name('payment.print');
+        Route::get('/print/receipt/pos/{payment}', [PaymentController::class, 'printPoSPaymentReceipt'])->name('payment.print.pos');
     }
 );
 
@@ -537,17 +538,6 @@ Route::group(
                 Route::get('company/edit/{company}', 'edit')->name('companies.edit');
                 Route::put('company/update/{company}', 'update')->name('companies.update');
                 Route::delete('company/delete/{company}', 'destroy')->name('companies.destroy');
-            }
-        );
-        Route::controller(DosageFormController::class)->group(
-            function () {
-                Route::get('dosage_form/view', 'index')->name('dosage_forms.index');
-                Route::get('dosage_form/show/{dosageform}', 'show')->name('dosage_forms.show');
-                Route::get('dosage_form/create', 'create')->name('dosage_forms.create');
-                Route::post('dosage_form/store', 'store')->name('dosage_forms.store');
-                Route::get('dosage_form/edit/{dosageform}', 'edit')->name('dosage_forms.edit');
-                Route::put('dosage_form/update/{dosageform}', 'update')->name('dosage_forms.update');
-                Route::delete('dosage_form/delete/{dosageform}', 'destroy')->name('dosage_forms.destroy');
             }
         );
     }

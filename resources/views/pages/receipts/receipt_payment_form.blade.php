@@ -106,10 +106,6 @@
                 @endif
             </div>
         </div>
-        <div class="offset-2 col-md-4">
-            <span class="text text-danger fa fa-mobile"> Send SMS: </span> <input type="checkbox" name="sms"
-                id="debt_sms" />
-        </div>
     </div>
     </div>
     <div class="form-group text-right ">

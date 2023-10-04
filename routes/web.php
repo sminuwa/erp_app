@@ -409,11 +409,11 @@ Route::group(
     ['prefix' => '/payment-invoice'],
     function () {
         Route::get('/list', [PaymentController::class, 'payments'])->name('payments.list');
-        Route::get('/create', [PaymentController::class, 'makePayment'])->name('create.payment.reciept');
-        Route::post('/store', [PaymentController::class, 'pay'])->name('receipt.payment.store');
+        Route::get('/create', [PaymentController::class, 'makePayment'])->name('create.payment');
+        Route::post('/store', [PaymentController::class, 'pay'])->name('payment.store');
         Route::delete('/destroy/{ledger}', [PaymentController::class, 'deletePayment'])->name('payment.destroy');
         Route::put('/update/{ledger}', [PaymentController::class, 'updateReceipt'])->name('payment.update');
-        Route::post('/search', [PaymentController::class, 'search'])->name('receipt.payment.search');
+        Route::post('/search', [PaymentController::class, 'search'])->name('payment.search');
         Route::get('/print/receipt/{payment}', [PaymentController::class, 'printPaymentReceipt'])->name('payment.print');
         Route::get('/print/receipt/pos/{payment}', [PaymentController::class, 'printPoSPaymentReceipt'])->name('payment.print.pos');
     }

@@ -67,17 +67,17 @@ class ReceiptController extends Controller
             if ($request->has('type') && $request->type == "Customer") {
                 $customer_id = $request->payer_id;
                 $status = Transaction::receipt($customer_id, 'Customer', $bank_account_id, 'GeneralLedger', $amount, $refence_no, $date);
-                
+
             }
             if ($request->has('type') && $request->type == "Supplier") {
                 $supplier_id = $request->payer_id;
                 $status = Transaction::receipt($supplier_id, 'Supplier', $bank_account_id, 'GeneralLedger', $amount, $refence_no, $date);
             }
-        
 
-            
+
+
             DB::commit();
-            if($status == true){
+            if ($status == true) {
                 $action = "Generated receipt  $request->amount_paid for : " . $request->receipt_no;
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Receipt generated successfully');
@@ -88,7 +88,7 @@ class ReceiptController extends Controller
             session()->flash('app_error', 'Failed to generated receipt');
             throw $e;
         }
-    
+
         return redirect()->back()->with(['prev_id' => $ledger_id]);
 
     }
@@ -165,8 +165,8 @@ class ReceiptController extends Controller
     }
     public function generateReceiptNo()
     {
-        $invoice = DB::table('customer_ledgers')->select(DB::raw('MAX(SUBSTR(receipt_no,10,15)) as max'))->where(DB::raw('YEAR(created_at)'), '=', date('Y'))->where('cr', "=", 0)->first();
-
-        return auth()->user()->user_code . '-CP-' . date('y') . str_pad(($invoice->max + 1), 4, "0", STR_PAD_LEFT);
+        $invoice = DB::table('general_account_ledgers')->select(DB::raw('MAX(SUBSTR(receipt_no,1,7)) as max'))->where(DB::raw('SUBSTR(receipt_no,1,3)'), '=', 'RCT')->where(DB::raw('YEAR(created_at)'), '=', date('Y'))->first();
+        $number = $invoice == null ? 1 : $invoice->max + 1;
+        return 'RCT' . date('y') . str_pad($number, 10, "0", STR_PAD_LEFT);
     }
 }

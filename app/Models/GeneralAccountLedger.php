@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+
 /**
    @property bigint $model_id model id
 @property varchar $model_name model name
@@ -17,34 +18,39 @@ use Illuminate\Database\Eloquent\Model;
 @property timestamp $updated_at updated at
    
  */
-class GeneralAccountLedger extends Model 
+class GeneralAccountLedger extends Model
 {
-    
+
     /**
-    * Database table name
-    */
+     * Database table name
+     */
     protected $table = 'general_account_ledgers';
 
     /**
-    * Mass assignable columns
-    */
-    protected $fillable=['model_id',
-'model_name',
-'branch_id',
-'description',
-'reference',
-'credit',
-'debit',
-'date',
-'user_id',
-'receipt_no'];
+     * Mass assignable columns
+     */
+    protected $fillable = [
+        'model_id',
+        'model_name',
+        'branch_id',
+        'description',
+        'reference',
+        'credit',
+        'debit',
+        'date',
+        'user_id',
+        'receipt_no'
+    ];
 
     /**
-    * Date time columns.
-    */
-    protected $dates=['date'];
+     * Date time columns.
+     */
+    protected $dates = ['date'];
 
-
+    public function recievedBy()
+    {
+        return $this->belongsTo(User::class);
+    }
 
 
 }

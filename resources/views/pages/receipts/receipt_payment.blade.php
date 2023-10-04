@@ -18,7 +18,7 @@
                     <div class="col-sm-6 offset-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Debtors Payment List</li>
+                            <li class="breadcrumb-item active">Reciept Payment List</li>
                         </ol>
                     </div>
                 </div>
@@ -34,26 +34,27 @@
                         <!-- general form elements -->
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Customer Payment List</h3>
+                                <h3 class="card-title">Reciept Payment List</h3>
                             </div>
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <a href="{{ route('debtor.payments') }}" class="btn btn-sm btn-secondary"
-                                    style="margin-left: 2px;"><span class="fa fa-list"> </span> List</a>
-                                    <a href="{{ route('debtors.payment.create') }}" class="btn btn-sm btn-secondary"
-                                        style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Debtor
+                                    <a href="{{ route('receipt.payments') }}" class="btn btn-sm btn-secondary"
+                                        style="margin-left: 2px;"><span class="fa fa-list"> </span> List</a>
+                                    <a href="{{ route('create.payment.reciept') }}" class="btn btn-sm btn-secondary"
+                                        style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Reciept
                                         Payment</a>
-                                        <a href="{{ route('bank.ledger') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                                            class="ion-model-s"> </span> Bank Ledger</a>
+                                    <a href="{{ route('bank.ledger') }}" class="btn btn-sm btn-secondary"
+                                        style="margin-left: 2px;"><span class="ion-model-s"> </span> Bank Ledger</a>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <form action="{{ route('debtors.payment.search') }}" method="POST">
+                                    <form action="{{ route('receipt.payment.search') }}" method="POST">
                                         @csrf
                                         <div class="input-group">
-                                            <input type="search" class="form-control rounded" required placeholder="Search by Receipt number"
-                                                name="refno" aria-label="Search" aria-describedby="search-addon" />
+                                            <input type="search" class="form-control rounded" required
+                                                placeholder="Search by Receipt number" name="refno" aria-label="Search"
+                                                aria-describedby="search-addon" />
                                             <button type="submit" class="btn btn-outline-primary">search</button>
                                         </div>
                                     </form>
@@ -65,54 +66,54 @@
                                     class="table table-bordered table-striped text-left table-responsive-xl">
                                     <thead>
                                         <tr>
-                                            <th>Name</th>
+                                            <th>Payee</th>
                                             <th>Date</th>
                                             <th>Receipt No</th>
-                                            <th>Amount Paid</th>
-                                            <th>Payment Mode</th>
-                                            <th>Account Info</th>
+                                            <th>Receipt Amount</th>
+                                            <th>Description</th>
                                             <th>Received BY</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tfoot>
                                         <tr>
-                                            <th>Name</th>
+                                            <th>Payee</th>
                                             <th>Date</th>
                                             <th>Receipt No</th>
-                                            <th>Amount Paid</th>
-                                            <th>Payment Mode</th>
-                                            <th>Account Info</th>
-                                            <th>Received By</th>
+                                            <th>Receipt Amount</th>
+                                            <th>Description</th>
+                                            <th>Received BY</th>
                                             <th>Actions</th>
                                         </tr>
                                     </tfoot>
                                     <tbody>
                                         @foreach ($payments as $payment)
                                             <tr>
-
-                                                <td>{{ optional($payment->customer)->name }}</td>
+                                                <td>
+                                                    @if ($payment->model_name == 'Customer')
+                                                        {{ optional($payment->customer)->code ?? '' }}-{{ optional($payment->customer)->name ?? '' }}
+                                                    @elseif($payment->model_name == 'Supplier')
+                                                        {{ optional($payment->supplier)->name ?? '' }}{{ optional($payment->supplier)->name ?? '' }}
+                                                    @endif
+                                                </td>
                                                 <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                                                 </td>
                                                 <td>{{ $payment->receipt_no }}</td>
-                                                <td align="right">{{ number_format($payment->dr, 2, '.', ',') }}</td>
-                                                <td>{{ $payment->payment_mode }}</td>
-                                                <td>{{ optional($payment->bankAccount)->account_name }}({{ optional($payment->bankAccount)->account_no }})
-                                                </td>
-                                                <td>{{ optional($payment->user)->name }}</td>
+                                                <td align="right">{{ number_format($payment->credit, 2, '.', ',') }}</td>
+                                                <td>{{ $payment->description }}</td>
+                                                <td>{{ optional($payment->recievedBy)->name }}</td>
                                                 <td align="center">
-                                                    <a href="{{ route('debtor.payment.print', $payment->id) }}"
+                                                    <a href="{{ route('receipt.payment.print', $payment->id) }}"
                                                         target="_BLANK" class="btn btn-secondary btn-sm">
                                                         <i class="fa fa-print" aria-hidden="true"></i>
                                                     </a>
-                                                    <a href="{{ route('debtor.payment.print.pos', $payment->id) }}"
+                                                    <a href="{{ route('receipt.payment.print.pos', $payment->id) }}"
                                                         target="_BLANK" class="btn btn-secondary btn-sm">
                                                         <i class="fa fa-print" aria-hidden="true">PoS</i>
                                                     </a>
                                                     <a href="javascript:void(0)" data-toggle="modal"
                                                         data-target="#payment_edit{{ $payment->id }}"
-                                                        data-val="{{ $payment->id }}"
-                                                        class="btn btn-primary btn-sm edit">
+                                                        data-val="{{ $payment->id }}" class="btn btn-primary btn-sm edit">
                                                         <i class="fa fa-edit" aria-hidden="true"></i>
                                                     </a>
                                                     <button class="btn btn-danger btn-sm" type="button"
@@ -120,7 +121,7 @@
                                                         <i class="fa fa-trash" aria-hidden="true"></i>
                                                     </button>
                                                     <form id="delete-form-{{ $payment->id }}"
-                                                        action="{{ route('debtors.payment.destroy', $payment->id) }}"
+                                                        action="{{ route('receipt.payment.destroy', $payment->id) }}"
                                                         method="post" style="display:none;">
                                                         @csrf
                                                         @method('DELETE')
@@ -142,7 +143,7 @@
                                                         </div>
                                                         <div class="modal-body">
                                                             <form
-                                                                action="{{ route('debtor.payment.update', $payment->id) }}"
+                                                                action="{{ route('receipt.payment.update', $payment->id) }}"
                                                                 method="POST">
                                                                 @csrf
                                                                 @method('PUT')

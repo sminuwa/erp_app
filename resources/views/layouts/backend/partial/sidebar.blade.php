@@ -97,15 +97,6 @@
                                 </a>
                             </li>
                         @endcan
-                        @can('make.debtor.payment')
-                            <li class="nav-item">
-                                <a href="{{ route('debtor.payments') }}"
-                                    class="nav-link {{ Request::is('customers/debtor-payment/*') ? 'active' : '' }}">
-                                    <i class="ion-cash"></i>
-                                    <p>Debtor Payment</p>
-                                </a>
-                            </li>
-                        @endcan
                         @can('view.daily.sale')
                             <li class="nav-item">
                                 <a href="{{ route('orders.approved') }}"
@@ -190,7 +181,7 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="#"
+                            <a href="{{route('receipt.payments')}}"
                                class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Receipts</p>

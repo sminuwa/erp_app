@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\GeneralAccountController;
+use App\Http\Controllers\ReceiptController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\CategoryController;
@@ -378,27 +379,42 @@ Route::group(
                 Route::delete('/delete/{creditlimit}', [CreditLimitController::class, 'destroy'])->name('credit_limits.destroy');
             }
         );
-        Route::group(
-            ['prefix' => '/debtor-payment'],
-            function () {
-                Route::get('/payment/list', [CustomerController::class, 'debtorPayments'])->name('debtor.payments');
-                Route::get('/create', [CustomerController::class, 'createDebtorpayment'])->name('debtors.payment.create');
-                Route::post('/store', [CustomerController::class, 'payDebt'])->name('debtors.payment.store');
-                Route::delete('/destroy/{ledger}', [CustomerController::class, 'deletePayment'])->name('debtors.payment.destroy');
-                Route::put('/payment/update/{ledger}', [CustomerController::class, 'updatePayment'])->name('debtor.payment.update');
-                Route::get('/balance', [CustomerController::class, 'loadCustomerBalance'])->name('ajax.load.customer.balance');
-                Route::post('/search', [CustomerController::class, 'search'])->name('debtors.payment.search');
-            }
-        );
+        
         Route::get('/ledger', [CustomerController::class, 'generateCustomerLedger'])->name('customer.ledger');
         Route::get('/ledger/load', [CustomerController::class, 'loadLedger'])->name('ajax.customer.ledger');
         Route::get('/ledger/load/general', [CustomerController::class, 'loadGeneralCustomerLedger'])->name('ajax.general.customer.ledger');
         Route::get('/credit_limit', [CustomerController::class, 'getCustomerCreditLimit'])->name('ajax.load.customer.credit_limit');
         Route::post('update/credit_limit', [CustomerController::class, 'updateCreditLimit'])->name('customers.update.credit_limit');
         Route::get('/print/ledger/{from_date}/{to_date}/{customer_id}', [CustomerController::class, 'printLedger'])->name('ajax.customer.print.ledger');
-        Route::get('/print/receipt/{payment}', [CustomerController::class, 'printPaymentReceipt'])->name('debtor.payment.print');
-        Route::get('/print/receipt/pos/{payment}', [CustomerController::class, 'printPoSPaymentReceipt'])->name('debtor.payment.print.pos');
+       
 
+    }
+);
+Route::group(
+    ['prefix' => '/receipt-payment'],
+    function () {
+        Route::get('/list', [ReceiptController::class, 'receipts'])->name('receipt.payments');
+        Route::get('/create', [ReceiptController::class, 'createReciept'])->name('create.payment.reciept');
+        Route::post('/store', [ReceiptController::class, 'payReciept'])->name('receipt.payment.store');
+        Route::delete('/destroy/{ledger}', [ReceiptController::class, 'deleteReceipt'])->name('receipt.payment.destroy');
+        Route::put('/update/{ledger}', [ReceiptController::class, 'updateReceipt'])->name('receipt.payment.update');
+        Route::post('/search', [ReceiptController::class, 'search'])->name('receipt.payment.search');
+        Route::get('/print/receipt/{payment}', [ReceiptController::class, 'printPaymentReceipt'])->name('receipt.payment.print');
+        Route::get('/print/receipt/pos/{payment}', [ReceiptController::class, 'printPoSPaymentReceipt'])->name('receipt.payment.print.pos');
+        Route::get('/load/payers', [ReceiptController::class, 'loadPayers'])->name('ajax.load.payers');
+    }
+);
+Route::group(
+    ['prefix' => '/payment'],
+    function () {
+        Route::get('/list', [ReceiptController::class, 'payments'])->name('payments.list');
+        Route::get('/create', [ReceiptController::class, 'makePayment'])->name('create.payment.reciept');
+        Route::post('/store', [ReceiptController::class, 'pay'])->name('receipt.payment.store');
+        Route::delete('/destroy/{ledger}', [ReceiptController::class, 'deletePayment'])->name('payment.destroy');
+        Route::put('/update/{ledger}', [ReceiptController::class, 'updateReceipt'])->name('payment.update');
+        Route::post('/search', [ReceiptController::class, 'search'])->name('receipt.payment.search');
+        Route::get('/print/receipt/{payment}', [ReceiptController::class, 'printPaymentReceipt'])->name('payment.print');
+        Route::get('/print/receipt/pos/{payment}', [ReceiptController::class, 'printPoSPaymentReceipt'])->name('payment.print.pos');
     }
 );
 

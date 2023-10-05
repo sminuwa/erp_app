@@ -23,7 +23,6 @@ class ReceiptController extends Controller
     {
         $user_branch = User::userBranchAction();
         $payments = Receipt::select('receipts.*')
-            ->whereIn('model_id', GeneralAccount::whereIn('class', ['A11','A12','A13'])->get('id')->toArray())
             ->where('branch_id', 'LIKE', $user_branch)
             ->orderBy('date', 'DESC')->take(10)->get();
         return view('pages.receipts.receipt_payment', ['payments' => $payments]);
@@ -102,7 +101,7 @@ class ReceiptController extends Controller
                     'description' => $description,
                     'recieved_by' => auth()->id(),
                     'model_id' => $supplier_id,
-                    'model_name' => 'Supplier',
+                    'model_name' => 'GeneralAccount',
                     'charged_account_id' => $bank_account_id,
                     'charged_account_name' => 'GeneralAccount',
                     'branch_id' => $user_branch,

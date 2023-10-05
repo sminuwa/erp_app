@@ -20,4 +20,13 @@ class Receipt extends Model
     {
         return $this->belongsTo(Supplier::class, 'model_id');
     }
+
+    public function payer(){
+        if($this->model_name == 'Customer')
+            return Customer::find($this->model_id);
+        if($this->model_name == 'Supplier')
+            return Supplier::find($this->model_id);
+        if($this->model_name == 'GeneralAccount')
+            return GeneralAccount::find($this->model_id);
+    }
 }

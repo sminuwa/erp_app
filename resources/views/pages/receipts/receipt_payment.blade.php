@@ -97,11 +97,14 @@
                                         @foreach ($payments as $payment)
                                             <tr>
                                                 <td>
-                                                    @if ($payment->model_name == 'Customer')
+                                                    {{--@if ($payment->model_name == 'Customer')
                                                         {{ optional($payment->customer)->code ?? '' }}-{{ optional($payment->customer)->name ?? '' }}
                                                     @elseif($payment->model_name == 'Supplier')
                                                         {{ optional($payment->supplier)->name ?? '' }}{{ optional($payment->supplier)->name ?? '' }}
-                                                    @endif
+                                                    @endif--}}
+                                                    {{
+                                                        $payment->payer()->code ? $payment->payer()->code.' - '.$payment->payer()->name : ($payment->payer()->number.' - '.$payment->payer()->description)
+                                                    }}
                                                 </td>
                                                 <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                                                 </td>

@@ -159,7 +159,7 @@
             <div style="float:left">
                 <div class="receipt-right">
                     <h5>Payment From</h5>
-                    <p><b>{{ $payment->customer->name }} </b></p>
+                    <p><b>{{ $payment->customer->code }} - {{ $payment->customer->name }} </b></p>
                     <p><b>Mobile :</b> {{ $payment->customer->phone }}</p>
                     <p><b>Address :</b> {{ $payment->customer->address }}</p>
                 </div>
@@ -195,7 +195,7 @@
                     @if ($payment->description == null)
                         Payment for {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                     @else
-                        {{ $payment->ref }}
+                        {{ $payment->description }}
                     @endif
                 </td>
                 <td align="right">

@@ -58,7 +58,7 @@
                     <option value="">Select...</option>
                     @foreach ($accounts as $account)
                         <option value="{{ $account->id }}" {{ $account->id = old('account_id', $model->branch_id) }}>
-                            {{ $account->number }}-{{ $account->description }}</option>
+                            {{ $account->number }} - {{ $account->description }}</option>
                     @endforeach
                 </select>
                 @if ($errors->has('payer_id'))

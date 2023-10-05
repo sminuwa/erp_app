@@ -65,24 +65,24 @@
                                     <thead>
                                     <tr>
                                         <th>Date</th>
-                                        <th>Receipt No</th>
+                                        <th>Payment No</th>
                                         <th>Payee</th>
                                         <th>Account</th>
                                         <th>Amount</th>
                                         <th>Description</th>
-                                        <th>Received BY</th>
+                                        <th>Paid BY</th>
                                         <th>Actions</th>
                                     </tr>
                                     </thead>
                                     <tfoot>
                                     <tr>
                                         <th>Date</th>
-                                        <th>Receipt No</th>
+                                        <th>Payment No</th>
                                         <th>Payee</th>
                                         <th>Account</th>
                                         <th>Amount</th>
                                         <th>Description</th>
-                                        <th>Received BY</th>
+                                        <th>Paid BY</th>
                                         <th>Actions</th>
                                     </tr>
                                     </tfoot>

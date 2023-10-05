@@ -114,7 +114,6 @@ class PaymentController extends Controller
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Posted  successfully');
             }
-
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('app_error', 'Failed to make payment');

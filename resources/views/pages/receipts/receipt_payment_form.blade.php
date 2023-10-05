@@ -10,6 +10,7 @@
                     <option value="">Select...</option>
                     <option value="Customer" {{ 'Customer' == $model->model_name ? 'selected' : '' }}>Customer</option>
                     <option value="Supplier" {{ 'Suppplier' == $model->model_name ? 'selected' : '' }}>Suppplier
+                    <option value="GeneralAccount" {{ 'GeneralAccount' == $model->model_name ? 'selected' : '' }}>General Accounts
                     </option>
                 </select>
                 @if ($errors->has('type'))

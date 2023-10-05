@@ -113,11 +113,11 @@
                                             <td>{{ $payment->description }}</td>
                                             <td>{{ optional($payment->received_by)->name }}</td>
                                             <td align="center">
-                                                <a href="{{ route('receipt.payment.print', $payment->id) }}"
+                                                <a href="{{ route('payment.print', $payment->id) }}"
                                                    target="_BLANK" class="btn btn-secondary btn-sm">
                                                     <i class="fa fa-print" aria-hidden="true"></i>
                                                 </a>
-                                                <a href="{{ route('receipt.payment.print.pos', $payment->id) }}"
+                                                <a href="{{ route('payment.print.pos', $payment->id) }}"
                                                    target="_BLANK" class="btn btn-secondary btn-sm">
                                                     <i class="fa fa-print" aria-hidden="true">PoS</i>
                                                 </a>

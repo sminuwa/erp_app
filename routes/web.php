@@ -4,6 +4,7 @@ use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\GeneralAccountController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\ReceiptController;
+use App\Http\Controllers\InterBankController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\CategoryController;
@@ -401,9 +402,22 @@ Route::group(
         Route::delete('/destroy/{ledger}', [ReceiptController::class, 'deleteReceipt'])->name('receipt.payment.destroy');
         Route::put('/update/{ledger}', [ReceiptController::class, 'updateReceipt'])->name('receipt.payment.update');
         Route::post('/search', [ReceiptController::class, 'search'])->name('receipt.payment.search');
-        Route::get('/print/receipt/{payment}', [ReceiptController::class, 'printPaymentReceipt'])->name('receipt.payment.print');
+        Route::get('/print/receipt/{payment}', [ReceiptController::class, 'printReceipt'])->name('receipt.payment.print');
         Route::get('/print/receipt/pos/{payment}', [ReceiptController::class, 'printPoSPaymentReceipt'])->name('receipt.payment.print.pos');
         Route::get('/load/payers', [ReceiptController::class, 'loadPayers'])->name('ajax.load.payers');
+    }
+);
+Route::group(
+    ['prefix' => '/interbanks'],
+    function () {
+        Route::get('/list', [InterBankController::class, 'list'])->name('interbank.list');
+        Route::get('/create', [InterBankController::class, 'create'])->name('create.interbank');
+        Route::post('/store', [InterBankController::class, 'store'])->name('interbank.store');
+        Route::delete('/destroy/{ledger}', [InterBankController::class, 'destroy'])->name('interbank.destroy');
+        Route::put('/update/{ledger}', [InterBankController::class, 'update'])->name('interbank.update');
+        Route::post('/search', [InterBankController::class, 'search'])->name('interbank.search');
+        Route::get('/print/receipt/{ledger}', [InterBankController::class, 'print'])->name('interbank.print');
+        Route::get('/print/receipt/pos/{ledger}', [InterBankController::class, 'printPos'])->name('interbank.print.pos');
     }
 );
 Route::group(

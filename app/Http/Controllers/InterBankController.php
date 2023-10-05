@@ -1,0 +1,150 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Classes\Transaction;
+use App\Models\AuditLog;
+use App\Models\GeneralAccount;
+use App\Models\InterBank;
+use App\Models\Setting;
+use App\Models\User;
+use Carbon\Carbon;
+use DB;
+use Illuminate\Http\Request;
+
+class InterBankController extends Controller
+{
+    public function list(Request $request)
+    {
+        $user_branch = User::userBranchAction();
+        $payments = InterBank::select('inter_banks.*')
+            ->where('branch_id', 'LIKE', $user_branch)
+            ->orderBy('date', 'DESC')->take(10)->get();
+        return view('pages.interbanks.list', ['payments' => $payments]);
+    } /**
+      * Display the specified resource.
+      *
+      * @param  Show  $request
+      * @param  Branch  $branch
+      * @return \Illuminate\Http\Response
+      */
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @param  Create  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function create(Request $request)
+    {
+
+        $user_branch = User::userBranchAction();
+        $accounts = GeneralAccount::where('class', 'A11')->orderBy('description')->get();
+        $model = new InterBank;
+        return view('pages.interbanks.create', compact('accounts', 'model'));
+    } /**
+      * Store a newly created resource in storage.
+      *
+      * @param  Store  $request
+      * @return \Illuminate\Http\Response
+      */
+    public function store(Request $request)
+    { 
+        $amount = $request->amount_paid;
+        $source_account_id = $request->source_account_id;
+        $destination_account_id =190;//= $request->destination_account_id;
+        $refence_no = $this->generateReceiptNo();
+        $date = $request->payment_date;
+        $description = $request->payment_ref;
+        $user_branch = User::userBranchAction();
+        $status = false;
+        $insert_id = 0;
+        $ledger_id = 0;
+
+        DB::beginTransaction();
+        try {
+            $supplier_id = $request->payer_id;
+            $status = Transaction::interbank($source_account_id, 'GeneralAccount', $destination_account_id, 'GeneralAccount', $amount, $refence_no, $date);
+            $ledger_id = DB::table('inter_banks')->insertGetId([
+                'amount' => $amount,
+                'date' => $date,
+                'receipt_no' => $refence_no,
+                'description' => $description,
+                'recieved_by' => auth()->id(),
+                'source_account_id' => $source_account_id,
+                'destination_account_id' => $destination_account_id,
+                'branch_id' => $user_branch,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]);
+            DB::commit();
+            if ($status == true) {
+                $action = "Posted payment of $amount for : " . $refence_no;
+                AuditLog::auditLog(auth()->id(), $action);
+                session()->flash('app_message', 'Transfered  successfully');
+            }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('app_error', 'Failed to make payment');
+            throw $e;
+        }
+
+        return redirect()->back()->with(['prev_id' => $ledger_id]);
+    } /**
+      * Show the form for editing the specified resource.
+      *
+      * @param  Edit  $request
+      * @param  Branch  $branch
+      * @return \Illuminate\Http\Response
+      */
+    public function edit(Edit $request, InterBank $interBank)
+    {
+
+        return view('pages.interbanks.create_payment', [
+            'model' => $interBank,
+
+        ]);
+    } /**
+      * Update a existing resource in storage.
+      *
+      * @param  Update  $request
+      * @param  Branch  $branch
+      * @return \Illuminate\Http\Response
+      */
+    public function update(Update $request, Branch $branch)
+    {
+        
+    } /**
+      * Delete a  resource from  storage.
+      *
+      * @param  Destroy  $request
+      * @param  Branch  $branch
+      * @return \Illuminate\Http\Response
+      * @throws \Exception
+      */
+    public function destroy(Request $request, InterBank $interBank)
+    {
+        if ($interBank->delete()) {
+            AuditLog::auditLog(Auth::id(), "Deleted interbank transfer: " . $interBank->receipt_no);
+            session()->flash('app_message', 'Record successfully deleted');
+        } else {
+            session()->flash('app_error', 'Error occurred while deleting Branch');
+        }
+
+        return redirect()->back();
+    }
+    public function printPaymentReceipt(InterBank $payment)
+    {
+        return view('pages.payments.print_payment', ['payment' => $payment, 'setting' => Setting::first()]);
+    }
+    public function printPoSPaymentReceipt(InterBank $payment)
+    {
+        return view('pages.payments.print_pos_payment', ['payment' => $payment, 'setting' => Setting::first()]);
+    }
+    public function generateReceiptNo()
+    {
+        $invoice = DB::table('general_account_ledgers')->select(DB::raw('MAX(SUBSTR(receipt_no,8,17)) as max'))->where(DB::raw('SUBSTR(receipt_no,1,3)'), '=', 'RCT')->where(DB::raw('YEAR(created_at)'), '=', date('Y'))->first();
+        $number = $invoice == null ? 1 : $invoice->max + 1;
+        return 'ITB' . date('y') . str_pad($number, 10, "0", STR_PAD_LEFT);
+    }
+}

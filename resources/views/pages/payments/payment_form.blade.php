@@ -1,4 +1,4 @@
-<form action="{{ isset($route) ? $route : route('receipt.payment.store') }}" method="POST">
+<form action="{{ isset($route) ? $route : route('payment.store') }}" method="POST">
     {{ csrf_field() }}
     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
     <div class="row">

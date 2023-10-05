@@ -38,7 +38,7 @@ class InterBankController extends Controller
     {
 
         $user_branch = User::userBranchAction();
-        $accounts = GeneralAccount::where('class', 'A11')->orderBy('description')->get();
+        $accounts = GeneralAccount::where('class', 'A11')->orderBy('number')->get();
         $model = new InterBank;
         return view('pages.interbanks.create', compact('accounts', 'model'));
     } /**
@@ -48,7 +48,7 @@ class InterBankController extends Controller
       * @return \Illuminate\Http\Response
       */
     public function store(Request $request)
-    { 
+    {
         $amount = $request->amount_paid;
         $source_account_id = $request->source_account_id;
         $destination_account_id =190;//= $request->destination_account_id;
@@ -113,7 +113,7 @@ class InterBankController extends Controller
       */
     public function update(Update $request, Branch $branch)
     {
-        
+
     } /**
       * Delete a  resource from  storage.
       *

@@ -195,7 +195,7 @@
                     @if ($payment->description == null)
                         Payment for {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                     @else
-                        {{ $payment->ref }}
+                        {{ $payment->description }}
                     @endif
                 </td>
                 <td align="right">

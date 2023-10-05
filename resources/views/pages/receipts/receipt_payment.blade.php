@@ -1,6 +1,6 @@
 @extends('layouts.backend.app')
 
-@section('title', 'Approved Orders')
+@section('title', 'Receipt List')
 
 @push('css')
     <!-- DataTables -->
@@ -18,7 +18,7 @@
                     <div class="col-sm-6 offset-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Reciept Payment List</li>
+                            <li class="breadcrumb-item active">Receipt List</li>
                         </ol>
                     </div>
                 </div>
@@ -34,15 +34,14 @@
                         <!-- general form elements -->
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Reciept Payment List</h3>
+                                <h3 class="card-title">Receipt List</h3>
                             </div>
                             <div class="row">
                                 <div class="col-sm-6">
                                     <a href="{{ route('receipt.payments') }}" class="btn btn-sm btn-secondary"
                                         style="margin-left: 2px;"><span class="fa fa-list"> </span> List</a>
                                     <a href="{{ route('create.payment.reciept') }}" class="btn btn-sm btn-secondary"
-                                        style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Reciept
-                                        Payment</a>
+                                        style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Reciept</a>
                                     @if (Session::get('prev_id') != null)
                                         <a href="{{ route('receipt.payment.print', Session::get('prev_id')) }}" target="_BLANK"
                                             class="btn btn-sm btn-primary" style="margin-left: 2px;"><span

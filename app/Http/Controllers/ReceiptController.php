@@ -110,9 +110,11 @@ class ReceiptController extends Controller
     {
         $type = $request->get('type');
         if ($type == "Customer")
-            $payers = Customer::orderBy('code')->orderBy('name')->get();
+            $payers = Customer::where('branch_id', auth()->user()->branch->id)->orderBy('code')->orderBy('code')->get();
         if ($type == "Supplier")
-            $payers = Supplier::orderBy('code')->orderBy('name')->get();
+            $payers = Supplier::orderBy('code')->orderBy('code')->get();
+        if ($type == "GeneralAccount")
+            $payers = GeneralAccount::orderBy('number')->orderBy('number')->get();
 
         return view('pages.receipts.load_data_payer', ['payers' => $payers]);
     }

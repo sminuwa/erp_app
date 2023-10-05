@@ -56,7 +56,7 @@ class ReceiptController extends Controller
 
             if ($request->has('type') && $request->type == "Customer") {
                 $customer_id = $request->payer_id;
-                $status = Transaction::receipt($customer_id, 'Customer', $bank_account_id, 'GeneralAccount', $amount, $refence_no, $date);
+                $status = Transaction::receipt($bank_account_id, 'GeneralAccount',$customer_id, 'Customer',  $amount, $refence_no, $date);
                 $ledger_id = DB::table('receipts')->insertGetId([
                     'amount' => $amount,
                     'date' => $date,
@@ -75,7 +75,7 @@ class ReceiptController extends Controller
             }
             if ($request->has('type') && $request->type == "Supplier") {
                 $supplier_id = $request->payer_id;
-                $status = Transaction::receipt($supplier_id, 'Supplier', $bank_account_id, 'GeneralAccount', $amount, $refence_no, $date);
+                $status = Transaction::receipt($bank_account_id, 'GeneralAccount', $supplier_id, 'Supplier', $amount, $refence_no, $date);
                 $ledger_id = DB::table('receipts')->insertGetId([
                     'amount' => $amount,
                     'date' => $date,
@@ -93,7 +93,7 @@ class ReceiptController extends Controller
             }
             if ($request->has('type') && $request->type == "GeneralAccount") {
                 $supplier_id = $request->payer_id;
-                $status = Transaction::receipt($supplier_id, 'GeneralAccount', $bank_account_id, 'GeneralAccount', $amount, $refence_no, $date);
+                $status = Transaction::receipt($bank_account_id, 'GeneralAccount', $supplier_id, 'GeneralAccount', $amount, $refence_no, $date);
                 $ledger_id = DB::table('receipts')->insertGetId([
                     'amount' => $amount,
                     'date' => $date,

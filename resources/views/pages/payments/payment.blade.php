@@ -114,19 +114,9 @@
                                                         data-val="{{ $payment->id }}" class="btn btn-primary btn-sm edit">
                                                         <i class="fa fa-edit" aria-hidden="true"></i>
                                                     </a>
-                                                    <button class="btn btn-danger btn-sm" type="button"
-                                                        onclick="deleteItem({{ $payment->id }})">
-                                                        <i class="fa fa-trash" aria-hidden="true"></i>
-                                                    </button>
-                                                    <form id="delete-form-{{ $payment->id }}"
-                                                        action="{{ route('receipt.payment.destroy', $payment->id) }}"
-                                                        method="post" style="display:none;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                    </form>
                                                 </td>
                                             </tr>
-                                           
+
                                         @endforeach
                                     </tbody>
 

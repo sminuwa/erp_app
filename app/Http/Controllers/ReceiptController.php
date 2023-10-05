@@ -119,7 +119,7 @@ class ReceiptController extends Controller
     public function createReciept()
     {
         $user_branch = User::userBranchAction();
-        $accounts = GeneralAccount::where('class', 'A11')->orderBy('description')->get();
+        $accounts = GeneralAccount::whereIn('class', ['A11', 'A12', 'A13'])->orderBy('description')->get();
         $customers = Customer::whereIn('type', ['Retail', 'Wholesale'])->where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
         $model = new GeneralAccountLedger;
         return view('pages.receipts.create_receipt_payment', compact('accounts', 'customers', 'model'));

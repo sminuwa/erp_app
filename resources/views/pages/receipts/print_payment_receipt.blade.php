@@ -43,7 +43,7 @@
                         <div class="col-xs-7 col-sm-7 col-md-7 text-left">
                             <div class="receipt-right">
                                 <h5>Payment From</h5>
-                                <p><b>{{ $payment->customer->name }} </b></p>
+                                <p><b>{{ $payment->customer->code }} - {{ $payment->customer->name }} </b></p>
                                 <p><b>Mobile :</b> {{ $payment->customer->phone }}</p>
                                 <p><b>Address :</b> {{ $payment->customer->address }}</p>
                             </div>
@@ -58,7 +58,7 @@
                     </div>
                 </div>
                 <div>
-                    <h4 style="text-align: center;font-weight:700">PAYMENT RECEIPT</h4>
+                    <h4 style="text-align: center;font-weight:700">RECEIPT</h4>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -83,7 +83,7 @@
                                     <p>
                                         <strong>Amount: </strong>
                                     </p>
-            
+
                                 </td>
                                 <td align="right">
                                     <p>

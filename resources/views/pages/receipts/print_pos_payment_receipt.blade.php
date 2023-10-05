@@ -159,7 +159,7 @@
             <div style="float:left">
                 <div class="receipt-right">
                     <h5>Payment From</h5>
-                    <p><b>{{ $payment->customer->name }} </b></p>
+                    <p><b>{{ $payment->customer->code }} - {{ $payment->customer->name }} </b></p>
                     <p><b>Mobile :</b> {{ $payment->customer->phone }}</p>
                     <p><b>Address :</b> {{ $payment->customer->address }}</p>
                 </div>
@@ -176,7 +176,7 @@
     <table class="bill-details">
         <tbody>
             <tr>
-                <th class="center-align" colspan="2"><span class="receipt"><strong> PAYMENT RECEIPT </strong></span>
+                <th class="center-align" colspan="2"><span class="receipt"><strong> RECEIPT </strong></span>
                 </th>
             </tr>
         </tbody>

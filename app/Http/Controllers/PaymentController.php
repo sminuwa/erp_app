@@ -24,7 +24,6 @@ class PaymentController extends Controller
     {
         $user_branch = User::userBranchAction();
         $payments = Payment::select('payments.*')
-            ->whereIn('model_id', GeneralAccount::where('class', 'A11')->get('id')->toArray())
             ->where('branch_id', 'LIKE', $user_branch)
             ->orderBy('date', 'DESC')->take(10)->get();
         return view('pages.payments.payment', ['payments' => $payments]);
@@ -65,7 +64,7 @@ class PaymentController extends Controller
                     'recieved_by' => auth()->id(),
                     'model_id' => $customer_id,
                     'model_name' => 'Customer',
-                    'charged_account_id'    =>$bank_account_id,
+                    'charged_account_id' => $bank_account_id,
                     'charged_account_name' => 'GeneralAccount',
                     'branch_id' => $user_branch,
                     'created_at' => Carbon::now(),
@@ -84,7 +83,25 @@ class PaymentController extends Controller
                     'recieved_by' => auth()->id(),
                     'model_id' => $supplier_id,
                     'model_name' => 'Supplier',
-                    'charged_account_id'    =>$bank_account_id,
+                    'charged_account_id' => $bank_account_id,
+                    'charged_account_name' => 'GeneralAccount',
+                    'branch_id' => $user_branch,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]);
+            }
+            if ($request->has('type') && $request->type == "GeneralAccount") {
+                $supplier_id = $request->payer_id;
+                $status = Transaction::payment($supplier_id, 'GeneralAccount', $bank_account_id, 'GeneralAccount', $amount, $refence_no, $date);
+                $ledger_id = DB::table('payments')->insertGetId([
+                    'amount' => $amount,
+                    'date' => $date,
+                    'receipt_no' => $refence_no,
+                    'description' => $description,
+                    'recieved_by' => auth()->id(),
+                    'model_id' => $supplier_id,
+                    'model_name' => 'GeneralAccount',
+                    'charged_account_id' => $bank_account_id,
                     'charged_account_name' => 'GeneralAccount',
                     'branch_id' => $user_branch,
                     'created_at' => Carbon::now(),
@@ -111,7 +128,7 @@ class PaymentController extends Controller
     public function makePayment()
     {
         $user_branch = User::userBranchAction();
-        $accounts = GeneralAccount::where('class', 'A11')->orderBy('description')->get();
+        $accounts = GeneralAccount::whereIn('class', ['A11','A12','A13'])->orderBy('number')->get();
         $customers = Customer::whereIn('type', ['Retail', 'Wholesale'])->where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
         $model = new GeneralAccountLedger;
         return view('pages.payments.create_payment', compact('accounts', 'customers', 'model'));

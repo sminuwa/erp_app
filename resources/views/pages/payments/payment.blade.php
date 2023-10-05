@@ -61,63 +61,75 @@
                             <!-- /.card-header -->
                             <div class="card-body table-responsive">
                                 <table id="example1"
-                                    class="table table-bordered table-striped text-left table-responsive-xl">
+                                       class="table table-bordered table-striped text-left table-responsive-xl">
                                     <thead>
-                                        <tr>
-                                            <th>Payee</th>
-                                            <th>Date</th>
-                                            <th>Receipt No</th>
-                                            <th>Receipt Amount</th>
-                                            <th>Description</th>
-                                            <th>Received BY</th>
-                                            <th>Actions</th>
-                                        </tr>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Receipt No</th>
+                                        <th>Payee</th>
+                                        <th>Account</th>
+                                        <th>Amount</th>
+                                        <th>Description</th>
+                                        <th>Received BY</th>
+                                        <th>Actions</th>
+                                    </tr>
                                     </thead>
                                     <tfoot>
-                                        <tr>
-                                            <th>Payee</th>
-                                            <th>Date</th>
-                                            <th>Receipt No</th>
-                                            <th>Receipt Amount</th>
-                                            <th>Description</th>
-                                            <th>Received BY</th>
-                                            <th>Actions</th>
-                                        </tr>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Receipt No</th>
+                                        <th>Payee</th>
+                                        <th>Account</th>
+                                        <th>Amount</th>
+                                        <th>Description</th>
+                                        <th>Received BY</th>
+                                        <th>Actions</th>
+                                    </tr>
                                     </tfoot>
                                     <tbody>
-                                        @foreach ($payments as $payment)
-                                            <tr>
-                                                <td>
-                                                    @if ($payment->model_name == 'Customer')
-                                                        {{ optional($payment->customer)->code ?? '' }}-{{ optional($payment->customer)->name ?? '' }}
-                                                    @elseif($payment->model_name == 'Supplier')
-                                                        {{ optional($payment->supplier)->name ?? '' }}{{ optional($payment->supplier)->name ?? '' }}
-                                                    @endif
-                                                </td>
-                                                <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
-                                                </td>
-                                                <td>{{ $payment->receipt_no }}</td>
-                                                <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
-                                                <td>{{ $payment->description }}</td>
-                                                <td>{{ optional($payment->received_by)->name }}</td>
-                                                <td align="center">
-                                                    <a href="{{ route('receipt.payment.print', $payment->id) }}"
-                                                        target="_BLANK" class="btn btn-secondary btn-sm">
-                                                        <i class="fa fa-print" aria-hidden="true"></i>
-                                                    </a>
-                                                    <a href="{{ route('receipt.payment.print.pos', $payment->id) }}"
-                                                        target="_BLANK" class="btn btn-secondary btn-sm">
-                                                        <i class="fa fa-print" aria-hidden="true">PoS</i>
-                                                    </a>
-                                                    <a href="javascript:void(0)" data-toggle="modal"
-                                                        data-target="#payment_edit{{ $payment->id }}"
-                                                        data-val="{{ $payment->id }}" class="btn btn-primary btn-sm edit">
-                                                        <i class="fa fa-edit" aria-hidden="true"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
+                                    @foreach ($payments as $payment)
+                                        <tr>
 
-                                        @endforeach
+                                            <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
+                                            </td>
+                                            <td>{{ $payment->receipt_no }}</td>
+                                            <td>
+                                                {{--@if ($payment->model_name == 'Customer')
+                                                    {{ optional($payment->customer)->code ?? '' }}-{{ optional($payment->customer)->name ?? '' }}
+                                                @elseif($payment->model_name == 'Supplier')
+                                                    {{ optional($payment->supplier)->name ?? '' }}{{ optional($payment->supplier)->name ?? '' }}
+                                                @endif--}}
+                                                {{
+                                                    $payment->payer()->code ? $payment->payer()->code.' - '.$payment->payer()->name : ($payment->payer()->number.' - '.$payment->payer()->description)
+                                                }}
+                                            </td>
+                                            <td>
+                                                {{
+                                                    $payment->account()->code ? $payment->account()->code.' - '.$payment->account()->name : ($payment->account()->number.' - '.$payment->account()->description)
+                                                }}
+                                            </td>
+
+                                            <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
+                                            <td>{{ $payment->description }}</td>
+                                            <td>{{ optional($payment->received_by)->name }}</td>
+                                            <td align="center">
+                                                <a href="{{ route('receipt.payment.print', $payment->id) }}"
+                                                   target="_BLANK" class="btn btn-secondary btn-sm">
+                                                    <i class="fa fa-print" aria-hidden="true"></i>
+                                                </a>
+                                                <a href="{{ route('receipt.payment.print.pos', $payment->id) }}"
+                                                   target="_BLANK" class="btn btn-secondary btn-sm">
+                                                    <i class="fa fa-print" aria-hidden="true">PoS</i>
+                                                </a>
+                                                <a href="javascript:void(0)" data-toggle="modal"
+                                                   data-target="#payment_edit{{ $payment->id }}"
+                                                   data-val="{{ $payment->id }}" class="btn btn-primary btn-sm edit">
+                                                    <i class="fa fa-edit" aria-hidden="true"></i>
+                                                </a>
+
+                                            </td>
+                                        </tr>
+                                    @endforeach
                                     </tbody>
 
                                 </table>

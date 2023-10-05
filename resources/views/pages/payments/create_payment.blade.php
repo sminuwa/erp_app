@@ -15,7 +15,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Payment Invoice </h4>
+                        <h4>New Payment</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -30,12 +30,12 @@
 
         <!-- Main content -->
         <section class="content">
+            <a class="btn btn-secondary btn-sm" href="{{ route('payments.list') }}">
+                <span class="fa fa-list"> List</span>
+            </a>
             <a href="{{ route('create.payment') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
                     class="fa fa-plus-circle"> </span> New
                 Payment</a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('payments.list') }}">
-                <span class="fa fa-list"> Receipts</span>
-            </a>
             @if (Session::get('prev_id') != null)
                 <a href="{{ route('payment.print', Session::get('prev_id')) }}" target="_BLANK"
                     class="btn btn-sm btn-primary" style="margin-left: 2px;"><span class="fa fa-print"> Print</span> </a>

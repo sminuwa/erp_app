@@ -29,4 +29,13 @@ class Receipt extends Model
         if($this->model_name == 'GeneralAccount')
             return GeneralAccount::find($this->model_id);
     }
+
+    public function account(){
+        if($this->model_name == 'Customer')
+            return Customer::find($this->model_id);
+        if($this->model_name == 'Supplier')
+            return Supplier::find($this->model_id);
+        if($this->model_name == 'GeneralAccount')
+            return GeneralAccount::find($this->model_id);
+    }
 }

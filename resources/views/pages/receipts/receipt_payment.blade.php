@@ -73,10 +73,11 @@
                                     class="table table-bordered table-striped text-left table-responsive-xl">
                                     <thead>
                                         <tr>
-                                            <th>Payee</th>
                                             <th>Date</th>
                                             <th>Receipt No</th>
-                                            <th>Receipt Amount</th>
+                                            <th>Payer</th>
+                                            <th>Account</th>
+                                            <th>Amount</th>
                                             <th>Description</th>
                                             <th>Received BY</th>
                                             <th>Actions</th>
@@ -84,10 +85,11 @@
                                     </thead>
                                     <tfoot>
                                         <tr>
-                                            <th>Payee</th>
                                             <th>Date</th>
                                             <th>Receipt No</th>
-                                            <th>Receipt Amount</th>
+                                            <th>Payer</th>
+                                            <th>Account</th>
+                                            <th>Amount</th>
                                             <th>Description</th>
                                             <th>Received BY</th>
                                             <th>Actions</th>
@@ -96,6 +98,10 @@
                                     <tbody>
                                         @foreach ($payments as $payment)
                                             <tr>
+
+                                                <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
+                                                </td>
+                                                <td>{{ $payment->receipt_no }}</td>
                                                 <td>
                                                     {{--@if ($payment->model_name == 'Customer')
                                                         {{ optional($payment->customer)->code ?? '' }}-{{ optional($payment->customer)->name ?? '' }}
@@ -106,9 +112,12 @@
                                                         $payment->payer()->code ? $payment->payer()->code.' - '.$payment->payer()->name : ($payment->payer()->number.' - '.$payment->payer()->description)
                                                     }}
                                                 </td>
-                                                <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
+                                                <td>
+                                                    {{
+                                                        $payment->account()->code ? $payment->account()->code.' - '.$payment->account()->name : ($payment->account()->number.' - '.$payment->account()->description)
+                                                    }}
                                                 </td>
-                                                <td>{{ $payment->receipt_no }}</td>
+
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
                                                 <td>{{ $payment->description }}</td>
                                                 <td>{{ optional($payment->received_by)->name }}</td>

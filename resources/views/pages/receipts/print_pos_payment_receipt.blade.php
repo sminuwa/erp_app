@@ -159,7 +159,7 @@
             <div style="float:left">
                 <div class="receipt-right">
                     <h5>Payment From</h5>
-                    <p><b>{{ $payment->customer->code }} - {{ $payment->customer->name }} </b></p>
+                    <p><b>{{ $payment->payer()->code ? $payment->payer()->code.' - '.$payment->payer()->name : ($payment->payer()->number.' - '.$payment->payer()->description) }}</b></p>
                     <p><b>Mobile :</b> {{ $payment->customer->phone }}</p>
                     <p><b>Address :</b> {{ $payment->customer->address }}</p>
                 </div>

@@ -182,7 +182,6 @@ class Transaction
         $general_ledgers = GeneralAccountLedger::forReference($reference)->get();
         $general_account_ledgers = [];
         foreach($general_ledgers as $general_ledger){
-            $amount =
             $general_account_ledgers[] = [
                 'model_id' => $general_ledger->model_id,
                 'model_name' => $general_ledger->model_name,
@@ -210,8 +209,19 @@ class Transaction
         return self::transaction($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date, 'PAY');
     }
 
-    public static function journal(){
+    public static function journal(array $source_accounts, array $destination_account, $reference, $date, $type = 'JOURNAL' ){
+        /*
+         * source and destination account structure
+         * [
+         *  [source_id=>1, model_name=>Customer, source_amount=>200],
+         *  [source_id=>1, model_name=>Customer, source_amount=>200]
+         * ]
+         * Same as destination accounts
+         * */
 
+        foreach($source_accounts as $source){
+            return $source;
+        }
     }
 
     public static function credit_note(){

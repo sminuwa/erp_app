@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\GeneralAccountController;
+use App\Http\Controllers\JournalController;
 use App\Http\Controllers\ReceiptController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BankController;
@@ -380,14 +381,14 @@ Route::group(
                 Route::delete('/delete/{creditlimit}', [CreditLimitController::class, 'destroy'])->name('credit_limits.destroy');
             }
         );
-        
+
         Route::get('/ledger', [CustomerController::class, 'generateCustomerLedger'])->name('customer.ledger');
         Route::get('/ledger/load', [CustomerController::class, 'loadLedger'])->name('ajax.customer.ledger');
         Route::get('/ledger/load/general', [CustomerController::class, 'loadGeneralCustomerLedger'])->name('ajax.general.customer.ledger');
         Route::get('/credit_limit', [CustomerController::class, 'getCustomerCreditLimit'])->name('ajax.load.customer.credit_limit');
         Route::post('update/credit_limit', [CustomerController::class, 'updateCreditLimit'])->name('customers.update.credit_limit');
         Route::get('/print/ledger/{from_date}/{to_date}/{customer_id}', [CustomerController::class, 'printLedger'])->name('ajax.customer.print.ledger');
-       
+
 
     }
 );
@@ -897,6 +898,10 @@ Route::group(['prefix' => 'ap_ar_account', 'middleware' => 'auth'], function () 
             Route::post('/import', [GeneralAccountController::class, 'import'])->name('general_accounts.import');
         }
     );
+    Route::prefix('journals')->group(function(){
+       Route::get('/', [JournalController::class,'index'])->name('journal.index');
+       Route::post('/', [JournalController::class,'store'])->name('journal.store');
+    });
 });
 
 Route::middleware('auth')->group(function () {

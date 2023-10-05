@@ -209,7 +209,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#"
+                            <a href="{{ route('journal.index') }}"
                                class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Journals</p>

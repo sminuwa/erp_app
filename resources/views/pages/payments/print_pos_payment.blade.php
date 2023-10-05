@@ -176,7 +176,7 @@
     <table class="bill-details">
         <tbody>
             <tr>
-                <th class="center-align" colspan="2"><span class="receipt"><strong> PAYMENT RECEIPT </strong></span>
+                <th class="center-align" colspan="2"><span class="receipt"><strong> PAYMENT </strong></span>
                 </th>
             </tr>
         </tbody>

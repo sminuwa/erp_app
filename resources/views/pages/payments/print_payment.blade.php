@@ -58,7 +58,7 @@
                     </div>
                 </div>
                 <div>
-                    <h4 style="text-align: center;font-weight:700">PAYMENT RECEIPT</h4>
+                    <h4 style="text-align: center;font-weight:700">PAYMENT</h4>
                     <table class="table table-bordered">
                         <thead>
                             <tr>

@@ -23,11 +23,12 @@ class ReceiptController extends Controller
     {
         $user_branch = User::userBranchAction();
         $payments = Receipt::select('receipts.*')
-            ->whereIn('model_id', GeneralAccount::where('class', 'A11')->get('id')->toArray())
+            ->whereIn('model_id', GeneralAccount::whereIn('class', ['A11','A12','A13'])->get('id')->toArray())
             ->where('branch_id', 'LIKE', $user_branch)
             ->orderBy('date', 'DESC')->take(10)->get();
         return view('pages.receipts.receipt_payment', ['payments' => $payments]);
     }
+
     public function search(Request $request)
     {
         $search_value = $request->refno;
@@ -37,6 +38,7 @@ class ReceiptController extends Controller
             ->orderBy('receipt_no', 'DESC')->take(10)->get();
         return view('pages.receipts.receipt_payment', ['payments' => $payments]);
     }
+
     public function payReciept(Request $request)
     {
 
@@ -75,6 +77,24 @@ class ReceiptController extends Controller
             if ($request->has('type') && $request->type == "Supplier") {
                 $supplier_id = $request->payer_id;
                 $status = Transaction::receipt($supplier_id, 'Supplier', $bank_account_id, 'GeneralAccount', $amount, $refence_no, $date);
+                $ledger_id = DB::table('receipts')->insertGetId([
+                    'amount' => $amount,
+                    'date' => $date,
+                    'receipt_no' => $refence_no,
+                    'description' => $description,
+                    'recieved_by' => auth()->id(),
+                    'model_id' => $supplier_id,
+                    'model_name' => 'Supplier',
+                    'charged_account_id' => $bank_account_id,
+                    'charged_account_name' => 'GeneralAccount',
+                    'branch_id' => $user_branch,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]);
+            }
+            if ($request->has('type') && $request->type == "GeneralAccount") {
+                $supplier_id = $request->payer_id;
+                $status = Transaction::receipt($supplier_id, 'GeneralAccount', $bank_account_id, 'GeneralAccount', $amount, $refence_no, $date);
                 $ledger_id = DB::table('receipts')->insertGetId([
                     'amount' => $amount,
                     'date' => $date,

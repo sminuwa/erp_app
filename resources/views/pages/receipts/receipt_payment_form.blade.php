@@ -22,7 +22,7 @@
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label for="payer_id">Customer/Supplier</label>
+                <label for="payer_id">Payer</label>
                 <select class="form-control select2-single {{ $errors->has('payer_id') ? ' is-invalid' : '' }}"
                     name="payer_id" id="payer_id" required="required">
 

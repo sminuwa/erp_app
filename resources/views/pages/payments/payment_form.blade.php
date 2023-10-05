@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
-                <label for="type">Payer Category</label>
+                <label for="type">Payee Category</label>
                 <select class="form-control select2-single {{ $errors->has('type') ? ' is-invalid' : '' }}"
                         name="type" id="type" required="required">
                     <option value="">Select...</option>
@@ -22,7 +22,7 @@
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label for="payer_id">Payer</label>
+                <label for="payer_id">Payee</label>
                 <select class="form-control select2-single {{ $errors->has('payer_id') ? ' is-invalid' : '' }}"
                         name="payer_id" id="payer_id" required="required">
 

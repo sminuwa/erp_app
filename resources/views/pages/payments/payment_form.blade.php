@@ -58,7 +58,7 @@
                         name="account_id" id="account_id" required="required">
                     <option value="">Select...</option>
                     @foreach ($accounts as $account)
-                        <option value="{{ $account->id }}" {{ $account->id = old('account_id', $model->branch_id) }}>
+                        <option value="{{ $account->id }}" {{ $account->id == $model->charged_account_id ? 'selected' : '' }} {{ $account->id = old('account_id', $model->branch_id) }}>
                             {{ $account->number }} - {{ $account->description }}</option>
                     @endforeach
                 </select>
@@ -75,7 +75,7 @@
             <div class="form-group">
                 <label for="amount_paid">Amount</label>
                 <input type="number" class="form-control {{ $errors->has('amount_paid') ? ' is-invalid' : '' }}"
-                       name="amount_paid" id="amount_paid" value="{{ old('amount_paid', $model->amount_paid) }}" required>
+                       name="amount_paid" id="amount_paid" value="{{ old('amount_paid', $model->amount) }}" required>
                 @if ($errors->has('amount_paid'))
                     <div class="invalid-feedback">
                         <strong>{{ $errors->first('amount_paid') }}</strong>

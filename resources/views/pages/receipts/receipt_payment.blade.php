@@ -121,19 +121,36 @@
                                                 <td>{{ $payment->description }}</td>
                                                 <td>{{ optional($payment->received_by)->name }}</td>
                                                 <td align="center">
-                                                    <a href="{{ route('receipt.payment.print', $payment->id) }}"
-                                                        target="_BLANK" class="btn btn-secondary btn-sm">
-                                                        <i class="fa fa-print" aria-hidden="true"></i>
-                                                    </a>
-                                                    <a href="{{ route('receipt.payment.print.pos', $payment->id) }}"
-                                                        target="_BLANK" class="btn btn-secondary btn-sm">
-                                                        <i class="fa fa-print" aria-hidden="true">PoS</i>
-                                                    </a>
-                                                    <a href="javascript:void(0)" data-toggle="modal"
-                                                        data-target="#payment_edit{{ $payment->id }}"
-                                                        data-val="{{ $payment->id }}" class="btn btn-primary btn-sm edit">
-                                                        <i class="fa fa-edit" aria-hidden="true"></i>
-                                                    </a>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            Action
+                                                        </button>
+                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                            <a href="{{ route('receipt.payment.print', $payment->id) }}"
+                                                               class="dropdown-item">
+                                                                <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                            </a>
+                                                            <a href="{{ route('receipt.payment.print.pos', $payment->id) }}"
+                                                               class="dropdown-item">
+                                                                <i class="fa fa-print" aria-hidden="true"></i> PoS
+                                                            </a>
+                                                            @if($payment->status == 0)
+                                                                <a href="{{ route('create.payment.reciept', ['receipt_id'=>$payment->id]) }}"
+                                                                   class="dropdown-item">
+                                                                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                                                </a>
+                                                                <a href="{{ route('create.payment.reciept', ['receipt_id'=>$payment->id]) }}"
+                                                                   class="dropdown-item">
+                                                                    <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                                                </a>
+                                                            @else
+                                                                <a href="{{ route('receipt.payment.reverse',[$payment->id]) }}"
+                                                                   class="dropdown-item">
+                                                                    <i class="fa fa-reply" aria-hidden="true"></i> Reverse
+                                                                </a>
+                                                            @endif
+                                                        </div>
+                                                    </div>
 
                                                 </td>
                                             </tr>

@@ -132,6 +132,11 @@ class PaymentController extends Controller
         $model = new GeneralAccountLedger;
         return view('pages.payments.create_payment', compact('accounts', 'customers', 'model'));
     }
+    public function reverse(Payment $payment) {
+        $payment->status = 0;
+        $payment->save();
+        return back();
+    }
     public function printPaymentReceipt(Payment $payment)
     {
         return view('pages.payments.print_payment', ['payment' => $payment, 'setting' => Setting::first()]);

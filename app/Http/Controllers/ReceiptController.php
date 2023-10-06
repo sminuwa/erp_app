@@ -137,14 +137,26 @@ class ReceiptController extends Controller
 
         return view('pages.receipts.load_data_payer', ['payers' => $payers]);
     }
-    public function createReciept()
+    public function createReciept(Request $request)
     {
+        $receipt_id = $request->receipt_id;
+        $receipt = Receipt::find($receipt_id);
+//        return $receipt;
         $user_branch = User::userBranchAction();
         $accounts = GeneralAccount::whereIn('class', ['A11', 'A12', 'A13'])->orderBy('number')->get();
         $customers = Customer::whereIn('type', ['Retail', 'Wholesale'])->where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
         $model = new GeneralAccountLedger;
+        if($receipt)
+            $model = $receipt;
         return view('pages.receipts.create_receipt_payment', compact('accounts', 'customers', 'model'));
     }
+
+    public function reverse(Receipt $receipt) {
+         $receipt->status = 0;
+         $receipt->save();
+         return back();
+    }
+
     public function printReceipt(Receipt $payment)
     {
         return view('pages.receipts.print_payment_receipt', ['payment' => $payment, 'setting' => Setting::first()]);

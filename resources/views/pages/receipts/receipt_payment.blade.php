@@ -96,7 +96,7 @@
                                     </tfoot>
                                     <tbody>
                                         @foreach ($payments as $payment)
-                                            <tr>
+                                            <tr class="@if($payment->status == 0) bg-warning @endif">
 
                                                 <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                                                 </td>

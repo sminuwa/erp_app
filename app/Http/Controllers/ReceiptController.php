@@ -21,10 +21,12 @@ class ReceiptController extends Controller
 {
     public function receipts()
     {
+        $date = \Carbon\Carbon::today()->subDays(7);
         $user_branch = User::userBranchAction();
         $payments = Receipt::select('receipts.*')
             ->where('branch_id', 'LIKE', $user_branch)
-            ->orderBy('date', 'DESC')->take(10)->get();
+            ->where('created_at','>=',$date)
+            ->orderBy('id', 'DESC')->get();
         return view('pages.receipts.receipt_payment', ['payments' => $payments]);
     }
 
@@ -43,24 +45,51 @@ class ReceiptController extends Controller
 
         $amount = $request->amount_paid;
         $bank_account_id = $request->account_id;
-        $refence_no = $this->generateReceiptNo();
+        $reference_no = Receipt::generateNewNumber();
         $date = $request->payment_date;
         $description = $request->payment_ref;
         $user_branch = User::userBranchAction();
         $status = false;
         $insert_id = 0;
         $ledger_id = 0;
+        $payer_id = $request->payer_id;
+        $payer_type = $request->type;
 
         DB::beginTransaction();
         try {
+            $record = new Receipt();
+            $record->amount = $amount;
+            $record->date = $date;
+            $record->receipt_no = $reference_no;
+            $record->description = $description;
+            $record->recieved_by = auth()->id();
+            $record->model_id = $payer_id;
+            $record->model_name = $payer_type;
+            $record->charged_account_id = $bank_account_id;
+            $record->charged_account_name = 'GeneralAccount';
+            $record->branch_id = $user_branch;
+            $record->status = 0;
+            if($record->save()){
+                if(Transaction::receipt($bank_account_id, 'GeneralAccount',$payer_id, $payer_type,  $amount, $reference_no, $date)){
+                    $action = "Generated receipt of $amount for : " . $reference_no;
+                    AuditLog::auditLog(auth()->id(), $action);
+                    session()->flash('app_message', 'Receipt generated successfully');
+                    DB::commit();
+                }else {
+                    return 'something went wrong';
+                    DB::rollBack();
+                }
+            }
+            return redirect()->back()->with(['prev_id' => $ledger_id]);
 
-            if ($request->has('type') && $request->type == "Customer") {
+
+            /*if ($request->has('type') && $request->type == "Customer") {
                 $customer_id = $request->payer_id;
-                $status = Transaction::receipt($bank_account_id, 'GeneralAccount',$customer_id, 'Customer',  $amount, $refence_no, $date);
+                $status = Transaction::receipt($bank_account_id, 'GeneralAccount',$customer_id, 'Customer',  $amount, $reference_no, $date);
                 $ledger_id = DB::table('receipts')->insertGetId([
                     'amount' => $amount,
                     'date' => $date,
-                    'receipt_no' => $refence_no,
+                    'receipt_no' => $reference_no,
                     'description' => $description,
                     'recieved_by' => auth()->id(),
                     'model_id' => $customer_id,
@@ -68,18 +97,17 @@ class ReceiptController extends Controller
                     'charged_account_id' => $bank_account_id,
                     'charged_account_name' => 'GeneralAccount',
                     'branch_id' => $user_branch,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
+
                 ]);
 
             }
             if ($request->has('type') && $request->type == "Supplier") {
                 $supplier_id = $request->payer_id;
-                $status = Transaction::receipt($bank_account_id, 'GeneralAccount', $supplier_id, 'Supplier', $amount, $refence_no, $date);
+                $status = Transaction::receipt($bank_account_id, 'GeneralAccount', $supplier_id, 'Supplier', $amount, $reference_no, $date);
                 $ledger_id = DB::table('receipts')->insertGetId([
                     'amount' => $amount,
                     'date' => $date,
-                    'receipt_no' => $refence_no,
+                    'receipt_no' => $reference_no,
                     'description' => $description,
                     'recieved_by' => auth()->id(),
                     'model_id' => $supplier_id,
@@ -87,17 +115,16 @@ class ReceiptController extends Controller
                     'charged_account_id' => $bank_account_id,
                     'charged_account_name' => 'GeneralAccount',
                     'branch_id' => $user_branch,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
+
                 ]);
             }
             if ($request->has('type') && $request->type == "GeneralAccount") {
                 $supplier_id = $request->payer_id;
-                $status = Transaction::receipt($bank_account_id, 'GeneralAccount', $supplier_id, 'GeneralAccount', $amount, $refence_no, $date);
+                $status = Transaction::receipt($bank_account_id, 'GeneralAccount', $supplier_id, 'GeneralAccount', $amount, $reference_no, $date);
                 $ledger_id = DB::table('receipts')->insertGetId([
                     'amount' => $amount,
                     'date' => $date,
-                    'receipt_no' => $refence_no,
+                    'receipt_no' => $reference_no,
                     'description' => $description,
                     'recieved_by' => auth()->id(),
                     'model_id' => $supplier_id,
@@ -105,8 +132,7 @@ class ReceiptController extends Controller
                     'charged_account_id' => $bank_account_id,
                     'charged_account_name' => 'GeneralAccount',
                     'branch_id' => $user_branch,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
+
                 ]);
             }
             DB::commit();
@@ -114,7 +140,7 @@ class ReceiptController extends Controller
                 $action = "Generated receipt of $amount for : " . $refence_no;
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Receipt generated successfully');
-            }
+            }*/
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -137,6 +163,7 @@ class ReceiptController extends Controller
 
         return view('pages.receipts.load_data_payer', ['payers' => $payers]);
     }
+
     public function createReciept(Request $request)
     {
         $receipt_id = $request->receipt_id;
@@ -153,7 +180,9 @@ class ReceiptController extends Controller
 
     public function reverse(Receipt $receipt) {
          $receipt->status = 0;
-         $receipt->save();
+        if($receipt->save()){
+            Transaction::reversal($receipt->receipt_no);
+        }
          return back();
     }
 

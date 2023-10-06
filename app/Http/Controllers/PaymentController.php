@@ -134,7 +134,9 @@ class PaymentController extends Controller
     }
     public function reverse(Payment $payment) {
         $payment->status = 0;
-        $payment->save();
+        if($payment->save()){
+            Transaction::reversal($payment->receipt_no);
+        }
         return back();
     }
     public function printPaymentReceipt(Payment $payment)

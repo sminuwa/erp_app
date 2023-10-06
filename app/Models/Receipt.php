@@ -38,4 +38,16 @@ class Receipt extends Model
         if($this->charged_account_name == 'GeneralAccount')
             return GeneralAccount::find($this->charged_account_id);
     }
+
+    public static function generateNewNumber($prefix = 'RCT', $length = 4){
+        $prefix = $prefix.date('ymd');
+        $record = self::where('receipt_no', 'like', '%'.$prefix.'%')->orderBy('receipt_no', 'desc')->first();
+        if($record){
+            $number = $record->receipt_no;
+            $new = intval(substr($number,strlen($prefix)))+1;
+            return $prefix.str_pad($new, $length,0,STR_PAD_LEFT);
+        }
+        return $prefix.str_pad(1, $length,0,STR_PAD_LEFT);
+    }
+
 }

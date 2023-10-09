@@ -7,6 +7,16 @@
             </div>
             <div class="col-sm-3 text-right">
                 <div class="btn-group">
+                    @if ($record->status == 0)
+                    <form onsubmit="return confirm('Are you sure you want to approve?')"
+                    action="{{ route('purchase.approve', $record->id) }}" method="post" style="display: inline">
+                    {{ csrf_field() }}
+                    {{ method_field('POST') }}
+                    <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
+                        <i class="text-white fa fa-check"> Approve</i>
+                    </button>
+                </form>
+                    @endif
                     <a class="btn btn-secondary btn-sm" href="{{ route('purchases.index', $record->id) }}">
                         <span class="fa fa-list"></span>
                     </a>
@@ -41,10 +51,6 @@
                     <td>{{ optional($record->purchase_date)->toDayDateTimeString() }}</td>
                 </tr>
                 <tr>
-                    <th>Purchase Mode</th>
-                    <td>{{ $record->purchase_mode }}</td>
-                </tr>
-                <tr>
                     <th>Truck No</th>
                     <td>{{ $record->vehicle_reg_no }}</td>
                 </tr>
@@ -54,7 +60,7 @@
                 </tr>
                 <tr>
                     <th>Status</th>
-                    <td>{{ $record->status === 1 ? 'Completed' : 'Cancelled' }}</td>
+                    <td>{{ $record->status === 1 ? 'Completed' : 'Pending' }}</td>
                 </tr>
                 <tr>
                     <th>Updated By</th>

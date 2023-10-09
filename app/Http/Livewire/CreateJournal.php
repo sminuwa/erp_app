@@ -31,7 +31,7 @@ class CreateJournal extends Component
         array_push($this->inputs ,$i);
         $this->debit[$i] = 0.00;
         $this->credit[$i] = 0.00;
-        $this->accounts[$i] = Customer::where('branch_id', auth()->user()->branch->id)->orderBy('code', 'asc')->get();
+//        $this->accounts[$i] = Customer::where('branch_id', auth()->user()->branch->id)->orderBy('code', 'asc')->get();
     }
 
     public function remove($i)

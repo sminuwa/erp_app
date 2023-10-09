@@ -34,7 +34,7 @@
                            <div class="col-md-12">
                                <table>
                                @foreach($inputs as $key => $value)
-                                   <tr>
+                                   <tr :wire:key="{{ $loop->index }}">
                                        <td>
                                            <div class="col-12">
                                                <div class="form-group">

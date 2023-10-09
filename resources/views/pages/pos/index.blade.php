@@ -159,12 +159,7 @@
                                         Customer
                                         <span>
                                             &nbsp;
-                                            @can('make.debtor.payment')
-                                                <a href="javascript:void(0)" data-toggle="modal"
-                                                    data-target="#debtor_payment_form"
-                                                    class="btn btn-sm btn-secondary float-md-right"
-                                                    style="margin-left: 2px;">Payment </a>
-                                            @endcan
+                            
                                             @can('view.customer.ledger')
                                                 <a href="javascript:void(0)" data-toggle="modal"
                                                     data-target="#customer_ledgerform"
@@ -514,181 +509,6 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="debtor_payment_form" style="display: none;" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Debtor Payment</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form action="{{ isset($route) ? $route : route('debtors.payment.store') }}" method="POST"
-                        id="debtor_payment">
-                        {{ csrf_field() }}
-                        <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="customer_id2">Customer</label>
-                                    @php
-                                        $customers = clone $customers;
-                                    @endphp
-                                    <select
-                                        class="form-control select2-single {{ $errors->has('customer_id2') ? ' is-invalid' : '' }}"
-                                        name="customer_id2" id="customer_id2" required="required">
-                                        <option value="">Select...</option>
-                                        @if (isset($customers))
-                                            @foreach ($customers->where('branch_id', 'LIKE', App\Models\User::userBranchAction())->get() as $data)
-                                                <option value="{{ $data->id }}">
-                                                    {{ $data->code }}-{{ $data->name }}</option>
-                                            @endforeach
-                                        @endif
-                                    </select>
-                                    @if ($errors->has('customer_id2'))
-                                        <div class="invalid-feedback">
-                                            <strong>{{ $errors->first('customer_id2') }}</strong>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="payment_date">Payment Date</label>
-                                    <input type="text"
-                                        class="form-control datepicker {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
-                                        name="payment_date" id="payment_date" value="{{ date('Y-m-d') }}"
-                                        required="required">
-                                    @if ($errors->has('payment_date'))
-                                        <div class="invalid-feedback">
-                                            <strong>{{ $errors->first('payment_date') }}</strong>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="receipt_no">Receipt No</label>
-                                    <input type="text"
-                                        class="form-control {{ $errors->has('receipt_no') ? ' is-invalid' : '' }}"
-                                        readonly='readonly' name="receipt_no" id="receipt_no"
-                                        value="{{ old('receipt_no', isset($receipt_no) ? $receipt_no : '') }}">
-                                    @if ($errors->has('receipt_no'))
-                                        <div class="invalid-feedback">
-                                            <strong>{{ $errors->first('receipt_no') }}</strong>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="amount_paid">Amount Paid</label>
-                                    <input type="number"
-                                        class="form-control {{ $errors->has('amount_paid') ? ' is-invalid' : '' }}"
-                                        name="amount_paid" id="amount_paid" required>
-                                    @if ($errors->has('amount_paid'))
-                                        <div class="invalid-feedback">
-                                            <strong>{{ $errors->first('amount_paid') }}</strong>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="payment_mode">Payment Mode</label>
-                                    <select class="form-control {{ $errors->has('payment_mode') ? ' is-invalid' : '' }}"
-                                        name="payment_mode" id="payment_mode" required="required">
-                                        <option value="">Select...</option>
-                                        <option value="Cash">Cash
-                                        </option>
-                                        <option value="Cheque">
-                                            Cheque</option>
-                                    </select>
-                                    @if ($errors->has('payment_mode'))
-                                        <div class="invalid-feedback">
-                                            <strong>{{ $errors->first('payment_mode') }}</strong>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="col-md-4" id="account_number">
-                                <div class="form-group">
-                                    <label for="bank_account_id">Account Number</label>
-                                    <select
-                                        class="form-control select2-single {{ $errors->has('bank_account_id') ? ' is-invalid' : '' }}"
-                                        name="bank_account_id" id="bank_account_id" required="required">
-                                        <option value="">Select...</option>
-                                    </select>
-                                    @if ($errors->has('bank_account_id'))
-                                        <div class="invalid-feedback">
-                                            <strong>{{ $errors->first('bank_account_id') }}</strong>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4" id="account_number">
-                                <div class="form-group">
-                                    <label for="account_name">Account Name</label>
-                                    <input type="text" class="form-control" disabled name="account_name"
-                                        id="account_name">
-                                    @if ($errors->has('account_name'))
-                                        <div class="invalid-feedback">
-                                            <strong>{{ $errors->first('account_name') }}</strong>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="payment_ref">Payment Ref</label>
-                                    <textarea type="text" class="form-control" name="payment_ref" id="payment_ref"></textarea>
-                                    @if ($errors->has('payment_ref'))
-                                        <div class="invalid-feedback">
-                                            <strong>{{ $errors->first('payment_ref') }}</strong>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="balance">Total Balance</label>
-                                    <input type="text" class="form-control col-4" name="balance" id="balance"
-                                        placeholder="Total Balance" value="" readonly>
-                                </div>
-                                <span class="text text-danger fa fa-mobile">Send SMS: </span> <input type="checkbox"
-                                    name="sms" id="debt_sms" />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-6 text-danger">
-                                <strong>Total Record is of 1:
-                                    {{ number_format(App\Models\CustomerLedger::where('cr', '>', 0)->count('*'), 0, ',', '') }}</strong>
-                            </div>
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-dark" data-dismiss="modal"><i class="fa fa-times"></i>
-                                Close
-                            </button>
-                            <a href="" class="btn btn-dark" id="print_reciept" target="_BLANK"
-                                style="display: none;"><i class="fa fa-print"></i>
-                                Print
-                            </a>
-                            <button type="button" id="debtor" class="btn btn-info px-3"><i class="fa fa-save"></i>
-                                Save
-                            </button>
-                        </div>
-                    </form>
-
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 
 
@@ -815,23 +635,6 @@
 
             });
 
-            $('#customer_record').on("change", function() {
-                customer_id = $(this).val();
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route('ajax.load.customer.balance') }}",
-                    data: {
-                        customer_id: customer_id
-                    }
-                }).done(function(data) {
-                    balance = 0;
-                    if (data < 0)
-                        balance = "(" + formatMoney(Math.abs(data)) + ")";
-                    else
-                        balance = formatMoney(data);
-                    $("#balance").val(balance);
-                });
-            });
             $('#bank_account_id').on("change", function() {
                 bank_account_id = $(this).val();
                 $.ajax({
@@ -855,27 +658,7 @@
                 return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ?
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
-            $('#debtor').on('click', function() {
-
-                $.ajax({
-                    type: "POST",
-                    url: "{{ route('debtors.payment.store') }}",
-                    data: $('#debtor_payment').serialize()
-                }).done(function(data) {
-                    if (data > 0) {
-                        $('#print_reciept').show();
-                        $('#print_reciept').attr('href', '');
-                        alert("Payment successfully added");
-                        $('#print_reciept').attr('href', "{{ url('/customers/print/receipt') }}/" +
-                            data)
-                    } else {
-                        alert("This is already captured or something wrong!")
-                    }
-
-                    $('#debtor_payment_form').modal('hide');
-                });
-
-            });
+            
         });
 
         var delay = (function() {

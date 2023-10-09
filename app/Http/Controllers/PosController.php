@@ -57,7 +57,7 @@ class PosController extends Controller
         $categories = Category::orderBy('name', 'ASC')->get();
         $store = Store::where('id', 'LIKE', $user_branch)->get();
         $debtor = new CustomerController();
-        $receipt_no = $debtor->generateReceiptNo();
+        $receipt_no = "";//$debtor->generateReceiptNo();
         if (request()->routeIs('proformer.index')) {
             $stores = Product::orderBy('code', 'asc');
             return view('pages.pos.proformer', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no'));

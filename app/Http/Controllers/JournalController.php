@@ -22,6 +22,15 @@ class JournalController extends Controller
         return view('pages.journals.create');
     }
 
+    public function show(Journal $journal){
+        return view('pages.journals.show', compact('journal'));
+    }
+
+    public function post(Journal $journal){
+        return $journal;
+        return view('pages.journals.show', compact('journal'));
+    }
+
 
 
 

@@ -919,6 +919,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [JournalController::class, 'index'])->name('journal.index');
         Route::post('/', [JournalController::class, 'store'])->name('journal.store');
         Route::get('/create', [JournalController::class, 'create'])->name('journal.create');
+        Route::get('/show/{journal}', [JournalController::class, 'show'])->name('journal.show');
+        Route::get('/post/{journal}', [JournalController::class, 'post'])->name('journal.post');
     });
 
     Route::prefix('inventory')->group(function () {

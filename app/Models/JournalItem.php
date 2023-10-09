@@ -36,5 +36,13 @@ class JournalItem extends Model
      */
     protected $dates = [];
 
+    public function account(){
+        if($this->account_type == 'Customer')
+            return Customer::find($this->account_id);
+        if($this->account_type == 'Supplier')
+            return Supplier::find($this->account_id);
+        if($this->account_type == 'GeneralAccount')
+            return GeneralAccount::find($this->account_id);
+    }
 
 }

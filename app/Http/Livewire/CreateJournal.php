@@ -118,9 +118,10 @@ class CreateJournal extends Component
             $this->resetInputFields();
 
             session()->flash('message', 'Journal created Successfully.');
+            return $this->redirect(route('journal.index'));
         }catch (\Exception $e){
             session()->flash('error', $e->getMessage());
         }
-//        return $this->redirect(route('journal.index'))->with('message', 'Journal created Successfully.');
+
     }
 }

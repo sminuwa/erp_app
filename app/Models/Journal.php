@@ -35,6 +35,10 @@ class Journal extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function items(){
+        return $this->hasMany(JournalItem::class, 'journal_id');
+    }
+
     public static function generateNewNumber($prefix = 'JNL', $length = 4){
         $prefix = $prefix.date('ymd');
         $record = self::where('reference', 'like', '%'.$prefix.'%')->orderBy('reference', 'desc')->first();

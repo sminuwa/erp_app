@@ -32,7 +32,29 @@
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datepicker/jquery.datetimepicker.css') }}">
     <link rel="stylesheet" href="{{ asset('commons/css/custom-style.css') }}">
 
-
+    <style>
+        .floating-label{
+            position:absolute;
+            left:10px;
+            top:6px;
+            padding: 0 4px;
+            color: #9b9b9b;
+            background: #ffffff;
+            transition: all 0.2s ease;
+            pointer-events: none;
+            font-weight: lighter !important;
+            z-index:3;
+        }
+        input:not(:placeholder-shown)~.floating-label,
+        select:not(:placeholder-shown)~.floating-label,
+        textarea:not(:placeholder-shown)~.floating-label,
+        input:focus~.floating-label,
+        textarea:focus~.floating-label,
+        select:focus~.floating-label {
+            top:-10px;
+            font-size:13px
+        }
+    </style>
 
     @stack('css')
 

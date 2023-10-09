@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 @property bigint $created_by created by
 @property timestamp $created_at created at
 @property timestamp $updated_at updated at
-   
+
  */
-class Journal extends Model 
+class Journal extends Model
 {
-    
+
     /**
     * Database table name
     */
@@ -31,6 +31,20 @@ class Journal extends Model
     protected $dates=[];
 
 
+    public function createdBy(){
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public static function generateNewNumber($prefix = 'JNL', $length = 4){
+        $prefix = $prefix.date('ymd');
+        $record = self::where('reference', 'like', '%'.$prefix.'%')->orderBy('reference', 'desc')->first();
+        if($record){
+            $number = $record->reference;
+            $new = intval(substr($number,strlen($prefix)))+1;
+            return $prefix.str_pad($new, $length,0,STR_PAD_LEFT);
+        }
+        return $prefix.str_pad(1, $length,0,STR_PAD_LEFT);
+    }
 
 
 }

@@ -40,7 +40,7 @@ class CustomerController extends Controller
     public function index(Index $request)
     {
         $user_branch = User::userBranchAction();
-        return view('pages.customers.index', ['records' => Customer::where('type', 'Credit')->where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get()]);
+        return view('pages.customers.index', ['records' => Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get()]);
     } /**
   * Display the specified resource.
   *
@@ -245,7 +245,7 @@ class CustomerController extends Controller
     public function createOpeningBalance()
     {
         $user_branch = User::userBranchAction();
-        $customers = Customer::where('type', 'credit')->where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
+        $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
         return view('pages.customers.create_opening_balance', [
             'customers' => $customers,
             'model' => null]);

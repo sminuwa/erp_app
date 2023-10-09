@@ -10,7 +10,7 @@
             @if (isset($customers))
                 @foreach ($customers as $data)
                     <option value="{{ $data->id }}" {{ $data->id == optional($model)->customer_id ? 'selected' : '' }}>
-                        {{ $data->name }}</option>
+                        {{ $data->code }}-{{ $data->name }}</option>
                 @endforeach
             @endif
         </select>

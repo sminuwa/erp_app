@@ -4,12 +4,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\DB;
+
 /**
  @property bigint $supplier_id supplier id @property varchar $invoice invoice @property date $purchase_date purchase date @property enum $purchase_mode purchase mode @property varchar $address address @property varchar $wbno wbno @property bigint $source_store_id source store id @property bigint $product_id product id @property int $qty_supplied qty supplied @property decimal $unit_price unit price @property bigint $destination_store_id destination store id @property tinyint $status status @property bigint $updated_by updated by @property timestamp $created_at created at @property timestamp $updated_at updated at
  
  */
 class Purchase extends Model
-
 {
     const PURCHASE_MODE_CASH = 'Cash';
     const PURCHASE_MODE_CREDIT = 'Credit';
@@ -32,7 +32,7 @@ class Purchase extends Model
 
     public function supplier()
     {
-        return $this->belongsTo(Supplier::class , 'supplier_id', 'id');
+        return $this->belongsTo(Supplier::class, 'supplier_id', 'id');
     }
     public function purchasedProducts()
     {
@@ -40,15 +40,15 @@ class Purchase extends Model
     }
     public function sourceStore()
     {
-        return $this->belongsTo(Store::class , 'source_store_id', 'id');
+        return $this->belongsTo(Store::class, 'source_store_id', 'id');
     }
     public function destinationStore()
     {
-        return $this->belongsTo(Store::class , 'destination_store_id', 'id');
+        return $this->belongsTo(Store::class, 'destination_store_id', 'id');
     }
     public function user()
     {
-        return $this->belongsTo(User::class , 'updated_by', 'id');
+        return $this->belongsTo(User::class, 'updated_by', 'id');
     }
     public function totalProductCost()
     {
@@ -60,5 +60,9 @@ class Purchase extends Model
             return SupplierLedger::where('purchase_id', $this->id)->sum('dr'); //>SupplierLedger::where('purchase_id',$this->id)->sum('dr')->first();
         else
             return SupplierLedger::where('purchase_id', $this->id)->sum('cr'); //>SupplierLedger::where('purchase_id',$this->id)->sum('dr')->first();
+    }
+    public function expenses()
+    {
+        return $this->hasMany(PurchaseExpense::class);
     }
 }

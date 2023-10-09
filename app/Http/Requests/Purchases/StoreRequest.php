@@ -30,10 +30,8 @@ class StoreRequest extends FormRequest
             'supplier_id' => 'required|numeric',
             'invoice' => 'required|max:191',
             'purchase_date' => 'required|date',
-            'purchase_mode' => 'required|in:Cash,Credit,Cash/Credit',
             'vehicle_reg_no' => 'nullable|max:191',
             'source_store_id' => 'required|numeric',
-            'status' => 'required',
             'updated_by' => 'required|numeric',
         ];
     }

@@ -54,6 +54,9 @@
             top:-10px;
             font-size:13px
         }
+        .datepicker {
+            padding: .375rem .75rem;
+        }
     </style>
 
     @stack('css')
@@ -153,8 +156,9 @@
 
         $('.datepicker').datepicker({
             autoclose: true,
-            todayHighlight: true
+            todayHighlight: true,
         });
+
         $('.datetimepicker').datetimepicker({
             datepicker: false,
             format: 'H:i',

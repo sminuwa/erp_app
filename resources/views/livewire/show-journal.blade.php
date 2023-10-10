@@ -14,10 +14,15 @@
             </div>
             <div class="row">
                 <div class="col-md-5 mb-3">
+                    <p>Reference: {{ $journal->reference }}</p>
                     <p>Date: {{ $journal->date }}</p>
+                    <p>Description: {{ $journal->description }}</p>
+                    <p>Created By: {{ $journal->createdBy->name ?? null }}</p>
+                    <p>Posted By: {{ $journal->postedBy->name ?? null }}</p>
+                    <p>Modified By: {{ $journal->updatedBy->name ?? null }}</p>
                 </div>
                 <div class="col-md-7 mb-3">
-                    <p>Date: {{ $journal->description }}</p>
+
                 </div>
 
                 <div class="col-md-12">
@@ -48,7 +53,7 @@
                                         <td>{{ $journal_item->debit }}</td>
                                         <td>{{ $journal_item->credit }}</td>
                                         <td>{{ $journal_item->description }}</td>
-                                        <td>{{ $journal->status }}</td>
+                                        <td>{!!  $journal->status == 0 ? '<span class="badge badge-danger">not posted</span>' : '<span class="badge badge-success">posted</span>' !!}</td>
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -62,7 +67,12 @@
                             </h4>
                         </div>
                         <div class="col-md-12 mt-3">
-                            <button type="submit"  class="btn btn-success btn-sm">Save</button>
+                            @if($journal->status == 0)
+                                <a href="{{ route('journal.post', $journal->id) }}"  class="btn btn-success btn-sm">Edit</a>
+                                <a href="{{ route('journal.post', $journal->id) }}"  class="btn btn-primary btn-sm">Post</a>
+                            @else
+                                <a href="{{ route('journal.reverse', $journal->id) }}"  class="btn btn-success btn-sm">Reverse</a>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -70,12 +80,4 @@
         </div>
     </div>
 </div>
-<script>
-    $('.select2-single').on('change', function (e) {
-        var data = $('.select2-single').select2("val");
-    @this.set('selected', data);
-    });
-    $('.datepicker').on('change', function (e) {
-    @this.set('datepicker', e.target.value);
-    });
-</script>
+

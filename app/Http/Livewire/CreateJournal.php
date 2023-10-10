@@ -101,6 +101,7 @@ class CreateJournal extends Component
             $journal->reference = \App\Models\Journal::generateNewNumber();
             $journal->description = $this->description;
             $journal->date = $this->journal_date;
+            $journal->created_by = auth()->id();
             if($journal->save()){
                 foreach ($this->type as $key => $value) {
                     JournalItem::create([

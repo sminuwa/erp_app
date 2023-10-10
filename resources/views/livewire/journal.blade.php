@@ -28,7 +28,7 @@
                 <td>{{ Carbon\Carbon::parse($record->date)->toFormattedDateString() }}</td>
                 <td>{{ $record->reference }}</td>
                 <td>{{ $record->description ?? null }}</td>
-                <td>{{ $record->status ?? null }}</td>
+                <td>{!!  $record->status == 0 ? '<span class="badge badge-danger">not posted</span>' : '<span class="badge badge-success">posted</span>' !!}</td>
                 <td>{{ optional($record->createdBy)->name }}</td>
                 <td align="center">
                     {{-- <a href="{{ route('interbank.print', $payment->id) }}"

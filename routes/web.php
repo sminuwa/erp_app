@@ -28,6 +28,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\CreditLimitController;
 use App\Http\Controllers\PurchaseGRNController;
+use App\Http\Controllers\PurchaseRequestController;
 use App\Models\Supplier;
 use App\Http\Controllers\ReportController;
 use Faker\Provider\Miscellaneous;
@@ -237,7 +238,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::group(
-        ['prefix' => 'purchases'],
+        ['prefix' => 'purchases/grn'],
         function () {
             Route::get('/index', [PurchaseGRNController::class, 'index'])->name('purchases.index');
             Route::get('/create', [PurchaseGRNController::class, 'create'])->name('purchases.create');
@@ -257,6 +258,29 @@ Route::middleware('auth')->group(function () {
             Route::post('/expense', [PurchaseGRNController::class, 'expense'])->name('purchases.expense.ajax.create');
             Route::delete('/expense/delete/{expense}', [PurchaseGRNController::class, 'deleteExpense'])->name('delete.purchase.expense');
             Route::post('/approve/{purchase}', [PurchaseGRNController::class, 'approve'])->name('purchase.approve');
+        }
+    );
+    Route::group(
+        ['prefix' => 'purchases/request'],
+        function () {
+            Route::get('/index', [PurchaseRequestController::class, 'index'])->name('purchases.request.index');
+            Route::get('/create', [PurchaseRequestController::class, 'create'])->name('purchases.request.create');
+            Route::get('/show/{purchase}', [PurchaseRequestController::class, 'show'])->name('purchases.request.show');
+            Route::post('/store', [PurchaseRequestController::class, 'store'])->name('purchases.request.store');
+            Route::get('/edit/{purchase}', [PurchaseRequestController::class, 'edit'])->name('purchases.request.edit');
+            Route::put('/update/{purchase}', [PurchaseRequestController::class, 'update'])->name('purchases.request.update');
+            Route::put('/purchase/update-cart', [PurchaseRequestController::class, 'updateCart'])->name('purchase.request.cart.update');
+            Route::delete('/delete/{purchase}', [PurchaseRequestController::class, 'destroy'])->name('purchases.request.destroy');
+            Route::post('/cart', [PurchaseRequestController::class, 'addToCart'])->name('purchases.request.cart.store');
+            Route::delete('/remove/{id}', [PurchaseRequestController::class, 'removeCart'])->name('purchases.request.cart.remove');
+            Route::post('/clear', [PurchaseRequestController::class, 'clearAllCart'])->name('purchases.request.cart.clear');
+            Route::get('/print/{purchase}', [PurchaseRequestController::class, 'printInvoice'])->name('purchase.request.print');
+            Route::post('/waybill/{purchase}', [PurchaseRequestController::class, 'generateWaybill'])->name('purchase.request.generate.waybill');
+            Route::get('/print/waybill/{purchase}', [PurchaseRequestController::class, 'printWaybill'])->name('purchase.request.waybill.print');
+            Route::post('/search', [PurchaseRequestController::class, 'search'])->name('purchases.request.search');
+            Route::post('/expense', [PurchaseRequestController::class, 'expense'])->name('purchases.request.expense.ajax.create');
+            Route::delete('/expense/delete/{expense}', [PurchaseRequestController::class, 'deleteExpense'])->name('delete.purchase.request.expense');
+            Route::post('/approve/{purchase}', [PurchaseRequestController::class, 'approve'])->name('purchase.request.approve');
         }
     );
     Route::group(['prefix' => 'expenses'], function () {

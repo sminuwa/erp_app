@@ -5,7 +5,7 @@
                 Products
             </div>
             <div class="card-body">
-                <form action="{{ route('purchases.cart.store') }}" method="POST">
+                <form action="{{ route('purchases.request.cart.store') }}" method="POST">
                     <input type="hidden" name="purchase_id" value="{{ $model->id }}" />
                     <input type="hidden" name="type" value="{{ $type }}" />
                     @csrf
@@ -128,7 +128,7 @@
                                     <td class="text-left">{{ $product->name }}</td>
 
 
-                                    <form action="{{ route('purchase.cart.update') }}" method="post"
+                                    <form action="{{ route('purchase.request.cart.update') }}" method="post"
                                         id="p{{ $product->id }}">
                                         @csrf
                                         @method('PUT')
@@ -188,7 +188,7 @@
             </div>
             <div class="card-body">
                 <h5 class="card-title"></h5>
-                <form action="{{ isset($route) ? $route : route('purchases.store') }}" method="POST">
+                <form action="{{ isset($route) ? $route : route('purchases.request.store') }}" method="POST">
                     {{ csrf_field() }}
                     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
 

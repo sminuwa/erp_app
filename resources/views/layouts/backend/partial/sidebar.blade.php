@@ -254,7 +254,7 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ route('inventories.purchases.index') }}" class="nav-link ">
+                            <a href="{{ route('purchases.request.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Purchases (Request)</p>
                             </a>

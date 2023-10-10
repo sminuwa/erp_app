@@ -15,12 +15,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Purchases(GRN)</h4>
+                        <h4>Purchase (Requests)</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Purchases(GRN)</li>
+                            <li class="breadcrumb-item active">Purchase (Requests)</li>
                         </ol>
                     </div>
                 </div>
@@ -29,10 +29,10 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('purchases.index') }}">
+            <a class="btn btn-secondary btn-sm" href="{{ route('purchases.request.index') }}">
                 <span class="fa fa-list"></span>
             </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('purchases.create') }}">
+            <a class="btn btn-secondary btn-sm" href="{{ route('purchases.request.create') }}">
                 <span class="fa fa-plus-circle"></span>
             </a>
             <a href="{{ route('suppliers.payment.create') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
@@ -42,7 +42,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-6">
-                        <form action="{{ route('purchases.search') }}" method="POST">
+                        <form action="{{ route('purchases.request.search') }}" method="POST">
                             @csrf
                             <div class="input-group">
                                 <input type="search" class="form-control rounded" required placeholder="Search by Reference number"
@@ -54,7 +54,7 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-12 table-responsive">
-                        @include('tables.purchase')
+                        @include('tables.purchase_request')
                     </div>
                 </div>
             </div><!-- /.container-fluid -->

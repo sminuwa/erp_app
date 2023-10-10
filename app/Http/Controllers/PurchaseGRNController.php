@@ -45,7 +45,7 @@ class PurchaseGRNController extends Controller
     public function index(Index $request)
     {
         \Cart::clear();
-        return view('pages.purchases.grn.index', [
+        return view('pages.inventories.purchases.grn.index', [
             'records' => Purchase::select('purchases.*')->orderBy('purchase_date', 'DESC')
                 ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
                 // ->where('branch_id', 'LIKE', User::userBranchAction())
@@ -73,7 +73,7 @@ class PurchaseGRNController extends Controller
      */
     public function show(Show $request, Purchase $purchase)
     {
-        return view('pages.purchases.grn.show', [
+        return view('pages.inventories.purchases.grn.show', [
             'record' => $purchase,
         ]);
 
@@ -86,7 +86,7 @@ class PurchaseGRNController extends Controller
     public function create(Create $request)
     {
         //\Cart::clear();
-        return view('pages.purchases.grn.create', [
+        return view('pages.inventories.purchases.grn.create', [
             'model' => new Purchase,
             'products' => Product::all(),
             'suppliers' => Supplier::orderBy('name', 'asc')->get(),
@@ -238,7 +238,7 @@ class PurchaseGRNController extends Controller
         if (\Cart::getContent()->isEmpty())
             $this->loadToCart($purchase);
         $cart_products = \Cart::getContent();
-        return view('pages.purchases.grn.edit', [
+        return view('pages.inventories.purchases.grn.edit', [
             'model' => $purchase,
             'products' => Product::all(),
             'suppliers' => Supplier::where('branch_id', 'LIKE', User::userBranchAction())->get(),
@@ -493,7 +493,7 @@ class PurchaseGRNController extends Controller
 
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         $utility = new Utility();
-        return view('pages.purchases.grn.print', compact('purchase_details', 'purchase', 'company', 'utility'));
+        return view('pages.inventories.purchases.grn.print', compact('purchase_details', 'purchase', 'company', 'utility'));
     }
     public function generateWaybill(Request $request, Purchase $purchase)
     {
@@ -514,7 +514,7 @@ class PurchaseGRNController extends Controller
 
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         $utility = new Utility();
-        return view('pages.purchases.grn.print_waybill', compact('purchase_details', 'purchase', 'company', 'utility'));
+        return view('pages.inventories.purchases.grn.print_waybill', compact('purchase_details', 'purchase', 'company', 'utility'));
     }
     public function expense(Request $request)
     {
@@ -522,7 +522,7 @@ class PurchaseGRNController extends Controller
         $action = "Added purchase expense $request->name";
         AuditLog::auditLog(Auth::id(), $action);
         $purchase_expenses = PurchaseExpense::where('purchase_id', $request->purchase_id)->orderBy('name')->get();
-        return view('pages.purchases.grn.load_expenses', compact('purchase_expenses'));
+        return view('pages.inventories.purchases.grn.load_expenses', compact('purchase_expenses'));
     }
     public function deleteExpense(Request $request, PurchaseExpense $expense)
     {

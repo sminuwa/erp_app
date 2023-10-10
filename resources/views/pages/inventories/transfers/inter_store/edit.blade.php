@@ -1,5 +1,6 @@
 @extends('layouts.backend.app')
-@section('title', 'Stock Tranfer')
+
+@section('title', 'Stock Transfer')
 
 @push('css')
 @endpush
@@ -14,11 +15,11 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Stock Transfer</h4>
+                        <h4>Interstore Stock Transfer</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
                             <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
                             <li class="breadcrumb-item active">Stock Transfer</li>
                         </ol>
@@ -29,13 +30,24 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('transfer_products.index') }}">
+            <a class="btn btn-secondary btn-sm" href="{{ route('interstore.create') }}">
+                <span class="fa fa-plus-circle"></span>
+            </a>
+            <a class="btn btn-secondary btn-sm" href="{{ route('interstore.index') }}">
                 <span class="fa fa-list"></span>
             </a>
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>
-                        @include('forms.transfer_product')
+                        <div class='card'>
+
+                            <div class="card-body">
+                                @include('forms.transfer_product', [
+                                    'route' => route('interstore.update', $model->id),
+                                    'method' => 'PUT',
+                                ])
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-8">
                         <div class="card">
@@ -48,50 +60,33 @@
                                         No Product Added
                                     </div>
                                 @else
-                                    <table class="table table-bordered table-striped mb-3">
-
+                                    <table class="table table-bordered table-striped text-center mb-3">
                                         <thead>
-                                            <tr>
-                                                <td colspan="6" style="line-height: 0.4 !important;text-align: right">
-                                                    <form method="POST"
-                                                        action="{{ route('transfer_products.cart.clear') }}">
-                                                        @csrf
-                                                        <div class="row">
-                                                            <div class="offset-10 col-sm-2">
-                                                                <button type="submit" class="btn-danger btn btn-sm"><span
-                                                                        class="ion-trash-a text text-white"></span> Clear
-                                                                    All</button>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </td>
-                                            </tr>
                                             <tr>
                                                 <th>S.N</th>
                                                 <th>Name</th>
                                                 <th>Qty</th>
                                                 <th>Source Store</th>
-                                                <th>Destination Store</th>
                                                 <th><span class="ion-ios-trash"></span></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($transfer_products as $product)
+                                            @foreach ($interstore as $product)
                                                 <tr>
                                                     @php $attr = $product->attributes @endphp
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td class="text-left">{{ $product->name }}</td>
                                                     <td>{{ number_format($product->quantity, 0, '', ',') }}</td>
                                                     <td>{{ \App\Models\Store::find($attr['source_store_id'])->name }}</td>
-                                                    <td>{{ \App\Models\Store::find($attr['destination_store_id'])->name }}
-                                                    </td>
+
+
                                                     <td>
                                                         <button class="btn btn-danger btn-sm" type="button"
                                                             onclick="deleteItem({{ $product->id }})">
                                                             <i class="fa fa-trash" aria-hidden="true"></i>
                                                         </button>
                                                         <form id="delete-form-{{ $product->id }}"
-                                                            action="{{ route('transfer_products.cart.remove', $product->id) }}"
+                                                            action="{{ route('interstore.cart.remove', $product->id) }}"
                                                             method="post" style="display:none;">
                                                             @csrf
                                                             @method('DELETE')
@@ -102,7 +97,7 @@
                                         </tbody>
                                     </table>
                                 @endif
-                                <form action="{{ isset($route) ? $route : route('transfer_products.store') }}"
+                                <form action="{{ isset($route) ? $route : route('interstore.store') }}"
                                     method="POST">
                                     {{ csrf_field() }}
                                     <input type="hidden" name="_method"
@@ -124,7 +119,7 @@
                                         <input type="text" name="transfer_date" class="form-control datepicker"
                                             value="{{ isset($model->transfer_date) ? $model->transfer_date : old('transfer_date', date('Y-m-d')) }}" />
                                     </div>
-                                    @if (isset($model) && $model->status != null)
+                                    @if (isset($model))
                                         <div class="form-check">
                                             <input
                                                 class="form-check-input {{ $errors->has('status') ? ' is-invalid' : '' }}"
@@ -133,7 +128,7 @@
                                             Completed
                                             &nbsp;&nbsp;
                                             &nbsp;&nbsp;
-                                            <input
+                                            {{-- <input
                                                 class="form-check-input {{ $errors->has('status') ? ' is-invalid' : '' }}"
                                                 type="radio" value="Cancelled" name="status" id="status_no"
                                                 {{ isset($model) && $model->status == 'Cancelled' ? 'checked' : '' }}>Cancelled
@@ -141,7 +136,7 @@
                                                 <div class="invalid-feedback">
                                                     <strong>{{ $errors->first('status') }}</strong>
                                                 </div>
-                                            @endif
+                                            @endif --}}
                                         </div>
                                     @endif
                                     <div class="form-group">
@@ -165,7 +160,18 @@
     <!-- /.content-wrapper -->
 
 @endsection
+
 @push('js')
+    <script type="text/javascript">
+        <!-- DataTables 
+        -->
+    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
+    <!-- SlimScroll -->
+    <script src="{{ asset('assets/backend/plugins/slimScroll/jquery.slimscroll.min.js') }}"></script>
+    <!-- FastClick -->
+    <script src="{{ asset('assets/backend/plugins/fastclick/fastclick.js') }}"></script>
+
+    <!-- Sweet Alert Js -->
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script type="text/javascript">
         $(function() {
@@ -184,6 +190,7 @@
             });
 
             $(document).on("change", "#product_id,#source_store_id", function(event) {
+
                 $.ajax({
                     url: "{{ route('ajax.load.quantity.available') }}",
                     type: 'GET',
@@ -194,9 +201,8 @@
                 }).done(function(msg) {
                     if (msg == null || msg == 0)
                         msg = 0;
-                    if (msg != 0)
-                        $("#available").html(
-                            "<span class='ion-alert-circled'></span> Available Quantity: " + msg);
+                    $("#available").html(
+                        "<span class='ion-alert-circled'></span> Available Quantity: " + msg);
                     $('#qty_transfered').attr('max', msg);
                 });
             });

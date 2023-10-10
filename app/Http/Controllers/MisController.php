@@ -46,12 +46,12 @@ class MisController extends Controller
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->where('stores.branch_id', 'LIKE', User::userBranchAction())
             ->where('category_id', 'like', $request->query->get('category_id'))
-            ->where('stores.branch_id', $request->query->get('branch_id'))
+            ->where('store_products.store_id', $request->query->get('store_id'))
             ->where('qty_available', '>', 0)
             ->orderBy('name', 'asc')
             ->get();
         $result = "";
-        if ($types->count() > 1)
+        if ($types->count() > 0)
             $result .= "<option value=''>Select....</option>";
         foreach ($types as $type) {
             $result .= "<option value='" . $type->id . "'>" . $type->name . "</option>";

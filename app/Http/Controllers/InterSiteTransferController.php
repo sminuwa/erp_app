@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Branch;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\TransferProduct;
@@ -21,13 +22,14 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\AuditLog;
 use App\Models\User;
+
 /**
- * Description of TransferProductController
+ * Description of InterStoreTransferController
  *
  * @author Tuhin Bepari <digitaldreams40@gmail.com>
  */
 
-class TransferProductController extends Controller
+class InterSiteTransferController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -38,21 +40,23 @@ class TransferProductController extends Controller
     public function index(Index $request)
     {
         \Cart::session('_token')->clear();
-        $records = TransferProduct::where(['nature' => 'Transfer', 'stock_in_out' => 'out', 'transfer_products.status' => 1])
+        $records = TransferProduct::select('transfer_products.*')->where(['nature' => 'Transfer', 'stock_in_out' => 'out', 'transfer_products.status' => 1])
             ->where('stores.branch_id', 'LIKE', User::userBranchAction())
+            ->where('transfer_products.type', 'intersite')
             ->join('stores', 'stores.id', 'transfer_products.source_store_id')
             ->groupBy(['refno', 'source_store_id', 'product_id'])->orderBy('transfer_products.created_at', 'DESC')->take(10)->get();
-        return view('pages.transfer_products.index', ['records' => $records]);
+        return view('pages.inventories.transfers.inter_site.index', ['records' => $records]);
     }
     public function search(Index $request)
     {
         $refno = $request->refno;
         $records = TransferProduct::where(['nature' => 'Transfer', 'stock_in_out' => 'out', 'transfer_products.status' => 1])
             ->where('stores.branch_id', 'LIKE', User::userBranchAction())
+            ->where('transfer_products.type', 'intersite')
             ->where('refno', 'LIKE', "%$refno%")
             ->join('stores', 'stores.id', 'transfer_products.source_store_id')
             ->groupBy(['refno', 'source_store_id', 'product_id'])->orderBy('transfer_products.created_at', 'DESC')->get();
-        return view('pages.transfer_products.index', ['records' => $records]);
+        return view('pages.inventories.transfers.inter_site.index', ['records' => $records]);
     }
     /**
      * Display the specified resource.
@@ -63,40 +67,42 @@ class TransferProductController extends Controller
      */
     public function show(Show $request, TransferProduct $transferproduct)
     {
-        return view('pages.transfer_products.show', [
+        return view('pages.inventories.transfers.inter_site.show', [
             'record' => $transferproduct,
         ]);
 
     } /**
-  * Show the form for creating a new resource.
-  *
-  * @param  Create  $request
-  * @return \Illuminate\Http\Response
-  */
+      * Show the form for creating a new resource.
+      *
+      * @param  Create  $request
+      * @return \Illuminate\Http\Response
+      */
     public function create(Create $request)
     {
         //\Cart::session('_token')->clear();
-        
+
         $products = Product::select('products.id', 'products.name')
-        ->join('store_products', 'store_products.product_id', 'products.id')
-        ->where('qty_available', '>', 0)->get();
+            ->join('store_products', 'store_products.product_id', 'products.id')
+            ->where('qty_available', '>', 0)->get();
         $categories = Category::all(['id', 'name']);
         $stores = Store::where('branch_id', 'LIKE', User::userBranchAction())->get();
         $cartItems = \Cart::session('_token')->getContent(); //\Cart::getContent();
+        $branches = Branch::where('id', '<>', User::userBranchAction())->orderBy('name')->get();
 
-        return view('pages.transfer_products.create', [
+        return view('pages.inventories.transfers.inter_site.create', [
             'model' => new TransferProduct,
             'products' => $products,
             'categories' => $categories,
             'stores' => $stores,
             'transfer_products' => $cartItems,
+            'branches' => $branches,
         ]);
     } /**
-  * Store a newly created resource in storage.
-  *
-  * @param  Store  $request
-  * @return \Illuminate\Http\Response
-  */
+      * Store a newly created resource in storage.
+      *
+      * @param  Store  $request
+      * @return \Illuminate\Http\Response
+      */
     public function store(StoreRequest $request)
     {
         $model = new TransferProduct;
@@ -119,19 +125,24 @@ class TransferProductController extends Controller
                     $destination_qty_available = optional($record)->qty_available;
                     if ($record != null) {
                         DB::table('store_products')->where([
-                            'store_id' => $source_store_id, 'product_id' => $product_id
+                            'store_id' => $source_store_id,
+                            'product_id' => $product_id
                         ])->decrement('qty_available', $product->quantity);
                         DB::table('store_products')->where([
-                            'store_id' => $destination_store_id, 'product_id' => $product_id
+                            'store_id' => $destination_store_id,
+                            'product_id' => $product_id
                         ])->increment('qty_available', $product->quantity);
-                    }
-                    else {
+                    } else {
 
                         DB::table('store_products')->where([
-                            'store_id' => $source_store_id, 'product_id' => $product_id
+                            'store_id' => $source_store_id,
+                            'product_id' => $product_id
                         ])->decrement('qty_available', $product->quantity);
                         DB::table('store_products')->insert([
-                            'store_id' => $destination_store_id, 'product_id' => $product_id, 'qty_available' => $product->quantity, 'created_at' => Carbon::now(),
+                            'store_id' => $destination_store_id,
+                            'product_id' => $product_id,
+                            'qty_available' => $product->quantity,
+                            'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now()
                         ]);
                     }
@@ -148,6 +159,7 @@ class TransferProductController extends Controller
                         'nature' => 'Transfer',
                         'stock_in_out' => 'out',
                         'refno' => $refno,
+                        'type' => 'intersite',
                         'transfer_date' => $request->transfer_date,
                         'vehicle_no' => $request->vehicle_no,
                         'created_at' => Carbon::now(),
@@ -166,6 +178,7 @@ class TransferProductController extends Controller
                         'nature' => 'Transfer',
                         'stock_in_out' => 'in',
                         'refno' => $refno,
+                        'type' => 'intersite',
                         'transfer_date' => $request->transfer_date,
                         'vehicle_no' => $request->vehicle_no,
                         'created_at' => Carbon::now(),
@@ -202,8 +215,7 @@ class TransferProductController extends Controller
                     DB::commit();
                 }
             }
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             DB::rollBack();
             session()->flash('app_message', 'Something is wrong while transfering stock');
             throw $ex;
@@ -211,12 +223,12 @@ class TransferProductController extends Controller
         \Cart::session('_token')->clear();
         return redirect()->back();
     } /**
-  * Show the form for editing the specified resource.
-  *
-  * @param  Edit  $request
-  * @param  TransferProduct  $transferproduct
-  * @return \Illuminate\Http\Response
-  */
+      * Show the form for editing the specified resource.
+      *
+      * @param  Edit  $request
+      * @param  TransferProduct  $transferproduct
+      * @return \Illuminate\Http\Response
+      */
     public function edit(Edit $request, TransferProduct $transferproduct)
     {
         //\Cart::session('_token')->clear();
@@ -225,20 +237,22 @@ class TransferProductController extends Controller
         $stores = Store::where('branch_id', 'LIKE', User::userBranchAction())->get();
         $this->loadToCart($transferproduct);
         $cartItems = \Cart::session('_token')->getContent();
-        return view('pages.transfer_products.edit', [
+        $branches = Branch::where('id', '<>', User::userBranchAction())->orderBy('name')->get();
+        return view('pages.inventories.transfers.inter_site.edit', [
             'model' => $transferproduct,
             'products' => $products,
             'categories' => $categories,
             'stores' => $stores,
             'transfer_products' => $cartItems,
+            'branches' => $branches,
         ]);
     } /**
-  * Update a existing resource in storage.
-  *
-  * @param  Update  $request
-  * @param  TransferProduct  $transferproduct
-  * @return \Illuminate\Http\Response
-  */
+      * Update a existing resource in storage.
+      *
+      * @param  Update  $request
+      * @param  TransferProduct  $transferproduct
+      * @return \Illuminate\Http\Response
+      */
     public function update(Update $request, TransferProduct $transferproduct)
     {
         $source_qty = 0;
@@ -246,12 +260,10 @@ class TransferProductController extends Controller
         if ($transferproduct->status == 'Cancelled' && $request->status == 'Completed') {
             $source_qty = 0 - $request->qty_transfered;
             $destination_qty = -1 * $source_qty;
-        }
-        else if ($transferproduct->status == 'Completed' && $request->status == 'Cancelled') {
+        } else if ($transferproduct->status == 'Completed' && $request->status == 'Cancelled') {
             $source_qty = $request->qty_transfered;
             $destination_qty = 0 - $source_qty;
-        }
-        else {
+        } else {
             $source_qty = $transferproduct->qty_transfered - $request->qty_transfered;
             if ($source_qty > 0)
                 $destination_qty = 0 - $source_qty;
@@ -295,27 +307,25 @@ class TransferProductController extends Controller
                 $action = "Updated stock transfer made from " . Store::find($request->source_store_id)->name . " to " . Store::find($request->destination_store_id)->name;
                 AuditLog::auditLog(Auth::id(), $action);
                 session()->flash('app_message', 'Stock transfer successfully updated');
-                return redirect()->route('transfer_products.index');
-            }
-            else {
+                return redirect()->route('intersite.index');
+            } else {
                 session()->flash('app_error', 'Something is wrong while updating stock transfer');
             }
             DB::commit();
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             DB::rollBack();
             throw $ex;
         }
         \Cart::session('_token')->clear();
         return redirect()->back();
     } /**
-  * Delete a  resource from  storage.
-  *
-  * @param  Destroy  $request
-  * @param  TransferProduct  $transferproduct
-  * @return \Illuminate\Http\Response
-  * @throws \Exception
-  */
+      * Delete a  resource from  storage.
+      *
+      * @param  Destroy  $request
+      * @param  TransferProduct  $transferproduct
+      * @return \Illuminate\Http\Response
+      * @throws \Exception
+      */
     public function destroy(Destroy $request, TransferProduct $transferproduct)
     {
 
@@ -331,8 +341,7 @@ class TransferProductController extends Controller
             $action = "Deleted stock transfer made from " . Store::find($transfer->source_store_id)->name . " to " . Store::find($transfer->destination_store_id)->name;
             AuditLog::auditLog(Auth::id(), $action);
             DB::commit();
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             DB::rollBack();
             session()->flash('app_error', 'Something is wrong while cancelling stock transfer');
             throw $ex;
@@ -352,9 +361,11 @@ class TransferProductController extends Controller
         $add = \Cart::session('_token')->add([
             'id' => $this->generateRandomString(),
             'name' => Product::find($request->product_id)->name,
-            'price' => 0, //Thos is not applicable here
+            'price' => $request->unit_price,
+            //Thos is not applicable here
             'quantity' => $request->qty_transfered,
-            'attributes' => array('source_store_id' => $request->source_store_id,
+            'attributes' => array(
+                'source_store_id' => $request->source_store_id,
                 'destination_store_id' => $request->destination_store_id,
                 'product_id' => $request->product_id
             ),
@@ -365,8 +376,7 @@ class TransferProductController extends Controller
             session()->flash('app_message', 'Product is Added to Cart Successfully !');
             return redirect()->back()->withInput();
 
-        }
-        else {
+        } else {
 
             session()->flash('app_error', 'Product not added to cart');
             return redirect()->back()->withInput();
@@ -393,12 +403,12 @@ class TransferProductController extends Controller
         \Cart::session('_token')->clear();
         foreach ($transfer->transferProducts()->get() as $data) {
             \Cart::session('_token')->add([
-
                 'id' => $this->generateRandomString(),
                 'name' => Product::find($data->product_id)->name,
-                'price' => 0,
-                'quantity' => $data->qty_transfered,
-                'attributes' => array('source_store_id' => $data->source_store_id,
+                'price' => $data->price,
+                'quantity' => $data->quantity,
+                'attributes' => array(
+                    'source_store_id' => $data->source_store_id,
                     'destination_store_id' => $data->destination_store_id,
                     'product_id' => $data->product_id,
                 ),
@@ -427,6 +437,6 @@ class TransferProductController extends Controller
     }
     public function printStockTransfer($transfer_id)
     {
-        return view('pages.transfer_products.print')->with(['transfers' => TransferProduct::where(['transfer_id' => $transfer_id, 'stock_in_out' => 'out'])->get()]);
+        return view('pages.inventories.transfers.inter_site.print')->with(['transfers' => TransferProduct::where(['transfer_id' => $transfer_id, 'stock_in_out' => 'out'])->get()]);
     }
 }

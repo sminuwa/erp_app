@@ -71,13 +71,9 @@ class PurchaseRequest extends Model
     {
         return $this->hasMany(PurchaseProductRequest::class,'purchase_id');
     }
-    public function sourceStore()
+    public function branch()
     {
-        return $this->belongsTo(Store::class, 'source_store_id', 'id');
-    }
-    public function destinationStore()
-    {
-        return $this->belongsTo(Store::class, 'destination_store_id', 'id');
+        return $this->belongsTo(Branch::class, 'branch_id', 'id');
     }
     public function user()
     {

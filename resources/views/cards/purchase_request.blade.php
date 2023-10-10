@@ -55,8 +55,8 @@
                     <td>{{ $record->vehicle_reg_no }}</td>
                 </tr>
                 <tr>
-                    <th>Store/Shop</th>
-                    <td> {{ $record->sourceStore->name }} </td>
+                    <th>Branch</th>
+                    <td> {{ $record->branch->name ?? '' }} </td>
                 </tr>
                 <tr>
                     <th>Status</th>

@@ -84,6 +84,7 @@ class PurchaseRequestController extends Controller
     public function create(Create $request)
     {
         //\Cart::clear();
+        //dd(\Cart::getContent());
         return view('pages.inventories.purchases.request.create', [
             'model' => new PurchaseRequest,
             'products' => Product::all(),
@@ -100,21 +101,17 @@ class PurchaseRequestController extends Controller
       * @param  Store  $request
       * @return \Illuminate\Http\Response
       */
-    public function store(StoreRequest $request)
+    public function store(Request $request)
     {
 
         $amount = 0;
         DB::beginTransaction();
         try {
-            $purchase_datetime = date('Y-m-d H:i:s', strtotime("$request->purchase_date $request->purchase_time"));
             $purchase_id = DB::table('purchase_requests')->insertGetId([
                 'supplier_id' => $request->supplier_id,
                 'invoice' => $request->invoice,
-                'purchase_date' => $purchase_datetime,
-                'purchase_mode' => 'Cash',
-                'vehicle_reg_no' => $request->vehicle_reg_no,
-                'source_store_id' => $request->source_store_id,
-                'destination_store_id' => $request->source_store_id,
+                'purchase_date' => Carbon::now(),
+                'branch_id' => User::userBranchAction(),
                 'updated_by' => $request->updated_by,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
@@ -266,15 +263,15 @@ class PurchaseRequestController extends Controller
         //return $request;
         $validated = $request->validate([
             'product_id' => 'required',
-            'unit_price' => 'required',
             'qty_supplied' => 'required',
         ]);
-
+        $product = Product::find($request->product_id);
         $add = \Cart::add([
             'id' => $request->product_id,
-            'name' => Product::find($request->product_id)->name,
-            'price' => $request->unit_price,
+            'name' => $product->name,
+            'price' => $request->unit_price ?? 0,
             'quantity' => $request->qty_supplied,
+            'attributes' => array('code' => $product->code),
         ]);
         //dd(\Cart::getContent());
         if ($add) {
@@ -310,11 +307,13 @@ class PurchaseRequestController extends Controller
         //\Cart::clear();
         foreach ($purchase->purchasedProducts()->get() as $data) {
             $qty = $data->qty_supplied == 0 ? 1 : $data->qty_supplied;
+            $product = Product::find($data->product_id);
             \Cart::add([
                 'id' => $data->product_id,
-                'name' => Product::find($data->product_id)->name,
+                'name' => $product->name,
                 'price' => $data->unit_price,
                 'quantity' => $qty,
+                'attributes' => array('code' => $product->code),
             ]);
         }
     }

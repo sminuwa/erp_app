@@ -12,6 +12,7 @@ class EditJournal extends Component
 {
 
     public $accounts, $journal;
+    public $customers, $suppliers, $gls;
     public $journal_date, $description;
     public $type, $account, $debit, $credit, $desc, $result;
     public $total_credit = 0, $total_debit = 0;
@@ -20,13 +21,12 @@ class EditJournal extends Component
     public $i = 1;
 
 
-    public function add($i)
+
+    public function add()
     {
-        $i = $i + 1;
-        $this->i = $i;
-        array_push($this->inputs ,$i);
-        $this->debit[$i] = 0.00;
-        $this->credit[$i] = 0.00;
+        $this->inputs[] = '';
+        $this->debit[] = 0.00;
+        $this->credit[] = 0.00;
     }
 
     public function remove($i)
@@ -34,22 +34,28 @@ class EditJournal extends Component
         unset($this->inputs[$i]);
     }
 
-    public function render()
+    public function mount()
     {
+        $this->customers = Customer::where('branch_id', auth()->user()->branch->id)->orderBy('code', 'asc')->get();
+        $this->suppliers = Supplier::orderBy('code', 'asc')->get();
+        $this->gls = GeneralAccount::orderBy('number', 'asc')->get();
         $this->description = $this->journal->description;
-        $this->jounal_date = $this->journal->date;
-        foreach($this->journal->items as $items){
-            $this->i++;
-            array_push($this->inputs ,$this->i);
-            $this->type[$this->i] = $items->account_type;
-            $this->account[$this->i] = $items->account_id;
-            $this->credit[$this->i] = $items->credit;
-            $this->debit[$this->i] = $items->debit;
-            $this->desc[$this->i] = $items->description;
-            $this->changeTypeEvent($this->i);
-
+        $this->journal_date = $this->journal->date;
+        foreach($this->journal->items as $key => $items){
+            $this->inputs[] = "";
+            $this->type[] = $items->account_type;
+            $this->account[] = $items->account_id;
+            $this->credit[] = $items->credit;
+            $this->debit[] = $items->debit;
+            $this->desc[] = $items->description;
+            $this->changeTypeEvent($key);
         }
 
+    }
+
+    public function render()
+    {
+        $this->totals();
         return view('livewire.edit-journal');
     }
 
@@ -68,11 +74,11 @@ class EditJournal extends Component
     public function changeTypeEvent($value)
     {
         if ($this->type[$value] == 'Customer')
-            $this->accounts[$value] = Customer::where('branch_id', auth()->user()->branch->id)->orderBy('code', 'asc')->get();
+            $this->accounts[$value] = $this->customers;
         if ($this->type[$value]  == 'Supplier')
-            $this->accounts[$value] = Supplier::orderBy('code', 'asc')->get();
+            $this->accounts[$value] = $this->suppliers;
         if ($this->type[$value]  == 'GeneralAccount')
-            $this->accounts[$value] = GeneralAccount::orderBy('number', 'asc')->get();
+            $this->accounts[$value] = $this->gls;
     }
 
     private function resetInputFields(){
@@ -102,26 +108,27 @@ class EditJournal extends Component
                 ]
             );
 
-            $journal = new \App\Models\Journal();
-            $journal->reference = \App\Models\Journal::generateNewNumber();
-            $journal->description = $this->description;
-            $journal->date = $this->journal_date;
-            $journal->created_by = auth()->id();
-            if($journal->save()){
+            $this->journal->reference = \App\Models\Journal::generateNewNumber();
+            $this->journal->description = $this->description;
+            $this->journal->date = $this->journal_date;
+            $this->journal->updated_by = auth()->id();
+            $items = [];
+            if($this->journal->save()){
                 foreach ($this->type as $key => $value) {
-                    JournalItem::create([
-                        'journal_id' =>$journal->id,
+                    $items[] = [
+                        'journal_id' =>$this->journal->id,
                         'account_type' =>$this->type[$key],
                         'account_id' =>$this->account[$key],
                         'credit' =>$this->credit[$key],
                         'debit' =>$this->debit[$key],
-                        'description' =>$this->desc[$key],
-                    ]);
+                        'description' =>$this->desc[$key] ?? null,
+                    ];
                 }
             }
-
-            $this->inputs = [];
-            $this->resetInputFields();
+            if(JournalItem::upsert($items, ['journal_id', 'account_id'])){
+                $this->inputs = [];
+                $this->resetInputFields();
+            }
 
             session()->flash('message', 'Journal created Successfully.');
             return $this->redirect(route('journal.index'));

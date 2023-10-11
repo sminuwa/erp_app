@@ -12,17 +12,17 @@
            <div class="col-12 mb-3">
                <h5>Journal Details</h5>
            </div>
-           <form wire:submit.prevent="store">
+           <form wire:submit.prevent="store" wire:ignore.self>
                <div class="row">
                    <div class="col-md-12" style="border-right:#dddddd solid">
 
                    </div>
-                   <div class="col-md-5 mb-3">
+                   <div class="col-md-5 mb-3" wire:ignore>
                        <input wire:model="journal_date" type="date" class="form-control " required>
                        <label class="floating-label">Date: @error('journal_date')<span class="text-danger error">{{ $message }}</span>@enderror</label>
                    </div>
-                   <div class="col-md-7 mb-3">
-                       <input wire:model="description" type="text" class="form-control" placeholder="">
+                   <div class="col-md-7 mb-3" wire:ignore>
+                       <input wire:model="description" type="text" class="form-control" placeholder="Description">
                        <label class="floating-label">Description: @error('description')<span class="text-danger error">{{ $message }}</span>@enderror</label>
                    </div>
 
@@ -34,57 +34,57 @@
                            <div class="col-md-12">
                                <table>
                                @foreach($inputs as $key => $value)
-                                   <tr :wire:key="{{ $loop->index }}">
+                                   <tr :wire:key="{{ $loop->index }}" wire:ignore.self>
                                        <td>
                                            <div class="col-12">
-                                               <div class="form-group">
-                                                   <select  wire:model="type.{{ $value }}" wire:change="changeTypeEvent({{$value}})" class="form-control select2-single" required>
+                                               <div class="form-group" wire:ignore>
+                                                   <select  wire:model="type.{{ $key }}" wire:change="changeTypeEvent({{$key}})" class="form-control select2-single" required>
                                                        <option value="">Select...</option>
                                                        <option value="Customer">Customer</option>
                                                        <option value="Supplier">Supplier
                                                        <option value="GeneralAccount">General Accounts
                                                        </option>
                                                    </select>
-                                                   <label class="floating-label">Account Type: @error('type.'.$value)<span class="text-danger error">{{ $message }}</span>@enderror</label>
+                                                   <label class="floating-label">Account Type: @error('type.'.$key)<span class="text-danger error">{{ $message }}</span>@enderror</label>
                                                </div>
                                            </div>
                                        </td>
                                        <td>
                                            <div class="col-12">
                                                <div class="form-group">
-                                                   <select wire:model="account.{{ $value }}" class="form-control select2-single" required>
+                                                   <select wire:ignore.self wire:model="account.{{ $key }}" class="form-control select2-single" required>
                                                        <option value="">Select...</option>
-                                                        @if(isset($accounts[$value]))
-                                                           @foreach($accounts[$value] as $account)
+                                                        @if(isset($accounts[$key]))
+                                                           @foreach($accounts[$key] as $account)
                                                                <option value="{{ $account['id'] }}"> {{ $account['number'] ?? ($account['code'] ?? "")  }} - {{ $account['description'] ?? ($account['name'] ?? "") }}</option>
                                                            @endforeach
                                                         @endif
                                                    </select>
-                                                   <label class="floating-label">Account: @error('account.'.$value) <span class="text-danger error">{{ $message }}</span>@enderror</label>
+                                                   <label class="floating-label">Account: @error('account.'.$key) <span class="text-danger error">{{ $message }}</span>@enderror</label>
                                                </div>
                                            </div>
                                        </td>
                                        <td>
                                            <div class="col-12">
-                                               <div class="form-group">
-                                                   <input type="number" min="0" class="form-control" placeholder="Debit" wire:model="debit.{{ $value }}" wire:keyup="totals">
-                                                   <label class="floating-label">Debit: @error('debit.'.$value) <br><span class="text-danger error">{{ $message }}</span>@enderror</label>
+                                               <div class="form-group" wire:ignore>
+                                                   <input type="number" min="0" class="form-control" placeholder="Debit" wire:model="debit.{{ $key }}" wire:keyup="totals">
+                                                   <label class="floating-label">Debit: @error('debit.'.$key) <br><span class="text-danger error">{{ $message }}</span>@enderror</label>
                                                </div>
                                            </div>
                                        </td>
                                        <td>
                                            <div class="col-12">
-                                               <div class="form-group">
-                                                   <input type="number" min="0" class="form-control" placeholder="Credit" wire:model="credit.{{ $value }}" wire:keyup="totals">
-                                                   <label class="floating-label">Credit: @error('credit.'.$value) <br><span class="text-danger error">{{ $message }}</span>@enderror</label>
+                                               <div class="form-group" wire:ignore>
+                                                   <input type="number" min="0" class="form-control" placeholder="Credit" wire:model="credit.{{ $key }}" wire:keyup="totals">
+                                                   <label class="floating-label">Credit: @error('credit.'.$key) <br><span class="text-danger error">{{ $message }}</span>@enderror</label>
                                                </div>
                                            </div>
                                        </td>
                                        <td>
                                            <div class="col-12">
-                                               <div class="input-group mb-3">
-                                                   <input type="text" class="form-control" placeholder="" wire:model="desc.{{ $value }}" >
-                                                   <label class="floating-label">Description: @error('desc.'.$value) <br><span class="text-danger error">{{ $message }}</span>@enderror</label>
+                                               <div class="input-group mb-3" wire:ignore>
+                                                   <input type="text" class="form-control" placeholder="Description" wire:model="desc.{{ $key }}" >
+                                                   <label class="floating-label">Description: @error('desc.'.$key) <br><span class="text-danger error">{{ $message }}</span>@enderror</label>
                                                    <div class="input-group-append">
                                                        <button class="btn btn-danger btn-sm" wire:click.prevent="remove({{$key}})"><i class="fa fa-trash"></i></button>
                                                    </div>

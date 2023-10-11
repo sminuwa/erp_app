@@ -395,7 +395,7 @@ class InterStoreTransferController extends Controller
     public function loadToCart(TransferProduct $transfer)
     {
         \Cart::session('_token')->clear();
-        foreach ($transfer->transferProducts()->get() as $data) {
+        foreach ($transfer->transferProducts()->where('type','interstore')->get() as $data) {
             \Cart::session('_token')->add([
 
                 'id' => $this->generateRandomString(),

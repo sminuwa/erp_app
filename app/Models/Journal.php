@@ -48,7 +48,7 @@ class Journal extends Model
     }
 
     public static function generateNewNumber($prefix = 'JNL', $length = 4){
-        $prefix = $prefix.date('ymd');
+        $prefix = $prefix.date('ym').auth()->user()->branch->code;
         $record = self::where('reference', 'like', '%'.$prefix.'%')->orderBy('reference', 'desc')->first();
         if($record){
             $number = $record->reference;

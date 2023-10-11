@@ -37,7 +37,7 @@ class EditJournal extends Component
     public function render()
     {
         $this->description = $this->journal->description;
-        $this->date = $this->journal->date;
+        $this->jounal_date = $this->journal->date;
         foreach($this->journal->items as $items){
             $this->i++;
             array_push($this->inputs ,$this->i);

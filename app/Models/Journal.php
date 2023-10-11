@@ -35,8 +35,20 @@ class Journal extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function postedBy(){
+        return $this->belongsTo(User::class, 'posted_by');
+    }
+
+    public function modifiedBy(){
+        return $this->belongsTo(User::class, 'modified_by');
+    }
+
+    public function items(){
+        return $this->hasMany(JournalItem::class, 'journal_id');
+    }
+
     public static function generateNewNumber($prefix = 'JNL', $length = 4){
-        $prefix = $prefix.date('ymd');
+        $prefix = $prefix.date('ym').auth()->user()->branch->code;
         $record = self::where('reference', 'like', '%'.$prefix.'%')->orderBy('reference', 'desc')->first();
         if($record){
             $number = $record->reference;

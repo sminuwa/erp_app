@@ -6,7 +6,7 @@
                    <div class="alert alert-success">{{ session('message') }}</div>
                @endif
                    @if(session()->has('error'))
-                       <div class="alert alert-success">{{ session('error') }}</div>
+                       <div class="alert alert-danger">{{ session('error') }}</div>
                    @endif
            </div>
            <div class="col-12 mb-3">
@@ -38,7 +38,7 @@
                                        <td>
                                            <div class="col-12">
                                                <div class="form-group">
-                                                   <select  wire:model="type.{{ $value }}" wire:change="changeTypeEvent($event.target.value)" class="form-control select2-single" required>
+                                                   <select  wire:model="type.{{ $value }}" wire:change="changeTypeEvent({{$value}})" class="form-control select2-single" required>
                                                        <option value="">Select...</option>
                                                        <option value="Customer">Customer</option>
                                                        <option value="Supplier">Supplier
@@ -67,7 +67,7 @@
                                        <td>
                                            <div class="col-12">
                                                <div class="form-group">
-                                                   <input type="number" min="0" class="form-control" placeholder="Debit" wire:model="debit.{{ $value }}" wire:change="totals">
+                                                   <input type="number" min="0" class="form-control" placeholder="Debit" wire:model="debit.{{ $value }}" wire:keyup="totals">
                                                    <label class="floating-label">Debit: @error('debit.'.$value) <br><span class="text-danger error">{{ $message }}</span>@enderror</label>
                                                </div>
                                            </div>
@@ -75,7 +75,7 @@
                                        <td>
                                            <div class="col-12">
                                                <div class="form-group">
-                                                   <input type="number" min="0" class="form-control" placeholder="Credit" wire:model="credit.{{ $value }}" wire:change="totals">
+                                                   <input type="number" min="0" class="form-control" placeholder="Credit" wire:model="credit.{{ $value }}" wire:keyup="totals">
                                                    <label class="floating-label">Credit: @error('credit.'.$value) <br><span class="text-danger error">{{ $message }}</span>@enderror</label>
                                                </div>
                                            </div>
@@ -96,7 +96,11 @@
                                </table>
                            </div>
                            <div class="col-md-12 mt-3">
-                               <h4>Total Credit: #{{ $total_credit }} <br>Total Debit: #{{ $total_debit }} <br>Balance: #{{ $total_credit-$total_debit }}</h4>
+                               <h4>
+                                   <small>Total Credit:</small> N{{ $total_credit }} <br>
+                                   <small>Total Debit:</small> N{{ $total_debit }} <br>
+                                   <small>Balance:</small> N{{ $total_credit-$total_debit }}
+                               </h4>
                            </div>
                            <div class="col-md-12 mt-3">
                                <button type="submit"  class="btn btn-success btn-sm">Save</button>

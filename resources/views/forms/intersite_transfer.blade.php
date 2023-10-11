@@ -9,7 +9,7 @@
                 @foreach ($stores as $data)
                     <option value="{{ $data->id }}"
                         {{ $data->id == old('source_store_id', $model->source_store_id) ? 'selected' : '' }}>
-                        {{ $data->name }}</option>
+                        {{ $data->code }}-{{ $data->name }}</option>
                 @endforeach
             @endif
         </select>
@@ -20,7 +20,7 @@
         @endif
     </div>
 
-    <div class="form-group">
+    {{-- <div class="form-group">
         <label for="category_id">Category</label>
         <select type="number" class="form-control {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
             name="category_id" id="category_id" required="required">
@@ -38,7 +38,7 @@
                 <strong>{{ $errors->first('category_id') }}</strong>
             </div>
         @endif
-    </div>
+    </div> --}}
     <div class="form-group">
         <label for="product_id">Product</label>
         <select class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
@@ -49,14 +49,14 @@
                 @foreach (\App\Models\Product::where('category_id', old('category_id'))->get() as $data)
                     <option value="{{ $data->id }}"
                         {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>
-                        {{ $data->name }}</option>
+                        {{ $data->code }}-{{ $data->name }}</option>
                 @endforeach
             @else
                 @if (isset($products))
                     @foreach ($products as $data)
                         <option value="{{ $data->id }}"
                             {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>
-                            {{ $data->name }}</option>
+                            {{ $data->code }}-{{ $data->name }}</option>
                     @endforeach
                 @endif
             @endif
@@ -80,7 +80,7 @@
                 @foreach ($branches as $data)
                     <option value="{{ $data->id }}"
                         {{ $data->id == old('destination_branch_id', $model->destination_branch_id) ? 'selected' : '' }}>
-                        {{ $data->name }}</option>
+                        {{ $data->code }}-{{ $data->name }}</option>
                 @endforeach
             @endif
         </select>
@@ -115,10 +115,10 @@
         @endif
     </div>
     <div class="form-group">
-        <label for="unit_price">Unit Price</label>
+        <label for="unit_price">Product Code Price</label>
         <input type="text"
             class="form-control {{ $errors->has('unit_price') ? ' is-invalid' : '' }}"
-            name="unit_price" id="unit_price" placeholder="" required="required">
+            name="unit_price" id="unit_price" placeholder="Product code price" required="required">
         @if ($errors->has('unit_price'))
             <div class="invalid-feedback">
                 <strong>{{ $errors->first('unit_price') }}</strong>

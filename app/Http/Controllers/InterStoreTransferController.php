@@ -21,6 +21,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\AuditLog;
 use App\Models\User;
+
 /**
  * Description of InterStoreTransferController
  *
@@ -40,7 +41,7 @@ class InterStoreTransferController extends Controller
         \Cart::session('_token')->clear();
         $records = TransferProduct::where(['nature' => 'Transfer', 'stock_in_out' => 'out', 'transfer_products.status' => 1])
             ->where('stores.branch_id', 'LIKE', User::userBranchAction())
-            ->where('transfer_products.type','interstore')
+            ->where('transfer_products.type', 'interstore')
             ->join('stores', 'stores.id', 'transfer_products.source_store_id')
             ->groupBy(['refno', 'source_store_id', 'product_id'])->orderBy('transfer_products.created_at', 'DESC')->take(10)->get();
         return view('pages.inventories.transfers.inter_store.index', ['records' => $records]);
@@ -50,7 +51,7 @@ class InterStoreTransferController extends Controller
         $refno = $request->refno;
         $records = TransferProduct::where(['nature' => 'Transfer', 'stock_in_out' => 'out', 'transfer_products.status' => 1])
             ->where('stores.branch_id', 'LIKE', User::userBranchAction())
-            ->where('transfer_products.type','interstore')
+            ->where('transfer_products.type', 'interstore')
             ->where('refno', 'LIKE', "%$refno%")
             ->join('stores', 'stores.id', 'transfer_products.source_store_id')
             ->groupBy(['refno', 'source_store_id', 'product_id'])->orderBy('transfer_products.created_at', 'DESC')->get();
@@ -70,18 +71,18 @@ class InterStoreTransferController extends Controller
         ]);
 
     } /**
-  * Show the form for creating a new resource.
-  *
-  * @param  Create  $request
-  * @return \Illuminate\Http\Response
-  */
+      * Show the form for creating a new resource.
+      *
+      * @param  Create  $request
+      * @return \Illuminate\Http\Response
+      */
     public function create(Create $request)
     {
         //\Cart::session('_token')->clear();
-        
-        $products = Product::select('products.id', 'products.name')
-        ->join('store_products', 'store_products.product_id', 'products.id')
-        ->where('qty_available', '>', 0)->get();
+
+        $products = Product::select('products.id', 'products.name', 'products.code')
+            ->join('store_products', 'store_products.product_id', 'products.id')
+            ->where('qty_available', '>', 0)->get();
         $categories = Category::all(['id', 'name']);
         $stores = Store::where('branch_id', 'LIKE', User::userBranchAction())->get();
         $cartItems = \Cart::session('_token')->getContent(); //\Cart::getContent();
@@ -94,11 +95,11 @@ class InterStoreTransferController extends Controller
             'transfer_products' => $cartItems,
         ]);
     } /**
-  * Store a newly created resource in storage.
-  *
-  * @param  Store  $request
-  * @return \Illuminate\Http\Response
-  */
+      * Store a newly created resource in storage.
+      *
+      * @param  Store  $request
+      * @return \Illuminate\Http\Response
+      */
     public function store(StoreRequest $request)
     {
         $model = new TransferProduct;
@@ -121,19 +122,24 @@ class InterStoreTransferController extends Controller
                     $destination_qty_available = optional($record)->qty_available;
                     if ($record != null) {
                         DB::table('store_products')->where([
-                            'store_id' => $source_store_id, 'product_id' => $product_id
+                            'store_id' => $source_store_id,
+                            'product_id' => $product_id
                         ])->decrement('qty_available', $product->quantity);
                         DB::table('store_products')->where([
-                            'store_id' => $destination_store_id, 'product_id' => $product_id
+                            'store_id' => $destination_store_id,
+                            'product_id' => $product_id
                         ])->increment('qty_available', $product->quantity);
-                    }
-                    else {
+                    } else {
 
                         DB::table('store_products')->where([
-                            'store_id' => $source_store_id, 'product_id' => $product_id
+                            'store_id' => $source_store_id,
+                            'product_id' => $product_id
                         ])->decrement('qty_available', $product->quantity);
                         DB::table('store_products')->insert([
-                            'store_id' => $destination_store_id, 'product_id' => $product_id, 'qty_available' => $product->quantity, 'created_at' => Carbon::now(),
+                            'store_id' => $destination_store_id,
+                            'product_id' => $product_id,
+                            'qty_available' => $product->quantity,
+                            'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now()
                         ]);
                     }
@@ -206,8 +212,7 @@ class InterStoreTransferController extends Controller
                     DB::commit();
                 }
             }
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             DB::rollBack();
             session()->flash('app_message', 'Something is wrong while transfering stock');
             throw $ex;
@@ -215,14 +220,14 @@ class InterStoreTransferController extends Controller
         \Cart::session('_token')->clear();
         return redirect()->back();
     } /**
-  * Show the form for editing the specified resource.
-  *
-  * @param  Edit  $request
-  * @param  TransferProduct  $transferproduct
-  * @return \Illuminate\Http\Response
-  */
+      * Show the form for editing the specified resource.
+      *
+      * @param  Edit  $request
+      * @param  TransferProduct  $transferproduct
+      * @return \Illuminate\Http\Response
+      */
     public function edit(Edit $request, TransferProduct $transferproduct)
-    { 
+    {
         //\Cart::session('_token')->clear();
         $products = Product::all(['id', 'name']);
         $categories = Category::all(['id', 'name']);
@@ -237,12 +242,12 @@ class InterStoreTransferController extends Controller
             'transfer_products' => $cartItems,
         ]);
     } /**
-  * Update a existing resource in storage.
-  *
-  * @param  Update  $request
-  * @param  TransferProduct  $transferproduct
-  * @return \Illuminate\Http\Response
-  */
+      * Update a existing resource in storage.
+      *
+      * @param  Update  $request
+      * @param  TransferProduct  $transferproduct
+      * @return \Illuminate\Http\Response
+      */
     public function update(Update $request, TransferProduct $transferproduct)
     {
         $source_qty = 0;
@@ -250,12 +255,10 @@ class InterStoreTransferController extends Controller
         if ($transferproduct->status == 'Cancelled' && $request->status == 'Completed') {
             $source_qty = 0 - $request->qty_transfered;
             $destination_qty = -1 * $source_qty;
-        }
-        else if ($transferproduct->status == 'Completed' && $request->status == 'Cancelled') {
+        } else if ($transferproduct->status == 'Completed' && $request->status == 'Cancelled') {
             $source_qty = $request->qty_transfered;
             $destination_qty = 0 - $source_qty;
-        }
-        else {
+        } else {
             $source_qty = $transferproduct->qty_transfered - $request->qty_transfered;
             if ($source_qty > 0)
                 $destination_qty = 0 - $source_qty;
@@ -300,26 +303,24 @@ class InterStoreTransferController extends Controller
                 AuditLog::auditLog(Auth::id(), $action);
                 session()->flash('app_message', 'Stock transfer successfully updated');
                 return redirect()->route('interstore.index');
-            }
-            else {
+            } else {
                 session()->flash('app_error', 'Something is wrong while updating stock transfer');
             }
             DB::commit();
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             DB::rollBack();
             throw $ex;
         }
         \Cart::session('_token')->clear();
         return redirect()->back();
     } /**
-  * Delete a  resource from  storage.
-  *
-  * @param  Destroy  $request
-  * @param  TransferProduct  $transferproduct
-  * @return \Illuminate\Http\Response
-  * @throws \Exception
-  */
+      * Delete a  resource from  storage.
+      *
+      * @param  Destroy  $request
+      * @param  TransferProduct  $transferproduct
+      * @return \Illuminate\Http\Response
+      * @throws \Exception
+      */
     public function destroy(Destroy $request, TransferProduct $transferproduct)
     {
 
@@ -335,8 +336,7 @@ class InterStoreTransferController extends Controller
             $action = "Deleted stock transfer made from " . Store::find($transfer->source_store_id)->name . " to " . Store::find($transfer->destination_store_id)->name;
             AuditLog::auditLog(Auth::id(), $action);
             DB::commit();
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             DB::rollBack();
             session()->flash('app_error', 'Something is wrong while cancelling stock transfer');
             throw $ex;
@@ -352,15 +352,18 @@ class InterStoreTransferController extends Controller
             'destination_store_id' => 'required',
             'qty_transfered' => 'required',
         ]);
-
+        $product = Product::find($request->product_id);
         $add = \Cart::session('_token')->add([
             'id' => $this->generateRandomString(),
-            'name' => Product::find($request->product_id)->name,
-            'price' => 0, //Thos is not applicable here
+            'name' => $product->name,
+            'price' => 0,
+            //Thos is not applicable here
             'quantity' => $request->qty_transfered,
-            'attributes' => array('source_store_id' => $request->source_store_id,
+            'attributes' => array(
+                'source_store_id' => $request->source_store_id,
                 'destination_store_id' => $request->destination_store_id,
-                'product_id' => $request->product_id
+                'product_id' => $request->product_id,
+                'code' => $product->code,
             ),
         ]);
         //dd(\Cart::getContent());
@@ -369,8 +372,7 @@ class InterStoreTransferController extends Controller
             session()->flash('app_message', 'Product is Added to Cart Successfully !');
             return redirect()->back()->withInput();
 
-        }
-        else {
+        } else {
 
             session()->flash('app_error', 'Product not added to cart');
             return redirect()->back()->withInput();
@@ -395,16 +397,19 @@ class InterStoreTransferController extends Controller
     public function loadToCart(TransferProduct $transfer)
     {
         \Cart::session('_token')->clear();
-        foreach ($transfer->transferProducts()->where('type','interstore')->get() as $data) {
+        foreach ($transfer->transferProducts()->where('type', 'interstore')->get() as $data) {
+            $product = Product::find($data->product_id);
             \Cart::session('_token')->add([
 
                 'id' => $this->generateRandomString(),
-                'name' => Product::find($data->product_id)->name,
+                'name' => $product->name,
                 'price' => 0,
                 'quantity' => $data->qty_transfered,
-                'attributes' => array('source_store_id' => $data->source_store_id,
+                'attributes' => array(
+                    'source_store_id' => $data->source_store_id,
                     'destination_store_id' => $data->destination_store_id,
                     'product_id' => $data->product_id,
+                    'code' => $product->code,
                 ),
             ]);
         }

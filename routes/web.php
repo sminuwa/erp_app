@@ -18,7 +18,8 @@ use App\Http\Controllers\StoreController;
 use App\Http\Controllers\BranchProductPriceController;
 use App\Http\Controllers\MisController;
 use App\Http\Controllers\BankAccountController;
-use App\Http\Controllers\TransferProductController;
+use App\Http\Controllers\InterStoreTransferController;
+use App\Http\Controllers\InterSiteTransferController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\InvoiceController;
@@ -166,24 +167,7 @@ Route::middleware('auth')->group(function () {
         Route::group(
             ['prefix' => 'products'],
             function () {
-                Route::group(
-                    ['prefix' => 'transfer'],
-                    function () {
-                        Route::get('/index', [TransferProductController::class, 'index'])->name('transfer_products.index');
-                        Route::post('/search', [TransferProductController::class, 'search'])->name('transfer_products.search');
-                        Route::get('/create', [TransferProductController::class, 'create'])->name('transfer_products.create');
-                        Route::get('/show/{transferproduct}', [TransferProductController::class, 'show'])->name('transfer_products.show');
-                        Route::post('/store', [TransferProductController::class, 'store'])->name('transfer_products.store');
-                        Route::get('/edit/{transferproduct}', [TransferProductController::class, 'edit'])->name('transfer_products.edit');
-                        Route::put('/update/{transferproduct}', [TransferProductController::class, 'update'])->name('transfer_products.update');
-                        Route::delete('/delete/{transferproduct}', [TransferProductController::class, 'destroy'])->name('transfer_products.destroy');
-                        Route::post('/cart', [TransferProductController::class, 'addToCart'])->name('transfer_products.cart');
-                        Route::delete('/remove/{id}', [TransferProductController::class, 'removeCart'])->name('transfer_products.cart.remove');
-                        Route::post('/clear', [TransferProductController::class, 'clearAllCart'])->name('transfer_products.cart.clear');
-                        Route::get('/print/{transfer_id}', [TransferProductController::class, 'printStockTransfer'])->name('transfer_products.print');
 
-                    }
-                );
                 Route::group(
                     ['prefix' => 'manage'],
                     function () {
@@ -237,52 +221,6 @@ Route::middleware('auth')->group(function () {
 
     });
 
-    Route::group(
-        ['prefix' => 'purchases/grn'],
-        function () {
-            Route::get('/index', [PurchaseGRNController::class, 'index'])->name('purchases.index');
-            Route::get('/create', [PurchaseGRNController::class, 'create'])->name('purchases.create');
-            Route::get('/show/{purchase}', [PurchaseGRNController::class, 'show'])->name('purchases.show');
-            Route::post('/store', [PurchaseGRNController::class, 'store'])->name('purchases.store');
-            Route::get('/edit/{purchase}', [PurchaseGRNController::class, 'edit'])->name('purchases.edit');
-            Route::put('/update/{purchase}', [PurchaseGRNController::class, 'update'])->name('purchases.update');
-            Route::put('/purchase/update-cart', [PurchaseGRNController::class, 'updateCart'])->name('purchase.cart.update');
-            Route::delete('/delete/{purchase}', [PurchaseGRNController::class, 'destroy'])->name('purchases.destroy');
-            Route::post('/cart', [PurchaseGRNController::class, 'addToCart'])->name('purchases.cart.store');
-            Route::delete('/remove/{id}', [PurchaseGRNController::class, 'removeCart'])->name('purchases.cart.remove');
-            Route::post('/clear', [PurchaseGRNController::class, 'clearAllCart'])->name('purchases.cart.clear');
-            Route::get('/print/{purchase}', [PurchaseGRNController::class, 'printInvoice'])->name('purchase.print');
-            Route::post('/waybill/{purchase}', [PurchaseGRNController::class, 'generateWaybill'])->name('purchase.generate.waybill');
-            Route::get('/print/waybill/{purchase}', [PurchaseGRNController::class, 'printWaybill'])->name('purchase.waybill.print');
-            Route::post('/search', [PurchaseGRNController::class, 'search'])->name('purchases.search');
-            Route::post('/expense', [PurchaseGRNController::class, 'expense'])->name('purchases.expense.ajax.create');
-            Route::delete('/expense/delete/{expense}', [PurchaseGRNController::class, 'deleteExpense'])->name('delete.purchase.expense');
-            Route::post('/approve/{purchase}', [PurchaseGRNController::class, 'approve'])->name('purchase.approve');
-        }
-    );
-    Route::group(
-        ['prefix' => 'purchases/request'],
-        function () {
-            Route::get('/index', [PurchaseRequestController::class, 'index'])->name('purchases.request.index');
-            Route::get('/create', [PurchaseRequestController::class, 'create'])->name('purchases.request.create');
-            Route::get('/show/{purchase}', [PurchaseRequestController::class, 'show'])->name('purchases.request.show');
-            Route::post('/store', [PurchaseRequestController::class, 'store'])->name('purchases.request.store');
-            Route::get('/edit/{purchase}', [PurchaseRequestController::class, 'edit'])->name('purchases.request.edit');
-            Route::put('/update/{purchase}', [PurchaseRequestController::class, 'update'])->name('purchases.request.update');
-            Route::put('/purchase/update-cart', [PurchaseRequestController::class, 'updateCart'])->name('purchase.request.cart.update');
-            Route::delete('/delete/{purchase}', [PurchaseRequestController::class, 'destroy'])->name('purchases.request.destroy');
-            Route::post('/cart', [PurchaseRequestController::class, 'addToCart'])->name('purchases.request.cart.store');
-            Route::delete('/remove/{id}', [PurchaseRequestController::class, 'removeCart'])->name('purchases.request.cart.remove');
-            Route::post('/clear', [PurchaseRequestController::class, 'clearAllCart'])->name('purchases.request.cart.clear');
-            Route::get('/print/{purchase}', [PurchaseRequestController::class, 'printInvoice'])->name('purchase.request.print');
-            Route::post('/waybill/{purchase}', [PurchaseRequestController::class, 'generateWaybill'])->name('purchase.request.generate.waybill');
-            Route::get('/print/waybill/{purchase}', [PurchaseRequestController::class, 'printWaybill'])->name('purchase.request.waybill.print');
-            Route::post('/search', [PurchaseRequestController::class, 'search'])->name('purchases.request.search');
-            Route::post('/expense', [PurchaseRequestController::class, 'expense'])->name('purchases.request.expense.ajax.create');
-            Route::delete('/expense/delete/{expense}', [PurchaseRequestController::class, 'deleteExpense'])->name('delete.purchase.request.expense');
-            Route::post('/approve/{purchase}', [PurchaseRequestController::class, 'approve'])->name('purchase.request.approve');
-        }
-    );
     Route::group(['prefix' => 'expenses'], function () {
         Route::group(
             ['prefix' => 'items'],
@@ -676,7 +614,7 @@ Route::middleware('auth')->group(function () {
             }
         );
     });
-//Ajax
+    //Ajax
 
     Route::get('load/products', [MisController::class, 'loadproducts'])->name('ajax.loadproducts');
     Route::get('load/products/available', [MisController::class, 'loadAvailableProducts'])->name('ajax.load.available.products');
@@ -818,7 +756,7 @@ Route::middleware('auth')->group(function () {
 
 
             //Begin Customer Sales Analysis Report
-
+    
             //Customer Debt Report
             Route::get('/ca/customer/debt', [ReportController::class, 'customerDebtReport'])->name('customer.total.debt.reports');
             Route::get('/ca/customer/debt/load', [ReportController::class, 'loadCustomerDebtReport'])->name('ajax.load.customer.total.debt.reports');
@@ -898,7 +836,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/activity/load/logs/print/{from_date}/{to_date}/{user_id}', [ReportController::class, 'printLogs'])->name('user.activity.logs.print');
 
             //User Ledger and Loans
-
+    
             //Loan Balances
             Route::get('/us/user/balance', [ReportController::class, 'loanBalance'])->name('user.loan.balance.report');
             Route::get('/us/user/balance/load', [ReportController::class, 'loadLoanBalance'])->name('ajax.load.user.loan.balance.report');
@@ -956,16 +894,98 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('inventory')->group(function () {
 
-        Route::prefix('purchases')->group(function () {
-            Route::get('/', [App\Http\Controllers\Inventory\PurchaseController::class, 'index'])->name('inventories.purchases.index');
-            Route::get('/create', [App\Http\Controllers\Inventory\PurchaseController::class, 'create'])->name('inventories.purchases.create');
-            Route::post('/ajax/create', [App\Http\Controllers\Inventory\PurchaseController::class, 'createAjax'])->name('inventories.purchases.ajax.create');
-            Route::post('/store', [App\Http\Controllers\Inventory\PurchaseController::class, 'store'])->name('inventories.purchases.store');
-        });
+        // Route::prefix('purchases')->group(function () {
+        //     Route::get('/', [App\Http\Controllers\Inventory\PurchaseController::class, 'index'])->name('inventories.purchases.index');
+        //     Route::get('/create', [App\Http\Controllers\Inventory\PurchaseController::class, 'create'])->name('inventories.purchases.create');
+        //     Route::post('/ajax/create', [App\Http\Controllers\Inventory\PurchaseController::class, 'createAjax'])->name('inventories.purchases.ajax.create');
+        //     Route::post('/store', [App\Http\Controllers\Inventory\PurchaseController::class, 'store'])->name('inventories.purchases.store');
+        // });
+        Route::group(
+            ['prefix' => 'purchases/grn'],
+            function () {
+                Route::get('/index', [PurchaseGRNController::class, 'index'])->name('purchases.index');
+                Route::get('/create', [PurchaseGRNController::class, 'create'])->name('purchases.create');
+                Route::get('/show/{purchase}', [PurchaseGRNController::class, 'show'])->name('purchases.show');
+                Route::post('/store', [PurchaseGRNController::class, 'store'])->name('purchases.store');
+                Route::get('/edit/{purchase}', [PurchaseGRNController::class, 'edit'])->name('purchases.edit');
+                Route::put('/update/{purchase}', [PurchaseGRNController::class, 'update'])->name('purchases.update');
+                Route::put('/purchase/update-cart', [PurchaseGRNController::class, 'updateCart'])->name('purchase.cart.update');
+                Route::delete('/delete/{purchase}', [PurchaseGRNController::class, 'destroy'])->name('purchases.destroy');
+                Route::post('/cart', [PurchaseGRNController::class, 'addToCart'])->name('purchases.cart.store');
+                Route::delete('/remove/{id}', [PurchaseGRNController::class, 'removeCart'])->name('purchases.cart.remove');
+                Route::post('/clear', [PurchaseGRNController::class, 'clearAllCart'])->name('purchases.cart.clear');
+                Route::get('/print/{purchase}', [PurchaseGRNController::class, 'printInvoice'])->name('purchase.print');
+                Route::post('/waybill/{purchase}', [PurchaseGRNController::class, 'generateWaybill'])->name('purchase.generate.waybill');
+                Route::get('/print/waybill/{purchase}', [PurchaseGRNController::class, 'printWaybill'])->name('purchase.waybill.print');
+                Route::post('/search', [PurchaseGRNController::class, 'search'])->name('purchases.search');
+                Route::post('/expense', [PurchaseGRNController::class, 'expense'])->name('purchases.expense.ajax.create');
+                Route::delete('/expense/delete/{expense}', [PurchaseGRNController::class, 'deleteExpense'])->name('delete.purchase.expense');
+                Route::post('/approve/{purchase}', [PurchaseGRNController::class, 'approve'])->name('purchase.approve');
+            }
+        );
+        Route::group(
+            ['prefix' => 'purchases/request'],
+            function () {
+                Route::get('/index', [PurchaseRequestController::class, 'index'])->name('purchases.request.index');
+                Route::get('/create', [PurchaseRequestController::class, 'create'])->name('purchases.request.create');
+                Route::get('/show/{purchase}', [PurchaseRequestController::class, 'show'])->name('purchases.request.show');
+                Route::post('/store', [PurchaseRequestController::class, 'store'])->name('purchases.request.store');
+                Route::get('/edit/{purchase}', [PurchaseRequestController::class, 'edit'])->name('purchases.request.edit');
+                Route::put('/update/{purchase}', [PurchaseRequestController::class, 'update'])->name('purchases.request.update');
+                Route::put('/purchase/update-cart', [PurchaseRequestController::class, 'updateCart'])->name('purchase.request.cart.update');
+                Route::delete('/delete/{purchase}', [PurchaseRequestController::class, 'destroy'])->name('purchases.request.destroy');
+                Route::post('/cart', [PurchaseRequestController::class, 'addToCart'])->name('purchases.request.cart.store');
+                Route::delete('/remove/{id}', [PurchaseRequestController::class, 'removeCart'])->name('purchases.request.cart.remove');
+                Route::post('/clear', [PurchaseRequestController::class, 'clearAllCart'])->name('purchases.request.cart.clear');
+                Route::get('/print/{purchase}', [PurchaseRequestController::class, 'printInvoice'])->name('purchase.request.print');
+                Route::post('/waybill/{purchase}', [PurchaseRequestController::class, 'generateWaybill'])->name('purchase.request.generate.waybill');
+                Route::get('/print/waybill/{purchase}', [PurchaseRequestController::class, 'printWaybill'])->name('purchase.request.waybill.print');
+                Route::post('/search', [PurchaseRequestController::class, 'search'])->name('purchases.request.search');
+                Route::post('/expense', [PurchaseRequestController::class, 'expense'])->name('purchases.request.expense.ajax.create');
+                Route::delete('/expense/delete/{expense}', [PurchaseRequestController::class, 'deleteExpense'])->name('delete.purchase.request.expense');
+                Route::post('/approve/{purchase}', [PurchaseRequestController::class, 'approve'])->name('purchase.request.approve');
+            }
+        );
+        Route::group(
+            ['prefix' => 'interstore/transfer'],
+            function () {
+                Route::get('/index', [InterStoreTransferController::class, 'index'])->name('interstore.index');
+                Route::post('/search', [InterStoreTransferController::class, 'search'])->name('interstore.search');
+                Route::get('/create', [InterStoreTransferController::class, 'create'])->name('interstore.create');
+                Route::get('/show/{transferproduct}', [InterStoreTransferController::class, 'show'])->name('interstore.show');
+                Route::post('/store', [InterStoreTransferController::class, 'store'])->name('interstore.store');
+                Route::get('/edit/{transferproduct}', [InterStoreTransferController::class, 'edit'])->name('interstore.edit');
+                Route::put('/update/{transferproduct}', [InterStoreTransferController::class, 'update'])->name('interstore.update');
+                Route::delete('/delete/{transferproduct}', [InterStoreTransferController::class, 'destroy'])->name('interstore.destroy');
+                Route::post('/cart', [InterStoreTransferController::class, 'addToCart'])->name('interstore.cart');
+                Route::delete('/remove/{id}', [InterStoreTransferController::class, 'removeCart'])->name('interstore.cart.remove');
+                Route::post('/clear', [InterStoreTransferController::class, 'clearAllCart'])->name('interstore.cart.clear');
+                Route::get('/print/{transfer_id}', [InterStoreTransferController::class, 'printStockTransfer'])->name('interstore.print');
+
+            }
+        );
+        Route::group(
+            ['prefix' => 'intersite/transfer'],
+            function () {
+                Route::get('/index', [InterSiteTransferController::class, 'index'])->name('intersite.index');
+                Route::post('/search', [InterSiteTransferController::class, 'search'])->name('intersite.search');
+                Route::get('/create', [InterSiteTransferController::class, 'create'])->name('intersite.create');
+                Route::get('/show/{transferproduct}', [InterSiteTransferController::class, 'show'])->name('intersite.show');
+                Route::post('/store', [InterSiteTransferController::class, 'store'])->name('intersite.store');
+                Route::get('/edit/{transferproduct}', [InterSiteTransferController::class, 'edit'])->name('intersite.edit');
+                Route::put('/update/{transferproduct}', [InterSiteTransferController::class, 'update'])->name('intersite.update');
+                Route::delete('/delete/{transferproduct}', [InterSiteTransferController::class, 'destroy'])->name('intersite.destroy');
+                Route::post('/cart', [InterSiteTransferController::class, 'addToCart'])->name('intersite.cart');
+                Route::delete('/remove/{id}', [InterSiteTransferController::class, 'removeCart'])->name('intersite.cart.remove');
+                Route::post('/clear', [InterSiteTransferController::class, 'clearAllCart'])->name('intersite.cart.clear');
+                Route::get('/print/{transfer_id}', [InterSiteTransferController::class, 'printStockTransfer'])->name('intersite.print');
+
+            }
+        );
 
     });
 
-//inventory
+    //inventory
 
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::post('customer/search', 'CustomerController@search')->name('customer.search');

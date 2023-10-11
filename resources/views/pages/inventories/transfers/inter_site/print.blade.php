@@ -39,7 +39,7 @@
                             <h3>
                                 {{App\Models\User::UserBranchName()->long_name}}
                             </h3>
-                            <h4>STOCK TRANSFER REPORT</h4>
+                            <h4>INTERSITE STOCK TRANSFER REPORT</h4>
                             <small class="float-right">View Date: {{ date('l, d-M-Y h:i:s A') }}</small>
 
                         </div>
@@ -54,9 +54,9 @@
                                         <th style="width:250px;">Item Name</th>
                                         <th>From Store</th>
                                         <th>To Store</th>
-                                        <th>QTY Before<br/><br/>Transfer</th>
-                                        <th>QTY <br/><br/>Transfer</th>
-                                        <th>Transfer No</th>
+                                        <th>QTY BF/T<br/><br/>Transfer</th>
+                                        <th>QTY <br/><br/>AF/T</th>
+                                        <th>TRF No</th>
                                         <th>Date <br/><br/>Transfer</th>
                                         <th>Vehicle No</th>
                                     </tr>

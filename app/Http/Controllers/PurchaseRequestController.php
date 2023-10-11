@@ -43,7 +43,7 @@ class PurchaseRequestController extends Controller
     public function index(Index $request)
     {
         \Cart::clear();
-        return view('pages.purchases.request.index', [
+        return view('pages.inventories.purchases.request.index', [
             'records' => PurchaseRequest::select('purchase_requests.*')->orderBy('purchase_date', 'DESC')
                 ->join('suppliers', 'suppliers.id', 'purchase_requests.supplier_id')
                 // ->where('branch_id', 'LIKE', User::userBranchAction())
@@ -58,7 +58,7 @@ class PurchaseRequestController extends Controller
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
             ->where('branch_id', 'LIKE', User::userBranchAction())
             ->orderBy('purchase_date', 'DESC')->take(10)->get();
-        return view('pages.purchases.request.index', [
+        return view('pages.inventories.purchases.request.index', [
             'records' => $records
         ]);
     }
@@ -71,7 +71,7 @@ class PurchaseRequestController extends Controller
      */
     public function show(Show $request, PurchaseRequest $purchase)
     {
-        return view('pages.purchases.request.show', [
+        return view('pages.inventories.purchases.request.show', [
             'record' => $purchase,
         ]);
 
@@ -84,7 +84,8 @@ class PurchaseRequestController extends Controller
     public function create(Create $request)
     {
         //\Cart::clear();
-        return view('pages.purchases.request.create', [
+        //dd(\Cart::getContent());
+        return view('pages.inventories.purchases.request.create', [
             'model' => new PurchaseRequest,
             'products' => Product::all(),
             'suppliers' => Supplier::orderBy('name', 'asc')->get(),
@@ -100,21 +101,17 @@ class PurchaseRequestController extends Controller
       * @param  Store  $request
       * @return \Illuminate\Http\Response
       */
-    public function store(StoreRequest $request)
+    public function store(Request $request)
     {
 
         $amount = 0;
         DB::beginTransaction();
         try {
-            $purchase_datetime = date('Y-m-d H:i:s', strtotime("$request->purchase_date $request->purchase_time"));
             $purchase_id = DB::table('purchase_requests')->insertGetId([
                 'supplier_id' => $request->supplier_id,
                 'invoice' => $request->invoice,
-                'purchase_date' => $purchase_datetime,
-                'purchase_mode' => 'Cash',
-                'vehicle_reg_no' => $request->vehicle_reg_no,
-                'source_store_id' => $request->source_store_id,
-                'destination_store_id' => $request->source_store_id,
+                'purchase_date' => Carbon::now(),
+                'branch_id' => User::userBranchAction(),
                 'updated_by' => $request->updated_by,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
@@ -163,7 +160,7 @@ class PurchaseRequestController extends Controller
         if (\Cart::getContent()->isEmpty())
             $this->loadToCart($purchase);
         $cart_products = \Cart::getContent();
-        return view('pages.purchases.request.edit', [
+        return view('pages.inventories.purchases.request.edit', [
             'model' => $purchase,
             'products' => Product::all(),
             'suppliers' => Supplier::where('branch_id', 'LIKE', User::userBranchAction())->get(),
@@ -266,15 +263,15 @@ class PurchaseRequestController extends Controller
         //return $request;
         $validated = $request->validate([
             'product_id' => 'required',
-            'unit_price' => 'required',
             'qty_supplied' => 'required',
         ]);
-
+        $product = Product::find($request->product_id);
         $add = \Cart::add([
             'id' => $request->product_id,
-            'name' => Product::find($request->product_id)->name,
-            'price' => $request->unit_price,
+            'name' => $product->name,
+            'price' => $request->unit_price ?? 0,
             'quantity' => $request->qty_supplied,
+            'attributes' => array('code' => $product->code),
         ]);
         //dd(\Cart::getContent());
         if ($add) {
@@ -310,11 +307,13 @@ class PurchaseRequestController extends Controller
         //\Cart::clear();
         foreach ($purchase->purchasedProducts()->get() as $data) {
             $qty = $data->qty_supplied == 0 ? 1 : $data->qty_supplied;
+            $product = Product::find($data->product_id);
             \Cart::add([
                 'id' => $data->product_id,
-                'name' => Product::find($data->product_id)->name,
+                'name' => $product->name,
                 'price' => $data->unit_price,
                 'quantity' => $qty,
+                'attributes' => array('code' => $product->code),
             ]);
         }
     }
@@ -346,7 +345,7 @@ class PurchaseRequestController extends Controller
 
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         $utility = new Utility();
-        return view('pages.purchases.request.print', compact('purchase_details', 'purchase', 'company', 'utility'));
+        return view('pages.inventories.purchases.request.print', compact('purchase_details', 'purchase', 'company', 'utility'));
     }
     public function generateWaybill(Request $request, PurchaseRequest $purchase)
     {
@@ -367,7 +366,7 @@ class PurchaseRequestController extends Controller
 
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         $utility = new Utility();
-        return view('pages.purchases.request.print_waybill', compact('purchase_details', 'purchase', 'company', 'utility'));
+        return view('pages.inventories.purchases.request.print_waybill', compact('purchase_details', 'purchase', 'company', 'utility'));
     }
     public function expense(Request $request)
     {
@@ -375,7 +374,7 @@ class PurchaseRequestController extends Controller
         $action = "Added purchase expense $request->name";
         AuditLog::auditLog(Auth::id(), $action);
         $purchase_expenses = PurchaseExpense::where('purchase_id', $request->purchase_id)->orderBy('name')->get();
-        return view('pages.purchases.request.load_expenses', compact('purchase_expenses'));
+        return view('pages.inventories.purchases.request.load_expenses', compact('purchase_expenses'));
     }
     public function deleteExpense(Request $request, PurchaseExpense $expense)
     {

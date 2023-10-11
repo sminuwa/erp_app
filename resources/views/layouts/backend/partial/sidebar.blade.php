@@ -108,7 +108,7 @@
                         @endcan
                         @can('view.stock.transfer')
                             <li class="nav-item">
-                                <a href="{{ route('transfer_products.index') }}"
+                                <a href="{{ route('interstore.index') }}"
                                     class="nav-link {{ Request::is('products/transfer/*') ? 'active' : '' }}">
                                     <i class="ion-ios-fastforward"></i>
                                     <p>Stock Transfer</p>
@@ -267,7 +267,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="#"
+                            <a href="{{route('intersite.index')}}"
                                class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Intersite Transfer</p>
@@ -275,7 +275,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="#"
+                            <a href="{{route('interstore.index')}}"
                                class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Interstore Transfer</p>

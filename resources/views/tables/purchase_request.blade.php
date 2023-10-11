@@ -3,8 +3,7 @@
         <tr>
             <th>Supplier</th>
             <th>Invoice </th>
-            <th>Purchase Date </th>
-            <th>Purchase Mode </th>
+            <th>Request Date </th>
             <th>Amount (&#8358;) </th>
             <th>Status </th>
             <th>&nbsp;</th>
@@ -16,7 +15,6 @@
                 <td> {{ optional($record->supplier)->name }} </td>
                 <td> {{ $record->invoice }} </td>
                 <td> {{ $record->purchase_date->toDayDateTimeString() }} </td>
-                <td> {{ $record->purchase_mode }} </td>
                 <td style="text-align: right"> {{ number_format($record->totalProductCost()->total, 2) }} </td>
                 <td> {{ $record->status == 1 ? 'Completed' : 'Pending' }} </td>
                 <td>

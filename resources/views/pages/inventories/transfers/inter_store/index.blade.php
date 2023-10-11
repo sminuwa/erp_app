@@ -1,10 +1,8 @@
 @extends('layouts.backend.app')
 
-@section('title', 'Product Companies')
+@section('title', 'Stock Tranfer')
 
 @push('css')
-    <!-- DataTables -->
-    <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
 @endpush
 
 @section('content')
@@ -17,30 +15,39 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Manage Dosage Forms</h4>
+                        <h4>Interstore Stock Transfer</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Dosage forms</li>
+                            <li class="breadcrumb-item"><a href="{{ route('stores.index') }}">Store</a></li>
+                            <li class="breadcrumb-item active">Stock Tranfer</li>
                         </ol>
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
         </section>
+
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('dosage_forms.create') }}">
-                <span class="fa fa-plus-circle">New Dosage</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('products.create') }}">
-                <span class="fa fa-plus-circle"> New Product</span>
+            <a class="btn btn-secondary btn-sm" href="{{ route('interstore.create') }}">
+                <span class="fa fa-plus-circle"></span>
             </a>
             <div class="container-fluid">
                 <div class="row">
-
-                    <div class="col-sm-8 table-responsive">
-                        @include('tables.dosage_form')
+                    <div class="col-md-6">
+                        <form action="{{route('interstore.search')}}" method="POST">
+                            @csrf
+                            <div class="input-group">
+                                <input type="search" class="form-control rounded" required placeholder="Search" name="refno" aria-label="Search" aria-describedby="search-addon" />
+                                <button type="submit" class="btn btn-outline-primary">search</button>
+                              </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row table-responsive-lg">
+                    <div class="col-sm-12 table-responsive-lg">
+                        @include('tables.interstore_transfer')
                     </div>
 
                 </div>
@@ -70,4 +77,3 @@
         });
     </script>
 @endpush
-

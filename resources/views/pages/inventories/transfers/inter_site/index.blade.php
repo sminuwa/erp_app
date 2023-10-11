@@ -15,7 +15,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Stock Transfer</h4>
+                        <h4>Intersite Stock Transfer</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -30,13 +30,13 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('transfer_products.create') }}">
+            <a class="btn btn-secondary btn-sm" href="{{ route('intersite.create') }}">
                 <span class="fa fa-plus-circle"></span>
             </a>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-6">
-                        <form action="{{route('transfer_products.search')}}" method="POST">
+                        <form action="{{route('intersite.search')}}" method="POST">
                             @csrf
                             <div class="input-group">
                                 <input type="search" class="form-control rounded" required placeholder="Search" name="refno" aria-label="Search" aria-describedby="search-addon" />
@@ -47,7 +47,7 @@
                 </div>
                 <div class="row table-responsive-lg">
                     <div class="col-sm-12 table-responsive-lg">
-                        @include('tables.transfer_product')
+                        @include('tables.intersite_transfer')
                     </div>
 
                 </div>

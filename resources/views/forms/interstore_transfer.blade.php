@@ -1,4 +1,4 @@
-<form action="{{ route('transfer_products.cart') }}" method="POST">
+<form action="{{ route('interstore.cart') }}" method="POST">
     {{ csrf_field() }}
     <div class="form-group">
         <label for="source_store_id">Source Store</label>

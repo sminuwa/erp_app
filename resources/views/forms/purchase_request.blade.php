@@ -9,7 +9,7 @@
                     <input type="hidden" name="purchase_id" value="{{ $model->id }}" />
                     <input type="hidden" name="type" value="{{ $type }}" />
                     @csrf
-                    <div class="form-group">
+                    {{-- <div class="form-group">
                         <label for="category_id">Category</label>
                         <select type="number"
                             class="form-control select2-single ajax-categories  {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
@@ -19,7 +19,7 @@
                                 <strong>{{ $errors->first('category_id') }}</strong>
                             </div>
                         @endif
-                    </div>
+                    </div> --}}
 
 
                     <div class="form-group">
@@ -61,7 +61,7 @@
                         <label for="unit_price">Cost Price</label>
                         <input type="text"
                             class="form-control {{ $errors->has('unit_price') ? ' is-invalid' : '' }}"
-                            name="unit_price" id="unit_price" placeholder="" required="required">
+                            name="unit_price" id="unit_price" placeholder="Optional">
                         @if ($errors->has('unit_price'))
                             <div class="invalid-feedback">
                                 <strong>{{ $errors->first('unit_price') }}</strong>
@@ -82,7 +82,7 @@
                 <i class="ion-android-cart"></i> Supplier Cart: <small>Purchased Products</small>
             </div>
             <div class="card-body table-responsive">
-                @if (Cart::getTotal() < 1)
+                @if (isset($cart_products) && $cart_products->count() < 1)
                     <div class="alert alert-danger">
                         No Product Added
                     </div>
@@ -91,9 +91,10 @@
                         <thead>
                             <tr>
                                 <th>S.N</th>
-                                <th>Name</th>
-                                <th>Unit Price</th>
+                                <th>Code</th>
+                                <th>Description</th>
                                 <th>Qty</th>
+                                <th>Price</th>
                                 <th>Sub Total</th>
                                 <th><span class="ion-ios-trash"></span></th>
                             </tr>
@@ -125,25 +126,24 @@
                             @foreach ($cart_products as $product)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
+                                    <td class="text-left">{{ $product->attributes['code'] }}</td>
                                     <td class="text-left">{{ $product->name }}</td>
-
-
                                     <form action="{{ route('purchase.request.cart.update') }}" method="post"
                                         id="p{{ $product->id }}">
                                         @csrf
                                         @method('PUT')
+                                        <td>
+                                            <input type="text" name="quantity" id="quantity{{ $product->id }}"
+                                                class="form-control quantity" data-value="p{{ $product->id }}"
+                                                style="min-width:58px;" value="{{ $product->quantity }}" min="1"
+                                                required>
+                                        </td>
                                         <td>
                                             <input type="text" name="cost_price" id="price{{ $product->id }}"
                                                 class="form-control price" style="min-width:65px;"
                                                 onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
                                                 value="{{ $product->price }}" data-val="{{ $product->price }}"
                                                 data-value="p{{ $product->id }}">
-                                        </td>
-                                        <td>
-                                            <input type="text" name="quantity" id="quantity{{ $product->id }}"
-                                                class="form-control quantity" data-value="p{{ $product->id }}"
-                                                style="min-width:58px;" value="{{ $product->quantity }}" min="1"
-                                                required>
                                         </td>
                                         <td><span
                                                 class="subtotal{{ $product->id }}">{{ number_format($product->price * $product->quantity, 2) }}</span>
@@ -202,7 +202,7 @@
                                 @foreach ($suppliers as $data)
                                     <option value="{{ $data->id }}"
                                         {{ $data->id == $model->supplier_id ? 'selected' : '' }}>
-                                        {{ $data->name }}</option>
+                                        {{ $data->code }}-{{ $data->name }}</option>
                                 @endforeach
                             @endif
                         </select>
@@ -221,8 +221,8 @@
                             </div>
                         @endif
                     </div>
-                    <div class="form-group">
-                        <label for="purchase_date">Purchase Date</label>
+                    {{-- <div class="form-group">
+                        <label for="purchase_date">Request Date</label>
                         <div class="input-group">
                             <input type="text"
                                 class="form-control datepicker {{ $errors->has('purchase_date') ? ' is-invalid' : '' }}"
@@ -245,8 +245,8 @@
                                 <strong>{{ $errors->first('purchase_date') }}</strong>
                             </div>
                         @endif
-                    </div>
-                    <div class="form-group">
+                    </div> --}}
+                    {{-- <div class="form-group">
                         <label for="vehicle_reg_no">Truck No</label>
                         <input type="text"
                             class="form-control {{ $errors->has('vehicle_reg_no') ? ' is-invalid' : '' }}"
@@ -258,9 +258,9 @@
                                 <strong>{{ $errors->first('vehicle_reg_no') }}</strong>
                             </div>
                         @endif
-                    </div>
+                    </div> --}}
 
-                    <div class="form-group">
+                    {{-- <div class="form-group">
                         <label for="source_store_id">Store</label>
                         <select
                             class="form-control select2-single {{ $errors->has('source_store_id') ? ' is-invalid' : '' }}"
@@ -274,7 +274,7 @@
                                 @endforeach
                             @endif
                         </select>
-                    </div>
+                    </div> --}}
             </div>
             <input type="hidden" name="updated_by" value="{{ Auth::id() }}" />
             <div class="form-group text-right ">

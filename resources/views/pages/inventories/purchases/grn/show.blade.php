@@ -51,9 +51,10 @@
                                     <thead>
                                         <tr>
                                             <th>S/N</th>
+                                            <th>Code</th>
                                             <th>Product</th>
                                             <th>QTY</th>
-                                            <th>Unit Price (&#8358;)</th>
+                                            <th>Price (&#8358;)</th>
                                             <th>Subtotal (&#8358;)</th>
                                             <th>Status</th>
                                         </tr>
@@ -63,6 +64,7 @@
                                         @foreach ($record->purchasedProducts()->get() as $product)
                                             <tr>
                                                 <th>{{ $loop->index + 1 }}</th>
+                                                <td>{{ $product->product->code }}</td>
                                                 <td>{{ $product->product->name }}</td>
                                                 <td>{{ number_format($product->qty_supplied, 0, '', ',') }}</td>
                                                 <td style="text-align: right">{{ number_format($product->unit_price, 2) }}
@@ -76,6 +78,7 @@
                                         @endforeach
                                     </tbody>
                                     <tfoot>
+                                        <th></th>
                                         <th></th>
                                         <th></th>
                                         <th></th>
@@ -96,7 +99,8 @@
                                 <thead>
                                     <tr>
                                         <th>S/N</th>
-                                        <th>Name</th>
+                                        <th>General Account</th>
+                                        <th>Description</th>
                                         <th>Amount</th>
                                         <th>Action</th>
                                     </tr>
@@ -107,7 +111,8 @@
                                         <tr>
                                             @php $total_expense +=$expense->amount; @endphp
                                             <td>{{ $loop->index + 1 }}</td>
-                                            <td>{{ $expense->name }}</td>
+                                            <td>{{ $expense->supplier->name ?? '' }}</td>
+                                            <td>{{ $expense->description }}</td>
                                             <td style="text-align: right;"> {{ number_format($expense->amount, 2) }}</td>
                                             <td style="text-align: right;">
                                                 @if ($record->status == 0)
@@ -116,8 +121,8 @@
                                                         <i class="fa fa-trash" aria-hidden="true"></i>
                                                     </button>
                                                     <form id="delete-form-{{ $expense->id }}"
-                                                        action="{{ route('delete.purchase.expense', $expense->id) }}" method="post"
-                                                        style="display:none;">
+                                                        action="{{ route('delete.purchase.expense', $expense->id) }}"
+                                                        method="post" style="display:none;">
                                                         @csrf
                                                         @method('DELETE')
                                                     </form>
@@ -127,8 +132,9 @@
                                     @endforeach
                                 <tfoot>
                                     <tr>
-                                        <td>Total:</td>
-                                        <td colspan="2" style="text-align: right;">
+                                        <td></td>
+                                        <td colspan="2">Total</td>
+                                        <td style="text-align: right;">
                                             {{ number_format($total_expense, 2) }}</td>
                                         <td></td>
                                     </tr>
@@ -141,7 +147,7 @@
                     <div class="col-md-6">
                         @if ($record->status == 0)
                             <button class="btn btn-primary btn-sm text-right right" data-toggle="modal" id="add-product-btn"
-                                data-target="#add-product-modal"><span class="fa fa-plus-circle"></span> Expense</button>
+                                data-target="#add-product-modal"><span class="fa fa-plus-circle"></span> Add Other Invoice </button>
                         @endif
                     </div>
                 </div>
@@ -154,7 +160,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add Expense</h5>
+                    <h5 class="modal-title">Additional Invoices</h5>
                     <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -166,8 +172,20 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="form-group">
-                                    <label for="name">Name</label>
-                                    <input name="name" id="name" class="form-control" required />
+                                    <label for="name">Account</label>
+                                    <select name="supplier_id" id="supplier_id" class="form-control select2-single" required>
+                                        <option value="">Select...</option>
+                                        @foreach ($suppliers as $supplier)
+                                            <option value="{{ $supplier->id }}">
+                                                {{ $supplier->code }}{{ $supplier->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="description">Description</label>
+                                    <textarea name="description" id="description" class="form-control" required></textarea>
                                 </div>
                             </div>
 
@@ -182,7 +200,7 @@
 
                         <div class="form-group text-right ">
                             <button type="submit" class="btn btn-primary"><span class="fa fa-plus-circle">
-                                </span>Add</button>
+                                </span> Add Invoice</button>
                         </div>
                     </form>
                 </div>
@@ -219,38 +237,39 @@
                 })
             });
 
-           
-        });
-        function deleteItem(id) {
-                const swalWithBootstrapButtons = swal.mixin({
-                    confirmButtonClass: 'btn btn-success',
-                    cancelButtonClass: 'btn btn-danger',
-                    buttonsStyling: false,
-                })
 
-                swalWithBootstrapButtons({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    type: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, delete it!',
-                    cancelButtonText: 'No, cancel!',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.value) {
-                        event.preventDefault();
-                        document.getElementById('delete-form-' + id).submit();
-                    } else if (
-                        // Read more about handling dismissals
-                        result.dismiss === swal.DismissReason.cancel
-                    ) {
-                        swalWithBootstrapButtons(
-                            'Cancelled',
-                            'Your data is safe :)',
-                            'error'
-                        )
-                    }
-                })
-            }
+        });
+
+        function deleteItem(id) {
+            const swalWithBootstrapButtons = swal.mixin({
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+            })
+
+            swalWithBootstrapButtons({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    event.preventDefault();
+                    document.getElementById('delete-form-' + id).submit();
+                } else if (
+                    // Read more about handling dismissals
+                    result.dismiss === swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons(
+                        'Cancelled',
+                        'Your data is safe :)',
+                        'error'
+                    )
+                }
+            })
+        }
     </script>
 @endpush

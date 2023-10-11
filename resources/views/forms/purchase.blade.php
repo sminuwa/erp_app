@@ -9,7 +9,7 @@
                     <input type="hidden" name="purchase_id" value="{{ $model->id }}" />
                     <input type="hidden" name="type" value="{{ $type }}" />
                     @csrf
-                    <div class="form-group">
+                    {{-- <div class="form-group">
                         <label for="category_id">Category</label>
                         <select type="number"
                             class="form-control select2-single ajax-categories  {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
@@ -19,8 +19,7 @@
                                 <strong>{{ $errors->first('category_id') }}</strong>
                             </div>
                         @endif
-                    </div>
-
+                    </div> --}}
 
                     <div class="form-group">
                         <label for="product_id">Product Name</label>
@@ -29,19 +28,19 @@
                             name="product_id" id="product_id" required="required">
                             <option value="">Select...</option>
                             @if (isset($products))
-                                @if (old('category_id', $model->category_id))
+                                {{-- @if (old('category_id', $model->category_id))
                                     @foreach (\App\Models\Product::where('category_id', old('category_id'))->get() as $data)
                                         <option value="{{ $data->id }}"
                                             {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>
                                             {{ $data->name }}</option>
                                     @endforeach
-                                @else
-                                    @foreach ($products as $data)
-                                        <option value="{{ $data->id }}"
-                                            {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>
-                                            {{ $data->name }}</option>
-                                    @endforeach
-                                @endif
+                                @else --}}
+                                @foreach ($products as $data)
+                                    <option value="{{ $data->id }}"
+                                        {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>
+                                        {{ $data->code }}-{{ $data->name }}</option>
+                                @endforeach
+                                {{-- @endif --}}
                             @endif
                         </select>
                     </div>
@@ -91,9 +90,10 @@
                         <thead>
                             <tr>
                                 <th>S.N</th>
-                                <th>Name</th>
-                                <th>Unit Price</th>
+                                <th>Code</th>
+                                <th>Description</th>
                                 <th>Qty</th>
+                                <th>Price</th>
                                 <th>Sub Total</th>
                                 <th><span class="ion-ios-trash"></span></th>
                             </tr>
@@ -125,13 +125,18 @@
                             @foreach ($cart_products as $product)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
+                                    <td class="text-left">{{ $product->attributes['code'] }}</td>
                                     <td class="text-left">{{ $product->name }}</td>
-
-
                                     <form action="{{ route('purchase.cart.update') }}" method="post"
                                         id="p{{ $product->id }}">
                                         @csrf
                                         @method('PUT')
+                                        <td>
+                                            <input type="text" name="quantity" id="quantity{{ $product->id }}"
+                                                class="form-control quantity" data-value="p{{ $product->id }}"
+                                                style="min-width:58px;" value="{{ $product->quantity }}" min="1"
+                                                required>
+                                        </td>
                                         <td>
                                             <input type="text" name="cost_price" id="price{{ $product->id }}"
                                                 class="form-control price" style="min-width:65px;"
@@ -139,17 +144,13 @@
                                                 value="{{ $product->price }}" data-val="{{ $product->price }}"
                                                 data-value="p{{ $product->id }}">
                                         </td>
-                                        <td>
-                                            <input type="text" name="quantity" id="quantity{{ $product->id }}"
-                                                class="form-control quantity" data-value="p{{ $product->id }}"
-                                                style="min-width:58px;" value="{{ $product->quantity }}" min="1"
-                                                required>
-                                        </td>
+
                                         <td><span
                                                 class="subtotal{{ $product->id }}">{{ number_format($product->price * $product->quantity, 2) }}</span>
                                         </td>
                                         <input type="hidden" name="id" class="form-control"
                                             value="{{ $product->id }}">
+                                        
 
                                     </form>
 
@@ -202,7 +203,7 @@
                                 @foreach ($suppliers as $data)
                                     <option value="{{ $data->id }}"
                                         {{ $data->id == $model->supplier_id ? 'selected' : '' }}>
-                                        {{ $data->name }}</option>
+                                        {{ $data->code }}-{{ $data->name }}</option>
                                 @endforeach
                             @endif
                         </select>
@@ -230,7 +231,7 @@
                                 value="{{ $model->purchase_date == null ? date('Y-m-d') : old('purchase_date', $model->purchase_date->format('Y-m-d')) }}"
                                 placeholder="" required="required">
                             <?php date_default_timezone_set('Africa/Lagos'); ?>
-                            <input type="text"
+                            {{-- <input type="text"
                                 class="form-control datetimepicker input-sm {{ $errors->has('purchase_time') ? ' is-invalid' : '' }}"
                                 name="purchase_time" id="purchase_time"
                                 value="{{ $model->purchase_time == null ? date('h:i') : old('purchase_time', $model->purchase_time) }}"
@@ -238,7 +239,7 @@
                             <div class="input-group-addon">
                                 <label for="purchase_date" class="fa fa-calendar">
                                 </label>
-                            </div>
+                            </div> --}}
                         </div>
                         @if ($errors->has('purchase_date'))
                             <div class="invalid-feedback">

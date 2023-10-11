@@ -38,10 +38,10 @@
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         @include('cards.purchase_request')
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-8">
                         <div class="card">
                             <div class="card-header">
                                 Purchased Products 
@@ -51,9 +51,10 @@
                                     <thead>
                                         <tr>
                                             <th>S/N</th>
-                                            <th>Product</th>
+                                            <th>Code</th>
+                                            <th>Description</th>
                                             <th>QTY</th>
-                                            <th>Unit Price (&#8358;)</th>
+                                            <th>Price (&#8358;)</th>
                                             <th>Subtotal (&#8358;)</th>
                                             <th>Status</th>
                                         </tr>
@@ -63,19 +64,21 @@
                                         @foreach ($record->purchasedProducts()->get() as $product)
                                             <tr>
                                                 <th>{{ $loop->index + 1 }}</th>
+                                                <td>{{ $product->product->code }}</td>
                                                 <td>{{ $product->product->name }}</td>
-                                                <td>{{ number_format($product->qty_supplied, 0, '', ',') }}</td>
+                                                <td>{{ number_format($product->quantity, 0, '', ',') }}</td>
                                                 <td style="text-align: right">{{ number_format($product->unit_price, 2) }}
                                                 </td>
                                                 <td style="text-align: right">
-                                                    {{ number_format($product->qty_supplied * $product->unit_price, 2) }}
+                                                    {{ number_format($product->quantity * $product->unit_price, 2) }}
                                                 </td>
-                                                <td>{{ $product->status == 1 ? 'Completed' : 'Cancelled' }}</td>
-                                                @php $total += $product->unit_price * $product->qty_supplied; @endphp
+                                                <td>{{ $product->status == 1 ? 'Completed' : 'Pending' }}</td>
+                                                @php $total += $product->unit_price * $product->quantity; @endphp
                                             </tr>
                                         @endforeach
                                     </tbody>
                                     <tfoot>
+                                        <th></th>
                                         <th></th>
                                         <th></th>
                                         <th></th>

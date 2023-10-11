@@ -68,6 +68,7 @@
                                             </tr>
                                             <tr>
                                                 <th>S.N</th>
+                                                <th>Code</th>
                                                 <th>Name</th>
                                                 <th>Qty</th>
                                                 <th>Source Store</th>
@@ -76,10 +77,11 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($interstore as $product)
+                                            @foreach ($transfer_products as $product)
                                                 <tr>
                                                     @php $attr = $product->attributes @endphp
                                                     <td>{{ $loop->iteration }}</td>
+                                                    <td class="text-left">{{ $product->attributes['code'] }}</td>
                                                     <td class="text-left">{{ $product->name }}</td>
                                                     <td>{{ number_format($product->quantity, 0, '', ',') }}</td>
                                                     <td>{{ \App\Models\Store::find($attr['source_store_id'])->name }}</td>
@@ -169,20 +171,20 @@
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script type="text/javascript">
         $(function() {
-            $(document).on("change", "#category_id,#source_store_id", function(event) {
-                $("#product_id").html(" < option value = '' > Loading... < /option>");
-                $.ajax({
-                    url: "{{ route('ajax.load.available.products') }}",
-                    type: 'GET',
-                    data: {
-                        category_id: $("#category_id").val(),
-                        store_id: $("#source_store_id").val()
-                    }
-                }).done(function(msg) {
+            // $(document).on("change", "#category_id,#source_store_id", function(event) {
+            //     $("#product_id").html(" < option value = '' > Loading... < /option>");
+            //     $.ajax({
+            //         url: "{{ route('ajax.load.available.products') }}",
+            //         type: 'GET',
+            //         data: {
+            //             category_id: $("#category_id").val(),
+            //             store_id: $("#source_store_id").val()
+            //         }
+            //     }).done(function(msg) {
                     
-                    $("#product_id").html("<option value=''>--select--</option>" + msg);
-                });
-            });
+            //         $("#product_id").html("<option value=''>--select--</option>" + msg);
+            //     });
+            // });
 
             $(document).on("change", "#product_id,#source_store_id", function(event) {
                 $.ajax({

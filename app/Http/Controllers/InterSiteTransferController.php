@@ -81,7 +81,7 @@ class InterSiteTransferController extends Controller
     {
         //\Cart::session('_token')->clear();
 
-        $products = Product::select('products.id', 'products.name')
+        $products = Product::select('products.id', 'products.name', 'products.code')
             ->join('store_products', 'store_products.product_id', 'products.id')
             ->where('qty_available', '>', 0)->get();
         $categories = Category::all(['id', 'name']);
@@ -275,7 +275,7 @@ class InterSiteTransferController extends Controller
         try {
             DB::table('stock_cards')->where('refno', $transferproduct->refno)->update(['status' => 0]);
             $transferproduct->fill($request->all());
-            DB::table('stock_cards')->insert(['refno' => $transferproduct->refno], [
+            DB::table('stock_cards')->updateOrInsert(['refno' => $transferproduct->refno], [
                 'store_id' => $transferproduct->source_store_id,
                 'product_id' => $transferproduct->product_id,
                 'cr' => 0,
@@ -357,17 +357,18 @@ class InterSiteTransferController extends Controller
             'destination_store_id' => 'required',
             'qty_transfered' => 'required',
         ]);
-
+        $product = Product::find($request->product_id);
         $add = \Cart::session('_token')->add([
             'id' => $this->generateRandomString(),
-            'name' => Product::find($request->product_id)->name,
+            'name' => $product->name,
             'price' => $request->unit_price,
             //Thos is not applicable here
             'quantity' => $request->qty_transfered,
             'attributes' => array(
                 'source_store_id' => $request->source_store_id,
                 'destination_store_id' => $request->destination_store_id,
-                'product_id' => $request->product_id
+                'product_id' => $request->product_id,
+                'code' => $product->code,
             ),
         ]);
         //dd(\Cart::getContent());
@@ -401,18 +402,24 @@ class InterSiteTransferController extends Controller
     public function loadToCart(TransferProduct $transfer)
     {
         \Cart::session('_token')->clear();
-        foreach ($transfer->transferProducts()->get() as $data) {
-            \Cart::session('_token')->add([
-                'id' => $this->generateRandomString(),
-                'name' => Product::find($data->product_id)->name,
-                'price' => $data->price,
-                'quantity' => $data->quantity,
-                'attributes' => array(
-                    'source_store_id' => $data->source_store_id,
-                    'destination_store_id' => $data->destination_store_id,
-                    'product_id' => $data->product_id,
-                ),
-            ]);
+        foreach ($transfer->transferProducts()->where('type', 'intersite')->get() as $data) {
+            if ($data != null) {
+                $product = Product::find($data->product_id);
+                \Cart::session('_token')->add([
+                    'id' => $this->generateRandomString(),
+                    //$this->generateRandomString(),
+                    'name' => $product->name,
+                    'price' => $data->price,
+                    'quantity' => $data->qty_transfered,
+                    'attributes' => array(
+                        'source_store_id' => $data->source_store_id,
+                        'destination_store_id' => $data->destination_store_id,
+                        'product_id' => $data->product_id ?? 1,
+                        'code' => $product->code,
+                    ),
+                ]);
+            }
+
         }
     }
     public function generateRandomString($length = 5)

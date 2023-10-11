@@ -28,21 +28,45 @@
                 <td>{{ Carbon\Carbon::parse($record->date)->toFormattedDateString() }}</td>
                 <td>{{ $record->reference }}</td>
                 <td>{{ $record->description ?? null }}</td>
-                <td>{!!  $record->status == 0 ? '<span class="badge badge-danger">not posted</span>' : '<span class="badge badge-success">posted</span>' !!}</td>
+                <td>{!!  $record->status == 0 ? '<span class="badge badge-danger">pending</span>' : '<span class="badge badge-success">posted</span>' !!}</td>
                 <td>{{ optional($record->createdBy)->name }}</td>
                 <td align="center">
-                    {{-- <a href="{{ route('interbank.print', $payment->id) }}"
-                        target="_BLANK" class="btn btn-secondary btn-sm">
-                        <i class="fa fa-print" aria-hidden="true"></i>
-                    </a>
-                    <a href="{{ route('interbank.print.pos', $payment->id) }}"
-                        target="_BLANK" class="btn btn-secondary btn-sm">
-                        <i class="fa fa-print" aria-hidden="true">PoS</i>
-                    </a> --}}
-                    <a href="{{ route('journal.show', $record->id) }}"
-                       class="btn btn-primary btn-sm edit">
-                        <i class="fa fa-edit" aria-hidden="true"></i>
-                    </a>
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Action
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a href="{{ route('journal.show', $record->id) }}"
+                               class="dropdown-item">
+                                <i class="fa fa-eye" aria-hidden="true"></i> Open
+                            </a>
+                            <a href="{{ route('journal.print', $record->id) }}" target="_blank"
+                               class="dropdown-item" >
+                                <i class="fa fa-print" aria-hidden="true"></i> Print
+                            </a>
+                            @if($record->status == 0)
+                                <a href="{{ route('journal.post',$record->id) }}"
+                                   onclick="return confirm('Are you sure you want to post this journal?');"
+                                   class="dropdown-item">
+                                    <i class="fa fa-check" aria-hidden="true"></i> Post
+                                </a>
+                                <a href="{{ route('journal.edit',$record->id) }}"
+                                   class="dropdown-item">
+                                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                </a>
+                                <a href="{{ route('journal.delete',$record->id) }}"
+                                   onclick="return confirm('Are you sure you want to delete this journal?');"
+                                   class="dropdown-item">
+                                    <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                </a>
+                            @else
+                                <a href="{{ route('journal.reverse',$record->id) }}"
+                                   class="dropdown-item">
+                                    <i class="fa fa-reply" aria-hidden="true"></i> Reverse
+                                </a>
+                            @endif
+                        </div>
+                    </div>
 
                 </td>
             </tr>

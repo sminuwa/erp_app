@@ -1,6 +1,6 @@
 @extends('layouts.backend.app')
 
-@section('title', 'Journals')
+@section('title', 'Journal')
 
 @push('css')
 @endpush
@@ -15,7 +15,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>New Journal </h4>
+                        <h4>Edit Journal </h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -37,7 +37,7 @@
                 <span class="fa fa-list"></span> Journals List
             </a>
             <div class="container-fluid py-4">
-                <livewire:show-journal :journal="$journal" />
+                <livewire:edit-journal :journal="$journal" />
             </div><!-- /.container-fluid -->
         </section>
         <!-- /.content -->

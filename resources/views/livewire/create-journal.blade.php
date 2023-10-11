@@ -38,7 +38,7 @@
                                        <td>
                                            <div class="col-12">
                                                <div class="form-group">
-                                                   <select  wire:model="type.{{ $value }}" wire:change="changeTypeEvent($event.target.value)" class="form-control select2-single" required>
+                                                   <select  wire:model="type.{{ $value }}" wire:change="changeTypeEvent({{$value}})" class="form-control select2-single" required>
                                                        <option value="">Select...</option>
                                                        <option value="Customer">Customer</option>
                                                        <option value="Supplier">Supplier

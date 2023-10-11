@@ -35,6 +35,14 @@ class Journal extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function postedBy(){
+        return $this->belongsTo(User::class, 'posted_by');
+    }
+
+    public function modifiedBy(){
+        return $this->belongsTo(User::class, 'modified_by');
+    }
+
     public function items(){
         return $this->hasMany(JournalItem::class, 'journal_id');
     }

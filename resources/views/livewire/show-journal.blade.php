@@ -53,7 +53,7 @@
                                         <td>{{ $journal_item->debit }}</td>
                                         <td>{{ $journal_item->credit }}</td>
                                         <td>{{ $journal_item->description }}</td>
-                                        <td>{!!  $journal->status == 0 ? '<span class="badge badge-danger">not posted</span>' : '<span class="badge badge-success">posted</span>' !!}</td>
+                                        <td>{!!  $journal->status == 0 ? '<span class="badge badge-danger">pending</span>' : '<span class="badge badge-success">posted</span>' !!}</td>
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -67,9 +67,15 @@
                             </h4>
                         </div>
                         <div class="col-md-12 mt-3">
+                            <a href="{{ route('journal.print', $journal->id) }}" target="_blank" class="btn btn-dark btn-sm"><i class="fa fa-print"></i> Print</a>
                             @if($journal->status == 0)
-                                <a href="{{ route('journal.post', $journal->id) }}"  class="btn btn-success btn-sm">Edit</a>
-                                <a href="{{ route('journal.post', $journal->id) }}"  class="btn btn-primary btn-sm">Post</a>
+                                <a href="{{ route('journal.post', $journal->id) }}"
+                                   onclick="return confirm('Are you sure you want to post this journal?');"
+                                   class="btn btn-primary btn-sm"><i class="fa fa-check"></i> Post</a>
+                                <a href="{{ route('journal.edit', $journal->id) }}"  class="btn btn-success btn-sm"><i class="fa fa-edit"></i> Edit</a>
+                                <a href="{{ route('journal.delete', $journal->id) }}"
+                                   onclick="return confirm('Are you sure you want to delete this journal?');"
+                                   class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Delete</a>
                             @else
                                 <a href="{{ route('journal.reverse', $journal->id) }}"  class="btn btn-success btn-sm">Reverse</a>
                             @endif

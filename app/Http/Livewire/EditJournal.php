@@ -3,18 +3,15 @@
 namespace App\Http\Livewire;
 
 use App\Models\Customer;
-use App\Models\Supplier;
-use Livewire\Attributes\Rule;
 use App\Models\GeneralAccount;
 use App\Models\JournalItem;
+use App\Models\Supplier;
 use Livewire\Component;
 
-
-class CreateJournal extends Component
+class EditJournal extends Component
 {
 
-
-    public $accounts;
+    public $accounts, $journal;
     public $journal_date, $description;
     public $type, $account, $debit, $credit, $desc, $result;
     public $total_credit = 0, $total_debit = 0;
@@ -22,7 +19,6 @@ class CreateJournal extends Component
     public $inputs = [];
     public $i = 1;
 
-    protected $listeners = ['accounts' => 'changeTypeEvent'];
 
     public function add($i)
     {
@@ -40,8 +36,21 @@ class CreateJournal extends Component
 
     public function render()
     {
-//        $this->accounts = GeneralAccount::all();
-        return view('livewire.create-journal');
+        $this->description = $this->journal->description;
+        $this->date = $this->journal->date;
+        foreach($this->journal->items as $items){
+            $this->i++;
+            array_push($this->inputs ,$this->i);
+            $this->type[$this->i] = $items->account_type;
+            $this->account[$this->i] = $items->account_id;
+            $this->credit[$this->i] = $items->credit;
+            $this->debit[$this->i] = $items->debit;
+            $this->desc[$this->i] = $items->description;
+            $this->changeTypeEvent($this->i);
+
+        }
+
+        return view('livewire.edit-journal');
     }
 
     public function totals(){
@@ -58,15 +67,12 @@ class CreateJournal extends Component
 
     public function changeTypeEvent($value)
     {
-        $this->result = $value;
-//        foreach ($this->type as $key => $val) {
-            if ($this->type[$value] == 'Customer')
-                $this->accounts[$value] = Customer::where('branch_id', auth()->user()->branch->id)->orderBy('code', 'asc')->get();
-            if ($this->type[$value]  == 'Supplier')
-                $this->accounts[$value] = Supplier::orderBy('code', 'asc')->get();
-            if ($this->type[$value]  == 'GeneralAccount')
-                $this->accounts[$value] = GeneralAccount::orderBy('number', 'asc')->get();
-//        }
+        if ($this->type[$value] == 'Customer')
+            $this->accounts[$value] = Customer::where('branch_id', auth()->user()->branch->id)->orderBy('code', 'asc')->get();
+        if ($this->type[$value]  == 'Supplier')
+            $this->accounts[$value] = Supplier::orderBy('code', 'asc')->get();
+        if ($this->type[$value]  == 'GeneralAccount')
+            $this->accounts[$value] = GeneralAccount::orderBy('number', 'asc')->get();
     }
 
     private function resetInputFields(){

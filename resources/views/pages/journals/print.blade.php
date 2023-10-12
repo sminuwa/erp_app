@@ -56,7 +56,7 @@
                     </div>
                 </div>
                 <div>
-                    <h4 style="text-align: center;font-weight:700">Accounts</h4>
+                    <h4 style="text-align: center;font-weight:700">Entry Details</h4>
                     <table class="table">
                         <thead>
                         <tr>
@@ -65,7 +65,6 @@
                             <th>Debit</th>
                             <th>Credit</th>
                             <th>Description</th>
-                            <th>Status</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -82,7 +81,6 @@
                                 <td>{{ $journal_item->debit }}</td>
                                 <td>{{ $journal_item->credit }}</td>
                                 <td>{{ $journal_item->description }}</td>
-                                <td>{!!  $journal->status == 0 ? '<span class="badge badge-danger">pending</span>' : '<span class="badge badge-success">posted</span>' !!}</td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -91,7 +89,8 @@
                         <h4 class="text-bold">
                             <small>Total Credit:</small> N{{ $total_credit }} <br>
                             <small>Total Debit:</small> N{{ $total_debit }} <br>
-                            <small>Balance:</small> N{{ $total_credit-$total_debit }}
+                            <small>Balance:</small> N{{ $total_credit-$total_debit }} <br>
+                            <b>Status :</b> {!!  $journal->status == 0 ? '<span class="badge badge-danger">pending</span>' : '<span class="badge badge-success">posted</span>' !!}
                         </h4>
                     </div>
                 </div>
@@ -100,10 +99,11 @@
                     <div class="receipt-header receipt-header-mid receipt-footer">
                         <div class="col-xs-10 col-sm-10 col-md-10 text-left">
                             <div class="receipt-right">
+
                                 <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
                                 <p><b>Created By :</b> {{ $journal->createdBy->name ?? null }}</p>
                                 <p><b>Posted By :</b> {{ $journal->postedBy->name ?? null }}</p>
-                                <p><b>Modified By :</b> {{ $journal->modifiedBy->name ?? null }}</p>
+                                <p><b>Modified By :</b> {{ $journal->updatedBy->name ?? null }}</p>
                                 <p><b>Printed By :</b> {{ Auth::user()->name }}</p><br>
 
                                 <p><b>Signatire :</b> ______________________________________</p>

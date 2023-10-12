@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\Customer;
 use App\Models\Supplier;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Rule;
 use App\Models\GeneralAccount;
 use App\Models\JournalItem;
@@ -13,24 +14,24 @@ use Livewire\Component;
 class CreateJournal extends Component
 {
 
+    public $readyToLoad = false;
 
     public $accounts;
+    public $customers, $suppliers, $gls;
     public $journal_date, $description;
     public $type, $account, $debit, $credit, $desc, $result;
     public $total_credit = 0, $total_debit = 0;
     public $updateMode = false;
-    public $inputs = [];
+    public $inputs = [], $items =  [];
     public $i = 1;
 
     protected $listeners = ['accounts' => 'changeTypeEvent'];
 
-    public function add($i)
+    public function add()
     {
-        $i = $i + 1;
-        $this->i = $i;
-        array_push($this->inputs ,$i);
-        $this->debit[$i] = 0.00;
-        $this->credit[$i] = 0.00;
+        $this->inputs[] = '';
+        $this->debit[] = 0.00;
+        $this->credit[] = 0.00;
     }
 
     public function remove($i)
@@ -40,7 +41,10 @@ class CreateJournal extends Component
 
     public function render()
     {
-//        $this->accounts = GeneralAccount::all();
+        $this->customers = Customer::where('branch_id', auth()->user()->branch->id)->orderBy('code', 'asc')->get();
+        $this->suppliers = Supplier::orderBy('code', 'asc')->get();
+        $this->gls = GeneralAccount::orderBy('number', 'asc')->get();
+
         return view('livewire.create-journal');
     }
 
@@ -61,11 +65,11 @@ class CreateJournal extends Component
         $this->result = $value;
 //        foreach ($this->type as $key => $val) {
             if ($this->type[$value] == 'Customer')
-                $this->accounts[$value] = Customer::where('branch_id', auth()->user()->branch->id)->orderBy('code', 'asc')->get();
+                $this->accounts[$value] = $this->customers;
             if ($this->type[$value]  == 'Supplier')
-                $this->accounts[$value] = Supplier::orderBy('code', 'asc')->get();
+                $this->accounts[$value] = $this->suppliers;
             if ($this->type[$value]  == 'GeneralAccount')
-                $this->accounts[$value] = GeneralAccount::orderBy('number', 'asc')->get();
+                $this->accounts[$value] = $this->gls;
 //        }
     }
 
@@ -95,28 +99,31 @@ class CreateJournal extends Component
                     'credit.*' => 'credit field is required',
                 ]
             );
-
+            DB::beginTransaction();
             $journal = new \App\Models\Journal();
             $journal->reference = \App\Models\Journal::generateNewNumber();
             $journal->description = $this->description;
             $journal->date = $this->journal_date;
             $journal->created_by = auth()->id();
             if($journal->save()){
-                foreach ($this->type as $key => $value) {
-                    JournalItem::create([
+                foreach ($this->inputs as $key => $value) {
+                    $this->items[] = [
                         'journal_id' =>$journal->id,
                         'account_type' =>$this->type[$key],
                         'account_id' =>$this->account[$key],
                         'credit' =>$this->credit[$key],
                         'debit' =>$this->debit[$key],
-                        'description' =>$this->desc[$key],
-                    ]);
+                        'description' =>$this->desc[$key] ?? null,
+                    ];
                 }
             }
-
-            $this->inputs = [];
-            $this->resetInputFields();
-
+            if(JournalItem::upsert($this->items, ['journal_id', 'account_id'])){
+                DB::commit();
+                $this->inputs = [];
+                $this->resetInputFields();
+            }else{
+                DB::rollback();
+            }
             session()->flash('message', 'Journal created Successfully.');
             return $this->redirect(route('journal.index'));
         }catch (\Exception $e){

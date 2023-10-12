@@ -14,6 +14,7 @@ use Livewire\Component;
 class CreateJournal extends Component
 {
 
+    public $readyToLoad = false;
 
     public $accounts;
     public $customers, $suppliers, $gls;

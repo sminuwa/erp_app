@@ -11,6 +11,8 @@ use Livewire\Component;
 class EditJournal extends Component
 {
 
+    public $readyToLoad = false;
+
     public $accounts, $journal;
     public $customers, $suppliers, $gls;
     public $journal_date, $description;

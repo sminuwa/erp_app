@@ -56,7 +56,7 @@
                     </div>
                 </div>
                 <div>
-                    <h4 style="text-align: center;font-weight:700">Accounts</h4>
+                    <h4 style="text-align: center;font-weight:700">Entry Details</h4>
                     <table class="table">
                         <thead>
                         <tr>

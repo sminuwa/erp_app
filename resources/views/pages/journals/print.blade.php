@@ -102,7 +102,7 @@
                                 <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
                                 <p><b>Created By :</b> {{ $journal->createdBy->name ?? null }}</p>
                                 <p><b>Posted By :</b> {{ $journal->postedBy->name ?? null }}</p>
-                                <p><b>Updated By :</b> {{ $journal->updatedBy->name ?? null }}</p>
+                                <p><b>Modified By :</b> {{ $journal->updatedBy->name ?? null }}</p>
                                 <p><b>Printed By :</b> {{ Auth::user()->name }}</p><br>
 
                                 <p><b>Signatire :</b> ______________________________________</p>

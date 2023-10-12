@@ -137,4 +137,5 @@ class EditJournal extends Component
         }
 
     }
+
 }

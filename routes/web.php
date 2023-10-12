@@ -309,7 +309,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/order-invoice/delete/{order}', [OrderController::class, 'destroy_order_invoice'])->name('order.invoice.destroy');
         Route::delete('/proformer-invoice/delete/{order}', [OrderController::class, 'destroy_proformer'])->name('proformer.destroy');
         Route::get('/download/{id}', [OrderController::class, 'download'])->name('orders.download');
-        Route::get('/payment/print/{id}', [OrderController::class, 'printPayment'])->name('payment.print');
+        Route::get('/payment/print/{id}', [OrderController::class, 'printPayment'])->name('orders.payment.print');
         Route::post('/order/edit{order}', [OrderController::class, 'edit'])->name('orders.edit');
         Route::get('/load/', [OrderController::class, 'load'])->name('orders.load');
         Route::get('/edit', [OrderController::class, 'loadEdit'])->name('orders.detail.edit');
@@ -384,8 +384,8 @@ Route::middleware('auth')->group(function () {
             Route::delete('/destroy/{ledger}', [InterBankController::class, 'destroy'])->name('interbank.destroy');
             Route::put('/update/{ledger}', [InterBankController::class, 'update'])->name('interbank.update');
             Route::post('/search', [InterBankController::class, 'search'])->name('interbank.search');
-            Route::get('/print/receipt/{ledger}', [InterBankController::class, 'print'])->name('interbank.print');
-            Route::get('/print/receipt/pos/{ledger}', [InterBankController::class, 'printPos'])->name('interbank.print.pos');
+            Route::get('/print/interbank/{ledger}', [InterBankController::class, 'print'])->name('interbank.print');
+            Route::get('/print/interbank/pos/{ledger}', [InterBankController::class, 'printPos'])->name('interbank.print.pos');
         }
     );
     Route::group(
@@ -397,8 +397,8 @@ Route::middleware('auth')->group(function () {
             Route::delete('/destroy/{ledger}', [PaymentController::class, 'deletePayment'])->name('payment.destroy');
             Route::put('/update/{ledger}', [PaymentController::class, 'updateReceipt'])->name('payment.update');
             Route::post('/search', [PaymentController::class, 'search'])->name('payment.search');
-            Route::get('/print/receipt/{payment}', [PaymentController::class, 'printPaymentReceipt'])->name('payment.print');
-            Route::get('/print/receipt/pos/{payment}', [PaymentController::class, 'printPoSPaymentReceipt'])->name('payment.print.pos');
+            Route::get('/print/payment/{payment}', [PaymentController::class, 'printPaymentReceipt'])->name('payment.print');
+            Route::get('/print/payment/pos/{payment}', [PaymentController::class, 'printPoSPaymentReceipt'])->name('payment.print.pos');
             Route::get('/reverse/{payment}', [PaymentController::class, 'reverse'])->name('payment.reverse');
         }
     );
@@ -756,7 +756,7 @@ Route::middleware('auth')->group(function () {
 
 
             //Begin Customer Sales Analysis Report
-    
+
             //Customer Debt Report
             Route::get('/ca/customer/debt', [ReportController::class, 'customerDebtReport'])->name('customer.total.debt.reports');
             Route::get('/ca/customer/debt/load', [ReportController::class, 'loadCustomerDebtReport'])->name('ajax.load.customer.total.debt.reports');
@@ -836,7 +836,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/activity/load/logs/print/{from_date}/{to_date}/{user_id}', [ReportController::class, 'printLogs'])->name('user.activity.logs.print');
 
             //User Ledger and Loans
-    
+
             //Loan Balances
             Route::get('/us/user/balance', [ReportController::class, 'loanBalance'])->name('user.loan.balance.report');
             Route::get('/us/user/balance/load', [ReportController::class, 'loadLoanBalance'])->name('ajax.load.user.loan.balance.report');

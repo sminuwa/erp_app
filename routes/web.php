@@ -381,11 +381,13 @@ Route::middleware('auth')->group(function () {
             Route::get('/list', [InterBankController::class, 'list'])->name('interbank.list');
             Route::get('/create', [InterBankController::class, 'create'])->name('create.interbank');
             Route::post('/store', [InterBankController::class, 'store'])->name('interbank.store');
-            Route::delete('/destroy/{ledger}', [InterBankController::class, 'destroy'])->name('interbank.destroy');
-            Route::put('/update/{ledger}', [InterBankController::class, 'update'])->name('interbank.update');
+            Route::delete('/destroy/{interbank}', [InterBankController::class, 'destroy'])->name('interbank.destroy');
+            Route::get('/delete/{interbank}', [InterBankController::class, 'destroy'])->name('interbank.delete');
+            Route::put('/update/{interbank}', [InterBankController::class, 'update'])->name('interbank.update');
             Route::post('/search', [InterBankController::class, 'search'])->name('interbank.search');
-            Route::get('/print/interbank/{ledger}', [InterBankController::class, 'print'])->name('interbank.print');
-            Route::get('/print/interbank/pos/{ledger}', [InterBankController::class, 'printPos'])->name('interbank.print.pos');
+            Route::get('/print/interbank/{interbank}', [InterBankController::class, 'print'])->name('interbank.print');
+            Route::get('/print/interbank/pos/{interbank}', [InterBankController::class, 'printPos'])->name('interbank.print.pos');
+            Route::get('/reverse/{interbank}', [ReceiptController::class, 'reverse'])->name('interbank.reverse');
         }
     );
     Route::group(

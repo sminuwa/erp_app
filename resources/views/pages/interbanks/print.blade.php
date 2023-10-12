@@ -30,9 +30,6 @@
                         <div class="col-xs-6 col-sm-6 col-md-6 text-right">
                             <div class="receipt-right">
                                 <h5>AL-BABELLO</h5>
-                                <p>{{ optional($payment->customer)->branch->address }} <i class="fa fa-location-arrow"></i></p>
-                                <p>{{ optional($payment->customer)->branch->email }}<i class="fa fa-envelope-o"></i></p>
-                                <p>{{ optional($payment->customer)->branch->phone }} <i class="fa fa-phone"></i></p>
                             </div>
                         </div>
                     </div>
@@ -42,58 +39,63 @@
                     <div class="receipt-header receipt-header-mid">
                         <div class="col-xs-7 col-sm-7 col-md-7 text-left">
                             <div class="receipt-right">
-                                <h5>Payment From</h5>
-                                <p><b>{{ $payment->customer->name }} </b></p>
-                                <p><b>Mobile :</b> {{ $payment->customer->phone }}</p>
-                                <p><b>Address :</b> {{ $payment->customer->address }}</p>
+                                <h5>Interbank</h5>
                             </div>
                         </div>
                         <div class="col-xs-5 col-sm-5 col-md-5">
                             <div class="receipt-right">
-                                <p><b>Receipt No: {{ $payment->receipt_no }}</b></p>
+                                <p><b>Reference: {{ $interbank->reference }}</b></p>
                                 <p><b>Payment Date:
-                                        {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}</b></p>
+                                        {{ \Carbon\Carbon::parse($interbank->date)->toFormattedDateString() }}</b></p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div>
-                    <h4 style="text-align: center;font-weight:700">PAYMENT RECEIPT</h4>
+                    <h4 style="text-align: center;font-weight:700">INTER-BANK</h4>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Description</th>
+                                <th width="40%">Source</th>
+                                <th width="40%">Destination</th>
                                 <th>Amount</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td class="col-md-9">
-                                    @if ($payment->description == null)
-                                    Payment for {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
+                                    @if ($interbank->source_account() == null)
+                                    Payment for {{ \Carbon\Carbon::parse($interbank->date)->toFormattedDateString() }}
                                     @else
-                                        {{ $payment->description }}
+                                        {{ $interbank->source_account()->number }} - {{ $interbank->source_account()->description }}
+                                    @endif
+                                </td>
+                                <td class="col-md-9">
+                                    @if ($interbank->destination_account() == null)
+                                        Payment for {{ \Carbon\Carbon::parse($interbank->date)->toFormattedDateString() }}
+                                    @else
+                                        {{ $interbank->destination_account()->number }} - {{ $interbank->destination_account()->description }}
                                     @endif
                                 </td>
                                 <td class="col-md-3" align="right"><i class="fa fa-inr"></i>
-                                    &#8358; {{ number_format($payment->amount, 2) }}</td>
+                                    &#8358; {{ number_format($interbank->amount, 2) }}</td>
                             </tr>
                             <tr>
                                 <td class="text-right">
                                     <p>
                                         <strong>Amount: </strong>
                                     </p>
-            
+
                                 </td>
                                 <td align="right">
                                     <p>
                                         <strong><i
-                                                class="fa fa-inr"></i>{{ number_format($payment->amount, 2) }}</strong>
+                                                class="fa fa-inr"></i>{{ number_format($interbank->amount, 2) }}</strong>
                                     </p>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="text-left text-danger" colspan="2">
+                                <td class="text-left text-danger" colspan="3">
                                     <p>
                                         <strong>Amount in ward: </strong>
 
@@ -101,7 +103,7 @@
                                             $obj = new App\Models\Utility();
                                         @endphp
                                         <strong><i class="fa fa-inr"></i>
-                                            {{ $obj->convertNumberToWords($payment->amount) }}</strong>
+                                            {{ $obj->convertNumberToWords($interbank->amount) }}</strong>
                                     </p>
                                 </td>
                             </tr>
@@ -114,7 +116,6 @@
                         <div class="col-xs-10 col-sm-10 col-md-10 text-left">
                             <div class="receipt-right">
                                 <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
-                                <p><b>Collected By :</b> {{ $payment->user?->name }}</p>
                                 <p><b>Printed By :</b> {{ Auth::user()->name }}</p><br>
 
                                 <p><b>Signatire :</b> ______________________________________</p>
@@ -127,9 +128,9 @@
                         <div class="col-xs-2 col-sm-2 col-md-2 text-right">
                             <div class="receipt-left">
                                 @php
-                                    $uc = $payment->receipt_no;
+                                    $uc = $interbank->reference;
                                 @endphp
-                                {{ QrCode::size(70)->backgroundColor(255, 55, 0)->generate("$payment->dr\n$uc\n\n.") }}<br />
+                                {{ QrCode::size(70)->backgroundColor(255, 55, 0)->generate("$interbank->dr\n$uc\n\n.") }}<br />
                             </div>
                         </div>
                     </div>

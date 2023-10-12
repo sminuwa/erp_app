@@ -90,13 +90,26 @@ class InterBankController extends Controller
         }
 
         return redirect()->back()->with(['prev_id' => $ledger_id]);
-    } /**
-      * Show the form for editing the specified resource.
-      *
-      * @param  Edit  $request
-      * @param  Branch  $branch
-      * @return \Illuminate\Http\Response
-      */
+    }
+
+
+    public function reverse(interbank $interbank) {
+        $interbank->status = 0;
+        if($interbank->save()){
+            Transaction::reversal($interbank->receipt_no);
+        }
+        return back();
+    }
+
+    public function print(InterBank $interbank)
+    {
+        return view('pages.interbanks.print', ['interbank' => $interbank, 'setting' => Setting::first()]);
+    }
+    public function printPoS(InterBank $interbank)
+    {
+        return view('pages.interbanks.print_pos', ['interbank' => $interbank, 'setting' => Setting::first()]);
+    }
+
     public function edit(Edit $request, InterBank $interBank)
     {
 
@@ -104,13 +117,8 @@ class InterBankController extends Controller
             'model' => $interBank,
 
         ]);
-    } /**
-      * Update a existing resource in storage.
-      *
-      * @param  Update  $request
-      * @param  Branch  $branch
-      * @return \Illuminate\Http\Response
-      */
+    }
+
     public function update(Update $request, Branch $branch)
     {
 
@@ -133,14 +141,15 @@ class InterBankController extends Controller
 
         return redirect()->back();
     }
-    public function printPaymentReceipt(InterBank $payment)
+
+    /*public function printPaymentReceipt(InterBank $payment)
     {
         return view('pages.payments.print_payment', ['payment' => $payment, 'setting' => Setting::first()]);
     }
     public function printPoSPaymentReceipt(InterBank $payment)
     {
         return view('pages.payments.print_pos_payment', ['payment' => $payment, 'setting' => Setting::first()]);
-    }
+    }*/
     public function generateReceiptNo()
     {
         $invoice = DB::table('general_account_ledgers')->select(DB::raw('MAX(SUBSTR(receipt_no,8,17)) as max'))->where(DB::raw('SUBSTR(receipt_no,1,3)'), '=', 'RCT')->where(DB::raw('YEAR(created_at)'), '=', date('Y'))->first();

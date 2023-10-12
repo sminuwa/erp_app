@@ -40,4 +40,12 @@ class InterBank extends Model
         return $prefix.str_pad(1, $length,0,STR_PAD_LEFT);
     }
 
+    public function source_account(){
+            return GeneralAccount::find($this->source_account_id);
+    }
+
+    public function destination_account(){
+            return GeneralAccount::find($this->destination_account_id);
+    }
+
 }

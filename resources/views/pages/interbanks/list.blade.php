@@ -104,25 +104,25 @@
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            <a href="{{ route('receipt.payment.print', $payment->id) }}"
+                                                            <a href="{{ route('interbank.print', $payment->id) }}"
                                                                class="dropdown-item">
                                                                 <i class="fa fa-print" aria-hidden="true"></i> Print
                                                             </a>
-                                                            <a href="{{ route('receipt.payment.print.pos', $payment->id) }}"
+                                                            <a href="{{ route('interbank.print.pos', $payment->id) }}"
                                                                class="dropdown-item">
                                                                 <i class="fa fa-print" aria-hidden="true"></i> PoS
                                                             </a>
                                                             @if($payment->status == 0)
-                                                                <a href="{{ route('create.payment.reciept', ['receipt_id'=>$payment->id]) }}"
+                                                                <a href="{{ route('interbank.update', ['receipt_id'=>$payment->id]) }}"
                                                                    class="dropdown-item">
                                                                     <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                                                 </a>
-                                                                <a href="{{ route('create.payment.reciept', ['receipt_id'=>$payment->id]) }}"
+                                                                <a href="{{ route('interbank.delete', ['receipt_id'=>$payment->id]) }}"
                                                                    class="dropdown-item">
                                                                     <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                                                 </a>
                                                             @else
-                                                                <a href="{{ route('receipt.payment.reverse',[$payment->id]) }}"
+                                                                <a href="{{ route('interbank.reverse',[$payment->id]) }}"
                                                                    class="dropdown-item">
                                                                     <i class="fa fa-reply" aria-hidden="true"></i> Reverse
                                                                 </a>

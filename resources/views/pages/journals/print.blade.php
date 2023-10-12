@@ -98,11 +98,11 @@
                     <div class="receipt-header receipt-header-mid receipt-footer">
                         <div class="col-xs-10 col-sm-10 col-md-10 text-left">
                             <div class="receipt-right">
-                                <p><b>Status :</b> <td>{!!  $journal->status == 0 ? '<span class="badge badge-danger">pending</span>' : '<span class="badge badge-success">posted</span>' !!}</td></p>
+                                <p class="h1"><b>Status :</b> {!!  $journal->status == 0 ? '<span class="badge badge-danger">pending</span>' : '<span class="badge badge-success">posted</span>' !!}</p>
                                 <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
                                 <p><b>Created By :</b> {{ $journal->createdBy->name ?? null }}</p>
                                 <p><b>Posted By :</b> {{ $journal->postedBy->name ?? null }}</p>
-                                <p><b>Modified By :</b> {{ $journal->modifiedBy->name ?? null }}</p>
+                                <p><b>Updated By :</b> {{ $journal->updatedBy->name ?? null }}</p>
                                 <p><b>Printed By :</b> {{ Auth::user()->name }}</p><br>
 
                                 <p><b>Signatire :</b> ______________________________________</p>

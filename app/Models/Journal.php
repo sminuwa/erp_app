@@ -39,8 +39,8 @@ class Journal extends Model
         return $this->belongsTo(User::class, 'posted_by');
     }
 
-    public function modifiedBy(){
-        return $this->belongsTo(User::class, 'modified_by');
+    public function updatedBy(){
+        return $this->belongsTo(User::class, 'updated_by');
     }
 
     public function items(){

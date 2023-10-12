@@ -32,6 +32,7 @@ class JournalController extends Controller
     public function post(Journal $journal){
         DB::beginTransaction();
         $journal->status = 1;
+        $journal->posted_by = auth()->id();
         if($journal->save()){
 //            if(Transaction::journal('','','','','')) {
                 DB::commit();

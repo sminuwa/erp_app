@@ -976,6 +976,7 @@ Route::middleware('auth')->group(function () {
                 Route::post('/store', [InterSiteTransferController::class, 'store'])->name('intersite.store');
                 Route::get('/edit/{intersiteTransfer}', [InterSiteTransferController::class, 'edit'])->name('intersite.edit');
                 Route::put('/update/{intersiteTransfer}', [InterSiteTransferController::class, 'update'])->name('intersite.update');
+                Route::put('/approve/{intersiteTransfer}', [InterSiteTransferController::class, 'approve'])->name('intersite.approve');
                 Route::delete('/delete/{intersiteTransfer}', [InterSiteTransferController::class, 'destroy'])->name('intersite.destroy');
                 Route::post('/cart', [InterSiteTransferController::class, 'addToCart'])->name('intersite.cart');
                 Route::delete('/remove/{id}', [InterSiteTransferController::class, 'removeCart'])->name('intersite.cart.remove');

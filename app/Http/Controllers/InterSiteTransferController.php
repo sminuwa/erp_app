@@ -121,7 +121,7 @@ class InterSiteTransferController extends Controller
                 foreach (\Cart::session('_token')->getContent() as $product) {
                     $attribute = $product->attributes;
                     $source_store_id = $attribute['source_store_id'];
-                    
+
                     $product_id = $attribute['product_id'];
 
                     DB::table('intersite_transfer_products')->insert([
@@ -252,19 +252,16 @@ class InterSiteTransferController extends Controller
       * @return \Illuminate\Http\Response
       * @throws \Exception
       */
-    public function destroy(Destroy $request, TransferProduct $transferproduct)
+    public function destroy(Destroy $request, IntersiteTransfer $intersiteTransfer)
     {
 
         DB::beginTransaction();
         try {
-            $all_transfers = TransferProduct::where('transfer_id', $transferproduct->transfer_id)->get();
-            foreach ($all_transfers as $transfer) {
-                DB::table('store_products')->where(['store_id' => $transfer->source_store_id, 'product_id' => $transfer->product_id])->increment('qty_available', $transfer->qty_transfered);
-                DB::table('store_products')->where(['store_id' => $transfer->destination_store_id, 'product_id' => $transfer->product_id])->decrement('qty_available', $transfer->qty_transfered);
-                DB::table('transfer_products')->where('id', $transfer->id)->delete();
-            }
+            $reference_no = $intersiteTransfer->reference_no;
+           DB::table('intersite_transfer_products')->where('intersite_transfer_id',$intersiteTransfer->id)->delete();
+           DB::table('intersite_transfers')->where('id',$intersiteTransfer->id)->delete();
             session()->flash('app_message', 'Stock transfer cancelled successfully');
-            $action = "Deleted stock transfer made from " . Store::find($transfer->source_store_id)->name . " to " . Store::find($transfer->destination_store_id)->name;
+            $action = "Deleted stock transfer request with reference no " . $reference_no;
             AuditLog::auditLog(Auth::id(), $action);
             DB::commit();
         } catch (\Exception $ex) {
@@ -368,5 +365,10 @@ class InterSiteTransferController extends Controller
     public function printStockTransfer($transfer_id)
     {
         return view('pages.inventories.transfers.inter_site.print')->with(['transfers' => TransferProduct::where(['transfer_id' => $transfer_id, 'stock_in_out' => 'out'])->get()]);
+    }
+    public function approve(IntersiteTransfer $intersiteTransfer)
+    {
+        echo "Waiting for function to call\n";
+        return $intersiteTransfer;
     }
 }

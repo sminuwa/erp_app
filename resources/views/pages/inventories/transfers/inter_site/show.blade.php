@@ -51,10 +51,10 @@
                                         <div class="btn-group">
                                             @if ($record->status == 'Pending')
                                                 <form onsubmit="return confirm('Are you sure you want to approve?')"
-                                                    action="{{ route('purchase.request.approve', $record->id) }}"
+                                                    action="{{ route('intersite.approve', $record->id) }}"
                                                     method="post" style="display: inline">
                                                     {{ csrf_field() }}
-                                                    {{ method_field('POST') }}
+                                                    {{ method_field('PUT') }}
                                                     <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
                                                         <i class="text-white fa fa-check"> Approve</i>
                                                     </button>

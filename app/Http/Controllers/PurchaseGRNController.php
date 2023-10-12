@@ -47,7 +47,7 @@ class PurchaseGRNController extends Controller
     {
         \Cart::clear();
         return view('pages.inventories.purchases.grn.index', [
-            'records' => Purchase::select('purchases.*')->orderBy('purchase_date', 'DESC')
+            'records' => Purchase::select('purchases.*')->orderBy('created_at', 'DESC')
                 ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
                 // ->where('branch_id', 'LIKE', User::userBranchAction())
                 ->take(10)->get()

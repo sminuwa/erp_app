@@ -970,11 +970,11 @@ Route::middleware('auth')->group(function () {
                 Route::get('/index', [InterSiteTransferController::class, 'index'])->name('intersite.index');
                 Route::post('/search', [InterSiteTransferController::class, 'search'])->name('intersite.search');
                 Route::get('/create', [InterSiteTransferController::class, 'create'])->name('intersite.create');
-                Route::get('/show/{transferproduct}', [InterSiteTransferController::class, 'show'])->name('intersite.show');
+                Route::get('/show/{intersiteTransfer}', [InterSiteTransferController::class, 'show'])->name('intersite.show');
                 Route::post('/store', [InterSiteTransferController::class, 'store'])->name('intersite.store');
-                Route::get('/edit/{transferproduct}', [InterSiteTransferController::class, 'edit'])->name('intersite.edit');
-                Route::put('/update/{transferproduct}', [InterSiteTransferController::class, 'update'])->name('intersite.update');
-                Route::delete('/delete/{transferproduct}', [InterSiteTransferController::class, 'destroy'])->name('intersite.destroy');
+                Route::get('/edit/{intersiteTransfer}', [InterSiteTransferController::class, 'edit'])->name('intersite.edit');
+                Route::put('/update/{intersiteTransfer}', [InterSiteTransferController::class, 'update'])->name('intersite.update');
+                Route::delete('/delete/{intersiteTransfer}', [InterSiteTransferController::class, 'destroy'])->name('intersite.destroy');
                 Route::post('/cart', [InterSiteTransferController::class, 'addToCart'])->name('intersite.cart');
                 Route::delete('/remove/{id}', [InterSiteTransferController::class, 'removeCart'])->name('intersite.cart.remove');
                 Route::post('/clear', [InterSiteTransferController::class, 'clearAllCart'])->name('intersite.cart.clear');

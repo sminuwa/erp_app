@@ -53,8 +53,7 @@
                                         <thead>
                                             <tr>
                                                 <td colspan="7" style="line-height: 0.4 !important;text-align: right">
-                                                    <form method="POST"
-                                                        action="{{ route('intersite.cart.clear') }}">
+                                                    <form method="POST" action="{{ route('intersite.cart.clear') }}">
                                                         @csrf
                                                         <div class="row">
                                                             <div class="offset-10 col-sm-2">
@@ -73,7 +72,6 @@
                                                 <th>Qty</th>
                                                 <th>Price</th>
                                                 <th>Source Store</th>
-                                                <th>Destination Store</th>
                                                 <th><span class="ion-ios-trash"></span></th>
                                             </tr>
                                         </thead>
@@ -85,10 +83,8 @@
                                                     <td class="text-left">{{ $product->attributes['code'] }}</td>
                                                     <td class="text-left">{{ $product->name }}</td>
                                                     <td>{{ number_format($product->quantity, 0, '', ',') }}</td>
-                                                    <td class="text-right">{{ number_format($product->price,2) }}</td>
+                                                    <td class="text-right">{{ number_format($product->price, 2) }}</td>
                                                     <td>{{ \App\Models\Store::find($attr['source_store_id'])->name }}</td>
-                                                    <td>{{ \App\Models\Store::find($attr['destination_store_id'])->name }}
-                                                    </td>
                                                     <td>
                                                         <button class="btn btn-danger btn-sm" type="button"
                                                             onclick="deleteItem({{ $product->id }})">
@@ -106,11 +102,29 @@
                                         </tbody>
                                     </table>
                                 @endif
-                                <form action="{{ isset($route) ? $route : route('intersite.store') }}"
-                                    method="POST">
+                                <form action="{{ isset($route) ? $route : route('intersite.store') }}" method="POST">
                                     {{ csrf_field() }}
-                                    <input type="hidden" name="_method"
-                                        value="{{ isset($method) ? $method : 'POST' }}" />
+                                    <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
+                                    <div class="form-group">
+                                        <label for="transfer_branch_id">Destination Branch</label>
+                                        <select
+                                            class="form-control select2-single {{ $errors->has('transfer_branch_id') ? ' is-invalid' : '' }}"
+                                            name="transfer_branch_id" id="transfer_branch_id" required="required">
+                                            <option value="">Select...</option>
+                                            @if (isset($branches))
+                                                @foreach ($branches as $data)
+                                                    <option value="{{ $data->id }}"
+                                                        {{ $data->id == old('transfer_branch_id', $model->transfer_branch_id) ? 'selected' : '' }}>
+                                                        {{ $data->code }}-{{ $data->name }}</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                        @if ($errors->has('transfer_branch_id'))
+                                            <div class="invalid-feedback">
+                                                <strong>{{ $errors->first('transfer_branch_id') }}</strong>
+                                            </div>
+                                        @endif
+                                    </div>
                                     <div class="form-group">
                                         <label for="vehicle_no">Vehicle No</label>
                                         <input type="text"
@@ -123,11 +137,11 @@
                                             </div>
                                         @endif
                                     </div>
-                                    <div class="form-group">
+                                    {{-- <div class="form-group">
                                         <label for="transfer_date">Date</label>
                                         <input type="text" name="transfer_date" class="form-control datepicker"
                                             value="{{ isset($model->transfer_date) ? $model->transfer_date : old('transfer_date', date('Y-m-d')) }}" />
-                                    </div>
+                                    </div> --}}
                                     @if (isset($model) && $model->status != null)
                                         <div class="form-check">
                                             <input
@@ -183,7 +197,7 @@
             //             store_id: $("#source_store_id").val()
             //         }
             //     }).done(function(msg) {
-                    
+
             //         $("#product_id").html("<option value=''>--select--</option>" + msg);
             //     });
             // });

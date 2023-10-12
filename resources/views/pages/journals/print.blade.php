@@ -65,7 +65,6 @@
                             <th>Debit</th>
                             <th>Credit</th>
                             <th>Description</th>
-                            <th>Status</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -82,7 +81,6 @@
                                 <td>{{ $journal_item->debit }}</td>
                                 <td>{{ $journal_item->credit }}</td>
                                 <td>{{ $journal_item->description }}</td>
-                                <td>{!!  $journal->status == 0 ? '<span class="badge badge-danger">pending</span>' : '<span class="badge badge-success">posted</span>' !!}</td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -100,6 +98,7 @@
                     <div class="receipt-header receipt-header-mid receipt-footer">
                         <div class="col-xs-10 col-sm-10 col-md-10 text-left">
                             <div class="receipt-right">
+                                <p><b>Status :</b> <td>{!!  $journal->status == 0 ? '<span class="badge badge-danger">pending</span>' : '<span class="badge badge-success">posted</span>' !!}</td></p>
                                 <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
                                 <p><b>Created By :</b> {{ $journal->createdBy->name ?? null }}</p>
                                 <p><b>Posted By :</b> {{ $journal->postedBy->name ?? null }}</p>

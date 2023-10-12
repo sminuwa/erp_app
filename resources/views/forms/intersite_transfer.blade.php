@@ -71,26 +71,8 @@
             </div>
         @endif
     </div>
-    <div class="form-group">
-        <label for="destination_branch_id">Destination Branch</label>
-        <select class="form-control select2-single {{ $errors->has('destination_branch_id') ? ' is-invalid' : '' }}"
-            name="destination_branch_id" id="destination_branch_id" required="required">
-            <option value="">Select...</option>
-            @if (isset($branches))
-                @foreach ($branches as $data)
-                    <option value="{{ $data->id }}"
-                        {{ $data->id == old('destination_branch_id', $model->destination_branch_id) ? 'selected' : '' }}>
-                        {{ $data->code }}-{{ $data->name }}</option>
-                @endforeach
-            @endif
-        </select>
-        @if ($errors->has('destination_branch_id'))
-            <div class="invalid-feedback">
-                <strong>{{ $errors->first('destination_branch_id') }}</strong>
-            </div>
-        @endif
-    </div>
-    <div class="form-group">
+    
+    {{-- <div class="form-group">
         <label for="destination_store_id">Destination Store</label>
         <select class="form-control select2-single {{ $errors->has('destination_store_id') ? ' is-invalid' : '' }}"
             name="destination_store_id" id="destination_store_id" required="required">
@@ -102,7 +84,7 @@
                 <strong>{{ $errors->first('destination_store_id') }}</strong>
             </div>
         @endif
-    </div>
+    </div> --}}
     <div class="form-group">
         <label for="qty_transfered">Qty</label>
         <input type="number" class="form-control {{ $errors->has('qty_transfered') ? ' is-invalid' : '' }}"

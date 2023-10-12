@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Branch;
+use App\Models\IntersiteTransfer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\TransferProduct;
@@ -40,11 +41,8 @@ class InterSiteTransferController extends Controller
     public function index(Index $request)
     {
         \Cart::session('_token')->clear();
-        $records = TransferProduct::select('transfer_products.*')->where(['nature' => 'Transfer', 'stock_in_out' => 'out', 'transfer_products.status' => 1])
-            ->where('stores.branch_id', 'LIKE', User::userBranchAction())
-            ->where('transfer_products.type', 'intersite')
-            ->join('stores', 'stores.id', 'transfer_products.source_store_id')
-            ->groupBy(['refno', 'source_store_id', 'product_id'])->orderBy('transfer_products.created_at', 'DESC')->take(10)->get();
+        $records = IntersiteTransfer::where('source_branch_id', 'LIKE', User::userBranchAction())
+            ->take(10)->get();
         return view('pages.inventories.transfers.inter_site.index', ['records' => $records]);
     }
     public function search(Index $request)
@@ -65,10 +63,10 @@ class InterSiteTransferController extends Controller
      * @param  TransferProduct  $transferproduct
      * @return \Illuminate\Http\Response
      */
-    public function show(Show $request, TransferProduct $transferproduct)
+    public function show(Show $request, IntersiteTransfer $intersiteTransfer)
     {
         return view('pages.inventories.transfers.inter_site.show', [
-            'record' => $transferproduct,
+            'record' => $intersiteTransfer,
         ]);
 
     } /**
@@ -109,107 +107,35 @@ class InterSiteTransferController extends Controller
         DB::beginTransaction();
         try {
             if (\Cart::session('_token')->getContent()->count() > 0) {
-                $transfer_id = $this->getNextTransferID();
+                //$transfer_id = $this->getNextTransferID();
                 $refno = $this->generateRefNo();
-                $source_qty_available = 0;
-                $destination_qty_available = 0; // get qty before transfer
-
+                $transfer_branch_id = $request->transfer_branch_id;
+                $transfer_id = DB::table('intersite_transfers')->insertGetId([
+                    'reference_no' => $refno,
+                    'source_branch_id' => User::userBranchAction(),
+                    'destination_branch_id' => $transfer_branch_id,
+                    'requested_by' => Auth::id(),
+                    'date_requested' => date('Y-m-d'),
+                    'vehicle_no' => $request->vehicle_no,
+                ]);
                 foreach (\Cart::session('_token')->getContent() as $product) {
                     $attribute = $product->attributes;
                     $source_store_id = $attribute['source_store_id'];
-                    $destination_store_id = $attribute['destination_store_id'];
+                    
                     $product_id = $attribute['product_id'];
-                    //Get qty before transfer
-                    $source_qty_available = StoreProduct::where(['store_id' => $source_store_id, 'product_id' => $product_id])->first()->qty_available;
-                    $record = StoreProduct::where(['store_id' => $destination_store_id, 'product_id' => $product_id])->first();
-                    $destination_qty_available = optional($record)->qty_available;
-                    if ($record != null) {
-                        DB::table('store_products')->where([
-                            'store_id' => $source_store_id,
-                            'product_id' => $product_id
-                        ])->decrement('qty_available', $product->quantity);
-                        DB::table('store_products')->where([
-                            'store_id' => $destination_store_id,
-                            'product_id' => $product_id
-                        ])->increment('qty_available', $product->quantity);
-                    } else {
 
-                        DB::table('store_products')->where([
-                            'store_id' => $source_store_id,
-                            'product_id' => $product_id
-                        ])->decrement('qty_available', $product->quantity);
-                        DB::table('store_products')->insert([
-                            'store_id' => $destination_store_id,
-                            'product_id' => $product_id,
-                            'qty_available' => $product->quantity,
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now()
-                        ]);
-                    }
-
-                    DB::table('transfer_products')->insert([
-                        'transfer_id' => $transfer_id,
+                    DB::table('intersite_transfer_products')->insert([
+                        'intersite_transfer_id' => $transfer_id,
                         'source_store_id' => $source_store_id,
                         'product_id' => $product_id,
-                        'destination_store_id' => $destination_store_id,
-                        'qty_transfered' => $product->quantity,
-                        'qty_available' => $source_qty_available,
-                        'transfered_by' => Auth::id(),
-                        'status' => 'Completed',
-                        'nature' => 'Transfer',
-                        'stock_in_out' => 'out',
-                        'refno' => $refno,
-                        'type' => 'intersite',
-                        'transfer_date' => $request->transfer_date,
-                        'vehicle_no' => $request->vehicle_no,
+                        'quantity_requested' => $product->quantity,
+                        'quantity_approved' => $product->quantity,
+                        'cost_price' => $product->price,
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now()
                     ]);
 
-                    DB::table('transfer_products')->insert([
-                        'transfer_id' => $transfer_id,
-                        'source_store_id' => $destination_store_id,
-                        'product_id' => $product_id,
-                        'destination_store_id' => $destination_store_id,
-                        'qty_transfered' => $product->quantity,
-                        'qty_available' => $destination_qty_available,
-                        'transfered_by' => Auth::id(),
-                        'status' => 'Completed',
-                        'nature' => 'Transfer',
-                        'stock_in_out' => 'in',
-                        'refno' => $refno,
-                        'type' => 'intersite',
-                        'transfer_date' => $request->transfer_date,
-                        'vehicle_no' => $request->vehicle_no,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now()
-                    ]);
-                    DB::table('stock_cards')->insert([
-                        'store_id' => $source_store_id,
-                        'product_id' => $product_id,
-                        'cr' => 0,
-                        'dr' => $product->quantity,
-                        'refno' => $refno,
-                        'type' => 'Transfer',
-                        'date' => $request->transfer_date,
-                        'user_id' => Auth::id(),
-                        'priority' => 4,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now()
-                    ]);
-                    DB::table('stock_cards')->insert([
-                        'store_id' => $destination_store_id,
-                        'product_id' => $product_id,
-                        'cr' => $product->quantity,
-                        'dr' => 0,
-                        'refno' => $refno,
-                        'type' => 'Transfer',
-                        'date' => $request->transfer_date,
-                        'user_id' => Auth::id(),
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now()
-                    ]);
-                    $action = "Transfered product from " . Store::find($source_store_id)->name . " to " . Store::find($destination_store_id)->name;
+                    $action = "Made transfer request of product from " . Store::find($source_store_id)->name . " to  branch" . Store::find($transfer_branch_id)->name;
                     AuditLog::auditLog(Auth::id(), $action);
                     session()->flash('app_message', 'Stock transfered successfully');
                     DB::commit();
@@ -229,17 +155,17 @@ class InterSiteTransferController extends Controller
       * @param  TransferProduct  $transferproduct
       * @return \Illuminate\Http\Response
       */
-    public function edit(Edit $request, TransferProduct $transferproduct)
+    public function edit(Edit $request, IntersiteTransfer $intersiteTransfer)
     {
         //\Cart::session('_token')->clear();
         $products = Product::all(['id', 'name']);
         $categories = Category::all(['id', 'name']);
         $stores = Store::where('branch_id', 'LIKE', User::userBranchAction())->get();
-        $this->loadToCart($transferproduct);
+        $this->loadToCart($intersiteTransfer);
         $cartItems = \Cart::session('_token')->getContent();
         $branches = Branch::where('id', '<>', User::userBranchAction())->orderBy('name')->get();
         return view('pages.inventories.transfers.inter_site.edit', [
-            'model' => $transferproduct,
+            'model' => $intersiteTransfer,
             'products' => $products,
             'categories' => $categories,
             'stores' => $stores,
@@ -354,7 +280,6 @@ class InterSiteTransferController extends Controller
         $validated = $request->validate([
             'product_id' => 'required',
             'source_store_id' => 'required',
-            'destination_store_id' => 'required',
             'qty_transfered' => 'required',
         ]);
         $product = Product::find($request->product_id);
@@ -366,7 +291,6 @@ class InterSiteTransferController extends Controller
             'quantity' => $request->qty_transfered,
             'attributes' => array(
                 'source_store_id' => $request->source_store_id,
-                'destination_store_id' => $request->destination_store_id,
                 'product_id' => $request->product_id,
                 'code' => $product->code,
             ),
@@ -399,10 +323,10 @@ class InterSiteTransferController extends Controller
 
         return redirect()->back();
     }
-    public function loadToCart(TransferProduct $transfer)
+    public function loadToCart(IntersiteTransfer $transfer)
     {
         \Cart::session('_token')->clear();
-        foreach ($transfer->transferProducts()->where('type', 'intersite')->get() as $data) {
+        foreach ($transfer->requestProducts()->get() as $data) {
             if ($data != null) {
                 $product = Product::find($data->product_id);
                 \Cart::session('_token')->add([
@@ -413,7 +337,6 @@ class InterSiteTransferController extends Controller
                     'quantity' => $data->qty_transfered,
                     'attributes' => array(
                         'source_store_id' => $data->source_store_id,
-                        'destination_store_id' => $data->destination_store_id,
                         'product_id' => $data->product_id ?? 1,
                         'code' => $product->code,
                     ),

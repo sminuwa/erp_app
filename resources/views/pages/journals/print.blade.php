@@ -89,7 +89,8 @@
                         <h4 class="text-bold">
                             <small>Total Credit:</small> N{{ $total_credit }} <br>
                             <small>Total Debit:</small> N{{ $total_debit }} <br>
-                            <small>Balance:</small> N{{ $total_credit-$total_debit }}
+                            <small>Balance:</small> N{{ $total_credit-$total_debit }} <br>
+                            <b>Status :</b> {!!  $journal->status == 0 ? '<span class="badge badge-danger">pending</span>' : '<span class="badge badge-success">posted</span>' !!}
                         </h4>
                     </div>
                 </div>
@@ -98,7 +99,7 @@
                     <div class="receipt-header receipt-header-mid receipt-footer">
                         <div class="col-xs-10 col-sm-10 col-md-10 text-left">
                             <div class="receipt-right">
-                                <p class="h1"><b>Status :</b> {!!  $journal->status == 0 ? '<span class="badge badge-danger">pending</span>' : '<span class="badge badge-success">posted</span>' !!}</p>
+
                                 <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
                                 <p><b>Created By :</b> {{ $journal->createdBy->name ?? null }}</p>
                                 <p><b>Posted By :</b> {{ $journal->postedBy->name ?? null }}</p>

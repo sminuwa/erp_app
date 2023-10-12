@@ -18,11 +18,11 @@
 
                     </div>
                     <div class="col-md-5 mb-3" wire:ignore>
-                        <input wire:model="journal_date" type="date" class="form-control " required>
+                        <input wire:model.lazy="journal_date" type="date" class="form-control " required>
                         <label class="floating-label">Date: @error('journal_date')<span class="text-danger error">{{ $message }}</span>@enderror</label>
                     </div>
                     <div class="col-md-7 mb-3" wire:ignore>
-                        <input wire:model="description" type="text" class="form-control" placeholder="Description">
+                        <input wire:model.lazy="description" type="text" class="form-control" placeholder="Description">
                         <label class="floating-label">Description: @error('description')<span class="text-danger error">{{ $message }}</span>@enderror</label>
                     </div>
 
@@ -38,7 +38,7 @@
                                             <td>
                                                 <div class="col-12">
                                                     <div class="form-group" wire:ignore>
-                                                        <select  wire:model="type.{{ $key }}" wire:change="changeTypeEvent({{$key}})" class="form-control" required>
+                                                        <select  wire:model.lazy="type.{{ $key }}" wire:change="changeTypeEvent({{$key}})" class="form-control" required>
                                                             <option value="">Select...</option>
                                                             <option value="Customer">Customer</option>
                                                             <option value="Supplier">Supplier
@@ -52,7 +52,7 @@
                                             <td>
                                                 <div class="col-12">
                                                     <div class="form-group">
-                                                        <select wire:model="account.{{ $key }}" class="form-control" required>
+                                                        <select wire:model.lazy="account.{{ $key }}" class="form-control" required>
                                                             <option value="">Select...</option>
                                                             @if(isset($accounts[$key]))
                                                                 @foreach($accounts[$key] as $account)

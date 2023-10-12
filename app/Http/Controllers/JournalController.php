@@ -33,12 +33,12 @@ class JournalController extends Controller
         DB::beginTransaction();
         $journal->status = 1;
         if($journal->save()){
-            if(Transaction::journal('','','','','')) {
+//            if(Transaction::journal('','','','','')) {
                 DB::commit();
                 return back()->with('success', 'Reversed successfully');
-            }
-            else
-                DB::rollback();
+//            }
+//            else
+//                DB::rollback();
             return back()->with('error', 'Something went wrong.');
         }
     }

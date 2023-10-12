@@ -92,7 +92,7 @@
 
                                                 <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                                                 </td>
-                                                <td>{{ $payment->receipt_no }}</td>
+                                                <td>{{ $payment->reference }}</td>
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
                                                 <td>{{ $payment->description }}</td>
                                                 <td>{{ $payment->source->description }}</td>
@@ -113,11 +113,11 @@
                                                                 <i class="fa fa-print" aria-hidden="true"></i> PoS
                                                             </a>
                                                             @if($payment->status == 0)
-                                                                <a href="{{ route('interbank.update', ['receipt_id'=>$payment->id]) }}"
+                                                                <a href="{{ route('interbank.edit', $payment->id) }}"
                                                                    class="dropdown-item">
                                                                     <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                                                 </a>
-                                                                <a href="{{ route('interbank.delete', ['receipt_id'=>$payment->id]) }}"
+                                                                <a href="{{ route('interbank.delete', $payment->id) }}"
                                                                    class="dropdown-item">
                                                                     <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                                                 </a>

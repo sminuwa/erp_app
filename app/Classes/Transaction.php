@@ -178,6 +178,8 @@ class Transaction
     }
 
     public static function reversal($reference, $type = 'REVERSAL'){
+        if(is_null($reference))
+            return ['status'=>false, 'message'=>'Reference can not be null.'];
         $user = auth()->user();
         $general_ledgers = GeneralAccountLedger::forReference($reference)->get();
         $general_account_ledgers = [];

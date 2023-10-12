@@ -384,10 +384,11 @@ Route::middleware('auth')->group(function () {
             Route::delete('/destroy/{interbank}', [InterBankController::class, 'destroy'])->name('interbank.destroy');
             Route::get('/delete/{interbank}', [InterBankController::class, 'destroy'])->name('interbank.delete');
             Route::put('/update/{interbank}', [InterBankController::class, 'update'])->name('interbank.update');
+            Route::get('/edit/{interbank}', [InterBankController::class, 'edit'])->name('interbank.edit');
             Route::post('/search', [InterBankController::class, 'search'])->name('interbank.search');
             Route::get('/print/interbank/{interbank}', [InterBankController::class, 'print'])->name('interbank.print');
             Route::get('/print/interbank/pos/{interbank}', [InterBankController::class, 'printPos'])->name('interbank.print.pos');
-            Route::get('/reverse/{interbank}', [ReceiptController::class, 'reverse'])->name('interbank.reverse');
+            Route::get('/reverse/{interbank}', [InterBankController::class, 'reverse'])->name('interbank.reverse');
         }
     );
     Route::group(

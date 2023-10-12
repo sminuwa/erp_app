@@ -77,10 +77,11 @@ class InterBankController extends Controller
     }
 
 
-    public function reverse(interbank $interbank) {
+    public function reverse(InterBank $interbank) {
         $interbank->status = 0;
+        $interbank->reversed_by = auth()->id();
         if($interbank->save()){
-            Transaction::reversal($interbank->receipt_no);
+            Transaction::reversal($interbank->reference);
         }
         return back();
     }
@@ -93,21 +94,18 @@ class InterBankController extends Controller
     {
         return view('pages.interbanks.print_pos', ['interbank' => $interbank, 'setting' => Setting::first()]);
     }
-
-    public function edit(Edit $request, InterBank $interBank)
+    public function edit(Request $request, InterBank $interbank)
     {
-
-        return view('pages.interbanks.create_payment', [
-            'model' => $interBank,
-
+        $accounts = GeneralAccount::orderBy('number', 'asc')->where('class', 'A11')->get();
+        return view('pages.interbanks.create', [
+            'model' => $interbank,
+            'accounts' => $accounts
         ]);
     }
-
     public function update(Update $request, Branch $branch)
     {
 
     }
-
     public function destroy(Request $request, InterBank $interBank)
     {
         if ($interBank->delete()) {
@@ -119,8 +117,6 @@ class InterBankController extends Controller
 
         return redirect()->back();
     }
-
-
     public function generateReceiptNo()
     {
         $invoice = DB::table('general_account_ledgers')->select(DB::raw('MAX(SUBSTR(receipt_no,8,17)) as max'))->where(DB::raw('SUBSTR(receipt_no,1,3)'), '=', 'RCT')->where(DB::raw('YEAR(created_at)'), '=', date('Y'))->first();

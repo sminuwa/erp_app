@@ -111,13 +111,20 @@
            </form>
        </div>
    </div>
+
+    <script>
+
+    </script>
+    @push('scripts')
+        <script>
+            document.addEventListener('livewire:load', function () {
+                $(".select2-single, .select2-multiple, .select2").select2({
+                    theme: "bootstrap",
+                    maximumSelectionSize: 6,
+                    containerCssClass: ':all:'
+                });
+            })
+        </script>
+    @endpush
 </div>
-<script>
-    $('.select2-single').on('change', function (e) {
-        var data = $('.select2-single').select2("val");
-        @this.set('selected', data);
-    });
-    $('.datepicker').on('change', function (e) {
-        @this.set('datepicker', e.target.value);
-    });
-</script>
+

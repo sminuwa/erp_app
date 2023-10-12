@@ -104,11 +104,11 @@
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            <a href="{{ route('interbank.print', $payment->id) }}"
+                                                            <a href="{{ route('interbank.print', $payment->id) }}" target="_blank"
                                                                class="dropdown-item">
                                                                 <i class="fa fa-print" aria-hidden="true"></i> Print
                                                             </a>
-                                                            <a href="{{ route('interbank.print.pos', $payment->id) }}"
+                                                            <a href="{{ route('interbank.print.pos', $payment->id) }}" target="_blank"
                                                                class="dropdown-item">
                                                                 <i class="fa fa-print" aria-hidden="true"></i> PoS
                                                             </a>

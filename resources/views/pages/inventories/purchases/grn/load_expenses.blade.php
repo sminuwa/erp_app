@@ -18,7 +18,7 @@
                 <td>{{ $expense->description }}</td>
                 <td style="text-align: right;"> {{ number_format($expense->amount, 2) }}</td>
                 <td style="text-align: right;">
-                    @if ($record->status == 0)
+                    @if ($expense->status == 0)
                         <button class="btn btn-danger btn-sm" type="button"
                             onclick="deleteItem({{ $expense->id }})">
                             <i class="fa fa-trash" aria-hidden="true"></i>

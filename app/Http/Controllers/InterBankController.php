@@ -21,19 +21,8 @@ class InterBankController extends Controller
             ->where('branch_id', 'LIKE', $user_branch)
             ->orderBy('date', 'DESC')->take(10)->get();
         return view('pages.interbanks.list', ['payments' => $payments]);
-    } /**
-      * Display the specified resource.
-      *
-      * @param  Show  $request
-      * @param  Branch  $branch
-      * @return \Illuminate\Http\Response
-      */
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @param  Create  $request
-     * @return \Illuminate\Http\Response
-     */
+    }
+
     public function create(Request $request)
     {
 
@@ -41,18 +30,13 @@ class InterBankController extends Controller
         $accounts = GeneralAccount::where('class', 'A11')->orderBy('number')->get();
         $model = new InterBank;
         return view('pages.interbanks.create', compact('accounts', 'model'));
-    } /**
-      * Store a newly created resource in storage.
-      *
-      * @param  Store  $request
-      * @return \Illuminate\Http\Response
-      */
+    }
     public function store(Request $request)
     {
         $amount = $request->amount_paid;
         $source_account_id = $request->source_account_id;
         $destination_account_id =190;//= $request->destination_account_id;
-        $refence_no = $this->generateReceiptNo();
+        $reference = $this->generateReceiptNo();
         $date = $request->payment_date;
         $description = $request->payment_ref;
         $user_branch = User::userBranchAction();
@@ -63,11 +47,11 @@ class InterBankController extends Controller
         DB::beginTransaction();
         try {
             $supplier_id = $request->payer_id;
-            $status = Transaction::interbank($source_account_id, 'GeneralAccount', $destination_account_id, 'GeneralAccount', $amount, $refence_no, $date);
+            $status = Transaction::interbank($source_account_id, 'GeneralAccount', $destination_account_id, 'GeneralAccount', $amount, $reference, $date);
             $ledger_id = DB::table('inter_banks')->insertGetId([
                 'amount' => $amount,
                 'date' => $date,
-                'receipt_no' => $refence_no,
+                'reference' => $reference,
                 'description' => $description,
                 'recieved_by' => auth()->id(),
                 'source_account_id' => $source_account_id,
@@ -78,7 +62,7 @@ class InterBankController extends Controller
             ]);
             DB::commit();
             if ($status == true) {
-                $action = "Posted payment of $amount for : " . $refence_no;
+                $action = "Posted payment of $amount for : " . $reference;
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Transfered  successfully');
             }
@@ -122,14 +106,8 @@ class InterBankController extends Controller
     public function update(Update $request, Branch $branch)
     {
 
-    } /**
-      * Delete a  resource from  storage.
-      *
-      * @param  Destroy  $request
-      * @param  Branch  $branch
-      * @return \Illuminate\Http\Response
-      * @throws \Exception
-      */
+    }
+
     public function destroy(Request $request, InterBank $interBank)
     {
         if ($interBank->delete()) {
@@ -142,14 +120,7 @@ class InterBankController extends Controller
         return redirect()->back();
     }
 
-    /*public function printPaymentReceipt(InterBank $payment)
-    {
-        return view('pages.payments.print_payment', ['payment' => $payment, 'setting' => Setting::first()]);
-    }
-    public function printPoSPaymentReceipt(InterBank $payment)
-    {
-        return view('pages.payments.print_pos_payment', ['payment' => $payment, 'setting' => Setting::first()]);
-    }*/
+
     public function generateReceiptNo()
     {
         $invoice = DB::table('general_account_ledgers')->select(DB::raw('MAX(SUBSTR(receipt_no,8,17)) as max'))->where(DB::raw('SUBSTR(receipt_no,1,3)'), '=', 'RCT')->where(DB::raw('YEAR(created_at)'), '=', date('Y'))->first();

@@ -25,15 +25,14 @@ class InterBankController extends Controller
 
     public function create(Request $request)
     {
-
         $user_branch = User::userBranchAction();
-        $accounts = GeneralAccount::where('class', 'A11')->orderBy('number')->get();
+        $accounts = GeneralAccount::whereIn('class', ['A11','A12','A13'])->orderBy('number')->get();
         $model = new InterBank;
         return view('pages.interbanks.create', compact('accounts', 'model'));
     }
     public function store(Request $request)
     {
-        $amount = $request->amount_paid;
+        $amount = $request->amount;
         $source_account_id = $request->source_account_id;
         $destination_account_id = $request->destination_account_id;
         $reference = InterBank::generateNewNumber();
@@ -76,7 +75,6 @@ class InterBankController extends Controller
         return redirect()->back()->with(['prev_id' => $ledger_id]);
     }
 
-
     public function reverse(InterBank $interbank) {
         $interbank->status = 0;
         $interbank->reversed_by = auth()->id();
@@ -96,7 +94,8 @@ class InterBankController extends Controller
     }
     public function edit(Request $request, InterBank $interbank)
     {
-        $accounts = GeneralAccount::orderBy('number', 'asc')->where('class', 'A11')->get();
+
+        $accounts = GeneralAccount::orderBy('number', 'asc')->whereIn('class', ['A11','A12','A13'])->get();
         return view('pages.interbanks.create', [
             'model' => $interbank,
             'accounts' => $accounts

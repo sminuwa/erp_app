@@ -2,6 +2,7 @@
     {{ csrf_field() }}
     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
     <div class="row">
+        @json($model)
         <div class="col-md-4">
             <div class="form-group">
                 <label for="source_account_id">Source Account</label>

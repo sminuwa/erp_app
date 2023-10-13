@@ -83,7 +83,7 @@ class InterBankController extends Controller
 
     public function reverse(InterBank $interbank) {
         $interbank->status = 0;
-        $interbank->reversed_by = auth()->id();
+        $interbank->updated_by = auth()->id();
         if($interbank->save()){
             Transaction::reversal($interbank->reference);
         }

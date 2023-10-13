@@ -46,13 +46,11 @@ class JournalController extends Controller
 
     public function reverse(Journal $journal) {
         try{
-//            return $journal;
             DB::beginTransaction();
             $journal->status = 0;
             $journal->updated_by = auth()->id();
             if($journal->save()){
-                return Transaction::reversal($journal->reference);
-                if(Transaction::reversal($journal->reference)) {
+                if(Transaction::reversal($journal->reference)['status']) {
                     DB::commit();
                     return back()->with('success', 'Reversed successfully');
                 }

@@ -103,6 +103,7 @@ class InterSiteTransferController extends Controller
       */
     public function store(StoreRequest $request)
     {
+        return \Cart::session('_token')->getContent();
         $model = new TransferProduct;
         DB::beginTransaction();
         try {
@@ -111,7 +112,7 @@ class InterSiteTransferController extends Controller
                 $refno = $this->generateRefNo();
                 $transfer_branch_id = $request->transfer_branch_id;
                 $transfer_id = DB::table('intersite_transfers')->insertGetId([
-                    'reference_no' => $refno,
+                    'invoice' => $refno,
                     'source_branch_id' => User::userBranchAction(),
                     'destination_branch_id' => $transfer_branch_id,
                     'requested_by' => Auth::id(),

@@ -31,9 +31,17 @@
                 <div class="row">
                     <!-- left column -->
                     <div class="col-12">
-                        @if(session()->has('message'))
+                        <div class="col-12">
+                            @if(session()->has('message'))
+                                <div class="alert alert-success">{{ session('message') }}</div>
+                            @endif
+                            @if(session()->has('error'))
+                                <div class="alert alert-danger">{{ session('error') }}</div>
+                            @endif
+                        </div>
+                        {{--@if(session()->has('message'))
                             <div class="alert alert-success">{{ session('message') }}</div>
-                        @endif
+                        @endif--}}
                     </div>
                     <div class="col-md-12">
                         <!-- general form elements -->
@@ -51,6 +59,7 @@
                                 </div>
                             </div>
                             <div class="row">
+
                                 <div class="col-md-6">
                                     <form action="{{ route('payment.search') }}" method="POST">
                                         @csrf

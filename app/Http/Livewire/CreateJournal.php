@@ -138,6 +138,7 @@ class CreateJournal extends Component
             $journal->description = $this->description;
             $journal->date = $this->journal_date;
             $journal->created_by = auth()->id();
+            $journal->status = 0;
             if($journal->save()){
                 foreach ($this->inputs as $key => $value) {
                     $this->items[] = [

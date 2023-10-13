@@ -215,7 +215,7 @@ class Transaction
         return self::transaction($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date, 'PAY');
     }
 
-    public static function journal(array $source_accounts, array $destination_account, $reference, $date, $type = 'JOURNAL' ){
+    public static function journal(array $accounts_details, $reference, $date, $type = 'JOURNAL' ){
         /*
          * source and destination account structure
          * [
@@ -224,9 +224,27 @@ class Transaction
          * ]
          * Same as destination accounts
          * */
-
-        foreach($source_accounts as $source){
-            return $source;
+        $user = auth()->user();
+        $branch = $user->branch;
+        $general_account_ledgers = [];
+        foreach($accounts_details as $account){
+            $general_account_ledgers[] = [
+                'model_id' => $account['account_id'],
+                'model_name' => $account['account_type'],
+                'branch_id' => $branch->id,
+                'description' => 'Journal on behalf of ' . $reference,
+                'reference' => $reference,
+                'credit' => $account['credit'],
+                'debit' => $account['debit'],
+                'date' => $date,
+                'user_id' => $user->id,
+                'receipt_no' => $type . '_' . $reference
+            ];
+        }
+        if(GeneralAccountLedger::upsert($general_account_ledgers, ['model_id', 'model_name', 'branch_id', 'receipt_no'])){
+            return ['status'=>true, 'message'=>'success'];
+        }else{
+            return ['status'=>false, 'message'=>'Something went wrong'];
         }
     }
 

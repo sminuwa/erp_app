@@ -8,10 +8,21 @@ use Illuminate\Database\Eloquent\Model;
 class InterBank extends Model
 {
     use HasFactory;
-    public function transfered_by()
+    public function createdBy()
     {
-        return $this->belongsTo(User::class, 'recieved_by');
+        return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function postedBy()
+    {
+        return $this->belongsTo(User::class, 'posted_by');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
     public function customer()
     {
         return $this->belongsTo(Customer::class, 'model_id');

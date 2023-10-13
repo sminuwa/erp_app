@@ -45,16 +45,23 @@ class JournalController extends Controller
     }
 
     public function reverse(Journal $journal) {
-        DB::beginTransaction();
-        $journal->status = 0;
-        if($journal->save()){
-           if(Transaction::reversal($journal->reference)) {
-               DB::commit();
-               return back()->with('success', 'Reversed successfully');
-           }
-            else
-               DB::rollback();
-            return back()->with('error', 'Something went wrong.');
+        try{
+//            return $journal;
+            DB::beginTransaction();
+            $journal->status = 0;
+            $journal->updated_by = auth()->id();
+            if($journal->save()){
+                return Transaction::reversal($journal->reference);
+                if(Transaction::reversal($journal->reference)) {
+                    DB::commit();
+                    return back()->with('success', 'Reversed successfully');
+                }
+                else
+                    DB::rollback();
+                return back()->with('error', 'Something went wrong.');
+            }
+        }catch (\Exception $e){
+            return back()->with('error', 'Something went wrong. '.$e->getMessage());
         }
     }
 

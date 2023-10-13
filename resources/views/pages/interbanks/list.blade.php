@@ -82,13 +82,13 @@
                                             <th>Description</th>
                                             <th>Source</th>
                                             <th>Destination</th>
-                                            <th>Transfer By</th>
+                                            <th>Created By</th>
                                             <th>Actions</th>
                                         </tr>
                                     </tfoot>
                                     <tbody>
                                         @foreach ($interbanks as $interbank)
-                                            <tr>
+                                            <tr class="@if($interbank->status == 0) bg-warning @endif">
 
                                                 <td>{{ Carbon\Carbon::parse($interbank->date)->toFormattedDateString() }}
                                                 </td>
@@ -97,7 +97,7 @@
                                                 <td>{{ $interbank->description }}</td>
                                                 <td>{{ $interbank->source->description }}</td>
                                                 <td>{{ $interbank->destination->description }}</td>
-                                                <td>{{ optional($interbank->transfered_by)->name }}</td>
+                                                <td>{{ optional($interbank->createdBy)->name }}</td>
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

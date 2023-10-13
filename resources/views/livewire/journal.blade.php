@@ -23,8 +23,7 @@
         </tfoot>
         <tbody>
         @foreach ($records as $record)
-            <tr>
-
+            <tr class="@if($record->status == 0) bg-warning @endif">
                 <td>{{ Carbon\Carbon::parse($record->date)->toFormattedDateString() }}</td>
                 <td>{{ $record->reference }}</td>
                 <td>{{ $record->description ?? null }}</td>

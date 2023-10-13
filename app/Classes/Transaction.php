@@ -179,26 +179,30 @@ class Transaction
 
     public static function reversal($reference, $type = 'REVERSAL'){
         if(is_null($reference))
-            return ['status'=>false, 'message'=>'Reference can not be null.'];
+            return ['status'=>false, 'message'=>'$reference is null.'];
         $user = auth()->user();
         $general_ledgers = GeneralAccountLedger::forReference($reference)->get();
-        $general_account_ledgers = [];
-        foreach($general_ledgers as $general_ledger){
-            $general_account_ledgers[] = [
-                'model_id' => $general_ledger->model_id,
-                'model_name' => $general_ledger->model_name,
-                'branch_id' => $general_ledger->branch_id,
-                'description' => 'Receipt on behalf of '.$reference,
-                'reference' => $reference,
-                'credit' => $general_ledger->credit <= 0 ? $general_ledger->debit : 0,
-                'debit' => $general_ledger->debit <= 0 ? $general_ledger->credit : 0,
-                'date' => $general_ledger->date,
-                'user_id' => $user->id,
-                'receipt_no' => $type.'_'.$reference
-            ];
-        }
-        if(GeneralAccountLedger::upsert($general_account_ledgers, ['model_id', 'model_name', 'branch_id', 'receipt_no'])){
-            return ['status'=>true, 'message'=>'success'];
+        if(count($general_ledgers) > 0) {
+            $general_account_ledgers = [];
+            foreach ($general_ledgers as $general_ledger) {
+                $general_account_ledgers[] = [
+                    'model_id' => $general_ledger->model_id,
+                    'model_name' => $general_ledger->model_name,
+                    'branch_id' => $general_ledger->branch_id,
+                    'description' => 'Receipt on behalf of ' . $reference,
+                    'reference' => $reference,
+                    'credit' => $general_ledger->credit <= 0 ? $general_ledger->debit : 0,
+                    'debit' => $general_ledger->debit <= 0 ? $general_ledger->credit : 0,
+                    'date' => $general_ledger->date,
+                    'user_id' => $user->id,
+                    'receipt_no' => $type . '_' . $reference
+                ];
+            }
+            if(GeneralAccountLedger::upsert($general_account_ledgers, ['model_id', 'model_name', 'branch_id', 'receipt_no'])){
+                return ['status'=>true, 'message'=>'success'];
+            }
+        }else{
+            return ['status'=>false, 'message'=>'No transaction found for .'.$reference];
         }
         return ['status'=>false, 'message'=>'Something went wrong.'];
     }

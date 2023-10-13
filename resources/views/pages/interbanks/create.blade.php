@@ -52,6 +52,7 @@
                                 <form action="{{ isset($route) ? $route : route('interbank.store') }}" method="POST">
                                     {{ csrf_field() }}
                                     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
+                                    <input type="hidden" name="interbank_id" value="{{ isset($model) ? $model->id : '' }}" />
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group">
@@ -91,7 +92,6 @@
 
                                             </div>
                                         </div>
-
                                     </div>
                                     <div class="row">
                                         <div class="col-md-4">
@@ -139,13 +139,11 @@
                                     <div class="">
                                         <div class="col-md-8">
                                             <div class="form-group text-right ">
-                                                <input type="submit" class="btn btn-primary" value="Save" />
+                                                <input type="submit" class="btn btn-primary" value="Save & Post" />
                                             </div>
                                         </div>
                                     </div>
                                 </form>
-
-                                {{--                                @include('pages.interbanks.form')--}}
                             </div>
                         </div>
                     </div>

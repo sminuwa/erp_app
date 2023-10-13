@@ -9,8 +9,8 @@ use App\Models\InterBank;
 use App\Models\Setting;
 use App\Models\User;
 use Carbon\Carbon;
-use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class InterBankController extends Controller
 {
@@ -32,6 +32,7 @@ class InterBankController extends Controller
     }
     public function store(Request $request)
     {
+        $interbank_id = $request->interbank_id;
         $amount = $request->amount;
         $source_account_id = $request->source_account_id;
         $destination_account_id = $request->destination_account_id;
@@ -42,28 +43,33 @@ class InterBankController extends Controller
         $status = false;
         $insert_id = 0;
         $ledger_id = 0;
-
+        $interbank = InterBank::find($interbank_id);
+        if(!$interbank)
+            $interbank = new InterBank();
         DB::beginTransaction();
         try {
-            $supplier_id = $request->payer_id;
-            $status = Transaction::interbank($source_account_id, 'GeneralAccount', $destination_account_id, 'GeneralAccount', $amount, $reference, $date);
-            $ledger_id = DB::table('inter_banks')->insertGetId([
-                'amount' => $amount,
-                'date' => $date,
-                'reference' => $reference,
-                'description' => $description,
-                'recieved_by' => auth()->id(),
-                'source_account_id' => $source_account_id,
-                'destination_account_id' => $destination_account_id,
-                'branch_id' => $user_branch,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
-            DB::commit();
-            if ($status == true) {
-                $action = "Posted payment of $amount for : " . $reference;
-                AuditLog::auditLog(auth()->id(), $action);
-                session()->flash('app_message', 'Transfered  successfully');
+            $interbank->amount = $amount;
+            $interbank->date = $date;
+            if(!$interbank) {
+                $interbank->reference = $reference;
+                $interbank->created_by = auth()->id();
+            }else{
+                $interbank->updated_by = auth()->id();
+            }
+            $interbank->description = $description;
+            $interbank->source_account_id = $source_account_id;
+            $interbank->destination_account_id = $destination_account_id;
+            $interbank->branch_id = $user_branch;
+            $interbank->status = 1;
+            if($interbank->save()) {
+                if(Transaction::interbank($source_account_id, 'GeneralAccount', $destination_account_id, 'GeneralAccount', $amount, $reference, $date)) {
+                    $action = "Posted payment of $amount for : " . $reference;
+                    AuditLog::auditLog(auth()->id(), $action);
+                    session()->flash('app_message', 'Transfered  successfully');
+                    DB::commit();
+                } else {
+                    DB::rollBack();
+                }
             }
 
         } catch (\Exception $e) {

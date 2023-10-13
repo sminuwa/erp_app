@@ -70,7 +70,7 @@
                                             <th>Description</th>
                                             <th>Source</th>
                                             <th>Destination</th>
-                                            <th>Transfer By</th>
+                                            <th>Created By</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>

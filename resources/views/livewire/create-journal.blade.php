@@ -1,5 +1,5 @@
-<div>
-   <div class="card">
+<div >
+   <div class="card" >
        <div class="card-body">
            <div class="col-12">
                @if(session()->has('message'))
@@ -31,6 +31,7 @@
                            <div class="col-md-12 mb-3">
                                <button class="btn text-white btn-info btn-sm" wire:click.prevent="add({{$i}})">Add</button>
                            </div>
+{{--                           @json($accounts)--}}
                            <div class="col-md-12">
                                <table>
                                @foreach($inputs as $key => $value)
@@ -38,7 +39,7 @@
                                        <td>
                                            <div class="col-12">
                                                <div class="form-group" wire:ignore>
-                                                   <select  wire:model="type.{{ $key }}" wire:change="changeTypeEvent({{$key}})" class="form-control select2-single" required>
+                                                   <select  wire:model="type.{{ $key }}" wire:change="changeTypeEvent($event.target.value, {{ $key }})" class="form-control select2-single" required>
                                                        <option value="">Select...</option>
                                                        <option value="Customer">Customer</option>
                                                        <option value="Supplier">Supplier

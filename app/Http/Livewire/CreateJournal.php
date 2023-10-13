@@ -16,7 +16,7 @@ class CreateJournal extends Component
 
     public $readyToLoad = false;
 
-    public $accounts;
+    public $accounts = [], $accounts_arr = [];
     public $customers, $suppliers, $gls;
     public $journal_date, $description;
     public $type, $account, $debit, $credit, $desc, $result;
@@ -26,6 +26,56 @@ class CreateJournal extends Component
     public $i = 1;
 
     protected $listeners = ['accounts' => 'changeTypeEvent'];
+
+    public bool $loadData = false;
+
+    public function init()
+    {
+        $this->loadData = true;
+    }
+
+    public function mount(){
+        $customers = Customer::where('branch_id', auth()->user()->branch->id)->orderBy('code', 'asc')->get();
+        $suppliers = Supplier::orderBy('code', 'asc')->get();
+        $gls = GeneralAccount::orderBy('number', 'asc')->get();
+        $c = $s = $g = [];
+        foreach($customers as $customer){
+            $c[] = [
+                'id'=>$customer->id,
+                'code' => $customer->code,
+                'name' => $customer->name
+            ];
+        }
+        foreach($suppliers as $supplier){
+            $s[] = [
+                'id'=>$supplier->id,
+                'code'=>$supplier->code,
+                'name' => $supplier->name
+            ];
+        }
+        foreach($gls as $gl){
+            $g[] = [
+                'id'=>$gl->id,
+                'code' => $gl->number,
+                'name' => $gl->description
+            ];
+        }
+        $this->accounts_arr['Customer'] = $c;
+        $this->accounts_arr['Supplier'] = $s;
+        $this->accounts_arr['GeneralAccount'] = $g;
+    }
+    public function render()
+    {
+        /*try {
+            if ($this->loadData) {
+
+                return view('livewire.create-journal');
+            }
+        }catch (\Exception $e){
+            return view('livewire.create-journal');
+        }*/
+        return view('livewire.create-journal');
+    }
 
     public function add()
     {
@@ -39,14 +89,6 @@ class CreateJournal extends Component
         unset($this->inputs[$i]);
     }
 
-    public function render()
-    {
-        $this->customers = Customer::where('branch_id', auth()->user()->branch->id)->orderBy('code', 'asc')->get();
-        $this->suppliers = Supplier::orderBy('code', 'asc')->get();
-        $this->gls = GeneralAccount::orderBy('number', 'asc')->get();
-
-        return view('livewire.create-journal');
-    }
 
     public function totals(){
         try{
@@ -60,17 +102,16 @@ class CreateJournal extends Component
         }
     }
 
-    public function changeTypeEvent($value)
+    public function changeTypeEvent($value, $key)
     {
-        $this->result = $value;
-//        foreach ($this->type as $key => $val) {
-            if ($this->type[$value] == 'Customer')
+        $this->result = $key;
+        $this->accounts[$key] = $this->accounts_arr[$value];
+            /*if ($this->type[$value] == 'Customer')
                 $this->accounts[$value] = $this->customers;
             if ($this->type[$value]  == 'Supplier')
                 $this->accounts[$value] = $this->suppliers;
             if ($this->type[$value]  == 'GeneralAccount')
-                $this->accounts[$value] = $this->gls;
-//        }
+                $this->accounts[$value] = $this->gls;*/
     }
 
     private function resetInputFields(){

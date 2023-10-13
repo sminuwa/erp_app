@@ -12,8 +12,8 @@ class EditJournal extends Component
 {
 
     public $readyToLoad = false;
-
-    public $accounts, $journal;
+    public $accounts = [], $accounts_arr = [];
+    public $journal;
     public $customers, $suppliers, $gls;
     public $journal_date, $description;
     public $type, $account, $debit, $credit, $desc, $result;
@@ -22,6 +22,57 @@ class EditJournal extends Component
     public $inputs = [];
     public $i = 1;
 
+    public function mount()
+    {
+        $customers = Customer::where('branch_id', auth()->user()->branch->id)->orderBy('code', 'asc')->get();
+        $suppliers = Supplier::orderBy('code', 'asc')->get();
+        $gls = GeneralAccount::orderBy('number', 'asc')->get();
+        $c = $s = $g = [];
+        foreach($customers as $customer){
+            $c[] = [
+                'id'=>$customer->id,
+                'code' => $customer->code,
+                'name' => $customer->name
+            ];
+        }
+        foreach($suppliers as $supplier){
+            $s[] = [
+                'id'=>$supplier->id,
+                'code'=>$supplier->code,
+                'name' => $supplier->name
+            ];
+        }
+        foreach($gls as $gl){
+            $g[] = [
+                'id'=>$gl->id,
+                'code' => $gl->number,
+                'name' => $gl->description
+            ];
+        }
+        $this->accounts_arr['Customer'] = $c;
+        $this->accounts_arr['Supplier'] = $s;
+        $this->accounts_arr['GeneralAccount'] = $g;
+
+        $this->description = $this->journal->description;
+        $this->journal_date = $this->journal->date;
+        foreach($this->journal->items as $key => $items){
+            $this->inputs[] = "";
+            $this->type[] = $items->account_type;
+            $this->account[] = $items->account_id;
+            $this->credit[] = $items->credit;
+            $this->debit[] = $items->debit;
+            $this->desc[] = $items->description;
+            $this->accounts[] = '';
+            $this->changeTypeEvent($items->account_type,$key);
+        }
+
+    }
+
+    public function render()
+    {
+        $this->totals();
+        return view('livewire.edit-journal');
+    }
 
 
     public function add()
@@ -36,31 +87,6 @@ class EditJournal extends Component
         unset($this->inputs[$i]);
     }
 
-    public function mount()
-    {
-        $this->customers = Customer::where('branch_id', auth()->user()->branch->id)->orderBy('code', 'asc')->get();
-        $this->suppliers = Supplier::orderBy('code', 'asc')->get();
-        $this->gls = GeneralAccount::orderBy('number', 'asc')->get();
-        $this->description = $this->journal->description;
-        $this->journal_date = $this->journal->date;
-        foreach($this->journal->items as $key => $items){
-            $this->inputs[] = "";
-            $this->type[] = $items->account_type;
-            $this->account[] = $items->account_id;
-            $this->credit[] = $items->credit;
-            $this->debit[] = $items->debit;
-            $this->desc[] = $items->description;
-            $this->changeTypeEvent($key);
-        }
-
-    }
-
-    public function render()
-    {
-        $this->totals();
-        return view('livewire.edit-journal');
-    }
-
     public function totals(){
         try{
             $this->total_credit = $this->total_debit = 0;
@@ -73,7 +99,19 @@ class EditJournal extends Component
         }
     }
 
-    public function changeTypeEvent($value)
+    public function changeTypeEvent($value, $key)
+    {
+        $this->result = $key;
+        $this->accounts[$key] = $this->accounts_arr[$value];
+        /*if ($this->type[$value] == 'Customer')
+            $this->accounts[$value] = $this->customers;
+        if ($this->type[$value]  == 'Supplier')
+            $this->accounts[$value] = $this->suppliers;
+        if ($this->type[$value]  == 'GeneralAccount')
+            $this->accounts[$value] = $this->gls;*/
+    }
+
+    /*public function changeTypeEvent($value)
     {
         if ($this->type[$value] == 'Customer')
             $this->accounts[$value] = $this->customers;
@@ -81,7 +119,7 @@ class EditJournal extends Component
             $this->accounts[$value] = $this->suppliers;
         if ($this->type[$value]  == 'GeneralAccount')
             $this->accounts[$value] = $this->gls;
-    }
+    }*/
 
     private function resetInputFields(){
         $this->journal_date = '';

@@ -38,7 +38,7 @@
                                             <td>
                                                 <div class="col-12">
                                                     <div class="form-group" wire:ignore>
-                                                        <select  wire:model.lazy="type.{{ $key }}" wire:change="changeTypeEvent({{$key}})" class="form-control" required>
+                                                        <select  wire:model.lazy="type.{{ $key }}" wire:change="changeTypeEvent($event.target.value, {{ $key }})" class="form-control" required>
                                                             <option value="">Select...</option>
                                                             <option value="Customer">Customer</option>
                                                             <option value="Supplier">Supplier

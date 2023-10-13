@@ -30,10 +30,10 @@ class InterBank extends Model
     }
 
     public static function generateNewNumber($prefix = 'ITB', $length = 4){
-        $prefix = $prefix.date('ymd');
-        $record = self::where('receipt_no', 'like', '%'.$prefix.'%')->orderBy('receipt_no', 'desc')->first();
+        $prefix = $prefix.date('ym').auth()->user()->branch->code;
+        $record = self::where('reference', 'like', '%'.$prefix.'%')->orderBy('reference', 'desc')->first();
         if($record){
-            $number = $record->receipt_no;
+            $number = $record->reference;
             $new = intval(substr($number,strlen($prefix)))+1;
             return $prefix.str_pad($new, $length,0,STR_PAD_LEFT);
         }

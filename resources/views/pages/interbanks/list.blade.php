@@ -87,42 +87,42 @@
                                         </tr>
                                     </tfoot>
                                     <tbody>
-                                        @foreach ($payments as $payment)
+                                        @foreach ($interbanks as $interbank)
                                             <tr>
 
-                                                <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
+                                                <td>{{ Carbon\Carbon::parse($interbank->date)->toFormattedDateString() }}
                                                 </td>
-                                                <td>{{ $payment->reference }}</td>
-                                                <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
-                                                <td>{{ $payment->description }}</td>
-                                                <td>{{ $payment->source->description }}</td>
-                                                <td>{{ $payment->destination->description }}</td>
-                                                <td>{{ optional($payment->transfered_by)->name }}</td>
+                                                <td>{{ $interbank->reference }}</td>
+                                                <td align="right">{{ number_format($interbank->amount, 2, '.', ',') }}</td>
+                                                <td>{{ $interbank->description }}</td>
+                                                <td>{{ $interbank->source->description }}</td>
+                                                <td>{{ $interbank->destination->description }}</td>
+                                                <td>{{ optional($interbank->transfered_by)->name }}</td>
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            <a href="{{ route('interbank.print', $payment->id) }}" target="_blank"
+                                                            <a href="{{ route('interbank.print', $interbank->id) }}" target="_blank"
                                                                class="dropdown-item">
                                                                 <i class="fa fa-print" aria-hidden="true"></i> Print
                                                             </a>
-                                                            <a href="{{ route('interbank.print.pos', $payment->id) }}" target="_blank"
+                                                            <a href="{{ route('interbank.print.pos', $interbank->id) }}" target="_blank"
                                                                class="dropdown-item">
                                                                 <i class="fa fa-print" aria-hidden="true"></i> PoS
                                                             </a>
-                                                            @if($payment->status == 0)
-                                                                <a href="{{ route('interbank.edit', $payment->id) }}"
+                                                            @if($interbank->status == 0)
+                                                                <a href="{{ route('interbank.edit', $interbank->id) }}"
                                                                    class="dropdown-item">
                                                                     <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                                                 </a>
-                                                                <a href="{{ route('interbank.delete', $payment->id) }}"
+                                                                <a href="{{ route('interbank.delete', $interbank->id) }}"
                                                                    class="dropdown-item">
                                                                     <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                                                 </a>
                                                             @else
-                                                                <a href="{{ route('interbank.reverse',[$payment->id]) }}"
+                                                                <a href="{{ route('interbank.reverse',[$interbank->id]) }}"
                                                                    class="dropdown-item">
                                                                     <i class="fa fa-reply" aria-hidden="true"></i> Reverse
                                                                 </a>

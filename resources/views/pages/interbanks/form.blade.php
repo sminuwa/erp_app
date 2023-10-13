@@ -9,7 +9,7 @@
                     name="source_account_id" id="source_account_id" required="required">
                     <option value="">Select...</option>
                     @foreach ($accounts as $account)
-                        <option value="{{ $account->id }}" {{ $account->id = old('source_account_id', $model->source_account_id) }}>
+                        <option value="{{ $account->id }}" {{ $account->id == old('source_account_id', $model->source_account_id) }}>
                             {{ $account->number }} - {{ $account->description }}</option>
                     @endforeach
                 </select>
@@ -20,14 +20,15 @@
                 @endif
             </div>
         </div>
+
         <div class="col-md-4">
             <div class="form-group">
                 <label for="destination_account_id">Destination Account</label>
                 <select class="form-control select2-single {{ $errors->has('destination_account_id') ? ' is-invalid' : '' }}"
-                    name="destination_account_id" id="destination_account_id" required="required">
+                        name="destination_account_id" id="destination_account_id" required="required">
                     <option value="">Select...</option>
                     @foreach ($accounts as $account)
-                        <option value="{{ $account->id }}" {{ $account->id = old('destination_account_id', $model->destination_account_id) }}>
+                        <option value="{{ $account->id }}" {{ $account->id == old('destination_account_id', $model->source_account_id) }}>
                             {{ $account->number }} - {{ $account->description }}</option>
                     @endforeach
                 </select>
@@ -36,6 +37,7 @@
                         <strong>{{ $errors->first('destination_account_id') }}</strong>
                     </div>
                 @endif
+
             </div>
         </div>
 

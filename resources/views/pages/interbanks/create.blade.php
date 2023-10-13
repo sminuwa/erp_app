@@ -44,12 +44,17 @@
                     <i class="fa fa-print" aria-hidden="true">PoS</i>
                 </a>
             @endif
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-sm-12 ">
-                        @include('pages.interbanks.form')
+            <div class="container-fluid py-4">
+                <div class="card" >
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-12 ">
+                                @include('pages.interbanks.form')
+                            </div>
+                        </div>
                     </div>
                 </div>
+
             </div><!-- /.container-fluid -->
         </section>
         <!-- /.content -->

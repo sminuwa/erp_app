@@ -65,12 +65,13 @@ class EditJournal extends Component
             $this->accounts[] = '';
             $this->changeTypeEvent($items->account_type,$key);
         }
+        $this->totals();
 
     }
 
     public function render()
     {
-        $this->totals();
+
         return view('livewire.edit-journal');
     }
 
@@ -103,23 +104,7 @@ class EditJournal extends Component
     {
         $this->result = $key;
         $this->accounts[$key] = $this->accounts_arr[$value];
-        /*if ($this->type[$value] == 'Customer')
-            $this->accounts[$value] = $this->customers;
-        if ($this->type[$value]  == 'Supplier')
-            $this->accounts[$value] = $this->suppliers;
-        if ($this->type[$value]  == 'GeneralAccount')
-            $this->accounts[$value] = $this->gls;*/
     }
-
-    /*public function changeTypeEvent($value)
-    {
-        if ($this->type[$value] == 'Customer')
-            $this->accounts[$value] = $this->customers;
-        if ($this->type[$value]  == 'Supplier')
-            $this->accounts[$value] = $this->suppliers;
-        if ($this->type[$value]  == 'GeneralAccount')
-            $this->accounts[$value] = $this->gls;
-    }*/
 
     private function resetInputFields(){
         $this->journal_date = '';

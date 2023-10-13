@@ -66,14 +66,6 @@ class CreateJournal extends Component
     }
     public function render()
     {
-        /*try {
-            if ($this->loadData) {
-
-                return view('livewire.create-journal');
-            }
-        }catch (\Exception $e){
-            return view('livewire.create-journal');
-        }*/
         return view('livewire.create-journal');
     }
 

@@ -17,10 +17,10 @@ class InterBankController extends Controller
     public function list(Request $request)
     {
         $user_branch = User::userBranchAction();
-        $payments = InterBank::select('inter_banks.*')
+        $interbanks = InterBank::select('inter_banks.*')
             ->where('branch_id', 'LIKE', $user_branch)
-            ->orderBy('date', 'DESC')->take(10)->get();
-        return view('pages.interbanks.list', ['payments' => $payments]);
+            ->orderBy('reference', 'DESC')->take(10)->get();
+        return view('pages.interbanks.list', ['interbanks' => $interbanks]);
     }
 
     public function create(Request $request)
@@ -35,8 +35,8 @@ class InterBankController extends Controller
     {
         $amount = $request->amount_paid;
         $source_account_id = $request->source_account_id;
-        $destination_account_id =190;//= $request->destination_account_id;
-        $reference = $this->generateReceiptNo();
+        $destination_account_id = $request->destination_account_id;
+        $reference = InterBank::generateNewNumber();
         $date = $request->payment_date;
         $description = $request->payment_ref;
         $user_branch = User::userBranchAction();

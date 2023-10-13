@@ -121,8 +121,7 @@
                                 <p><b>Signatire :</b> ______________________________________</p>
                                 <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For:
                                     ALBABELLO </span>
-                                <br /><br />
-                                <h5 style="color: rgb(140, 140, 140);text-align:center;">Thanks for Patronage!</h5>
+
                             </div>
                         </div>
                         <div class="col-xs-2 col-sm-2 col-md-2 text-right">
@@ -130,7 +129,7 @@
                                 @php
                                     $uc = $interbank->reference;
                                 @endphp
-                                {{ QrCode::size(70)->backgroundColor(255, 55, 0)->generate("$interbank->dr\n$uc\n\n.") }}<br />
+                                {{ QrCode::size(70)->generate("$interbank->dr\n$uc\n\n.") }}<br />
                             </div>
                         </div>
                     </div>

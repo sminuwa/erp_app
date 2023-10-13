@@ -133,7 +133,7 @@ class EditJournal extends Component
                 ]
             );
 
-            $this->journal->reference = \App\Models\Journal::generateNewNumber();
+//            $this->journal->reference = \App\Models\Journal::generateNewNumber();
             $this->journal->description = $this->description;
             $this->journal->date = $this->journal_date;
             $this->journal->updated_by = auth()->id();

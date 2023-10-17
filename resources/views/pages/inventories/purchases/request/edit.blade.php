@@ -41,8 +41,8 @@
                     <div class='col-md-12'>
                         <div class='card'>
                             <div class="card-body">
-                                @include('forms.purchase', [
-                                    'route' => route('purchases.update', $model->id),
+                                @include('forms.purchase_request', [
+                                    'route' => route('purchases.request.update', $model->id),
                                     'method' => 'PUT',
                                 ])
                             </div>

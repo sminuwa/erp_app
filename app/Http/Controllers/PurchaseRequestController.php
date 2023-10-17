@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PurchaseExpense;
+use App\Models\PurchaseProductRequest;
 use App\Models\PurchaseRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -54,9 +55,9 @@ class PurchaseRequestController extends Controller
     {
         \Cart::clear();
         $search_value = $request->refno;
-        $records = PurchaseRequest::select('purchases.*')->where('invoice', 'LIKE', "%$search_value%")
-            ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
-            ->where('branch_id', 'LIKE', User::userBranchAction())
+        $records = PurchaseRequest::select('purchase_requests.*')->where('invoice', 'LIKE', "%$search_value%")
+            ->join('suppliers', 'suppliers.id', 'purchase_requests.supplier_id')
+            ->where('purchase_requests.branch_id', 'LIKE', User::userBranchAction())
             ->orderBy('purchase_date', 'DESC')->take(10)->get();
         return view('pages.inventories.purchases.request.index', [
             'records' => $records
@@ -163,7 +164,7 @@ class PurchaseRequestController extends Controller
         return view('pages.inventories.purchases.request.edit', [
             'model' => $purchase,
             'products' => Product::all(),
-            'suppliers' => Supplier::where('branch_id', 'LIKE', User::userBranchAction())->get(),
+            'suppliers' => Supplier::orderBy('name')->get(),
             'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->get(),
             'categories' => Category::all(),
             'cart_products' => $cart_products,
@@ -184,42 +185,48 @@ class PurchaseRequestController extends Controller
         $purchase_id = $purchase->id;
         DB::beginTransaction();
         try {
-            DB::table('purchases')->where('id', $purchase->id)->update([
+            DB::table('purchase_requests')->where('purchase_requests.id', $purchase_id)->update([
                 'supplier_id' => $request->supplier_id,
                 'invoice' => $request->invoice,
-                'purchase_date' => $request->purchase_date,
-                'purchase_mode' => $request->purchase_mode,
-                'vehicle_reg_no' => $request->vehicle_reg_no,
-                'source_store_id' => $request->source_store_id,
-                'destination_store_id' => $request->source_store_id,
+                'purchase_date' => Carbon::now(),
+                'branch_id' => User::userBranchAction(),
                 'updated_by' => $request->updated_by,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]);
+            DB::table('purchase_product_requests')->where('purchase_id', $purchase->id)->delete();
+            foreach (\Cart::getContent() as $product) {
+                $cart_attributes = $product->attributes;
+                //dd( $cart_attributes);
 
-            DB::table('purchase_products')->where(['purchase_id' => $purchase->id])->delete();
-            DB::table('supplier_ledgers')->where(['purchase_id' => $purchase->id])->delete();
-
-            if (\Cart::getContent()->count() > 0) {
-                foreach (\Cart::getContent() as $product) {
-                    $cart_attributes = $product->attributes;
-                    //dd( $cart_attributes);
-                    $selling_price = $product->price;
-                    DB::table('purchase_products')->insert([
+                $selling_price = $product->price;
+                //This will be uncommented later if the logic has changed
+                //$selling_price = optional(BranchProductPrice::find($product->id))->selling_price;
+                
+                DB::table('purchase_product_requests')->updateOrInsert(
+                    [
+                        'purchase_id' => $purchase_id,
+                        'product_id' => $product->id
+                    ],
+                    [
                         'purchase_id' => $purchase_id,
                         'product_id' => $product->id,
-                        'qty_supplied' => $product->quantity,
-                        'unit_price' => $product->unit_price,
-                        'selling_price' => 0,
+                        'quantity' => $product->quantity,
+                        'unit_price' => $product->price,
+                        'user_id' => auth()->id(),
+                        'status' => 0,
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
-                    ]);
-                }
+                    ]
+                );
+
                 $action = "Modified a purchase with invoice $request->invoice from supplier: " . Supplier::find($request->supplier_id)->name;
                 AuditLog::auditLog(Auth::id(), $action);
                 DB::commit();
                 session()->flash('app_message', 'Purchase updated successfully');
             }
 
-            return redirect()->route('purchases.index');
+            return redirect()->route('purchases.request.index');
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('app_message', 'Something is wrong while updating Purchase');
@@ -243,8 +250,9 @@ class PurchaseRequestController extends Controller
         $invoice = $purchase->invoice;
         DB::beginTransaction();
         try {
-            DB::table('purchase_products')->where(['purchase_id' => $purchase->id])->delete();
-            DB::table('purchases')->where('id', $purchase->id)->delete();
+            DB::table('purchase_product_requests')->where('purchase_id', $purchase->id)->delete();
+            DB::table('purchase_requests')->where(['id' => $purchase->id])->delete();
+           
 
             $action = "Deleted a purchase with invoice $invoice from supplier: " . Supplier::find($purchase->supplier_id)->name;
             AuditLog::auditLog(Auth::id(), $action);
@@ -278,7 +286,7 @@ class PurchaseRequestController extends Controller
             session()->flash('app_message', 'Product is Added to Cart Successfully !');
             if ($request->has('type') && $request->type == "create")
                 return redirect()->back()->withInput();
-            return redirect()->route('purchases.edit', $request->purchase_id)->withInput();
+            return redirect()->route('purchases.request.edit', $request->purchase_id)->withInput();
 
         } else {
 
@@ -341,7 +349,7 @@ class PurchaseRequestController extends Controller
     {
         $purchase = PurchaseRequest::with('supplier')->where('id', $purchase->id)->first();
 
-        $purchase_details = PurchaseProduct::with('Product')->where('purchase_id', $purchase->id)->get();
+        $purchase_details = PurchaseProductRequest::with('Product')->where('purchase_id', $purchase->id)->get();
 
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         $utility = new Utility();

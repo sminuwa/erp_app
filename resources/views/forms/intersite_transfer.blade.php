@@ -96,7 +96,7 @@
             </div>
         @endif
     </div>
-    <div class="form-group">
+    {{-- <div class="form-group">
         <label for="unit_price">Product Code Price</label>
         <input type="text"
             class="form-control {{ $errors->has('unit_price') ? ' is-invalid' : '' }}"
@@ -106,7 +106,8 @@
                 <strong>{{ $errors->first('unit_price') }}</strong>
             </div>
         @endif
-    </div>
+    </div> --}}
+    <input type="hidden" value="0" name="unit_price" id="unit_price"/>
     <div class="form-group text-right ">
         <button type="submit" class="btn btn-primary"><span class="ion-ios-cart-outline"></span> Add to Cart</button>
     </div>

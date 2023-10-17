@@ -134,8 +134,8 @@
                                             <th>Code</th>
                                             <th>Description</th>
                                             <th>QTY</th>
-                                            <th>Price (&#8358;)</th>
-                                            <th>Subtotal (&#8358;)</th>
+                                            {{-- <th>Price (&#8358;)</th>
+                                            <th>Subtotal (&#8358;)</th> --}}
                                             <th>Status</th>
                                         </tr>
                                     </thead>
@@ -147,11 +147,11 @@
                                                 <td>{{ $product->product->code }}</td>
                                                 <td>{{ $product->product->name }}</td>
                                                 <td>{{ number_format($product->quantity_requested, 0, '', ',') }}</td>
-                                                <td style="text-align: right">{{ number_format($product->cost_price, 2) }}
+                                                {{-- <td style="text-align: right">{{ number_format($product->cost_price, 2) }}
                                                 </td>
                                                 <td style="text-align: right">
                                                     {{ number_format($product->quantity_requested * $product->cost_price, 2) }}
-                                                </td>
+                                                </td> --}}
                                                 <td>{{ $product->status == 1 ? 'Completed' : 'Pending' }}</td>
                                                 @php $total += $product->cost_price * $product->quantity_requested; @endphp
                                             </tr>
@@ -162,8 +162,8 @@
                                         <th></th>
                                         <th></th>
                                         <th></th>
-                                        <th style="text-align: right">Total</th>
-                                        <th style="text-align: right">&#8358;{{ number_format($total, 2) }}</th>
+                                        {{-- <th style="text-align: right">Total</th>
+                                        <th style="text-align: right">&#8358;{{ number_format($total, 2) }}</th> --}}
                                         <th></th>
                                     </tfoot>
                                 </table>

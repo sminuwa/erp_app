@@ -4,7 +4,6 @@
             <th>Supplier</th>
             <th>Invoice </th>
             <th>Purchase Date </th>
-            <th>Purchase Mode </th>
             <th>Amount (&#8358;) </th>
             <th>Status </th>
             <th>&nbsp;</th>
@@ -13,10 +12,9 @@
     <tbody>
         @foreach ($records as $record)
             <tr>
-                <td> {{ optional($record->supplier)->name }} </td>
+                <td> {{ optional($record->supplier)->code }}-{{ optional($record->supplier)->name }} </td>
                 <td> {{ $record->invoice }} </td>
                 <td> {{ $record->purchase_date->toDayDateTimeString() }} </td>
-                <td> {{ $record->purchase_mode }} </td>
                 <td style="text-align: right"> {{ number_format($record->totalProductCost()->total, 2) }} </td>
                 <td> {{ $record->status == 1 ? 'Completed' : 'Pending' }} </td>
                 <td>
@@ -82,10 +80,10 @@
                                                 placeholder="Driver name">
                                         </div>
                                         <div class="form-group">
-                                            <label>Location ID: </label>
-                                            <input type="text" class="form-control" name="location_id"
-                                                value="{{ old('location_id', $record->location_id) }}"
-                                                placeholder="Enter Address">
+                                            <label for="transporter_phone">Phone No: </label>
+                                            <input type="text" class="form-control" name="transporter_phone"
+                                                value="{{ old('transporter_phone', $record->transporter_phone) }}"
+                                                placeholder="Phone Number">
                                         </div>
 
                                         <div class="form-group">
@@ -102,9 +100,16 @@
                                         </div>
                                         <div class="form-group">
                                             <label>Transporter:</label>
-                                            <input type="text" class="form-control" name="transporter"
-                                                value="{{ old('transporter', $record->transporter) }}"
-                                                placeholder="Transporter name">
+                                            <select class="form-control select2-single" name="transporter"
+                                                id="transporter" required>
+                                                <option value="">Select...</option>
+                                                @foreach ($suppliers as $data)
+                                                    <option value="{{ $data->id }}"
+                                                        {{ $record->transporter == $data->id ? 'selected' : '' }}>
+                                                        {{ $data->code }}-{{ $data->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                     <input type="hidden" name="modal" value="modal" />

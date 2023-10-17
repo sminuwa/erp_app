@@ -194,10 +194,10 @@
                     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
 
                     <div class="form-group">
-                        <label for="supplier_id">Supplier Name</label>
+                        <label for="supplier_id">Supplier Name {{$model->supplier_id}}</label>
                         <select
                             class="form-control select2-single {{ $errors->has('supplier_id') ? ' is-invalid' : '' }}"
-                            name="supplier_id" id="supplier_id" required="required">
+                            name="supplier_id" id="supplier_id" required="required" autocomplete="off">
                             <option value="">Select...</option>
                             @if (isset($suppliers))
                                 @foreach ($suppliers as $data)
@@ -271,7 +271,7 @@
                                 @foreach ($stores as $data)
                                     <option value="{{ $data->id }}"
                                         {{ $data->id == $model->source_store_id ? 'selected' : '' }}>
-                                        {{ $data->name }}</option>
+                                        {{ $data->code }}-{{ $data->name }}</option>
                                 @endforeach
                             @endif
                         </select>

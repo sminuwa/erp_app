@@ -87,7 +87,7 @@
                         </div>
                         <div class="col-sm-4" style="text-align: left;font-size:18px;">
                             <b>Drivers's Name:</b> {{ $purchase->driver_name }}<br>
-                            <b>Location ID:</b> {{ $purchase->location_id }}<br>
+                            <b>Phone Number:</b> {{ $purchase->transporter_phone }}<br>
                             <b>Warehouse:</b> {{ $purchase->warehouse }}<br>
                             <b>Vehicle Reg No:</b> {{ $purchase->vehicle_reg_no }}<br>
                             <b>Transporter:</b> {{ $purchase->transporter }}<br>

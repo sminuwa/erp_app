@@ -89,7 +89,6 @@
                                         <th>Product Name</th>
                                         <th>Quantity</th>
                                         <th>Rate</th>
-                                        <th>Store</th>
                                         <th>Total</th>
                                     </tr>
                                 </thead>
@@ -102,15 +101,14 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $purchase_detail->product->name }}</td>
-                                            <td align="center">{{ $purchase_detail->qty_supplied }}</td>
+                                            <td align="center">{{ $purchase_detail->quantity }}</td>
                                             <td align="right">
                                                 &#8358;{{ number_format($purchase_detail->unit_price, 2) }}</td>
-                                            <td>{{ $purchase->sourceStore->name }}</td>
                                             <td align="right">
-                                                &#8358;{{ number_format($purchase_detail->unit_price * $purchase_detail->qty_supplied, 2) }}
+                                                &#8358;{{ number_format($purchase_detail->unit_price * $purchase_detail->quantity, 2) }}
                                             </td>
                                         </tr>
-                                        @php $total += ($purchase_detail->unit_price * $purchase_detail->qty_supplied);  @endphp
+                                        @php $total += ($purchase_detail->unit_price * $purchase_detail->quantity);  @endphp
                                     @endforeach
                                     <tr>
                                         <th colspan="5" style="text-align: right">Total Amount</th>

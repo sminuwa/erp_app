@@ -14,7 +14,7 @@ class Update extends FormRequest
      */
     public function authorize() 
     {
-        return $this->user()->can('edit.item.purchase', Purchase::class);
+        return $this->user()->can('edit.item.purchase');
     }
 
     /**
@@ -27,7 +27,7 @@ class Update extends FormRequest
         return [
 			'supplier_id' => 'required|numeric',
 			'invoice' => 'required|max:191',
-			'purchase_date' => 'required|date',
+			'purchase_date' => 'nullable|date',
 			'vehicle_reg_no' => 'nullable|max:191',
 			'updated_by' => 'required|numeric',
         ];

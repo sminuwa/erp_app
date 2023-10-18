@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Model;
 @property bigint $updated_by updated by
 @property timestamp $created_at created at
 @property timestamp $updated_at updated at
-   
+
  */
 class PurchaseRequest extends Model
 {
@@ -93,6 +93,17 @@ class PurchaseRequest extends Model
     public function expenses()
     {
         return $this->hasMany(PurchaseExpense::class,'purchase_id');
+    }
+
+    public static function generateNewNumber($prefix = 'PUR', $length = 4){
+        $prefix = $prefix.date('ym').auth()->user()->branch->code;
+        $record = self::where('reference', 'like', '%'.$prefix.'%')->orderBy('reference', 'desc')->first();
+        if($record){
+            $number = $record->reference;
+            $new = intval(substr($number,strlen($prefix)))+1;
+            return $prefix.str_pad($new, $length,0,STR_PAD_LEFT);
+        }
+        return $prefix.str_pad(1, $length,0,STR_PAD_LEFT);
     }
 
 

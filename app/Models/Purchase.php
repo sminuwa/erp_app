@@ -67,7 +67,7 @@ class Purchase extends Model
     }
 
 
-    public static function generateNewNumber($prefix = 'PUR', $length = 4){
+    public static function generateNewNumber($prefix = 'GRN', $length = 4){
         $prefix = $prefix.date('ym').auth()->user()->branch->code;
         $record = self::where('reference', 'like', '%'.$prefix.'%')->orderBy('reference', 'desc')->first();
         if($record){

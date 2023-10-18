@@ -12,8 +12,8 @@
     <tbody>
         @foreach ($records as $record)
             <tr>
-                <td> {{ optional($record->supplier)->name }} </td>
-                <td> {{ $record->invoice }} </td>
+                <td> {{ optional($record->supplier)->code }} - {{ optional($record->supplier)->name }} </td>
+                <td> {{ $record->reference }} </td>
                 <td> {{ $record->purchase_date->toDayDateTimeString() }} </td>
                 <td style="text-align: right"> {{ number_format($record->totalProductCost()->total, 2) }} </td>
                 <td> {{ $record->status == 1 ? 'Completed' : 'Pending' }} </td>

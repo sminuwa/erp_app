@@ -106,17 +106,17 @@
                                             &#8358;{{ number_format($total, 2, '.', ',') }}</th>
                                     </tr>
                                     <tr>
-                                        <th colspan="5" style="text-align: right">Discount</th>
+                                        <th colspan="4" style="text-align: right">Discount</th>
                                         <th style="text-align: right;">
                                             &#8358;{{ number_format(0, 2, '.', ',') }}</th>
                                     </tr>
                                     <tr>
-                                        <th colspan="5" style="text-align: right">Amount Paid</th>
+                                        <th colspan="4" style="text-align: right">Amount Paid</th>
                                         <th style="text-align: right;">
                                             &#8358;{{ number_format($purchase->totalPaid(), 2, '.', ',') }}</th>
                                     </tr>
                                     <tr>
-                                        <th colspan="5" style="text-align: right">Balance</th>
+                                        <th colspan="4" style="text-align: right">Balance</th>
                                         <th style="text-align: right;">
                                             @if ($total - $purchase->totalPaid() < 0)
                                                 &#8358;({{ number_format(abs($total - $purchase->totalPaid()), 2) }})

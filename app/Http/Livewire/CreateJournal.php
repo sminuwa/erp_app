@@ -35,6 +35,7 @@ class CreateJournal extends Component
     }
 
     public function mount(){
+
         $customers = Customer::where('branch_id', auth()->user()->branch->id)->orderBy('code', 'asc')->get();
         $suppliers = Supplier::orderBy('code', 'asc')->get();
         $gls = GeneralAccount::orderBy('number', 'asc')->get();

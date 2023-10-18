@@ -114,6 +114,7 @@ class PurchaseGRNController extends Controller
             $purchase_datetime = date('Y-m-d H:i:s', strtotime("$request->purchase_date $request->purchase_time"));
             $purchase_id = DB::table('purchases')->insertGetId([
                 'supplier_id' => $request->supplier_id,
+                'reference' => Purchase::generateNewNumber(),
                 'invoice' => $request->invoice,
                 'purchase_date' => $purchase_datetime,
                 'purchase_mode' => 'Cash',

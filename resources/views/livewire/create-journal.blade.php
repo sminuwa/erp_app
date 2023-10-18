@@ -12,6 +12,7 @@
            <div class="col-12 mb-3">
                <h5>Journal Details</h5>
            </div>
+
            <form wire:submit.prevent="store" wire:ignore.self>
                <div class="row">
                    <div class="col-md-12" style="border-right:#dddddd solid">
@@ -22,13 +23,13 @@
                        <label class="floating-label">Date: @error('journal_date')<span class="text-danger error">{{ $message }}</span>@enderror</label>
                    </div>
                    <div class="col-md-7 mb-3" wire:ignore>
-                       <input wire:model="description" type="text" class="form-control" placeholder="Description">
+                       <input wire:model="description" id="description" type="text" class="form-control" placeholder="Description">
                        <label class="floating-label">Description: @error('description')<span class="text-danger error">{{ $message }}</span>@enderror</label>
                    </div>
 
                    <div class="col-md-12">
                        <div class="row">
-                           <div class="col-md-12 mb-3">
+                           <div class="col-md-12 mb-3" wire:ignore>
                                <button class="btn text-white btn-info btn-sm" wire:click.prevent="add({{$i}})">Add</button>
                            </div>
 {{--                           @json($accounts)--}}
@@ -39,7 +40,7 @@
                                        <td>
                                            <div class="col-12">
                                                <div class="form-group" wire:ignore>
-                                                   <select  wire:model="type.{{ $key }}" wire:change="changeTypeEvent($event.target.value, {{ $key }})" class="form-control select2-single" required>
+                                                   <select wire:model="type.{{ $key }}" wire:change.lazy="changeTypeEvent($event.target.value, {{ $key }})" class="form-control  type select2-single" required>
                                                        <option value="">Select...</option>
                                                        <option value="Customer">Customer</option>
                                                        <option value="Supplier">Supplier
@@ -53,7 +54,7 @@
                                        <td>
                                            <div class="col-12">
                                                <div class="form-group">
-                                                   <select wire:ignore.self wire:model="account.{{ $key }}" class="form-control select2-single" required>
+                                                   <select wire:ignore.self wire:model.lazy="account.{{ $key }}" class="form-control select2" required>
                                                        <option value="">Select...</option>
                                                         @if(isset($accounts[$key]))
                                                            @foreach($accounts[$key] as $account)
@@ -68,7 +69,7 @@
                                        <td>
                                            <div class="col-12">
                                                <div class="form-group" wire:ignore>
-                                                   <input type="number" min="0" class="form-control" placeholder="Debit" wire:model="debit.{{ $key }}" wire:keyup="totals">
+                                                   <input type="number" min="0" class="form-control" placeholder="Debit" wire:model.lazy="debit.{{ $key }}" wire:change="totals">
                                                    <label class="floating-label">Debit: @error('debit.'.$key) <br><span class="text-danger error">{{ $message }}</span>@enderror</label>
                                                </div>
                                            </div>
@@ -76,7 +77,7 @@
                                        <td>
                                            <div class="col-12">
                                                <div class="form-group" wire:ignore>
-                                                   <input type="number" min="0" class="form-control" placeholder="Credit" wire:model="credit.{{ $key }}" wire:keyup="totals">
+                                                   <input type="number" min="0" class="form-control" placeholder="Credit" wire:model.lazy="credit.{{ $key }}" wire:change="totals">
                                                    <label class="floating-label">Credit: @error('credit.'.$key) <br><span class="text-danger error">{{ $message }}</span>@enderror</label>
                                                </div>
                                            </div>
@@ -84,7 +85,7 @@
                                        <td>
                                            <div class="col-12">
                                                <div class="input-group mb-3" wire:ignore>
-                                                   <input type="text" class="form-control" placeholder="Description" wire:model="desc.{{ $key }}" >
+                                                   <input type="text" class="form-control" placeholder="Description" wire:model.lazy="desc.{{ $key }}" >
                                                    <label class="floating-label">Description: @error('desc.'.$key) <br><span class="text-danger error">{{ $message }}</span>@enderror</label>
                                                    <div class="input-group-append">
                                                        <button class="btn btn-danger btn-sm" wire:click.prevent="remove({{$key}})"><i class="fa fa-trash"></i></button>
@@ -116,16 +117,27 @@
     <script>
 
     </script>
-    @push('scripts')
+{{--    @push('scripts')--}}
         <script>
-            document.addEventListener('livewire:load', function () {
-                $(".select2-single, .select2-multiple, .select2").select2({
-                    theme: "bootstrap",
-                    maximumSelectionSize: 6,
-                    containerCssClass: ':all:'
-                });
-            })
+            /*document.addEventListener('livewire:load', function () {
+                function initSelect2(){
+                    $(".select2").select2();
+                }
+                // initSelect2()
+                console.log('Navigated')
+                $('body').on('change', '.type', function () {
+                    initSelect2()
+                    // let data = $(this).select2('val')
+                    // console.log(data)
+                })
+               /!* $('body').on('change', @this.type, function () {
+                    // initSelect2()
+                    let data = $(this).select2('val')
+                    console.log(data)
+                })*!/
+
+            })*/
         </script>
-    @endpush
+{{--    @endpush--}}
 </div>
 

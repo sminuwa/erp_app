@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 /**
  @property bigint $supplier_id supplier id @property varchar $invoice invoice @property date $purchase_date purchase date @property enum $purchase_mode purchase mode @property varchar $address address @property varchar $wbno wbno @property bigint $source_store_id source store id @property bigint $product_id product id @property int $qty_supplied qty supplied @property decimal $unit_price unit price @property bigint $destination_store_id destination store id @property tinyint $status status @property bigint $updated_by updated by @property timestamp $created_at created at @property timestamp $updated_at updated at
- 
+
  */
 class Purchase extends Model
 {
@@ -65,4 +65,17 @@ class Purchase extends Model
     {
         return $this->hasMany(PurchaseExpense::class);
     }
+
+
+    public static function generateNewNumber($prefix = 'PUR', $length = 4){
+        $prefix = $prefix.date('ym').auth()->user()->branch->code;
+        $record = self::where('reference', 'like', '%'.$prefix.'%')->orderBy('reference', 'desc')->first();
+        if($record){
+            $number = $record->reference;
+            $new = intval(substr($number,strlen($prefix)))+1;
+            return $prefix.str_pad($new, $length,0,STR_PAD_LEFT);
+        }
+        return $prefix.str_pad(1, $length,0,STR_PAD_LEFT);
+    }
+
 }

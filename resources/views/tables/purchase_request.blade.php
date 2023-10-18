@@ -18,7 +18,7 @@
                 <td> {{ $record->invoice }} </td>
                 <td> {{ $record->purchase_date->toDayDateTimeString() }} </td>
                 <td style="text-align: right"> {{ number_format($record->totalProductCost()->total, 2) }} </td>
-                <td> {{ $record->status == 1 ? 'Completed' : 'Pending' }} </td>
+                <td> {{ $record->status == 1 ? 'Close' : 'Open' }} </td>
                 <td>
                     <a class="btn btn-secondary btn-sm" href="{{ route('purchases.request.show', $record->id) }}">
                         <span class="fa fa-eye"></span>

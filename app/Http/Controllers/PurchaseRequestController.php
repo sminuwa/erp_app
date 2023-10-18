@@ -115,6 +115,7 @@ class PurchaseRequestController extends Controller
                 'purchase_date' => Carbon::now(),
                 'branch_id' => User::userBranchAction(),
                 'updated_by' => $request->updated_by,
+                'status' => 0,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]);

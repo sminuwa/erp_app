@@ -50,7 +50,8 @@ class PurchaseGRNController extends Controller
             'records' => Purchase::select('purchases.*')->orderBy('created_at', 'DESC')
                 ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
                 // ->where('branch_id', 'LIKE', User::userBranchAction())
-                ->take(10)->get()
+                ->take(10)->get(),
+            'suppliers' => Supplier::where('code', 'like', 'TS%')->orderBy('name')->get(),
         ]);
     }
     public function search(Request $request)
@@ -61,7 +62,7 @@ class PurchaseGRNController extends Controller
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
             // ->where('branch_id', 'LIKE', User::userBranchAction())
             ->orderBy('purchase_date', 'DESC')->take(10)->get();
-        return view('pages.purchases.grn.index', [
+        return view('pages.inventories.purchases.grn.index', [
             'records' => $records
         ]);
     }
@@ -125,6 +126,7 @@ class PurchaseGRNController extends Controller
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]);
+
             foreach (\Cart::getContent() as $product) {
                 $cart_attributes = $product->attributes;
                 //dd( $cart_attributes);
@@ -245,7 +247,7 @@ class PurchaseGRNController extends Controller
         return view('pages.inventories.purchases.grn.edit', [
             'model' => $purchase,
             'products' => Product::all(),
-            'suppliers' => Supplier::where('branch_id', 'LIKE', User::userBranchAction())->get(),
+            'suppliers' => Supplier::orderBy('name')->get(),
             'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->get(),
             'categories' => Category::all(),
             'cart_products' => $cart_products,
@@ -286,7 +288,7 @@ class PurchaseGRNController extends Controller
             // }
             DB::table('purchase_products')->where(['purchase_id' => $purchase->id])->delete();
             DB::table('supplier_ledgers')->where(['purchase_id' => $purchase->id])->delete();
-
+            //dd(\Cart::getContent());
             if (\Cart::getContent()->count() > 0) {
                 foreach (\Cart::getContent() as $product) {
                     $cart_attributes = $product->attributes;
@@ -298,7 +300,7 @@ class PurchaseGRNController extends Controller
                         'purchase_id' => $purchase_id,
                         'product_id' => $product->id,
                         'qty_supplied' => $product->quantity,
-                        'unit_price' => $product->unit_price,
+                        'unit_price' => $product->price,
                         'selling_price' => 0,
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
@@ -506,7 +508,7 @@ class PurchaseGRNController extends Controller
     {
         $purchase->waybill_no = $request->waybill_no;
         $purchase->driver_name = $request->driver_name;
-        $purchase->location_id = $request->location_id;
+        $purchase->transporter_phone = $request->transporter_phone;
         $purchase->warehouse = $request->warehouse;
         $purchase->vehicle_reg_no = $request->vehicle_reg_no;
         $purchase->transporter = $request->transporter;
@@ -525,7 +527,7 @@ class PurchaseGRNController extends Controller
     }
     public function expense(Request $request)
     {
-        DB::table('purchase_expenses')->updateOrInsert(['purchase_id' => $request->purchase_id,'supplier_id'=>$request->supplier_id, 'description' => $request->description], ['amount' => $request->amount, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()]);
+        DB::table('purchase_expenses')->updateOrInsert(['purchase_id' => $request->purchase_id, 'supplier_id' => $request->supplier_id, 'description' => $request->description], ['amount' => $request->amount, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()]);
         $action = "Added purchase expense $request->name";
         AuditLog::auditLog(Auth::id(), $action);
         $purchase_expenses = PurchaseExpense::where('purchase_id', $request->purchase_id)->get();

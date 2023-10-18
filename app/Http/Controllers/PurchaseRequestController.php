@@ -27,20 +27,10 @@ use App\Models\Utility;
 use App\Models\AuditLog;
 use App\Models\User;
 
-/**
- * Description of PurchaseController
- *
- * @author Tuhin Bepari <digitaldreams40@gmail.com>
- */
 
 class PurchaseRequestController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @param  Index  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function index(Index $request)
     {
         \Cart::clear();
@@ -63,25 +53,14 @@ class PurchaseRequestController extends Controller
             'records' => $records
         ]);
     }
-    /**
-     * Display the specified resource.
-     *
-     * @param  Show  $request
-     * @param  PurchaseRequest  $purchase
-     * @return \Illuminate\Http\Response
-     */
+
     public function show(Show $request, PurchaseRequest $purchase)
     {
         return view('pages.inventories.purchases.request.show', [
             'record' => $purchase,
         ]);
 
-    } /**
-      * Show the form for creating a new resource.
-      *
-      * @param  Create  $request
-      * @return \Illuminate\Http\Response
-      */
+    }
     public function create(Create $request)
     {
         //\Cart::clear();
@@ -96,12 +75,7 @@ class PurchaseRequestController extends Controller
             'type' => 'create',
 
         ]);
-    } /**
-      * Store a newly created resource in storage.
-      *
-      * @param  Store  $request
-      * @return \Illuminate\Http\Response
-      */
+    }
     public function store(Request $request)
     {
 
@@ -150,13 +124,7 @@ class PurchaseRequestController extends Controller
             throw $e;
         }
         return redirect()->back();
-    } /**
-      * Show the form for editing the specified resource.
-      *
-      * @param  Edit  $request
-      * @param  PurchaseRequest  $purchase
-      * @return \Illuminate\Http\Response
-      */
+    }
     public function edit(Edit $request, PurchaseRequest $purchase)
     {
 
@@ -174,13 +142,8 @@ class PurchaseRequestController extends Controller
             'type' => 'edit',
 
         ]);
-    } /**
-      * Update a existing resource in storage.
-      *
-      * @param  Update  $request
-      * @param  PurchaseRequest  $purchase
-      * @return \Illuminate\Http\Response
-      */
+    }
+
     public function update(Update $request, PurchaseRequest $purchase)
     {
         //return "Cool";
@@ -237,14 +200,7 @@ class PurchaseRequestController extends Controller
         }
         \Cart::clear();
         return redirect()->back();
-    } /**
-      * Delete a  resource from  storage.
-      *
-      * @param  Destroy  $request
-      * @param  PurchaseRequest  $purchase
-      * @return \Illuminate\Http\Response
-      * @throws \Exception
-      */
+    }
     public function destroy(Destroy $request, PurchaseRequest $purchase)
     {
 

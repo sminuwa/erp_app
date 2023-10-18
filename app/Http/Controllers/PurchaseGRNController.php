@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Transaction;
 use App\Models\GeneralAccount;
 use App\Models\PurchaseExpense;
 use Illuminate\Http\Request;
@@ -549,6 +550,15 @@ class PurchaseGRNController extends Controller
     }
     public function approve(Request $request, Purchase $purchase)
     {
-        return $purchase;
+        DB::beginTransaction();
+        $purchase->status = 1;
+        if($purchase->save()){
+            if(Transaction::purchases($purchase->id, auth()->user()->branch->id)['status']){
+                DB::commit();
+            }
+            else
+                DB::rollback();
+        }
+        return back()->with('success', 'Approved successfully');
     }
 }

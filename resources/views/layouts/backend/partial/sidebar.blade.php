@@ -283,7 +283,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="#"
+                            <a href="{{route('stock_adjustments.index')}}"
                                class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Stock Adjustment</p>

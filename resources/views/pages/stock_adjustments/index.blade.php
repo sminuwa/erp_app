@@ -35,7 +35,7 @@
             </a>
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-sm-8 table-responsive">
+                    <div class="col-sm-12 table-responsive">
                         @include('tables.stock_adjustment')
                     </div>
                 </div>

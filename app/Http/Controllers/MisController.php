@@ -202,7 +202,7 @@ class MisController extends Controller
     {
         $store_id = $request->store_id;
         $product_id = $request->product_id;
-        return StoreProduct::where(['store_id' => $store_id, 'product_id' => $product_id])->pluck('qty_available');
+        return StoreProduct::where(['store_id' => $store_id, 'product_id' => $product_id])->pluck('qty_available')->first();
     }
     public function loadSupplierInvoices(Request $request)
     {

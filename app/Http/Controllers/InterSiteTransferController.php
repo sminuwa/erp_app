@@ -159,11 +159,12 @@ class InterSiteTransferController extends Controller
     public function edit(Edit $request, IntersiteTransfer $intersiteTransfer)
     {
         //\Cart::session('_token')->clear();
-        $products = Product::all(['id', 'name']);
-        $categories = Category::all(['id', 'name']);
+        $products = Product::all(['id', 'name', 'code']);
+        $categories = Category::all(['id', 'name', 'code']);
         $stores = Store::where('branch_id', 'LIKE', User::userBranchAction())->get();
         $this->loadToCart($intersiteTransfer);
         $cartItems = \Cart::session('_token')->getContent();
+
         $branches = Branch::where('id', '<>', User::userBranchAction())->orderBy('name')->get();
         return view('pages.inventories.transfers.inter_site.edit', [
             'model' => $intersiteTransfer,
@@ -180,58 +181,86 @@ class InterSiteTransferController extends Controller
       * @param  TransferProduct  $transferproduct
       * @return \Illuminate\Http\Response
       */
-    public function update(Update $request, TransferProduct $transferproduct)
-    {
-        $source_qty = 0;
-        $destination_qty = 0;
-        if ($transferproduct->status == 'Cancelled' && $request->status == 'Completed') {
-            $source_qty = 0 - $request->qty_transfered;
-            $destination_qty = -1 * $source_qty;
-        } else if ($transferproduct->status == 'Completed' && $request->status == 'Cancelled') {
-            $source_qty = $request->qty_transfered;
-            $destination_qty = 0 - $source_qty;
-        } else {
-            $source_qty = $transferproduct->qty_transfered - $request->qty_transfered;
-            if ($source_qty > 0)
-                $destination_qty = 0 - $source_qty;
-            if ($source_qty < 0)
-                $destination_qty = -1 * $source_qty;
-        }
+    public function update(Update $request, IntersiteTransfer $intersiteTransfer)
+    { 
+        // $source_qty = 0;
+        // $destination_qty = 0;
+        // if ($transferproduct->status == 'Cancelled' && $request->status == 'Completed') {
+        //     $source_qty = 0 - $request->qty_transfered;
+        //     $destination_qty = -1 * $source_qty;
+        // } else if ($transferproduct->status == 'Completed' && $request->status == 'Cancelled') {
+        //     $source_qty = $request->qty_transfered;
+        //     $destination_qty = 0 - $source_qty;
+        // } else {
+        //     $source_qty = $transferproduct->qty_transfered - $request->qty_transfered;
+        //     if ($source_qty > 0)
+        //         $destination_qty = 0 - $source_qty;
+        //     if ($source_qty < 0)
+        //         $destination_qty = -1 * $source_qty;
+        // }
 
         DB::beginTransaction();
         try {
-            DB::table('stock_cards')->where('refno', $transferproduct->refno)->update(['status' => 0]);
-            $transferproduct->fill($request->all());
-            DB::table('stock_cards')->updateOrInsert(['refno' => $transferproduct->refno], [
-                'store_id' => $transferproduct->source_store_id,
-                'product_id' => $transferproduct->product_id,
-                'cr' => 0,
-                'dr' => $source_qty,
-                'refno' => $transferproduct->refno,
-                'type' => 'Transfer',
-                'date' => $request->transfer_date,
-                'user_id' => Auth::id(),
-                'status' => 1,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
+            $reference_no = $intersiteTransfer->reference_no;
+            $transfer_branch_id = $request->transfer_branch_id;
+            $transfer_id = DB::table('intersite_transfers')->updateOrInsert(
+                [
+                    'reference_no' => $reference_no,
+                ],
+            [
+                
+                'source_branch_id' => User::userBranchAction(),
+                'destination_branch_id' => $transfer_branch_id,
+                'requested_by' => Auth::id(),
+                'date_requested' => date('Y-m-d'),
+                'vehicle_no' => $request->vehicle_no,
             ]);
-            DB::table('stock_cards')->updateOrInsert(['refno' => $transferproduct->refno], [
-                'store_id' => $transferproduct->destination_store_id,
-                'product_id' => $transferproduct->product_id,
-                'cr' => $destination_qty,
-                'dr' => 0,
-                'refno' => $transferproduct->refno,
-                'type' => 'Transfer',
-                'date' => $request->transfer_date,
-                'user_id' => Auth::id(),
-                'status' => 1,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ]);
-            StoreProduct::where(['store_id' => $request->source_store_id, 'product_id' => $request->product_id])->increment('qty_available', $source_qty);
-            StoreProduct::where(['store_id' => $request->destination_store_id, 'product_id' => $request->product_id])->increment('qty_available', $destination_qty);
-            if ($transferproduct->save()) {
-                $action = "Updated stock transfer made from " . Store::find($request->source_store_id)->name . " to " . Store::find($request->destination_store_id)->name;
+            foreach (\Cart::session('_token')->getContent() as $product) {
+                $attribute = $product->attributes;
+                $source_store_id = $attribute['source_store_id'];
+
+                $product_id = $attribute['product_id'];
+
+                DB::table('intersite_transfer_products')->updateOrInsert(
+                    [
+                        'intersite_transfer_id' => $intersiteTransfer->id,
+                        'source_store_id' => $source_store_id,
+                        'product_id' => $product_id,
+                    ],
+                    [
+                        'quantity_requested' => $product->quantity,
+                        'quantity_approved' => $product->quantity,
+                        'cost_price' => $product->price ?? 0,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now()
+                    ]
+                );
+
+                $action = "Modified transfer request of product from " . (Store::find($source_store_id)?->name). " to  branch " . (Branch::find($transfer_branch_id)?->name);
+                AuditLog::auditLog(Auth::id(), $action);
+                session()->flash('app_message', 'Stock transfered successfully');
+                DB::commit();
+            }
+
+            //DB::table('stock_cards')->where('refno', $transferproduct->refno)->update(['status' => 0]);
+            $intersiteTransfer->fill($request->all());
+            // DB::table('stock_cards')->updateOrInsert(['refno' => $transferproduct->refno], [
+            //     'store_id' => $transferproduct->source_store_id,
+            //     'product_id' => $transferproduct->product_id,
+            //     'cr' => 0,
+            //     'dr' => $source_qty,
+            //     'refno' => $transferproduct->refno,
+            //     'type' => 'Transfer',
+            //     'date' => $request->transfer_date,
+            //     'user_id' => Auth::id(),
+            //     'status' => 1,
+            //     'created_at' => Carbon::now(),
+            //     'updated_at' => Carbon::now()
+            // ]);
+
+           
+            if ($intersiteTransfer->save()) {
+                $action = "Updated stock transfer made from " . Store::find($request->source_store_id)?->name . " to " . Store::find($request->destination_store_id)?->name;
                 AuditLog::auditLog(Auth::id(), $action);
                 session()->flash('app_message', 'Stock transfer successfully updated');
                 return redirect()->route('intersite.index');
@@ -259,8 +288,8 @@ class InterSiteTransferController extends Controller
         DB::beginTransaction();
         try {
             $reference_no = $intersiteTransfer->reference_no;
-           DB::table('intersite_transfer_products')->where('intersite_transfer_id',$intersiteTransfer->id)->delete();
-           DB::table('intersite_transfers')->where('id',$intersiteTransfer->id)->delete();
+            DB::table('intersite_transfer_products')->where('intersite_transfer_id', $intersiteTransfer->id)->delete();
+            DB::table('intersite_transfers')->where('id', $intersiteTransfer->id)->delete();
             session()->flash('app_message', 'Stock transfer cancelled successfully');
             $action = "Deleted stock transfer request with reference no " . $reference_no;
             AuditLog::auditLog(Auth::id(), $action);
@@ -278,15 +307,15 @@ class InterSiteTransferController extends Controller
         $validated = $request->validate([
             'product_id' => 'required',
             'source_store_id' => 'required',
-            'qty_transfered' => 'required',
+            'quantity_requested' => 'required',
         ]);
         $product = Product::find($request->product_id);
         $add = \Cart::session('_token')->add([
             'id' => $this->generateRandomString(),
             'name' => $product->name,
-            'price' => $request->unit_price,
+            'price' => $request->cost_price ?? 1,
             //Thos is not applicable here
-            'quantity' => $request->qty_transfered,
+            'quantity' => $request->quantity_requested,
             'attributes' => array(
                 'source_store_id' => $request->source_store_id,
                 'product_id' => $request->product_id,
@@ -323,20 +352,24 @@ class InterSiteTransferController extends Controller
     }
     public function loadToCart(IntersiteTransfer $transfer)
     {
-        \Cart::session('_token')->clear();
-        foreach ($transfer->requestProducts()->get() as $data) {
+        //\Cart::session('_token')->clear();
+        //dd($transfer->requestProducts()->get());
+        $records = $transfer->requestProducts()->get();
+        foreach ($records as $data) {
             if ($data != null) {
                 $product = Product::find($data->product_id);
+
                 \Cart::session('_token')->add([
                     'id' => $this->generateRandomString(),
                     //$this->generateRandomString(),
+
                     'name' => $product->name,
-                    'price' => $data->price,
-                    'quantity' => $data->qty_transfered,
+                    'price' => $data->cost_price,
+                    'quantity' => $data->quantity_requested,
                     'attributes' => array(
-                        'source_store_id' => $data->source_store_id,
+                        'source_store_id' => $data->source_store_id ?? 1,
                         'product_id' => $data->product_id ?? 1,
-                        'code' => $product->code,
+                        'code' => $product->code ?? '',
                     ),
                 ]);
             }
@@ -370,6 +403,6 @@ class InterSiteTransferController extends Controller
     public function approve(IntersiteTransfer $intersiteTransfer)
     {
         echo "Waiting for function to call\n";
-        return $intersiteTransfer;
+        return $intersiteTransfer->reference_no;
     }
 }

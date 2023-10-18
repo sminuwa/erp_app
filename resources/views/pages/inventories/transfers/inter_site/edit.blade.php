@@ -71,7 +71,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($interstore as $product)
+                                            @foreach ($transfer_products as $product)
                                                 <tr>
                                                     @php $attr = $product->attributes @endphp
                                                     <td>{{ $loop->iteration }}</td>
@@ -97,11 +97,30 @@
                                         </tbody>
                                     </table>
                                 @endif
-                                <form action="{{ isset($route) ? $route : route('intersite.store') }}"
-                                    method="POST">
+                                <form action="{{ isset($route) ? $route : route('intersite.update',$model->id) }}" method="POST">
                                     {{ csrf_field() }}
-                                    <input type="hidden" name="_method"
-                                        value="{{ isset($method) ? $method : 'POST' }}" />
+                                    {{-- <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" /> --}}
+                                    @method('PUT')
+                                    <div class="form-group">
+                                        <label for="transfer_branch_id">Destination Branch</label>
+                                        <select
+                                            class="form-control select2-single {{ $errors->has('transfer_branch_id') ? ' is-invalid' : '' }}"
+                                            name="transfer_branch_id" id="transfer_branch_id" required="required">
+                                            <option value="">Select...</option>
+                                            @if (isset($branches))
+                                                @foreach ($branches as $data)
+                                                    <option value="{{ $data->id }}"
+                                                        {{ $data->id == old('transfer_branch_id', $model->transfer_branch_id) ? 'selected' : '' }}>
+                                                        {{ $data->code }}-{{ $data->name }}</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                        @if ($errors->has('transfer_branch_id'))
+                                            <div class="invalid-feedback">
+                                                <strong>{{ $errors->first('transfer_branch_id') }}</strong>
+                                            </div>
+                                        @endif
+                                    </div>
                                     <div class="form-group">
                                         <label for="vehicle_no">Vehicle No</label>
                                         <input type="text"
@@ -203,7 +222,7 @@
                         msg = 0;
                     $("#available").html(
                         "<span class='ion-alert-circled'></span> Available Quantity: " + msg);
-                    $('#qty_transfered').attr('max', msg);
+                    $('#quantity_requested').attr('max', msg);
                 });
             });
         });

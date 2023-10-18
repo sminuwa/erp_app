@@ -86,28 +86,28 @@
         @endif
     </div> --}}
     <div class="form-group">
-        <label for="qty_transfered">Qty</label>
-        <input type="number" class="form-control {{ $errors->has('qty_transfered') ? ' is-invalid' : '' }}"
-            name="qty_transfered" id="qty_transfered" value="{{ $model->qty_transfered }}" placeholder=""
+        <label for="quantity_requested">Qty</label>
+        <input type="number" class="form-control {{ $errors->has('quantity_requested') ? ' is-invalid' : '' }}"
+            name="quantity_requested" id="quantity_requested" value="{{ $model->quantity_requested }}" placeholder=""
             required="required">
-        @if ($errors->has('qty_transfered'))
+        @if ($errors->has('quantity_requested'))
             <div class="invalid-feedback">
-                <strong>{{ $errors->first('qty_transfered') }}</strong>
+                <strong>{{ $errors->first('quantity_requested') }}</strong>
             </div>
         @endif
     </div>
     {{-- <div class="form-group">
-        <label for="unit_price">Product Code Price</label>
+        <label for="cost_price">Product Code Price</label>
         <input type="text"
-            class="form-control {{ $errors->has('unit_price') ? ' is-invalid' : '' }}"
-            name="unit_price" id="unit_price" placeholder="Product code price" required="required">
-        @if ($errors->has('unit_price'))
+            class="form-control {{ $errors->has('cost_price') ? ' is-invalid' : '' }}"
+            name="cost_price" id="cost_price" placeholder="Product code price" required="required">
+        @if ($errors->has('cost_price'))
             <div class="invalid-feedback">
-                <strong>{{ $errors->first('unit_price') }}</strong>
+                <strong>{{ $errors->first('cost_price') }}</strong>
             </div>
         @endif
     </div> --}}
-    <input type="hidden" value="0" name="unit_price" id="unit_price"/>
+    <input type="hidden" value="0" name="cost_price" id="cost_price"/>
     <div class="form-group text-right ">
         <button type="submit" class="btn btn-primary"><span class="ion-ios-cart-outline"></span> Add to Cart</button>
     </div>

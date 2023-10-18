@@ -12,8 +12,8 @@
             <tr>
                 <td> {{ \Carbon\Carbon::parse($record->date)->toFormattedDateString() }} </td>
                 <td> {{ $record->refno }} </td>
-                <td> {{ $record->user->name }} </td>
-                <td>
+                <td> {{ $record->user?->name }} </td>
+                <td style="text-align: right">
                     @can('make.stock.adjustment')
                         <a class="btn btn-secondary btn-sm" href="{{ route('stock_adjustments.show', $record->id) }}">
                             <span class="fa fa-eye"></span>

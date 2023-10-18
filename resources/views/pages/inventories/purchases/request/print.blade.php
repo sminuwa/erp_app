@@ -101,7 +101,7 @@
                                         @php $total += ($purchase_detail->unit_price * $purchase_detail->quantity);  @endphp
                                     @endforeach
                                     <tr>
-                                        <th colspan="5" style="text-align: right">Total Amount</th>
+                                        <th colspan="4" style="text-align: right">Total Amount</th>
                                         <th style="text-align: right;">
                                             &#8358;{{ number_format($total, 2, '.', ',') }}</th>
                                     </tr>

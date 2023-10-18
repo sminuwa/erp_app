@@ -47,7 +47,7 @@ class PurchaseGRNController extends Controller
     {
         \Cart::clear();
         return view('pages.inventories.purchases.grn.index', [
-            'records' => Purchase::select('purchases.*')->orderBy('created_at', 'DESC')
+            'records' => Purchase::select('purchases.*')->orderBy('reference', 'DESC')
                 ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
                 // ->where('branch_id', 'LIKE', User::userBranchAction())
                 ->take(10)->get(),
@@ -122,6 +122,7 @@ class PurchaseGRNController extends Controller
                 'vehicle_reg_no' => $request->vehicle_reg_no,
                 'source_store_id' => $request->source_store_id,
                 'destination_store_id' => $request->source_store_id,
+                'status' => 0,
                 'updated_by' => $request->updated_by,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),

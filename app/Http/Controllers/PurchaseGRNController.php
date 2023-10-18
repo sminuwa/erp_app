@@ -553,7 +553,7 @@ class PurchaseGRNController extends Controller
         DB::beginTransaction();
         $purchase->status = 1;
         if($purchase->save()){
-            if(Transaction::purchases($purchase->id, auth()->user()->branch->id)['status']){
+            if(Transaction::purchases($purchase->id, $purchase->date)['status']){
                 DB::commit();
             }
             else

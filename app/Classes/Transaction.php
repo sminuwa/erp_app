@@ -77,18 +77,6 @@ class Transaction
                 'user_id' => auth()->id(),
                 'receipt_no' => 'A'.$purchase_grn->reference
             ];
-            $cost_account[] = [
-                'model_id' => $cat['cost_account_id'],
-                'model_name' => 'GeneralAccount',
-                'branch_id' => $branch->id,
-                'description' => 'Purchase of '.$purchase_grn->reference,
-                'reference' => $purchase_grn->reference,
-                'credit' => $cat['amount'],
-                'debit' => 0,
-                'date' => $date,
-                'user_id' => auth()->id(),
-                'receipt_no' => 'C'.$purchase_grn->reference,
-            ];
         }
         $supplier_ledger[] = [
             'model_id' => $purchase_grn->supplier_id,

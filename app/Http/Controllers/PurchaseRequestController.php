@@ -110,6 +110,7 @@ class PurchaseRequestController extends Controller
         try {
             $purchase_id = DB::table('purchase_requests')->insertGetId([
                 'supplier_id' => $request->supplier_id,
+                'reference' => PurchaseRequest::generateNewNumber(),
                 'invoice' => $request->invoice,
                 'purchase_date' => Carbon::now(),
                 'branch_id' => User::userBranchAction(),
@@ -202,7 +203,7 @@ class PurchaseRequestController extends Controller
                 $selling_price = $product->price;
                 //This will be uncommented later if the logic has changed
                 //$selling_price = optional(BranchProductPrice::find($product->id))->selling_price;
-                
+
                 DB::table('purchase_product_requests')->updateOrInsert(
                     [
                         'purchase_id' => $purchase_id,
@@ -252,7 +253,7 @@ class PurchaseRequestController extends Controller
         try {
             DB::table('purchase_product_requests')->where('purchase_id', $purchase->id)->delete();
             DB::table('purchase_requests')->where(['id' => $purchase->id])->delete();
-           
+
 
             $action = "Deleted a purchase with invoice $invoice from supplier: " . Supplier::find($purchase->supplier_id)->name;
             AuditLog::auditLog(Auth::id(), $action);

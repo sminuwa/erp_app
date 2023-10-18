@@ -79,7 +79,7 @@
     <div class="col-sm-8">
         <div class="card">
             <div class="card-header">
-                <i class="ion-android-cart"></i> Supplier Cart: <small>Purchased Products</small>
+                <i class="ion-android-cart"></i> Request Cart: <small>Purchased Products</small>
             </div>
             <div class="card-body table-responsive">
                 @if (isset($cart_products) && $cart_products->count() < 1)
@@ -126,8 +126,8 @@
                             @foreach ($cart_products as $product)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td class="text-left">{{ $product->attributes['code'] }}</td>
-                                    <td class="text-left">{{ $product->name }}</td>
+                                    <td class="text-left">{{ $product->product->code }}</td>
+                                    <td class="text-left">{{ $product->product->name }}</td>
                                     <form action="{{ route('purchase.request.cart.update') }}" method="post"
                                         id="p{{ $product->id }}">
                                         @csrf
@@ -142,11 +142,11 @@
                                             <input type="text" name="cost_price" id="price{{ $product->id }}"
                                                 class="form-control price" style="min-width:65px;"
                                                 onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
-                                                value="{{ $product->price }}" data-val="{{ $product->price }}"
+                                                value="{{ $product->unit_price }}" data-val="{{ $product->unit_price }}"
                                                 data-value="p{{ $product->id }}">
                                         </td>
                                         <td><span
-                                                class="subtotal{{ $product->id }}">{{ number_format($product->price * $product->quantity, 2) }}</span>
+                                                class="subtotal{{ $product->id }}">{{ number_format($product->unit_price * $product->quantity, 2) }}</span>
                                         </td>
                                         <input type="hidden" name="id" class="form-control"
                                             value="{{ $product->id }}">

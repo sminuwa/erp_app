@@ -159,9 +159,10 @@ class PurchaseRequestController extends Controller
     public function edit(Edit $request, PurchaseRequest $purchase)
     {
 
+
         if (\Cart::getContent()->isEmpty())
             $this->loadToCart($purchase);
-        $cart_products = \Cart::getContent();
+        $cart_products = $purchase->purchasedProducts;
         return view('pages.inventories.purchases.request.edit', [
             'model' => $purchase,
             'products' => Product::all(),

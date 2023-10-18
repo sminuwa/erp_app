@@ -39,7 +39,7 @@ class StockAdjustmentController extends Controller
      */
     public function index(Index $request)
     {
-        return view('pages.stock_adjustments.index', ['records' => StockAdjustment::latest('date')
+        return view('pages.stock_adjustments.index', ['records' => StockAdjustment::select('stock_adjustments.*')->latest('date')
             ->join('stores', 'stores.id', 'stock_adjustments.store_id')
             ->where('stores.branch_id', 'LIKE', User::userBranchAction())
             ->groupBy('refno')->get()]);
@@ -65,7 +65,7 @@ class StockAdjustmentController extends Controller
     public function create(Create $request)
     {
 
-        $products = Product::select('products.id', 'products.name')->join('store_products', 'store_products.product_id', 'products.id')->get();
+        $products = Product::select('products.id', 'products.name','code')->join('store_products', 'store_products.product_id', 'products.id')->get();
         $categories = Category::all(['id', 'name']);
         $stores = Store::where('branch_id', 'LIKE', User::userBranchAction())->get();
         $cartItems = \Cart::session('_token')->getContent(); //\Cart::getContent();
@@ -286,7 +286,7 @@ class StockAdjustmentController extends Controller
             'adjusted_qty' => 'required'
         ]);
         $sign = "+";
-        if ($request->adjusted_qty < 0)
+        if ($request->operation == -1)
             $sign = "-";
         $add = \Cart::session('_token')->add([
             'id' => $this->generateRandomString(),

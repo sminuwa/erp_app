@@ -26,7 +26,8 @@ class Update extends FormRequest
     public function rules() 
     {
         return [
-			'destination_store_id' => 'required|numeric',
+			'transfer_branch_id' => 'required|numeric',
+            'vehicle_no'=>'nullable'
         ];
     }
 

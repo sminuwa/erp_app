@@ -169,22 +169,23 @@
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script type="text/javascript">
         $(function() {
-            $(document).on("change", "#category_id", function(event) {
-                $("#product_id").html(" < option value = '' > Loading... < /option>");
-                $.ajax({
-                    url: "{{ route('ajax.loadproducts') }}",
-                    type: 'GET',
-                    data: {
-                        category_id: $("#category_id").val(),
-                        store_id: $("#store_id").val()
-                    }
-                }).done(function(msg) {
-                    $("#product_id").html("<option value=''>--select--</option>" + msg);
-                });
-            });
+            // $(document).on("change", "#category_id", function(event) {
+            //     $("#product_id").html(" < option value = '' > Loading... < /option>");
+            //     $.ajax({
+            //         url: "{{ route('ajax.loadproducts') }}",
+            //         type: 'GET',
+            //         data: {
+            //             category_id: $("#category_id").val(),
+            //             store_id: $("#store_id").val()
+            //         }
+            //     }).done(function(msg) {
+            //         $("#product_id").html("<option value=''>--select--</option>" + msg);
+            //     });
+            // });
 
             $(document).on("change", "#product_id,#store_id", function(event) {
                 $("#available_qty").val("");
+                
                 $.ajax({
                     url: "{{ route('ajax.load.quantity.available') }}",
                     type: 'GET',

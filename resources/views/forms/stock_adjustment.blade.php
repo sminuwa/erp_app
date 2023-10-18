@@ -9,7 +9,7 @@
             @if (isset($stores))
                 @foreach ($stores as $data)
                     <option value="{{ $data->id }}" {{ old('store_id') == $data->id ? 'selected' : '' }}>
-                        {{ $data->name }}</option>
+                        {{ $data->code }}-{{ $data->name }}</option>
                 @endforeach
             @endif
         </select>
@@ -19,7 +19,7 @@
             </div>
         @endif
     </div>
-    <div class="form-group">
+    {{-- <div class="form-group">
         <label for="category_id">Group </label>
         <select class="form-control select2-single {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
             name="category_id" id="category_id" required="required">
@@ -36,7 +36,7 @@
                 <strong>{{ $errors->first('category_id') }}</strong>
             </div>
         @endif
-    </div>
+    </div> --}}
 
     <div class="form-group">
         <label for="product_id">Product</label>
@@ -47,13 +47,13 @@
             @if (old('category_id', optional(optional($model->product)->category)->id))
                 @foreach (\App\Models\Product::where('category_id', old('category_id'))->get() as $data)
                     <option value="{{ $data->id }}">
-                        {{ $data->name }}</option>
+                        {{ $data->code }}-{{ $data->name }}</option>
                 @endforeach
             @else
                 @if (isset($products))
                     @foreach ($products as $data)
                         <option value="{{ $data->id }}">
-                            {{ $data->name }}</option>
+                            {{ $data->code }}-{{ $data->name }}</option>
                     @endforeach
                 @endif
             @endif
@@ -89,8 +89,9 @@
             </div>
         @endif
     </div>
+    <input type="radio"  name="operation" value="1" {{ $model->qty > 0  ? 'checked' : '' }}> Add (+)<br>
+    <input type="radio" name="operation" value="-1" {{ !$model->qty < 0 ? 'checked' : '' }}> Subtract(-)<br>
     <div class="form-group text-right ">
         <button type="submit" class="btn btn-primary"><i class="fa fa-cart-plus"> Add to Cart</i></button>
-
     </div>
 </form>

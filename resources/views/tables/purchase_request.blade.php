@@ -2,7 +2,7 @@
     <thead>
         <tr>
             <th>Supplier</th>
-            <th>Invoice </th>
+            <th>Reference </th>
             <th>Request Date </th>
             <th>Amount (&#8358;) </th>
             <th>Status </th>

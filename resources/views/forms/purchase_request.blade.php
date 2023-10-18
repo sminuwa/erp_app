@@ -126,8 +126,8 @@
                             @foreach ($cart_products as $product)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td class="text-left">{{ $product->product->code }}</td>
-                                    <td class="text-left">{{ $product->product->name }}</td>
+                                    <td class="text-left">{{ $product->product->code ?? $product->attributes['code'] }}</td>
+                                    <td class="text-left">{{ $product->product->name ?? $product->name }}</td>
                                     <form action="{{ route('purchase.request.cart.update') }}" method="post"
                                         id="p{{ $product->id }}">
                                         @csrf
@@ -142,11 +142,11 @@
                                             <input type="text" name="cost_price" id="price{{ $product->id }}"
                                                 class="form-control price" style="min-width:65px;"
                                                 onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
-                                                value="{{ $product->unit_price }}" data-val="{{ $product->unit_price }}"
+                                                value="{{ $product->unit_price ?? $product->price }}" data-val="{{ $product->unit_price ?? $product->price}}"
                                                 data-value="p{{ $product->id }}">
                                         </td>
                                         <td><span
-                                                class="subtotal{{ $product->id }}">{{ number_format($product->unit_price * $product->quantity, 2) }}</span>
+                                                class="subtotal{{ $product->id }}">{{ number_format($product->unit_price ?? $product->price * $product->quantity, 2) }}</span>
                                         </td>
                                         <input type="hidden" name="id" class="form-control"
                                             value="{{ $product->id }}">

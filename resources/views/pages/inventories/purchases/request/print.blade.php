@@ -53,26 +53,21 @@
                                 {{ $company->phone !== null ? ', 0' . $company->phone : '' }}
                                 <br>
                                 Email <span class="ion-email"></span>: {{ $company->email }}
+                                <br>
+                                <b>Truck No: {{ $purchase->vehicle_reg_no }}</b><br>
+                                <b>Request No: {{ $purchase->reference }}</b><br>
+                                <b>Reference: {{ $purchase->invoice }}</b><br>
+                                <b>Date: {{ $purchase->purchase_date->toFormattedDateString() }}</b><br>
                             </address>
                         </div>
-                        <div class="col-sm-8" style="text-align: right">
-                            To
-                            <address>
-                                <strong>{{ $purchase->supplier->name }}</strong><br>
-                                Address <span class="ion-ios-contact-outline"></span>:
-                                {{ $purchase->supplier->address }}<br>
-                                Phone <span class="ion-android-phone-portrait"></span>:
-                                {{ $purchase->supplier->phone }}<br>
-                                Email <span class="ion-email"></span>: {{ $purchase->supplier->email }}
-                            </address>
-                        </div>
+
                     </div>
                     <!-- /.row -->
 
                     <!-- Table row -->
                     <div class="row">
                         <div class="col-sm-6">
-                            <h3 style="text-align: right;">Purchase Invoice</h3>
+                            <h3 style="text-align: right;">Purchase Request</h3>
                         </div>
                         <div class="col-sm-6" style="text-align: right;">
                             <b>Truck No: {{ $purchase->vehicle_reg_no }}</b><br>

@@ -54,7 +54,6 @@
                                 <br>
                                 Email <span class="ion-email"></span>: {{ $company->email }}
                                 <br>
-                                <b>Truck No: {{ $purchase->vehicle_reg_no }}</b><br>
                                 <b>Request No: {{ $purchase->reference }}</b><br>
                                 <b>Reference: {{ $purchase->invoice }}</b><br>
                                 <b>Date: {{ $purchase->purchase_date->toFormattedDateString() }}</b><br>
@@ -66,14 +65,10 @@
 
                     <!-- Table row -->
                     <div class="row">
-                        <div class="col-sm-6">
-                            <h3 style="text-align: right;">Purchase Request</h3>
+                        <div class="col-sm-12">
+                            <h3 style="text-align: center;">Purchase Request</h3>
                         </div>
-                        <div class="col-sm-6" style="text-align: right;">
-                            <b>Truck No: {{ $purchase->vehicle_reg_no }}</b><br>
-                            <b>Invoice No: {{ $purchase->invoice }}</b><br>
-                            <b>Date: {{ $purchase->purchase_date->toFormattedDateString() }}</b><br>
-                        </div>
+
                     </div>
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">

@@ -320,7 +320,8 @@ class CustomerController extends Controller
     public function createCreditNote()
     {
         $user_branch = User::userBranchAction();
-        $orders = Order::where('branch_id', 'LIKE', $user_branch)->orderBy('order_date', 'DESC')->take(20)->get();
+        $orders = Order::where('status', 1)
+            ->where('branch_id', 'LIKE', $user_branch)->orderBy('order_date', 'DESC')->take(20)->get();
         //$receipt_no = $this->generateCreditNoteInvoice();
         $model = new Customer;
         return view('pages.inventories.credit_notes.create_credit_note', compact('orders', 'model'));
@@ -366,7 +367,8 @@ class CustomerController extends Controller
     {
         $search_value = $request->refno;
 
-        $payments = Order::where('invoice_no', 'LIKE', "%$search_value%")
+        $payments = Order::where('status', 1)
+            ->where('invoice_no', 'LIKE', "%$search_value%")
             ->where('branch_id', 'LIKE', User::userBranchAction())
             ->orderBy('order_date', 'DESC')->get();
         return view('pages.suppliers.credit_note', ['payments' => $payments]);
@@ -379,7 +381,8 @@ class CustomerController extends Controller
     {
         $word_search = $request->search;
         if (strlen($word_search) > 0) {
-            $orders = Order::where('invoice_no', 'LIKE', "%$word_search%")
+            $orders = Order::where('status', 1)
+                ->where('invoice_no', 'LIKE', "%$word_search%")
                 ->where('branch_id', 'LIKE', User::userBranchAction())
                 ->orderBy('order_date', 'DESC')->get();
         } else {

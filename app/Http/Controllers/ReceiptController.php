@@ -13,9 +13,9 @@ use App\Models\Setting;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Models\CustomerLedger;
-use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ReceiptController extends Controller
 {
@@ -42,7 +42,7 @@ class ReceiptController extends Controller
 
     public function payReciept(Request $request)
     {
-
+        $receipt_id = $request->receipt_id;
         $amount = $request->amount_paid;
         $bank_account_id = $request->account_id;
         $reference_no = Receipt::generateNewNumber();
@@ -54,15 +54,18 @@ class ReceiptController extends Controller
         $ledger_id = 0;
         $payer_id = $request->payer_id;
         $payer_type = $request->type;
-
+        $record = Receipt::find($receipt_id);
         DB::beginTransaction();
         try {
-            $record = new Receipt();
+            if(!$record){
+                $record = new Receipt();
+                $record->receipt_no = $reference_no;
+                $record->created_by = auth()->id();
+                $record->status = 0;
+            }
             $record->amount = $amount;
             $record->date = $date;
-            $record->receipt_no = $reference_no;
             $record->description = $description;
-            $record->recieved_by = auth()->id();
             $record->model_id = $payer_id;
             $record->model_name = $payer_type;
             $record->charged_account_id = $bank_account_id;
@@ -76,12 +79,11 @@ class ReceiptController extends Controller
                     session()->flash('app_message', 'Receipt generated successfully');
                     DB::commit();
                 }else {
-                    return 'something went wrong';
                     DB::rollBack();
+                    return 'something went wrong';
                 }
             }
             return redirect()->back()->with(['prev_id' => $ledger_id]);
-
 
             /*if ($request->has('type') && $request->type == "Customer") {
                 $customer_id = $request->payer_id;
@@ -178,10 +180,46 @@ class ReceiptController extends Controller
         return view('pages.receipts.create_receipt_payment', compact('accounts', 'customers', 'model'));
     }
 
+    public function post(Receipt $receipt) {
+        $receipt->status = 1;
+        $receipt->posted_by = auth()->id();
+        DB::beginTransaction();
+        if($receipt->save()){
+            if(Transaction::receipt(
+                $receipt->charged_account_id,
+                $receipt->charged_account_name,
+                $receipt->model_id,
+                $receipt->model_name,
+                $receipt->amount,
+                $receipt->receipt_no,
+                $receipt->date)
+            ){
+                $action = "Generated receipt of $receipt->amount for : " . $receipt->receipt_no;
+                AuditLog::auditLog(auth()->id(), $action);
+                session()->flash('app_message', 'Receipt generated successfully');
+                DB::commit();
+            }else {
+                DB::rollBack();
+                session()->flash('app_message', 'Something went wrong');
+            }
+        }
+        return back();
+    }
+
     public function reverse(Receipt $receipt) {
          $receipt->status = 0;
+        $receipt->updated_by = auth()->id();
+         DB::beginTransaction();
         if($receipt->save()){
-            Transaction::reversal($receipt->receipt_no);
+            if(Transaction::reversal($receipt->receipt_no)['status']){
+                $action = "Generated receipt of $receipt->amount for : " . $receipt->receipt_no;
+                AuditLog::auditLog(auth()->id(), $action);
+                session()->flash('app_message', 'Receipt generated successfully');
+                DB::commit();
+            }else{
+                DB::rollBack();
+                session()->flash('app_message', 'Something went wrong');
+            }
         }
          return back();
     }

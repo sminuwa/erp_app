@@ -22,10 +22,21 @@
         </div>
         <div class="col-md-4">
             <div class="form-group">
+                @if(isset($model) && $model->model_name == 'Customer')
+                    <?php $payers = \App\Models\Customer::orderBy('code','asc')->get(); ?>
+                @elseif(isset($model) && $model->model_name == 'Supplier')
+                    <?php $payers = \App\Models\Supplier::orderBy('code','asc')->get(); ?>
+                @else
+                    <?php $payers = \App\Models\GeneralAccount::orderBy('number','asc')->get(); ?>
+                @endif
                 <label for="payer_id">Payee</label>
                 <select class="form-control select2-single {{ $errors->has('payer_id') ? ' is-invalid' : '' }}"
                         name="payer_id" id="payer_id" required="required">
-
+                    @if(isset($payers))
+                        @foreach($payers as $payer)
+                            <option value="{{ $payer->id }}" {{ $payer->id==$model->model_id ? 'selected' : '' }}>{{ $payer->code ?? $payer->number }} - {{ $payer->name ?? $payer->description }}</option>
+                        @endforeach
+                    @endif
                 </select>
                 @if ($errors->has('payer_id'))
                     <div class="invalid-feedback">

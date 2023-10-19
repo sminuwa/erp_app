@@ -8,9 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 class Receipt extends Model
 {
     use HasFactory;
-    public function received_by()
+    public function createdBy()
     {
-        return $this->belongsTo(User::class, 'recieved_by');
+        return $this->belongsTo(User::class, 'created_by');
+    }
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updatedBy');
+    }
+    public function postedBy()
+    {
+        return $this->belongsTo(User::class, 'posted_by');
     }
     public function customer()
     {
@@ -40,7 +48,7 @@ class Receipt extends Model
     }
 
     public static function generateNewNumber($prefix = 'RCT', $length = 4){
-        $prefix = $prefix.date('ymd');
+        $prefix = $prefix.date('ym').auth()->user()->branch->code;
         $record = self::where('receipt_no', 'like', '%'.$prefix.'%')->orderBy('receipt_no', 'desc')->first();
         if($record){
             $number = $record->receipt_no;

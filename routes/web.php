@@ -373,6 +373,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/print/receipt/pos/{payment}', [ReceiptController::class, 'printPoSPaymentReceipt'])->name('receipt.payment.print.pos');
             Route::get('/load/payers', [ReceiptController::class, 'loadPayers'])->name('ajax.load.payers');
             Route::get('/reverse/{receipt}', [ReceiptController::class, 'reverse'])->name('receipt.payment.reverse');
+            Route::post('/post/{receipt}', [ReceiptController::class, 'post'])->name('receipt.payment.post');
         }
     );
     Route::group(
@@ -398,11 +399,13 @@ Route::middleware('auth')->group(function () {
             Route::get('/create', [PaymentController::class, 'makePayment'])->name('create.payment');
             Route::post('/store', [PaymentController::class, 'pay'])->name('payment.store');
             Route::delete('/destroy/{ledger}', [PaymentController::class, 'deletePayment'])->name('payment.destroy');
+            Route::post('/delete/{payment}', [PaymentController::class, 'delete'])->name('payment.delete');
             Route::put('/update/{ledger}', [PaymentController::class, 'updateReceipt'])->name('payment.update');
             Route::post('/search', [PaymentController::class, 'search'])->name('payment.search');
             Route::get('/print/payment/{payment}', [PaymentController::class, 'printPaymentReceipt'])->name('payment.print');
             Route::get('/print/payment/pos/{payment}', [PaymentController::class, 'printPoSPaymentReceipt'])->name('payment.print.pos');
             Route::get('/reverse/{payment}', [PaymentController::class, 'reverse'])->name('payment.reverse');
+            Route::post('/post/{payment}', [PaymentController::class, 'post'])->name('payment.post');
         }
     );
 

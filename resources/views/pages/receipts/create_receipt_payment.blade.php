@@ -54,6 +54,7 @@
                         <form action="{{ isset($route) ? $route : route('receipt.payment.store') }}" method="POST">
                             {{ csrf_field() }}
                             <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
+                            <input type="hidden" name="receipt_id" value="{{ isset($model) ? $model->id : '' }}" />
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
@@ -76,9 +77,20 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="payer_id">Payer</label>
+                                        @if(isset($model) && $model->model_name == 'Customer')
+                                            <?php $payers = \App\Models\Customer::orderBy('code','asc')->get(); ?>
+                                        @elseif(isset($model) && $model->model_name == 'Supplier')
+                                            <?php $payers = \App\Models\Supplier::orderBy('code','asc')->get(); ?>
+                                        @else
+                                            <?php $payers = \App\Models\GeneralAccount::orderBy('number','asc')->get(); ?>
+                                        @endif
                                         <select class="form-control select2-single {{ $errors->has('payer_id') ? ' is-invalid' : '' }}"
                                                 name="payer_id" id="payer_id" selected_item="{{ $model->model_id }}" required>
-                                            
+                                            @if(isset($payers))
+                                                @foreach($payers as $payer)
+                                                    <option value="{{ $payer->id }}" {{ $payer->id==$model->model_id ? 'selected' : '' }}>{{ $payer->code ?? $payer->number }} - {{ $payer->name ?? $payer->description }}</option>
+                                                @endforeach
+                                            @endif
                                         </select>
                                         @if ($errors->has('payer_id'))
                                             <div class="invalid-feedback">

@@ -82,6 +82,7 @@
                 <i class="ion-android-cart"></i> Request Cart: <small>Purchased Products</small>
             </div>
             <div class="card-body table-responsive">
+                <?php $total_price = 0; ?>
                 @if (isset($cart_products) && $cart_products->count() < 1)
                     <div class="alert alert-danger">
                         No Product Added
@@ -123,7 +124,9 @@
                                     </td>
                                 </tr>
                             @endforeach --}}
+
                             @foreach ($cart_products as $product)
+                                <?php $total_price += ($product->unit_price ?? $product->price) * $product->quantity; ?>
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td class="text-left">{{ $product->product->code ?? $product->attributes['code'] }}</td>
@@ -146,7 +149,7 @@
                                                 data-value="p{{ $product->id }}">
                                         </td>
                                         <td><span
-                                                class="subtotal{{ $product->id }}">{{ number_format($product->unit_price ?? $product->price * $product->quantity, 2) }}</span>
+                                                class="subtotal{{ $product->id }}">{{ number_format(($product->unit_price ?? $product->price) * $product->quantity, 2) }}</span>
                                         </td>
                                         <input type="hidden" name="id" class="form-control"
                                             value="{{ $product->id }}">
@@ -174,7 +177,7 @@
                     </table>
                 @endif
                 <div class="alert alert-success" id="total">
-                    Total : <span id="total">{{ number_format(Cart::getTotal()) }}</span>
+                    Total : <span id="total">{{ number_format($total_price) }}</span>
                 </div>
             </div>
         </div>

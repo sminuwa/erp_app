@@ -126,15 +126,22 @@
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            <a href="{{ route('receipt.payment.print', $payment->id) }}"
+                                                            <a href="{{ route('receipt.payment.print', $payment->id) }}" target="_blank"
                                                                class="dropdown-item">
                                                                 <i class="fa fa-print" aria-hidden="true"></i> Print
                                                             </a>
-                                                            <a href="{{ route('receipt.payment.print.pos', $payment->id) }}"
+                                                            <a href="{{ route('receipt.payment.print.pos', $payment->id) }}" target="_blank"
                                                                class="dropdown-item">
-                                                                <i class="fa fa-print" aria-hidden="true"></i> PoS
+                                                                <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
                                                             </a>
                                                             @if($payment->status == 0)
+                                                                <form action="{{ route('receipt.payment.post', $payment->id) }}" method="post">
+                                                                    @csrf
+                                                                    <button type="submit" class="dropdown-item">
+                                                                        <i class="fa fa-check" aria-hidden="true"></i> Post
+                                                                    </button>
+                                                                </form>
+
                                                                 <a href="{{ route('create.payment.reciept', ['receipt_id'=>$payment->id]) }}"
                                                                    class="dropdown-item">
                                                                     <i class="fa fa-edit" aria-hidden="true"></i> Edit

@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\GeneralAccount;
 use App\Models\JournalItem;
 use App\Models\Supplier;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class EditJournal extends Component
@@ -134,6 +135,7 @@ class EditJournal extends Component
             );
 
 //            $this->journal->reference = \App\Models\Journal::generateNewNumber();
+            DB::beginTransaction();
             $this->journal->description = $this->description;
             $this->journal->date = $this->journal_date;
             $this->journal->updated_by = auth()->id();
@@ -150,7 +152,9 @@ class EditJournal extends Component
                     ];
                 }
             }
+
             if(JournalItem::upsert($items, ['journal_id', 'account_id'])){
+                DB::commit();
                 $this->inputs = [];
                 $this->resetInputFields();
             }
@@ -158,6 +162,7 @@ class EditJournal extends Component
             session()->flash('message', 'Journal created Successfully.');
             return $this->redirect(route('journal.index'));
         }catch (\Exception $e){
+            DB::rollback();
             session()->flash('error', $e->getMessage());
         }
 

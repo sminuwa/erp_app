@@ -14,9 +14,9 @@ use App\Models\Setting;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Models\CustomerLedger;
-use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
@@ -25,7 +25,7 @@ class PaymentController extends Controller
         $user_branch = User::userBranchAction();
         $payments = Payment::select('payments.*')
             ->where('branch_id', 'LIKE', $user_branch)
-            ->orderBy('date', 'DESC')->take(10)->get();
+            ->orderBy('receipt_no', 'DESC')->take(10)->get();
         return view('pages.payments.payment', ['payments' => $payments]);
     }
     public function search(Request $request)
@@ -39,21 +39,49 @@ class PaymentController extends Controller
     }
     public function pay(Request $request)
     {
-
+        $payment_id = $request->payment_id;
         $amount = $request->amount_paid;
         $bank_account_id = $request->account_id;
-        $refence_no = $this->generateReceiptNo();
+        $reference_no = Payment::generateNewNumber();
         $date = $request->payment_date;
         $description = $request->payment_ref;
         $user_branch = User::userBranchAction();
         $status = false;
         $insert_id = 0;
         $ledger_id = 0;
-
+        $payer_id = $request->payer_id;
+        $payer_type = $request->type;
+        $record = Payment::find($payment_id);
         DB::beginTransaction();
         try {
-
-            if ($request->has('type') && $request->type == "Customer") {
+            if(!$record){
+                $record = new Payment();
+                $record->receipt_no = $reference_no;
+                $record->created_by = auth()->id();
+                $record->status = 0;
+            }
+            $record->amount = $amount;
+            $record->date = $date;
+            $record->description = $description;
+            $record->model_id = $payer_id;
+            $record->model_name = $payer_type;
+            $record->charged_account_id = $bank_account_id;
+            $record->charged_account_name = 'GeneralAccount';
+            $record->branch_id = $user_branch;
+            $record->status = 0;
+            if($record->save()){
+                if(Transaction::receipt($payer_id, $payer_type, $bank_account_id, 'GeneralAccount', $amount, $reference_no, $date)){
+                    $action = "Made/Edited payment of $amount for : " . $reference_no;
+                    AuditLog::auditLog(auth()->id(), $action);
+                    session()->flash('app_message', 'Receipt generated successfully');
+                    DB::commit();
+                }else {
+                    DB::rollBack();
+                    return 'something went wrong';
+                }
+            }
+            return redirect()->back()->with(['prev_id' => $ledger_id]);
+            /*if ($request->has('type') && $request->type == "Customer") {
                 $customer_id = $request->payer_id;
                 $status = Transaction::payment($customer_id, 'Customer', $bank_account_id, 'GeneralAccount', $amount, $refence_no, $date);
                 $ledger_id = DB::table('payments')->insertGetId([
@@ -113,7 +141,7 @@ class PaymentController extends Controller
                 $action = "Posted payment of $amount for : " . $refence_no;
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Posted  successfully');
-            }
+            }*/
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('app_error', 'Failed to make payment');
@@ -124,13 +152,46 @@ class PaymentController extends Controller
 
     }
 
-    public function makePayment()
+    public function makePayment(Request $request)
     {
+        $payment_id = $request->payment_id;
+        $payment = Payment::find($payment_id);
         $user_branch = User::userBranchAction();
         $accounts = GeneralAccount::whereIn('class', ['A11','A12','A13'])->orderBy('number')->get();
         $customers = Customer::whereIn('type', ['Retail', 'Wholesale'])->where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
         $model = new GeneralAccountLedger;
+        if($payment)
+            $model = $payment;
         return view('pages.payments.create_payment', compact('accounts', 'customers', 'model'));
+    }
+    public function delete(Payment $payment){
+        $payment->delete();
+        return back();
+    }
+    public function post(Payment $payment) {
+        $payment->status = 1;
+        $payment->posted_by = auth()->id();
+        DB::beginTransaction();
+        if($payment->save()){
+            if(Transaction::receipt(
+                $payment->model_id,
+                $payment->model_name,
+                $payment->charged_account_id,
+                $payment->charged_account_name,
+                $payment->amount,
+                $payment->receipt_no,
+                $payment->date)
+            ){
+                $action = "Made payment of $payment->amount for : " . $payment->receipt_no;
+                AuditLog::auditLog(auth()->id(), $action);
+                session()->flash('app_message', 'Payment generated successfully');
+                DB::commit();
+            }else {
+                DB::rollBack();
+                session()->flash('app_message', 'Something went wrong');
+            }
+        }
+        return back();
     }
     public function reverse(Payment $payment) {
         $payment->status = 0;

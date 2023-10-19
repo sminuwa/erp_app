@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Transaction;
 use App\Models\GeneralAccount;
 use App\Models\PurchaseExpense;
 use Illuminate\Http\Request;
@@ -47,7 +48,7 @@ class PurchaseGRNController extends Controller
     {
         \Cart::clear();
         return view('pages.inventories.purchases.grn.index', [
-            'records' => Purchase::select('purchases.*')->orderBy('created_at', 'DESC')
+            'records' => Purchase::select('purchases.*')->orderBy('reference', 'DESC')
                 ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
                 // ->where('branch_id', 'LIKE', User::userBranchAction())
                 ->take(10)->get(),
@@ -122,6 +123,7 @@ class PurchaseGRNController extends Controller
                 'vehicle_reg_no' => $request->vehicle_reg_no,
                 'source_store_id' => $request->source_store_id,
                 'destination_store_id' => $request->source_store_id,
+                'status' => 0,
                 'updated_by' => $request->updated_by,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
@@ -548,6 +550,15 @@ class PurchaseGRNController extends Controller
     }
     public function approve(Request $request, Purchase $purchase)
     {
-        return $purchase;
+        DB::beginTransaction();
+        $purchase->status = 1;
+        if($purchase->save()){
+            if(Transaction::purchases($purchase->id, $purchase->date)['status']){
+                DB::commit();
+            }
+            else
+                DB::rollback();
+        }
+        return back()->with('success', 'Approved successfully');
     }
 }

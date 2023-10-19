@@ -88,7 +88,7 @@
                                     </tfoot>
                                     <tbody>
                                     @foreach ($payments as $payment)
-                                        <tr>
+                                        <tr class="@if($payment->status == 0) bg-warning @endif">
 
                                             <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                                             </td>
@@ -127,14 +127,22 @@
                                                             <i class="fa fa-print" aria-hidden="true"></i> PoS
                                                         </a>
                                                         @if($payment->status == 0)
-                                                            <a href="{{ route('create.payment.reciept', ['receipt_id'=>$payment->id]) }}"
+                                                            <form action="{{ route('payment.post', $payment->id) }}" method="post" onsubmit="return confirm('Are you sure you want post this transaction?')">
+                                                                @csrf
+                                                                <button type="submit" class="dropdown-item">
+                                                                    <i class="fa fa-check" aria-hidden="true"></i> Post
+                                                                </button>
+                                                            </form>
+                                                            <a href="{{ route('create.payment', ['payment_id'=>$payment->id]) }}"
                                                                class="dropdown-item">
                                                                 <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                                             </a>
-                                                            <a href="{{ route('create.payment.reciept', ['receipt_id'=>$payment->id]) }}"
-                                                               class="dropdown-item">
-                                                                <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                                            </a>
+                                                            <form action="{{ route('payment.delete', $payment->id) }}" method="post" onsubmit="return confirm('Are you sure you want delete this transaction?')">
+                                                                @csrf
+                                                                <button type="submit" class="dropdown-item">
+                                                                    <i class="fa fa-check" aria-hidden="true"></i> Delete
+                                                                </button>
+                                                            </form>
                                                         @else
                                                             <a href="{{ route('payment.reverse',[$payment->id]) }}"
                                                                class="dropdown-item">

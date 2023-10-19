@@ -40,7 +40,7 @@ class Payment extends Model
     }
 
     public static function generateNewNumber($prefix = 'PAY', $length = 4){
-        $prefix = $prefix.date('ymd');
+        $prefix = $prefix.date('ym').auth()->user()->branch->code;
         $record = self::where('receipt_no', 'like', '%'.$prefix.'%')->orderBy('receipt_no', 'desc')->first();
         if($record){
             $number = $record->receipt_no;

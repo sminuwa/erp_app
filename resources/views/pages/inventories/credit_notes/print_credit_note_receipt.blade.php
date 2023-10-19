@@ -44,7 +44,7 @@
 
                         </div>
                         <!-- /.col -->
-                        <h4>SUPPLIER NAME: <small>{{$payment->supplier->name}}</small></h4>
+                        <h4>CUSTOMER NAME: <small>{{$payment->customer->name}}</small></h4>
                     </div>
 
                     <div class="row">
@@ -53,10 +53,9 @@
                                 <thead>
                                     <tr>
                                         <th>DATE</th>
-                                        <th>RECEIPT NO</th>
-                                        <th>SUPPLIER NAME</th>
+                                        <th>REF NO</th>
+                                        <th>CUSTOMER NAME</th>
                                         <th>AMOUNT</th>
-                                        <th>CHEQUE NO</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -65,16 +64,13 @@
                                             {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                                         </td>
                                         <td>
-                                            {{ $payment->teller_no }}
+                                            {{ $payment->reference_no }}
                                         </td>
                                         <td>
-                                            {{ $payment->supplier->name }}
+                                            {{ $payment->customer->name }}
                                         </td>
                                         <td  align="right">
-                                            &#8358; {{ number_format($payment->dr, 2) }}</td>
-                                        <td>
-                                            {{ $payment->Ref }}
-                                        </td>
+                                            &#8358; {{ number_format($payment->amount, 2) }}</td>
                                     </tr>
         
                                     <tr>
@@ -85,7 +81,7 @@
                                         </td>
                                         <td class="text-right text-danger">
                                             <p>
-                                                <strong>&#8358;{{ number_format($payment->dr, 2) }}</strong>
+                                                <strong>&#8358;{{ number_format($payment->amount, 2) }}</strong>
                                             </p>
                                         </td>
                                         <td></td>

@@ -348,7 +348,7 @@ class CustomerController extends Controller
                 'customer_id' => $order->customer_id,
                 'amount' => $order->total,
                 'comment' => $request->comment,
-                'branch_id'=> User::userBranchAction()
+                'branch_id' => User::userBranchAction()
             ]);
             session()->flash('app_message', 'Credit note captured successfully');
             $action = "Posted credit note $order->invoice_no for customer: " . $order->customer->name;
@@ -361,81 +361,19 @@ class CustomerController extends Controller
 
         return redirect()->back();
     }
-    public function updateCreditNote(Request $request, SupplierLedger $ledger)
-    {
-        $supplier_id = $ledger->supplier_id;
-        $amount = $request->amount_paid;
-        $bank_account_id = $request->group_id; //This will be used as bank_account_id
 
-        DB::beginTransaction();
-        try {
-            DB::table('suppliers')->where(['id' => $supplier_id])->increment('opening_balance', $ledger->dr);
-            DB::table('suppliers')->where(['id' => $supplier_id])->decrement('opening_balance', $amount);
-
-            //Bank Withdrawal
-            DB::table('bank_transactions')->where(['ref_no' => $ledger->teller_no, 'bank_account_id' => $ledger->bank_account_id])->update([
-                'bank_account_id' => $bank_account_id,
-                'trans_date' => $request->payment_date,
-                'cr' => 0,
-                'dr' => $amount,
-                'ref_no' => $request->teller_no,
-                'updated_at' => Carbon::now(),
-            ]);
-            DB::table('supplier_ledgers')->where('id', $ledger->id)->update([
-                'teller_no' => $request->teller_no,
-                'bank_account_id' => $bank_account_id,
-                'date' => $request->payment_date,
-                'payment_mode' => 'Credit Note',
-                'dr' => $amount,
-                'updated_at' => Carbon::now()
-            ]);
-            session()->flash('app_message', 'Credit note updated successfully');
-            $action = "Updated credit note $request->teller_no from customer: " . Customer::find($supplier_id)->name;
-            AuditLog::auditLog(Auth::id(), $action);
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            session()->flash('app_error', 'Credit note failed to update');
-            throw $e;
-        }
-        return redirect()->back();
-    }
-    public function deleteCreditNote(Request $request, SupplierLedger $ledger)
-    {
-        $supplier_id = $ledger->supplier_id;
-        $bank_account_id = $ledger->bank_account_id;
-
-        DB::beginTransaction();
-        try {
-            DB::table('suppliers')->where(['id' => $supplier_id])->increment('opening_balance', $ledger->dr);
-
-            DB::table('supplier_ledgers')->where('id', $ledger->id)->delete();
-            //Bank Withdrawal
-            DB::table('bank_transactions')->where(['ref_no' => $ledger->teller_no, 'bank_account_id' => $bank_account_id])->delete();
-            session()->flash('app_message', 'Credit note deleted successfully');
-            $action = "Deleted credit note $ledger->teller_no from supplier: " . Supplier::find($supplier_id)->name;
-            AuditLog::auditLog(Auth::id(), $action);
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            session()->flash('app_error', 'Credit note cannot be deleted');
-            throw $e;
-        }
-        return redirect()->route('suppliers.credit.note');
-    }
     public function searchCreditNote(Request $request)
     {
         $search_value = $request->refno;
-        $payments = SupplierLedger::where('teller_no', 'LIKE', "%$search_value%")
+
+        $payments = Order::where('invoice_no', 'LIKE', "%$search_value%")
             ->where('branch_id', 'LIKE', User::userBranchAction())
-            ->join('suppliers', 'suppliers.id', 'supplier_ledgers.supplier_id')
-            ->orWhere('Ref', 'LIKE', "%$search_value%")->orderBy('Ref', 'DESC')->get();
-        $categories = Category::orderBy('name')->get();
-        return view('pages.suppliers.credit_note', ['payments' => $payments, 'categories' => $categories]);
+            ->orderBy('order_date', 'DESC')->get();
+        return view('pages.suppliers.credit_note', ['payments' => $payments]);
     }
-    public function printCreditnoteReceipt(SupplierLedger $payment)
+    public function printCreditnoteReceipt(CreditNote $credit_note)
     {
-        return view('pages.suppliers.print_credit_note_receipt', ['payment' => $payment, 'setting' => Setting::first()]);
+        return view('pages.inventories.credit_notes.print_credit_note_receipt', ['payment' => $credit_note, 'setting' => Setting::first()]);
     }
     public function loadInvoices(Request $request)
     {

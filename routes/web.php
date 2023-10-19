@@ -910,11 +910,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/credit-note/create', [CustomerController::class, 'createCreditNote'])->name('customers.credit.note.create');
         Route::post('/credit-note/store', [CustomerController::class, 'payCreditNote'])->name('customers.credit.note.store');
         Route::put('/credit-note/update/{ledger}', [CustomerController::class, 'updateCreditnote'])->name('customers.credit.note.update');
-        Route::delete('/credit-note/delete/{ledger}', [CustomerController::class, 'deleteCreditNote'])->name('customers.credit.note.destroy');
+        
         Route::post('/credit-note/search', [CustomerController::class, 'searchCreditNote'])->name('customers.credit.note.search');
         Route::get('/credit-note/load_invoices', [CustomerController::class, 'loadInvoices'])->name('load.order.invoices');
         Route::get('/credit-note/load_cart', [CustomerController::class, 'loadToCart'])->name('load.order.cart');
-        Route::get('/credit-note/print/receipt/{payment}', [CustomerController::class, 'printCreditNoteReceipt'])->name('customers.credit.note.print');
+        Route::get('/credit-note/print/receipt/{credit_note}', [CustomerController::class, 'printCreditNoteReceipt'])->name('customers.credit.note.print');
         Route::group(
             ['prefix' => 'purchases/grn'],
             function () {

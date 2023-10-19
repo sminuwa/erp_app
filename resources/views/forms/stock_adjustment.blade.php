@@ -79,10 +79,10 @@
         @endif
     </div>
     <div class="form-group">
-        <span>Type negative or positive number (+ or -)</span>
+        <span>Type Number: </span>
         <label for="adjusted_qty">Adjusted Qty</label>
         <input type="number" class="form-control {{ $errors->has('adjusted_qty') ? ' is-invalid' : '' }}"
-            name="adjusted_qty" id="adjusted_qty" value="" placeholder="" required="required">
+            name="adjusted_qty" id="adjusted_qty" value="" placeholder="" required="required" min="1">
         @if ($errors->has('adjusted_qty'))
             <div class="invalid-feedback">
                 <strong>{{ $errors->first('adjusted_qty') }}</strong>

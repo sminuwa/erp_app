@@ -68,7 +68,7 @@ class CartController extends Controller
                     'value' => $request->quantity
                 ],
                 'price' => $sold_price,
-                'attributes' => array('cost_price' => $request->cost_price, 'selling_price' => $request->selling_price, 'discount' => $request->selling_price - $request->sold_price, 'qty_available' => $request->qty_available,'store'=>$request->store)
+                'attributes' => array('cost_price' => $request->cost_price, 'selling_price' => $request->selling_price, 'code'=>$request->code, 'discount' => $request->selling_price - $request->sold_price, 'qty_available' => $request->qty_available,'store'=>$request->store)
             ]
         );
 

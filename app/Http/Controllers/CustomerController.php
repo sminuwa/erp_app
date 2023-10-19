@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+use App\Models\CreditNote;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
@@ -42,12 +45,12 @@ class CustomerController extends Controller
         $user_branch = User::userBranchAction();
         return view('pages.customers.index', ['records' => Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get()]);
     } /**
-  * Display the specified resource.
-  *
-  * @param  Show  $request
-  * @param  Customer  $customer
-  * @return \Illuminate\Http\Response
-  */
+      * Display the specified resource.
+      *
+      * @param  Show  $request
+      * @param  Customer  $customer
+      * @return \Illuminate\Http\Response
+      */
     public function show(Show $request, Customer $customer)
     { //dd($customer->ledgers()->get());
         return view('pages.customers.show', [
@@ -55,11 +58,11 @@ class CustomerController extends Controller
         ]);
 
     } /**
-  * Show the form for creating a new resource.
-  *
-  * @param  Create  $request
-  * @return \Illuminate\Http\Response
-  */
+      * Show the form for creating a new resource.
+      *
+      * @param  Create  $request
+      * @return \Illuminate\Http\Response
+      */
     public function create(Create $request)
     {
 
@@ -68,11 +71,11 @@ class CustomerController extends Controller
 
         ]);
     } /**
-  * Store a newly created resource in storage.
-  *
-  * @param  Store  $request
-  * @return \Illuminate\Http\Response
-  */
+      * Store a newly created resource in storage.
+      *
+      * @param  Store  $request
+      * @return \Illuminate\Http\Response
+      */
     public function store(Store $request)
     {
         $model = new Customer;
@@ -87,18 +90,17 @@ class CustomerController extends Controller
             if ($request->has('modal'))
                 return back();
             return redirect()->route('customers.index');
-        }
-        else {
+        } else {
             session()->flash('app_message', 'Something is wrong while saving Customer');
         }
         return redirect()->back();
     } /**
-  * Show the form for editing the specified resource.
-  *
-  * @param  Edit  $request
-  * @param  Customer  $customer
-  * @return \Illuminate\Http\Response
-  */
+      * Show the form for editing the specified resource.
+      *
+      * @param  Edit  $request
+      * @param  Customer  $customer
+      * @return \Illuminate\Http\Response
+      */
     public function edit(Edit $request, Customer $customer)
     {
         $this->getOverDueInvoices($customer)->get();
@@ -107,12 +109,12 @@ class CustomerController extends Controller
 
         ]);
     } /**
-  * Update a existing resource in storage.
-  *
-  * @param  Update  $request
-  * @param  Customer  $customer
-  * @return \Illuminate\Http\Response
-  */
+      * Update a existing resource in storage.
+      *
+      * @param  Update  $request
+      * @param  Customer  $customer
+      * @return \Illuminate\Http\Response
+      */
     public function update(Update $request, Customer $customer)
     {
         $customer->fill($request->all());
@@ -122,19 +124,18 @@ class CustomerController extends Controller
             AuditLog::auditLog(Auth::id(), $action);
             session()->flash('app_message', 'Customer successfully updated');
             return redirect()->route('customers.index');
-        }
-        else {
+        } else {
             session()->flash('app_error', 'Something is wrong while updating Customer');
         }
         return redirect()->back();
     } /**
-  * Delete a  resource from  storage.
-  *
-  * @param  Destroy  $request
-  * @param  Customer  $customer
-  * @return \Illuminate\Http\Response
-  * @throws \Exception
-  */
+      * Delete a  resource from  storage.
+      *
+      * @param  Destroy  $request
+      * @param  Customer  $customer
+      * @return \Illuminate\Http\Response
+      * @throws \Exception
+      */
     public function destroy(Destroy $request, Customer $customer)
     {
         if ($customer->customer()->count() == 0) {
@@ -142,12 +143,10 @@ class CustomerController extends Controller
                 $action = "Deleted a credit customer : " . $customer->name;
                 AuditLog::auditLog(Auth::id(), $action);
                 session()->flash('app_message', 'Customer successfully deleted');
-            }
-            else {
+            } else {
                 session()->flash('app_error', 'Error occurred while deleting Customer');
             }
-        }
-        else {
+        } else {
             session()->flash('app_error', 'Error occurred while deleting Customer');
         }
         return redirect()->back();
@@ -169,7 +168,7 @@ class CustomerController extends Controller
         $balance_b_d = $sum_cr_b_d - $sum_dr_b_d; //balance before date
         $ledgers = $query->orderBy('date')->orderBy('id', 'ASC')->get();
 
-        return view('pages.customers.load_ledger', compact('ledgers', 'customer', 'from_date', 'to_date', 'balance_b_d','sum_cr_b_d','sum_dr_b_d'));
+        return view('pages.customers.load_ledger', compact('ledgers', 'customer', 'from_date', 'to_date', 'balance_b_d', 'sum_cr_b_d', 'sum_dr_b_d'));
     }
     public function printLedger($from_date, $to_date, $customer_id)
     {
@@ -180,7 +179,7 @@ class CustomerController extends Controller
         $balance_b_d = $sum_cr_b_d - $sum_dr_b_d; //balance before date
         $ledgers = $query->orderBy('date')->get();
 
-        return view('pages.customers.print_ledger', compact('ledgers', 'customer', 'from_date', 'to_date', 'balance_b_d','sum_cr_b_d','sum_dr_b_d'));
+        return view('pages.customers.print_ledger', compact('ledgers', 'customer', 'from_date', 'to_date', 'balance_b_d', 'sum_cr_b_d', 'sum_dr_b_d'));
     }
     public function loadGeneralCustomerLedger(Request $request)
     {
@@ -214,9 +213,9 @@ class CustomerController extends Controller
         $balance_b_d = $sum_cr_b_d - $sum_dr_b_d; //balance before date
 
         $customer = Customer::find($customer_id);
-        return view('pages.customers.load_general_ledger', compact('ledgers', 'from_date', 'to_date', 'balance_b_d', 'customer','sum_cr_b_d','sum_dr_b_d'));
+        return view('pages.customers.load_general_ledger', compact('ledgers', 'from_date', 'to_date', 'balance_b_d', 'customer', 'sum_cr_b_d', 'sum_dr_b_d'));
     }
-   
+
     public function payForMoreInvoices(Customer $customer, $amount)
     {
         //clear other unpaid invoice if the amount is more than the selected invoice
@@ -248,7 +247,8 @@ class CustomerController extends Controller
         $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
         return view('pages.customers.create_opening_balance', [
             'customers' => $customers,
-            'model' => null]);
+            'model' => null
+        ]);
     }
     public function openingBalanceStore(Request $request)
     {
@@ -296,14 +296,13 @@ class CustomerController extends Controller
             $action = "Updated  opening balance of customer ($request->new_amount) : " . Customer::find($customer_id)->name;
             AuditLog::auditLog(Auth::id(), $action);
             session()->flash('app_message', 'Customer credit limit successfully updated');
-        }
-        else {
+        } else {
             session()->flash('app_error', 'Customer must be selected');
         }
 
         return back()->withInput();
     }
-   
+
     public function getOverDueInvoices(Customer $customer)
     {
         return $customer->orders()->whereDate('due_date', '<=', 'CURDATE()')->where('due', '>', 0)->where('payment_mode', 'Credit')->orderBy('due_date', 'ASC');
@@ -312,5 +311,161 @@ class CustomerController extends Controller
     {
         return $customer->orders()->where('due', '>', 0)->where('payment_mode', 'Credit')->orderBy('due_date', 'ASC');
     }
-    
+    public function customerCreditNote()
+    {
+        $payments = CreditNote::orderBy('credit_notes.created_at', 'DESC')->take(10)->get();
+        $model = new CustomerLedger();
+        return view('pages.inventories.credit_notes.credit_note', ['payments' => $payments, 'model' => $model]);
+    }
+    public function createCreditNote()
+    {
+        $user_branch = User::userBranchAction();
+        $orders = Order::where('branch_id', 'LIKE', $user_branch)->orderBy('order_date', 'DESC')->take(20)->get();
+        //$receipt_no = $this->generateCreditNoteInvoice();
+        $model = new Customer;
+        return view('pages.inventories.credit_notes.create_credit_note', compact('orders', 'model'));
+    }
+    public function payCreditNote(Request $request)
+    {
+        return "To call your function";
+        $order_id = $request->order_id;
+        $comment = $request->comment;
+        $order = Order::find($order_id);
+        DB::beginTransaction();
+        try {
+            //Bank Withdrawal
+            DB::table('bank_transactions')->insert([
+                'bank_account_id' => $order->customer_id,
+                'trans_date' => date('Y-m-d'),
+                'cr' => 0,
+                'dr' => $order->total,
+                'ref_no' => $order->invoice_no,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]);
+            DB::table('credit_notes')->insert([
+                'reference_no' => $order->invoice_no,
+                'customer_id' => $order->customer_id,
+                'amount' => $order->total,
+                'comment' => $request->comment,
+                'branch_id'=> User::userBranchAction()
+            ]);
+            session()->flash('app_message', 'Credit note captured successfully');
+            $action = "Posted credit note $order->invoice_no for customer: " . $order->customer->name;
+            AuditLog::auditLog(Auth::id(), $action);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+
+        return redirect()->back();
+    }
+    public function updateCreditNote(Request $request, SupplierLedger $ledger)
+    {
+        $supplier_id = $ledger->supplier_id;
+        $amount = $request->amount_paid;
+        $bank_account_id = $request->group_id; //This will be used as bank_account_id
+
+        DB::beginTransaction();
+        try {
+            DB::table('suppliers')->where(['id' => $supplier_id])->increment('opening_balance', $ledger->dr);
+            DB::table('suppliers')->where(['id' => $supplier_id])->decrement('opening_balance', $amount);
+
+            //Bank Withdrawal
+            DB::table('bank_transactions')->where(['ref_no' => $ledger->teller_no, 'bank_account_id' => $ledger->bank_account_id])->update([
+                'bank_account_id' => $bank_account_id,
+                'trans_date' => $request->payment_date,
+                'cr' => 0,
+                'dr' => $amount,
+                'ref_no' => $request->teller_no,
+                'updated_at' => Carbon::now(),
+            ]);
+            DB::table('supplier_ledgers')->where('id', $ledger->id)->update([
+                'teller_no' => $request->teller_no,
+                'bank_account_id' => $bank_account_id,
+                'date' => $request->payment_date,
+                'payment_mode' => 'Credit Note',
+                'dr' => $amount,
+                'updated_at' => Carbon::now()
+            ]);
+            session()->flash('app_message', 'Credit note updated successfully');
+            $action = "Updated credit note $request->teller_no from customer: " . Customer::find($supplier_id)->name;
+            AuditLog::auditLog(Auth::id(), $action);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('app_error', 'Credit note failed to update');
+            throw $e;
+        }
+        return redirect()->back();
+    }
+    public function deleteCreditNote(Request $request, SupplierLedger $ledger)
+    {
+        $supplier_id = $ledger->supplier_id;
+        $bank_account_id = $ledger->bank_account_id;
+
+        DB::beginTransaction();
+        try {
+            DB::table('suppliers')->where(['id' => $supplier_id])->increment('opening_balance', $ledger->dr);
+
+            DB::table('supplier_ledgers')->where('id', $ledger->id)->delete();
+            //Bank Withdrawal
+            DB::table('bank_transactions')->where(['ref_no' => $ledger->teller_no, 'bank_account_id' => $bank_account_id])->delete();
+            session()->flash('app_message', 'Credit note deleted successfully');
+            $action = "Deleted credit note $ledger->teller_no from supplier: " . Supplier::find($supplier_id)->name;
+            AuditLog::auditLog(Auth::id(), $action);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('app_error', 'Credit note cannot be deleted');
+            throw $e;
+        }
+        return redirect()->route('suppliers.credit.note');
+    }
+    public function searchCreditNote(Request $request)
+    {
+        $search_value = $request->refno;
+        $payments = SupplierLedger::where('teller_no', 'LIKE', "%$search_value%")
+            ->where('branch_id', 'LIKE', User::userBranchAction())
+            ->join('suppliers', 'suppliers.id', 'supplier_ledgers.supplier_id')
+            ->orWhere('Ref', 'LIKE', "%$search_value%")->orderBy('Ref', 'DESC')->get();
+        $categories = Category::orderBy('name')->get();
+        return view('pages.suppliers.credit_note', ['payments' => $payments, 'categories' => $categories]);
+    }
+    public function printCreditnoteReceipt(SupplierLedger $payment)
+    {
+        return view('pages.suppliers.print_credit_note_receipt', ['payment' => $payment, 'setting' => Setting::first()]);
+    }
+    public function loadInvoices(Request $request)
+    {
+        $word_search = $request->search;
+        if (strlen($word_search) > 0) {
+            $orders = Order::where('invoice_no', 'LIKE', "%$word_search%")
+                ->where('branch_id', 'LIKE', User::userBranchAction())
+                ->orderBy('order_date', 'DESC')->get();
+        } else {
+            $orders = Order::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('order_date', 'DESC')->take(20)->get();
+        }
+        return view('pages.inventories.credit_notes.load_order_invoices', ['orders' => $orders]);
+    }
+    public function loadToCart(Request $request)
+    {
+        $invoice_no = $request->invoice_no;
+        $order = Order::where('invoice_no', $invoice_no)->first();
+
+        \Cart::clear();
+        foreach ($order->order_items()->where('status', 1)->get() as $data) {
+            $qty = $data->quantity == 0 ? 1 : $data->quantity;
+            \Cart::add([
+                'id' => $data->store_product_id,
+                'name' => $data->storeProduct->product->name ?? 'No name found',
+                'price' => $data->sold_price,
+                'quantity' => $qty,
+                'attributes' => array('cost_price' => $data->cost_price, 'selling_price' => $data->selling_price, 'discount' => 0),
+            ]);
+        }
+        $cart_products = \Cart::getContent();
+        return view('pages.inventories.credit_notes.load_products', ['cart_products' => $cart_products, 'invoice_no' => $invoice_no, 'order' => $order]);
+    }
 }

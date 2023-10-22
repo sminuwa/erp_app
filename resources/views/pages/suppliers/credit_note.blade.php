@@ -49,7 +49,7 @@
                                     <form action="{{ route('suppliers.credit.note.search') }}" method="POST">
                                         @csrf
                                         <div class="input-group">
-                                            <input type="search" class="form-control rounded" required placeholder="Search by Receipt or Cheque number"
+                                            <input type="search" class="form-control rounded" required placeholder="Search by reference number"
                                                 name="refno" aria-label="Search" aria-describedby="search-addon" />
                                             <button type="submit" class="btn btn-outline-primary">search</button>
                                         </div>

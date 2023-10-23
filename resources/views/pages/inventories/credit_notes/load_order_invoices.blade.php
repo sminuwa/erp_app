@@ -9,23 +9,3 @@
                     class=""></span>Select</a></td>
     </tr>
 @endforeach
-<script>
-    $('.invoice').on('click', function() {
-        var invoice_no = $(this).attr('data-val');
-        $('#load').html("<h3>Please wait... while it is loading...</h3>");
-        $.ajax({
-            url: "{{ route('load.order.cart') }}",
-            method: 'GET',
-            data: {
-                invoice_no: invoice_no
-            },
-            success: function(response) {
-
-                $('#load').html(response);
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        });
-    });
-</script>

@@ -39,7 +39,8 @@
                             <div class="row">
                                 <div class="col-sm-4">
                                     <a href="{{ route('customers.credit.note.create') }}" class="btn btn-sm btn-secondary"
-                                        style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Credit Note</a>
+                                        style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Credit
+                                        Note</a>
                                 </div>
                             </div>
                             <div class="row">
@@ -47,8 +48,9 @@
                                     <form action="{{ route('customers.credit.note.search') }}" method="POST">
                                         @csrf
                                         <div class="input-group">
-                                            <input type="search" class="form-control rounded" required placeholder="Search by Receipt or Cheque number"
-                                                name="refno" aria-label="Search" aria-describedby="search-addon" />
+                                            <input type="search" class="form-control rounded" required
+                                                placeholder="Search by Receipt or Cheque number" name="refno"
+                                                aria-label="Search" aria-describedby="search-addon" />
                                             <button type="submit" class="btn btn-outline-primary">search</button>
                                         </div>
                                     </form>
@@ -86,9 +88,9 @@
                                                 <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                                                 </td>
                                                 <td>{{ $payment->reference_no }}</td>
-                                                
+
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
-                                                <td>{{ $payment->postedBy->name ?? ''}}</td>
+                                                <td>{{ $payment->postedBy->name ?? '' }}</td>
                                                 <td align="center">
                                                     <a href="{{ route('customers.credit.note.print', $payment->id) }}"
                                                         target="_BLANK" class="btn btn-secondary btn-sm">
@@ -111,23 +113,27 @@
                                                     </form>
                                                 </td>
                                             </tr>
-                                            <div class="modal fade" id="payment_edit{{$payment->id}}" style="display: none;" aria-hidden="true">
+                                            <div class="modal fade" id="payment_edit{{ $payment->id }}"
+                                                style="display: none;" aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title">Credit note to
-                                                                {{ $payment->customer->name ?? ''}} | Cheque No:
+                                                                {{ $payment->customer->name ?? '' }} | Cheque No:
                                                                 {{ $payment->Ref }}</h5>
-                                                            <button type="button" class="close"
-                                                                data-dismiss="modal" aria-label="Close">
+                                                            <button type="button" class="close" data-dismiss="modal"
+                                                                aria-label="Close">
                                                                 <span aria-hidden="true">×</span>
                                                             </button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="{{route('suppliers.credit.note.update',$payment->id)}}" method="POST" target="_BLANK">
+                                                            <form
+                                                                action="{{ route('customers.credit.note.update', $payment->id) }}"
+                                                                method="POST" target="_BLANK">
                                                                 @csrf
                                                                 @method('PUT')
-                                                                <input type="hidden" name="payment_id" id="payment_id" value="{{$payment->id}}"/>
+                                                                <input type="hidden" name="payment_id" id="payment_id"
+                                                                    value="{{ $payment->id }}" />
                                                                 <div class="row">
                                                                     <div class="col-md-6">
                                                                         <div class="form-group">
@@ -187,13 +193,16 @@
                                                                     <div class="col-md-6">
                                                                         <div class="form-group">
                                                                             <label for="group_id">Group Name</label>
-                                                                            <select class="form-control select2-single {{ $errors->has('group_id') ? ' is-invalid' : '' }}"
-                                                                                name="group_id" id="group_id" required="required">
+                                                                            <select
+                                                                                class="form-control select2-single {{ $errors->has('group_id') ? ' is-invalid' : '' }}"
+                                                                                name="group_id" id="group_id"
+                                                                                required="required">
                                                                                 <option value="">Select...</option>
                                                                                 @if (isset($categories))
                                                                                     @foreach ($categories as $data)
-                                                                                        <option value="{{ $data->id }}"
-                                                                                            {{ $data->id == old('group_id',$payment->bank_account_id) ? 'selected' : '' }}>
+                                                                                        <option
+                                                                                            value="{{ $data->id }}"
+                                                                                            {{ $data->id == old('group_id', $payment->bank_account_id) ? 'selected' : '' }}>
                                                                                             {{ $data->name }}</option>
                                                                                     @endforeach
                                                                                 @endif
@@ -271,7 +280,7 @@
                 "info": true,
                 "autoWidth": false
             });
-            $(".show").on('click', function() {
+            $(document).on('click', '".show"',function() {
                 order_id = $(this).attr('data-val');
                 $.ajax({
                     type: 'get',
@@ -284,41 +293,7 @@
                     $('.display').html(data);
                 });
             });
+           
         });
-    </script>
-
-
-    <script type="text/javascript">
-        function deleteItem(id) {
-            const swalWithBootstrapButtons = swal.mixin({
-                confirmButtonClass: 'btn btn-success',
-                cancelButtonClass: 'btn btn-danger',
-                buttonsStyling: false,
-            })
-
-            swalWithBootstrapButtons({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.value) {
-                    event.preventDefault();
-                    document.getElementById('delete-form-' + id).submit();
-                } else if (
-                    // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
-                ) {
-                    swalWithBootstrapButtons(
-                        'Cancelled',
-                        'Your data is safe :)',
-                        'error'
-                    )
-                }
-            })
-        }
     </script>
 @endpush

@@ -2,7 +2,12 @@
     <div class="card-header">
         <h3 class="card-title">
             <i class="fa fa-info"></i>
-            Item Lists for Invoice {{ $invoice_no }}
+            Item Lists for Invoice
+            @if (isset($order))
+                {{ $order->invoice_no }}
+            @elseif (Cart::getTotal() > 0)
+                {{ $invoice_no }}
+            @endif
 
         </h3>
     </div>
@@ -13,9 +18,9 @@
                 No Product Added
             </div>
         @else
-            <table class="table table-bordered table-striped text-center">
+            <table class="table table-bordered table-striped text-center" style="font-size: 12px;">
                 <thead>
-                    <tr style="font-size: 14px;">
+                    <tr>
                         <th>S.N</th>
                         <th style="width:30%">Item</th>
                         <th>Price</th>
@@ -31,11 +36,11 @@
                             <td>{{ $loop->iteration }}</td>
                             <td class="text-left">{{ $product->name }}</td>
 
-                            <form action="{{ route('cart.update') }}" method="post" id="p{{ $product->id }}">
+                            <form action="{{ route('credit.note.cart.update') }}" method="post" id="p{{ $product->id }}">
                                 @csrf
                                 @method('PUT')
                                 <td>
-                                    <input type="text" name="sold_price" id="price{{ $product->id }}" readonly
+                                    <input type="text" name="sold_price" id="price{{ $product->id }}"
                                         class="form-control price" style="min-width:65px;"
                                         onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
                                         value="{{ $product->price }}"
@@ -44,7 +49,7 @@
                                     <span style="color: red;" id="valid_price{{ $product->id }}"></span>
                                 </td>
                                 <td>
-                                    <input type="text" name="quantity" id="quantity{{ $product->id }}" readonly
+                                    <input type="text" name="quantity" id="quantity{{ $product->id }}"
                                         class="form-control quantity" data-value="p{{ $product->id }}"
                                         style="min-width:58px;" value="{{ $product->quantity }}" min="1"
                                         required>
@@ -64,34 +69,30 @@
                             </td> --}}
                             </form>
 
-                            {{-- <td>
-                                <button class="btn btn-danger btn-sm" type="button"
-                                    onclick="deleteItem({{ $product->id }})">
+                            <td>
+                                <button class="btn btn-danger btn-sm delete" type="button"
+                                    data-val="{{ $product->id }}">
                                     <i class="fa fa-trash" aria-hidden="true"></i>
                                 </button>
                                 <form id="delete-form-{{ $product->id }}"
-                                    action="{{ route('cart.remove', $product->id) }}" method="post"
+                                    action="{{ route('credit.note.cart.remove', $product->id) }}" method="post"
                                     style="display:none;">
+                                    <input type="hidden" name="order" id="order" value="{{ $order->id }}" />
                                     @csrf
                                     @method('DELETE')
                                 </form>
-                            </td> --}}
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         @endif
-
-        <div class="alert alert-info">
-            {{-- <p>Quantity : {{ Cart::getTotalQuantity() }}</p> --}}
-            <p>Sub Total : &#8358; <span id="subtotal">{{ number_format(Cart::getSubTotal(), 2) }}</span></p>
-        </div>
         <div class="alert alert-success">
             Total : &#8358; <span id="total">{{ number_format(Cart::getTotal()) }}</span>
         </div>
-        <form action="{{route('customers.credit.note.store')}}" method="POST">
+        <form action="{{ route('customers.credit.note.store') }}" method="POST">
             @csrf
-            <input type="hidden" name="order_id" value="{{$order->id}}" />
+            <input type="hidden" name="order_id" id="order_id" value="{{ $order->id }}" />
             <textarea name="comment" placeholder="Comment" rows="5" cols="100" class="form-control"></textarea>
             <div class="form-group text-right">
                 <input type="submit" name="Submit" class=" btn btn-primary" value="Submit" />
@@ -100,37 +101,3 @@
     </div>
     <!-- /.card-body -->
 </div>
-<script>
-    function deleteItem(id) {
-        const swalWithBootstrapButtons = swal.mixin({
-            confirmButtonClass: 'btn btn-success',
-            cancelButtonClass: 'btn btn-danger',
-            buttonsStyling: false,
-        })
-
-        swalWithBootstrapButtons({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            type: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'No, cancel!',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.value) {
-                event.preventDefault();
-                document.getElementById('delete-form-' + id).submit();
-            } else if (
-                // Read more about handling dismissals
-                result.dismiss === swal.DismissReason.cancel
-            ) {
-                swalWithBootstrapButtons(
-                    'Cancelled',
-                    'Your data is safe :)',
-                    'error'
-                )
-            }
-        })
-    }
-  
-</script>

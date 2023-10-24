@@ -33,7 +33,10 @@
         <!-- Main content -->
         <section class="content">
             <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.create') }}">
-                <span class="fa fa-plus-circle"></span>
+                <span class="fa fa-plus-circle"> New Price</span>
+            </a>
+            <a class="btn btn-secondary btn-sm" href="{{ url('upload_templates/price_template.xlsx') }}">
+                <span class="fa fa-download"> Template</span>
             </a>
             <div class="container-fluid">
                 <div class="row">

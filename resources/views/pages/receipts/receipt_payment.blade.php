@@ -135,12 +135,12 @@
                                                                 <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
                                                             </a>
                                                             @if($payment->status == 0)
-                                                                <form action="{{ route('receipt.payment.post', $payment->id) }}" method="post">
+                                                                {{-- <form action="{{ route('receipt.payment.post', $payment->id) }}" method="post">
                                                                     @csrf
                                                                     <button type="submit" class="dropdown-item">
                                                                         <i class="fa fa-check" aria-hidden="true"></i> Post
                                                                     </button>
-                                                                </form>
+                                                                </form> --}}
 
                                                                 <a href="{{ route('create.payment.reciept', ['receipt_id'=>$payment->id]) }}"
                                                                    class="dropdown-item">

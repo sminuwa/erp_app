@@ -89,7 +89,7 @@ class InterBankController extends Controller
         $interbank->posted_by = auth()->id();
         DB::beginTransaction();
         if($interbank->save()){
-            if(Transaction::interbank($interbank->source_account_id, 'GeneralAccount', $interbank->destination_account_id, 'GeneralAccount', $interbank->amount, $interbank->reference, $interbank->date)){
+            if(Transaction::interbank( $interbank->destination_account_id, 'GeneralAccount',$interbank->source_account_id, 'GeneralAccount', $interbank->amount, $interbank->reference, $interbank->date)){
                 $action = "Made payment of $interbank->amount for : " . $interbank->receipt_no;
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Payment generated successfully');

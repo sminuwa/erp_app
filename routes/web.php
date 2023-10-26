@@ -390,6 +390,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/print/interbank/{interbank}', [InterBankController::class, 'print'])->name('interbank.print');
             Route::get('/print/interbank/pos/{interbank}', [InterBankController::class, 'printPos'])->name('interbank.print.pos');
             Route::get('/reverse/{interbank}', [InterBankController::class, 'reverse'])->name('interbank.reverse');
+            Route::post('/post/{interbank}', [InterBankController::class, 'post'])->name('interbank.post');
         }
     );
     Route::group(

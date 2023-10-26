@@ -191,16 +191,16 @@
         </thead>
         <tbody>
             <tr>
-                <td>
+                <td>{{ $payment->account()->code ?? $payment->account()->number }} - {{ $payment->account()->name ?? $payment->account()->description }}</td>
+                <td class="col-md-9">
                     @if ($payment->description == null)
                         Payment for {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                     @else
                         {{ $payment->description }}
                     @endif
                 </td>
-                <td align="right">
-                    &#8358;{{ number_format($payment->amount, 2) }}
-                </td>
+                <td class="col-md-3" align="right"><i class="fa fa-inr"></i>
+                    &#8358; {{ number_format($payment->amount, 2) }}</td>
             </tr>
             <tr>
                 <td class="text-right">

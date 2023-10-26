@@ -113,6 +113,12 @@
                                                                 <i class="fa fa-print" aria-hidden="true"></i> PoS
                                                             </a>
                                                             @if($interbank->status == 0)
+                                                                <form action="{{ route('interbank.post', $interbank->id) }}" method="post" onsubmit="return confirm('Are you sure you want post this transaction?')">
+                                                                    @csrf
+                                                                    <button type="submit" class="dropdown-item">
+                                                                        <i class="fa fa-check" aria-hidden="true"></i> Post
+                                                                    </button>
+                                                                </form>
                                                                 <a href="{{ route('interbank.edit', $interbank->id) }}"
                                                                    class="dropdown-item">
                                                                     <i class="fa fa-edit" aria-hidden="true"></i> Edit

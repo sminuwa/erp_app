@@ -77,7 +77,9 @@
                                    onclick="return confirm('Are you sure you want to delete this journal?');"
                                    class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Delete</a>
                             @else
-                                <a href="{{ route('journal.reverse', $journal->id) }}"  class="btn btn-success btn-sm">Reverse</a>
+                                <a href="{{ route('journal.reverse', $journal->id) }}"
+                                   onclick="return confirm('Are you sure you want reverse this transaction?')"
+                                   class="btn btn-success btn-sm">Reverse</a>
                             @endif
                         </div>
                     </div>

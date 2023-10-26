@@ -236,9 +236,7 @@ class PaymentController extends Controller
         try {
             $receipt_no = $payment->receipt_no;
             Transaction::reversal($receipt_no, 'REVERSAL');
-
-            DB::table('bank_transactions')->where(['ref_no' => $receipt_no])->delete();
-
+            $payment->delete();
             $action = "Deleted $payment->amount that was posted with invoice $receipt_no ";
             AuditLog::auditLog(auth()->user()->id, $action);
             DB::commit();
@@ -247,7 +245,7 @@ class PaymentController extends Controller
             session()->flash('app_error', 'Payment update failed');
             throw $e;
         }
-        return redirect()->route('receipts.payments');
+        return redirect()->back();
     }
     public function generateReceiptNo()
     {

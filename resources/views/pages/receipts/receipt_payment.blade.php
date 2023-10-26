@@ -139,10 +139,12 @@
                                                                    class="dropdown-item">
                                                                     <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                                                 </a>
-                                                                <a href="{{ route('create.payment.reciept', ['receipt_id'=>$payment->id]) }}"
-                                                                   class="dropdown-item">
-                                                                    <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                                                </a>
+                                                                <form action="{{ route('receipt.payment.delete', $payment->id) }}" method="post" onsubmit="return confirm('Are you sure you want delete this transaction?')">
+                                                                    @csrf
+                                                                    <button type="submit" class="dropdown-item">
+                                                                        <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                                                    </button>
+                                                                </form>
                                                             @else
                                                                 <a href="{{ route('receipt.payment.print', $payment->id) }}" target="_blank"
                                                                    class="dropdown-item">

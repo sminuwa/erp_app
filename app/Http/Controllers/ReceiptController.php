@@ -224,6 +224,13 @@ class ReceiptController extends Controller
          return back();
     }
 
+    public function delete(Receipt $receipt) {
+        if($receipt->delete()){
+
+        }
+        return back();
+    }
+
     public function printReceipt(Receipt $payment)
     {
         return view('pages.receipts.print_payment_receipt', ['payment' => $payment, 'setting' => Setting::first()]);

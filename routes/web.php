@@ -374,6 +374,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/load/payers', [ReceiptController::class, 'loadPayers'])->name('ajax.load.payers');
             Route::get('/reverse/{receipt}', [ReceiptController::class, 'reverse'])->name('receipt.payment.reverse');
             Route::post('/post/{receipt}', [ReceiptController::class, 'post'])->name('receipt.payment.post');
+            Route::post('/delete/{receipt}', [ReceiptController::class, 'delete'])->name('receipt.payment.delete');
         }
     );
     Route::group(

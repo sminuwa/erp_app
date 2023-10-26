@@ -107,6 +107,11 @@ class InterBankController extends Controller
         return back();
     }
 
+    public function delete(InterBank $interbank){
+        $interbank->delete();
+        return back();
+    }
+
     public function print(InterBank $interbank)
     {
         return view('pages.interbanks.print', ['interbank' => $interbank, 'setting' => Setting::first()]);

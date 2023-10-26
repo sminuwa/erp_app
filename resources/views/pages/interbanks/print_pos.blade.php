@@ -239,16 +239,16 @@
     </table>
     <section>
         <p>
-            Date/Printed By : <span>{{ \Carbon\Carbon::parse(\Carbon\Carbon::now())->toDayDateTimeString() }}
-                {{ Auth::user()->name }}</span>
+            Date : <span>{{ \Carbon\Carbon::parse(\Carbon\Carbon::now())->toDayDateTimeString() }}</span>
         </p>
+        <p><b>Created By :</b> {{ $interbank->createdBy?->name }}</p>
     </section>
     <footer style="text-align:center">
-        <p>{{App\Models\User::UserBranchName()->long_name}}</p>
+        <p>{{App\Models\User::UserBranchName()->name}}</p>
         @php
             $uc = $interbank->reference;
         @endphp
-        {{ QrCode::size(70)->generate("$interbank->amount\n$uc\n\n.") }}<br />
+        {{ QrCode::size(70)->generate($interbank->amount) }}<br />
         </ul>
     </footer>
 </body>

@@ -384,7 +384,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/create', [InterBankController::class, 'create'])->name('create.interbank');
             Route::post('/store', [InterBankController::class, 'store'])->name('interbank.store');
             Route::delete('/destroy/{interbank}', [InterBankController::class, 'destroy'])->name('interbank.destroy');
-            Route::get('/delete/{interbank}', [InterBankController::class, 'destroy'])->name('interbank.delete');
             Route::put('/update/{interbank}', [InterBankController::class, 'update'])->name('interbank.update');
             Route::get('/edit/{interbank}', [InterBankController::class, 'edit'])->name('interbank.edit');
             Route::post('/search', [InterBankController::class, 'search'])->name('interbank.search');
@@ -392,6 +391,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/print/interbank/pos/{interbank}', [InterBankController::class, 'printPos'])->name('interbank.print.pos');
             Route::get('/reverse/{interbank}', [InterBankController::class, 'reverse'])->name('interbank.reverse');
             Route::post('/post/{interbank}', [InterBankController::class, 'post'])->name('interbank.post');
+            Route::post('/delete/{interbank}', [InterBankController::class, 'delete'])->name('interbank.delete');
+
         }
     );
     Route::group(

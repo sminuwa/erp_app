@@ -133,7 +133,7 @@
                                 @php
                                     $uc = $payment->receipt_no;
                                 @endphp
-                                {{ QrCode::size(70)->backgroundColor(255, 55, 0)->generate("$payment->dr\n$uc\n\n.") }}<br />
+                                {{ QrCode::size(70)->generate("$payment->dr\n$uc\n\n.") }}<br />
                             </div>
                         </div>
                     </div>

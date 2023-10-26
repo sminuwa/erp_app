@@ -244,7 +244,7 @@
         @php
             $uc = $payment->description;
         @endphp
-        {{ QrCode::size(70)->backgroundColor(255, 55, 0)->generate("$payment->amount\n$uc\n\n.") }}<br />
+        {{ QrCode::size(70)->generate($payment->amount) }}<br />
         </ul>
     </footer>
 </body>

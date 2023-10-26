@@ -36,7 +36,10 @@ class Role extends Model
     */
     public function modelhasses()
     {
-        return $this->belongsToMany(Modelhass::class,'model_has_roles');
+        return $this->belongsToMany(Modelhass::class,'model_has_roles','user_id');
+    }
+    public function modelHasPermission(){
+        return $this->hasMany(ModelHasRole::class,'role_id');
     }
     /**
     * haspermissions

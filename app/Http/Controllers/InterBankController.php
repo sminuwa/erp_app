@@ -69,7 +69,7 @@ class InterBankController extends Controller
                     $action = "Posted payment of $amount for : " . $reference;
                     AuditLog::auditLog(auth()->id(), $action);
                     session()->flash('app_message', 'Transfered  successfully');
-//                    DB::commit();
+                    DB::commit();
 //                } else {
 //                    DB::rollBack();
 //                }

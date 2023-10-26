@@ -231,8 +231,8 @@
     </table>
     <section>
         <p>
-            Date/Printed By : <span>{{ \Carbon\Carbon::parse(\Carbon\Carbon::now())->toDayDateTimeString() }}
-                {{ Auth::user()->name }}</span>
+            Date: <span>{{ \Carbon\Carbon::parse(\Carbon\Carbon::now())->toDayDateTimeString() }}
+                </span>
         </p>
         <p style="text-align:center">
             Thank you for your patronage!

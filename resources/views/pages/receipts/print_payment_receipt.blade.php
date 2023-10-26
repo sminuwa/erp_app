@@ -118,8 +118,8 @@
                         <div class="col-xs-10 col-sm-10 col-md-10 text-left">
                             <div class="receipt-right">
                                 <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
-                                <p><b>Collected By :</b> {{ $payment->createdBy?->name }}</p>
-                                <p><b>Printed By :</b> {{ Auth::user()->name }}</p><br>
+                                <p><b>Created By :</b> {{ $payment->createdBy?->name }}</p>
+{{--                                <p><b>Printed By :</b> {{ Auth::user()->name }}</p><br>--}}
 
                                 <p><b>Signatire :</b> ______________________________________</p>
                                 <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For:

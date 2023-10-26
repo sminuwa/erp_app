@@ -16,7 +16,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Credit Note</h4>
+                        <h4>Debit Note</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -33,14 +33,14 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('customers.credit.note') }}">
-                <span class="fa fa-list"> Credit Notes</span>
+            <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.debit.note') }}">
+                <span class="fa fa-list"> Debit Notes</span>
             </a>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-6" id="load">
-                        @if (isset($order) && $order != null)
-                            @include('pages.inventories.credit_notes.load_products')
+                        @if (isset($purchase) && $purchase != null)
+                            @include('pages.inventories.debit_notes.load_expenses')
                         @endif
                     </div>
                     <div class="col-sm-6">
@@ -63,17 +63,17 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="table-body">
-                                                @foreach ($orders as $order)
+                                                @foreach ($purchases as $order)
                                                     <tr>
                                                         <td><a href="javascript:void(0)" class="invoice" onclick="load()"
-                                                                data-val="{{ $order->invoice_no }}">{{ $order->invoice_no }}</a>
+                                                                data-val="{{ $order->reference }}">{{ $order->reference }}</a>
                                                         </td>
-                                                        <td>{{ $order->customer->name }}</td>
-                                                        <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}
+                                                        <td>{{ $order->supplier->name ?? '' }}</td>
+                                                        <td>{{ Carbon\Carbon::parse($order->purchase_date)->toFormattedDateString() }}
                                                         </td>
                                                         <td style="text-align: right"><a href="javascript:void(0)"
                                                                 onclick="load()" class="invoice"
-                                                                data-val="{{ $order->invoice_no }}"><span
+                                                                data-val="{{ $order->reference }}"><span
                                                                     class=""></span>Select</a></td>
                                                     </tr>
                                                 @endforeach
@@ -84,76 +84,10 @@
                             </div>
                         </div>
                         <div class="card-body table-responsive" id="load">
-                            <table id="store_data" class="table table-bordered table-striped text-left"
-                                style="font-size: 12px;">
-                                <thead>
-                                    <tr>
-                                        <th>Store</th>
-                                        <th>Code</th>
-                                        <th>Item</th>
-                                        <th>Unit</th>
-                                        <th>QTY</th>
-                                        {{-- <th>Price</th> --}}
-                                        <th>Add To Cart</th>
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <tr>
-                                        <th>Store</th>
-                                        <th>Code</th>
-                                        <th>Name</th>
-                                        <th>Unit</th>
-                                        <th>QTY</th>
-                                        {{-- <th>Price</th> --}}
-                                        <th>Add To Cart</th>
-                                    </tr>
-                                </tfoot>
-                                <tbody>
+                            <button class="btn btn-primary btn-sm text-right right" data-toggle="modal" id="add-product-btn"
+                                data-target="#add-product-modal"><span class="fa fa-plus-circle"></span> Add Other Invoice
+                            </button>
 
-                                    @foreach ($stores as $key => $store)
-                                        <tr>
-                                            <form action="{{ route('credit.note.cart.store') }}" method="post">
-                                                @csrf
-                                                <input type="hidden" name="id" value="{{ $store->id }}">
-                                                <input type="hidden" name="order" value="{{ $order->id }}">
-                                                <input type="hidden" name="name" value="{{ $store->name }}">
-                                                <input type="hidden" name="code" value="{{ $store->code }}">
-                                                <input type="hidden" name="store" value="{{ $store->store }}">
-                                                <input type="hidden" name="qty" value="1">
-                                                <input type="hidden" name="selling_price"
-                                                    value="{{ $store->selling_price }}">
-                                                <input type="hidden" name="qty_available"
-                                                    value="{{ $store->qty_available }}">
-                                                <input type="hidden" name="sold_price"
-                                                    value="{{ $store->selling_price }}">
-                                                <input type="hidden" name="cost_price" value="{{ $store->cost_price }}">
-
-                                                <td>{{ ucwords($store->store) }}</td>
-                                                <td>{{ $store->code }}</td>
-                                                <td>{{ $store->name }}</td>
-                                                <td>{{ $store->unit }}</td>
-                                                <td align="center">{{ $store->qty_available }}</td>
-                                                {{-- <td align="right">
-                                                    {{ number_format($store->selling_price, 2) }}
-                                                </td> --}}
-                                                @if ($store->qty_available > 0 && $store->selling_price > 0)
-                                                    <td align="center">
-                                                        <button type="submit" class="btn btn-sm btn-success px-2">
-                                                            <i class="fa fa-cart-plus" aria-hidden="true"></i>
-                                                        </button>
-                                                    </td>
-                                                @else
-                                                    <td align="center">
-                                                        <span class="fa fa-crosshairs text text-danger"></span>
-                                                    </td>
-                                                @endif
-                                            </form>
-                                        </tr>
-                                    @endforeach
-
-                                </tbody>
-
-                            </table>
 
                         </div>
                     </div>
@@ -163,6 +97,60 @@
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
+    <div class="modal fade" id="add-product-modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Additional Invoices</h5>
+                    <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="create-form" action="{{ route('debit.note.cart.store') }}" method="post">
+                        <input type="hidden" name="purchase_id" id="purchase_id" value="{{ $purchase?->id }}" />
+                        <input type="hidden" name="reference" id="reference" value="" />
+                        @csrf
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="name">Account</label>
+                                    <select name="supplier_id" id="supplier_id" class="form-control select2-single"
+                                        required>
+                                        <option value="">Select...</option>
+                                        @foreach ($suppliers as $supplier)
+                                            <option value="{{ $supplier->id }}">
+                                                {{ $supplier->code }}-{{ $supplier->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="description">Description</label>
+                                    <textarea name="description" id="description" class="form-control" required></textarea>
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="amount">Amount</label>
+                                    <input type="number" class="form-control" name="amount" id="amount"
+                                        placeholder="Amount" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group text-right ">
+                            <input type="submit" class="btn btn-primary" value="Add Invoice"><span class="fa fa-plus-circle">
+                                </span> 
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('js')
@@ -188,7 +176,7 @@
             $(document).on('keyup', '#search', function() {
                 var searchText = $(this).val();
                 $.ajax({
-                    url: "{{ route('load.order.invoices') }}",
+                    url: "{{ route('suppliers.load.order.invoices') }}",
                     method: 'GET',
                     data: {
                         search: searchText
@@ -214,14 +202,14 @@
 
             // function load() {
             $(document).on('click', '.invoice', function() {
-                var invoice_no = $(this).attr('data-val');
-
+                var reference = $(this).attr('data-val');
+                $('#reference').val(reference);
                 $('#load').html("<h3>Please wait... while it is loading...</h3>");
                 $.ajax({
-                    url: "{{ route('load.order.cart') }}",
+                    url: "{{ route('suppliers.load.order.cart') }}",
                     method: 'GET',
                     data: {
-                        invoice_no: invoice_no
+                        reference: reference
                     },
                     success: function(response) {
 
@@ -285,18 +273,9 @@
                     timer = setTimeout(callback, ms);
                 };
             })();
-            $(document).on('keyup', '.quantity,.price', function() {
+            $(document).on('keyup', '.price', function() {
                 id = $(this).attr('data-value');
-                $("#valid_qty" + id.substr(1)).html("");
-                if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(
-                        1)).attr(
-                        'max-qty'))) {
-                    $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $(
-                        '#quantity' +
-                        id.substr(1)).attr('max-qty') + ")");
-                    $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
-                    return false;
-                }
+
                 delay(function() {
 
                     $.ajax({
@@ -309,8 +288,7 @@
                         success: function(data) {
                             id = id.substr(1);
 
-                            subtotal = $('#price' + id).val() * $('#quantity' + id)
-                                .val();
+                            subtotal = $('#price' + id).val();
                             $('.subtotal' + id).text(formatMoney(subtotal));
                             $('#total').text(formatMoney(data));
                             $('#subtotal').text(formatMoney(data));
@@ -322,6 +300,27 @@
                     });
 
                 }, 500);
+            });
+
+            $(document).on('click', '#add-product-btn', function(e) {
+                
+                $('#purchase_id').val($('#purchase').val());
+               
+            });
+            $('body').on('submit', '.create-form', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    type: 'post',
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
+                    beforeSend: function() {
+                        $('.close-modal').trigger('click')
+                    },
+                    success: function(response) {
+                        $('#load').html(response)
+                        //console.log(response)
+                    }
+                })
             });
         });
     </script>

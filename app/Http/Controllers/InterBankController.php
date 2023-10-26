@@ -63,7 +63,7 @@ class InterBankController extends Controller
             $interbank->source_account_id = $source_account_id;
             $interbank->destination_account_id = $destination_account_id;
             $interbank->branch_id = $user_branch;
-            $interbank->status = 1;
+            $interbank->status = 0;
             if($interbank->save()) {
                 if(Transaction::interbank($source_account_id, 'GeneralAccount', $destination_account_id, 'GeneralAccount', $amount, $reference, $date)) {
                     $action = "Posted payment of $amount for : " . $reference;
@@ -83,6 +83,7 @@ class InterBankController extends Controller
 
         return redirect()->back()->with(['prev_id' => $ledger_id]);
     }
+
     public function post(InterBank $interbank) {
         $interbank->status = 1;
         $interbank->posted_by = auth()->id();

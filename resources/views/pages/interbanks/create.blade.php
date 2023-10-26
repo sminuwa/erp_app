@@ -139,7 +139,7 @@
                                     <div class="">
                                         <div class="col-md-8">
                                             <div class="form-group text-right ">
-                                                <input type="submit" class="btn btn-primary" value="Save & Post" />
+                                                <input type="submit" class="btn btn-primary" value="Save" />
                                             </div>
                                         </div>
                                     </div>

@@ -1,4 +1,4 @@
-@extends('layouts.backend.app')
+ @extends('layouts.backend.app')
 @section('title', 'Manage Categories')
 
 @push('css')
@@ -47,7 +47,7 @@
 	<!-- /.content-wrapper -->
 
 @endsection
-@push('js')    
+@push('js')
 	<script type="text/javascript">
 
 	</script>

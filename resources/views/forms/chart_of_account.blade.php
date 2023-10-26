@@ -3,7 +3,7 @@
     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
     <div class="form-group">
         <label for="prefix">Prefix</label>
-        <input type="text" class="form-control {{ $errors->has('prefix') ? ' is-invalid' : '' }}" name="prefix"
+        <input @if(isset($model->id)) readonly @endif type="text" class="form-control {{ $errors->has('prefix') ? ' is-invalid' : '' }}" name="prefix"
             id="prefix" value="{{ old('prefix', $model->prefix) }}" placeholder="" maxlength="50"
             required="required">
         @if ($errors->has('prefix'))
@@ -15,7 +15,7 @@
 
     <div class="form-group">
         <label for="class">Class</label>
-        <input type="text" class="form-control {{ $errors->has('class') ? ' is-invalid' : '' }}" name="class"
+        <input @if(isset($model->id)) readonly @endif type="text" class="form-control {{ $errors->has('class') ? ' is-invalid' : '' }}" name="class"
             id="class" value="{{ old('class', $model->class) }}" placeholder="" maxlength="50" required="required">
         @if ($errors->has('class'))
             <div class="invalid-feedback">

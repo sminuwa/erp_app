@@ -4,7 +4,7 @@
     <div class="form-group">
         <label for="code">Code</label>
         <input type="text" class="form-control {{ $errors->has('code') ? ' is-invalid' : '' }}" name="code" id="code"
-               value="{{ old('code', $model->code) }}" placeholder="" maxlength="191" required="required">
+               value="{{ old('code', $model->code) }}" @if(isset($model->id)) readonly @endif placeholder="" maxlength="191" required="required">
         @if ($errors->has('code'))
             <div class="invalid-feedback">
                 <strong>{{ $errors->first('code') }}</strong>

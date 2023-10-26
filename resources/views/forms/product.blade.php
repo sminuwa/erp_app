@@ -26,7 +26,7 @@
         <label for="barcode">Barcode</label>
         <input type="text" class="form-control {{ $errors->has('barcode') ? ' is-invalid' : '' }}"
             name="barcode" id="barcode" value="{{ old('barcode', $model->barcode) }}"
-            placeholder="" required="required">
+            placeholder="">
         @if ($errors->has('barcode'))
             <div class="invalid-feedback">
                 <strong>{{ $errors->first('barcode') }}</strong>

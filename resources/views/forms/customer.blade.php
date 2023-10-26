@@ -1,6 +1,21 @@
+
 <form action="{{ isset($route) ? $route : route('customers.store') }}" method="POST">
     {{ csrf_field() }}
     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
+    <div class="form-group">
+        <label for="code">Branch</label>
+        <select class="form-control ajax-branches  {{ $errors->has('account_type') ? ' is-invalid' : '' }}"
+                name="branch_id" id="branch_id"
+                selected_item="{{ $model->branch_id }}"
+                required>
+            <
+        </select>
+        @if ($errors->has('account_type'))
+            <div class="invalid-feedback">
+                <strong>{{ $errors->first('branch_id') }}</strong>
+            </div>
+        @endif
+    </div>
     <div class="form-group">
         <label for="name">Name</label>
         <input type="text" class="form-control {{ $errors->has('name') ? ' is-invalid' : '' }}" name="name" id="name"
@@ -15,8 +30,8 @@
         <label for="account_type">Account Type</label>
         <select class="form-control {{ $errors->has('account_type') ? ' is-invalid' : '' }}" name="account_type" id="account_type" required>
             <option value="">Select...</option>
-            <option value="R" {{old('account_type', $model->account_type)=="Retail"?'selected':''}}>Retail</option>
-            <option value="W" {{old('account_type', $model->account_type)=="Wholesale"?'selected':''}}>Whole Sale</option>
+            <option value="R" {{old('account_type', $model->account_type)}} {{ $model->type =="Retail" ? 'selected':'' }}>Retail</option>
+            <option value="W" {{old('account_type', $model->account_type)}} {{ $model->type =="Wholesale" ? 'selected':'' }}>Whole Sale</option>
         </select>
         @if ($errors->has('account_type'))
             <div class="invalid-feedback">
@@ -24,16 +39,7 @@
             </div>
         @endif
     </div>
-    <div class="form-group">
-        <label for="code">Code</label>
-        <input type="text" class="form-control {{ $errors->has('code') ? ' is-invalid' : '' }}" name="code" readonly
-            id="code" value="{{ isset($code)?$code:old('code', $model->code) }}" placeholder="" maxlength="20" minlength="6">
-        @if ($errors->has(' code'))
-            <div class="invalid-feedback">
-                <strong>{{ $errors->first('code') }}</strong>
-            </div>
-        @endif
-    </div>
+
     <div class="form-group">
         <label for="email">Email</label>
         <input type="text" class="form-control {{ $errors->has('email') ? ' is-invalid' : '' }}" name="email"
@@ -71,10 +77,26 @@
         <label for="credit_limit">Credit Limit</label>
         <input type="text" class="form-control {{ $errors->has('credit_limit') ? ' is-invalid' : '' }}"
             name="credit_limit" id="credit_limit" value="{{ old('credit_limit', $model->credit_limit) }}"
-            placeholder="" required="required">
+            placeholder="" value="0">
         @if ($errors->has('credit_limit'))
             <div class="invalid-feedback">
                 <strong>{{ $errors->first('credit_limit') }}</strong>
+            </div>
+        @endif
+    </div>
+    <div class="form-group">
+        <?php $officers = App\Models\User::orderBy('user_code', 'asc')->get(); ?>
+        <label for="code">Relation Officer</label>
+        <select class="form-control ajax-users select2-single {{ $errors->has('relation_officer') ? ' is-invalid' : '' }}"
+                name="relation_officer" id="relation_officer"
+                required>
+            @foreach($officers as $officer)
+                <option value="{{$officer->id}}" {{ $model->relation_officer == $officer->id ? 'selected' :'' }}>{{ $officer->user_code }} - {{ $officer->name }}</option>
+            @endforeach
+        </select>
+        @if ($errors->has('account_type'))
+            <div class="invalid-feedback">
+                <strong>{{ $errors->first('branch_id') }}</strong>
             </div>
         @endif
     </div>

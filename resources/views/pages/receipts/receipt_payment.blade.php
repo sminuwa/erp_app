@@ -119,7 +119,7 @@
 
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
                                                 <td>{{ $payment->description }}</td>
-                                                <td>{{ optional($payment->received_by)->name }}</td>
+                                                <td>{{ optional($payment->createdBy)->name }}</td>
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

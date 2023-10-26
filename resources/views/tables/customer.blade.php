@@ -9,7 +9,7 @@
             <th>Address </th>
             <th>Email </th>
             <th>Credit Limit </th>
-            <th>Opening Balance </th>
+            <th>Current Balance </th>
             <th>Action</th>
         </tr>
     </thead>

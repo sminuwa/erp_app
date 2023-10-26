@@ -1,6 +1,10 @@
 <form action="{{ isset($route) ? $route : route('general_accounts.store') }}" method="POST">
     {{ csrf_field() }}
     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
+
+    @if(isset($model->id))
+        <input type="hidden" name="class" value="{{ $model->class }}"
+    @else
     <div class="form-group">
         <label for="class">Class</label>
         <select type="text" class="form-control select2-single ajax-chart-of-accounts {{ $errors->has('class') ? ' is-invalid' : '' }}" name="class"
@@ -13,6 +17,7 @@
             </div>
         @endif
     </div>
+    @endif
 
     <div class="form-group">
         <label for="description">Description</label>

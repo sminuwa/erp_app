@@ -40,7 +40,7 @@ class CustomerController extends Controller
     public function index(Index $request)
     {
         $user_branch = User::userBranchAction();
-        return view('pages.customers.index', ['records' => Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get()]);
+        return view('pages.customers.index', ['records' => Customer::where('branch_id', 'LIKE', $user_branch)->limit(10)->orderBy('created_at', 'desc')->get()]);
     } /**
   * Display the specified resource.
   *
@@ -75,11 +75,14 @@ class CustomerController extends Controller
   */
     public function store(Store $request)
     {
+//        return $request;
         $model = new Customer;
         $model->fill($request->all());
-        $model->type = 'Credit';
+        $model->type = $request->account_type == 'R' ? 'Retail' : "Wholesale";
+        $model->branch_id = $request->branch_id;
+        $model->relation_officer = $request->relation_officer;
         if ($model->save()) {
-            $model->branch_id = Auth::user()->branch_id;
+            $model->code = Customer::generateNewCode($request->branch_id,$request->account_type);
             $model->save();
             $action = "Added a new credit customer : " . $model->name;
             AuditLog::auditLog(Auth::id(), $action);
@@ -104,7 +107,6 @@ class CustomerController extends Controller
         $this->getOverDueInvoices($customer)->get();
         return view('pages.customers.edit', [
             'model' => $customer,
-
         ]);
     } /**
   * Update a existing resource in storage.
@@ -137,7 +139,7 @@ class CustomerController extends Controller
   */
     public function destroy(Destroy $request, Customer $customer)
     {
-        if ($customer->customer()->count() == 0) {
+        if ($customer->ledgers()->count() == 0) {
             if ($customer->delete()) {
                 $action = "Deleted a credit customer : " . $customer->name;
                 AuditLog::auditLog(Auth::id(), $action);
@@ -216,7 +218,7 @@ class CustomerController extends Controller
         $customer = Customer::find($customer_id);
         return view('pages.customers.load_general_ledger', compact('ledgers', 'from_date', 'to_date', 'balance_b_d', 'customer','sum_cr_b_d','sum_dr_b_d'));
     }
-   
+
     public function payForMoreInvoices(Customer $customer, $amount)
     {
         //clear other unpaid invoice if the amount is more than the selected invoice
@@ -303,7 +305,7 @@ class CustomerController extends Controller
 
         return back()->withInput();
     }
-   
+
     public function getOverDueInvoices(Customer $customer)
     {
         return $customer->orders()->whereDate('due_date', '<=', 'CURDATE()')->where('due', '>', 0)->where('payment_mode', 'Credit')->orderBy('due_date', 'ASC');
@@ -312,5 +314,5 @@ class CustomerController extends Controller
     {
         return $customer->orders()->where('due', '>', 0)->where('payment_mode', 'Credit')->orderBy('due_date', 'ASC');
     }
-    
+
 }

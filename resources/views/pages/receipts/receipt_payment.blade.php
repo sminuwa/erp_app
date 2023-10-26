@@ -126,17 +126,9 @@
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            <a href="{{ route('receipt.payment.print', $payment->id) }}" target="_blank"
-                                                               class="dropdown-item">
-                                                                <i class="fa fa-print" aria-hidden="true"></i> Print
-                                                            </a>
-                                                            <a href="{{ route('receipt.payment.print.pos', $payment->id) }}" target="_blank"
-                                                               class="dropdown-item">
-                                                                <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
-                                                            </a>
-                                                            @if($payment->status == 0)
 
-                                                                 <form action="{{ route('receipt.payment.post', $payment->id) }}" method="post">
+                                                            @if($payment->status == 0)
+                                                                 <form action="{{ route('receipt.payment.post', $payment->id) }}" method="post" onsubmit="return confirm('Are you sure you want post this transaction?')">
                                                                     @csrf
                                                                     <button type="submit" class="dropdown-item">
                                                                         <i class="fa fa-check" aria-hidden="true"></i> Post
@@ -152,7 +144,16 @@
                                                                     <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                                                 </a>
                                                             @else
+                                                                <a href="{{ route('receipt.payment.print', $payment->id) }}" target="_blank"
+                                                                   class="dropdown-item">
+                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                </a>
+                                                                <a href="{{ route('receipt.payment.print.pos', $payment->id) }}" target="_blank"
+                                                                   class="dropdown-item">
+                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
+                                                                </a>
                                                                 <a href="{{ route('receipt.payment.reverse',[$payment->id]) }}"
+                                                                   onclick="return confirm('Are you sure you want reverse this transaction?')"
                                                                    class="dropdown-item">
                                                                     <i class="fa fa-reply" aria-hidden="true"></i> Reverse
                                                                 </a>

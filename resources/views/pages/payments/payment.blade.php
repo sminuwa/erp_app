@@ -118,14 +118,6 @@
                                                         Action
                                                     </button>
                                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                        <a href="{{ route('payment.print', $payment->id) }}"
-                                                           class="dropdown-item">
-                                                            <i class="fa fa-print" aria-hidden="true"></i> Print
-                                                        </a>
-                                                        <a href="{{ route('payment.print.pos', $payment->id) }}"
-                                                           class="dropdown-item">
-                                                            <i class="fa fa-print" aria-hidden="true"></i> PoS
-                                                        </a>
                                                         @if($payment->status == 0)
                                                             <form action="{{ route('payment.post', $payment->id) }}" method="post" onsubmit="return confirm('Are you sure you want post this transaction?')">
                                                                 @csrf
@@ -144,7 +136,16 @@
                                                                 </button>
                                                             </form>
                                                         @else
+                                                            <a href="{{ route('payment.print', $payment->id) }}"
+                                                               class="dropdown-item">
+                                                                <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                            </a>
+                                                            <a href="{{ route('payment.print.pos', $payment->id) }}"
+                                                               class="dropdown-item">
+                                                                <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
+                                                            </a>
                                                             <a href="{{ route('payment.reverse',[$payment->id]) }}"
+                                                               onclick="return confirm('Are you sure you want reverse this transaction?')"
                                                                class="dropdown-item">
                                                                 <i class="fa fa-reply" aria-hidden="true"></i> Reverse
                                                             </a>

@@ -86,6 +86,7 @@
                                         @endif
                                         <select class="form-control select2-single {{ $errors->has('payer_id') ? ' is-invalid' : '' }}"
                                                 name="payer_id" id="payer_id" selected_item="{{ $model->model_id }}" required>
+                                            <option value="">Select...</option>
                                             @if(isset($payers))
                                                 @foreach($payers as $payer)
                                                     <option value="{{ $payer->id }}" {{ $payer->id==$model->model_id ? 'selected' : '' }}>{{ $payer->code ?? $payer->number }} - {{ $payer->name ?? $payer->description }}</option>

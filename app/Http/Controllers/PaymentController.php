@@ -70,15 +70,15 @@ class PaymentController extends Controller
             $record->branch_id = $user_branch;
             $record->status = 0;
             if($record->save()){
-                if(Transaction::receipt($payer_id, $payer_type, $bank_account_id, 'GeneralAccount', $amount, $reference_no, $date)){
+//                if(Transaction::receipt($payer_id, $payer_type, $bank_account_id, 'GeneralAccount', $amount, $reference_no, $date)){
                     $action = "Made/Edited payment of $amount for : " . $reference_no;
                     AuditLog::auditLog(auth()->id(), $action);
                     session()->flash('app_message', 'Payment generated successfully');
                     DB::commit();
-                }else {
-                    DB::rollBack();
-                    return 'something went wrong';
-                }
+//                }else {
+//                    DB::rollBack();
+//                    return 'something went wrong';
+//                }
             }
             return redirect()->back()->with(['prev_id' => $ledger_id]);
             /*if ($request->has('type') && $request->type == "Customer") {

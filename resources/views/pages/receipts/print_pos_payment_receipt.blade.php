@@ -185,6 +185,7 @@
     <table class="items">
         <thead>
             <tr>
+                <th class="heading qty">Account</th>
                 <th class="heading qty">Description</th>
                 <th class="heading name">Amount</th>
             </tr>

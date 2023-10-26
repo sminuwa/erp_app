@@ -127,22 +127,22 @@
                                                             <i class="fa fa-print" aria-hidden="true"></i> PoS
                                                         </a>
                                                         @if($payment->status == 0)
-                                                            <form action="{{ route('payment.post', $payment->id) }}" method="post" onsubmit="return confirm('Are you sure you want post this transaction?')">
+                                                            {{-- <form action="{{ route('payment.post', $payment->id) }}" method="post" onsubmit="return confirm('Are you sure you want post this transaction?')">
                                                                 @csrf
                                                                 <button type="submit" class="dropdown-item">
                                                                     <i class="fa fa-check" aria-hidden="true"></i> Post
                                                                 </button>
-                                                            </form>
+                                                            </form> --}}
                                                             <a href="{{ route('create.payment', ['payment_id'=>$payment->id]) }}"
                                                                class="dropdown-item">
                                                                 <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                                             </a>
-                                                            <form action="{{ route('payment.delete', $payment->id) }}" method="post" onsubmit="return confirm('Are you sure you want delete this transaction?')">
+                                                            {{-- <form action="{{ route('payment.delete', $payment->id) }}" method="post" onsubmit="return confirm('Are you sure you want delete this transaction?')">
                                                                 @csrf
                                                                 <button type="submit" class="dropdown-item">
                                                                     <i class="fa fa-check" aria-hidden="true"></i> Delete
                                                                 </button>
-                                                            </form>
+                                                            </form> --}}
                                                         @else
                                                             <a href="{{ route('payment.reverse',[$payment->id]) }}"
                                                                class="dropdown-item">

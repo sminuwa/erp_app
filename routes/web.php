@@ -373,7 +373,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/print/receipt/pos/{payment}', [ReceiptController::class, 'printPoSPaymentReceipt'])->name('receipt.payment.print.pos');
             Route::get('/load/payers', [ReceiptController::class, 'loadPayers'])->name('ajax.load.payers');
             Route::get('/reverse/{receipt}', [ReceiptController::class, 'reverse'])->name('receipt.payment.reverse');
-            Route::post('/post/{receipt}', [ReceiptController::class, 'post'])->name('receipt.payment.post');
         }
     );
     Route::group(
@@ -399,13 +398,11 @@ Route::middleware('auth')->group(function () {
             Route::get('/create', [PaymentController::class, 'makePayment'])->name('create.payment');
             Route::post('/store', [PaymentController::class, 'pay'])->name('payment.store');
             Route::delete('/destroy/{ledger}', [PaymentController::class, 'deletePayment'])->name('payment.destroy');
-            Route::post('/delete/{payment}', [PaymentController::class, 'delete'])->name('payment.delete');
             Route::put('/update/{ledger}', [PaymentController::class, 'updateReceipt'])->name('payment.update');
             Route::post('/search', [PaymentController::class, 'search'])->name('payment.search');
             Route::get('/print/payment/{payment}', [PaymentController::class, 'printPaymentReceipt'])->name('payment.print');
             Route::get('/print/payment/pos/{payment}', [PaymentController::class, 'printPoSPaymentReceipt'])->name('payment.print.pos');
             Route::get('/reverse/{payment}', [PaymentController::class, 'reverse'])->name('payment.reverse');
-            Route::post('/post/{payment}', [PaymentController::class, 'post'])->name('payment.post');
         }
     );
 
@@ -454,7 +451,7 @@ Route::middleware('auth')->group(function () {
                     Route::get('/print/receipt/{payment}', [SupplierController::class, 'printPaymentReceipt'])->name('supplier.payment.print');
                     Route::get('/print/receipt/pos/{payment}', [SupplierController::class, 'printPoSPaymentReceipt'])->name('supplier.payment.print.pos');
 
-                    //Credit Note
+                    //Debite Note
                     Route::get('/credit-note', [SupplierController::class, 'supplierCreditNote'])->name('suppliers.credit.note');
                     Route::get('/credit-note/create', [SupplierController::class, 'createCreditNote'])->name('suppliers.credit.note.create');
                     Route::post('/credit-note/store', [SupplierController::class, 'payCreditNote'])->name('suppliers.credit.note.store');
@@ -462,6 +459,8 @@ Route::middleware('auth')->group(function () {
                     Route::delete('/credit-note/delete/{ledger}', [SupplierController::class, 'deleteCreditNote'])->name('suppliers.credit.note.destroy');
                     Route::post('/credit-note/search', [SupplierController::class, 'searchCreditNote'])->name('suppliers.credit.note.search');
                     Route::get('/credit-note/print/receipt/{payment}', [SupplierController::class, 'printCreditNoteReceipt'])->name('supplier.credit.note.print');
+
+
                 }
             );
             Route::get('/ledger', [SupplierController::class, 'generateSupplierLedger'])->name('supplier.ledger');
@@ -762,7 +761,7 @@ Route::middleware('auth')->group(function () {
 
 
             //Begin Customer Sales Analysis Report
-
+    
             //Customer Debt Report
             Route::get('/ca/customer/debt', [ReportController::class, 'customerDebtReport'])->name('customer.total.debt.reports');
             Route::get('/ca/customer/debt/load', [ReportController::class, 'loadCustomerDebtReport'])->name('ajax.load.customer.total.debt.reports');
@@ -842,7 +841,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/activity/load/logs/print/{from_date}/{to_date}/{user_id}', [ReportController::class, 'printLogs'])->name('user.activity.logs.print');
 
             //User Ledger and Loans
-
+    
             //Loan Balances
             Route::get('/us/user/balance', [ReportController::class, 'loanBalance'])->name('user.loan.balance.report');
             Route::get('/us/user/balance/load', [ReportController::class, 'loadLoanBalance'])->name('ajax.load.user.loan.balance.report');
@@ -906,6 +905,23 @@ Route::middleware('auth')->group(function () {
         //     Route::post('/ajax/create', [App\Http\Controllers\Inventory\PurchaseController::class, 'createAjax'])->name('inventories.purchases.ajax.create');
         //     Route::post('/store', [App\Http\Controllers\Inventory\PurchaseController::class, 'store'])->name('inventories.purchases.store');
         // });
+        //Credit Note
+        Route::group(
+            ['prefix' => 'credit-note'],
+            function () {
+        Route::get('/', [CustomerController::class, 'customerCreditNote'])->name('customers.credit.note');
+        Route::get('/create/{order?}', [CustomerController::class, 'createCreditNote'])->name('customers.credit.note.create');
+        Route::post('/store', [CustomerController::class, 'payCreditNote'])->name('customers.credit.note.store');
+        Route::put('/update/{ledger}', [CustomerController::class, 'updateCreditnote'])->name('customers.credit.note.update');
+        Route::delete('/delete/{ledger}', [CustomerController::class, 'deleteCreditNote'])->name('customers.credit.note.destroy');
+        Route::post('/search', [CustomerController::class, 'searchCreditNote'])->name('customers.credit.note.search');
+        Route::get('/load_invoices', [CustomerController::class, 'loadInvoices'])->name('load.order.invoices');
+        Route::get('/load_cart', [CustomerController::class, 'loadToCart'])->name('load.order.cart');
+        Route::post('/cart', [CustomerController::class, 'addToCart'])->name('credit.note.cart.store');
+        Route::put('/update-cart', [CustomerController::class, 'updateCart'])->name('credit.note.cart.update');
+        Route::delete('/remove/{id}', [CustomerController::class, 'removeCart'])->name('credit.note.cart.remove');
+        Route::get('/print/receipt/{credit_note}', [CustomerController::class, 'printCreditNoteReceipt'])->name('customers.credit.note.print');
+            });
         Route::group(
             ['prefix' => 'purchases/grn'],
             function () {

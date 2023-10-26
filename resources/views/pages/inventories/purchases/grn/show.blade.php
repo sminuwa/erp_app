@@ -151,10 +151,10 @@
                         @endif
                     </div>
                     <div class="col-md-6">
-                        @if ($record->status == 0)
+                        {{-- @if ($record->status == 0) --}}
                             <button class="btn btn-primary btn-sm text-right right" data-toggle="modal" id="add-product-btn"
                                 data-target="#add-product-modal"><span class="fa fa-plus-circle"></span> Add Other Invoice </button>
-                        @endif
+                        {{-- @endif --}}
                     </div>
                 </div>
             </div><!-- /.container-fluid -->

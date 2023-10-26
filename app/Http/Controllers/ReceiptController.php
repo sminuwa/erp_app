@@ -228,10 +228,12 @@ class ReceiptController extends Controller
     {
         return view('pages.receipts.print_payment_receipt', ['payment' => $payment, 'setting' => Setting::first()]);
     }
+
     public function printPoSPaymentReceipt(Receipt $payment)
     {
         return view('pages.receipts.print_pos_payment_receipt', ['payment' => $payment, 'setting' => Setting::first()]);
     }
+
     public function updatePayment(Request $request, Receipt $payment)
     {
         $amount = $request->amount_paid;
@@ -268,6 +270,7 @@ class ReceiptController extends Controller
         }
         return redirect()->route('receipts.payments');
     }
+
     public function deletePayment(Request $request, CustomerLedger $ledger)
     {
         DB::beginTransaction();

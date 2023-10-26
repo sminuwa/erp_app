@@ -225,21 +225,6 @@ class InvoiceController extends Controller
                         'updated_at' => Carbon::now()
                     ]);
 
-                    DB::table('transfer_products')->insert([
-                        'source_store_id' => $store->store->id,
-                        'product_id' => $store->product->id,
-                        'destination_store_id' => $store->store->id,
-                        'qty_transfered' => $content->quantity,
-                        'qty_available' => $qtyAval,
-                        //Before Sale
-                        'transfered_by' => Auth::id(),
-                        'status' => 'Completed',
-                        'nature' => 'Sale',
-                        'stock_in_out' => 'out',
-                        'refno' => $invoice,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now()
-                    ]);
                     DB::table('stock_cards')->insert([
                         'store_id' => $store->store->id,
                         'product_id' => $store->product->id,

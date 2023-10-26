@@ -314,10 +314,7 @@ class CustomerController extends Controller
     {
         return $customer->orders()->where('due', '>', 0)->where('payment_mode', 'Credit')->orderBy('due_date', 'ASC');
     }
-<<<<<<< HEAD
 
-=======
->>>>>>> bd6e95fb173307bcbf395a674941c478cb667985
     public function customerCreditNote()
     {
         $payments = CreditNote::orderBy('credit_notes.created_at', 'DESC')->take(10)->get();

@@ -110,19 +110,28 @@
                                                             </a>
                                                             <a href="{{ route('interbank.print.pos', $interbank->id) }}" target="_blank"
                                                                class="dropdown-item">
-                                                                <i class="fa fa-print" aria-hidden="true"></i> PoS
+                                                                <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
                                                             </a>
                                                             @if($interbank->status == 0)
+                                                                <form action="{{ route('interbank.post', $interbank->id) }}" method="post" onsubmit="return confirm('Are you sure you want post this transaction?')">
+                                                                    @csrf
+                                                                    <button type="submit" class="dropdown-item">
+                                                                        <i class="fa fa-check" aria-hidden="true"></i> Post
+                                                                    </button>
+                                                                </form>
                                                                 <a href="{{ route('interbank.edit', $interbank->id) }}"
                                                                    class="dropdown-item">
                                                                     <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                                                 </a>
-                                                                <a href="{{ route('interbank.delete', $interbank->id) }}"
-                                                                   class="dropdown-item">
-                                                                    <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                                                </a>
+                                                                <form action="{{ route('interbank.delete', $interbank->id) }}" method="post" onsubmit="return confirm('Are you sure you want delete this transaction?')">
+                                                                    @csrf
+                                                                    <button type="submit" class="dropdown-item">
+                                                                        <i class="fa fa-check" aria-hidden="true"></i> Delete
+                                                                    </button>
+                                                                </form>
                                                             @else
                                                                 <a href="{{ route('interbank.reverse',[$interbank->id]) }}"
+                                                                   onclick="return confirm('Are you sure you want reverse this transaction?')"
                                                                    class="dropdown-item">
                                                                     <i class="fa fa-reply" aria-hidden="true"></i> Reverse
                                                                 </a>

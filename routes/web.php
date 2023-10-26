@@ -375,6 +375,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/print/receipt/pos/{payment}', [ReceiptController::class, 'printPoSPaymentReceipt'])->name('receipt.payment.print.pos');
             Route::get('/load/payers', [ReceiptController::class, 'loadPayers'])->name('ajax.load.payers');
             Route::get('/reverse/{receipt}', [ReceiptController::class, 'reverse'])->name('receipt.payment.reverse');
+            Route::post('/post/{receipt}', [ReceiptController::class, 'post'])->name('receipt.payment.post');
+            Route::post('/delete/{receipt}', [ReceiptController::class, 'delete'])->name('receipt.payment.delete');
         }
     );
     Route::group(
@@ -384,13 +386,15 @@ Route::middleware('auth')->group(function () {
             Route::get('/create', [InterBankController::class, 'create'])->name('create.interbank');
             Route::post('/store', [InterBankController::class, 'store'])->name('interbank.store');
             Route::delete('/destroy/{interbank}', [InterBankController::class, 'destroy'])->name('interbank.destroy');
-            Route::get('/delete/{interbank}', [InterBankController::class, 'destroy'])->name('interbank.delete');
             Route::put('/update/{interbank}', [InterBankController::class, 'update'])->name('interbank.update');
             Route::get('/edit/{interbank}', [InterBankController::class, 'edit'])->name('interbank.edit');
             Route::post('/search', [InterBankController::class, 'search'])->name('interbank.search');
             Route::get('/print/interbank/{interbank}', [InterBankController::class, 'print'])->name('interbank.print');
             Route::get('/print/interbank/pos/{interbank}', [InterBankController::class, 'printPos'])->name('interbank.print.pos');
             Route::get('/reverse/{interbank}', [InterBankController::class, 'reverse'])->name('interbank.reverse');
+            Route::post('/post/{interbank}', [InterBankController::class, 'post'])->name('interbank.post');
+            Route::post('/delete/{interbank}', [InterBankController::class, 'delete'])->name('interbank.delete');
+
         }
     );
     Route::group(
@@ -405,6 +409,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/print/payment/{payment}', [PaymentController::class, 'printPaymentReceipt'])->name('payment.print');
             Route::get('/print/payment/pos/{payment}', [PaymentController::class, 'printPoSPaymentReceipt'])->name('payment.print.pos');
             Route::get('/reverse/{payment}', [PaymentController::class, 'reverse'])->name('payment.reverse');
+            Route::post('/post/{payment}', [PaymentController::class, 'post'])->name('payment.post');
+            Route::post('/delete/{payment}', [PaymentController::class, 'deletePayment'])->name('payment.delete');
         }
     );
 
@@ -763,7 +769,7 @@ Route::middleware('auth')->group(function () {
 
 
             //Begin Customer Sales Analysis Report
-    
+
             //Customer Debt Report
             Route::get('/ca/customer/debt', [ReportController::class, 'customerDebtReport'])->name('customer.total.debt.reports');
             Route::get('/ca/customer/debt/load', [ReportController::class, 'loadCustomerDebtReport'])->name('ajax.load.customer.total.debt.reports');
@@ -843,7 +849,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/activity/load/logs/print/{from_date}/{to_date}/{user_id}', [ReportController::class, 'printLogs'])->name('user.activity.logs.print');
 
             //User Ledger and Loans
-    
+
             //Loan Balances
             Route::get('/us/user/balance', [ReportController::class, 'loanBalance'])->name('user.loan.balance.report');
             Route::get('/us/user/balance/load', [ReportController::class, 'loadLoanBalance'])->name('ajax.load.user.loan.balance.report');

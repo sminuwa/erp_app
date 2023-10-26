@@ -185,22 +185,23 @@
     <table class="items">
         <thead>
             <tr>
+                <th class="heading qty">Account</th>
                 <th class="heading qty">Description</th>
                 <th class="heading name">Amount</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>
+                <td>{{ $payment->account()->code ?? $payment->account()->number }} - {{ $payment->account()->name ?? $payment->account()->description }}</td>
+                <td class="col-md-9">
                     @if ($payment->description == null)
                         Payment for {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                     @else
                         {{ $payment->description }}
                     @endif
                 </td>
-                <td align="right">
-                    &#8358;{{ number_format($payment->amount, 2) }}
-                </td>
+                <td class="col-md-3" align="right"><i class="fa fa-inr"></i>
+                    &#8358; {{ number_format($payment->amount, 2) }}</td>
             </tr>
             <tr>
                 <td class="text-right">
@@ -231,8 +232,8 @@
     </table>
     <section>
         <p>
-            Date/Printed By : <span>{{ \Carbon\Carbon::parse(\Carbon\Carbon::now())->toDayDateTimeString() }}
-                {{ Auth::user()->name }}</span>
+            Date: <span>{{ \Carbon\Carbon::parse(\Carbon\Carbon::now())->toDayDateTimeString() }}
+                </span>
         </p>
         <p style="text-align:center">
             Thank you for your patronage!
@@ -243,7 +244,7 @@
         @php
             $uc = $payment->description;
         @endphp
-        {{ QrCode::size(70)->backgroundColor(255, 55, 0)->generate("$payment->amount\n$uc\n\n.") }}<br />
+        {{ QrCode::size(70)->generate($payment->amount) }}<br />
         </ul>
     </footer>
 </body>

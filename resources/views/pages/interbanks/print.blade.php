@@ -117,8 +117,6 @@
                             <div class="receipt-right">
                                 <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
                                 <p><b>Created By :</b> {{ $interbank->createdBy->name ?? null }}</p><br>
-                                <p><b>Updated By :</b> {{ $interbank->updatedBy->name ?? null }}</p><br>
-                                <p><b>Printed By :</b> {{ Auth::user()->name }}</p><br>
 
                                 <p><b>Signatire :</b> ______________________________________</p>
                                 <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For:

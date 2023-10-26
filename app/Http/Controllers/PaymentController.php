@@ -70,15 +70,15 @@ class PaymentController extends Controller
             $record->branch_id = $user_branch;
             $record->status = 0;
             if($record->save()){
-                if(Transaction::receipt($payer_id, $payer_type, $bank_account_id, 'GeneralAccount', $amount, $reference_no, $date)){
+//                if(Transaction::receipt($payer_id, $payer_type, $bank_account_id, 'GeneralAccount', $amount, $reference_no, $date)){
                     $action = "Made/Edited payment of $amount for : " . $reference_no;
                     AuditLog::auditLog(auth()->id(), $action);
-                    session()->flash('app_message', 'Receipt generated successfully');
+                    session()->flash('app_message', 'Payment generated successfully');
                     DB::commit();
-                }else {
-                    DB::rollBack();
-                    return 'something went wrong';
-                }
+//                }else {
+//                    DB::rollBack();
+//                    return 'something went wrong';
+//                }
             }
             return redirect()->back()->with(['prev_id' => $ledger_id]);
             /*if ($request->has('type') && $request->type == "Customer") {
@@ -236,9 +236,7 @@ class PaymentController extends Controller
         try {
             $receipt_no = $payment->receipt_no;
             Transaction::reversal($receipt_no, 'REVERSAL');
-
-            DB::table('bank_transactions')->where(['ref_no' => $receipt_no])->delete();
-
+            $payment->delete();
             $action = "Deleted $payment->amount that was posted with invoice $receipt_no ";
             AuditLog::auditLog(auth()->user()->id, $action);
             DB::commit();
@@ -247,7 +245,7 @@ class PaymentController extends Controller
             session()->flash('app_error', 'Payment update failed');
             throw $e;
         }
-        return redirect()->route('receipts.payments');
+        return redirect()->back();
     }
     public function generateReceiptNo()
     {

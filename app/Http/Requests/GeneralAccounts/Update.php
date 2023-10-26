@@ -4,7 +4,7 @@ namespace App\Http\Requests\GeneralAccounts;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class Update extends FormRequest 
+class Update extends FormRequest
 {
 
     /**
@@ -12,7 +12,7 @@ class Update extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
         return true;
     }
@@ -22,13 +22,11 @@ class Update extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 			'class' => 'required|max:30',
-			'number' => 'required|max:30',
 			'description' => 'nullable|max:100',
-			'branch_id' => 'required|numeric',
 			'is_control' => 'nullable|numeric',
 			'status' => 'required|numeric',
         ];
@@ -42,7 +40,7 @@ class Update extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

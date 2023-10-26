@@ -62,15 +62,17 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
+                                <th>Account</th>
                                 <th>Description</th>
                                 <th>Amount</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
+                                <td>{{ $payment->account()->code ?? $payment->account()->number }} - {{ $payment->account()->name ?? $payment->account()->description }}</td>
                                 <td class="col-md-9">
                                     @if ($payment->description == null)
-                                    Payment for {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
+                                        Payment for {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                                     @else
                                         {{ $payment->description }}
                                     @endif
@@ -114,8 +116,7 @@
                         <div class="col-xs-10 col-sm-10 col-md-10 text-left">
                             <div class="receipt-right">
                                 <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
-                                <p><b>Collected By :</b> {{ $payment->user?->name }}</p>
-                                <p><b>Printed By :</b> {{ Auth::user()->name }}</p><br>
+                                <p><b>Created By :</b> {{ $payment->createdBy?->name }}</p>
 
                                 <p><b>Signatire :</b> ______________________________________</p>
                                 <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For:

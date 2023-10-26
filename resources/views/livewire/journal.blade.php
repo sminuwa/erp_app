@@ -60,6 +60,7 @@
                                 </a>
                             @else
                                 <a href="{{ route('journal.reverse',$record->id) }}"
+                                   onclick="return confirm('Are you sure you want reverse this transaction?')"
                                    class="dropdown-item">
                                     <i class="fa fa-reply" aria-hidden="true"></i> Reverse
                                 </a>

@@ -73,15 +73,15 @@ class ReceiptController extends Controller
             $record->branch_id = $user_branch;
             $record->status = 0;
             if($record->save()){
-                if(Transaction::receipt($bank_account_id, 'GeneralAccount',$payer_id, $payer_type,  $amount, $reference_no, $date)){
+//                if(Transaction::receipt($bank_account_id, 'GeneralAccount',$payer_id, $payer_type,  $amount, $reference_no, $date)){
                     $action = "Generated receipt of $amount for : " . $reference_no;
                     AuditLog::auditLog(auth()->id(), $action);
                     session()->flash('app_message', 'Receipt generated successfully');
                     DB::commit();
-                }else {
-                    DB::rollBack();
-                    return 'something went wrong';
-                }
+//                }else {
+//                    DB::rollBack();
+//                    return 'something went wrong';
+//                }
             }
             return redirect()->back()->with(['prev_id' => $ledger_id]);
 
@@ -224,14 +224,23 @@ class ReceiptController extends Controller
          return back();
     }
 
+    public function delete(Receipt $receipt) {
+        if($receipt->delete()){
+
+        }
+        return back();
+    }
+
     public function printReceipt(Receipt $payment)
     {
         return view('pages.receipts.print_payment_receipt', ['payment' => $payment, 'setting' => Setting::first()]);
     }
+
     public function printPoSPaymentReceipt(Receipt $payment)
     {
         return view('pages.receipts.print_pos_payment_receipt', ['payment' => $payment, 'setting' => Setting::first()]);
     }
+
     public function updatePayment(Request $request, Receipt $payment)
     {
         $amount = $request->amount_paid;
@@ -268,6 +277,7 @@ class ReceiptController extends Controller
         }
         return redirect()->route('receipts.payments');
     }
+
     public function deletePayment(Request $request, CustomerLedger $ledger)
     {
         DB::beginTransaction();

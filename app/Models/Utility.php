@@ -54,7 +54,7 @@ class Utility
         }
 
         if (($number >= 0 && (int) $number < 0) || (int) $number < 0 - PHP_INT_MAX) {
-// overflow
+        // overflow
             trigger_error(
                 'convert number to words only accepts numbers between -' . PHP_INT_MAX . ' and ' . PHP_INT_MAX, E_USER_WARNING
             );
@@ -101,18 +101,21 @@ class Utility
                     $string .= $this->convertNumberToWords($remainder);
                 }
                 break;
+
         }
 
-        if (null !== $fraction && is_numeric($fraction)) {
+        if (null !== $fraction && is_numeric($fraction) && $fraction > 0) {
             $string .= $decimal;
             $words = array();
             foreach (str_split((string) $fraction) as $number) {
                 $words[] = $dictionary[$number];
             }
             $string .= implode(' ', $words);
+
         }
 
         return ucwords($string);
     }
-    
+
+
 }

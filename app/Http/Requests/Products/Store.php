@@ -29,7 +29,6 @@ class Store extends FormRequest
 			'name' => 'required|max:191|unique:products,name',
 			'expiry_status' => 'required',
 			'category_id' => 'required|numeric|exists:categories,id',
-            'barcode' => 'required|max:191|unique:products,barcode',
 			'status' => 'required',
         ];
     }

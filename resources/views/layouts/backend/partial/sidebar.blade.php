@@ -525,24 +525,7 @@
                                     </a>
                                 </li>-->
                             @endcan
-                            @can('set.stock.opening.balance')
-                                <li class="nav-item">
-                                    <a href="{{ route('stock_opening_balance.create') }}"
-                                        class="nav-link {{ Request::is('settings/products/manage/*') ? 'active' : '' }}">
-                                        <i class="ion-ios-cart-outline"></i>
-                                        <p>Stock Opening Balance</p>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('view.expense.item')
-                                <li class="nav-item">
-                                    <a href="{{ route('expense_items.index') }}"
-                                        class="nav-link {{ Request::is('settings/expenses/items/*') ? 'active' : '' }}">
-                                        <i class="ion-bag"></i>
-                                        <p>Manage Expense Items</p>
-                                    </a>
-                                </li>
-                            @endcan
+
                             {{--@can('view.bank')
                                 <li class="nav-item">
                                     <a href="{{ route('banks.index') }}"

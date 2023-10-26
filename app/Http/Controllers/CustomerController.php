@@ -500,9 +500,6 @@ class CustomerController extends Controller
         return redirect()->route('customers.credit.note.create', Order::find($request->order));
         //return redirect()->back()->with('order',Order::find($request->order));
     }
-<<<<<<< HEAD
+
 }
 
-=======
-}
->>>>>>> bd6e95fb173307bcbf395a674941c478cb667985

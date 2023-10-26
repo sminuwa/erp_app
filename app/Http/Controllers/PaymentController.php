@@ -73,7 +73,7 @@ class PaymentController extends Controller
                 if(Transaction::receipt($payer_id, $payer_type, $bank_account_id, 'GeneralAccount', $amount, $reference_no, $date)){
                     $action = "Made/Edited payment of $amount for : " . $reference_no;
                     AuditLog::auditLog(auth()->id(), $action);
-                    session()->flash('app_message', 'Receipt generated successfully');
+                    session()->flash('app_message', 'Payment generated successfully');
                     DB::commit();
                 }else {
                     DB::rollBack();

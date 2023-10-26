@@ -65,14 +65,14 @@ class InterBankController extends Controller
             $interbank->branch_id = $user_branch;
             $interbank->status = 0;
             if($interbank->save()) {
-                if(Transaction::interbank($source_account_id, 'GeneralAccount', $destination_account_id, 'GeneralAccount', $amount, $reference, $date)) {
+//                if(Transaction::interbank($source_account_id, 'GeneralAccount', $destination_account_id, 'GeneralAccount', $amount, $reference, $date)) {
                     $action = "Posted payment of $amount for : " . $reference;
                     AuditLog::auditLog(auth()->id(), $action);
                     session()->flash('app_message', 'Transfered  successfully');
-                    DB::commit();
-                } else {
-                    DB::rollBack();
-                }
+//                    DB::commit();
+//                } else {
+//                    DB::rollBack();
+//                }
             }
 
         } catch (\Exception $e) {

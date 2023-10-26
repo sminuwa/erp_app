@@ -236,6 +236,7 @@
             Date : <span>{{ \Carbon\Carbon::parse(\Carbon\Carbon::now())->toDayDateTimeString() }}
                 </span>
         </p>
+        <p><b>Created By :</b> {{ $payment->createdBy?->name }}</p>
         <p style="text-align:center">
             Thank you for your patronage!
         </p>

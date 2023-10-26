@@ -32,6 +32,7 @@ class InterBankController extends Controller
     }
     public function store(Request $request)
     {
+
         $interbank_id = $request->interbank_id;
         $amount = $request->amount;
         $source_account_id = $request->source_account_id;
@@ -45,17 +46,19 @@ class InterBankController extends Controller
         $ledger_id = 0;
         $interbank = InterBank::find($interbank_id);
         if(!$interbank)
-            $interbank = new InterBank();
+
         DB::beginTransaction();
         try {
-            $interbank->amount = $amount;
-            $interbank->date = $date;
             if(!$interbank) {
+                $interbank = new InterBank();
                 $interbank->reference = $reference;
                 $interbank->created_by = auth()->id();
             }else{
                 $interbank->updated_by = auth()->id();
             }
+            $interbank->amount = $amount;
+            $interbank->date = $date;
+
             $interbank->description = $description;
             $interbank->source_account_id = $source_account_id;
             $interbank->destination_account_id = $destination_account_id;

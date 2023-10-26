@@ -185,12 +185,14 @@
     <table class="items">
         <thead>
             <tr>
+                <th class="heading qty">Account</th>
                 <th class="heading qty">Description</th>
                 <th class="heading name">Amount</th>
             </tr>
         </thead>
         <tbody>
             <tr>
+                <td>{{ $payment->account()->code ?? $payment->account()->number }} - {{ $payment->account()->name ?? $payment->account()->description }}</td>
                 <td>
                     @if ($payment->description == null)
                         Payment for {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
@@ -231,8 +233,8 @@
     </table>
     <section>
         <p>
-            Date/Printed By : <span>{{ \Carbon\Carbon::parse(\Carbon\Carbon::now())->toDayDateTimeString() }}
-                {{ Auth::user()->name }}</span>
+            Date : <span>{{ \Carbon\Carbon::parse(\Carbon\Carbon::now())->toDayDateTimeString() }}
+                </span>
         </p>
         <p style="text-align:center">
             Thank you for your patronage!

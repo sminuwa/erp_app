@@ -70,7 +70,7 @@
                                         <th>Account</th>
                                         <th>Amount</th>
                                         <th>Description</th>
-                                        <th>Paid BY</th>
+                                        <th>Created By</th>
                                         <th>Actions</th>
                                     </tr>
                                     </thead>
@@ -82,7 +82,7 @@
                                         <th>Account</th>
                                         <th>Amount</th>
                                         <th>Description</th>
-                                        <th>Paid BY</th>
+                                        <th>Created By</th>
                                         <th>Actions</th>
                                     </tr>
                                     </tfoot>
@@ -111,7 +111,7 @@
 
                                             <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
                                             <td>{{ $payment->description }}</td>
-                                            <td>{{ optional($payment->received_by)->name }}</td>
+                                            <td>{{ optional($payment->createdBy)->name }}</td>
                                             <td align="center">
                                                 <div class="dropdown">
                                                     <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -136,11 +136,11 @@
                                                                 </button>
                                                             </form>
                                                         @else
-                                                            <a href="{{ route('payment.print', $payment->id) }}"
+                                                            <a href="{{ route('payment.print', $payment->id) }}" target="_blank"
                                                                class="dropdown-item">
                                                                 <i class="fa fa-print" aria-hidden="true"></i> Print
                                                             </a>
-                                                            <a href="{{ route('payment.print.pos', $payment->id) }}"
+                                                            <a href="{{ route('payment.print.pos', $payment->id) }}" target="_blank"
                                                                class="dropdown-item">
                                                                 <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
                                                             </a>

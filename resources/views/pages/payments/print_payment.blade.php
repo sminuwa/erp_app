@@ -62,15 +62,17 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
+                                <th>Account</th>
                                 <th>Description</th>
                                 <th>Amount</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
+                                <td>{{ $payment->account()->code ?? $payment->account()->number }} - {{ $payment->account()->name ?? $payment->account()->description }}</td>
                                 <td class="col-md-9">
                                     @if ($payment->description == null)
-                                    Payment for {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
+                                        Payment for {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                                     @else
                                         {{ $payment->description }}
                                     @endif

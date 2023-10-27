@@ -35,6 +35,87 @@
             <div class="container-fluid">
                 <div class="row">
                     <!-- left column -->
+                    <div class="col-md-12">
+                        <div class="card">
+                            <form action="{{ route('invoice.create') }}" method="post">
+                                @csrf
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        Customer
+                                        <span>
+                                            &nbsp;
+
+                                            @can('view.customer.ledger')
+                                                <a href="javascript:void(0)" data-toggle="modal"
+                                                   data-target="#customer_ledgerform"
+                                                   class="btn btn-sm btn-secondary float-md-right"
+                                                   style="margin-left: 2px;">Customer Ledger </a>
+                                            @endcan
+                                            @can('increase.customer.credit.limit')
+                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#credit_limitform"
+                                                   class="btn btn-sm btn-success float-md-right"
+                                                   style="margin-left: 2px;">Increase Limit </a>
+                                            @endcan
+                                            @can('add.customer')
+                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#customermodal"
+                                                   class="btn btn-sm btn-primary float-md-right">Add New</a>
+                                            @endcan
+                                            <span class="text text-danger fa fa-mobile">Send SMS: </span> <input
+                                                type="checkbox" name="sms" id="sms" />
+                                        </span>
+                                    </h3>
+
+                                </div>
+                                <div class="card-body">
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                @hasanyrole('Super-admin|Admin')
+                                                <div class="form-group">
+                                                    <label for="order_date">Sale Date</label>
+                                                    <input type="text" name="order_date" class="form-control datepicker"
+                                                           value="{{ date('Y-m-d') }}" />
+                                                </div>
+                                                @else
+                                                    <input type="hidden" name="order_date" class="form-control datepicker"
+                                                           value="{{ date('Y-m-d') }}" />
+                                                    @endhasanyrole
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>Customer Type</label>
+                                                    <select name="account_type" id="account_type" class="form-control" required>
+                                                        <option value="" disabled selected>Select...</option>
+                                                        <option value="Retail">Retail</option>
+                                                        <option value="Wholesale">WholeSale</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>Customer</label>
+                                                    <div class="form-group" >
+                                                        <select name="customer_id" id="customer_record" class="form-control select2-single">
+
+                                                        </select>
+                                                        <div class="form-group">
+                                                            <span class="text text-danger ion-android-alert" id="credit_balance"></span>
+                                                        </div>
+                                                    </div>
+                                                    {{-- <div class="form-group" style="border: 1px solid rgba(64, 44, 45, 0.4)">
+                                                        <input type="text" class="form-control" name="reference" id="reference"
+                                                            placeholder="Reference" />
+                                                    </div> --}}
+                                                    <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create
+                                                        Invoice</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
                     <div class="col-md-6">
                         <!-- general form elements -->
                         <div class="card">
@@ -151,86 +232,11 @@
                         <!-- /.card -->
                     </div>
                     <div class="col-md-6">
-                        <div class="card">
-                            <form action="{{ route('invoice.create') }}" method="post">
-                                @csrf
-                                <div class="card-header">
-                                    <h3 class="card-title">
-                                        Customer
-                                        <span>
-                                            &nbsp;
-
-                                            @can('view.customer.ledger')
-                                                <a href="javascript:void(0)" data-toggle="modal"
-                                                    data-target="#customer_ledgerform"
-                                                    class="btn btn-sm btn-secondary float-md-right"
-                                                    style="margin-left: 2px;">Customer Ledger </a>
-                                            @endcan
-                                            @can('increase.customer.credit.limit')
-                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#credit_limitform"
-                                                    class="btn btn-sm btn-success float-md-right"
-                                                    style="margin-left: 2px;">Increase Limit </a>
-                                            @endcan
-                                            @can('add.customer')
-                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#customermodal"
-                                                    class="btn btn-sm btn-primary float-md-right">Add New</a>
-                                            @endcan
-                                            <span class="text text-danger fa fa-mobile">Send SMS: </span> <input
-                                                type="checkbox" name="sms" id="sms" />
-                                        </span>
-                                    </h3>
-
-                                </div>
-                                <div class="card-body">
-                                    @hasanyrole('Super-admin|Admin')
-                                        <div class="form-group">
-                                            <label for="order_date">Sale Date</label>
-                                            <input type="text" name="order_date" class="form-control datepicker"
-                                                value="{{ date('Y-m-d') }}" />
-                                        </div>
-                                    @else
-                                        <input type="hidden" name="order_date" class="form-control datepicker"
-                                            value="{{ date('Y-m-d') }}" />
-                                    @endhasanyrole
-                                    <div class="form-group">
-                                        <label>Customer Type</label>
-                                        <select name="account_type" id="account_type" class="form-control" required>
-                                            <option value="" disabled selected>Select...</option>
-                                            <option value="Retail">Retail</option>
-                                            <option value="Wholesale">WholeSale</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Customer</label>
-                                        <div class="form-group" >
-                                            <select name="customer_id" id="customer_record" class="form-control select2-single">
-
-                                            </select><br />
-                                            <div class="form-group" id="display_due_date" style="border: 1px solid rgba(64, 44, 45, 0.4)">
-
-                                                <input type="text" class="form-control datepicker" name="due_date" id="due_date" placeholder="Due Date"
-                                                    value="{{ old('due_date') }}" autocomplete="off" />
-                                            </div>
-                                            <div class="form-group">
-                                                <span class="text text-danger ion-android-alert" id="credit_balance"></span>
-                                            </div>
-                                        </div>
-                                        {{-- <div class="form-group" style="border: 1px solid rgba(64, 44, 45, 0.4)">
-                                            <input type="text" class="form-control" name="reference" id="reference"
-                                                placeholder="Reference" />
-                                        </div> --}}
-                                        <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create
-                                            Invoice</button>
-                                    </div>
-                                </div>
-                            </form>
-
-                        </div>
                         <div class="card card-default">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    <i class="fa fa-info"></i>
-                                    Shopping Lists
+                                    <i class="fa fa-shopping-cart"></i>
+                                    Cart
 
                                 </h3>
                             </div>
@@ -260,7 +266,7 @@
                                                 <tr>
                                                     {{-- <td>{{ $loop->iteration }}</td> --}}
                                                     <td class="text-left">{{ $product->attributes['store'] }}</td>
-                                                    <td class="text-left">{{ $product->attributes['code'] }}</td>
+                                                    <td class="text-left">{{ $product->attributes['code'] }} {{ $product->name }}</td>
 
                                                     <form action="{{ route('cart.update') }}" method="post"
                                                         id="p{{ $product->id }}">
@@ -283,7 +289,7 @@
                                                                     readonly style="min-width:65px;"
                                                                     onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
                                                                     value="{{ $product->price }}"
-                                                                    data-val="{{ $product->attributes['cost_price'] }}"
+                                                                    data-val="{{ $product->attributes['selling_price'] }}"
                                                                     data-value="p{{ $product->id }}">
                                                                 <span style="color: red;"
                                                                     id="valid_price{{ $product->id }}"></span>

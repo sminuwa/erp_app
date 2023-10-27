@@ -39,11 +39,64 @@
             <div class="container-fluid">
                 <div class="row">
                     <!-- left column -->
+                    <div class="col-md-12">
+                        <div class="card">
+                            <form action="{{ route('proformer.create') }}" method="post">
+                                @csrf
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        Proforma Invoice Details
+                                    </h3>
+
+                                </div>
+                                <div class="card-body">
+
+                                    <input type="hidden" name="order_date" class="form-control datepicker"
+                                           value="{{ date('Y-m-d') }}" />
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Customer Type</label>
+                                                <select name="account_type" id="account_type" class="form-control" required>
+                                                    <option value="" disabled selected>Select...</option>
+                                                    <option value="Retail">Retail</option>
+                                                    <option value="Wholesale">WholeSale</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Customer</label>
+                                                <div class="form-group">
+                                                    <select name="customer_id" id="customer_record"
+                                                            class="form-control select2-single">
+                                                    </select>
+
+                                                    <div class="form-group">
+                                                <span class="text text-danger "
+                                                      id="credit_balance"></span>
+                                                    </div>
+                                                </div>
+                                                {{-- <div class="form-group" style="border: 1px solid rgba(64, 44, 45, 0.4)">
+                                                    <input type="text" class="form-control" name="reference" id="reference"
+                                                        placeholder="Reference" />
+                                                </div> --}}
+                                                <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create
+                                                    Invoice</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
                     <div class="col-md-6">
                         <!-- general form elements -->
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Proforma</h3>
+                                <h3 class="card-title">Products</h3>
                             </div>
                             <!-- /.card-header -->
                             @can('view.sale.products')
@@ -109,56 +162,11 @@
                         <!-- /.card -->
                     </div>
                     <div class="col-md-6">
-                        <div class="card">
-                            <form action="{{ route('proformer.create') }}" method="post">
-                                @csrf
-                                <div class="card-header">
-                                    <h3 class="card-title">
-                                        Customer
-                                    </h3>
-
-                                </div>
-                                <div class="card-body">
-
-                                    <input type="hidden" name="order_date" class="form-control datepicker"
-                                        value="{{ date('Y-m-d') }}" />
-
-                                    <div class="form-group">
-                                        <label>Customer Type</label>
-                                        <select name="account_type" id="account_type" class="form-control" required>
-                                            <option value="" disabled selected>Select...</option>
-                                            <option value="Retail">Retail</option>
-                                            <option value="Wholesale">WholeSale</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Customer</label>
-                                        <div class="form-group">
-                                            <select name="customer_id" id="customer_record"
-                                                class="form-control select2-single">
-                                            </select>
-
-                                            <div class="form-group">
-                                                <span class="text text-danger "
-                                                    id="credit_balance"></span>
-                                            </div>
-                                        </div>
-                                        {{-- <div class="form-group" style="border: 1px solid rgba(64, 44, 45, 0.4)">
-                                            <input type="text" class="form-control" name="reference" id="reference"
-                                                placeholder="Reference" />
-                                        </div> --}}
-                                        <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create
-                                            Invoice</button>
-                                    </div>
-                                </div>
-                            </form>
-
-                        </div>
                         <div class="card card-default">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    <i class="fa fa-info"></i>
-                                    Shopping Lists
+                                    <i class="fa fa-shopping-cart"></i>
+                                    Cart
 
                                 </h3>
                             </div>
@@ -209,7 +217,7 @@
                                                                     readonly style="min-width:65px;"
                                                                     onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
                                                                     value="{{ $product->price }}"
-                                                                    data-val="{{ $product->attributes['cost_price'] }}"
+                                                                    data-val="{{ $product->attributes['selling_price'] }}"
                                                                     data-value="p{{ $product->id }}">
                                                                 <span style="color: red;"
                                                                     id="valid_price{{ $product->id }}"></span>
@@ -583,7 +591,7 @@
                 return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ?
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
-           
+
         });
 
         var delay = (function() {

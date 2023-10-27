@@ -176,6 +176,7 @@ class InvoiceController extends Controller
             }
             if ($status) {
                 $order_id = DB::table('orders')->insertGetId([
+                    'reference' => Order::generateNewNumber(),
                     'customer_id' => $customer_id,
                     'payment_mode' => $payment_mode,
                     'due_date' => $due_date,
@@ -337,6 +338,7 @@ class InvoiceController extends Controller
             }
 
             $order_id = DB::table('proformers')->insertGetId([
+                'reference' => Proformer::generateNewNumber(),
                 'customer_id' => $customer_id,
                 'payment_mode' => $payment_mode,
                 'due_date' => $due_date,

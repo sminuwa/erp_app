@@ -4,7 +4,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 /**
  @property bigint $customer_id customer id @property varchar $order_date order date @property varchar $order_status order status @property int $total_products total products @property double $sub_total sub total @property double $vat vat @property double $total total @property varchar $payment_status payment status @property double $pay pay @property double $due due @property timestamp $created_at created at @property timestamp $updated_at updated at
- 
+
  */
 class Order extends Model
 
@@ -47,5 +47,16 @@ class Order extends Model
     }
     public function branch(){
         return $this->order_items()->first()->branch();
+    }
+
+    public static function generateNewNumber($prefix = 'INV', $length = 4){
+        $prefix = $prefix.date('ym').auth()->user()->branch->code;
+        $record = self::where('reference', 'like', '%'.$prefix.'%')->orderBy('reference', 'desc')->first();
+        if($record){
+            $number = $record->reference;
+            $new = intval(substr($number,strlen($prefix)))+1;
+            return $prefix.str_pad($new, $length,0,STR_PAD_LEFT);
+        }
+        return $prefix.str_pad(1, $length,0,STR_PAD_LEFT);
     }
 }

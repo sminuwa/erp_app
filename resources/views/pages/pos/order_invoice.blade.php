@@ -74,7 +74,6 @@
                                             </tr>
                                         </tfoot>
                                         <tbody>
-
                                             @foreach ($stores as $key => $store)
                                                 <tr>
                                                     <form action="{{ route('cart.store') }}" method="post">

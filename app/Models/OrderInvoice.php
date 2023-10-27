@@ -43,4 +43,16 @@ class OrderInvoice extends Model
     public function branch(){
         return $this->order_items()->first()->branch();
     }
+
+    public static function generateNewNumber($prefix = 'ODR', $length = 4){
+        $prefix = $prefix.date('ym').auth()->user()->branch->code;
+        $record = self::where('reference', 'like', '%'.$prefix.'%')->orderBy('reference', 'desc')->first();
+        if($record){
+            $number = $record->reference;
+            $new = intval(substr($number,strlen($prefix)))+1;
+            return $prefix.str_pad($new, $length,0,STR_PAD_LEFT);
+        }
+        return $prefix.str_pad(1, $length,0,STR_PAD_LEFT);
+    }
+
 }

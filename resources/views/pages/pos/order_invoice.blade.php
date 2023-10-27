@@ -241,12 +241,12 @@
                                                                 <span style="color: red;"
                                                                     id="valid_price{{ $product->id }}"></span>
                                                             @else
-                                                                <input type="text" name="sold_price"
+                                                                <input type="text" name="selling_price"
                                                                     id="price{{ $product->id }}" class="form-control price"
                                                                     readonly style="min-width:65px;"
                                                                     onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
                                                                     value="{{ $product->price }}"
-                                                                    data-val="{{ $product->attributes['cost_price'] }}"
+                                                                    data-val="{{ $product->attributes['selling_price'] }}"
                                                                     data-value="p{{ $product->id }}">
                                                                 <span style="color: red;"
                                                                     id="valid_price{{ $product->id }}"></span>
@@ -598,7 +598,7 @@
 
             });
 
-           
+
             $('#bank_account_id').on("change", function() {
                 bank_account_id = $(this).val();
                 $.ajax({
@@ -622,7 +622,7 @@
                 return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ?
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
-           
+
         });
 
         var delay = (function() {

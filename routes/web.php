@@ -257,6 +257,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/month/{month?}', [ExpenseController::class, 'month_expense'])->name('expense.month');
         Route::get('/yearly/{year?}', [ExpenseController::class, 'yearly_expense'])->name('expense.yearly');
     });
+
     Route::group(['prefix' => 'sales'], function () {
         Route::get('/cart/list', [CartController::class, 'cartList'])->name('cart.list');
         Route::post('/cart', [CartController::class, 'addToCart'])->name('cart.store');
@@ -273,7 +274,7 @@ Route::middleware('auth')->group(function () {
         Route::get('order_invoice', [PosController::class, 'index'])->name('order.invoice.index');
 
         Route::post('/invoice', [InvoiceController::class, 'final_invoice'])->name('invoice.create');
-        Route::post('/preformer/create', [InvoiceController::class, 'final_proformer'])->name('proformer.create');
+        Route::post('/preforma/create', [InvoiceController::class, 'final_proformer'])->name('proformer.create');
         Route::post('/order-invoice/create', [InvoiceController::class, 'final_order_invoice'])->name('order.invoice.create');
         Route::put('/invoice/update/{order}', [InvoiceController::class, 'updateInvoice'])->name('invoice.update');
         Route::get('/print/{customer_id}', [InvoiceController::class, 'print'])->name('invoice.print');

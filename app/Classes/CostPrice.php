@@ -34,10 +34,13 @@ class CostPrice
         $quantity = $cost_price = 0;
         $prices = BranchProductPrice::whereIn('product_id', $product_ids)->where('branch_id', $branch_id)->get();
         $quantities = StoreProduct::whereIn('product_id', $product_ids)->where('store_id', $store_id)->get();
-        if($prices){
-            foreach($prices as $record){
+        $old_product_costs = [];
+        $old_product_quantity = [];
+        foreach($prices as $pr){
+            return $pr;
+        }
+        foreach($quantities as $qqt){
 
-            }
         }
         return $quantities;
         return $product_ids;

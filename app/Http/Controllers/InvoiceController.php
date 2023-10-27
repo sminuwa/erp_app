@@ -287,7 +287,7 @@ class InvoiceController extends Controller
     }
 
     public function final_proformer(Request $request)
-    { 
+    {
         $invoice = $this->generateProfomerInvoice('PFI');
         $inputs = $request->except('_token');
 
@@ -384,7 +384,7 @@ class InvoiceController extends Controller
             //Upate the Order table with the discount
             DB::table('proformers')->where('id', $order_id)->increment('discount', $total_discount);
 
-            $action = "Issue proformer $invoice: $total";
+            $action = "Issue proforma $invoice: $total";
             AuditLog::auditLog(Auth::id(), $action);
             DB::commit();
         } catch (\Exception $ex) {
@@ -393,7 +393,7 @@ class InvoiceController extends Controller
         }
         \Cart::clear();
 
-        session()->flash('Proformer created successfully');
+        session()->flash('Proforma created successfully');
         return redirect()->route('proformer.show', $order_id);
 
     }
@@ -420,10 +420,10 @@ class InvoiceController extends Controller
         }
         $customer_id = $request->input('customer_id');
 
-        if ((\Cart::getTotal() + Customer::find($customer_id)->runningBalance()) > Customer::find($customer_id)->credit_limit) {
+        /*if ((\Cart::getTotal() + Customer::find($customer_id)->runningBalance()) > Customer::find($customer_id)->credit_limit) {
             session()->flash('app_error', 'The amount has exceeded the customer credit limit');
             return redirect()->back();
-        }
+        }*/
         $customer = Customer::findOrFail($customer_id);
         $items = $this->orderItems();
 
@@ -452,6 +452,7 @@ class InvoiceController extends Controller
             }
 
             $order_id = DB::table('order_invoices')->insertGetId([
+                'reference' => OrderInvoice::generateNewNumber(),
                 'customer_id' => $customer_id,
                 'payment_mode' => $payment_mode,
                 'due_date' => $due_date,

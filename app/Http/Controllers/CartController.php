@@ -52,7 +52,7 @@ class CartController extends Controller
     }
 
     public function updateCart(Request $request)
-    { 
+    {
         $sold_price = $request->sold_price;
         if ($request->has('percent')) {
             $percent = $request->percent;
@@ -80,7 +80,7 @@ class CartController extends Controller
     }
 
     public function removeCart(Request $request, $id)
-    { 
+    {
         \Cart::remove($request->id);
         session()->flash('success', 'Item Cart Remove Successfully !');
 

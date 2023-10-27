@@ -159,7 +159,7 @@
                                         Customer
                                         <span>
                                             &nbsp;
-                            
+
                                             @can('view.customer.ledger')
                                                 <a href="javascript:void(0)" data-toggle="modal"
                                                     data-target="#customer_ledgerform"
@@ -204,10 +204,10 @@
                                         <label>Customer</label>
                                         <div class="form-group" >
                                             <select name="customer_id" id="customer_record" class="form-control select2-single">
-                                                
+
                                             </select><br />
                                             <div class="form-group" id="display_due_date" style="border: 1px solid rgba(64, 44, 45, 0.4)">
-                                            
+
                                                 <input type="text" class="form-control datepicker" name="due_date" id="due_date" placeholder="Due Date"
                                                     value="{{ old('due_date') }}" autocomplete="off" />
                                             </div>
@@ -554,7 +554,7 @@
         }
         $('#customer_record').on("change", function() {
             customer_id = $(this).val();
-           
+
             $.ajax({
                 type: "GET",
                 url: "{{ route('ajax.load.customer.credit_limit') }}",
@@ -658,7 +658,7 @@
                 return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ?
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
-            
+
         });
 
         var delay = (function() {

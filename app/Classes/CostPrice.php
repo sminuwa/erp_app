@@ -3,11 +3,13 @@
 namespace App\Classes;
 
 use App\Models\BranchProductPrice;
+use App\Models\Store;
+use App\Models\StoreProduct;
 
 class CostPrice
 {
 
-    public static function newCostPrice(array $products, $branch_id = 2){
+    public static function newCostPrice(array $products, $store_id = 278,  $branch_id = 2){
         /*
          * branch id of the destination store
          * array of product list as follows
@@ -30,13 +32,14 @@ class CostPrice
 
         //get record of cost prices in the database
         $quantity = $cost_price = 0;
-        $records = BranchProductPrice::whereIn('product_id', $product_ids)->where('branch_id', $branch_id)->get();
-        if($records){
-            foreach($records as $record){
+        $prices = BranchProductPrice::whereIn('product_id', $product_ids)->where('branch_id', $branch_id)->get();
+        $quantities = StoreProduct::whereIn('product_id', $product_ids)->where('store_id', $store_id)->get();
+        if($prices){
+            foreach($prices as $record){
 
             }
         }
-        return $records;
+        return $quantities;
         return $product_ids;
         return $products;
 

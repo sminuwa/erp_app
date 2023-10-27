@@ -48,6 +48,8 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProductExpireSettingController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\CreditNoteController;
+use App\Http\Controllers\DebitNoteController;
 
 
 /* |-------------------------------------------------------------------------- | Web Routes |-------------------------------------------------------------------------- | | Here is where you can register web routes for your application. These | routes are loaded by the RouteServiceProvider within a group which | contains the "web" middleware group. Now create something great! | */
@@ -911,23 +913,43 @@ Route::middleware('auth')->group(function () {
         //     Route::post('/ajax/create', [App\Http\Controllers\Inventory\PurchaseController::class, 'createAjax'])->name('inventories.purchases.ajax.create');
         //     Route::post('/store', [App\Http\Controllers\Inventory\PurchaseController::class, 'store'])->name('inventories.purchases.store');
         // });
-        //Credit Note
+        //Debit Notes
+        Route::group(
+            ['prefix' => 'debit-note'],
+            function () {
+                Route::get('/', [DebitNoteController::class, 'supplierDebitNote'])->name('suppliers.debit.note');
+                Route::get('/create/{purchase?}', [DebitNoteController::class, 'createDebitNote'])->name('suppliers.debit.note.create');
+                Route::post('/store', [DebitNoteController::class, 'payDebitNote'])->name('suppliers.debit.note.store');
+                Route::put('/update/{ledger}', [DebitNoteController::class, 'updateDebitNote'])->name('suppliers.debit.note.update');
+                Route::delete('/delete/{ledger}', [DebitNoteController::class, 'deleteDebitNote'])->name('suppliers.debit.note.destroy');
+                Route::post('/search', [DebitNoteController::class, 'searchDebitNote'])->name('suppliers.debit.note.search');
+                Route::get('/load_invoices', [DebitNoteController::class, 'loadInvoices'])->name('suppliers.load.order.invoices');
+                Route::get('/load_cart', [DebitNoteController::class, 'loadToCart'])->name('suppliers.load.order.cart');
+                Route::post('/cart', [DebitNoteController::class, 'addToCart'])->name('debit.note.cart.store');
+                Route::put('/update-cart', [DebitNoteController::class, 'updateCart'])->name('debit.note.cart.update');
+                Route::delete('/remove/{id}', [DebitNoteController::class, 'removeCart'])->name('debit.note.cart.remove');
+                Route::get('/print/receipt/{debit_note}', [DebitNoteController::class, 'printDebitNoteReceipt'])->name('suppliers.debit.note.print');
+                Route::post('/expense', [DebitNoteController::class, 'expense'])->name('update.purchases.expense.ajax.create');
+            }
+        );
+        //Credit Notes
         Route::group(
             ['prefix' => 'credit-note'],
             function () {
-        Route::get('/', [CustomerController::class, 'customerCreditNote'])->name('customers.credit.note');
-        Route::get('/create/{order?}', [CustomerController::class, 'createCreditNote'])->name('customers.credit.note.create');
-        Route::post('/store', [CustomerController::class, 'payCreditNote'])->name('customers.credit.note.store');
-        Route::put('/update/{ledger}', [CustomerController::class, 'updateCreditnote'])->name('customers.credit.note.update');
-        Route::delete('/delete/{ledger}', [CustomerController::class, 'deleteCreditNote'])->name('customers.credit.note.destroy');
-        Route::post('/search', [CustomerController::class, 'searchCreditNote'])->name('customers.credit.note.search');
-        Route::get('/load_invoices', [CustomerController::class, 'loadInvoices'])->name('load.order.invoices');
-        Route::get('/load_cart', [CustomerController::class, 'loadToCart'])->name('load.order.cart');
-        Route::post('/cart', [CustomerController::class, 'addToCart'])->name('credit.note.cart.store');
-        Route::put('/update-cart', [CustomerController::class, 'updateCart'])->name('credit.note.cart.update');
-        Route::delete('/remove/{id}', [CustomerController::class, 'removeCart'])->name('credit.note.cart.remove');
-        Route::get('/print/receipt/{credit_note}', [CustomerController::class, 'printCreditNoteReceipt'])->name('customers.credit.note.print');
-            });
+                Route::get('/', [CreditNoteController::class, 'customerCreditNote'])->name('customers.credit.note');
+                Route::get('/create/{order?}', [CreditNoteController::class, 'createCreditNote'])->name('customers.credit.note.create');
+                Route::post('/store', [CreditNoteController::class, 'payCreditNote'])->name('customers.credit.note.store');
+                Route::put('/update/{ledger}', [CreditNoteController::class, 'updateCreditnote'])->name('customers.credit.note.update');
+                Route::delete('/delete/{ledger}', [CreditNoteController::class, 'deleteCreditNote'])->name('customers.credit.note.destroy');
+                Route::post('/search', [CreditNoteController::class, 'searchCreditNote'])->name('customers.credit.note.search');
+                Route::get('/load_invoices', [CreditNoteController::class, 'loadInvoices'])->name('load.order.invoices');
+                Route::get('/load_cart', [CreditNoteController::class, 'loadToCart'])->name('load.order.cart');
+                Route::post('/cart', [CreditNoteController::class, 'addToCart'])->name('credit.note.cart.store');
+                Route::put('/update-cart', [CreditNoteController::class, 'updateCart'])->name('credit.note.cart.update');
+                Route::delete('/remove/{id}', [CreditNoteController::class, 'removeCart'])->name('credit.note.cart.remove');
+                Route::get('/print/receipt/{credit_note}', [CreditNoteController::class, 'printCreditNoteReceipt'])->name('customers.credit.note.print');
+            }
+        );
         Route::group(
             ['prefix' => 'purchases/grn'],
             function () {

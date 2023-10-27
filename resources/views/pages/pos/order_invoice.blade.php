@@ -222,7 +222,7 @@
                                                 <tr>
                                                     {{-- <td>{{ $loop->iteration }}</td> --}}
                                                     <td class="text-left">{{ $product->attributes['store'] }}</td>
-                                                    <td class="text-left">{{ $product->attributes['code'] }}</td>
+                                                    <td class="text-left">{{ $product->attributes['code'] }} - {{ $product->name }}</td>
 
                                                     <form action="{{ route('cart.update') }}" method="post"
                                                         id="p{{ $product->id }}">

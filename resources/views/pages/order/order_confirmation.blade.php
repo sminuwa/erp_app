@@ -82,7 +82,9 @@
                                         <thead>
                                             <tr>
                                                 <th>S.N</th>
+                                                <th>Code</th>
                                                 <th>Product Name</th>
+                                                <th>Store Code</th>
                                                 <th>Quantity</th>
                                                 <th>Unit Cost</th>
                                                 <th>Subtotal</th>
@@ -96,7 +98,9 @@
                                             @foreach ($order_details as $order_detail)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ $order_detail->storeProduct->product->code }}</td>
                                                     <td>{{ $order_detail->storeProduct->product->name }}</td>
+                                                    <td>{{ $order_detail->storeProduct->store->code }}</td>
                                                     <td align="center">{{ $order_detail->quantity }}</td>
                                                     <td align="right">{{ number_format($order_detail->selling_price, 2) }}
                                                     </td>
@@ -107,7 +111,7 @@
                                                 @php $total += ($order_detail->selling_price * $order_detail->quantity);  @endphp
                                             @endforeach
                                             <tr>
-                                                <th colspan="4" align="right">Total</th>
+                                                <th colspan="6" align="right">Total</th>
                                                 <th style="text-align: right">{{ number_format($total, 2, '.', ',') }}</th>
 
                                             </tr>

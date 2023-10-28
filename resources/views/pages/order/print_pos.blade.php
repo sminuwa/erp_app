@@ -158,7 +158,7 @@
     <table class="bill-details">
         <tbody>
             <tr>
-                <td colspan="2"><strong>Date :
+                <td colspan="3"><strong>Date :
                     </strong><span>{{ \Carbon\Carbon::parse($order->order_date)->toDayDateTimeString() }}</span></td>
             </tr>
             <tr>
@@ -176,6 +176,7 @@
         <thead>
             <tr>
                 <th class="heading qty">Qty</th>
+                <th class="heading name">Code</th>
                 <th class="heading name">Item</th>
                 <th class="heading rate">Rate</th>
                 <th class="heading rate">Store</th>
@@ -187,10 +188,11 @@
             @foreach ($order_details as $order_detail)
                 <tr>
                     <td align="center">{{ $order_detail->quantity }}</td>
+                    <td>{{ $order_detail->storeProduct->product->code }}</td>
                     <td>{{ $order_detail->storeProduct->product->name }}</td>
                     <td align="right">&#8358;{{ number_format($order_detail->sold_price, 2) }}
                     </td>
-                    <td>{{ $order_detail->storeProduct->store->name }}</td>
+                    <td>{{ $order_detail->storeProduct->store->code }}</td>
                     <td align="right">
                         &#8358;{{ number_format($order_detail->sold_price * $order_detail->quantity, 2) }}
                     </td>

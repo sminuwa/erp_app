@@ -110,11 +110,12 @@
                             <table class="table table-bordered table-condensed text-left">
                                 <thead>
                                     <tr>
-                                        <th style="width:5%;">QTY</th>
-                                        <th style="width:10%;">STORE</th>
                                         <th style="width:10%;">CODE</th>
                                         <th style="width:30%;">DESCRIPTION</th>
-                                        <th style="width:10%;">RATE</th>
+                                        <th style="width:5%;">QTY</th>
+                                        <th style="width:5%;">UFM</th>
+                                        <th style="width:10%;">STORE CODE</th>
+                                        <th style="width:10%;">UNIT PRICE</th>
                                         <th style="width:20%;">TOTAL</th>
                                     </tr>
                                 </thead>
@@ -125,10 +126,12 @@
                                     @endphp
                                     @foreach ($order_details as $order_detail)
                                         <tr>
-                                            <td align="center">{{ $order_detail->quantity }}</td>
-                                            <td>{{ $order_detail->storeProduct->store->code }}</td>
                                             <td>{{ $order_detail->storeProduct->product->code }}</td>
                                             <td>{{ $order_detail->storeProduct->product->name }}</td>
+                                            <td align="center">{{ $order_detail->quantity }}</td>
+                                            <td align="center">{{ $order_detail->storeProduct->product->unit }}</td>
+                                            <td>{{ $order_detail->storeProduct->store->code }}</td>
+                                            
                                             <td align="right">
                                                 &#8358;{{ number_format($order_detail->sold_price, 2) }}
                                             </td>
@@ -142,7 +145,7 @@
                             </table>
                             <table class="table table-bordered table-condensed">
                                 <tr>
-                                    <td rowspan="5" style="text-align: left;vertical-align: bottom">
+                                    <td rowspan="6" style="text-align: left;vertical-align: bottom">
                                         Balance C/F =
                                         @if ($order->customer->amount()->sum('cr') - $order->customer->amount()->sum('dr') < 0)
                                             &#8358;({{ number_format(abs($order->customer->amount()->sum('cr') - $order->customer->amount()->sum('dr')), 2) }})
@@ -178,7 +181,7 @@
                                     </th>
                                 </tr>
                                 <tr>
-                                    <td colspan="3">Amoun Paid in Words:
+                                    <td colspan="4">Amoun Paid in Words:
                                         <span>{{ $utility->convertNumberToWords($total) }} Naira</span>
                                     </td>
                                 </tr>
@@ -187,7 +190,7 @@
 
                             <table class="table table-condensed">
                                 <tr>
-                                    <td colspan="3" style='border-style:none;'>
+                                    <td colspan="4" style='border-style:none;'>
                                         ___________________________<br /><br />
                                         Customer's Signature
                                     </td>
@@ -197,7 +200,7 @@
                                         @endphp
                                         {{ QrCode::size(100)->backgroundColor(255, 55, 0)->generate("$total\n$uc\n\n.") }} --}}
                                     </td>
-                                    <td colspan="3" style="text-align: right;border-style:none;"><span
+                                    <td colspan="4" style="text-align: right;border-style:none;"><span
                                             style='font-size:14px; border-style:none;'></span>
                                         Signature:
                                         _______________________________<br /><br />

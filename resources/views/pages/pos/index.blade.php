@@ -709,55 +709,7 @@
 
             }, 500);
         });
-        // detect when a barcode is scanned
-        // let code = "";
-        // let barcode ="";
-        // $(document).on('input', '#barcode', function(e) {
-        //     // var barcode = $(this).val();
-        //     // alert($('#barcode').val());
-        //     if (e.keyCode === 13) {
-        //         if (code.length >= 10) {
-        //             barcode = code;
-        //         }
-        //     } else {
-        //         code = code + e.key;
-        //     }
-
-        //     // send the barcode to the server to add the product to the cart
-        //     $.ajax({
-        //         url: "{{ route('barcode.search.product') }}",
-        //         type: 'GET',
-        //         data: {
-        //             barcode: barcode
-        //         },
-        //         dataType: 'html',
-        //         success: function(response) {
-        //             // update the cart items container with the new cart data
-        //             $('#load_cart').html(response);
-
-        //         },
-        //         error: function(xhr, status, error) {
-        //             // display an error message
-        //             alert('An error occurred while adding the product to cart.');
-        //         }
-        //     });
-        //     // clear the barcode input field
-        //     //$(this).val('');
-        // });
-
-        //     let UPC = '';
-        // document.addEventListener("keydown", function(e) {
-        //     const textInput = e.key || String.fromCharCode(e.keyCode);
-        //     const targetName = e.target.localName;
-        //     let newUPC = '';
-        //     if (textInput && textInput.length === 1 && targetName !== 'input'){
-        //         newUPC = UPC+textInput;
-
-        //       if (newUPC.length >= 6) {
-        //         console.log('barcode scanned:  ', newUPC);
-        //       }
-        //    }
-        // });
+        
         let code = "";
         let reading = false;
 
@@ -766,7 +718,7 @@
             if (e.keyCode === 13) {
                 if (code.length >= 5) {
                     //code = code.substr(2, code.length - 3);
-                    alert(code);
+                    
                     $.ajax({
                         url: "{{ route('barcode.search.product') }}",
                         type: 'GET',

@@ -175,32 +175,35 @@
     <table class="items">
         <thead>
             <tr>
-                <th class="heading qty">Qty</th>
-                <th class="heading name">Code</th>
-                <th class="heading name">Item</th>
-                <th class="heading rate">Rate</th>
-                <th class="heading rate">Store</th>
-                <th class="heading amount">Sub Total</th>
+                <th class="heading">Code</th>
+                <th class="heading">Item</th>
+                <th class="heading">Qty</th>
+                <th class="heading">Unit</th>
+                <th class="heading">Store</th>
+                <th class="heading">Unit Price</th>
+                <th class="heading">Sub Total</th>
             </tr>
         </thead>
         @php $total = 0; @endphp
         <tbody>
             @foreach ($order_details as $order_detail)
                 <tr>
-                    <td align="center">{{ $order_detail->quantity }}</td>
                     <td>{{ $order_detail->storeProduct->product->code }}</td>
                     <td>{{ $order_detail->storeProduct->product->name }}</td>
-                    <td align="right">&#8358;{{ number_format($order_detail->sold_price, 2) }}
-                    </td>
+                    <td style="text-align:center">{{ $order_detail->quantity }}</td>
+                    <td>{{ $order_detail->storeProduct->product->unit }}</td>
                     <td>{{ $order_detail->storeProduct->store->code }}</td>
-                    <td align="right">
+                    
+                    <td style="text-align:right">&#8358;{{ number_format($order_detail->sold_price, 2) }}
+                    </td>
+                    <td style="text-align:right">
                         &#8358;{{ number_format($order_detail->sold_price * $order_detail->quantity, 2) }}
                     </td>
                 </tr>
                 @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
             @endforeach
             <tr>
-                <td colspan="4" class="sum-up line">Total</td>
+                <td colspan="6" class="sum-up line">Total</td>
                 <td class="line price">{{ number_format($total, 2) }}</td>
             </tr>
             {{--@if ($order->discount != 0)
@@ -210,11 +213,11 @@
                 </tr>
             @endif--}}
             <tr>
-                <td colspan="4" class="sum-up line">Amount Paid</td>
+                <td colspan="6" class="sum-up line">Amount Paid</td>
                 <td class="line price">{{ number_format($order->pay, 2) }}</td>
             </tr>
             <tr>
-                <td colspan="4" class="sum-up line">Amount Due</td>
+                <td colspan="6" class="sum-up line">Amount Due</td>
                 <td class="line price">
                     @if ($order->due < 0)
                         &#8358;({{ number_format(abs($order->due), 2) }})
@@ -224,7 +227,7 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="4">Balance C/F =
+                <td colspan="6">Balance C/F =
                     @if ($order->customer->amount()->sum('cr') - $order->customer->amount()->sum('dr') < 0)
                         &#8358;({{ number_format(abs($order->customer->amount()->sum('cr') - $order->customer->amount()->sum('dr')), 2) }})
                     @else

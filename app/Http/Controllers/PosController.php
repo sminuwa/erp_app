@@ -57,7 +57,7 @@ class PosController extends Controller
         $categories = Category::orderBy('name', 'ASC')->get();
         $store = Store::where('id', 'LIKE', $user_branch)->get();
         $debtor = new CustomerController();
-        $receipt_no = "";//$debtor->generateReceiptNo();
+        $receipt_no = ""; //$debtor->generateReceiptNo();
         if (request()->routeIs('proformer.index')) {
             $stores = Product::orderBy('code', 'asc');
             return view('pages.pos.proformer', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no'));
@@ -70,19 +70,20 @@ class PosController extends Controller
     //This is no longer used but keep it
     public function edit(Request $request, Order $order)
     {
-
+        //\Cart::clear();
         $category_id = 0;
         $store_id = 0;
         $user_branch = User::userBranchAction();
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price','unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('products', 'products.id', 'store_products.product_id')
+            ->join('branches', 'branches.id', 'stores.branch_id')
             ->join('branch_product_prices', function ($join) {
                 $join->on('branch_product_prices.product_id', '=', 'products.id')
                     ->on('branch_product_prices.branch_id', '=', 'branches.id');
 
             })
-            ->join('branches', 'branches.id', 'stores.branch_id')
+
             ->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('branch_product_prices.status', 1);
         if ($request->has('category_id') && $request->has('store_id')) {
@@ -114,12 +115,16 @@ class PosController extends Controller
         //\Cart::clear();
         foreach ($order->order_items()->where('status', 1)->get() as $data) {
             $qty = $data->quantity == 0 ? 1 : $data->quantity;
+            $qty_available = $data->storeProduct->qty_available;
+            $store = $data->storeProduct->store->name;
+            $code = $data->storeProduct->product->code;
             \Cart::add([
                 'id' => $data->store_product_id,
                 'name' => $data->storeProduct->product->name,
                 'price' => $data->sold_price,
                 'quantity' => $qty,
-                'attributes' => array('cost_price' => $data->cost_price, 'selling_price' => $data->selling_price, 'discount' => 0),
+                //'attributes' => array('cost_price' => $data->cost_price, 'selling_price' => $data->selling_price, 'discount' => 0),
+                'attributes' => array('cost_price' => $data->cost_price, 'code' => $code, 'selling_price' => $data->selling_price, 'qty_available' => $qty_available, 'discount' => 0, 'store' => $store),
             ]);
         }
     }

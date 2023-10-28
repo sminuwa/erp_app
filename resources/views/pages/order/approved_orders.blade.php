@@ -114,56 +114,67 @@
                                                 </td>
                                                 <td>{{ $order->payment_mode }}</td>
                                                 <td align="center">
-                                                    @can("verify.invoice")
-                                                        <a href="javascript:void(0)" data-toggle="modal"
-                                                            data-target="#order_detail_form{{ $order->id }}"
-                                                            data-val="{{ $order->id }}" class="btn btn-success btn-sm show">
-                                                            <i class="fa fa-eye" aria-hidden="true"></i>
-                                                        </a>
-                                                    @endcan
-                                                    @can("transfer.sale.to.user")
-                                                    <a href="javascript:void(0)" data-toggle="modal"
-                                                            data-target="#sale_transfer_form{{ $order->id }}"
-                                                            data-val="{{ $order->id }}" class="btn btn-success btn-sm show">
-                                                            <i class="fa fa-exchange" aria-hidden="true"></i>
-                                                    </a>
-                                                    @endcan
-                                                    <a href="{{ route('invoice.order_print', $order->id) }}"
-                                                        target="_BLANK" class="btn btn-secondary btn-sm">
-                                                        <i class="fa fa-print" aria-hidden="true"></i>
-                                                    </a>
-                                                    <a href="{{ route('waybill.order_print', $order->id) }}"
-                                                        target="_BLANK" class="btn btn-primary btn-sm">
-                                                        <i class="fa fa-print" aria-hidden="true"></i> Waybill
-                                                    </a>
-                                                    <a href="{{ route('pos.order_print', $order->id) }}" target="_BLANK"
-                                                        class="btn btn-primary btn-sm">
-                                                        <i class="fa fa-print" aria-hidden="true"></i> POS
-                                                    </a>
-                                                    @can('edit.daily.sale')
-                                                        <a href="{{ route('pos.edit', $order->id) }}"
-                                                            class="btn btn-primary btn-sm">
-                                                            <i class="fa fa-edit" aria-hidden="true"></i>
-                                                        </a>
-                                                    @endcan
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-default dropdown-toggle" type="button"
+                                                            id="dropdownMenuButton" data-toggle="dropdown"
+                                                            aria-haspopup="true" aria-expanded="false">
+                                                            Action
+                                                        </button>
+                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                            @can('verify.invoice')
+                                                                <a href="javascript:void(0)" data-toggle="modal"
+                                                                    data-target="#order_detail_form{{ $order->id }}"
+                                                                    data-val="{{ $order->id }}"
+                                                                    class="btn btn-success btn-sm show">
+                                                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                                                </a>
+                                                            @endcan
+                                                            {{-- @can('transfer.sale.to.user')
+                                                                <a href="javascript:void(0)" data-toggle="modal"
+                                                                    data-target="#sale_transfer_form{{ $order->id }}"
+                                                                    data-val="{{ $order->id }}"
+                                                                    class="btn btn-success btn-sm show">
+                                                                    <i class="fa fa-exchange" aria-hidden="true"></i>
+                                                                </a>
+                                                            @endcan --}}
+                                                            <a href="{{ route('invoice.order_print', $order->id) }}"
+                                                                target="_BLANK" class="btn btn-secondary btn-sm">
+                                                                <i class="fa fa-print" aria-hidden="true"></i>
+                                                            </a>
+                                                            <a href="{{ route('waybill.order_print', $order->id) }}"
+                                                                target="_BLANK" class="btn btn-primary btn-sm">
+                                                                <i class="fa fa-print" aria-hidden="true"></i> Waybill
+                                                            </a>
+                                                            <a href="{{ route('pos.order_print', $order->id) }}"
+                                                                target="_BLANK" class="btn btn-primary btn-sm">
+                                                                <i class="fa fa-print" aria-hidden="true"></i> POS
+                                                            </a>
+                                                            @can('edit.daily.sale')
+                                                                <a href="{{ route('pos.edit', $order->id) }}"
+                                                                    class="btn btn-primary btn-sm">
+                                                                    <i class="fa fa-edit" aria-hidden="true"></i>
+                                                                </a>
+                                                            @endcan
 
-                                                    {{-- <a href="javascript:void(0)" data-toggle="modal"
+                                                            {{-- <a href="javascript:void(0)" data-toggle="modal"
                                                         data-target=".order_edit" data-val="{{ $order->id }}"
                                                         class="btn btn-primary btn-sm edit">
                                                         <i class="fa fa-edit" aria-hidden="true"></i>
                                                     </a> --}}
-                                                    @can('delete.daily.sale')
-                                                        <button class="btn btn-danger btn-sm" type="button"
-                                                            onclick="deleteItem({{ $order->id }})">
-                                                            <i class="fa fa-trash" aria-hidden="true"></i>
-                                                        </button>
-                                                        <form id="delete-form-{{ $order->id }}"
-                                                            action="{{ route('orders.destroy', $order->id) }}" method="post"
-                                                            style="display:none;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                        </form>
-                                                    @endcan
+                                                            @can('delete.daily.sale')
+                                                                <button class="btn btn-danger btn-sm" type="button"
+                                                                    onclick="deleteItem({{ $order->id }})">
+                                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                </button>
+                                                                <form id="delete-form-{{ $order->id }}"
+                                                                    action="{{ route('orders.destroy', $order->id) }}"
+                                                                    method="post" style="display:none;">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                </form>
+                                                            @endcan
+                                                        </div>
+                                                    </div>
                                                 </td>
                                             </tr>
                                             <div class="modal fade" id="order_detail_form{{ $order->id }}"
@@ -196,8 +207,9 @@
                                 <div class="row">
                                     <div class="col-sm-2">
                                         @can('view.customer.ledger')
-                                            <a href="javascript:void(0)" data-toggle="modal" data-target="#customer_ledgerform"
-                                                class="btn btn-sm btn-secondary" style="margin-left: 2px;">Customer Ledger </a>
+                                            <a href="javascript:void(0)" data-toggle="modal"
+                                                data-target="#customer_ledgerform" class="btn btn-sm btn-secondary"
+                                                style="margin-left: 2px;">Customer Ledger </a>
                                         @endcan
 
                                     </div>
@@ -276,7 +288,8 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Invoice Verification/Stock out Panel: {{ optional($order)->customer->name }} | Invoice:
+                        <h5 class="modal-title">Invoice Verification/Stock out Panel: {{ optional($order)->customer->name }} |
+                            Invoice:
                             {{ optional($order)->invoice_no }}</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>

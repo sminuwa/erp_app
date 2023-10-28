@@ -35,6 +35,95 @@
             <div class="container-fluid">
                 <div class="row">
                     <!-- left column -->
+                    <div class="col-md-12">
+                        <div class="card">
+                            <form action="{{ route('invoice.create') }}" method="post">
+                                @csrf
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        Customer
+                                        <span>
+                                            &nbsp;
+
+                                            @can('view.customer.ledger')
+                                                <a href="javascript:void(0)" data-toggle="modal"
+                                                    data-target="#customer_ledgerform"
+                                                    class="btn btn-sm btn-secondary float-md-right"
+                                                    style="margin-left: 2px;">Customer Ledger </a>
+                                            @endcan
+                                            @can('increase.customer.credit.limit')
+                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#credit_limitform"
+                                                    class="btn btn-sm btn-success float-md-right"
+                                                    style="margin-left: 2px;">Increase Limit </a>
+                                            @endcan
+                                            @can('add.customer')
+                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#customermodal"
+                                                    class="btn btn-sm btn-primary float-md-right">Add New</a>
+                                            @endcan
+                                            <span class="text text-danger fa fa-mobile">Send SMS: </span> <input
+                                                type="checkbox" name="sms" id="sms" />
+                                        </span>
+                                    </h3>
+
+                                </div>
+                                <div class="card-body">
+
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            @hasanyrole('Super-admin|Admin')
+                                                <div class="form-group">
+                                                    <label for="order_date">Sale Date</label>
+                                                    <input type="text" name="order_date" class="form-control datepicker"
+                                                        value="{{ date('Y-m-d') }}" />
+                                                </div>
+                                            @else
+                                                <input type="hidden" name="order_date" class="form-control datepicker"
+                                                    value="{{ date('Y-m-d') }}" />
+                                            @endhasanyrole
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Customer Type</label>
+                                                <select name="account_type" id="account_type" class="form-control" required>
+                                                    <option value="" disabled selected>Select...</option>
+                                                    <option value="Retail"
+                                                        {{ $order->customer->type == 'Retail' ? 'selected' : '' }}>Retail
+                                                    </option>
+                                                    <option value="Wholesale"
+                                                        {{ $order->customer->type == 'Wholesale' ? 'selected' : '' }}>
+                                                        WholeSale</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Customer</label>
+                                                <div class="form-group">
+                                                    <select name="customer_id" id="customer_record"
+                                                        class="form-control select2-single">
+                                                        <option value="{{ $order->customer->id }}">
+                                                            {{ $order->customer->code }}-{{ $order->customer->name }}</option>
+                                                    </select>
+                                                    <div class="form-group">
+                                                        <span class="text text-danger ion-android-alert"
+                                                            id="credit_balance"></span>
+                                                    </div>
+                                                </div>
+                                                {{-- <div class="form-group" style="border: 1px solid rgba(64, 44, 45, 0.4)">
+                                                        <input type="text" class="form-control" name="reference" id="reference"
+                                                            placeholder="Reference" />
+                                                    </div> --}}
+                                                <button type="submit"
+                                                    class="btn btn-sm btn-info float-md-right ml-3">Create
+                                                    Invoice</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
                     <div class="col-md-6">
                         <!-- general form elements -->
                         <div class="card">
@@ -42,74 +131,63 @@
                                 <h3 class="card-title text text-danger" style="font-weight: 900;"><span
                                         class="ion-alert-circled"> </span>PoS Edit Mode: <br><small>Invoice:
                                         {{ $order->invoice_no }} <br />Customer: {{ $order->customer->name }}</small></h3>
-                                <form action="{{ route('pos.index') }}" method="get">
-                                    @csrf
-                                    Product Category
-                                    <select name="category_id" id="category_id" class="form-control">
-                                        <option value="all">All categories</option>
-                                        @foreach ($categories as $data)
-                                            <option value="{{ $data->id }}"
-                                                {{ $data->id == $category_id ? 'selected' : '' }}>
-                                                {{ $data->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    Store
-                                    <select name="store_id" id="store_id" class="form-control select2-single">
-                                        <option value="all">All stores</option>
-                                        @foreach ($store as $data)
-                                            <option value="{{ $data->id }}"
-                                                {{ $data->id == $store_id ? 'selected' : '' }}>{{ $data->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <input type="submit" name="btnLoad" id="btnLoad" value="Load"
-                                        class="btn btn-sm btn-secondary" />
-                                </form>
+
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body table-responsive" id="load">
-                                <table id="example1" class="table table-bordered table-striped text-left">
+                                <table id="example1" class="table table-bordered table-striped text-left"
+                                    style="font-size: 12px;">
                                     <thead>
-                                        <tr style="font-size: 14px;">
+                                        <tr>
                                             <th>Store</th>
+                                            <th>Code</th>
                                             <th>Item</th>
-                                            <th>QTY Avail.</th>
-                                            <th>Price</th>
+                                            <th>Unit</th>
+                                            <th>QTY</th>
+                                            {{-- <th>Price</th> --}}
                                             <th>Add To Cart</th>
                                         </tr>
                                     </thead>
                                     <tfoot>
-                                        <tr style="font-size: 14px;">
+                                        <tr>
                                             <th>Store</th>
-                                            <th>Item</th>
-                                            <th>QTY Avail.</th>
-                                            <th>Price</th>
+                                            <th>Code</th>
+                                            <th>Name</th>
+                                            <th>Unit</th>
+                                            <th>QTY</th>
+                                            {{-- <th>Price</th> --}}
                                             <th>Add To Cart</th>
                                         </tr>
                                     </tfoot>
                                     <tbody>
+
                                         @foreach ($stores as $key => $store)
                                             <tr>
                                                 <form action="{{ route('cart.store') }}" method="post">
                                                     @csrf
                                                     <input type="hidden" name="id" value="{{ $store->id }}">
                                                     <input type="hidden" name="name" value="{{ $store->name }}">
+                                                    <input type="hidden" name="code" value="{{ $store->code }}">
+                                                    <input type="hidden" name="store" value="{{ $store->store }}">
                                                     <input type="hidden" name="qty" value="1">
                                                     <input type="hidden" name="selling_price"
                                                         value="{{ $store->selling_price }}">
+                                                    <input type="hidden" name="qty_available"
+                                                        value="{{ $store->qty_available }}">
                                                     <input type="hidden" name="sold_price"
                                                         value="{{ $store->selling_price }}">
                                                     <input type="hidden" name="cost_price"
                                                         value="{{ $store->cost_price }}">
 
-                                                    <td>{{ $store->store }}</td>
+                                                    <td>{{ ucwords($store->store) }}</td>
+                                                    <td>{{ $store->code }}</td>
                                                     <td>{{ $store->name }}</td>
+                                                    <td>{{ $store->unit }}</td>
                                                     <td align="center">{{ $store->qty_available }}</td>
-
-                                                    <td align="right">
+                                                    {{-- <td align="right">
                                                         {{ number_format($store->selling_price, 2) }}
-                                                    </td>
-                                                    @if ($store->qty_available > 0)
+                                                    </td> --}}
+                                                    @if ($store->qty_available > 0 && $store->selling_price > 0)
                                                         <td align="center">
                                                             <button type="submit" class="btn btn-sm btn-success px-2">
                                                                 <i class="fa fa-cart-plus" aria-hidden="true"></i>
@@ -123,9 +201,11 @@
                                                 </form>
                                             </tr>
                                         @endforeach
+
                                     </tbody>
 
                                 </table>
+
                             </div>
                             <!-- /.card-body -->
                         </div>
@@ -141,185 +221,120 @@
                                 </h3>
                             </div>
                             <!-- /.card-header -->
-                            <div class="card-body table-responsive">
+                            <div class="card-body table-responsive" id="load_cart">
                                 @if (Cart::getTotal() < 1)
                                     <div class="alert alert-danger">
                                         No Product Added
                                     </div>
                                 @else
-                                    <table class="table table-bordered table-striped text-center">
+                                    <table class="table table-bordered table-striped text-center"
+                                        style="font-size: 12px;">
                                         <thead>
-                                            <tr style="font-size: 14px;">
-                                                <th>S.N</th>
-                                                <th style="width:30%">Item Description</th>
+                                            <tr>
+                                                {{-- <th>S.N</th> --}}
+                                                <th>Store</th>
+                                                <th style="width:30%">Code</th>
                                                 <th>Price</th>
                                                 <th>Qty</th>
                                                 <th>Total</th>
-                                                <!--<th><span class="ion-refresh"></span></th> -->
+                                                {{-- <th><span class="ion-refresh"></span></th> --}}
                                                 <th><span class="ion-ios-trash"></span></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($cart_products as $product)
-                                            <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td class="text-left">{{ $product->name }}</td>
+                                                <tr>
+                                                    {{-- <td>{{ $loop->iteration }}</td> --}}
+                                                    <td class="text-left">{{ $product->attributes['store'] }}</td>
+                                                    <td class="text-left">{{ $product->attributes['code'] }} {{ $product->name }}</td>
 
-                                                <form action="{{ route('cart.update') }}" method="post"
-                                                    id="p{{ $product->id }}">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <td>
-                                                        <input type="text" name="sold_price"
-                                                            id="price{{ $product->id }}" class="form-control price"
-                                                            style="min-width:65px;"
-                                                            onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
-                                                            value="{{ $product->price }}"
-                                                            data-val="{{ $product->attributes['cost_price'] }}"
-                                                            data-value="p{{ $product->id }}">
-                                                        <span style="color: red;"
-                                                            id="valid_price{{ $product->id }}"></span>
-                                                    </td>
-                                                    <td>
-                                                        <input type="text" name="quantity"
-                                                            id="quantity{{ $product->id }}"
-                                                            class="form-control quantity"
-                                                            data-value="p{{ $product->id }}" style="min-width:58px;"
-                                                            value="{{ $product->quantity }}" min="1" required>
-                                                    </td>
-                                                    <td><span
-                                                            class="subtotal{{ $product->id }}">{{ number_format($product->price * $product->quantity, 2) }}</span>
-                                                    </td>
-                                                    <input type="hidden" name="id" class="form-control"
-                                                        value="{{ $product->id }}">
-                                                    <input type="hidden" name="selling_price" class="form-control"
-                                                        value="{{ $product->attributes['selling_price'] }}">
-                                                    <input type="hidden" name="cost_price" class="form-control"
-                                                        value="{{ $product->attributes['cost_price'] }}">
-                                                    {{-- <td>
-                                                        <button type="submit" class="btn btn-sm btn-success">
-                                                            <i class="fa fa-check-circle" aria-hidden="true"></i>
-                                                        </button>
-                                                    </td> --}}
-                                                </form>
-
-                                                <td>
-                                                    <button class="btn btn-danger btn-sm" type="button"
-                                                        onclick="deleteItem({{ $product->id }})">
-                                                        <i class="fa fa-trash" aria-hidden="true"></i>
-                                                    </button>
-                                                    <form id="delete-form-{{ $product->id }}"
-                                                        action="{{ route('cart.remove', $product->id) }}"
-                                                        method="post" style="display:none;">
+                                                    <form action="{{ route('cart.update') }}" method="post"
+                                                        id="p{{ $product->id }}">
                                                         @csrf
-                                                        @method('DELETE')
+                                                        @method('PUT')
+                                                        <td>
+                                                            @can('edit.daily.sale')
+                                                                <input type="text" name="sold_price"
+                                                                    id="price{{ $product->id }}" class="form-control price"
+                                                                    style="min-width:65px;"
+                                                                    onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
+                                                                    value="{{ $product->price }}"
+                                                                    data-val="{{ $product->attributes['cost_price'] }}"
+                                                                    data-value="p{{ $product->id }}">
+                                                                <span style="color: red;"
+                                                                    id="valid_price{{ $product->id }}"></span>
+                                                            @else
+                                                                <input type="text" name="sold_price"
+                                                                    id="price{{ $product->id }}" class="form-control price"
+                                                                    readonly style="min-width:65px;"
+                                                                    onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
+                                                                    value="{{ $product->price }}"
+                                                                    data-val="{{ $product->attributes['selling_price'] }}"
+                                                                    data-value="p{{ $product->id }}">
+                                                                <span style="color: red;"
+                                                                    id="valid_price{{ $product->id }}"></span>
+                                                            @endcan
+
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="quantity"
+                                                                id="quantity{{ $product->id }}"
+                                                                class="form-control quantity"
+                                                                data-value="p{{ $product->id }}" style="min-width:58px;"
+                                                                value="{{ $product->quantity }}" min="1"
+                                                                max-qty="{{ $product->attributes['qty_available'] }}"
+                                                                required>
+                                                            <span style="color: red;"
+                                                                id="valid_qty{{ $product->id }}"></span>
+                                                        </td>
+                                                        <td><span
+                                                                class="subtotal{{ $product->id }}">{{ number_format($product->price * $product->quantity, 2) }}</span>
+                                                        </td>
+                                                        <input type="hidden" name="id" class="form-control"
+                                                            value="{{ $product->id }}">
+                                                        <input type="hidden" name="selling_price" class="form-control"
+                                                            value="{{ $product->attributes['selling_price'] }}">
+                                                        <input type="hidden" name="cost_price" class="form-control"
+                                                            value="{{ $product->attributes['cost_price'] }}">
+                                                        <input type="hidden" name="qty_available" class="form-control"
+                                                            value="{{ $product->attributes['qty_available'] }}">
+                                                        {{-- <td>
+                                                            <button type="submit" class="btn btn-sm btn-success">
+                                                                <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                                            </button>
+                                                        </td> --}}
                                                     </form>
-                                                </td>
-                                            </tr>
-                                        @endforeach
+
+                                                    <td>
+                                                        <button class="btn btn-danger btn-sm" type="button"
+                                                            onclick="deleteItem({{ $product->id }})">
+                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                        </button>
+                                                        <form id="delete-form-{{ $product->id }}"
+                                                            action="{{ route('cart.remove', $product->id) }}"
+                                                            method="post" style="display:none;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
                                         </tbody>
                                     </table>
                                 @endif
 
-                                <div class="alert alert-info">
-                                    {{-- <p>Quantity : {{ Cart::getTotalQuantity() }}</p> --}}
+                                {{-- <div class="alert alert-info">
+                                    <p>Quantity : {{ Cart::getTotalQuantity() }}</p>
                                     <p>Sub Total : &#8358; <span
                                             id="subtotal">{{ number_format(Cart::getSubTotal(), 2) }}</span></p>
-                                </div>
+                                </div> --}}
                                 <div class="alert alert-success">
                                     Total : &#8358; <span id="total">{{ number_format(Cart::getTotal()) }}</span>
                                 </div>
                             </div>
                             <!-- /.card-body -->
                         </div>
-                        <div class="card">
-                            <form action="{{ route('invoice.update', $order->id) }}" method="post">
-                                <input type="hidden" name="_method" value="{{ 'PUT' }}" />
-                                @csrf
-                                <div class="card-header">
-                                    <h3 class="card-title">
-                                        Customer
-                                        <span>
-                                            &nbsp;
-                                            <a href="javascript:void(0)" data-toggle="modal"
-                                                data-target="#customer_ledgerform"
-                                                class="btn btn-sm btn-secondary float-md-right"
-                                                style="margin-left: 2px;">Customer Ledger </a>
-                                            <a href="javascript:void(0)" data-toggle="modal"
-                                                data-target="#credit_limitform"
-                                                class="btn btn-sm btn-success float-md-right"
-                                                style="margin-left: 2px;">Increase Limit </a>
-                                            <a href="javascript:void(0)" data-toggle="modal" data-target="#customermodal"
-                                                class="btn btn-sm btn-primary float-md-right">Add New</a>
-                                        </span>
-                                    </h3>
 
-                                </div>
-                                <div class="card-body">
-                                    @hasanyrole('Super-admin|Admin')
-                                        <div class="form-group">
-                                            <label for="order_date">Sale Date</label>
-                                            <input type="text" name="order_date" class="form-control datepicker"
-                                                value="{{ \Carbon\Carbon::parse($order->order_date)->toDateString() }}" />
-                                        </div>
-                                    @else
-                                        <input type="hidden" name="order_date" class="form-control datepicker"
-                                            value="{{ \Carbon\Carbon::parse($order->order_date)->toDateString() }}" />
-                                    @endhasanyrole
-                                    <div class="form-group">
-                                        <label>Sales Mode</label>
-                                        <select name="sale_mode" id="sale_mode" class="form-control" required>
-                                            <option value="" disabled selected>Select...</option>
-                                            <option value="Cash" {{ $order->payment_mode == 'Cash' ? 'selected' : '' }}>
-                                                Cash
-                                                Sales</option>
-                                            <option value="Credit"
-                                                {{ $order->payment_mode == 'Credit' ? 'selected' : '' }}>
-                                                Credit Sales</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Customer</label>
-                                        <div class="form-group" id="walk_customer"
-                                            style="border: 1px solid rgba(64, 44, 45, 0.4)">
-                                            <input type="text" class="form-control" name="customer" id="customer"
-                                                placeholder="Customer name" value="{{ $order->customer->name }}" />
-                                            <input type="text" class="form-control" name="phone" id="phone"
-                                                placeholder="Phone number" value="{{ $order->customer->phone }}" />
-                                            <input type="text" class="form-control" name="address" id="address"
-                                                value="{{ $order->customer->address }}" placeholder="Address" />
-                                        </div>
-                                        <div class="form-group" id="credit_customer_div">
-                                            <select name="customer_id" id="credit_customer"
-                                                class="form-control ct select2-single">
-                                                <option value="">Select...</option>
-                                                @foreach ($customers as $customer)
-                                                    <option value="{{ old('customer_id', $customer->id) }}"
-                                                        {{ old('customer_id', $order->customer->id) == $customer->id ? 'selected' : '' }}>
-                                                        {{ $customer->name }}</option>
-                                                @endforeach
-                                            </select>
-                                            <div class="form-group" id="display_due_date"
-                                                style="border: 1px solid rgba(64, 44, 45, 0.4)">
-
-                                                <input type="text" class="form-control datepicker" name="due_date"
-                                                    id="due_date" placeholder="Due Date"
-                                                    value="{{ old('due_date', \Carbon\Carbon::parse($order->due_date)->toDateString()) }}"
-                                                    autocomplete="off" />
-                                            </div>
-                                            <div class="form-group">
-                                                <span class="text text-danger ion-android-alert"
-                                                    id="credit_balance"></span>
-                                            </div>
-
-                                        </div>
-                                        <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Update
-                                            Invoice</button>
-                                    </div>
-                                </div>
-                            </form>
-
-                        </div>
                     </div>
 
 
@@ -491,22 +506,17 @@
     <script>
         $(function() {
             $("#example1").DataTable();
-            $('#credit_customer_div').hide();
-            $('#walk_customer').hide();
-            $('#sale_mode').on("change", function() {
-                if ($(this).val() == "Credit" || $(this).val() == "Cash/Credit") {
-                    $('#walk_customer').hide();
-                    $('#display_due_date').show();
-                    $('#credit_customer_div').show();
-                }
-                if ($(this).val() == "Cash") {
-                    $('#walk_customer').show();
-                    $('#display_due_date').val("");
-                    $('#display_due_date').hide();
-                    $('#credit_customer_div').hide();
-                }
+            $('#account_type').on("change", function() {
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('ajax.load.customers') }}",
+                    data: {
+                        type: $(this).val()
+                    }
+                }).done(function(data) {
+                    $("#customer_record").html(data);
+                });
             });
-
 
         });
     </script>
@@ -600,23 +610,7 @@
 
             });
 
-            $('#customer_id2').on("change", function() {
-                customer_id = $(this).val();
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route('ajax.load.customer.balance') }}",
-                    data: {
-                        customer_id: customer_id
-                    }
-                }).done(function(data) {
-                    balance = 0;
-                    if (data < 0)
-                        balance = "(" + formatMoney(Math.abs(data)) + ")";
-                    else
-                        balance = formatMoney(data);
-                    $("#balance").val(balance);
-                });
-            });
+
             $('#bank_account_id').on("change", function() {
                 bank_account_id = $(this).val();
                 $.ajax({
@@ -640,27 +634,7 @@
                 return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ?
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
-            $('#debtor').on('click', function() {
 
-                $.ajax({
-                    type: "POST",
-                    url: "{{ route('debtors.payment.store') }}",
-                    data: $('#debtor_payment').serialize()
-                }).done(function(data) {
-                    if (data > 0) {
-                        $('#print_reciept').show();
-                        $('#print_reciept').attr('href', '');
-                        alert("Payment successfully added");
-                        $('#print_reciept').attr('href', "{{ url('/customers/print/receipt') }}/" +
-                            data)
-                    } else {
-                        alert("This is already captured or something wrong!")
-                    }
-
-                    $('#debtor_payment_form').modal('hide');
-                });
-
-            });
         });
 
         var delay = (function() {
@@ -698,4 +672,3 @@
         });
     </script>
 @endpush
-

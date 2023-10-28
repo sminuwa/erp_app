@@ -725,10 +725,28 @@ class OrderController extends Controller
     {
         \Cart::clear();
         $user = Auth::user();
-        $orders = OrderInvoice::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where(['order_status' => 'approved', 'status' => 1]);
+        $orders = OrderInvoice::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where(['status' => 1]);
         if ($user->hasRole('Sales-Manager'))
             $orders = $orders->where('sold_by', Auth::id());
         $orders = $orders->whereDate('order_date', date('Y-m-d'))->get();
         return view('pages.order.order_invoices', compact('orders'));
+    }
+    public function approveOrderInvoice(Request $request, OrderInvoice $order)
+    {
+        $comment = $request->comment;
+        $order_status = $request->order_status;
+        $order->order_status = $order_status;
+        $order->comment = $comment;
+        $order->modified_by = auth()->id();
+        $order->updated_at = Carbon::now();
+        if ($order->save()) {
+            AuditLog::auditLog(Auth::id(), "$order_status Invoice with " . $request->reference);
+            session()->flash('app_message', "Invoice $order_status successfully");
+            return redirect()->back();
+        } else {
+            session()->flash('app_error', "Failed to $order_status Order Invoice");
+            return back();
+        }
+
     }
 }

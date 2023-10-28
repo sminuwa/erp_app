@@ -274,9 +274,11 @@ Route::middleware('auth')->group(function () {
         Route::get('order_invoice', [PosController::class, 'index'])->name('order.invoice.index');
 
         Route::post('/invoice', [InvoiceController::class, 'final_invoice'])->name('invoice.create');
+        Route::put('/invoice/update/{order}', [InvoiceController::class, 'updateInvoice'])->name('invoice.update');
         Route::post('/preforma/create', [InvoiceController::class, 'final_proformer'])->name('proformer.create');
         Route::post('/order-invoice/create', [InvoiceController::class, 'final_order_invoice'])->name('order.invoice.create');
-        Route::put('/invoice/update/{order}', [InvoiceController::class, 'updateInvoice'])->name('invoice.update');
+        Route::get('/order-invoice/edit/{order}', [InvoiceController::class, 'editOrderInvoice'])->name('order.invoice.edit');
+        Route::put('/order-invoice/update/{order}', [InvoiceController::class, 'updateOrderInvoice'])->name('order.invoice.update');
         Route::get('/print/{customer_id}', [InvoiceController::class, 'print'])->name('invoice.print');
         Route::get('/order-print/{order_id}', [InvoiceController::class, 'order_print'])->name('invoice.order_print');
         Route::get('/proformer/print/{customer_id}', [InvoiceController::class, 'print_proformer'])->name('proformer.print');
@@ -308,6 +310,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/approved', [OrderController::class, 'approved_order'])->name('orders.approved');
         Route::get('/proformer', [OrderController::class, 'proformer_list'])->name('proformer.list');
         Route::get('/order-invoice', [OrderController::class, 'order_invoice_list'])->name('order.invoice.list');
+        Route::put('/approve/order-invoice/{order}', [OrderController::class, 'approveOrderInvoice'])->name('order.invoice.approve');
         Route::delete('/delete/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
         Route::delete('/order-invoice/delete/{order}', [OrderController::class, 'destroy_order_invoice'])->name('order.invoice.destroy');
         Route::delete('/proformer-invoice/delete/{order}', [OrderController::class, 'destroy_proformer'])->name('proformer.destroy');

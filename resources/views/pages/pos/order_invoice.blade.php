@@ -27,10 +27,8 @@
         </section>
         <div class="row">
             <div class="col-sm-2">
-                <a href="{{ route('orders.approved') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                        class="fa fa-list"> </span> Sales </a>
                 <a href="{{ route('order.invoice.list') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                        class="fa fa-list"> </span> Orders </a>
+                        class="fa fa-list"> </span> Order List</a>
 
             </div>
         </div>
@@ -41,27 +39,32 @@
                     <!-- left column -->
                     <div class="col-md-12">
                         <div class="card">
-                            <form action="{{ route('order.invoice.create') }}" method="post">
+                            <form
+                                action="{{ isset($order) ? route('order.invoice.update',$order->id) : route('order.invoice.create') }}"
+                                method="post">
                                 @csrf
+                                @isset($order)
+                                    @method('PUT')
+                                @endisset
                                 <div class="card-header">
                                     <h3 class="card-title">
-                                        Order Details
+                                        Order Details {{ isset($order) ? ": Edit Mode $order->reference" : '' }}
                                         <span>
                                             &nbsp;
                                             @can('view.customer.ledger')
                                                 <a href="javascript:void(0)" data-toggle="modal"
-                                                   data-target="#customer_ledgerform"
-                                                   class="btn btn-sm btn-secondary float-md-right"
-                                                   style="margin-left: 2px;">Customer Ledger </a>
+                                                    data-target="#customer_ledgerform"
+                                                    class="btn btn-sm btn-secondary float-md-right"
+                                                    style="margin-left: 2px;">Customer Ledger </a>
                                             @endcan
                                             @can('increase.customer.credit.limit')
                                                 <a href="javascript:void(0)" data-toggle="modal" data-target="#credit_limitform"
-                                                   class="btn btn-sm btn-success float-md-right"
-                                                   style="margin-left: 2px;">Increase Limit </a>
+                                                    class="btn btn-sm btn-success float-md-right"
+                                                    style="margin-left: 2px;">Increase Limit </a>
                                             @endcan
                                             @can('add.customer')
                                                 <a href="javascript:void(0)" data-toggle="modal" data-target="#customermodal"
-                                                   class="btn btn-sm btn-primary float-md-right">Add New</a>
+                                                    class="btn btn-sm btn-primary float-md-right">Add New</a>
                                             @endcan
                                             <span class="text text-danger fa fa-mobile">Send SMS: </span> <input
                                                 type="checkbox" name="sms" id="sms" />
@@ -72,7 +75,7 @@
                                 <div class="card-body">
 
                                     <input type="hidden" name="order_date" class="form-control datepicker"
-                                           value="{{ date('Y-m-d') }}" />
+                                        value="{{ date('Y-m-d') }}" />
 
                                     <div class="row">
                                         <div class="col-md-6">
@@ -80,8 +83,12 @@
                                                 <label>Customer Type</label>
                                                 <select name="account_type" id="account_type" class="form-control" required>
                                                     <option value="" disabled selected>Select...</option>
-                                                    <option value="Retail">Retail</option>
-                                                    <option value="Wholesale">WholeSale</option>
+                                                    <option value="Retail"
+                                                        {{ (isset($order) && $order->customer->type) == 'Retail' ? 'selected' : '' }}>
+                                                        Retail</option>
+                                                    <option value="Wholesale"
+                                                        {{ (isset($order) && $order->customer->type) == 'WholeSale' ? 'selected' : '' }}>
+                                                        WholeSale</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -90,20 +97,24 @@
                                                 <label>Customer</label>
                                                 <div class="form-group">
                                                     <select name="customer_id" id="customer_record"
-                                                            class="form-control select2-single">
-
+                                                        class="form-control select2-single">
+                                                        @if (isset($order))
+                                                            <option value="{{ $order->customer->id }}">
+                                                                {{ $order->customer->name }}</option>
+                                                        @endif
                                                     </select>
 
                                                     <div class="form-group">
-                                                <span class="text text-danger ion-android-alert"
-                                                      id="credit_balance"></span>
+                                                        <span class="text text-danger ion-android-alert"
+                                                            id="credit_balance"></span>
                                                     </div>
                                                 </div>
                                                 {{-- <div class="form-group" style="border: 1px solid rgba(64, 44, 45, 0.4)">
                                                     <input type="text" class="form-control" name="reference" id="reference"
                                                         placeholder="Reference" />
                                                 </div> --}}
-                                                <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create
+                                                <button type="submit"
+                                                    class="btn btn-sm btn-info float-md-right ml-3">Create
                                                     Invoice</button>
                                             </div>
                                         </div>
@@ -113,7 +124,7 @@
 
                         </div>
                     </div>
-                    <div class="col-md-6" >
+                    <div class="col-md-6">
                         <!-- general form elements -->
                         <div class="card">
                             <div class="card-header">
@@ -231,7 +242,8 @@
                                                 <tr>
                                                     {{-- <td>{{ $loop->iteration }}</td> --}}
                                                     <td class="text-left">{{ $product->attributes['store'] }}</td>
-                                                    <td class="text-left">{{ $product->attributes['code'] }} - {{ $product->name }}</td>
+                                                    <td class="text-left">{{ $product->attributes['code'] }} -
+                                                        {{ $product->name }}</td>
 
                                                     <form action="{{ route('cart.update') }}" method="post"
                                                         id="p{{ $product->id }}">
@@ -244,7 +256,7 @@
                                                                     style="min-width:65px;"
                                                                     onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
                                                                     value="{{ $product->price }}"
-                                                                    data-val="{{ $product->attributes['cost_price'] }}"
+                                                                    data-val="{{ $product->attributes['selling_price'] }}"
                                                                     data-value="p{{ $product->id }}">
                                                                 <span style="color: red;"
                                                                     id="valid_price{{ $product->id }}"></span>
@@ -459,7 +471,7 @@
                                     $customers = clone $customers;
                                 @endphp
                                 <option value="">Select...</option>
-                                @foreach ($customers->where('branch_id', 'LIKE', App\Models\User::userBranchAction())->get() as $data)
+                                @foreach ($customers as $data)
                                     <option value="{{ $data->id }}">{{ $data->code }}-{{ $data->name }}
                                     </option>
                                 @endforeach
@@ -645,13 +657,13 @@
         $('.quantity,.price').keyup(function() {
             id = $(this).attr('data-value');
             $("#valid_qty" + id.substr(1)).html("");
-            if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
-                    'max-qty'))) {
-                $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $('#quantity' +
-                    id.substr(1)).attr('max-qty') + ")");
-                $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
-                return false;
-            }
+            // if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
+            //         'max-qty'))) {
+            //     $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $('#quantity' +
+            //         id.substr(1)).attr('max-qty') + ")");
+            //     $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
+            //     return false;
+            // }
             delay(function() {
 
                 $.ajax({

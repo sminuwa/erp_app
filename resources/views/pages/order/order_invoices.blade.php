@@ -46,7 +46,8 @@
                                     @endcan
                                     @can('make.daily.sale')
                                         <a href="{{ route('order.invoice.index') }}" class="btn btn-sm btn-secondary"
-                                            style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Order Invoice</a>
+                                            style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Order
+                                            Invoice</a>
                                     @endcan
                                 </div>
                             </div>
@@ -73,6 +74,7 @@
                                             <th>Date</th>
                                             <th>Name</th>
                                             <th>Invoice No</th>
+                                            <th>STATUS</th>
                                             <th>Total</th>
                                             <th>Actions</th>
                                         </tr>
@@ -92,41 +94,57 @@
                                                 </td>
                                                 <td>{{ $order->customer->name }}</td>
                                                 <td>{{ $order->invoice_no }}</td>
+                                                <td>{{ $order->order_status }}</td>
                                                 <td align="right">&#8358;{{ number_format($order->total, 2, '.', ',') }}
                                                 </td>
                                                 <td align="center">
-                                                    @can("verify.invoice")
-                                                        <a href="javascript:void(0)" data-toggle="modal"
-                                                            data-target="#order_detail_form{{ $order->id }}"
-                                                            data-val="{{ $order->id }}" class="btn btn-success btn-sm show">
-                                                            <i class="fa fa-eye" aria-hidden="true"></i>
-                                                        </a>
-                                                    @endcan
-
-                                                    <a href="{{ route('order.invoice.print', $order->id) }}"
-                                                        target="_BLANK" class="btn btn-secondary btn-sm">
-                                                        <i class="fa fa-print" aria-hidden="true"></i>
-                                                    </a>
-
-                                                    @can('delete.daily.sale')
-                                                        <button class="btn btn-danger btn-sm" type="button"
-                                                            onclick="deleteItem({{ $order->id }})">
-                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-default dropdown-toggle" type="button"
+                                                            id="dropdownMenuButton" data-toggle="dropdown"
+                                                            aria-haspopup="true" aria-expanded="false">
+                                                            Action
                                                         </button>
-                                                        <form id="delete-form-{{ $order->id }}"
-                                                            action="{{ route('order.invoice.destroy', $order->id) }}" method="post"
-                                                            style="display:none;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                        </form>
-                                                    @endcan
+                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                            @can('verify.invoice')
+                                                                <a href="javascript:void(0)" data-toggle="modal"
+                                                                    data-target="#order_detail_form{{ $order->id }}"
+                                                                    data-val="{{ $order->id }}"
+                                                                    class="btn btn-success btn-sm show">
+                                                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                                                </a>
+                                                            @endcan
+                                                            @if ($order->order_status == 'Pending')
+                                                                <a href="{{ route('order.invoice.edit', $order->id) }}"
+                                                                    target="_BLANK" class="btn btn-secondary btn-sm">
+                                                                    <i class="fa fa-edit" aria-hidden="true"></i>
+                                                                </a>
+                                                            @endif
+                                                            <a href="{{ route('order.invoice.print', $order->id) }}"
+                                                                target="_BLANK" class="btn btn-secondary btn-sm">
+                                                                <i class="fa fa-print" aria-hidden="true"></i>
+                                                            </a>
+                                                            @if ($order->order_status == 'Pending')
+                                                                @can('delete.daily.sale')
+                                                                    <button class="btn btn-danger btn-sm" type="button"
+                                                                        onclick="deleteItem({{ $order->id }})">
+                                                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                    </button>
+                                                                    <form id="delete-form-{{ $order->id }}"
+                                                                        action="{{ route('order.invoice.destroy', $order->id) }}"
+                                                                        method="post" style="display:none;">
+                                                                        @csrf
+                                                                        @method('DELETE')
+                                                                    </form>
+                                                                @endcan
+                                                            @endif
+                                                        </div>
+                                                    </div>
                                                 </td>
                                             </tr>
                                             <div class="modal fade" id="order_detail_form{{ $order->id }}"
                                                 style="display: none;" aria-hidden="true">
                                                 @include('pages.order.order_invoice_modal')
                                             </div>
-
                                         @endforeach
                                     </tbody>
                                     <tfoot>
@@ -134,6 +152,7 @@
                                             <th>Date</th>
                                             <th>Name</th>
                                             <th>Invoice No</th>
+                                            <th>STATUS</th>
                                             <th style="text-align:right">&#8358;{{ number_format($total, 2, '.', ',') }}
                                             </th>
                                             <th>Actions</th>
@@ -223,7 +242,8 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Invoice Verification/Stock out Panel: {{ optional($order)->customer->name }} | Invoice:
+                        <h5 class="modal-title">Invoice Verification/Stock out Panel: {{ optional($order)->customer->name }} |
+                            Invoice:
                             {{ optional($order)->invoice_no }}</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
@@ -275,7 +295,7 @@
                     url: "{{ route('orders.load') }}",
                     data: {
                         order_id: order_id,
-                        type:'order'
+                        type: 'order'
                     }
                 }).done(function(data) {
                     $('.display').html();

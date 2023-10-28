@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Classes\Transaction;
+use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -11,6 +12,7 @@ use App\Models\OrderInvoiceDetail;
 use App\Models\Product;
 use App\Models\Proformer;
 use App\Models\ProformerDetail;
+use App\Models\Store;
 use Brian2694\Toastr\Facades\Toastr;
 use Darryldecode\Cart\Cart;
 use Illuminate\Http\Request;
@@ -509,7 +511,7 @@ class InvoiceController extends Controller
             DB::rollBack();
             throw $ex;
         }
-        \Cart::clear();
+        //\Cart::clear();
 
         session()->flash('Order invoice created successfully');
         return redirect()->route('order.invoice.show', $order_id);
@@ -560,7 +562,6 @@ class InvoiceController extends Controller
     }
     public function updateInvoice(Request $request, Order $order)
     {
-
         $invoice = $order->invoice_no;
         $inputs = $request->except('_token');
 
@@ -818,5 +819,153 @@ class InvoiceController extends Controller
             $items[$content->id] = $content->quantity;
         }
         return $items;
+    }
+    public function editOrderInvoice(Request $request, OrderInvoice $order)
+    {
+       
+        $user_branch = User::userBranchAction();
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
+            ->join('stores', 'stores.id', 'store_products.store_id')
+            ->join('products', 'products.id', 'store_products.product_id')
+            ->join('branches', 'branches.id', 'stores.branch_id')
+            ->join('branch_product_prices', function ($join) {
+                $join->on('branch_product_prices.product_id', '=', 'products.id')
+                    ->on('branch_product_prices.branch_id', '=', 'branches.id');
+
+            })
+            ->where('stores.branch_id', 'LIKE', $user_branch)
+            ->where('branch_product_prices.status', 1)
+            ->orderBy('products.name')->orderBy('stores.name')->get();
+
+
+        $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
+        if (\Cart::getContent()->isEmpty())
+            $this->loadOrderInvoiceToCart($order);
+        $cart_products = \Cart::getContent();
+       //dd($cart_products);
+        $categories = Category::orderBy('name', 'ASC')->get();
+        $store = Store::where('id', 'LIKE', $user_branch)->get();
+        return view('pages.pos.order_invoice', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'order'));
+    }
+    public function loadOrderInvoiceToCart(OrderInvoice $order)
+    {
+
+        foreach ($order->order_items()->get() as $item) {
+            $selling_price = $item->selling_price;
+            $cost_price = $item->cost_price;
+            $qty_available = $item->qty_available;
+            $store = $item->storeProduct->store->name;
+            $qty = $item->quantity;
+            $add = \Cart::add([
+                'id' => $item->store_product_id,
+                'name' => $item->storeProduct->product->name,
+                'price' => $item->sold_price,
+                'quantity' => $qty == 0 ? 1 : $qty,
+                'attributes' => array('cost_price' => $cost_price, 'code' => $item->storeProduct->product->code, 'selling_price' => $selling_price, 'qty_available' => $qty_available, 'discount' => 0, 'store' => $store),
+            ]);
+        }
+
+        //dd(\Cart::getContent());
+    }
+    public function updateOrderInvoice(Request $request, OrderInvoice $order)
+    {
+        $invoice = $order->invoice_no;
+        $inputs = $request->except('_token');
+
+        $rules = [];
+        if ($request->has('customer') && $request->customer == "" && $request->customer_id == "") {
+            $rules = [
+                'customer' => 'required',
+            ];
+        }
+        if ($request->has('customer_id') && $request->customer_id == "" && $request->customer == "") {
+            $rules = [
+                'customer' => 'required',
+            ];
+        }
+
+        $customMessages = [
+            'customer_id.required' => 'Select a Customer first!.',
+            //'customer_id.integer' => 'Invalid Customer!.'
+        ];
+
+        $validator = Validator::make($inputs, $rules, $customMessages);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $customer_id = $request->input('customer_id');
+
+
+
+        $sub_total = str_replace(',', '', \Cart::getSubTotal());
+        $tax = 0;
+        $total = str_replace(',', '', \Cart::getTotal());
+
+
+        $pay = $request->input('pay');
+        //$due = $total - $pay;
+        $order_id = $order->id;
+        $amount_paid = 0;
+
+        //$customer_id = $request->input('customer_id');
+        DB::beginTransaction();
+        try {
+            $due_date = $request->input('due_date');
+            DB::table('order_invoices')->where('id', $order->id)->update([
+                'customer_id' => $customer_id,
+                'due' => $total,
+                'order_date' => $request->order_date,
+                'order_status' => 'pending',
+                'total_products' => \Cart::getTotalQuantity(),
+                'sub_total' => $sub_total,
+                'vat' => $tax,
+                'total' => $total,
+                'invoice_no' => $invoice,
+                'modified_by' => Auth::id(),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ]);
+
+            $contents = \Cart::getContent();
+            $products = [];
+            $total_discount = 0;
+
+            foreach ($contents as $content) {
+                //Put back the previous quantity
+                /*$restored_qty = $order->order_items()->where('store_product_id', $content->id)->first();
+
+               if($restored_qty?->quantity >0)
+                   DB::table('store_products')->where('id', $content->id)->increment('qty_available', $restored_qty->$restored_qty?->quantity);*/
+                $total_discount += $content->attributes['discount'] * $content->quantity;
+                $store = StoreProduct::find($content->id);
+                $qtyAval = $store->qty_available;
+                //DB::table('order_invoice_details')->where('order_id', $order->id)->delete();
+                DB::table('order_invoice_details')->insert([
+                    'store_product_id' => $content->id,
+                    'order_id' => $order->id,
+                    'quantity' => $content->quantity,
+                    'selling_price' => $content->attributes['selling_price'],
+                    'sold_price' => $content->price,
+                    'cost_price' => $content->attributes['cost_price'],
+                    'total' => $content->getPriceSum(),
+                    'avail_qty_before_sale' => $qtyAval,
+                    'status' => 1,
+                    'last_modified_by' => Auth::id(),
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]);
+            }
+
+            $action = "Updated invoice $invoice: $total";
+            AuditLog::auditLog(Auth::id(), $action);
+            DB::commit();
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            throw $ex;
+        }
+        \Cart::clear();
+
+        session()->flash('Order invoice updated successfully');
+        return redirect()->route('order.invoice.show', $order_id);
     }
 }

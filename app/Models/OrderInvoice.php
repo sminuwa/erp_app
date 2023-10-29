@@ -26,11 +26,11 @@ class OrderInvoice extends Model
     }
     public function sold()
     {
-        return $this->belongsTo(User::class , 'sold_by', 'id');
+        return $this->belongsTo(User::class, 'sold_by', 'id');
     }
     public function issued()
     {
-        return $this->belongsTo(User::class , 'issued_by', 'id');
+        return $this->belongsTo(User::class, 'issued_by', 'id');
     }
     public function amount()
     {
@@ -38,21 +38,26 @@ class OrderInvoice extends Model
     }
     public function order_items()
     {
-        return $this->hasMany(OrderInvoiceDetail::class,'order_id');
+        return $this->hasMany(OrderInvoiceDetail::class, 'order_id');
     }
-    public function branch(){
+    public function branch()
+    {
         return $this->order_items()->first()->branch();
     }
 
-    public static function generateNewNumber($prefix = 'ODR', $length = 4){
-        $prefix = $prefix.date('ym').auth()->user()->branch->code;
-        $record = self::where('reference', 'like', '%'.$prefix.'%')->orderBy('reference', 'desc')->first();
-        if($record){
+    public static function generateNewNumber($prefix = 'ODR', $length = 4)
+    {
+        $prefix = $prefix . date('ym') . auth()->user()->branch->code;
+        $record = self::where('reference', 'like', '%' . $prefix . '%')->orderBy('reference', 'desc')->first();
+        if ($record) {
             $number = $record->reference;
-            $new = intval(substr($number,strlen($prefix)))+1;
-            return $prefix.str_pad($new, $length,0,STR_PAD_LEFT);
+            $new = intval(substr($number, strlen($prefix))) + 1;
+            return $prefix . str_pad($new, $length, 0, STR_PAD_LEFT);
         }
-        return $prefix.str_pad(1, $length,0,STR_PAD_LEFT);
+        return $prefix . str_pad(1, $length, 0, STR_PAD_LEFT);
     }
-
+    public function linked_order()
+    {
+        return $this->hasOne(Order::class, 'order_invoice_id', 'id');
+    }
 }

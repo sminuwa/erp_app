@@ -39,10 +39,10 @@
                                 </h3>
                             </div>
                             <div class="row">
-                                <div class="col-sm-2">
+                                <div class="col-sm-4">
                                     @can('view.daily.sale')
-                                        <a href="{{ route('orders.approved') }}" class="btn btn-sm btn-secondary"
-                                            style="margin-left: 2px;"><span class="fa fa-list"> </span> View Sales </a>
+                                        <a href="{{ route('order.invoice.index') }}" class="btn btn-sm btn-secondary"
+                                            style="margin-left: 2px;"><span class="fa fa-list"> </span> View Orders </a>
                                     @endcan
                                     @can('make.daily.sale')
                                         <a href="{{ route('order.invoice.index') }}" class="btn btn-sm btn-secondary"
@@ -115,8 +115,14 @@
                                                             @endcan
                                                             @if ($order->order_status == 'Pending')
                                                                 <a href="{{ route('order.invoice.edit', $order->id) }}"
-                                                                    target="_BLANK" class="btn btn-secondary btn-sm">
+                                                                   class="btn btn-secondary btn-sm">
                                                                     <i class="fa fa-edit" aria-hidden="true"></i>
+                                                                </a>
+                                                            @endif
+                                                            @if ($order->order_status == 'Pending')
+                                                                <a href="{{ route('order.invoice.linking', $order->id) }}" title="Linking"
+                                                                    class="btn btn-secondary btn-sm">
+                                                                    <i class="fa fa-link" aria-hidden="true"></i>
                                                                 </a>
                                                             @endif
                                                             <a href="{{ route('order.invoice.print', $order->id) }}"
@@ -166,10 +172,6 @@
                                                 class="btn btn-sm btn-secondary" style="margin-left: 2px;">Customer Ledger </a>
                                         @endcan
 
-                                    </div>
-                                    <div class="col-sm-6 text-danger">
-                                        <strong>Total Record is of
-                                            {{ number_format(App\Models\Order::count('*'), 0, ',', '') }}</strong>
                                     </div>
                                 </div>
                             </div>

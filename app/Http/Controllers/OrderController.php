@@ -150,10 +150,10 @@ class OrderController extends Controller
     {
         $search_value = $request->refno;
 
-        $orders = Proformer::with('customer')->select('orders.*', 'customers.name')->latest('order_date')->join(
+        $orders = OrderInvoice::with('customer')->select('order_invoices.*', 'customers.name')->latest('order_date')->join(
             'customers',
             'customers.id',
-            'orders.customer_id'
+            'order_invoices.customer_id'
         );
         if (Auth::user()->hasRole('Sales-Manager'))
             $orders = $orders->where('sold_by', Auth::id());
@@ -162,18 +162,16 @@ class OrderController extends Controller
                 'order_invoices.branch_id',
                 'LIKE',
                 User::userBranchAction()
-            )->where(
-                'order_status',
-                'approved'
             )
             ->where(
                 function ($query) use ($search_value) {
-                    $query->where('invoice_no', 'LIKE', "%$search_value%")
+                    $query->where('reference', 'LIKE', "%$search_value%")
                         ->orWhere(
                             'customers.name',
                             'LIKE',
                             "%$search_value%"
                         )
+                        ->orWhere('invoice_no', 'LIKE', "%$search_value%")
                         ->orWhere(
                             'customers.phone',
                             'LIKE',

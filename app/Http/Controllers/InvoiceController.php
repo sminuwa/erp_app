@@ -185,7 +185,6 @@ class InvoiceController extends Controller
                     'pay' => $payment_mode == "Credit" ? $amount_paid : $total,
                     'due' => $payment_mode == "Credit" ? ($total - $amount_paid) : 0,
                     'order_date' => $request->order_date,
-                    //date('Y-m-d'),
                     'order_status' => 'approved',
                     'total_products' => \Cart::getTotalQuantity(),
                     'sub_total' => $sub_total,
@@ -193,7 +192,7 @@ class InvoiceController extends Controller
                     'total' => $total,
                     'invoice_no' => $invoice,
                     'sold_by' => Auth::id(),
-                    'system_id' => gethostname(),
+                    'order_invoice_id'=>$request->order_invoice_id,
                     'branch_id' => User::userBranchAction(),
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now()
@@ -272,6 +271,11 @@ class InvoiceController extends Controller
                     'ref_no' => $invoice,
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
+                ]);
+                DB::table('order_invoices')->where('id', $request->order_invoice_id)->update([
+                    'order_status' => 'Completed',
+                    'approved_by' => auth()->id(),
+                    'updated_at' => Carbon::now()
                 ]);
 
             }
@@ -820,9 +824,35 @@ class InvoiceController extends Controller
         }
         return $items;
     }
+    public function linkOrderInvoice(Request $request, OrderInvoice $order)
+    {
+        $user_branch = User::userBranchAction();
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
+            ->join('stores', 'stores.id', 'store_products.store_id')
+            ->join('products', 'products.id', 'store_products.product_id')
+            ->join('branches', 'branches.id', 'stores.branch_id')
+            ->join('branch_product_prices', function ($join) {
+                $join->on('branch_product_prices.product_id', '=', 'products.id')
+                    ->on('branch_product_prices.branch_id', '=', 'branches.id');
+
+            })
+            ->where('stores.branch_id', 'LIKE', $user_branch)
+            ->where('branch_product_prices.status', 1)
+            ->orderBy('products.name')->orderBy('stores.name')->get();
+
+
+        $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name');
+        if (\Cart::getContent()->isEmpty())
+            $this->loadOrderInvoiceToCart($order);
+        $cart_products = \Cart::getContent();
+        //dd($cart_products);
+        $categories = Category::orderBy('name', 'ASC')->get();
+        $store = Store::where('id', 'LIKE', $user_branch)->get();
+        return view('pages.pos.index', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'order'));
+    }
     public function editOrderInvoice(Request $request, OrderInvoice $order)
     {
-       
+
         $user_branch = User::userBranchAction();
         $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
@@ -842,7 +872,7 @@ class InvoiceController extends Controller
         if (\Cart::getContent()->isEmpty())
             $this->loadOrderInvoiceToCart($order);
         $cart_products = \Cart::getContent();
-       //dd($cart_products);
+        //dd($cart_products);
         $categories = Category::orderBy('name', 'ASC')->get();
         $store = Store::where('id', 'LIKE', $user_branch)->get();
         return view('pages.pos.order_invoice', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'order'));

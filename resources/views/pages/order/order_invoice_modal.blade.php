@@ -14,7 +14,8 @@
                     @csrf
                     @method('PUT')
                     <span class="fa fa-id-badge bold"> Current Status:<span class="text text-primary">
-                            {{ $order->order_status }}</span>
+                            {{ $order->order_status }}</span> {{ $order->linked_order != null ? 'and linked with ' : '' }}
+                        {{ $order->linked_order->reference ?? '' }}
                         <div class="display">
 
                         </div>
@@ -23,24 +24,24 @@
                         <input type="hidden" name="modal" value="modal" />
                         <input type="hidden" name="reference" value="{{ $order?->reference }}" />
 
-                        <textarea name="comment" id="comment" class="form-control" rows="5" cols="50" placeholder="Comment">{{$order->comment}}</textarea>
+                        <textarea name="comment" id="comment" class="form-control" rows="5" cols="50" placeholder="Comment">{{ $order->comment }}</textarea>
 
                         <select name="order_status" id="order_status" class="form-control">
                             @if ($order->order_status == 'Pending')
-                                <option value="Pending"
-                                    {{ $order->order_status == 'Completed' ? 'selected' : '' }}>Pending</option>
+                                <option value="Pending" {{ $order->order_status == 'Completed' ? 'selected' : '' }}>Pending
+                                </option>
                             @endif
-                            @if ($order->order_status == 'Pending' || $order->order_status == 'Approved')
-                                <option value="Approved"
-                                    {{ $order->order_status == 'Approved' ? 'selected' : '' }}>Approved</option>
+                            @if ($order->order_status == 'Pending')
+                                <option value="Closed" {{ $order->order_status == 'Closed' ? 'selected' : '' }}>Closed
+                                </option>
                             @endif
-                            @if ($order->order_status == 'Approved' || $order->order_status == 'Completed')
-                                <option value="Completed"
-                                    {{ $order->order_status == 'Completed' ? 'selected' : '' }}>Completed</option>
+                            @if ($order->order_status == 'Closed' || $order->order_status == 'Completed')
+                                <option value="Completed" {{ $order->order_status == 'Completed' ? 'selected' : '' }}>
+                                    Completed</option>
                             @endif
                         </select>
                         <div class="modal-footer">
-                            @if ($order->order_status == 'Pending' || $order->order_status == 'Approved')
+                            @if ($order->order_status == 'Pending' || $order->order_status == 'Closed')
                                 <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i>
                                     Submit
                                 </button>

@@ -278,6 +278,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/preforma/create', [InvoiceController::class, 'final_proformer'])->name('proformer.create');
         Route::post('/order-invoice/create', [InvoiceController::class, 'final_order_invoice'])->name('order.invoice.create');
         Route::get('/order-invoice/edit/{order}', [InvoiceController::class, 'editOrderInvoice'])->name('order.invoice.edit');
+        Route::get('/order-invoice/link/{order}', [InvoiceController::class, 'linkOrderInvoice'])->name('order.invoice.linking');
         Route::put('/order-invoice/update/{order}', [InvoiceController::class, 'updateOrderInvoice'])->name('order.invoice.update');
         Route::get('/print/{customer_id}', [InvoiceController::class, 'print'])->name('invoice.print');
         Route::get('/order-print/{order_id}', [InvoiceController::class, 'order_print'])->name('invoice.order_print');

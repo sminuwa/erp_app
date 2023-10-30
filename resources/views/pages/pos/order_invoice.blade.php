@@ -124,7 +124,7 @@
 
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 cart-container">
                         <!-- general form elements -->
                         <div class="card">
                             <div class="card-header">
@@ -206,7 +206,7 @@
                         </div>
                         <!-- /.card -->
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 cart-container">
 
                         <div class="card card-default">
                             <div class="card-header">
@@ -333,7 +333,6 @@
                         </div>
 
                     </div>
-
 
                     <!--/.col (left) -->
 
@@ -501,6 +500,10 @@
     <!-- Sweet Alert Js -->
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script>
+        /*$('.cart-container').addClass('d-none')
+        $('select[name=account_type]').change( () => {
+            $('.cart-container').removeClass('d-none')
+        })*/
         $(function() {
             $("#example1").DataTable();
 

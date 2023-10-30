@@ -59,7 +59,17 @@ class PosController extends Controller
         $debtor = new CustomerController();
         $receipt_no = ""; //$debtor->generateReceiptNo();
         if (request()->routeIs('proformer.index')) {
-            $stores = Product::orderBy('code', 'asc');
+            $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.code AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
+                ->join('stores', 'stores.id', 'store_products.store_id')
+                ->join('branches', 'branches.id', 'stores.branch_id')
+                ->join('products', 'products.id', 'store_products.product_id')
+                ->join('branch_product_prices', function ($join) {
+                    $join->on('branch_product_prices.product_id', '=', 'products.id')
+                        ->on('branch_product_prices.branch_id', '=', 'branches.id');
+                })
+
+                ->where('stores.branch_id', 'LIKE', $user_branch)
+                ->where('branch_product_prices.status', 1)->get();
             return view('pages.pos.proformer', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no'));
         }
         if (request()->routeIs('order.invoice.index'))

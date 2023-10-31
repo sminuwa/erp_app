@@ -90,7 +90,12 @@
                                                 </td>
                                                 <td>{{ $order->reference }}</td>
                                                 <td>{{ $order->customer->name }}</td>
-                                                <td>{{ $order->status == 0 ? 'Pending' : ($order->status == 1 ? 'Closed' : 'Completed') }}</td>
+                                                <td>
+                                                    {!!
+                                                        $order->status == 0 ? '<span class="badge badge-warning">Pending</span>':
+                                                        ($order->status == 1 ? '<span class="badge badge-success">Close</span>': '<span class="badge badge-success">Completed</span>' )
+                                                    !!}
+                                                </td>
                                                 <td align="right">&#8358;{{ number_format($order->total, 2, '.', ',') }}
                                                 </td>
                                                 <td align="center">

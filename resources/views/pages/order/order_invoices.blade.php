@@ -122,7 +122,7 @@
                                                                     @csrf
                                                                     <button type="submit"
                                                                        class="dropdown-item">
-                                                                        <i class="fa fa-link" aria-hidden="true"></i> Close
+                                                                        <i class="fa fa-close" aria-hidden="true"></i> Close
                                                                     </button>
                                                                 </form>
 

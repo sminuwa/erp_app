@@ -37,7 +37,7 @@ class ProductController extends Controller
      */
     public function index(Index $request)
     {
-        return view('pages.products.index', ['records' => Product::orderBy('created_at', 'desc')->limit(10)->get()]);
+        return view('pages.products.index', ['records' => Product::orderBy('created_at', 'desc')->get()]);
     } /**
       * Display the specified resource.
       *

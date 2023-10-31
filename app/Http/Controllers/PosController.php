@@ -48,7 +48,6 @@ class PosController extends Controller
                 ->where('products.category_id', 'LIKE', $category_id);
         }
 
-
         $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name');
         $cart_products = \Cart::getContent();
         $categories = Category::orderBy('name', 'ASC')->get();

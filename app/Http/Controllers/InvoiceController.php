@@ -192,6 +192,7 @@ class InvoiceController extends Controller
                     'total' => $total,
                     'invoice_no' => $invoice,
                     'sold_by' => Auth::id(),
+                    'status' => 0,
                     'order_invoice_id'=>$request->order_invoice_id,
                     'branch_id' => User::userBranchAction(),
                     'created_at' => Carbon::now(),
@@ -359,7 +360,7 @@ class InvoiceController extends Controller
                 'total' => $total,
                 'invoice_no' => $invoice,
                 'sold_by' => Auth::id(),
-//                'system_id' => gethostname(),
+                'status' => 1,
                 'branch_id' => User::userBranchAction(),
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
@@ -475,7 +476,7 @@ class InvoiceController extends Controller
                 'total' => $total,
                 'invoice_no' => $invoice,
                 'sold_by' => Auth::id(),
-//                'system_id' => gethostname(),
+                'status' => 0,
                 'branch_id' => User::userBranchAction(),
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
@@ -646,7 +647,7 @@ class InvoiceController extends Controller
                 'total' => $total,
                 'invoice_no' => $invoice,
                 'modified_by' => Auth::id(),
-//                'system_id' => gethostname(),
+                'status' => 0,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ]);

@@ -68,8 +68,12 @@
                                 <div class="col-sm-4 invoice-col">
                                     <b>Invoice
                                         No: {{ $order->invoice_no }}</b><br><br>
-                                    <b>Order Status:</b> <span
-                                        class="badge {{ $order->order_status == 'approved' ? 'badge-success' : 'badge-warning' }}">{{ ucfirst($order->order_status) }}</span><br>
+                                    <b>Order Status:</b>
+                                    {!!
+                                        $order->status == 0 ? '<span class="badge badge-warning">Pending</span>':
+                                        ($order->status == 1 ? '<span class="badge badge-success">Close</span>': '<span class="badge badge-success">Completed</span>' )
+                                    !!}
+
                                 </div>
                                 <!-- /.col -->
                             </div>
@@ -126,7 +130,7 @@
                         <!-- this row will not appear when printing -->
                         <div class="row no-print">
                             <div class="col-12">
-                                
+
                                 <a href="{{ route('order.invoice.list') }}" class="btn btn-primary btn-sm float-right"
                                     style="margin-right: 5px;">
                                     <i class="fa fa-list"></i> View Orders

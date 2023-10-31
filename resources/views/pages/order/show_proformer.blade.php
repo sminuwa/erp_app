@@ -123,6 +123,7 @@
 
                         <!-- this row will not appear when printing -->
                         <div class="row no-print">
+
                             <div class="col-12">
 
                                 <a href="{{ route('proformer.list') }}" class="btn btn-primary btn-sm float-right"
@@ -133,6 +134,8 @@
                                 <a href="{{ route('proformer.index') }}" class="btn btn-secondary btn-sm float-right">
                                     <i class="fa fa-plus-circle" aria-hidden="true"> New Sales</i>
                                 </a>
+
+
                             </div>
                         </div>
                     </div>

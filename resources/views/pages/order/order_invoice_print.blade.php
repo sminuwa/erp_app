@@ -87,17 +87,14 @@
                         </div>
                         <div class="col-sm-3 invoice-col">
                             <div style="color:chocolate;">
-                                @php
-                                    $uc = substr($order->invoice_no, 0, 6) . substr($order->invoice_no, 6, 10) + 3000;
-                                @endphp
-                                {{ QrCode::size(70)->backgroundColor(255, 55, 0)->generate("$order->total\n$uc\n\n.") }}<br />
+                                {{ QrCode::size(70)->generate($order->total) }}<br />
                                 <span style="font-size:28px;margin-top:-5px">
                                     Order Invoice
                                 </span>
                             </div>
                         </div>
                         <div class="col-sm-4">
-                            <b>Invoice No:</b> {{ $order->invoice_no }}<br>
+                            <b>Reference:</b> {{ $order->reference }}<br>
                             <b>Date and Time:
                                 {{ \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</b><br>
                             <b>Prepared By</b> <span class="ion-card"></span> {{ $order->sold->name }}<br />

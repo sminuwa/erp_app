@@ -123,7 +123,7 @@
                                                                    class="dropdown-item">
                                                                     <i class="fa fa-link" aria-hidden="true"></i> Create Invoice
                                                                 </a>
-                                                                <form action="{{ route('order.invoice.close', $order->id) }}" method="post">
+                                                                <form action="{{ route('order.invoice.close', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this order?')">
                                                                     @csrf
                                                                     <button type="submit"
                                                                        class="dropdown-item">
@@ -131,15 +131,13 @@
                                                                     </button>
                                                                 </form>
 
-                                                                <button class="dropdown-item" type="button"
-                                                                        onclick="deleteItem({{ $order->id }})">
-                                                                    <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                                                </button>
-                                                                <form id="delete-form-{{ $order->id }}"
-                                                                      action="{{ route('order.invoice.destroy', $order->id) }}"
-                                                                      method="post" style="display:none;">
+
+                                                                <form id="delete-form-{{ $order->id }}" action="{{ route('order.invoice.destroy', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to close this order?')">
                                                                     @csrf
                                                                     @method('DELETE')
+                                                                    <button class="dropdown-item" type="submit">
+                                                                        <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                                                    </button>
                                                                 </form>
 
                                                             @endif

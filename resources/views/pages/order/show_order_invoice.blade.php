@@ -45,10 +45,6 @@
                                     <i class="fa fa-plus-circle" aria-hidden="true"> New Order</i>
                                 </a>
 
-                                <a href="{{ route('order.invoice.show', $order->id) }}"
-                                   class="btn btn-info btn-sm ">
-                                    <i class="fa fa-eye" aria-hidden="true"></i> View
-                                </a>
                                 <a href="{{ route('order.invoice.print', $order->id) }}"
                                    target="_BLANK" class="btn btn-dark btn-sm ">
                                     <i class="fa fa-print" aria-hidden="true"></i> Print

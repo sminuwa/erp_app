@@ -748,6 +748,10 @@ class OrderController extends Controller
 
     }
     public function orderInvoiceClose(Request $request, OrderInvoice $order){
-        return $order;
+        $order->status = 1;
+        if($order->save()){
+            return back()->with('success', 'Order closed successfully');
+        }
+        return back()->with('error', 'Something went wrong.');
     }
 }

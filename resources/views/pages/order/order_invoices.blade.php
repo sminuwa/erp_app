@@ -105,12 +105,14 @@
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            @can('verify.invoice')
-                                                                <a href="{{ route('order.invoice.show', $order->id) }}"
-                                                                    class="dropdown-item">
-                                                                    <i class="fa fa-eye" aria-hidden="true"></i> View
-                                                                </a>
-                                                            @endcan
+                                                            <a href="{{ route('order.invoice.show', $order->id) }}"
+                                                                class="dropdown-item">
+                                                                <i class="fa fa-eye" aria-hidden="true"></i> View
+                                                            </a>
+                                                            <a href="{{ route('order.invoice.print', $order->id) }}"
+                                                               target="_BLANK" class="dropdown-item">
+                                                                <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                            </a>
                                                             @if ($order->status == 0)
                                                                 <a href="{{ route('order.invoice.edit', $order->id) }}"
                                                                    class="dropdown-item">
@@ -120,25 +122,27 @@
                                                                    class="dropdown-item">
                                                                     <i class="fa fa-link" aria-hidden="true"></i> Create Invoice
                                                                 </a>
-                                                            @endif
-                                                            <a href="{{ route('order.invoice.print', $order->id) }}"
-                                                                target="_BLANK" class="dropdown-item">
-                                                                <i class="fa fa-print" aria-hidden="true"></i> Print
-                                                            </a>
-                                                            @if ($order->order_status == 'Pending')
-                                                                @can('delete.daily.sale')
-                                                                    <button class="dropdown-item" type="button"
-                                                                        onclick="deleteItem({{ $order->id }})">
-                                                                        <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                                                <form action="{{ route('order.invoice.close', $order->id) }}" method="post">
+                                                                    @csrf
+                                                                    <button type="submit"
+                                                                       class="dropdown-item">
+                                                                        <i class="fa fa-link" aria-hidden="true"></i> Close
                                                                     </button>
-                                                                    <form id="delete-form-{{ $order->id }}"
-                                                                        action="{{ route('order.invoice.destroy', $order->id) }}"
-                                                                        method="post" style="display:none;">
-                                                                        @csrf
-                                                                        @method('DELETE')
-                                                                    </form>
-                                                                @endcan
+                                                                </form>
+
+                                                                <button class="dropdown-item" type="button"
+                                                                        onclick="deleteItem({{ $order->id }})">
+                                                                    <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                                                </button>
+                                                                <form id="delete-form-{{ $order->id }}"
+                                                                      action="{{ route('order.invoice.destroy', $order->id) }}"
+                                                                      method="post" style="display:none;">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                </form>
+
                                                             @endif
+
                                                         </div>
                                                     </div>
                                                 </td>

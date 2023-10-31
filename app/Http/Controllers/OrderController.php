@@ -747,4 +747,7 @@ class OrderController extends Controller
         }
 
     }
+    public function orderInvoiceClose(Request $request, OrderInvoice $order){
+        return $order;
+    }
 }

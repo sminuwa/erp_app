@@ -314,6 +314,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/approve/order-invoice/{order}', [OrderController::class, 'approveOrderInvoice'])->name('order.invoice.approve');
         Route::delete('/delete/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
         Route::delete('/order-invoice/delete/{order}', [OrderController::class, 'destroy_order_invoice'])->name('order.invoice.destroy');
+        Route::post('/order-invoice/close/{order}', [OrderController::class, 'orderInvoiceClose'])->name('order.invoice.close');
         Route::delete('/proformer-invoice/delete/{order}', [OrderController::class, 'destroy_proformer'])->name('proformer.destroy');
         Route::get('/download/{id}', [OrderController::class, 'download'])->name('orders.download');
         Route::get('/payment/print/{id}', [OrderController::class, 'printPayment'])->name('orders.payment.print');

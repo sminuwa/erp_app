@@ -43,7 +43,7 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
+<!--                <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
                         <i class="ion-android-list"></i>
                         <p>
@@ -170,7 +170,7 @@
                             </li>
                         @endcan
                     </ul>
-                </li>
+                </li>-->
                 <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
                         <i class="ion-android-list"></i>
@@ -316,28 +316,7 @@
 
                     </ul>
                 </li>
-
-                @can('make.daily.sale')
-                    <li class="nav-item has-treeview">
-                        <a href="{{ route('pos.index') }}" class="nav-link {{ Request::is('pos/*') ? 'active' : '' }}">
-                            <i class="nav-icon ion-cash"></i>
-                            <p>
-                                Point of Sales (POS)
-                            </p>
-                        </a>
-                    </li>
-                @endcan
-                {{-- @can('make.whole.sale')
-                    <li class="nav-item has-treeview">
-                        <a href="{{ route('pos.whole.sale') }}"
-                            class="nav-link {{ Request::is('pos/whole-sale*') ? 'active' : '' }}">
-                            <i class="nav-icon ion-cash"></i>
-                            <p>
-                                Whole Sale (POS)
-                            </p>
-                        </a>
-                    </li>
-                @endcan --}}
+<!--
                 @can('view.daily.sale.report')
                     <li class="nav-item">
                         <a href="{{ route('daily.report') }}"
@@ -346,125 +325,8 @@
                             <p>Daily Report</p>
                         </a>
                     </li>
-                @endcan
-                @can('view.customer')
-                    <li class="nav-item has-treeview {{ Request::is('customers/*') ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ Request::is('customers/*') ? 'active' : '' }}">
-                            <i class="nav-icon ion-android-camera"></i>
-                            <p>
-                                Customers
-                                <i class="right fa fa-angle-left"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            @can('add.customer')
-                                <li class="nav-item">
-                                    <a href="{{ route('customers.index') }}"
-                                        class="nav-link {{ Request::is('customers/manage/*') ? 'active' : '' }}">
-                                        <i class="ion-ios-sunny-outline"></i>
-                                        <p>Manage Customers</p>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('set.customer.opening.balance')
-                                <li class="nav-item">
-                                    <a href="{{ route('customers.create.opening_balance') }}"
-                                        class="nav-link {{ Request::is('customers/opening_balance*') ? 'active' : '' }}">
-                                        <i class="ion-ios-sunny-outline"></i>
-                                        <p>Customer Opening Balance</p>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('view.customer.ledger')
-                                <li class="nav-item">
-                                    <a href="{{ route('customer.ledger') }}"
-                                        class="nav-link {{ Request::is('customers/ledger*') ? 'active' : '' }}">
-                                        <i class="ion-cash"></i>
-                                        <p>General Customer Ledger</p>
-                                    </a>
-                                </li>
-                            @endcan
-                        </ul>
-                    </li>
-                @endcan
-                @can('view.supplier')
-                    <li class="nav-item has-treeview {{ Request::is('supplier*') ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ Request::is('supplier*') ? 'active' : '' }}">
-                            <i class="nav-icon ion-ios-upload-outline"></i>
-                            <p>
-                                Supplier
-                                <i class="right fa fa-angle-left"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="{{ route('suppliers.index') }}"
-                                    class="nav-link {{ Request::is('suppliers/manage/*') ? 'active' : '' }}">
-                                    <i class="ion-ios-sunny-outline"></i>
-                                    <p>Manage Suppliers</p>
-                                </a>
-                            </li>
-                            @can('set.supplier.opening.balance')
-                                <li class="nav-item">
-                                    <a href="{{ route('suppliers.create.opening_balance') }}"
-                                        class="nav-link {{ Request::is('suppliers/opening_balance*') ? 'active' : '' }}">
-                                        <i class="ion-ios-sunny-outline"></i>
-                                        <p>Supplier Opening Balance</p>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('view.supplier.ledger')
-                                <li class="nav-item">
-                                    <a href="{{ route('supplier.ledger') }}"
-                                        class="nav-link {{ Request::is('suppliers/ledger*') ? 'active' : '' }}">
-                                        <i class="ion-ios-sunny-outline"></i>
-                                        <p>General Supplier Ledger </p>
-                                    </a>
-                                </li>
-                            @endcan
-                        </ul>
-                    </li>
-                @endcan
-                @can('view.report')
-                    <li class="nav-item has-treeview {{ Request::is('sales/sales-*') ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ Request::is('sales/sales-*') ? 'active' : '' }}">
-                            <i class="nav-icon ion-social-usd"></i>
-                            <p>
-                                Sales Report
-                                <i class="right fa fa-angle-left"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            @can('view.daily.sale.report')
-                                <li class="nav-item">
-                                    <a href="{{ route('sales.today') }}"
-                                        class="nav-link {{ Request::is('sales/sales-today') ? 'active' : '' }}">
-                                        <i class="fa ion-clock"></i>
-                                        <p>Today's Report</p>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('view.monthly.sale.report')
-                                <li class="nav-item">
-                                    <a href="{{ route('sales.monthly') }}"
-                                        class="nav-link {{ Request::is('sales/sales-monthly*') ? 'active' : '' }}">
-                                        <i class="fa ion-calendar"></i>
-                                        <p>Monthly Report</p>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('view.yearly.sale.report')
-                                <li class="nav-item">
-                                    <a href="{{ route('sales.total') }}"
-                                        class="nav-link {{ Request::is('sales/sales-total') ? 'active' : '' }}">
-                                        <i class="ion-android-locate"></i>
-                                        <p>Total Sales</p>
-                                    </a>
-                                </li>
-                            @endcan
-                        </ul>
-                    </li>
-                @endcan
+                @endcan-->
+
                 @can('menu.setting')
                     <li class="nav-item has-treeview {{ Request::is('settings/*') ? 'menu-open' : '' }}">
                         <a href="#" class="nav-link {{ Request::is('settings/*') ? 'active' : '' }}">
@@ -484,6 +346,22 @@
                                     </a>
                                 </li>
                             @endcan
+                            @can('add.customer')
+                                <li class="nav-item">
+                                    <a href="{{ route('customers.index') }}"
+                                       class="nav-link {{ Request::is('customers/manage/*') ? 'active' : '' }}">
+                                        <i class="ion-ios-sunny-outline"></i>
+                                        <p>Manage Customers</p>
+                                    </a>
+                                </li>
+                            @endcan
+                            <li class="nav-item">
+                                <a href="{{ route('suppliers.index') }}"
+                                   class="nav-link {{ Request::is('suppliers/manage/*') ? 'active' : '' }}">
+                                    <i class="ion-ios-sunny-outline"></i>
+                                    <p>Manage Suppliers</p>
+                                </a>
+                            </li>
                             @can('view.product.group')
                                 <li class="nav-item">
                                     <a href="{{ route('categories.index') }}"

@@ -118,6 +118,8 @@ class CostPrice
                 'existing_quantity' => $record['existing_quantity'],
                 'new_quantity' => $record['new_quantity'],
                 'total_quantity' => $record['quantity'],
+                'existing_cost_price' => $record['existing_cost'],
+                'new_cost_price' => $record['new_cost'],
                 'created_by' => $user->id,
                 'expiry_date' => $record['expiry_date'],
             ];

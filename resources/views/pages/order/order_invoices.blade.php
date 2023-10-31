@@ -106,34 +106,30 @@
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                             @can('verify.invoice')
-                                                                <a href="javascript:void(0)" data-toggle="modal"
-                                                                    data-target="#order_detail_form{{ $order->id }}"
-                                                                    data-val="{{ $order->id }}"
-                                                                    class="btn btn-success btn-sm show">
-                                                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                                                <a href="{{ route('order.invoice.show', $order->id) }}"
+                                                                    class="dropdown-item">
+                                                                    <i class="fa fa-eye" aria-hidden="true"></i> View
                                                                 </a>
                                                             @endcan
-                                                            @if ($order->order_status == 'Pending')
+                                                            @if ($order->status == 0)
                                                                 <a href="{{ route('order.invoice.edit', $order->id) }}"
-                                                                   class="btn btn-secondary btn-sm">
-                                                                    <i class="fa fa-edit" aria-hidden="true"></i>
+                                                                   class="dropdown-item">
+                                                                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                                                 </a>
-                                                            @endif
-                                                            @if ($order->order_status == 'Pending')
                                                                 <a href="{{ route('order.invoice.linking', $order->id) }}" title="Linking"
-                                                                    class="btn btn-secondary btn-sm">
-                                                                    <i class="fa fa-link" aria-hidden="true"></i>
+                                                                   class="dropdown-item">
+                                                                    <i class="fa fa-link" aria-hidden="true"></i> Create Invoice
                                                                 </a>
                                                             @endif
                                                             <a href="{{ route('order.invoice.print', $order->id) }}"
-                                                                target="_BLANK" class="btn btn-secondary btn-sm">
-                                                                <i class="fa fa-print" aria-hidden="true"></i>
+                                                                target="_BLANK" class="dropdown-item">
+                                                                <i class="fa fa-print" aria-hidden="true"></i> Print
                                                             </a>
                                                             @if ($order->order_status == 'Pending')
                                                                 @can('delete.daily.sale')
-                                                                    <button class="btn btn-danger btn-sm" type="button"
+                                                                    <button class="dropdown-item" type="button"
                                                                         onclick="deleteItem({{ $order->id }})">
-                                                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                        <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                                                     </button>
                                                                     <form id="delete-form-{{ $order->id }}"
                                                                         action="{{ route('order.invoice.destroy', $order->id) }}"

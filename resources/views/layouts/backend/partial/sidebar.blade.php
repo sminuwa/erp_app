@@ -220,14 +220,14 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ route('order.invoice.index') }}" class="nav-link ">
+                            <a href="{{ route('order.invoice.list') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Orders</p>
                             </a>
                         </li>
                         @can('make.daily.sale')
                         <li class="nav-item">
-                            <a href="{{ route('pos.index') }}"
+                            <a href="{{ route('orders.approved') }}"
                                class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Invoice (POS)</p>
@@ -235,7 +235,7 @@
                         </li>
                         @endcan
                         <li class="nav-item">
-                            <a href="{{ route('proformer.index') }}"
+                            <a href="{{ route('proformer.list') }}"
                                class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Proformer Invoice</p>

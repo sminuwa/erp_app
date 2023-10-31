@@ -30,7 +30,7 @@ class OrderController extends Controller
     public function show($id)
     {
         $order = Order::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
-        $order_details = OrderDetail::with('storeProduct')->where(['order_id' => $id, 'status' => 1])->get();
+        $order_details = OrderDetail::with('storeProduct')->where(['order_id' => $id])->get();
         //return $order_details;
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         return view('pages.order.order_confirmation', compact('order_details', 'order', 'company'));
@@ -38,7 +38,7 @@ class OrderController extends Controller
     public function proformer_show($id)
     {
         $order = Proformer::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
-        $order_details = ProformerDetail::with('storeProduct')->where(['order_id' => $id, 'status' => 1])->get();
+        $order_details = ProformerDetail::with('storeProduct')->where(['order_id' => $id])->get();
         //return $order_details;
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         return view('pages.order.show_proformer', compact('order_details', 'order', 'company'));

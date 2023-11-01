@@ -839,8 +839,7 @@ class InvoiceController extends Controller
             })
             ->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('branch_product_prices.status', 1)
-            ->orderBy('products.name')->orderBy('stores.name')->get();
-
+            ->orderBy('products.name')->orderBy('stores.name')->limit(100)->get();
 
         $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name');
         if (\Cart::getContent()->isEmpty())

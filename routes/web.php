@@ -283,6 +283,7 @@ Route::middleware('auth')->group(function () {
             Route::put('/approve/order-invoice/{order}', [OrderController::class, 'approveOrderInvoice'])->name('order.invoice.approve');
         });
         Route::group(['prefix' => 'invoice'], function () {
+            Route::get('/approved', [OrderController::class, 'invoice_list'])->name('orders.approved');
             Route::post('/invoice', [InvoiceController::class, 'final_invoice'])->name('invoice.create');
             Route::put('/invoice/update/{order}', [InvoiceController::class, 'updateInvoice'])->name('invoice.update');
             Route::get('/print/{customer_id}', [InvoiceController::class, 'print'])->name('invoice.print');
@@ -291,13 +292,13 @@ Route::middleware('auth')->group(function () {
             Route::delete('/delete/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
         });
         Route::group(['prefix' => 'proforma'], function () {
-            Route::get('proformer', [PosController::class, 'index'])->name('proformer.index');
-            Route::post('/preforma/create', [InvoiceController::class, 'final_proformer'])->name('proformer.create');
-            Route::get('/proformer/print/{customer_id}', [InvoiceController::class, 'print_proformer'])->name('proformer.print');
-            Route::delete('/proformer-invoice/delete/{order}', [OrderController::class, 'destroy_proformer'])->name('proformer.destroy');
-            Route::get('/proformer/show/{id}', [OrderController::class, 'proformer_show'])->name('proformer.show');
-            Route::get('/proformer', [OrderController::class, 'proformer_list'])->name('proformer.list');
-            Route::post('/proformer/search', [OrderController::class, 'proformer_search'])->name('proformer.search');
+            Route::get('proforma', [PosController::class, 'index'])->name('proformer.index');
+            Route::post('/proforma/create', [InvoiceController::class, 'final_proformer'])->name('proformer.create');
+            Route::get('/proforma/print/{customer_id}', [InvoiceController::class, 'print_proformer'])->name('proformer.print');
+            Route::delete('/proforma-invoice/delete/{order}', [OrderController::class, 'destroy_proformer'])->name('proformer.destroy');
+            Route::get('/proforma/show/{id}', [OrderController::class, 'proformer_show'])->name('proformer.show');
+            Route::get('/proforma', [OrderController::class, 'proformer_list'])->name('proformer.list');
+            Route::post('/proforma/search', [OrderController::class, 'proformer_search'])->name('proformer.search');
         });
 
         Route::get('pos', [PosController::class, 'index'])->name('pos.index');
@@ -316,7 +317,6 @@ Route::middleware('auth')->group(function () {
     });
     Route::group(['prefix' => 'orders'], function () {
         Route::get('/customers/{id}', [OrderController::class, 'customer_order'])->name('orders.customer');
-        Route::get('/approved', [OrderController::class, 'approved_order'])->name('orders.approved');
         Route::get('/download/{id}', [OrderController::class, 'download'])->name('orders.download');
         Route::get('/payment/print/{id}', [OrderController::class, 'printPayment'])->name('orders.payment.print');
         Route::post('/order/edit{order}', [OrderController::class, 'edit'])->name('orders.edit');

@@ -58,16 +58,7 @@ class OrderController extends Controller
         return view('pages.order.pending_orders', compact('pendings'));
     }
 
-    public function approved_order()
-    {
-        \Cart::clear();
-        $user = Auth::user();
-        $orders = Order::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where(['order_status' => 'approved', 'status' => 1]);
-        if ($user->hasRole('Sales-Manager'))
-            $orders = $orders->where('sold_by', Auth::id());
-        $orders = $orders->whereDate('order_date', date('Y-m-d'))->get();
-        return view('pages.order.approved_orders', compact('orders'));
-    }
+
     public function search(Request $request)
     {
         $search_value = $request->refno;
@@ -709,15 +700,15 @@ class OrderController extends Controller
             return redirect()->route('orders.approved');
         }
     }
-    public function proformer_list()
+    public function invoice_list()
     {
         \Cart::clear();
         $user = Auth::user();
-        $orders = Proformer::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction());
+        $orders = Order::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where(['order_status' => 'approved', 'status' => 1]);
         if ($user->hasRole('Sales-Manager'))
             $orders = $orders->where('sold_by', Auth::id());
-        $orders = $orders->whereBetween('order_date', [date('Y-m-d',strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])->get();
-        return view('pages.order.proformers', compact('orders'));
+        $orders = $orders->whereDate('order_date', date('Y-m-d'))->get();
+        return view('pages.order.approved_orders', compact('orders'));
     }
     public function order_invoice_list()
     {
@@ -729,6 +720,16 @@ class OrderController extends Controller
             $orders = $orders->where('sold_by', Auth::id());
         $orders = $orders->whereBetween('order_date', [date('Y-m-d',strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])->get();
         return view('pages.order.order_invoices', compact('orders'));
+    }
+    public function proformer_list()
+    {
+        \Cart::clear();
+        $user = Auth::user();
+        $orders = Proformer::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction());
+        if ($user->hasRole('Sales-Manager'))
+            $orders = $orders->where('sold_by', Auth::id());
+        $orders = $orders->whereBetween('order_date', [date('Y-m-d',strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])->get();
+        return view('pages.order.proformers', compact('orders'));
     }
     public function approveOrderInvoice(Request $request, OrderInvoice $order)
     {

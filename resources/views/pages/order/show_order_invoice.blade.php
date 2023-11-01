@@ -113,7 +113,6 @@
                                         $order->status == 0 ? '<span class="badge badge-warning">Pending</span>':
                                         ($order->status == 1 ? '<span class="badge badge-success">Close</span>': '<span class="badge badge-success">Completed</span>' )
                                     !!}
-
                                 </div>
                                 <!-- /.col -->
                             </div>
@@ -142,13 +141,13 @@
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $order_detail->storeProduct->product->name ?? "" }}</td>
                                                     <td align="center">{{ $order_detail->quantity }}</td>
-                                                    <td align="right">{{ number_format($order_detail->selling_price, 2) }}
+                                                    <td align="right">{{ number_format($order_detail->sold_price, 2) }}
                                                     </td>
                                                     <td align="right">
-                                                        {{ number_format($order_detail->selling_price * $order_detail->quantity, 2) }}
+                                                        {{ number_format($order_detail->sold_price * $order_detail->quantity, 2) }}
                                                     </td>
                                                 </tr>
-                                                @php $total += ($order_detail->selling_price * $order_detail->quantity);  @endphp
+                                                @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
                                             @endforeach
                                             <tr>
                                                 <th colspan="4" align="right">Total</th>

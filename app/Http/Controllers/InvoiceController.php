@@ -832,6 +832,7 @@ class InvoiceController extends Controller
     }
     public function linkOrderInvoice(Request $request, OrderInvoice $order)
     {
+        return $order;
         $user_branch = User::userBranchAction();
         $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
@@ -844,8 +845,7 @@ class InvoiceController extends Controller
             })
             ->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('branch_product_prices.status', 1)
-            ->orderBy('products.name')->orderBy('stores.name')->get();
-
+            ->orderBy('products.name')->orderBy('stores.name')->limit(100)->get();
 
         $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name');
         if (\Cart::getContent()->isEmpty())

@@ -5,6 +5,7 @@ use App\Http\Controllers\GeneralAccountController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\InterBankController;
+use App\Http\Controllers\ReturnDebitController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\CategoryController;
@@ -953,6 +954,24 @@ Route::middleware('auth')->group(function () {
                 Route::put('/update-cart', [CreditNoteController::class, 'updateCart'])->name('credit.note.cart.update');
                 Route::delete('/remove/{id}', [CreditNoteController::class, 'removeCart'])->name('credit.note.cart.remove');
                 Route::get('/print/receipt/{credit_note}', [CreditNoteController::class, 'printCreditNoteReceipt'])->name('customers.credit.note.print');
+            }
+        );
+        //Return and Debit
+        Route::group(
+            ['prefix' => 'return-debit'],
+            function () {
+                Route::get('/', [ReturnDebitController::class, 'customerReturnDebit'])->name('customers.return.debit');
+                Route::get('/create/{order?}', [ReturnDebitController::class, 'createReturnDebit'])->name('customers.return.debit.create');
+                Route::post('/store', [ReturnDebitController::class, 'payReturnDebit'])->name('customers.return.debit.store');
+                Route::put('/update/{ledger}', [ReturnDebitController::class, 'updateReturnDebit'])->name('customers.return.debit.update');
+                Route::delete('/delete/{ledger}', [ReturnDebitController::class, 'deletReturnDebit'])->name('customers.return.debit.destroy');
+                Route::post('/search', [ReturnDebitController::class, 'searchReturnDebit'])->name('customers.return.debit.search');
+                Route::get('/load_invoices', [ReturnDebitController::class, 'loadInvoices'])->name('load.order.invoices');
+                Route::get('/load_cart', [ReturnDebitController::class, 'loadToCart'])->name('load.order.cart');
+                Route::post('/cart', [ReturnDebitController::class, 'addToCart'])->name('return.debit.cart.store');
+                Route::put('/update-cart', [ReturnDebitController::class, 'updateCart'])->name('return.debit.cart.update');
+                Route::delete('/remove/{id}', [ReturnDebitController::class, 'removeCart'])->name('return.debit.cart.remove');
+                Route::get('/print/receipt/{returnDebit}', [ReturnDebitController::class, 'printReturnDebitReceipt'])->name('customers.return.debit.print');
             }
         );
         Route::group(

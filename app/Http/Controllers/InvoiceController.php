@@ -827,6 +827,7 @@ class InvoiceController extends Controller
     }
     public function linkOrderInvoice(Request $request, OrderInvoice $order)
     {
+        return $order;
         $user_branch = User::userBranchAction();
         $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')

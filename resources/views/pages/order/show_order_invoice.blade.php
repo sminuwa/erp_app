@@ -147,7 +147,7 @@
                                                         {{ number_format($order_detail->selling_price * $order_detail->quantity, 2) }}
                                                     </td>
                                                 </tr>
-                                                @php $total += ($order_detail->selling_price * $order_detail->quantity);  @endphp
+                                                @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
                                             @endforeach
                                             <tr>
                                                 <th colspan="4" align="right">Total</th>

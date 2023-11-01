@@ -36,7 +36,7 @@ class PosController extends Controller
             })
 
             ->where('stores.branch_id', 'LIKE', $user_branch)
-            ->where('branch_product_prices.status', 1);
+            ->where('branch_product_prices.status', 1)->limit(100);
         if ($request->has('category_id') && $request->has('store_id')) {
             $category_id = $request->category_id;
             $store_id = $request->store_id;

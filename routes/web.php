@@ -258,64 +258,65 @@ Route::middleware('auth')->group(function () {
         Route::get('/yearly/{year?}', [ExpenseController::class, 'yearly_expense'])->name('expense.yearly');
     });
 
-    Route::group(['prefix' => 'sales'], function () {
+    Route::group(['prefix' => 'cart'], function () {
         Route::get('/cart/list', [CartController::class, 'cartList'])->name('cart.list');
         Route::post('/cart', [CartController::class, 'addToCart'])->name('cart.store');
         Route::put('/update-cart', [CartController::class, 'updateCart'])->name('cart.update');
         Route::delete('/remove/{id}', [CartController::class, 'removeCart'])->name('cart.remove');
         Route::post('/clear', [CartController::class, 'clearAllCart'])->name('cart.clear');
 
+    });
+    Route::group(['prefix' => 'sales'], function () {
+        Route::group(['prefix' => 'orders'], function () {
+            Route::get('order_invoice', [PosController::class, 'index'])->name('order.invoice.index');
+            Route::post('/order-invoice/create', [InvoiceController::class, 'final_order_invoice'])->name('order.invoice.create');
+            Route::get('/order-invoice/edit/{order}', [InvoiceController::class, 'editOrderInvoice'])->name('order.invoice.edit');
+            Route::get('/order-invoice/link/{order}', [InvoiceController::class, 'linkOrderInvoice'])->name('order.invoice.linking');
+            Route::put('/order-invoice/update/{order}', [InvoiceController::class, 'updateOrderInvoice'])->name('order.invoice.update');
+            Route::get('/order-print/{order_id}', [InvoiceController::class, 'order_print'])->name('invoice.order_print');
+            Route::get('/order-invoice/print/{customer_id}', [InvoiceController::class, 'print_order_invoice'])->name('order.invoice.print');
+            Route::get('/order-invoice/show/{id}', [OrderController::class, 'order_invoice_show'])->name('order.invoice.show');
+            Route::get('/order-invoice', [OrderController::class, 'order_invoice_list'])->name('order.invoice.list');
+            Route::delete('/order-invoice/delete/{order}', [OrderController::class, 'destroy_order_invoice'])->name('order.invoice.destroy');
+            Route::post('/order-invoice/close/{order}', [OrderController::class, 'orderInvoiceClose'])->name('order.invoice.close');
+            Route::post('/order-invoice/search', [OrderController::class, 'order_invoice_search'])->name('order.invoice.search');
+            Route::put('/approve/order-invoice/{order}', [OrderController::class, 'approveOrderInvoice'])->name('order.invoice.approve');
+        });
+        Route::group(['prefix' => 'invoice'], function () {
+            Route::post('/invoice', [InvoiceController::class, 'final_invoice'])->name('invoice.create');
+            Route::put('/invoice/update/{order}', [InvoiceController::class, 'updateInvoice'])->name('invoice.update');
+            Route::get('/print/{customer_id}', [InvoiceController::class, 'print'])->name('invoice.print');
+            Route::post('/invoice-final', [InvoiceController::class, 'final_invoice'])->name('invoice.final_invoice');
+            Route::get('/show/{id}', [OrderController::class, 'show'])->name('orders.show');
+            Route::delete('/delete/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+        });
+        Route::group(['prefix' => 'proforma'], function () {
+            Route::get('proformer', [PosController::class, 'index'])->name('proformer.index');
+            Route::post('/preforma/create', [InvoiceController::class, 'final_proformer'])->name('proformer.create');
+            Route::get('/proformer/print/{customer_id}', [InvoiceController::class, 'print_proformer'])->name('proformer.print');
+            Route::delete('/proformer-invoice/delete/{order}', [OrderController::class, 'destroy_proformer'])->name('proformer.destroy');
+            Route::get('/proformer/show/{id}', [OrderController::class, 'proformer_show'])->name('proformer.show');
+            Route::get('/proformer', [OrderController::class, 'proformer_list'])->name('proformer.list');
+            Route::post('/proformer/search', [OrderController::class, 'proformer_search'])->name('proformer.search');
+        });
+
         Route::get('pos', [PosController::class, 'index'])->name('pos.index');
         Route::get('pos/whole-sale', [PosController::class, 'wholeSale'])->name('pos.whole.sale');
         Route::get('pos/edit/{order}', [PosController::class, 'edit'])->name('pos.edit');
         Route::get('barcode/search/product', [PosController::class, 'barcodeSearch'])->name('barcode.search.product');
-
-        Route::get('proformer', [PosController::class, 'index'])->name('proformer.index');
-        Route::get('order_invoice', [PosController::class, 'index'])->name('order.invoice.index');
-
-        Route::post('/invoice', [InvoiceController::class, 'final_invoice'])->name('invoice.create');
-        Route::put('/invoice/update/{order}', [InvoiceController::class, 'updateInvoice'])->name('invoice.update');
-        Route::post('/preforma/create', [InvoiceController::class, 'final_proformer'])->name('proformer.create');
-        Route::post('/order-invoice/create', [InvoiceController::class, 'final_order_invoice'])->name('order.invoice.create');
-        Route::get('/order-invoice/edit/{order}', [InvoiceController::class, 'editOrderInvoice'])->name('order.invoice.edit');
-        Route::get('/order-invoice/link/{order}', [InvoiceController::class, 'linkOrderInvoice'])->name('order.invoice.linking');
-        Route::put('/order-invoice/update/{order}', [InvoiceController::class, 'updateOrderInvoice'])->name('order.invoice.update');
-        Route::get('/print/{customer_id}', [InvoiceController::class, 'print'])->name('invoice.print');
-        Route::get('/order-print/{order_id}', [InvoiceController::class, 'order_print'])->name('invoice.order_print');
-        Route::get('/proformer/print/{customer_id}', [InvoiceController::class, 'print_proformer'])->name('proformer.print');
-        Route::get('/order-invoice/print/{customer_id}', [InvoiceController::class, 'print_order_invoice'])->name('order.invoice.print');
-        Route::post('/invoice-final', [InvoiceController::class, 'final_invoice'])->name('invoice.final_invoice');
         Route::get('/waybill/order-print/{order_id}', [InvoiceController::class, 'waybill_print'])->name('waybill.order_print');
         Route::get('/pos/order-print/{order_id}', [InvoiceController::class, 'pos_print'])->name('pos.order_print');
-
         Route::get('/sales-today', [OrderController::class, 'today_sales'])->name('sales.today');
         Route::get('/sales-monthly/{month?}', [OrderController::class, 'monthly_sales'])->name('sales.monthly');
         Route::get('/sales-total', [OrderController::class, 'total_sales'])->name('sales.total');
-
         Route::get('load/store/products', [MisController::class, 'loadStoreProducts'])->name('ajax.load.store.products');
-
         Route::post('/product/search', [OrderController::class, 'search'])->name('sales_products.search');
-        Route::post('/proformer/search', [OrderController::class, 'proformer_search'])->name('proformer.search');
-        Route::post('/order-invoice/search', [OrderController::class, 'order_invoice_search'])->name('order.invoice.search');
         Route::post('/product/verify', [OrderController::class, 'verify'])->name('sales_products.verify');
-
         Route::post('/transfer/to-user', [OrderController::class, 'transfer'])->name('transfer.sale.to.user');
-
-
     });
     Route::group(['prefix' => 'orders'], function () {
-        Route::get('/show/{id}', [OrderController::class, 'show'])->name('orders.show');
-        Route::get('/proformer/show/{id}', [OrderController::class, 'proformer_show'])->name('proformer.show');
-        Route::get('/order-invoice/show/{id}', [OrderController::class, 'order_invoice_show'])->name('order.invoice.show');
         Route::get('/customers/{id}', [OrderController::class, 'customer_order'])->name('orders.customer');
         Route::get('/approved', [OrderController::class, 'approved_order'])->name('orders.approved');
-        Route::get('/proformer', [OrderController::class, 'proformer_list'])->name('proformer.list');
-        Route::get('/order-invoice', [OrderController::class, 'order_invoice_list'])->name('order.invoice.list');
-        Route::put('/approve/order-invoice/{order}', [OrderController::class, 'approveOrderInvoice'])->name('order.invoice.approve');
-        Route::delete('/delete/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
-        Route::delete('/order-invoice/delete/{order}', [OrderController::class, 'destroy_order_invoice'])->name('order.invoice.destroy');
-        Route::post('/order-invoice/close/{order}', [OrderController::class, 'orderInvoiceClose'])->name('order.invoice.close');
-        Route::delete('/proformer-invoice/delete/{order}', [OrderController::class, 'destroy_proformer'])->name('proformer.destroy');
         Route::get('/download/{id}', [OrderController::class, 'download'])->name('orders.download');
         Route::get('/payment/print/{id}', [OrderController::class, 'printPayment'])->name('orders.payment.print');
         Route::post('/order/edit{order}', [OrderController::class, 'edit'])->name('orders.edit');

@@ -74,7 +74,7 @@ class ProductController extends Controller
 
 //        $model = new Product;
 //        $model->fill($request->except(['shortcut']));
-        if ($model = Product::createRecord($request->category_id, $request->name, $request->barcode, $request->expiry_status, $request->status)) {
+        if ($model = Product::createRecord($request->comany_id,$request->category_id, $request->name, $request->barcode, $request->expiry_status, $request->status)) {
 //            $model->addStoreProduct();
             $action = "Added a new product: " . $model->name;
             AuditLog::auditLog(Auth::id(), $action);

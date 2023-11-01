@@ -713,7 +713,7 @@ class OrderController extends Controller
     {
         \Cart::clear();
         $user = Auth::user();
-        $orders = Proformer::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where(['order_status' => 'approved', 'status' => 1]);
+        $orders = Proformer::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction());
         if ($user->hasRole('Sales-Manager'))
             $orders = $orders->where('sold_by', Auth::id());
         $orders = $orders->whereDate('order_date', date('Y-m-d'))->get();
@@ -723,7 +723,7 @@ class OrderController extends Controller
     {
         \Cart::clear();
         $user = Auth::user();
-        $orders = OrderInvoice::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where(['status' => 1]);
+        $orders = OrderInvoice::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction());
         if ($user->hasRole('Sales-Manager'))
             $orders = $orders->where('sold_by', Auth::id());
         $orders = $orders->whereDate('order_date', date('Y-m-d'))->get();
@@ -746,5 +746,12 @@ class OrderController extends Controller
             return back();
         }
 
+    }
+    public function orderInvoiceClose(Request $request, OrderInvoice $order){
+        $order->status = 1;
+        if($order->save()){
+            return back()->with('success', 'Order closed successfully');
+        }
+        return back()->with('error', 'Something went wrong.');
     }
 }

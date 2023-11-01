@@ -13,8 +13,8 @@
                 <form method="post" action="{{ route('order.invoice.approve', $order->id) }}" id="ledger_form">
                     @csrf
                     @method('PUT')
-                    <span class="fa fa-id-badge bold"> Current Status:<span class="text text-primary">
-                            {{ $order->order_status }}</span> {{ $order->linked_order != null ? 'and linked with ' : '' }}
+                    <span class="fa fa-id-badge bold">
+                        {{ $order->linked_order != null ? 'and linked with ' : '' }}
                         {{ $order->linked_order->reference ?? '' }}
                         <div class="display">
 

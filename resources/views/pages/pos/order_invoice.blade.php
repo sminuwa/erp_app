@@ -181,17 +181,17 @@
                                                         <td>{{ $store->code }}</td>
                                                         <td>{{ $store->name }}</td>
                                                         <td>{{ $store->unit }}</td>
-                                                        @if ($store->qty_available > 0 && $store->selling_price > 0)
+{{--                                                        @if ($store->qty_available > 0 && $store->selling_price > 0)--}}
                                                             <td align="center">
                                                                 <button type="submit" class="btn btn-sm btn-success px-2">
                                                                     <i class="fa fa-cart-plus" aria-hidden="true"></i>
                                                                 </button>
                                                             </td>
-                                                        @else
+                                                        {{--@else
                                                             <td align="center">
                                                                 <span class="fa fa-crosshairs text text-danger"></span>
                                                             </td>
-                                                        @endif
+                                                        @endif--}}
                                                     </form>
                                                 </tr>
                                             @endforeach

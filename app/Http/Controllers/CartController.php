@@ -18,7 +18,8 @@ class CartController extends Controller
 
     public function addToCart(Request $request)
     {
-
+//        return \Cart::getContent();
+//        return $request;
         $validated = $request->validate([
             'id' => 'required',
             'name' => 'required',
@@ -35,7 +36,7 @@ class CartController extends Controller
         $add = \Cart::add([
             'id' => $request->id,
             'name' => $request->name,
-            'price' => $request->sold_price,
+            'price' => $request->sold_price == 0 ? 1 :$request->sold_price ,
             'quantity' => $qty == 0 ? 1 : $qty,
             'attributes' => array('cost_price' => $cost_price, 'code'=>$request->code,'selling_price' => $selling_price, 'qty_available' => $qty_available, 'discount' => 0,'store'=>$store),
         ]);

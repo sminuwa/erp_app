@@ -35,66 +35,67 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    Orders
+                                    Order List
                                 </h3>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    @can('view.daily.sale')
-                                        <a href="{{ route('order.invoice.index') }}" class="btn btn-sm btn-secondary"
-                                            style="margin-left: 2px;"><span class="fa fa-list"> </span> View Orders </a>
-                                    @endcan
-                                    @can('make.daily.sale')
-                                        <a href="{{ route('order.invoice.index') }}" class="btn btn-sm btn-secondary"
-                                            style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Order
-                                            Invoice</a>
-                                    @endcan
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <form action="{{ route('order.invoice.search') }}" method="POST">
-                                        @csrf
-                                        <div class="input-group">
-                                            <input type="search" class="form-control rounded" required
-                                                placeholder="Search by name, phone or invoice number" name="refno"
-                                                aria-label="Search" aria-describedby="search-addon" />
-                                            <button type="submit" class="btn btn-outline-primary">search</button>
-                                        </div>
-                                    </form>
-                                </div>
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body table-responsive">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        @can('view.daily.sale')
+                                            <a href="{{ route('order.invoice.index') }}" class="btn btn-sm btn-secondary"
+                                               style="margin-left: 2px;"><span class="fa fa-list"> </span> View Orders </a>
+                                        @endcan
+                                        @can('make.daily.sale')
+                                            <a href="{{ route('order.invoice.index') }}" class="btn btn-sm btn-secondary"
+                                               style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Order
+                                                Invoice</a>
+                                        @endcan
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <form action="{{ route('order.invoice.search') }}" method="POST">
+                                            @csrf
+                                            <div class="input-group">
+                                                <input type="search" class="form-control rounded" required
+                                                       placeholder="Search by name, phone or invoice number" name="refno"
+                                                       aria-label="Search" aria-describedby="search-addon" />
+                                                <button type="submit" class="btn btn-outline-primary">search</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                                 <table id="example1"
                                     class="table table-bordered table-striped text-left table-responsive-xl"
                                     data-ordering="false">
                                     <thead>
                                         <tr>
+                                            <th>#</th>
                                             <th>Date</th>
+                                            <th>Reference</th>
                                             <th>Name</th>
-                                            <th>Invoice No</th>
-                                            <th>STATUS</th>
+                                            <th>Status</th>
                                             <th>Total</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php
-                                            $total = 0;
-                                            $total_pay = 0;
-                                            $total_due = 0;
-                                        @endphp
+                                        @php $total = 0; @endphp
                                         @foreach ($orders as $order)
-                                            @php
-                                                $total = $total + $order->total;
-                                            @endphp
+                                            @php $total = $total + $order->total; @endphp
                                             <tr>
+                                                <td>{{ $loop->iteration }}</td>
                                                 <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}
                                                 </td>
+                                                <td>{{ $order->reference }}</td>
                                                 <td>{{ $order->customer->name }}</td>
-                                                <td>{{ $order->invoice_no }}</td>
-                                                <td>{{ $order->order_status }}</td>
+                                                <td>
+                                                    {!!
+                                                        $order->status == 0 ? '<span class="badge badge-warning">Pending</span>':
+                                                        ($order->status == 1 ? '<span class="badge badge-success">Close</span>': '<span class="badge badge-success">Completed</span>' )
+                                                    !!}
+                                                </td>
                                                 <td align="right">&#8358;{{ number_format($order->total, 2, '.', ',') }}
                                                 </td>
                                                 <td align="center">
@@ -105,44 +106,42 @@
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            @can('verify.invoice')
-                                                                <a href="javascript:void(0)" data-toggle="modal"
-                                                                    data-target="#order_detail_form{{ $order->id }}"
-                                                                    data-val="{{ $order->id }}"
-                                                                    class="btn btn-success btn-sm show">
-                                                                    <i class="fa fa-eye" aria-hidden="true"></i>
-                                                                </a>
-                                                            @endcan
-                                                            @if ($order->order_status == 'Pending')
-                                                                <a href="{{ route('order.invoice.edit', $order->id) }}"
-                                                                   class="btn btn-secondary btn-sm">
-                                                                    <i class="fa fa-edit" aria-hidden="true"></i>
-                                                                </a>
-                                                            @endif
-                                                            @if ($order->order_status == 'Pending')
-                                                                <a href="{{ route('order.invoice.linking', $order->id) }}" title="Linking"
-                                                                    class="btn btn-secondary btn-sm">
-                                                                    <i class="fa fa-link" aria-hidden="true"></i>
-                                                                </a>
-                                                            @endif
-                                                            <a href="{{ route('order.invoice.print', $order->id) }}"
-                                                                target="_BLANK" class="btn btn-secondary btn-sm">
-                                                                <i class="fa fa-print" aria-hidden="true"></i>
+                                                            <a href="{{ route('order.invoice.show', $order->id) }}"
+                                                                class="dropdown-item">
+                                                                <i class="fa fa-eye" aria-hidden="true"></i> View
                                                             </a>
-                                                            @if ($order->order_status == 'Pending')
-                                                                @can('delete.daily.sale')
-                                                                    <button class="btn btn-danger btn-sm" type="button"
-                                                                        onclick="deleteItem({{ $order->id }})">
-                                                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                                            <a href="{{ route('order.invoice.print', $order->id) }}"
+                                                               target="_BLANK" class="dropdown-item">
+                                                                <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                            </a>
+                                                            @if ($order->status == 0)
+                                                                <a href="{{ route('order.invoice.edit', $order->id) }}"
+                                                                   class="dropdown-item">
+                                                                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                                                </a>
+                                                                <a href="{{ route('order.invoice.linking', $order->id) }}" title="Linking"
+                                                                   class="dropdown-item">
+                                                                    <i class="fa fa-link" aria-hidden="true"></i> Create Invoice
+                                                                </a>
+                                                                <form action="{{ route('order.invoice.close', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this order?')">
+                                                                    @csrf
+                                                                    <button type="submit"
+                                                                       class="dropdown-item">
+                                                                        <i class="fa fa-close" aria-hidden="true"></i> Close
                                                                     </button>
-                                                                    <form id="delete-form-{{ $order->id }}"
-                                                                        action="{{ route('order.invoice.destroy', $order->id) }}"
-                                                                        method="post" style="display:none;">
-                                                                        @csrf
-                                                                        @method('DELETE')
-                                                                    </form>
-                                                                @endcan
+                                                                </form>
+
+
+                                                                <form id="delete-form-{{ $order->id }}" action="{{ route('order.invoice.destroy', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to close this order?')">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button class="dropdown-item" type="submit">
+                                                                        <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                                                    </button>
+                                                                </form>
+
                                                             @endif
+
                                                         </div>
                                                     </div>
                                                 </td>
@@ -155,25 +154,18 @@
                                     </tbody>
                                     <tfoot>
                                         <tr>
+                                            <th>#</th>
                                             <th>Date</th>
+                                            <th>Reference</th>
                                             <th>Name</th>
-                                            <th>Invoice No</th>
-                                            <th>STATUS</th>
+                                            <th>Status</th>
                                             <th style="text-align:right">&#8358;{{ number_format($total, 2, '.', ',') }}
                                             </th>
                                             <th>Actions</th>
                                         </tr>
                                     </tfoot>
                                 </table>
-                                <div class="row">
-                                    <div class="col-sm-2">
-                                        @can('view.customer.ledger')
-                                            <a href="javascript:void(0)" data-toggle="modal" data-target="#customer_ledgerform"
-                                                class="btn btn-sm btn-secondary" style="margin-left: 2px;">Customer Ledger </a>
-                                        @endcan
 
-                                    </div>
-                                </div>
                             </div>
                             <!-- /.card-body -->
 
@@ -189,56 +181,7 @@
         </section>
         <!-- /.content -->
     </div> <!-- Content Wrapper end -->
-    <div class="modal fade" id="customer_ledgerform" style="display: none;" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Customer Ledger</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="get" action="{{ route('ajax.general.customer.ledger') }}" id="ledger_form"
-                        target="_BLANK">
-                        @csrf
-                        <div class="form-group">
-                            <label for="from_date">From Date</label>
-                            <input type="text" class="form-control datepicker" name="from_date" id="from_date"
-                                placeholder="" autocomplete="off">
-                        </div>
-                        <div class="form-group">
-                            <label for="to_date">To Date</label>
-                            <input type="text" class="form-control datepicker" name="to_date" id="to_date"
-                                placeholder="" autocomplete="off">
-                        </div>
-                        <div class="form-group">
-                            &nbsp;&nbsp;
-                            <label for="customer_id">Customer</label>
-                            <select class="form-control select2-single" name="customer_id" id="customer_id" required>
-                                {{-- <option value="all">All</option> --}}
-                                <option value="">Select...</option>
-                                @foreach (App\Models\Customer::where('type', 'credit')->get() as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name }}-{{ $data->phone }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <input type="hidden" name="print" value="print" />
-                        <input type="hidden" name="modal" value="modal" />
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-dark" data-dismiss="modal"><i class="fa fa-times"></i>
-                                Close
-                            </button>
-                            <button type="submit" class="btn btn-info px-3"><i class="icon-trash"></i> Generate
-                            </button>
-                        </div>
-                        @method('post')
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+
     <div class="modal fade order_edit" style="display: none;" aria-hidden="true">
         @isset($order)
             <div class="modal-dialog modal-lg">

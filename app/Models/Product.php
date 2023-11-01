@@ -18,7 +18,8 @@ class Product extends Model
      * Mass assignable columns
      */
     protected $fillable = ['name', 'code',
-    'category_id',
+    'company_id',
+        'category_id',
      'barcode','status'];
 
     /**
@@ -63,10 +64,11 @@ class Product extends Model
         return Product::where('code', $code);
     }
 
-    public static function createRecord($category_id, $name, $barcode = null, $expiry_status = 0, $status = 1){
+    public static function createRecord($company_id,$category_id, $name, $barcode = null, $expiry_status = 0, $status = 1){
         $record = new self;
         $record->code = self::generateNewCode($category_id);
         $record->name = $name;
+        $record->company_id = $company_id;
         $record->category_id = $category_id;
         $record->expiry_status = $expiry_status;
         $record->status = $status;

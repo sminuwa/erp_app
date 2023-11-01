@@ -2,6 +2,17 @@
     {{ csrf_field() }}
     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
     <div class="form-group">
+        <label for="company_id">Company</label>
+        <select type="number" class="form-control ajax-companies select2-single {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
+                name="company_id" id="company_id" selected_item="{{ $model->company_id }}" required="required">
+        </select>
+        @if ($errors->has('company_id'))
+            <div class="invalid-feedback">
+                <strong>{{ $errors->first('company_id') }}</strong>
+            </div>
+        @endif
+    </div>
+    <div class="form-group">
         <label for="category_id">Category</label>
         <select type="number" class="form-control ajax-categories select2-single {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
             name="category_id" id="category_id" selected_item="{{ $model->category_id }}" required="required">

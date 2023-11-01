@@ -68,9 +68,7 @@
                                 <div class="col-sm-4 invoice-col">
                                     <b>Invoice
                                         No: {{ $order->invoice_no }}</b><br><br>
-                                    <b>Order Status:</b> <span
-                                        class="badge {{ $order->order_status == 'approved' ? 'badge-success' : 'badge-warning' }}">{{ ucfirst($order->order_status) }}</span><br>
-                                </div>
+                                    </div>
                                 <!-- /.col -->
                             </div>
                             <!-- /.row -->
@@ -125,8 +123,9 @@
 
                         <!-- this row will not appear when printing -->
                         <div class="row no-print">
+
                             <div class="col-12">
-                                
+
                                 <a href="{{ route('proformer.list') }}" class="btn btn-primary btn-sm float-right"
                                     style="margin-right: 5px;">
                                     <i class="fa fa-list"></i> View Sales
@@ -135,6 +134,8 @@
                                 <a href="{{ route('proformer.index') }}" class="btn btn-secondary btn-sm float-right">
                                     <i class="fa fa-plus-circle" aria-hidden="true"> New Sales</i>
                                 </a>
+
+
                             </div>
                         </div>
                     </div>

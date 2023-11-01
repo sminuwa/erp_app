@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditLog;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\ReturnDebit;
 use App\Models\Setting;
 use App\Models\StoreProduct;
 use App\Models\User;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReturnDebitController extends Controller
 {
@@ -24,10 +27,10 @@ class ReturnDebitController extends Controller
         $user_branch = User::userBranchAction();
         $orders = Order::where('status', 1)
             ->where('branch_id', 'LIKE', $user_branch)
-            ->whereNotIn('invoice_no',DB::table('credit_notes')->select('invoice_no')->pluck('invoice_no')->toArray())
+            ->whereNotIn('invoice_no', DB::table('credit_notes')->select('invoice_no')->pluck('invoice_no')->toArray())
             ->orderBy('order_date', 'DESC')->take(20)->get();
 
-            $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
             ->join('products', 'products.id', 'store_products.product_id')
@@ -45,37 +48,53 @@ class ReturnDebitController extends Controller
             \Cart::clear();
         $model = new Customer;
         $cart_products = \Cart::getContent();
-        return view('pages.inventories.return_debit.create_return_debit', compact('orders', 'model', 'cart_products', 'order','stores'));
+        return view('pages.inventories.return_debit.create_return_debit', compact('orders', 'model', 'cart_products', 'order', 'stores'));
     }
     public function payReturnDebit(Request $request)
     {
-        return "To call your function 8888";
+        //return "To call your function 8888";
         $order_id = $request->order_id;
         $comment = $request->comment;
         $order = Order::find($order_id);
-        $reference = $this->generateCreditNoteInvoice();
+        $reference = ReturnDebit::generateNewNumber();
+        $items = \Cart::getContent();
+        $total = \Cart::getTotal();
+
         DB::beginTransaction();
         try {
             //Bank Withdrawal
-            DB::table('bank_transactions')->insert([
-                'bank_account_id' => $order->customer_id,
-                'trans_date' => date('Y-m-d'),
-                'cr' => 0,
-                'dr' => $order->total,
-                'ref_no' => $order->invoice_no,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
-            DB::table('return_debits')->insert([
+            // DB::table('bank_transactions')->insert([
+            //     'bank_account_id' => $order->customer_id,
+            //     'trans_date' => date('Y-m-d'),
+            //     'cr' => 0,
+            //     'dr' => $total,
+            //     'ref_no' => $order->invoice_no,
+            //     'created_at' => Carbon::now(),
+            //     'updated_at' => Carbon::now(),
+            // ]);
+            $return_debit_id = DB::table('return_debits')->insertGetId([
+                'order_id' => $order->id,
                 'invoice_no' => $order->invoice_no,
                 'reference_no' => $reference,
                 'customer_id' => $order->customer_id,
                 'amount' => $order->total,
                 'comment' => $request->comment,
-                'branch_id' => User::userBranchAction()
+                'branch_id' => User::userBranchAction(),
+                'posted_by' => Auth::id(),
             ]);
-            session()->flash('app_message', 'Credit note captured successfully');
-            $action = "Posted credit note $order->invoice_no for customer: " . $order->customer->name;
+            $items = \Cart::getContent();
+            foreach ($items as $item) {
+                DB::table('return_debit_items')->insert([
+                    'return_debit_id' => $return_debit_id,
+                    'store_product_id' => $item->id,
+                    'current_quantity' => $item->quantity,
+                    'original_quantity_sold' => $item->quantity,
+                    'price' => $item->price,
+                ]);
+            }
+
+            session()->flash('app_message', 'Return and debit captured successfully');
+            $action = "Posted return and debit $order->invoice_no for customer: " . $order->customer->name;
             AuditLog::auditLog(Auth::id(), $action);
             DB::commit();
         } catch (\Exception $e) {
@@ -96,7 +115,7 @@ class ReturnDebitController extends Controller
             ->orderBy('order_date', 'DESC')->get();
         return view('pages.inventories.return_debit.return_debit', ['payments' => $payments]);
     }
-    public function printCreditnoteReceipt(ReturnDebit $returnDebit)
+    public function printReturnDebitReceipt(ReturnDebit $returnDebit)
     {
         return view('pages.inventories.return_debit.print_return_debit_receipt', ['payment' => $returnDebit, 'setting' => Setting::first()]);
     }
@@ -197,5 +216,34 @@ class ReturnDebitController extends Controller
         session()->flash('success', 'Item Cart Remove Successfully !');
         return redirect()->route('customers.return.debit.create', Order::find($request->order));
         //return redirect()->back()->with('order',Order::find($request->order));
+    }
+    public function deletReturnDebit(Request $request, ReturnDebit $returnDebit){
+        //return "To call your function 8888";
+        $reference = $returnDebit;
+        DB::beginTransaction();
+        try {
+            // //Bank Withdrawal
+            // DB::table('bank_transactions')->insert([
+            //     'bank_account_id' => $order->customer_id,
+            //     'trans_date' => date('Y-m-d'),
+            //     'cr' => 0,
+            //     'dr' => $total,
+            //     'ref_no' => $order->invoice_no,
+            //     'created_at' => Carbon::now(),
+            //     'updated_at' => Carbon::now(),
+            // ]);
+            
+            $returnDebit->returnItems()->delete();
+             $returnDebit->delete();   
+            session()->flash('app_message', 'Return and debit deleted successfully');
+            $action = "Deleted return and debit with reference $reference";
+            AuditLog::auditLog(Auth::id(), $action);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+
+        return redirect()->back();
     }
 }

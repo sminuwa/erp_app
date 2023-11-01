@@ -75,7 +75,7 @@
                                     <i class="fa fa-trash" aria-hidden="true"></i>
                                 </button>
                                 <form id="delete-form-{{ $product->id }}"
-                                    action="{{ route('credit.note.cart.remove', $product->id) }}" method="post"
+                                    action="{{ route('return.debit.cart.remove', $product->id) }}" method="post"
                                     style="display:none;">
                                     <input type="hidden" name="order" id="order" value="{{ $order->id }}" />
                                     @csrf
@@ -90,7 +90,7 @@
         <div class="alert alert-success">
             Total : &#8358; <span id="total">{{ number_format(Cart::getTotal()) }}</span>
         </div>
-        <form action="{{ route('customers.credit.note.store') }}" method="POST">
+        <form action="{{ route('customers.return.debit.store') }}" method="POST">
             @csrf
             <input type="hidden" name="order_id" id="order_id" value="{{ $order->id }}" />
             <textarea name="comment" placeholder="Comment" rows="5" cols="100" class="form-control"></textarea>

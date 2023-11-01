@@ -36,12 +36,35 @@ class ReturnDebit extends Model
         'posted_by'
     ];
 
-    /**
-     * Date time columns.
-     */
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    public function postedBy()
+    {
+        return $this->belongsTo(User::class, 'posted_by');
+    }
     protected $dates = [];
-
-
+    public function returnItems()
+    {
+        return $this->hasMany(ReturnDebitItem::class);
+    }
+    public static function generateNewNumber($prefix = 'RAD', $length = 4)
+    {
+        $prefix = $prefix . date('ym') . auth()->user()->branch->code;
+        $record = self::where('reference_no', 'like', '%' . $prefix . '%')->orderBy('reference_no', 'desc')->first();
+        if ($record) {
+            $number = $record->reference;
+            $new = intval(substr($number, strlen($prefix))) + 1;
+            return $prefix . str_pad($new, $length, 0, STR_PAD_LEFT);
+        }
+        return $prefix . str_pad(1, $length, 0, STR_PAD_LEFT);
+    }
 
 
 }

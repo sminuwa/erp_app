@@ -221,6 +221,7 @@ class PurchaseGRNController extends Controller
             //     'created_at' => Carbon::now(),
             //     'updated_at' => Carbon::now(),
             // ]);
+            Transaction::purchases($purchase_id, $purchase_datetime);
             $action = "Made a purchase with invoice $request->invoice from supplier: " . Supplier::find($request->supplier_id)->name;
             AuditLog::auditLog(Auth::id(), $action);
             DB::commit();
@@ -552,12 +553,12 @@ class PurchaseGRNController extends Controller
     {
         DB::beginTransaction();
         $purchase->status = 1;
-        if($purchase->save()){
-            if(Transaction::purchases($purchase->id, $purchase->date)['status']){
+        if ($purchase->save()) {
+            if (Transaction::purchases($purchase->id, $purchase->date)['status']) {
                 DB::commit();
-            }
-            else
+            } else
                 DB::rollback();
+                session()->flash('app_message', 'Purchase sucessfully approved');
         }
         return back()->with('success', 'Approved successfully');
     }

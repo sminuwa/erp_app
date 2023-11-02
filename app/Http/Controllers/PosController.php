@@ -21,7 +21,9 @@ class PosController extends Controller
     public function index(Request $request)
     {
         if (!(strpos(url()->previous(), 'pos') || strpos(url()->previous(), 'proformer') || strpos(url()->previous(), 'order_invoice'))) //Clear the cart after leaving the POS page
+        {
 //            \Cart::clear();
+        }
         $user_branch = User::userBranchAction();
         $category_id = 0;
         $store_id = 0;

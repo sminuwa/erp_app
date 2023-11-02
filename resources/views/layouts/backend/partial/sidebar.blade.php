@@ -297,7 +297,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="#"
+                            <a href="{{route('customers.return.debit')}}"
                                class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Return and Debit</p>

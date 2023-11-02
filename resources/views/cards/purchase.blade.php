@@ -9,13 +9,13 @@
                 <div class="btn-group">
                     {{-- @if ($record->status == 0) --}}
                     <form onsubmit="return confirm('Are you sure you want to approve?')"
-                    action="{{ route('purchase.approve', $record->id) }}" method="post" style="display: inline">
-                    {{ csrf_field() }}
-                    {{ method_field('POST') }}
-                    <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
-                        <i class="text-white fa fa-check"> Approve</i>
-                    </button>
-                </form>
+                        action="{{ route('purchase.approve', $record->id) }}" method="post" style="display: inline">
+                        {{ csrf_field() }}
+                        {{ method_field('POST') }}
+                        <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
+                            <i class="text-white fa fa-check"> Approve</i>
+                        </button>
+                    </form>
                     {{-- @endif --}}
                     <a class="btn btn-secondary btn-sm" href="{{ route('purchases.index', $record->id) }}">
                         <span class="fa fa-list"></span>

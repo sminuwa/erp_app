@@ -162,6 +162,8 @@ class InvoiceController extends Controller
         //$due = $total - $pay;
         $order_id = 0;
         $amount_paid = 0;
+        $reference = Order::generateNewNumber();
+        $order_date = $request->order_date;
         //$customer_id = $request->input('customer_id');
         DB::beginTransaction();
         try {
@@ -178,13 +180,13 @@ class InvoiceController extends Controller
             }
             if ($status) {
                 $order_id = DB::table('orders')->insertGetId([
-                    'reference' => Order::generateNewNumber(),
+                    'reference' => $reference,
                     'customer_id' => $customer_id,
-//                    'payment_mode' => $payment_mode,
+                    //                    'payment_mode' => $payment_mode,
 //                    'due_date' => $due_date,
                     'pay' => $payment_mode == "Credit" ? $amount_paid : $total,
                     'due' => $payment_mode == "Credit" ? ($total - $amount_paid) : 0,
-                    'order_date' => $request->order_date,
+                    'order_date' => $order_date,
                     'order_status' => 'approved',
                     'total_products' => \Cart::getTotalQuantity(),
                     'sub_total' => $sub_total,
@@ -193,7 +195,7 @@ class InvoiceController extends Controller
                     'invoice_no' => $invoice,
                     'sold_by' => Auth::id(),
                     'status' => 0,
-                    'order_invoice_id'=>$request->order_invoice_id,
+                    'order_invoice_id' => $request->order_invoice_id,
                     'branch_id' => User::userBranchAction(),
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now()
@@ -202,6 +204,7 @@ class InvoiceController extends Controller
                 $contents = \Cart::getContent();
                 $products = [];
                 $total_discount = 0;
+                $store_products = [];
                 foreach ($contents as $content) {
                     $total_discount += $content->attributes['discount'] * $content->quantity;
                     $store = StoreProduct::find($content->id);
@@ -241,6 +244,7 @@ class InvoiceController extends Controller
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now()
                     ]);
+                    $store_products[$content->id] = $content->quantity;
                 }
                 //Upate the Order table with the discount
                 DB::table('orders')->where('id', $order_id)->increment('discount', $total_discount);
@@ -278,6 +282,7 @@ class InvoiceController extends Controller
                     'approved_by' => auth()->id(),
                     'updated_at' => Carbon::now()
                 ]);
+                Transaction::sale($store_products, $customer_id, $reference, $order_date);
 
             }
             $action = "Made a sell of $invoice: $total";
@@ -347,7 +352,7 @@ class InvoiceController extends Controller
             $order_id = DB::table('proformers')->insertGetId([
                 'reference' => Proformer::generateNewNumber(),
                 'customer_id' => $customer_id,
-//                'payment_mode' => $payment_mode,
+                //                'payment_mode' => $payment_mode,
 //                'due_date' => $due_date,
                 'pay' => $payment_mode == "Credit" ? $amount_paid : $total,
                 'due' => $payment_mode == "Credit" ? ($total - $amount_paid) : 0,
@@ -463,7 +468,7 @@ class InvoiceController extends Controller
             $order_id = DB::table('order_invoices')->insertGetId([
                 'reference' => OrderInvoice::generateNewNumber(),
                 'customer_id' => $customer_id,
-//                'payment_mode' => $payment_mode,
+                //                'payment_mode' => $payment_mode,
 //                'due_date' => $due_date,
                 'pay' => $payment_mode == "Credit" ? $amount_paid : $total,
                 'due' => $payment_mode == "Credit" ? ($total - $amount_paid) : 0,
@@ -634,7 +639,7 @@ class InvoiceController extends Controller
             }
             DB::table('orders')->where('id', $order->id)->update([
                 'customer_id' => $customer_id,
-//                'payment_mode' => $payment_mode,
+                //                'payment_mode' => $payment_mode,
                 'due_date' => $due_date,
                 'pay' => $payment_mode == "Credit" ? $amount_paid : $total,
                 'due' => $payment_mode == "Credit" ? ($total - $amount_paid) : 0,

@@ -845,7 +845,6 @@ class InvoiceController extends Controller
         if (\Cart::getContent()->isEmpty())
             $this->loadOrderInvoiceToCart($order);
         $cart_products = \Cart::getContent();
-        //dd($cart_products);
         $categories = Category::orderBy('name', 'ASC')->get();
         $store = Store::where('id', 'LIKE', $user_branch)->get();
         return view('pages.pos.index', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'order'));
@@ -879,20 +878,22 @@ class InvoiceController extends Controller
     }
     public function loadOrderInvoiceToCart(OrderInvoice $order)
     {
-
         foreach ($order->order_items()->get() as $item) {
             $selling_price = $item->selling_price;
             $cost_price = $item->cost_price;
             $qty_available = $item->qty_available;
             $store = $item->storeProduct->store->name;
             $qty = $item->quantity;
-            $add = \Cart::add([
-                'id' => $item->store_product_id,
-                'name' => $item->storeProduct->product->name,
-                'price' => $item->sold_price,
-                'quantity' => $qty == 0 ? 1 : $qty,
-                'attributes' => array('cost_price' => $cost_price, 'code' => $item->storeProduct->product->code, 'selling_price' => $selling_price, 'qty_available' => $qty_available, 'discount' => 0, 'store' => $store),
-            ]);
+            $store_products = StoreProduct::find($item->store_product_id);
+            if ($store_products && $store_products->qty_available > 0){
+                $add = \Cart::add([
+                    'id' => $item->store_product_id,
+                    'name' => $item->storeProduct->product->name,
+                    'price' => $item->sold_price,
+                    'quantity' => $qty <= $store_products->qty_available ? $qty : ceil($store_products->qty_available),
+                    'attributes' => array('cost_price' => $cost_price, 'code' => $item->storeProduct->product->code, 'selling_price' => $selling_price, 'qty_available' => $qty_available, 'discount' => 0, 'store' => $store),
+                ]);
+            }
         }
 
         //dd(\Cart::getContent());

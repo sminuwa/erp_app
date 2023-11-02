@@ -238,17 +238,23 @@
                             <a href="{{ route('proformer.list') }}"
                                class="nav-link ">
                                 <i class="ion-card"></i>
-                                <p>Proformer Invoice</p>
+                                <p>Proforma Invoice</p>
                             </a>
                         </li>
-
+                        <li class="nav-item">
+                            <a href="{{route('customers.credit.note')}}"
+                               class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>Credit Note</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
                         <i class="ion-android-list"></i>
                         <p>
-                            Inventory
+                            Purchases
                             <i class="right fa fa-angle-left"></i>
                         </p>
                     </a>
@@ -303,14 +309,6 @@
                                class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Debit Note</p>
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a href="{{route('customers.credit.note')}}"
-                               class="nav-link ">
-                                <i class="ion-card"></i>
-                                <p>Credit Note</p>
                             </a>
                         </li>
 

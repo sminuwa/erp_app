@@ -56,5 +56,27 @@ class GeneralAccountLedger extends Model
         return $query->where('general_account_ledgers.reference', $reference);
     }
 
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function payer(){
+        if($this->model_name == 'Customer')
+            return Customer::find($this->model_id);
+        if($this->model_name == 'Supplier')
+            return Supplier::find($this->model_id);
+        if($this->model_name == 'GeneralAccount')
+            return GeneralAccount::find($this->model_id);
+    }
+
+    public function account(){
+        if($this->charged_account_name == 'Customer')
+            return Customer::find($this->charged_account_id);
+        if($this->charged_account_name == 'Supplier')
+            return Supplier::find($this->charged_account_id);
+        if($this->charged_account_name == 'GeneralAccount')
+            return GeneralAccount::find($this->charged_account_id);
+    }
 
 }

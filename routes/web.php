@@ -292,7 +292,7 @@ Route::middleware('auth')->group(function () {
             Route::delete('/delete/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
         });
         Route::group(['prefix' => 'proforma'], function () {
-            Route::get('proforma', [PosController::class, 'index'])->name('proformer.index');
+            Route::get('/', [PosController::class, 'index'])->name('proforma.index');
             Route::post('/proforma/create', [InvoiceController::class, 'final_proformer'])->name('proformer.create');
             Route::get('/proforma/print/{customer_id}', [InvoiceController::class, 'print_proformer'])->name('proformer.print');
             Route::delete('/proforma-invoice/delete/{order}', [OrderController::class, 'destroy_proformer'])->name('proformer.destroy');
@@ -1045,6 +1045,7 @@ Route::middleware('auth')->group(function () {
 
     //inventory
 
+    Route::get('/sample/report', [App\Http\Controllers\HomeController::class, 'sampleReport'])->name('sample-report');
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::post('customer/search', 'CustomerController@search')->name('customer.search');
     Route::get('/notification', [NotificationController::class, 'notify'])->name('notification');

@@ -827,7 +827,6 @@ class InvoiceController extends Controller
     }
     public function linkOrderInvoice(Request $request, OrderInvoice $order)
     {
-        return $order;
         $user_branch = User::userBranchAction();
         $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
@@ -926,12 +925,9 @@ class InvoiceController extends Controller
         }
         $customer_id = $request->input('customer_id');
 
-
-
         $sub_total = str_replace(',', '', \Cart::getSubTotal());
         $tax = 0;
         $total = str_replace(',', '', \Cart::getTotal());
-
 
         $pay = $request->input('pay');
         //$due = $total - $pay;
@@ -953,14 +949,12 @@ class InvoiceController extends Controller
                 'total' => $total,
                 'invoice_no' => $invoice,
                 'modified_by' => Auth::id(),
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
             ]);
 
             $contents = \Cart::getContent();
             $products = [];
             $total_discount = 0;
-
+            DB::table('order_invoice_details')->where('order_id', $order->id)->delete();
             foreach ($contents as $content) {
                 //Put back the previous quantity
                 /*$restored_qty = $order->order_items()->where('store_product_id', $content->id)->first();
@@ -970,7 +964,7 @@ class InvoiceController extends Controller
                 $total_discount += $content->attributes['discount'] * $content->quantity;
                 $store = StoreProduct::find($content->id);
                 $qtyAval = $store->qty_available;
-//                DB::table('order_invoice_details')->where('order_id', $order->id)->delete();
+
                 DB::table('order_invoice_details')->insert([
                     'store_product_id' => $content->id,
                     'order_id' => $order->id,

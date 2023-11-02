@@ -45,7 +45,7 @@
                                             style="margin-left: 2px;"><span class="fa fa-list"> </span> View Sales </a>
                                     @endcan
                                     @can('make.daily.sale')
-                                        <a href="{{ route('proformer.index') }}" class="btn btn-sm btn-secondary"
+                                        <a href="{{ route('proforma.index') }}" class="btn btn-sm btn-secondary"
                                             style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Proformer</a>
                                     @endcan
                                 </div>

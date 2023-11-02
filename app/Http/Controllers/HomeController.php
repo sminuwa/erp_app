@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GeneralAccountLedger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -65,11 +66,11 @@ class HomeController extends Controller
         $today_due = Order::whereDate('order_date', $today_date)->where(['orders.branch_id' => User::userBranchAction(),'payment_mode'=>'Credit','status'=>1])->where('due','>',0)->get();
         $yesterday_due = Order::whereDate('order_date', date('Y-m-d', strtotime('-1 day')))->where(['orders.branch_id' => User::userBranchAction(),'payment_mode'=>'Credit','orders.status'=>1])->where('due','>',0)->get();
 
-        
+
         $month_due = Order::distinct()->whereMonth('order_date', $month_date)->where(['orders.branch_id' => User::userBranchAction(),'payment_mode'=>'Credit','status'=>1])->where('due','>',0)->get();
         $previous_month_due = Order::whereMonth('order_date', date('m', strtotime('-1 month')))->where(['orders.branch_id' => User::userBranchAction(),'payment_mode'=>'Credit','orders.status'=>1])->where('due','>',0)->get();
 
-        
+
         $year_due = Order::distinct()->whereYear('order_date', $year_date)->where(['orders.branch_id' => User::userBranchAction(),'payment_mode'=>'Credit','status'=>1])->where('due','>',0)->get();
         $previous_year_due = Order::whereYear('order_date', date('Y', strtotime('-1 year')))->where(['orders.branch_id' => User::userBranchAction(),'payment_mode'=>'Credit','orders.status'=>1])->where('due','>',0)->get();
 
@@ -113,5 +114,10 @@ class HomeController extends Controller
         return view('home', compact('today', 'yesterday', 'month', 'previous_month', 'year', 'previous_year', 'sales',
         'today_due', 'yesterday_due', 'month_due', 'previous_month_due', 'year_due', 'previous_year_due', 'sales_due',
          'today_expenses', 'yesterday_expenses', 'month_expenses', 'previous_month_expenses', 'year_expenses', 'previous_year_expenses', 'expenses', 'current_sales', 'current_expenses', 'user_sales_per_branch'));
+    }
+
+    public function sampleReport(){
+        $reports = GeneralAccountLedger::all();
+        return view('sample-report', compact('reports'));
     }
 }

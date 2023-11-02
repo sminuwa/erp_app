@@ -52,7 +52,7 @@ class CartController extends Controller
 
         } else {
 
-            session()->flash('Product not added to cart');
+            session()->flash('success','Product not added to cart');
             return back()->with('customer', $customer);
         }
     }

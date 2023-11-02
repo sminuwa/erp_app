@@ -269,7 +269,7 @@ Route::middleware('auth')->group(function () {
     });
     Route::group(['prefix' => 'sales'], function () {
         Route::group(['prefix' => 'orders'], function () {
-            Route::get('order_invoice', [PosController::class, 'index'])->name('order.invoice.index');
+            Route::get('/create', [PosController::class, 'index'])->name('order.invoice.index');
             Route::post('/order-invoice/create', [InvoiceController::class, 'final_order_invoice'])->name('order.invoice.create');
             Route::get('/order-invoice/edit/{order}', [InvoiceController::class, 'editOrderInvoice'])->name('order.invoice.edit');
             Route::get('/order-invoice/link/{order}', [InvoiceController::class, 'linkOrderInvoice'])->name('order.invoice.linking');
@@ -277,7 +277,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/order-print/{order_id}', [InvoiceController::class, 'order_print'])->name('invoice.order_print');
             Route::get('/order-invoice/print/{customer_id}', [InvoiceController::class, 'print_order_invoice'])->name('order.invoice.print');
             Route::get('/order-invoice/show/{id}', [OrderController::class, 'order_invoice_show'])->name('order.invoice.show');
-            Route::get('/order-invoice', [OrderController::class, 'order_invoice_list'])->name('order.invoice.list');
+            Route::get('/', [OrderController::class, 'order_invoice_list'])->name('order.invoice.list');
             Route::delete('/order-invoice/delete/{order}', [OrderController::class, 'destroy_order_invoice'])->name('order.invoice.destroy');
             Route::post('/order-invoice/close/{order}', [OrderController::class, 'orderInvoiceClose'])->name('order.invoice.close');
             Route::post('/order-invoice/search', [OrderController::class, 'order_invoice_search'])->name('order.invoice.search');
@@ -293,12 +293,12 @@ Route::middleware('auth')->group(function () {
             Route::delete('/delete/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
         });
         Route::group(['prefix' => 'proforma'], function () {
-            Route::get('/', [PosController::class, 'index'])->name('proforma.index');
+            Route::get('/create', [PosController::class, 'index'])->name('proforma.index');
             Route::post('/proforma/create', [InvoiceController::class, 'final_proformer'])->name('proformer.create');
             Route::get('/proforma/print/{customer_id}', [InvoiceController::class, 'print_proformer'])->name('proformer.print');
             Route::delete('/proforma-invoice/delete/{order}', [OrderController::class, 'destroy_proformer'])->name('proformer.destroy');
             Route::get('/proforma/show/{id}', [OrderController::class, 'proformer_show'])->name('proformer.show');
-            Route::get('/proforma', [OrderController::class, 'proformer_list'])->name('proformer.list');
+            Route::get('/', [OrderController::class, 'proformer_list'])->name('proformer.list');
             Route::post('/proforma/search', [OrderController::class, 'proformer_search'])->name('proformer.search');
         });
 

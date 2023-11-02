@@ -196,12 +196,11 @@
                                 <h3 class="card-title">
                                     <i class="fa fa-shopping-cart"></i>
                                     Cart
-
                                 </h3>
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body table-responsive" id="load_cart">
-{{--                                @json(\Cart::getContent())--}}
+                                @json(Cart::getContent())
                                 @if (Cart::getTotal() < 1)
                                     <div class="alert alert-danger">
                                         No Product Added

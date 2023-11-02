@@ -707,7 +707,7 @@ class OrderController extends Controller
         $orders = Order::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where(['order_status' => 'approved', 'status' => 1]);
         if ($user->hasRole('Sales-Manager'))
             $orders = $orders->where('sold_by', Auth::id());
-        $orders = $orders->whereDate('order_date', date('Y-m-d'))->get();
+        $orders = $orders->whereBetween('order_date', [date('Y-m-d',strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])->get();
         return view('pages.order.approved_orders', compact('orders'));
     }
     public function order_invoice_list()

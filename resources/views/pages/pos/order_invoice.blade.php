@@ -81,12 +81,13 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Customer Type</label>
-                                                <select name="account_type" id="account_type" class="form-control" required>
+                                                <select
+                                                        name="account_type" id="account_type" class="form-control" required>
                                                     <option value="" disabled selected>Select...</option>
-                                                    <option value="Retail"
+                                                    <option value="Retail" @if(session()->has('customer') && session('customer')->type == 'Retail') selected @endif
                                                         {{ (isset($order) && $order->customer->type) == 'Retail' ? 'selected' : '' }}>
                                                         Retail</option>
-                                                    <option value="Wholesale"
+                                                    <option value="Wholesale" @if(session()->has('customer') && session('customer')->type == 'Wholesale') selected @endif
                                                         {{ (isset($order) && $order->customer->type) == 'WholeSale' ? 'selected' : '' }}>
                                                         WholeSale</option>
                                                 </select>
@@ -96,11 +97,15 @@
                                             <div class="form-group">
                                                 <label>Customer</label>
                                                 <div class="form-group">
-                                                    <select name="customer_id" id="customer_record"
+                                                    <select onchange="$('.customer').val($(this).val())"
+                                                        name="customer_id" id="customer_record"
                                                         class="form-control select2-single">
+                                                        @if(session()->has('customer'))
+                                                            <option value="{{ session('customer')->id }}">{{ session('customer')->code }} - {{ session('customer')->name }}</option>
+                                                        @endif
                                                         @if (isset($order))
-                                                            <option value="{{ $order->customer->id }}">
-                                                                {{ $order->customer->name }}</option>
+                                                            <option value="{{ $order->customer->id }}" @if(session()->has('customer') && session('customer')->id == $order->customer?->id) selected @endif>
+                                                                {{ $order->customer->code }} - {{ $order->customer->name }}</option>
                                                         @endif
                                                     </select>
 
@@ -113,9 +118,7 @@
                                                     <input type="text" class="form-control" name="reference" id="reference"
                                                         placeholder="Reference" />
                                                 </div> --}}
-                                                <button type="submit"
-                                                    class="btn btn-sm btn-info float-md-right ml-3">Create
-                                                    Invoice</button>
+                                                <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button>
                                             </div>
                                         </div>
                                     </div>
@@ -129,7 +132,6 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">Products</h3>
-
                                 @can('make.daily.sale')
                                     <input type="text" id="barcode" class="form-control" name="barcode"
                                         placeholder="Scan barcode">
@@ -163,6 +165,7 @@
                                                 <tr>
                                                     <form action="{{ route('cart.store') }}" method="post">
                                                         @csrf
+                                                        <input type="hidden" name="customer" class="customer" value="@if(session()->has('customer')) {{ session('customer')->id }} @endif">
                                                         <input type="hidden" name="id" value="{{ $store->id }}">
                                                         <input type="hidden" name="name" value="{{ $store->name }}">
                                                         <input type="hidden" name="code" value="{{ $store->code }}">

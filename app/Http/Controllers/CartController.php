@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use Illuminate\Http\Request;
 use Darryldecode\Cart\Cart;
 use Brian2694\Toastr\Facades\Toastr;
@@ -28,6 +29,9 @@ class CartController extends Controller
             'qty' => 'required',
             'cost_price' => 'required'
         ]);
+        $customer = Customer::find($request->customer);
+//        $order = Customer::where('type', $customer->type)->get();
+//        return $order;
         $qty = $request->qty;
         $selling_price = $request->selling_price;
         $cost_price = $request->cost_price;
@@ -43,12 +47,13 @@ class CartController extends Controller
         //dd(\Cart::getContent());
         if ($add) {
             session()->flash('success', 'Product is Added to Cart Successfully !');
-            return redirect()->back();
+
+            return back()->with(['customer'=> $customer]);
 
         } else {
 
             session()->flash('Product not added to cart');
-            return redirect()->back();
+            return back()->with('customer', $customer);
         }
     }
 

@@ -840,7 +840,7 @@ class InvoiceController extends Controller
             ->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('branch_product_prices.status', 1)
             ->orderBy('products.name')->orderBy('stores.name')->limit(100)->get();
-
+        //TODO:: remove limit here
         $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name');
         if (\Cart::getContent()->isEmpty())
             $this->loadOrderInvoiceToCart($order);
@@ -865,7 +865,7 @@ class InvoiceController extends Controller
             ->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('branch_product_prices.status', 1)
             ->orderBy('products.name')->orderBy('stores.name')->limit(100)->get();
-
+            //TODO:: remove limit here
 
         $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
         if (\Cart::getContent()->isEmpty())

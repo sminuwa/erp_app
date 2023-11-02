@@ -43,8 +43,7 @@
                                     <h3 class="card-title">
                                         Customer
                                         <span>
-                                            &nbsp;
-
+                                            &nbsp
                                             @can('view.customer.ledger')
                                                 <a href="javascript:void(0)" data-toggle="modal"
                                                     data-target="#customer_ledgerform"
@@ -116,13 +115,8 @@
                                                     <input type="hidden" name="order_invoice_id"
                                                         value="{{ $order->id }}" />
                                                 @endisset
-                                                {{-- <div class="form-group" style="border: 1px solid rgba(64, 44, 45, 0.4)">
-                                                        <input type="text" class="form-control" name="reference" id="reference"
-                                                            placeholder="Reference" />
-                                                    </div> --}}
-                                                <button type="submit"
-                                                    class="btn btn-sm btn-info float-md-right ml-3">Create
-                                                    Invoice</button>
+
+                                                <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button>
                                             </div>
                                         </div>
                                     </div>

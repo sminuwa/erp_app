@@ -122,10 +122,7 @@ class InvoiceController extends Controller
     {
         $invoice = $this->generateInvoice();
         $inputs = $request->except('_token');
-
-
         $rules = [];
-
         $rules = [
             'customer_id' => 'required|exists:customers,id',
         ];
@@ -197,8 +194,6 @@ class InvoiceController extends Controller
                     'status' => 0,
                     'order_invoice_id' => $request->order_invoice_id,
                     'branch_id' => User::userBranchAction(),
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
                 ]);
 
                 $contents = \Cart::getContent();
@@ -278,7 +273,7 @@ class InvoiceController extends Controller
                     'updated_at' => Carbon::now(),
                 ]);
                 DB::table('order_invoices')->where('id', $request->order_invoice_id)->update([
-                    'order_status' => 'Completed',
+                    'status' => 3,
                     'approved_by' => auth()->id(),
                     'updated_at' => Carbon::now()
                 ]);

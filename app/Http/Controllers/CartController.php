@@ -44,7 +44,7 @@ class CartController extends Controller
             'quantity' => $qty == 0 ? 1 : $qty,
             'attributes' => array('cost_price' => $cost_price, 'code'=>$request->code,'selling_price' => $selling_price, 'qty_available' => $qty_available, 'discount' => 0,'store'=>$store),
         ]);
-        //dd(\Cart::getContent());
+//        return \Cart::getContent();
         if ($add) {
             session()->flash('success', 'Product is Added to Cart Successfully !');
 
@@ -64,7 +64,6 @@ class CartController extends Controller
             $percent = $request->percent;
             $sold_price = ceil($request->cost_price + ($request->cost_price / 100) * $percent);
         }
-
 
         \Cart::update(
             $request->id,

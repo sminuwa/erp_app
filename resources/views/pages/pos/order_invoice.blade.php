@@ -49,26 +49,6 @@
                                 <div class="card-header">
                                     <h3 class="card-title">
                                         Order Details {{ isset($order) ? ": Edit Mode $order->reference" : '' }}
-                                        <span>
-                                            &nbsp;
-                                            @can('view.customer.ledger')
-                                                <a href="javascript:void(0)" data-toggle="modal"
-                                                    data-target="#customer_ledgerform"
-                                                    class="btn btn-sm btn-secondary float-md-right"
-                                                    style="margin-left: 2px;">Customer Ledger </a>
-                                            @endcan
-                                            @can('increase.customer.credit.limit')
-                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#credit_limitform"
-                                                    class="btn btn-sm btn-success float-md-right"
-                                                    style="margin-left: 2px;">Increase Limit </a>
-                                            @endcan
-                                            @can('add.customer')
-                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#customermodal"
-                                                    class="btn btn-sm btn-primary float-md-right">Add New</a>
-                                            @endcan
-                                            <span class="text text-danger fa fa-mobile">Send SMS: </span> <input
-                                                type="checkbox" name="sms" id="sms" />
-                                        </span>
                                     </h3>
 
                                 </div>

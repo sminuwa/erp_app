@@ -157,10 +157,12 @@ class Transaction
 
     }
 
-    /*
-     * $products = [2=>20,5=>10]
-     * */
+
     public static function sale(array $store_product, int $customer_id, string $reference, $date){
+        /*
+         *
+         * $products = [2=>20,5=>10]
+         * */
         //branch
         //category
         //GLs tied to each category (Asset account, Cost Of Sale Account, Revenue Account, Customer Account)

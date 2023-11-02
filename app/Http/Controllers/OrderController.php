@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Transaction;
 use App\Models\Customer;
 use App\Models\Expense;
 use App\Models\Order;
@@ -566,8 +567,32 @@ class OrderController extends Controller
         $orders = $orders->whereBetween('order_date', [date('Y-m-d',strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])->get();
         return view('pages.order.approved_orders', compact('orders'));
     }
-    public function post(Order $invoice){
-        return $invoice;
+    public function post(Order $invoice) {
+        $invoice->status = 1;
+        $invoice->posted_by = auth()->id();
+        $items = $invoice->order_items;
+        DB::beginTransaction();
+        if($invoice->save()){
+            $products = [];
+            foreach ($items as $item) {
+                $products[$item->id] = $item->quantity;
+            }
+            if(Transaction::sale(
+                $products,
+                $invoice->customer_id,
+                $invoice->reference,
+                $invoice->order_date)
+            ){
+                $action = "Invoice of $invoice->total for : " . $invoice->reference;
+                AuditLog::auditLog(auth()->id(), $action);
+                session()->flash('app_message', 'Receipt generated successfully');
+                DB::commit();
+            }else {
+                DB::rollBack();
+                session()->flash('app_message', 'Something went wrong');
+            }
+        }
+        return back();
     }
     public function show($id)
     {
@@ -677,7 +702,7 @@ class OrderController extends Controller
     public function order_confirm($id)
     {
         $order = Order::findOrFail($id);
-        $order->order_status = 'approved';
+        $order->status = 1;
         $order->save();
 
         session()->flash('Order has been Approved! Please deliver the products', 'Success');

@@ -100,11 +100,11 @@
                                                 $total_pay = $total_pay + $order->pay;
                                                 $total_due = $total_due + $order->due;
                                             @endphp
-                                            <tr>
+                                            <tr class="@if($order->status == 0) bg-warning @endif">
                                                 <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}
                                                 </td>
                                                 <td>{{ $order->customer->name }}</td>
-                                                <td>{{ $order->invoice_no }}</td>
+                                                <td>{{ $order->reference }}</td>
                                                 <td align="right">&#8358;{{ number_format($order->total, 2, '.', ',') }}
                                                 </td>
                                                 <td align="right">&#8358;{{ number_format($order->pay, 2, '.', ',') }}</td>
@@ -130,7 +130,7 @@
                                                                data-target="#order_detail_form{{ $order->id }}"
                                                                data-val="{{ $order->id }}"
                                                                class="dropdown-item show">
-                                                                <i class="fa fa-eye" aria-hidden="true"></i> Confirm
+                                                                <i class="fa fa-check" aria-hidden="true"></i> Confirm
                                                             </a>
                                                             <a href="{{ route('invoice.order_print', $order->id) }}"
                                                                target="_BLANK" class="dropdown-item">
@@ -154,7 +154,7 @@
                                                                     @csrf
                                                                     <button type="submit"
                                                                             class="dropdown-item">
-                                                                        <i class="fa fa-close" aria-hidden="true"></i> Post
+                                                                        <i class="fa fa-check" aria-hidden="true"></i> Post
                                                                     </button>
                                                                 </form>
 

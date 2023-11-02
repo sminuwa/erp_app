@@ -48,12 +48,12 @@ class CartController extends Controller
         if ($add) {
             session()->flash('success', 'Product is Added to Cart Successfully !');
 
-            return back()->with(['customer'=> $customer]);
+            return redirect()->back()->with(['customer'=> $customer]);
 
         } else {
 
             session()->flash('success','Product not added to cart');
-            return back()->with('customer', $customer);
+            return redirect()->back()->with('customer', $customer);
         }
     }
 

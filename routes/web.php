@@ -1050,7 +1050,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/notification', [NotificationController::class, 'notify'])->name('notification');
     Route::post('/notification/send', [NotificationController::class, 'send'])->name('notification.send');
 
-
     Route::get('generate/product_code', [MisController::class, 'generateProductCode'])->name('generate.productCode');
     Route::get('generate/customer_code', [MisController::class, 'nextCustomerCode'])->name('generate.customerCode');
 

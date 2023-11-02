@@ -866,7 +866,7 @@ class InvoiceController extends Controller
             })
             ->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('branch_product_prices.status', 1)
-            ->orderBy('products.name')->orderBy('stores.name')->get();
+            ->orderBy('products.name')->orderBy('stores.name')->limit(100)->get();
 
 
         $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
@@ -970,7 +970,7 @@ class InvoiceController extends Controller
                 $total_discount += $content->attributes['discount'] * $content->quantity;
                 $store = StoreProduct::find($content->id);
                 $qtyAval = $store->qty_available;
-                //DB::table('order_invoice_details')->where('order_id', $order->id)->delete();
+//                DB::table('order_invoice_details')->where('order_id', $order->id)->delete();
                 DB::table('order_invoice_details')->insert([
                     'store_product_id' => $content->id,
                     'order_id' => $order->id,

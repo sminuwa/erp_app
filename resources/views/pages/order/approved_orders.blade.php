@@ -116,66 +116,62 @@
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button"
-                                                            id="dropdownMenuButton" data-toggle="dropdown"
-                                                            aria-haspopup="true" aria-expanded="false">
+                                                                id="dropdownMenuButton" data-toggle="dropdown"
+                                                                aria-haspopup="true" aria-expanded="false">
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            @can('verify.invoice')
-                                                                <a href="javascript:void(0)" data-toggle="modal"
-                                                                    data-target="#order_detail_form{{ $order->id }}"
-                                                                    data-val="{{ $order->id }}"
-                                                                    class="btn btn-success btn-sm show">
-                                                                    <i class="fa fa-eye" aria-hidden="true"></i>
-                                                                </a>
-                                                            @endcan
-                                                            {{-- @can('transfer.sale.to.user')
-                                                                <a href="javascript:void(0)" data-toggle="modal"
-                                                                    data-target="#sale_transfer_form{{ $order->id }}"
-                                                                    data-val="{{ $order->id }}"
-                                                                    class="btn btn-success btn-sm show">
-                                                                    <i class="fa fa-exchange" aria-hidden="true"></i>
-                                                                </a>
-                                                            @endcan --}}
-                                                            <a href="{{ route('invoice.order_print', $order->id) }}"
-                                                                target="_BLANK" class="btn btn-secondary btn-sm">
-                                                                <i class="fa fa-print" aria-hidden="true"></i>
+                                                            <a href="{{ route('orders.show', $order->id) }}"
+                                                               class="dropdown-item">
+                                                                <i class="fa fa-eye" aria-hidden="true"></i> View
                                                             </a>
-                                                            <a href="{{ route('waybill.order_print', $order->id) }}"
-                                                                target="_BLANK" class="btn btn-primary btn-sm">
-                                                                <i class="fa fa-print" aria-hidden="true"></i> Waybill
+
+                                                            <a href="javascript:void(0)" data-toggle="modal"
+                                                               data-target="#order_detail_form{{ $order->id }}"
+                                                               data-val="{{ $order->id }}"
+                                                               class="dropdown-item show">
+                                                                <i class="fa fa-eye" aria-hidden="true"></i> Confirm
+                                                            </a>
+                                                            <a href="{{ route('invoice.order_print', $order->id) }}"
+                                                               target="_BLANK" class="dropdown-item">
+                                                                <i class="fa fa-print" aria-hidden="true"></i> Print
                                                             </a>
                                                             <a href="{{ route('pos.order_print', $order->id) }}"
-                                                                target="_BLANK" class="btn btn-primary btn-sm">
-                                                                <i class="fa fa-print" aria-hidden="true"></i> POS
+                                                               target="_BLANK" class="dropdown-item">
+                                                                <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
                                                             </a>
-                                                            @can('edit.daily.sale')
-                                                                <a href="{{ route('pos.edit', $order->id) }}"
-                                                                    class="btn btn-primary btn-sm">
-                                                                    <i class="fa fa-edit" aria-hidden="true"></i>
-                                                                </a>
-                                                            @endcan
+                                                            <a href="{{ route('waybill.order_print', $order->id) }}"
+                                                               target="_BLANK" class="dropdown-item">
+                                                                <i class="fa fa-print" aria-hidden="true"></i> Waybill
+                                                            </a>
 
-                                                            {{-- <a href="javascript:void(0)" data-toggle="modal"
-                                                        data-target=".order_edit" data-val="{{ $order->id }}"
-                                                        class="btn btn-primary btn-sm edit">
-                                                        <i class="fa fa-edit" aria-hidden="true"></i>
-                                                    </a> --}}
-                                                            @can('delete.daily.sale')
-                                                                <button class="btn btn-danger btn-sm" type="button"
-                                                                    onclick="deleteItem({{ $order->id }})">
-                                                                    <i class="fa fa-trash" aria-hidden="true"></i>
-                                                                </button>
-                                                                <form id="delete-form-{{ $order->id }}"
-                                                                    action="{{ route('orders.destroy', $order->id) }}"
-                                                                    method="post" style="display:none;">
+                                                            @if ($order->status == 0)
+                                                                <a href="{{ route('pos.edit', $order->id) }}"
+                                                                   class="dropdown-item">
+                                                                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                                                </a>
+                                                                <form action="{{ route('invoice.post', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to post this invoice?')">
+                                                                    @csrf
+                                                                    <button type="submit"
+                                                                            class="dropdown-item">
+                                                                        <i class="fa fa-close" aria-hidden="true"></i> Post
+                                                                    </button>
+                                                                </form>
+
+                                                                <form id="delete-form-{{ $order->id }}" action="{{ route('orders.destroy', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to close this invoice?')">
                                                                     @csrf
                                                                     @method('DELETE')
+                                                                    <button class="dropdown-item" type="submit">
+                                                                        <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                                                    </button>
                                                                 </form>
-                                                            @endcan
+
+                                                            @endif
+
                                                         </div>
                                                     </div>
                                                 </td>
+
                                             </tr>
                                             <div class="modal fade" id="order_detail_form{{ $order->id }}"
                                                 style="display: none;" aria-hidden="true">
@@ -362,7 +358,7 @@
                          id = $(this).attr('data-val');
                          //$('#'+id).submit();
                          qty = $('#qty' + id).val();
-                        
+
                          unit_cost = $('#unit_cost' + id).val();
                          alert(unit_cost)
                          store_product_id = $('#store_product_id' + id).val();

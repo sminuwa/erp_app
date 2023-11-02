@@ -291,6 +291,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/invoice-final', [InvoiceController::class, 'final_invoice'])->name('invoice.final_invoice');
             Route::get('/show/{id}', [OrderController::class, 'show'])->name('orders.show');
             Route::delete('/delete/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+            Route::post('/post/{invoice}', [OrderController::class, 'post'])->name('invoice.post');
         });
         Route::group(['prefix' => 'proforma'], function () {
             Route::get('/create', [PosController::class, 'index'])->name('proforma.index');

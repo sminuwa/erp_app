@@ -26,38 +26,11 @@ use Carbon\Carbon;
 
 class OrderController extends Controller
 {
-
-    public function show($id)
-    {
-        $order = Order::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
-        $order_details = OrderDetail::with('storeProduct')->where(['order_id' => $id, 'status' => 1])->get();
-        //return $order_details;
-        $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
-        return view('pages.order.order_confirmation', compact('order_details', 'order', 'company'));
-    }
-    public function proformer_show($id)
-    {
-        $order = Proformer::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
-        $order_details = ProformerDetail::with('storeProduct')->where(['order_id' => $id, 'status' => 1])->get();
-        //return $order_details;
-        $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
-        return view('pages.order.show_proformer', compact('order_details', 'order', 'company'));
-    }
-    public function order_invoice_show($id)
-    {
-        $order = OrderInvoice::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
-        $order_details = OrderInvoiceDetail::with('storeProduct')->where(['order_id' => $id, 'status' => 1])->get();
-        //return $order_details;
-        $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
-        return view('pages.order.show_order_invoice', compact('order_details', 'order', 'company'));
-    }
-
     public function pending_order()
     {
         $pendings = Order::latest()->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('order_status', 'pending')->get();
         return view('pages.order.pending_orders', compact('pendings'));
     }
-
 
     public function search(Request $request)
     {
@@ -182,20 +155,6 @@ class OrderController extends Controller
         if ($request->type == 'proformer')
             $order = Proformer::find($request->order_id);
         return view('pages.order.view_orders', compact('order'));
-    }
-    public function loadEdit(Request $request)
-    {
-        $order = Order::find($request->order_id);
-        return view('pages.order.load_edit_order', compact('order'));
-    }
-    public function order_confirm($id)
-    {
-        $order = Order::findOrFail($id);
-        $order->order_status = 'approved';
-        $order->save();
-
-        session()->flash('Order has been Approved! Please deliver the products', 'Success');
-        return redirect()->back();
     }
 
     public function destroy(Request $request, Order $order)
@@ -335,98 +294,6 @@ class OrderController extends Controller
         }
         return redirect()->back();
     }
-    public function updateOrder(Request $request, OrderDetail $orderdetail)
-    {
-        $store_product_id = $request->store_product_id;
-        $source_store_id = optional(StoreProduct::where('id', $store_product_id)->first())->store_id;
-        $new_cost = $request->new_cost;
-        $new_qty = $request->qty;
-        $old_qty = $orderdetail->quantity;
-        $old_cost = $orderdetail->unit_cost;
-        $new_total_cost = $new_cost * $new_qty;
-        $old_total_cost = $old_cost * $old_qty;
-
-        DB::beginTransaction();
-        try {
-            $order = $orderdetail->order;
-            $payment_mode = $order->payment_mode;
-
-            $bank_account_id = CustomerLedger::where('order_id', $order->id)->first()->bank_account_id;
-            if ($payment_mode == "Credit") {
-                DB::table('customers')->where(['id' => $order->customer_id, 'type' => 'Credit'])->decrement('opening_balance', $old_total_cost);
-                DB::table('customers')->where(['id' => $order->customer_id, 'type' => 'Credit'])->increment('opening_balance', $new_total_cost);
-            }
-            if ($payment_mode == "Cash") {
-                DB::table('bank_accounts')->where('id', $bank_account_id)->decrement('account_balance', $old_total_cost);
-                DB::table('bank_accounts')->where('id', $bank_account_id)->increment('account_balance', $new_total_cost);
-
-                DB::table('customer_ledgers')->where('order_id', $order->id)->decrement('cr', $old_total_cost);
-                DB::table('customer_ledgers')->where('order_id', $order->id)->decrement('dr', $old_total_cost);
-                DB::table('customer_ledgers')->where('order_id', $order->id)->increment('cr', $new_total_cost);
-                DB::table('customer_ledgers')->where('order_id', $order->id)->increment('dr', $new_total_cost);
-
-                DB::table('orders')->where('id', $order->id)->decrement('total', $old_total_cost);
-                DB::table('orders')->where('id', $order->id)->decrement('sub_total', $old_total_cost);
-                DB::table('orders')->where('id', $order->id)->decrement('pay', $old_total_cost);
-                DB::table('orders')->where('id', $order->id)->decrement('due', $old_total_cost);
-
-                DB::table('orders')->where('id', $order->id)->increment('total', $new_total_cost);
-                DB::table('orders')->where('id', $order->id)->increment('sub_total', $new_total_cost);
-                DB::table('orders')->where('id', $order->id)->increment('pay', $new_total_cost);
-                DB::table('orders')->where('id', $order->id)->increment('due', $new_total_cost);
-
-                //Bank Deposit
-                DB::table('bank_transactions')->where(['ref_no' => $order->invoice_no, 'bank_account_id' => $bank_account_id])->update(
-                    [
-                        'cr' => $new_total_cost,
-                        'updated_at' => Carbon::now(),
-                    ]
-                );
-            } else {
-                DB::table('customer_ledgers')->where('order_id', $order->id)->decrement('cr', $old_total_cost);
-                DB::table('customer_ledgers')->where('order_id', $order->id)->increment('cr', $new_total_cost);
-
-                DB::table('orders')->where('id', $order->id)->decrement('total', $old_total_cost);
-                DB::table('orders')->where('id', $order->id)->decrement('sub_total', $old_total_cost);
-                DB::table('orders')->where('id', $order->id)->decrement('due', $old_total_cost);
-
-                DB::table('orders')->where('id', $order->id)->increment('total', $new_total_cost);
-                DB::table('orders')->where('id', $order->id)->increment('sub_total', $new_total_cost);
-                DB::table('orders')->where('id', $order->id)->increment('due', $new_total_cost);
-
-                if ($order->pay > 0) {
-                    DB::table('orders')->where('id', $order->id)->decrement('pay', $old_total_cost);
-                    DB::table('orders')->where('id', $order->id)->increment('pay', $new_total_cost);
-
-                }
-            }
-            DB::table('transfer_products')->where(['source_store_id' => $orderdetail->storeProduct->store_id, 'product_id' => $orderdetail->storeProduct->product_id, 'refno' => $order->invoice_no])
-                ->update(
-                    [
-                        'status' => 'Cancelled',
-                        'source_store_id' => $source_store_id,
-                        'destination_store_id' => $source_store_id,
-                        'qty_transfered' => $new_qty,
-                        'qty_available' => $new_qty
-                    ]
-                );
-            DB::table('store_products')->where('id', $orderdetail->store_product_id)->decrement('qty_available', $old_qty);
-            DB::table('store_products')->where('id', $store_product_id)->increment('qty_available', $new_qty);
-
-            DB::table('order_details')->where('id', $orderdetail->id)->update(['unit_cost' => $new_cost, 'quantity' => $new_qty]);
-
-            session()->flash('app_message', 'Item modified successfully');
-            $action = "Updated  order made with invoice $order->invoice_no ";
-            AuditLog::auditLog(Auth::id(), $action);
-            DB::commit();
-        } catch (\Exception $e) {
-            session()->flash('app_error', 'Item could not be modified!');
-            DB::rollBack();
-            throw $e;
-        }
-        //return json_encode($orderdetail,true);
-        return redirect()->route('orders.approved');
-    }
     public function download($order_id)
     {
         $order = Order::with('customer')->where('id', $order_id)->first();
@@ -522,7 +389,6 @@ class OrderController extends Controller
 
         return view('pages.sales.today', compact('orders', 'balance'));
     }
-
     public function monthly_sales($month = null)
     {
 
@@ -599,7 +465,6 @@ class OrderController extends Controller
 
         return view('pages.sales.month', compact('orders', 'month', 'balance'));
     }
-
     public function total_sales()
     {
         $balance = Order::all();
@@ -674,18 +539,7 @@ class OrderController extends Controller
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         return view('pages.customer.print', compact('dates', 'customer', 'company'));
     }
-    public function verify(Request $request) // to be verified by store keeper
-    {
-        $order_id = $request->order_id;
-        $comment = $request->comment;
-        $invoice_no = $request->invoice;
-        Order::where('id', $order_id)->update(['comment' => $comment, 'issued_by' => Auth::id()]);
-        session()->flash('app_message', 'Invoice confirmed successfully');
-        $action = "Issued order with invoice $invoice_no out of stock";
-        AuditLog::auditLog(Auth::id(), $action);
-        $orders = Order::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('order_status', 'approved')->whereDate('order_date', date('Y-m-d'))->get();
-        return view('pages.order.approved_orders', compact('orders'));
-    }
+
     public function transfer(Request $request)
     {
         if (Auth::user()->can('transfer.sale.to.user')) {
@@ -700,6 +554,8 @@ class OrderController extends Controller
             return redirect()->route('orders.approved');
         }
     }
+
+    //invoice
     public function invoice_list()
     {
         \Cart::clear();
@@ -710,6 +566,137 @@ class OrderController extends Controller
         $orders = $orders->whereBetween('order_date', [date('Y-m-d',strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])->get();
         return view('pages.order.approved_orders', compact('orders'));
     }
+    public function post(Order $invoice){
+        return $invoice;
+    }
+    public function show($id)
+    {
+        $order = Order::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
+        $order_details = OrderDetail::with('storeProduct')->where(['order_id' => $id, 'status' => 1])->get();
+        //return $order_details;
+        $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
+        return view('pages.order.order_confirmation', compact('order_details', 'order', 'company'));
+    }
+    public function updateOrder(Request $request, OrderDetail $orderdetail)
+    {
+        $store_product_id = $request->store_product_id;
+        $source_store_id = optional(StoreProduct::where('id', $store_product_id)->first())->store_id;
+        $new_cost = $request->new_cost;
+        $new_qty = $request->qty;
+        $old_qty = $orderdetail->quantity;
+        $old_cost = $orderdetail->unit_cost;
+        $new_total_cost = $new_cost * $new_qty;
+        $old_total_cost = $old_cost * $old_qty;
+
+        DB::beginTransaction();
+        try {
+            $order = $orderdetail->order;
+            $payment_mode = $order->payment_mode;
+
+            $bank_account_id = CustomerLedger::where('order_id', $order->id)->first()->bank_account_id;
+            if ($payment_mode == "Credit") {
+                DB::table('customers')->where(['id' => $order->customer_id, 'type' => 'Credit'])->decrement('opening_balance', $old_total_cost);
+                DB::table('customers')->where(['id' => $order->customer_id, 'type' => 'Credit'])->increment('opening_balance', $new_total_cost);
+            }
+            if ($payment_mode == "Cash") {
+                DB::table('bank_accounts')->where('id', $bank_account_id)->decrement('account_balance', $old_total_cost);
+                DB::table('bank_accounts')->where('id', $bank_account_id)->increment('account_balance', $new_total_cost);
+
+                DB::table('customer_ledgers')->where('order_id', $order->id)->decrement('cr', $old_total_cost);
+                DB::table('customer_ledgers')->where('order_id', $order->id)->decrement('dr', $old_total_cost);
+                DB::table('customer_ledgers')->where('order_id', $order->id)->increment('cr', $new_total_cost);
+                DB::table('customer_ledgers')->where('order_id', $order->id)->increment('dr', $new_total_cost);
+
+                DB::table('orders')->where('id', $order->id)->decrement('total', $old_total_cost);
+                DB::table('orders')->where('id', $order->id)->decrement('sub_total', $old_total_cost);
+                DB::table('orders')->where('id', $order->id)->decrement('pay', $old_total_cost);
+                DB::table('orders')->where('id', $order->id)->decrement('due', $old_total_cost);
+
+                DB::table('orders')->where('id', $order->id)->increment('total', $new_total_cost);
+                DB::table('orders')->where('id', $order->id)->increment('sub_total', $new_total_cost);
+                DB::table('orders')->where('id', $order->id)->increment('pay', $new_total_cost);
+                DB::table('orders')->where('id', $order->id)->increment('due', $new_total_cost);
+
+                //Bank Deposit
+                DB::table('bank_transactions')->where(['ref_no' => $order->invoice_no, 'bank_account_id' => $bank_account_id])->update(
+                    [
+                        'cr' => $new_total_cost,
+                        'updated_at' => Carbon::now(),
+                    ]
+                );
+            } else {
+                DB::table('customer_ledgers')->where('order_id', $order->id)->decrement('cr', $old_total_cost);
+                DB::table('customer_ledgers')->where('order_id', $order->id)->increment('cr', $new_total_cost);
+
+                DB::table('orders')->where('id', $order->id)->decrement('total', $old_total_cost);
+                DB::table('orders')->where('id', $order->id)->decrement('sub_total', $old_total_cost);
+                DB::table('orders')->where('id', $order->id)->decrement('due', $old_total_cost);
+
+                DB::table('orders')->where('id', $order->id)->increment('total', $new_total_cost);
+                DB::table('orders')->where('id', $order->id)->increment('sub_total', $new_total_cost);
+                DB::table('orders')->where('id', $order->id)->increment('due', $new_total_cost);
+
+                if ($order->pay > 0) {
+                    DB::table('orders')->where('id', $order->id)->decrement('pay', $old_total_cost);
+                    DB::table('orders')->where('id', $order->id)->increment('pay', $new_total_cost);
+
+                }
+            }
+            DB::table('transfer_products')->where(['source_store_id' => $orderdetail->storeProduct->store_id, 'product_id' => $orderdetail->storeProduct->product_id, 'refno' => $order->invoice_no])
+                ->update(
+                    [
+                        'status' => 'Cancelled',
+                        'source_store_id' => $source_store_id,
+                        'destination_store_id' => $source_store_id,
+                        'qty_transfered' => $new_qty,
+                        'qty_available' => $new_qty
+                    ]
+                );
+            DB::table('store_products')->where('id', $orderdetail->store_product_id)->decrement('qty_available', $old_qty);
+            DB::table('store_products')->where('id', $store_product_id)->increment('qty_available', $new_qty);
+
+            DB::table('order_details')->where('id', $orderdetail->id)->update(['unit_cost' => $new_cost, 'quantity' => $new_qty]);
+
+            session()->flash('app_message', 'Item modified successfully');
+            $action = "Updated  order made with invoice $order->invoice_no ";
+            AuditLog::auditLog(Auth::id(), $action);
+            DB::commit();
+        } catch (\Exception $e) {
+            session()->flash('app_error', 'Item could not be modified!');
+            DB::rollBack();
+            throw $e;
+        }
+        //return json_encode($orderdetail,true);
+        return redirect()->route('orders.approved');
+    }
+    public function loadEdit(Request $request)
+    {
+        $order = Order::find($request->order_id);
+        return view('pages.order.load_edit_order', compact('order'));
+    }
+    public function order_confirm($id)
+    {
+        $order = Order::findOrFail($id);
+        $order->order_status = 'approved';
+        $order->save();
+
+        session()->flash('Order has been Approved! Please deliver the products', 'Success');
+        return redirect()->back();
+    }
+    public function verify(Request $request) // to be verified by store keeper
+    {
+        $order_id = $request->order_id;
+        $comment = $request->comment;
+        $invoice_no = $request->invoice;
+        Order::where('id', $order_id)->update(['comment' => $comment, 'issued_by' => Auth::id()]);
+        session()->flash('app_message', 'Invoice confirmed successfully');
+        $action = "Issued order with invoice $invoice_no out of stock";
+        AuditLog::auditLog(Auth::id(), $action);
+        $orders = Order::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('order_status', 'approved')->whereDate('order_date', date('Y-m-d'))->get();
+        return view('pages.order.approved_orders', compact('orders'));
+    }
+
+    //order
     public function order_invoice_list()
     {
 //        return date('Y-m-d', strtotime(Carbon::now()->subDays(7)));
@@ -721,15 +708,13 @@ class OrderController extends Controller
         $orders = $orders->whereBetween('order_date', [date('Y-m-d',strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])->get();
         return view('pages.order.order_invoices', compact('orders'));
     }
-    public function proformer_list()
+    public function order_invoice_show($id)
     {
-        \Cart::clear();
-        $user = Auth::user();
-        $orders = Proformer::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction());
-        if ($user->hasRole('Sales-Manager'))
-            $orders = $orders->where('sold_by', Auth::id());
-        $orders = $orders->whereBetween('order_date', [date('Y-m-d',strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])->get();
-        return view('pages.order.proformers', compact('orders'));
+        $order = OrderInvoice::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
+        $order_details = OrderInvoiceDetail::with('storeProduct')->where(['order_id' => $id, 'status' => 1])->get();
+        //return $order_details;
+        $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
+        return view('pages.order.show_order_invoice', compact('order_details', 'order', 'company'));
     }
     public function approveOrderInvoice(Request $request, OrderInvoice $order)
     {
@@ -756,4 +741,27 @@ class OrderController extends Controller
         }
         return back()->with('error', 'Something went wrong.');
     }
+
+    //proforma
+    public function proformer_list()
+    {
+        \Cart::clear();
+        $user = Auth::user();
+        $orders = Proformer::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction());
+        if ($user->hasRole('Sales-Manager'))
+            $orders = $orders->where('sold_by', Auth::id());
+        $orders = $orders->whereBetween('order_date', [date('Y-m-d',strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])->get();
+        return view('pages.order.proformers', compact('orders'));
+    }
+    public function proformer_show($id)
+    {
+        $order = Proformer::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
+        $order_details = ProformerDetail::with('storeProduct')->where(['order_id' => $id, 'status' => 1])->get();
+        //return $order_details;
+        $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
+        return view('pages.order.show_proformer', compact('order_details', 'order', 'company'));
+    }
+
+
+
 }

@@ -575,13 +575,18 @@ class OrderController extends Controller
         if($invoice->save()){
             $products = [];
             foreach ($items as $item) {
-                $products[$item->id] = $item->quantity;
+                $products[$item->store_product_id] = ['quantity'=>$item->quantity, 'cost_price'=>$item->cost_price,  'sold_price'=>$item->sold_price];
             }
+            /*return Transaction::sale(
+                $products,
+                $invoice->customer_id,
+                $invoice->reference,
+                $invoice->order_date);*/
             if(Transaction::sale(
                 $products,
                 $invoice->customer_id,
                 $invoice->reference,
-                $invoice->order_date)
+                $invoice->order_date)['status']
             ){
                 $action = "Invoice of $invoice->total for : " . $invoice->reference;
                 AuditLog::auditLog(auth()->id(), $action);

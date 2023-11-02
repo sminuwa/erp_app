@@ -161,7 +161,18 @@ class Transaction
     public static function sale(array $store_product, int $customer_id, string $reference, $date){
         /*
          *
-         * $products = [2=>20,5=>10]
+         * $products = [
+         *      2=>[
+         *          'quantity'=20,
+         *          'cost_price'=>3043,
+         *          'sold_price'=>3000
+         *         ],
+         *      5=>[
+         *          'quantity'=>20,
+         *          'cost_price'=>3043,
+         *          'sold_price'=>3043
+         *         ]
+         * ]
          * */
         //branch
         //category
@@ -173,11 +184,14 @@ class Transaction
         //unit cost price
         //unit sale price
         try{
-            $store_product_ids = $quantities = [];
+            $store_product_ids = $quantities = $sold_prices =  [];
             foreach($store_product as $key=>$value){
                 $store_product_ids[] = $key;
-                $quantities[] = $value;
+                $quantities[] = $value['quantity'];
+                $sold_prices[] = $value['sold_price'];
+                $cost_prices[] = $value['cost_price'];
             }
+//            return $sold_prices;
             $customer = Customer::find($customer_id);
             $records = StoreProduct::
             whereIn('store_products.id',$store_product_ids)
@@ -189,8 +203,6 @@ class Transaction
                 ->selectRaw("
                     store_products.id AS store_product_id,
                     branches.id AS branch_id,
-                    (SELECT cost_price FROM branch_product_prices WHERE branch_id = branches.id AND product_id = products.id) as cost_price,
-                    (SELECT selling_price FROM branch_product_prices WHERE branch_id = branches.id AND product_id = products.id) as sale_price,
                     categories.name AS category_name,
                     (SELECT id FROM general_accounts WHERE id = categories.asset_account LIMIT 1) AS asset_account_id,
                     (SELECT number FROM general_accounts WHERE id = categories.asset_account LIMIT 1) AS asset_account_number,
@@ -201,13 +213,14 @@ class Transaction
                 ")
                 ->groupBy('store_products.id')
                 ->get();
+//            return $records;
             $asset_account = $cost_account = $revenue_account = $customer_ledger = [];
             $customer_value = $branch_id = 0;
             foreach($records as $record){
                 // total value based on cost price
                 // total value based on sale price
-                $cost_value = ($record->cost_price * $store_product[$record->store_product_id]);
-                $sell_value = ($record->sale_price * $store_product[$record->store_product_id]);
+                $cost_value = ($store_product[$record->store_product_id]['cost_price'] * $store_product[$record->store_product_id]['quantity']);
+                $sell_value = ($store_product[$record->store_product_id]['sold_price'] * $store_product[$record->store_product_id]['quantity']);
                 $customer_value = ($customer_value+$sell_value);
                 $branch_id = $record->branch_id;
                 $asset_account[] = [

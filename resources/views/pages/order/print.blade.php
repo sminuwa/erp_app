@@ -85,10 +85,10 @@
                         </div>
                         <div class="col-sm-3 invoice-col">
                             <div style="color:aliceblue;">
-                                @php
+                                {{--@php
                                     $uc = substr($order->reference, 0, 6) . substr($order->reference, 6, 10) + 3000;
-                                @endphp
-                                {{ QrCode::size(70)->backgroundColor(255, 55, 0)->generate("$order->total\n$uc\n\n.") }}<br />
+                                @endphp--}}
+                                {{ QrCode::size(70)->backgroundColor(255, 55, 0)->generate($order->total) }}<br />
                                 <span style="font-size:28px;margin-top:-5px">
                                     {{ $order->payment_mode }} Sales
                                 </span>

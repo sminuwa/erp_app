@@ -141,6 +141,7 @@
                                                 <th>S.N</th>
                                                 <th>Code</th>
                                                 <th>Product Name</th>
+                                                <th>Unit</th>
                                                 <th>Store Code</th>
                                                 <th>Quantity</th>
                                                 <th>Unit Cost</th>
@@ -157,6 +158,7 @@
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $order_detail->storeProduct->product->code }}</td>
                                                     <td>{{ $order_detail->storeProduct->product->name }}</td>
+                                                    <td>{{ $order_detail->storeProduct->product->unit }}</td>
                                                     <td>{{ $order_detail->storeProduct->store->code }}</td>
                                                     <td align="center">{{ $order_detail->quantity }}</td>
                                                     <td align="right">{{ number_format($order_detail->selling_price, 2) }}

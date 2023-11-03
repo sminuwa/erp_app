@@ -120,7 +120,9 @@ class InvoiceController extends Controller
 
     public function final_invoice(Request $request)
     {
-        $invoice = $this->generateInvoice();
+        $invoice_id = $request->invoice_id;
+
+//        $invoice = $this->generateInvoice();
         $inputs = $request->except('_token');
         $rules = [];
         $rules = [
@@ -176,26 +178,28 @@ class InvoiceController extends Controller
 
             }
 
-                $order_id = DB::table('orders')->insertGetId([
-                    'reference' => $reference,
-                    'customer_id' => $customer_id,
-                    //                    'payment_mode' => $payment_mode,
-//                    'due_date' => $due_date,
-                    'pay' => $payment_mode == "Credit" ? $amount_paid : $total,
-                    'due' => $payment_mode == "Credit" ? ($total - $amount_paid) : 0,
-                    'order_date' => $order_date,
-                    'order_status' => 'approved',
-                    'total_products' => \Cart::getTotalQuantity(),
-                    'sub_total' => $sub_total,
-                    'vat' => $tax,
-                    'total' => $total,
-                    'invoice_no' => $invoice,
-                    'sold_by' => Auth::id(),
-                    'status' => 0,
-                    'order_invoice_id' => $request->order_invoice_id,
-                    'branch_id' => User::userBranchAction(),
-                ]);
-
+            $invoice = Order::find($invoice_id);
+            if(!$invoice){
+                $invoice = new \App\Models\Order();
+                $invoice->reference = $reference;
+                $invoice->branch_id = User::userBranchAction();
+                $invoice->order_status = 'approved';
+                $invoice->sold_by = Auth::id();
+                $invoice->customer_id = $customer_id;
+                $invoice->invoice_no = $reference;
+            }else{
+                $invoice->order_invoice_id = $request->order_invoice_id ?? 0;
+            }
+            $invoice->pay = $payment_mode == "Credit" ? $amount_paid : $total;
+            $invoice->due = $payment_mode == "Credit" ? ($total - $amount_paid) : 0;
+            $invoice->order_date = $order_date;
+            $invoice->total_products = \Cart::getTotalQuantity();
+            $invoice->sub_total = $sub_total;
+            $invoice->vat = $tax;
+            $invoice->total = $total;
+            $invoice->status = 0;
+            if($invoice->save()){
+                OrderDetail::where('order_id',$invoice->id)->delete();
                 $contents = \Cart::getContent();
                 $products = [];
                 $total_discount = 0;
@@ -207,7 +211,7 @@ class InvoiceController extends Controller
                     //$store->qty_available = $qtyAval - $content->quantity;
                     $order_detail = new OrderDetail();
                     DB::table('order_details')->insert([
-                        'order_id' => $order_id,
+                        'order_id' => $invoice->id,
                         'store_product_id' => $content->id,
                         'quantity' => $content->quantity,
                         'original_quantity_sold' => $content->quantity,
@@ -242,13 +246,13 @@ class InvoiceController extends Controller
                     $store_products[$content->id] = $content->quantity;
                 }
                 //Upate the Order table with the discount
-                DB::table('orders')->where('id', $order_id)->increment('discount', $total_discount);
+                DB::table('orders')->where('id', $invoice->id)->increment('discount', $total_discount);
                 DB::table('bank_accounts')->where(['account_type' => 'Cash'])->where('branch_id', 'LIKE', User::userBranchAction())->increment('account_balance', ($total - $total_discount));
 
                 $bank_account = DB::table('bank_accounts')->where(['account_type' => 'Cash'])->where('branch_id', 'LIKE', User::userBranchAction())->first();
                 DB::table('customer_ledgers')->insert([
                     'customer_id' => $customer_id,
-                    'order_id' => $order_id,
+                    'order_id' => $invoice->id,
                     'systemid' => $invoice,
                     'description' => 'Cash sales',
                     'Ref' => 'Nil',
@@ -279,10 +283,10 @@ class InvoiceController extends Controller
                 ]);
                 /*Transaction::sale($store_products, $customer_id, $reference, $order_date);*/
 
-
-            $action = "Made a sell of $invoice: $total";
-            AuditLog::auditLog(Auth::id(), $action);
-            DB::commit();
+                $action = "Made a sell of $invoice: $total";
+                AuditLog::auditLog(Auth::id(), $action);
+                DB::commit();
+            }
         } catch (\Exception $ex) {
             DB::rollBack();
             throw $ex;
@@ -290,7 +294,7 @@ class InvoiceController extends Controller
         \Cart::clear();
 
         session()->flash('Invoice created successfully');
-        return redirect()->route('orders.show', $order_id);
+        return redirect()->route('orders.show', $invoice->id);
 
     }
 

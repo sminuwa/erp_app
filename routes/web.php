@@ -288,6 +288,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/show/{id}', [OrderController::class, 'show'])->name('orders.show');
             Route::delete('/delete/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
             Route::post('/post/{invoice}', [OrderController::class, 'post'])->name('invoice.post');
+            Route::get('pos/edit/{order}', [PosController::class, 'edit'])->name('pos.edit');
         });
 
         Route::group(['prefix' => 'proforma'], function () {
@@ -302,7 +303,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('pos', [PosController::class, 'index'])->name('pos.index');
         Route::get('pos/whole-sale', [PosController::class, 'wholeSale'])->name('pos.whole.sale');
-        Route::get('pos/edit/{order}', [PosController::class, 'edit'])->name('pos.edit');
+
         Route::get('barcode/search/product', [PosController::class, 'barcodeSearch'])->name('barcode.search.product');
         Route::get('/waybill/order-print/{order_id}', [InvoiceController::class, 'waybill_print'])->name('waybill.order_print');
         Route::get('/pos/order-print/{order_id}', [InvoiceController::class, 'pos_print'])->name('pos.order_print');

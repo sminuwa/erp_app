@@ -175,7 +175,7 @@ class InvoiceController extends Controller
                     $amount_paid = abs($running_balance) - $total;
 
             }
-            if ($status) {
+
                 $order_id = DB::table('orders')->insertGetId([
                     'reference' => $reference,
                     'customer_id' => $customer_id,
@@ -277,9 +277,9 @@ class InvoiceController extends Controller
                     'approved_by' => auth()->id(),
                     'updated_at' => Carbon::now()
                 ]);
-                Transaction::sale($store_products, $customer_id, $reference, $order_date);
+                /*Transaction::sale($store_products, $customer_id, $reference, $order_date);*/
 
-            }
+
             $action = "Made a sell of $invoice: $total";
             AuditLog::auditLog(Auth::id(), $action);
             DB::commit();

@@ -76,7 +76,7 @@
                     <div class="row">
                         <div class="col-sm-4 invoice-col">
                             <address>
-                                <b>Customer Name:</b> {{ $order->customer->name }}<br />
+                                <b>Customer Name:</b> {{ $order->customer->code }} - {{ $order->customer->name }}<br />
                                 <b>Address:</b> <span class="ion-ios-contact-outline"></span>
                                 {{ $order->customer->address }}<br>
                                 <b>Phone:</b> <span class="ion-android-phone-portrait"></span>
@@ -86,7 +86,7 @@
                         <div class="col-sm-3 invoice-col">
                             <div style="color:aliceblue;">
                                 @php
-                                    $uc = substr($order->invoice_no, 0, 6) . substr($order->invoice_no, 6, 10) + 3000;
+                                    $uc = substr($order->reference, 0, 6) . substr($order->reference, 6, 10) + 3000;
                                 @endphp
                                 {{ QrCode::size(70)->backgroundColor(255, 55, 0)->generate("$order->total\n$uc\n\n.") }}<br />
                                 <span style="font-size:28px;margin-top:-5px">
@@ -95,7 +95,7 @@
                             </div>
                         </div>
                         <div class="col-sm-4">
-                            <b>Invoice No:</b> {{ $order->invoice_no }}<br>
+                            <b>Invoice No:</b> {{ $order->reference }}<br>
                             <b>Date and Time: {{ \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</b><br>
                             <b>Prepared By</b> <span class="ion-card"></span> {{ $order->sold->name }}<br />
                             <b>Printed By <span class="ion-printer"></span>
@@ -131,7 +131,7 @@
                                             <td align="center">{{ $order_detail->quantity }}</td>
                                             <td align="center">{{ $order_detail->storeProduct->product->unit }}</td>
                                             <td>{{ $order_detail->storeProduct->store->code }}</td>
-                                            
+
                                             <td align="right">
                                                 &#8358;{{ number_format($order_detail->sold_price, 2) }}
                                             </td>

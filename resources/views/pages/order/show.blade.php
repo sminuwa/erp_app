@@ -121,7 +121,7 @@
                                 </div>
                                 <!-- /.col -->
                                 <div class="col-sm-4 invoice-col">
-                                    <b>Reference No: {{ $order->reference }}</b><br><br>
+                                    <b>Invoice No: {{ $order->reference }}</b><br><br>
                                     <b>Order Status:</b>
                                     {!!
                                         $order->status == 0 ? '<span class="badge badge-warning">Pending</span>':

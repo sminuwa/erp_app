@@ -225,9 +225,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::group(['prefix' => 'expenses'], function () {
-        Route::group(
-            ['prefix' => 'items'],
-            function () {
+        Route::group(['prefix' => 'items'], function () {
                 Route::get('/index', [ExpenseItemController::class, 'index'])->name('expense_items.index');
                 Route::get('/create', [ExpenseItemController::class, 'create'])->name('expense_items.create');
                 Route::get('/show/{expenseitem}', [ExpenseItemController::class, 'show'])->name('expense_items.show');
@@ -237,9 +235,7 @@ Route::middleware('auth')->group(function () {
                 Route::delete('/delete/{expenseitem}', [ExpenseItemController::class, 'destroy'])->name('expense_items.destroy');
             }
         );
-        Route::group(
-            ['prefix' => 'expenditures'],
-            function () {
+        Route::group(['prefix' => 'expenditures'], function () {
                 Route::get('/index', [ExpenseController::class, 'index'])->name('expenses.index');
                 Route::post('/cart/create', [ExpenseController::class, 'addToCart'])->name('expenses.cart.create');
                 Route::put('/cart/update', [ExpenseController::class, 'updateCart'])->name('expenses.cart.update');
@@ -253,7 +249,6 @@ Route::middleware('auth')->group(function () {
                 Route::post('/search', [ExpenseController::class, 'search'])->name('expenses.search');
             }
         );
-
         Route::get('/today', [ExpenseController::class, 'today_expense'])->name('expense.today');
         Route::get('/month/{month?}', [ExpenseController::class, 'month_expense'])->name('expense.month');
         Route::get('/yearly/{year?}', [ExpenseController::class, 'yearly_expense'])->name('expense.yearly');
@@ -265,8 +260,8 @@ Route::middleware('auth')->group(function () {
         Route::put('/update-cart', [CartController::class, 'updateCart'])->name('cart.update');
         Route::delete('/remove/{id}', [CartController::class, 'removeCart'])->name('cart.remove');
         Route::post('/clear', [CartController::class, 'clearAllCart'])->name('cart.clear');
-
     });
+
     Route::group(['prefix' => 'sales'], function () {
         Route::group(['prefix' => 'orders'], function () {
             Route::get('/create', [PosController::class, 'index'])->name('order.invoice.index');
@@ -283,6 +278,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/order-invoice/search', [OrderController::class, 'order_invoice_search'])->name('order.invoice.search');
             Route::put('/approve/order-invoice/{order}', [OrderController::class, 'approveOrderInvoice'])->name('order.invoice.approve');
         });
+
         Route::group(['prefix' => 'invoice'], function () {
             Route::get('/approved', [OrderController::class, 'invoice_list'])->name('orders.approved');
             Route::post('/invoice', [InvoiceController::class, 'final_invoice'])->name('invoice.create');
@@ -293,6 +289,7 @@ Route::middleware('auth')->group(function () {
             Route::delete('/delete/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
             Route::post('/post/{invoice}', [OrderController::class, 'post'])->name('invoice.post');
         });
+
         Route::group(['prefix' => 'proforma'], function () {
             Route::get('/create', [PosController::class, 'index'])->name('proforma.index');
             Route::post('/proforma/create', [InvoiceController::class, 'final_proformer'])->name('proformer.create');
@@ -317,6 +314,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/product/verify', [OrderController::class, 'verify'])->name('sales_products.verify');
         Route::post('/transfer/to-user', [OrderController::class, 'transfer'])->name('transfer.sale.to.user');
     });
+
     Route::group(['prefix' => 'orders'], function () {
         Route::get('/customers/{id}', [OrderController::class, 'customer_order'])->name('orders.customer');
         Route::get('/download/{id}', [OrderController::class, 'download'])->name('orders.download');
@@ -328,13 +326,8 @@ Route::middleware('auth')->group(function () {
         Route::put('/update/{orderdetail}', [OrderController::class, 'updateOrder'])->name('orders.update');
     });
 
-    Route::group(
-        ['prefix' => 'customers'],
-        function () {
-
-            Route::group(
-                ['prefix' => 'manage/'],
-                function () {
+    Route::group(['prefix' => 'customers'], function () {
+            Route::group(['prefix' => 'manage/'], function () {
                     Route::get('/index', [CustomerController::class, 'index'])->name('customers.index');
                     Route::get('/create', [CustomerController::class, 'create'])->name('customers.create');
                     Route::get('/show/{customer}', [CustomerController::class, 'show'])->name('customers.show');
@@ -348,9 +341,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/opening_balance', [CustomerController::class, 'createOpeningBalance'])->name('customers.create.opening_balance');
             Route::post('/opening_balance/store', [CustomerController::class, 'openingBalanceStore'])->name('opening_balance.store');
 
-            Route::group(
-                ['prefix' => 'create/credit_limits'],
-                function () {
+            Route::group(['prefix' => 'create/credit_limits'], function () {
                     Route::get('/index', [CreditLimitController::class, 'index'])->name('credit_limits.index');
                     Route::get('/create', [CreditLimitController::class, 'create'])->name('credit_limits.create');
                     Route::get('/show/{creditlimit}', [CreditLimitController::class, 'show'])->name('credit_limits.show');
@@ -367,13 +358,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/credit_limit', [CustomerController::class, 'getCustomerCreditLimit'])->name('ajax.load.customer.credit_limit');
             Route::post('update/credit_limit', [CustomerController::class, 'updateCreditLimit'])->name('customers.update.credit_limit');
             Route::get('/print/ledger/{from_date}/{to_date}/{customer_id}', [CustomerController::class, 'printLedger'])->name('ajax.customer.print.ledger');
-
-
         }
     );
-    Route::group(
-        ['prefix' => '/receipt-payment'],
-        function () {
+    Route::group(['prefix' => '/receipt-payment'], function () {
             Route::get('/list', [ReceiptController::class, 'receipts'])->name('receipt.payments');
             Route::get('/create', [ReceiptController::class, 'createReciept'])->name('create.payment.reciept');
             Route::post('/store', [ReceiptController::class, 'payReciept'])->name('receipt.payment.store');
@@ -388,9 +375,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/delete/{receipt}', [ReceiptController::class, 'delete'])->name('receipt.payment.delete');
         }
     );
-    Route::group(
-        ['prefix' => '/interbanks'],
-        function () {
+    Route::group(['prefix' => '/interbanks'], function () {
             Route::get('/list', [InterBankController::class, 'list'])->name('interbank.list');
             Route::get('/create', [InterBankController::class, 'create'])->name('create.interbank');
             Route::post('/store', [InterBankController::class, 'store'])->name('interbank.store');
@@ -406,9 +391,7 @@ Route::middleware('auth')->group(function () {
 
         }
     );
-    Route::group(
-        ['prefix' => '/payment-invoice'],
-        function () {
+    Route::group(['prefix' => '/payment-invoice'], function () {
             Route::get('/list', [PaymentController::class, 'payments'])->name('payments.list');
             Route::get('/create', [PaymentController::class, 'makePayment'])->name('create.payment');
             Route::post('/store', [PaymentController::class, 'pay'])->name('payment.store');
@@ -423,9 +406,7 @@ Route::middleware('auth')->group(function () {
         }
     );
 
-    Route::group(
-        ['prefix' => 'employees'],
-        function () {
+    Route::group(['prefix' => 'employees'], function () {
             Route::get('/index', [EmployeeController::class, 'index'])->name('employees.index');
             Route::get('/create', [EmployeeController::class, 'create'])->name('employees.create');
             Route::get('/show/{employee}', [EmployeeController::class, 'show'])->name('employees.show');
@@ -436,12 +417,8 @@ Route::middleware('auth')->group(function () {
         }
     );
 
-    Route::group(
-        ['prefix' => 'suppliers'],
-        function () {
-            Route::group(
-                ['prefix' => 'manage'],
-                function () {
+    Route::group(['prefix' => 'suppliers'], function () {
+            Route::group(['prefix' => 'manage'], function () {
                     Route::get('/index', [SupplierController::class, 'index'])->name('suppliers.index');
                     Route::get('/create', [SupplierController::class, 'create'])->name('suppliers.create');
                     Route::get('/show/{supplier}', [SupplierController::class, 'show'])->name('suppliers.show');
@@ -451,13 +428,9 @@ Route::middleware('auth')->group(function () {
                     Route::delete('/delete/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
                     Route::get('/opening_balance', [SupplierController::class, 'createOpeningBalance'])->name('suppliers.create.opening_balance');
                     Route::post('/opening_balance/store', [SupplierController::class, 'openingBalanceStore'])->name('suppliers.opening_balance.store');
-
                 }
             );
-            Route::group(
-
-                ['prefix' => '/pay'],
-                function () {
+            Route::group(['prefix' => '/pay'], function () {
                     Route::get('/payment', [SupplierController::class, 'supplierPayments'])->name('suppliers.payments');
                     Route::get('/create', [SupplierController::class, 'createSupplierPayment'])->name('suppliers.payment.create');
                     Route::post('/store', [SupplierController::class, 'pay'])->name('suppliers.payment.store');
@@ -476,8 +449,6 @@ Route::middleware('auth')->group(function () {
                     Route::delete('/credit-note/delete/{ledger}', [SupplierController::class, 'deleteCreditNote'])->name('suppliers.credit.note.destroy');
                     Route::post('/credit-note/search', [SupplierController::class, 'searchCreditNote'])->name('suppliers.credit.note.search');
                     Route::get('/credit-note/print/receipt/{payment}', [SupplierController::class, 'printCreditNoteReceipt'])->name('supplier.credit.note.print');
-
-
                 }
             );
             Route::get('/ledger', [SupplierController::class, 'generateSupplierLedger'])->name('supplier.ledger');
@@ -485,16 +456,12 @@ Route::middleware('auth')->group(function () {
             Route::get('/ledger/load/general', [SupplierController::class, 'loadGeneralSupplierLedger'])->name('ajax.general.supplier.ledger');
             Route::get('/print/ledger/{from_date}/{to_date}/{supplier_id}', [SupplierController::class, 'printLedger'])->name('ajax.supplier.print.ledger');
 
-
         }
 
     );
     Route::group(
-        ['prefix' => 'users'],
-        function () {
-            Route::group(
-                ['prefix' => 'manage', 'middleware' => 'auth'],
-                function () {
+        ['prefix' => 'users'], function () {
+            Route::group(['prefix' => 'manage', 'middleware' => 'auth'], function () {
                     Route::get('/index', [UserController::class, 'index'])->name('users.index');
                     Route::get('/create', [UserController::class, 'create'])->name('users.create');
                     Route::get('/show/{user}', [UserController::class, 'show'])->name('users.show');
@@ -503,9 +470,7 @@ Route::middleware('auth')->group(function () {
                     Route::put('/update/{user}', [UserController::class, 'update'])->name('users.update');
                     Route::delete('/delete/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
-
-                    Route::controller(RoleController::class)->group(
-                        function () {
+                    Route::controller(RoleController::class)->group(function () {
                             Route::get('role/view', 'index')->name('roles.index');
                             Route::get('role/show/{role}', 'show')->name('roles.show');
                             Route::get('role/create', 'create')->name('roles.create');
@@ -515,8 +480,7 @@ Route::middleware('auth')->group(function () {
                             Route::delete('role/delete/{role}', 'destroy')->name('roles.destroy');
                         }
                     );
-                    Route::controller(PermissionController::class)->group(
-                        function () {
+                    Route::controller(PermissionController::class)->group(function () {
                             Route::get('permission/view', 'index')->name('permissions.index');
                             Route::get('permission/show/{permission}', 'show')->name('permissions.show');
                             Route::get('permission/create', 'create')->name('permissions.create');
@@ -535,8 +499,7 @@ Route::middleware('auth')->group(function () {
                     Route::post('/user/assign-permission', [UserController::class, 'storeUserPermission'])->name('user.store.permission');
                 }
             );
-            Route::controller(CompanyController::class)->group(
-                function () {
+            Route::controller(CompanyController::class)->group(function () {
                     Route::get('company/view', 'index')->name('companies.index');
                     Route::get('company/show/{company}', 'show')->name('companies.show');
                     Route::get('company/create', 'create')->name('companies.create');
@@ -549,8 +512,7 @@ Route::middleware('auth')->group(function () {
         }
     );
 
-    Route::controller(ProfileController::class)->group(
-        function () {
+    Route::controller(ProfileController::class)->group(function () {
             Route::get('profile', 'index')->name('profile');
             Route::put('profile/update/{user}', 'updateProfile')->name('profile.update');
             Route::post('profile/picture/', 'uploadPhoto')->name('upload.profile.picture');
@@ -560,9 +522,7 @@ Route::middleware('auth')->group(function () {
     );
 
     Route::group(['prefix' => 'cash'], function () {
-        Route::group(
-            ['prefix' => 'movement'],
-            function () {
+        Route::group(['prefix' => 'movement'], function () {
                 Route::get('/index', [CashMovementController::class, 'index'])->name('cash_movements.index');
                 Route::get('/create', [CashMovementController::class, 'create'])->name('cash_movements.create');
                 Route::get('/show/{cashmovement}', [CashMovementController::class, 'show'])->name('cash_movements.show');
@@ -570,7 +530,6 @@ Route::middleware('auth')->group(function () {
                 Route::get('/edit/{cashmovement}', [CashMovementController::class, 'edit'])->name('cash_movements.edit');
                 Route::put('/update/{cashmovement}', [CashMovementController::class, 'update'])->name('cash_movements.update');
                 Route::delete('/delete/{cashmovement}', [CashMovementController::class, 'destroy'])->name('cash_movements.destroy');
-
 
                 Route::get('/deposit/create', [CashMovementController::class, 'createDeposit'])->name('deposits.create');
                 Route::get('/deposit/show/{deposit}', [CashMovementController::class, 'showDeposit'])->name('deposits.show');
@@ -594,9 +553,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::group(['prefix' => 'loan'], function () {
-        Route::group(
-            ['prefix' => 'collector'],
-            function () {
+        Route::group(['prefix' => 'collector'], function () {
                 Route::get('/index', [LoanCollectorController::class, 'index'])->name('loan_collectors.index');
                 Route::get('/create', [LoanCollectorController::class, 'create'])->name('loan_collectors.create');
                 Route::get('/show/{loancollector}', [LoanCollectorController::class, 'show'])->name('loan_collectors.show');
@@ -608,8 +565,7 @@ Route::middleware('auth')->group(function () {
             }
         );
         Route::group(
-            ['prefix' => 'grant'],
-            function () {
+            ['prefix' => 'grant'], function () {
                 Route::get('/index', [LoanController::class, 'index'])->name('loans.index');
                 Route::get('/create', [LoanController::class, 'create'])->name('loans.create');
                 Route::get('/show/{loan}', [LoanController::class, 'show'])->name('loans.show');
@@ -621,9 +577,7 @@ Route::middleware('auth')->group(function () {
                 Route::post('/search', [LoanCollectorController::class, 'search'])->name('loan_grants.search');
             }
         );
-        Route::group(
-            ['prefix' => 'payment'],
-            function () {
+        Route::group(['prefix' => 'payment'], function () {
                 Route::get('/index', [LoanPaymentController::class, 'index'])->name('loan_payments.index');
                 Route::get('/create', [LoanPaymentController::class, 'create'])->name('loan_payments.create');
                 Route::get('/show/{loanpayment}', [LoanPaymentController::class, 'show'])->name('loan_payments.show');
@@ -652,10 +606,7 @@ Route::middleware('auth')->group(function () {
     Route::get('load/supplier/invoices', [MisController::class, 'loadSupplierInvoices'])->name('ajax.loadSupplierInvoices');
     Route::get('load/customer/invoices', [MisController::class, 'loadCustomerUnPaidInvoices'])->name('ajax.loadCustomerInvoices');
 
-
-    Route::group(
-        ['prefix' => 'reports'],
-        function () {
+    Route::group(['prefix' => 'reports'], function () {
             //Stock Transfer Report
             Route::get('/stock/transfer', [ReportController::class, 'stockTransfer'])->name('stock.transfer.reports');
             Route::get('/stock/transfer/load', [ReportController::class, 'loadStockTransferReport'])->name('ajax.load.stock.transfer.reports');
@@ -776,14 +727,12 @@ Route::middleware('auth')->group(function () {
             Route::get('/sa/discount-granted/load', [ReportController::class, 'loadTrackDiscount'])->name('ajax.load.discount.granted.reports');
             Route::get('/sa/discount-granted/print/{from_date}/{to_date}/{store_id}/{category_id}/{product_id}/{customer_id}/{credit_walkedin}/{lower}/{upper}', [ReportController::class, 'printTrackDiscount'])->name('ajax.discount.granted.report.print');
 
-
             //Begin Customer Sales Analysis Report
 
             //Customer Debt Report
             Route::get('/ca/customer/debt', [ReportController::class, 'customerDebtReport'])->name('customer.total.debt.reports');
             Route::get('/ca/customer/debt/load', [ReportController::class, 'loadCustomerDebtReport'])->name('ajax.load.customer.total.debt.reports');
             Route::get('/ca/customer/debt/print/{from_date}/{to_date}/{customer}/', [ReportController::class, 'printCustomerDebtReport'])->name('ajax.customer.total.debt.report.print');
-
 
             //Customer Balance Detail Report
             Route::get('/ca/customer/balance-details', [ReportController::class, 'customerBalanceDetailReport'])->name('customer.balance.details.reports');
@@ -809,7 +758,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/be/deleted-sales', [ReportController::class, 'deletedSaleReport'])->name('deleted.sales.reports');
             Route::get('/be/deleted-sales/load', [ReportController::class, 'loadDeletedSaleReport'])->name('ajax.load.deleted.sales.reports');
             Route::get('/be/deleted-sales/print/{from_date}/{to_date}/{customer}/', [ReportController::class, 'printDeletedSaleReport'])->name('ajax.deleted.sales.report.print');
-
 
             //Customer Balance Detail Report
             Route::get('/ca/customer/ageing-report', [ReportController::class, 'ageingReport'])->name('customer.ageing.reports');
@@ -871,9 +819,7 @@ Route::middleware('auth')->group(function () {
         }
     );
     Route::group(['prefix' => 'ap_ar_account'], function () {
-        Route::group(
-            ['prefix' => 'chart_of_accounts'],
-            function () {
+        Route::group(['prefix' => 'chart_of_accounts'], function () {
                 Route::get('/index', [ChartOfAccountController::class, 'index'])->name('chart_of_accounts.index');
                 Route::get('/create', [ChartOfAccountController::class, 'create'])->name('chart_of_accounts.create');
                 Route::post('/store', [ChartOfAccountController::class, 'store'])->name('chart_of_accounts.store');
@@ -885,9 +831,7 @@ Route::middleware('auth')->group(function () {
                 Route::post('/import', [ChartOfAccountController::class, 'import'])->name('chart_of_accounts.import');
             }
         );
-        Route::group(
-            ['prefix' => 'general_accounts'],
-            function () {
+        Route::group(['prefix' => 'general_accounts'], function () {
                 Route::get('/index', [GeneralAccountController::class, 'index'])->name('general_accounts.index');
                 Route::get('/create', [GeneralAccountController::class, 'create'])->name('general_accounts.create');
                 Route::post('/store', [GeneralAccountController::class, 'store'])->name('general_accounts.store');
@@ -923,9 +867,7 @@ Route::middleware('auth')->group(function () {
         //     Route::post('/store', [App\Http\Controllers\Inventory\PurchaseController::class, 'store'])->name('inventories.purchases.store');
         // });
         //Debit Notes
-        Route::group(
-            ['prefix' => 'debit-note'],
-            function () {
+        Route::group(['prefix' => 'debit-note'], function () {
                 Route::get('/', [DebitNoteController::class, 'supplierDebitNote'])->name('suppliers.debit.note');
                 Route::get('/create/{purchase?}', [DebitNoteController::class, 'createDebitNote'])->name('suppliers.debit.note.create');
                 Route::post('/store', [DebitNoteController::class, 'payDebitNote'])->name('suppliers.debit.note.store');
@@ -942,9 +884,7 @@ Route::middleware('auth')->group(function () {
             }
         );
         //Credit Notes
-        Route::group(
-            ['prefix' => 'credit-note'],
-            function () {
+        Route::group(['prefix' => 'credit-note'], function () {
                 Route::get('/', [CreditNoteController::class, 'customerCreditNote'])->name('customers.credit.note');
                 Route::get('/create/{order?}', [CreditNoteController::class, 'createCreditNote'])->name('customers.credit.note.create');
                 Route::post('/store', [CreditNoteController::class, 'payCreditNote'])->name('customers.credit.note.store');

@@ -146,9 +146,9 @@ class InvoiceController extends Controller
         // if ($request->has('customer') && ($request->customer != "")) {
         //     $customer_id = Customer::insertGetId(['name' => $request->customer, 'phone' => $request->phone, 'address' => $request->address, 'branch_id' => User::userBranchAction()]);
         // }
-        $customer = Customer::findOrFail($customer_id);
-        $items = $this->orderItems();
-        $status = Transaction::sale($items, $customer->id, $invoice, $request->order_date);
+        /*$customer = Customer::findOrFail($customer_id);*/
+        /*$items = $this->orderItems();
+        $status = Transaction::sale($items, $customer->id, $invoice, $request->order_date);*/
 
         $sub_total = str_replace(',', '', \Cart::getSubTotal());
         $tax = 0;

@@ -35,7 +35,62 @@
                 <div class="row">
                     <div class="col-12">
                         <!-- Main content -->
-                        <div class="invoice p-3 mb-3">
+                        <div class="row no-print">
+                            <div class="col-md-12 text-right">
+
+                                <a href="javascript:history.back()" class="btn btn-warning btn-sm">
+                                    <i class="fa fa-arrow-left"></i> Back
+                                </a>
+                                <a href="{{ route('pos.index') }}" class="btn btn-secondary btn-sm ">
+                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> New Invoice
+                                </a>
+
+                                <a href="javascript:void(0)" data-toggle="modal"
+                                   data-target="#order_detail_form{{ $order->id }}"
+                                   data-val="{{ $order->id }}"
+                                   class="btn btn-success btn-sm  show">
+                                    <i class="fa fa-check" aria-hidden="true"></i> Confirm
+                                </a>
+                                <a href="{{ route('invoice.order_print', $order->id) }}"
+                                   target="_BLANK" class="btn btn-dark btn-sm ">
+                                    <i class="fa fa-print" aria-hidden="true"></i> Print
+                                </a>
+                                <a href="{{ route('pos.order_print', $order->id) }}"
+                                   target="_BLANK" class="btn btn-dark btn-sm ">
+                                    <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
+                                </a>
+                                <a href="{{ route('waybill.order_print', $order->id) }}"
+                                   target="_BLANK" class="btn btn-primary btn-sm ">
+                                    <i class="fa fa-print" aria-hidden="true"></i> Waybill
+                                </a>
+
+                                @if ($order->status == 0)
+                                    <a href="{{ route('pos.edit', $order->id) }}"
+                                       class="btn btn-info btn-sm ">
+                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                    </a>
+                                    <form class="d-inline" action="{{ route('invoice.post', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to post this invoice?')">
+                                        @csrf
+                                        <button type="submit"
+                                                class="btn btn-success btn-sm ">
+                                            <i class="fa fa-check" aria-hidden="true"></i> Post
+                                        </button>
+                                    </form>
+
+                                    <form class="d-inline" id="delete-form-{{ $order->id }}" action="{{ route('orders.destroy', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to close this invoice?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-danger btn-sm " type="submit">
+                                            <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                        </button>
+                                    </form>
+
+                                @endif
+
+
+                            </div>
+                        </div>
+                        <div class="invoice p-3 mt-3">
                             <!-- title row -->
 
                             <!-- info row -->
@@ -68,8 +123,11 @@
                                 <div class="col-sm-4 invoice-col">
                                     <b>Invoice
                                         No: {{ $order->invoice_no }}</b><br><br>
-                                    <b>Order Status:</b> <span
-                                        class="badge {{ $order->order_status == 'approved' ? 'badge-success' : 'badge-warning' }}">{{ ucfirst($order->order_status) }}</span><br>
+                                    <b>Order Status:</b>
+                                    {!!
+                                        $order->status == 0 ? '<span class="badge badge-warning">Pending</span>':
+                                        ($order->status == 1 ? '<span class="badge badge-success">Close</span>': '<span class="badge badge-success">Completed</span>' )
+                                    !!}
                                 </div>
                                 <!-- /.col -->
                             </div>
@@ -122,58 +180,10 @@
                             </div>
                             <!-- /.row -->
 
-
                             <!-- /.col -->
                         </div>
                         <!-- /.row -->
 
-                        <!-- this row will not appear when printing -->
-                        <div class="row no-print">
-                            <div class="col-12">
-                                @if ($order->order_status === 'approved')
-                                    <a href="{{ route('waybill.order_print', $order->id) }}" target="_BLANK"
-                                        class="btn btn-primary btn-sm">
-                                        <i class="fa fa-print" aria-hidden="true"></i> Waybill
-                                    </a>
-                                @endif
-                                @if ($order->order_status === 'pending')
-                                    <a href="{{ route('order.confirm', $order->id) }}" class="btn btn-success float-right">
-                                        <i class="fa fa-credit-card"></i>
-                                        Approved Payment
-                                    </a>
-                                @endif
-                                <button class="btn btn-danger btn-sm float-right" type="button"
-                                    onclick="deleteItem({{ $order->id }})">
-                                    <i class="fa fa-trash" aria-hidden="true">Cancel</i>
-                                </button>
-                                <a href="{{ route('orders.approved') }}" class="btn btn-primary btn-sm float-right"
-                                    style="margin-right: 5px;">
-                                    <i class="fa fa-list"></i> View Sales
-                                </a>
-                                &nbsp;
-                                <a href="{{ route('pos.index') }}" class="btn btn-secondary btn-sm float-right">
-                                    <i class="fa fa-plus-circle" aria-hidden="true"> New Sales</i>
-                                </a>
-
-                                <form id="delete-form-{{ $order->id }}"
-                                    action="{{ route('orders.destroy', $order->id) }}" method="post"
-                                    style="display:none;">
-                                    @csrf
-                                    <input type="hidden" name="from_pos" value="pos" />
-                                    @method('DELETE')
-                                </form>&nbsp;
-                                @if ($order->order_status === 'approved')
-                                    <a href="{{ route('pos.order_print', $order->id) }}" target="_BLANK"
-                                        class="btn btn-info btn-sm float-right">&nbsp;
-                                        <i class="fa fa-print" aria-hidden="true"></i> POS
-                                    </a>&nbsp;&nbsp;
-                                    <a href="{{ route('invoice.order_print', $order->id) }}" target="_blank"
-                                        class="btn btn-primary btn-sm float-right" style="margin-right: 5px;">
-                                        <i class="fa fa-print"></i> Print
-                                    </a>&nbsp;&nbsp;
-                                @endif
-                            </div>
-                        </div>
                     </div>
                     <!-- /.invoice -->
                 </div><!-- /.col -->

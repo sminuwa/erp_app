@@ -594,7 +594,7 @@ class OrderController extends Controller
                 DB::commit();
             }else {
                 DB::rollBack();
-                session()->flash('app_message', 'Something went wrong');
+                session()->flash('app_message', 'Something went wrong.');
             }
         }
         return back();
@@ -605,7 +605,7 @@ class OrderController extends Controller
         $order_details = OrderDetail::with('storeProduct')->where(['order_id' => $id, 'status' => 1])->get();
         //return $order_details;
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
-        return view('pages.order.order_confirmation', compact('order_details', 'order', 'company'));
+        return view('pages.order.show', compact('order_details', 'order', 'company'));
     }
     public function updateOrder(Request $request, OrderDetail $orderdetail)
     {

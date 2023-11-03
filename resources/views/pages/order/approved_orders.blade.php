@@ -229,64 +229,13 @@
         </section>
         <!-- /.content -->
     </div> <!-- Content Wrapper end -->
-    <div class="modal fade" id="customer_ledgerform" style="display: none;" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Customer Ledger</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="get" action="{{ route('ajax.general.customer.ledger') }}" id="ledger_form"
-                        target="_BLANK">
-                        @csrf
-                        <div class="form-group">
-                            <label for="from_date">From Date</label>
-                            <input type="text" class="form-control datepicker" name="from_date" id="from_date"
-                                placeholder="" autocomplete="off">
-                        </div>
-                        <div class="form-group">
-                            <label for="to_date">To Date</label>
-                            <input type="text" class="form-control datepicker" name="to_date" id="to_date"
-                                placeholder="" autocomplete="off">
-                        </div>
-                        <div class="form-group">
-                            &nbsp;&nbsp;
-                            <label for="customer_id">Customer</label>
-                            <select class="form-control select2-single" name="customer_id" id="customer_id" required>
-                                {{-- <option value="all">All</option> --}}
-                                <option value="">Select...</option>
-                                @foreach (App\Models\Customer::where('type', 'credit')->get() as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name }}-{{ $data->phone }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <input type="hidden" name="print" value="print" />
-                        <input type="hidden" name="modal" value="modal" />
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-dark" data-dismiss="modal"><i class="fa fa-times"></i>
-                                Close
-                            </button>
-                            <button type="submit" class="btn btn-info px-3"><i class="icon-trash"></i> Generate
-                            </button>
-                        </div>
-                        @method('post')
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="modal fade order_edit" style="display: none;" aria-hidden="true">
         @isset($order)
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Invoice Verification/Stock out Panel: {{ optional($order)->customer->name }} |
-                            Invoice:
-                            {{ optional($order)->invoice_no }}</h5>
+                            Invoice: {{ optional($order)->reference }}</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>

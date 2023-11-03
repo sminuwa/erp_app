@@ -126,7 +126,7 @@
                                     <b>Order Status:</b>
                                     {!!
                                         $order->status == 0 ? '<span class="badge badge-warning">Pending</span>':
-                                        ($order->status == 1 ? '<span class="badge badge-success">Close</span>': '<span class="badge badge-success">Completed</span>' )
+                                        ($order->status == 1 ? '<span class="badge badge-success">Posted</span>': '<span class="badge badge-success">Pending</span>' )
                                     !!}
                                 </div>
                                 <!-- /.col -->

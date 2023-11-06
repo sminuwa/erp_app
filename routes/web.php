@@ -301,6 +301,10 @@ Route::middleware('auth')->group(function () {
             Route::post('/proforma/search', [OrderController::class, 'proformer_search'])->name('proformer.search');
         });
 
+        Route::group(['prefix' => 'credit-note'], function () {
+
+        });
+
         Route::get('pos', [PosController::class, 'index'])->name('pos.index');
         Route::get('pos/whole-sale', [PosController::class, 'wholeSale'])->name('pos.whole.sale');
 

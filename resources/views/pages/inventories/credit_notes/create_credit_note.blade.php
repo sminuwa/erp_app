@@ -74,11 +74,11 @@
                                                 <div class="form-group">
                                                     <select name="customer_id" id="customer_record"
                                                             class="form-control select2-single">
-                                                        <option value="">Select...</option>
-                                                        @foreach($customers as $customer)
+{{--                                                        <option value="">Select...</option>--}}
+                                                        {{--@foreach($customers as $customer)
                                                             <option value="{{ $customer->id }}">
                                                                 {{ $customer->code }}-{{ $customer->name }}</option>
-                                                        @endforeach
+                                                        @endforeach--}}
                                                     </select>
                                                     <div class="form-group">
                                                         <span class="text text-danger ion-android-alert"
@@ -235,6 +235,19 @@
                 "info": true,
                 "autoWidth": false
             });
+
+            $('#account_type').on("change", function() {
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('ajax.load.customers') }}",
+                    data: {
+                        type: $(this).val()
+                    }
+                }).done(function(data) {
+                    $("#customer_record").html(data);
+                });
+            });
+
             $(document).on('keyup', '#search', function() {
                 var searchText = $(this).val();
                 $.ajax({

@@ -42,7 +42,15 @@ class CartController extends Controller
             'name' => $request->name,
             'price' => $request->sold_price == 0 ? 1 :$request->sold_price ,
             'quantity' => $qty == 0 ? 1 : $qty,
-            'attributes' => array('cost_price' => $cost_price, 'code'=>$request->code,'selling_price' => $selling_price, 'qty_available' => $qty_available, 'discount' => 0,'store'=>$store),
+            'attributes' => array(
+                'cost_price' => $cost_price,
+                'code'=>$request->code,
+                'selling_price' => $selling_price,
+                'qty_available' => $qty_available,
+                'discount' => 0,
+                'store'=>$store,
+                'unit' =>$request->unit
+            ),
         ]);
 //        return \Cart::getContent();
         if ($add) {
@@ -70,7 +78,15 @@ class CartController extends Controller
                     'value' => $request->quantity
                 ],
                 'price' => $sold_price,
-                'attributes' => array('cost_price' => $request->cost_price, 'selling_price' => $request->selling_price, 'code'=>$request->code, 'discount' => $request->selling_price - $request->sold_price, 'qty_available' => $request->qty_available,'store'=>$request->store)
+                'attributes' => array(
+                    'cost_price' => $request->cost_price,
+                    'selling_price' => $request->selling_price,
+                    'code'=>$request->code,
+                    'discount' => $request->selling_price - $request->sold_price,
+                    'qty_available' => $request->qty_available,
+                    'store'=>$request->store,
+                    'unit'=>$request->unit,
+                )
             ]
         );
 

@@ -39,7 +39,7 @@ class PosController extends Controller
 
             ->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('branch_product_prices.status', 1)
-            ->orderBy('products.code','asc')
+//            ->orderBy('products.code','asc')
             ->limit(100);
         //TODO:: remove limit here
         if ($request->has('category_id') && $request->has('store_id')) {

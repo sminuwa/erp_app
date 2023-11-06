@@ -886,7 +886,15 @@ class InvoiceController extends Controller
                     'name' => $item->storeProduct->product->name,
                     'price' => $item->sold_price,
                     'quantity' => $qty,
-                    'attributes' => array('cost_price' => $cost_price, 'code' => $item->storeProduct->product->code, 'selling_price' => $selling_price, 'qty_available' => $qty_available, 'discount' => 0, 'store' => $store),
+                    'attributes' => array(
+                        'cost_price' => $cost_price,
+                        'code' => $item->storeProduct->product->code,
+                        'selling_price' => $selling_price,
+                        'qty_available' => $qty_available,
+                        'discount' => 0,
+                        'store' => $store,
+                        'unit'=>$item->storeProduct->product->unit
+                    ),
                 ]);
 
             }
@@ -913,7 +921,15 @@ class InvoiceController extends Controller
                     'name' => $item->storeProduct->product->name,
                     'price' => $item->sold_price,
                     'quantity' => $qty <= $store_products->qty_available ? $qty : ceil($store_products->qty_available),
-                    'attributes' => array('cost_price' => $cost_price, 'code' => $item->storeProduct->product->code, 'selling_price' => $selling_price, 'qty_available' => $qty_available, 'discount' => 0, 'store' => $store),
+                    'attributes' => array(
+                        'cost_price' => $cost_price,
+                        'code' => $item->storeProduct->product->code,
+                        'selling_price' => $selling_price,
+                        'qty_available' => $qty_available,
+                        'discount' => 0,
+                        'store' => $store,
+                        'unit'=>$item->storeProduct->product->unit
+                    ),
                 ]);
             }
         }

@@ -127,7 +127,15 @@ class PosController extends Controller
                 'price' => $data->sold_price,
                 'quantity' => $qty,
                 //'attributes' => array('cost_price' => $data->cost_price, 'selling_price' => $data->selling_price, 'discount' => 0),
-                'attributes' => array('cost_price' => $data->cost_price, 'code' => $code, 'selling_price' => $data->selling_price, 'qty_available' => $qty_available, 'discount' => 0, 'store' => $store),
+                'attributes' => array(
+                    'cost_price' => $data->cost_price,
+                    'code' => $code,
+                    'selling_price' => $data->selling_price,
+                    'qty_available' => $qty_available,
+                    'discount' => 0,
+                    'store' => $store,
+                    'unit'=>$data->storeProduct->product->unit
+                ),
             ]);
         }
     }

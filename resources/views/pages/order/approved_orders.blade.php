@@ -132,7 +132,7 @@
                                                                class="dropdown-item show">
                                                                 <i class="fa fa-check" aria-hidden="true"></i> Confirm
                                                             </a>
-                                                            <a href="{{ route('invoice.order_print', $order->id) }}"
+                                                            <a href="{{ route('invoice.print', $order->id) }}"
                                                                target="_BLANK" class="dropdown-item">
                                                                 <i class="fa fa-print" aria-hidden="true"></i> Print
                                                             </a>

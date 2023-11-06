@@ -39,7 +39,7 @@
                         <div class="card">
                             <form action="{{ route('invoice.create') }}" method="post">
                                 @csrf
-                                <input name="invoice_id" value="{{ $order->id }}">
+                                <input type="hidden" name="invoice_id" value="{{ $order->id }}">
                                 <div class="card-header">
                                     <h3 class="card-title">
                                         Customer
@@ -74,7 +74,7 @@
                                                 <div class="form-group">
                                                     <label for="order_date">Sale Date</label>
                                                     <input type="text" name="order_date" class="form-control datepicker"
-                                                        value="{{ date('Y-m-d') }}" />
+                                                        value="{{ $order ? $order->order_date : date('Y-m-d') }}" />
                                                 </div>
                                             @else
                                                 <input type="hidden" name="order_date" class="form-control datepicker"

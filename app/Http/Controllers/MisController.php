@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Branch;
+use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -142,6 +143,25 @@ class MisController extends Controller
             $result .= "<option value='" . $type->id . "'>" . $type->code.'-'.$type->name;
             $request .= "</option>";
         }
+        return $result;
+    }
+
+    public function loadCustomerOrders(Request $request)
+    { //return $request->type;
+        $customer = Customer::find($request->customer_id);
+        $orders = Order::where(['customer_id' => $customer->id, 'status'=>1])->orderBy('id','desc')->get();
+//        if (count($orders) > 1)
+        $result = "<tr>";
+        foreach ($orders as $order) {
+            $result .= '<tr>
+                        <td>
+                            <a href="javascript:void(0)" class="invoice" onclick="load()"
+                               data-val="'.$order->reference .'">'.$order->reference .'</a>
+                        </td>
+                        <td>'. \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() .'</td>
+                    </tr>';
+        }
+        $result .= "</tr>";
         return $result;
     }
 

@@ -45,7 +45,7 @@
                                     <i class="fa fa-plus-circle" aria-hidden="true"></i> New Order
                                 </a>
 
-                                <a href="{{ route('order.invoice.print', $order->id) }}"
+                                <a href="{{ route('invoice.order_print', $order->id) }}"
                                    target="_BLANK" class="btn btn-dark btn-sm ">
                                     <i class="fa fa-print" aria-hidden="true"></i> Print
                                 </a>
@@ -126,6 +126,7 @@
                                             <tr>
                                                 <th>S.N</th>
                                                 <th>Product Name</th>
+                                                <th>Unit</th>
                                                 <th>Quantity</th>
                                                 <th>Unit Cost</th>
                                                 <th>Subtotal</th>
@@ -140,6 +141,7 @@
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $order_detail->storeProduct->product->name ?? "" }}</td>
+                                                    <td>{{ $order_detail->storeProduct->product->unit ?? "" }}</td>
                                                     <td align="center">{{ $order_detail->quantity }}</td>
                                                     <td align="right">{{ number_format($order_detail->sold_price, 2) }}
                                                     </td>

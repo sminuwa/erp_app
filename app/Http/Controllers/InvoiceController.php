@@ -73,13 +73,16 @@ class InvoiceController extends Controller
         return view('pages.pos.invoice', compact('customer', 'contents', 'company', 'sale_mode'));
     }
 
-    public function print($customer_id)
+    public function print($order_id)
     {
-        $customer = Customer::findOrFail($customer_id);
-        $contents = \Cart::getContent();
-        $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
-        $util = new Utility();
-        return view('pages.pos.print', compact('customer', 'contents', 'company', 'util'));
+        $order = Order::with('customer')->where('id', $order_id)->first();
+        //return $order;
+        $order_details = OrderDetail::with('storeProduct')->where(['order_id' => $order_id, 'status' => 1])->get();
+        //return $order_details;
+        //$company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('created_at')->first();
+        $company = Setting::find(1);
+        $utility = new Utility();
+        return view('pages.order.print', compact('order_details', 'order', 'company', 'utility'));
     }
     public function print_proformer($order_id)
     {
@@ -107,14 +110,14 @@ class InvoiceController extends Controller
 
     public function order_print($order_id)
     {
-        $order = Order::with('customer')->where('id', $order_id)->first();
+        $order = OrderInvoice::with('customer')->where('id', $order_id)->first();
         //return $order;
-        $order_details = OrderDetail::with('storeProduct')->where(['order_id' => $order_id, 'status' => 1])->get();
+        $order_details = OrderInvoiceDetail::with('storeProduct')->where(['order_id' => $order_id, 'status' => 1])->get();
         //return $order_details;
         //$company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('created_at')->first();
         $company = Setting::find(1);
         $utility = new Utility();
-        return view('pages.order.print', compact('order_details', 'order', 'company', 'utility'));
+        return view('pages.order.order_print', compact('order_details', 'order', 'company', 'utility'));
     }
 
 
@@ -855,9 +858,8 @@ class InvoiceController extends Controller
     }
     public function editOrderInvoice(Request $request, OrderInvoice $order)
     {
-
         $user_branch = User::userBranchAction();
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('products', 'products.id', 'store_products.product_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
@@ -869,10 +871,34 @@ class InvoiceController extends Controller
             ->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('branch_product_prices.status', 1)
             ->orderBy('products.name')->orderBy('stores.name')->limit(100)->get();
-            //TODO:: remove limit here
+        //TODO:: remove limit here
 
         $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
-        if (\Cart::getContent()->isEmpty())
+        if (\Cart::getContent()->isEmpty()) {
+            foreach ($order->order_items()->get() as $item) {
+                $selling_price = $item->selling_price;
+                $cost_price = $item->cost_price;
+                $qty_available = $item->qty_available;
+                $store = $item->storeProduct->store->name;
+                $qty = $item->quantity == 0 ? 1 : $item->quantity;
+                $add = \Cart::add([
+                    'id' => $item->store_product_id,
+                    'name' => $item->storeProduct->product->name,
+                    'price' => $item->sold_price,
+                    'quantity' => $qty,
+                    'attributes' => array(
+                        'cost_price' => $cost_price,
+                        'code' => $item->storeProduct->product->code,
+                        'selling_price' => $selling_price,
+                        'qty_available' => $qty_available,
+                        'discount' => 0,
+                        'store' => $store,
+                        'unit'=>$item->storeProduct->product->unit
+                    ),
+                ]);
+
+            }
+        }
             $this->loadOrderInvoiceToCart($order);
         $cart_products = \Cart::getContent();
         //dd($cart_products);
@@ -895,7 +921,15 @@ class InvoiceController extends Controller
                     'name' => $item->storeProduct->product->name,
                     'price' => $item->sold_price,
                     'quantity' => $qty <= $store_products->qty_available ? $qty : ceil($store_products->qty_available),
-                    'attributes' => array('cost_price' => $cost_price, 'code' => $item->storeProduct->product->code, 'selling_price' => $selling_price, 'qty_available' => $qty_available, 'discount' => 0, 'store' => $store),
+                    'attributes' => array(
+                        'cost_price' => $cost_price,
+                        'code' => $item->storeProduct->product->code,
+                        'selling_price' => $selling_price,
+                        'qty_available' => $qty_available,
+                        'discount' => 0,
+                        'store' => $store,
+                        'unit'=>$item->storeProduct->product->unit
+                    ),
                 ]);
             }
         }

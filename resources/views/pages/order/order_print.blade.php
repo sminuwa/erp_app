@@ -166,6 +166,7 @@
                                     </tr>
                                 @endif--}}
 
+
                                 <tr>
                                     <td colspan="4">Amoun Paid in Words:
                                         <span>{{ $utility->convertNumberToWords($total) }} Naira</span>

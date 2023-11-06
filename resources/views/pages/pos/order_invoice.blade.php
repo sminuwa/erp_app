@@ -150,6 +150,7 @@
                                                         <input type="hidden" name="name" value="{{ $store->name }}">
                                                         <input type="hidden" name="code" value="{{ $store->code }}">
                                                         <input type="hidden" name="store" value="{{ $store->store }}">
+                                                        <input type="hidden" name="unit" value="{{ $store->unit }}">
                                                         <input type="hidden" name="qty" value="1">
                                                         <input type="hidden" name="selling_price"
                                                             value="{{ $store->selling_price }}">
@@ -159,6 +160,7 @@
                                                             value="{{ $store->selling_price }}">
                                                         <input type="hidden" name="cost_price"
                                                             value="{{ $store->cost_price }}">
+
 
                                                         <td>{{ ucwords($store->store) }}</td>
                                                         <td>{{ $store->code }}</td>
@@ -213,6 +215,7 @@
                                                 {{-- <th>S.N</th> --}}
                                                 <th>Store</th>
                                                 <th style="width:30%">Code</th>
+                                                <th>Unit</th>
                                                 <th>Price</th>
                                                 <th>Qty</th>
                                                 <th>Total</th>
@@ -227,7 +230,7 @@
                                                     <td class="text-left">{{ $product->attributes['store'] }}</td>
                                                     <td class="text-left">{{ $product->attributes['code'] }} -
                                                         {{ $product->name }}</td>
-
+                                                    <td>{{ $product->attributes['unit'] }}</td>
                                                     <form action="{{ route('cart.update') }}" method="post"
                                                         id="p{{ $product->id }}">
                                                         @csrf
@@ -278,6 +281,8 @@
                                                             value="{{ $product->attributes['cost_price'] }}">
                                                         <input type="hidden" name="qty_available" class="form-control"
                                                             value="{{ $product->attributes['qty_available'] }}">
+                                                        <input type="hidden" name="unit" class="form-control"
+                                                               value="{{ $product->attributes['unit'] }}">
                                                         {{-- <td>
                                                             <button type="submit" class="btn btn-sm btn-success">
                                                                 <i class="fa fa-check-circle" aria-hidden="true"></i>

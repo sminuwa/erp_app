@@ -38,7 +38,9 @@ class PosController extends Controller
             })
 
             ->where('stores.branch_id', 'LIKE', $user_branch)
-            ->where('branch_product_prices.status', 1)->limit(100);
+            ->where('branch_product_prices.status', 1)
+//            ->orderBy('products.code','asc')
+            ->limit(100);
         //TODO:: remove limit here
         if ($request->has('category_id') && $request->has('store_id')) {
             $category_id = $request->category_id;
@@ -127,7 +129,15 @@ class PosController extends Controller
                 'price' => $data->sold_price,
                 'quantity' => $qty,
                 //'attributes' => array('cost_price' => $data->cost_price, 'selling_price' => $data->selling_price, 'discount' => 0),
-                'attributes' => array('cost_price' => $data->cost_price, 'code' => $code, 'selling_price' => $data->selling_price, 'qty_available' => $qty_available, 'discount' => 0, 'store' => $store),
+                'attributes' => array(
+                    'cost_price' => $data->cost_price,
+                    'code' => $code,
+                    'selling_price' => $data->selling_price,
+                    'qty_available' => $qty_available,
+                    'discount' => 0,
+                    'store' => $store,
+                    'unit'=>$data->storeProduct->product->unit
+                ),
             ]);
         }
     }

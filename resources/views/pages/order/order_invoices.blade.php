@@ -110,7 +110,7 @@
                                                                 class="dropdown-item">
                                                                 <i class="fa fa-eye" aria-hidden="true"></i> View
                                                             </a>
-                                                            <a href="{{ route('order.invoice.print', $order->id) }}"
+                                                            <a href="{{ route('invoice.order_print', $order->id) }}"
                                                                target="_BLANK" class="dropdown-item">
                                                                 <i class="fa fa-print" aria-hidden="true"></i> Print
                                                             </a>

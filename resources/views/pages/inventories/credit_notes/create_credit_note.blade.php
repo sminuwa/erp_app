@@ -38,52 +38,95 @@
             </a>
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-sm-6" id="load">
-                        @if (isset($order) && $order != null)
-                            @include('pages.inventories.credit_notes.load_products')
-                        @endif
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="container mt-5" style="max-height: 300px;overflow: scroll;">
-                            <div class="card">
-                                <div class="card-header">
-                                    Previous Invoices
-                                </div>
-                                <div class="card-body">
-                                    <h5 class="card-title">Invoices</h5>
-                                    <input type="text" id="search" class="form-control mt-3" placeholder="Search">
-                                    <div id="table-container">
-                                        <table class="table" id="example1" style="font-size: 12px;">
-                                            <thead>
-                                                <tr>
-                                                    <th>Reference No</th>
-                                                    <th>Customer</th>
-                                                    <th>Date</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="table-body">
-                                                @foreach ($orders as $order)
-                                                    <tr>
-                                                        <td><a href="javascript:void(0)" class="invoice" onclick="load()"
-                                                                data-val="{{ $order->invoice_no }}">{{ $order->invoice_no }}</a>
-                                                        </td>
-                                                        <td>{{ $order->customer->name }}</td>
-                                                        <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}
-                                                        </td>
-                                                        <td style="text-align: right"><a href="javascript:void(0)"
-                                                                onclick="load()" class="invoice"
-                                                                data-val="{{ $order->invoice_no }}"><span
-                                                                    class=""></span>Select</a></td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                Credit Notes
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        @hasanyrole('Super-admin|Admin')
+                                        <div class="form-group">
+                                            <label for="order_date">Date</label>
+                                            <input type="text" name="order_date" class="form-control datepicker"
+                                                   value="{{ $order ? $order->order_date : date('Y-m-d') }}" />
+                                        </div>
+                                        @else
+                                            <input type="hidden" name="order_date" class="form-control datepicker"
+                                                   value="{{ date('Y-m-d') }}" />
+                                            @endhasanyrole
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Customer Type</label>
+                                            <select name="account_type" id="account_type" class="form-control" required>
+                                                <option value="" disabled selected>Select...</option>
+                                                <option value="Retail">Retail</option>
+                                                <option value="Wholesale">WholeSale</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Customer</label>
+                                            <div class="form-group">
+                                                <select name="customer_id" id="customer_record" class="form-control customer_id ">
+                                                    {{--                                                        <option value="">Select...</option>--}}
+                                                    {{--@foreach($customers as $customer)
+                                                        <option value="{{ $customer->id }}">
+                                                            {{ $customer->code }}-{{ $customer->name }}</option>
+                                                    @endforeach--}}
+                                                </select>
+                                                <div class="form-group">
+                                                        <span class="text text-danger ion-android-alert"
+                                                              id="credit_balance"></span>
+                                                </div>
+                                            </div>
+                                            {{-- <div class="form-group" style="border: 1px solid rgba(64, 44, 45, 0.4)">
+                                                    <input type="text" class="form-control" name="reference" id="reference"
+                                                        placeholder="Reference" />
+                                                </div> --}}
+                                            <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body table-responsive" id="load">
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Invoices</h3>
+                            </div>
+                            <div class="card-body">
+                                <input type="text" id="search" class="form-control" placeholder="Search">
+                                <table class="table" id="" style="font-size: 12px;">
+                                    <thead>
+                                    <tr>
+                                        <th>Reference No</th>
+                                        <th>Date</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="table-body" class="customer-orders">
+                                    @foreach ($orders as $order)
+                                        <tr>
+                                            <td>
+                                                <a href="javascript:void(0)" class="invoice" onclick="load()"
+                                                   data-val="{{ $order->invoice_no }}">{{ $order->invoice_no }}</a>
+                                            </td>
+                                            <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card-body table-responsive">
                             <table id="store_data" class="table table-bordered table-striped text-left"
                                 style="font-size: 12px;">
                                 <thead>
@@ -157,6 +200,11 @@
 
                         </div>
                     </div>
+                    <div class="col-md-6" id="load">
+                        @if (isset($order) && $order != null)
+                            @include('pages.inventories.credit_notes.load_products')
+                        @endif
+                    </div>
                 </div>
             </div><!-- /.container-fluid -->
         </section>
@@ -175,6 +223,8 @@
     <!-- Sweet Alert Js -->
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script>
+
+
         $(function() {
             $("#example1,#store_data").DataTable();
             $('#example2').DataTable({
@@ -185,6 +235,32 @@
                 "info": true,
                 "autoWidth": false
             });
+
+            $('#account_type').on("change", function() {
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('ajax.load.customers') }}",
+                    data: {
+                        type: $(this).val()
+                    }
+                }).done(function(data) {
+                    $("#customer_record").html(data);
+                });
+            });
+
+            $('.customer_id').on('change',function() {
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('ajax.load.customer-orders') }}",
+                    data: {
+                        customer_id: $(this).val()
+                    }
+                }).done(function(data) {
+                    console.log(data)
+                    $(".customer-orders").html(data);
+                });
+            });
+
             $(document).on('keyup', '#search', function() {
                 var searchText = $(this).val();
                 $.ajax({

@@ -51,7 +51,7 @@
                                    class="btn btn-success btn-sm  show">
                                     <i class="fa fa-check" aria-hidden="true"></i> Confirm
                                 </a>
-                                <a href="{{ route('invoice.order_print', $order->id) }}"
+                                <a href="{{ route('invoice.print', $order->id) }}"
                                    target="_BLANK" class="btn btn-dark btn-sm ">
                                     <i class="fa fa-print" aria-hidden="true"></i> Print
                                 </a>

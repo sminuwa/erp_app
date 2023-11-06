@@ -165,21 +165,8 @@
                                         </th>
                                     </tr>
                                 @endif--}}
-                                <tr>
-                                    <th style="text-align: right">Amount Paid := </th>
-                                    <th style="text-align: right;">
-                                        &#8358;{{ number_format($order->pay, 2, '.', ',') }}</th>
-                                </tr>
-                                <tr>
-                                    <th style="text-align: right">Balance := </th>
-                                    <th style="text-align: right;">
-                                        @if ($order->due < 0)
-                                            &#8358;({{ number_format(abs($order->due), 2) }})
-                                        @else
-                                            &#8358;{{ number_format($order->due, 2) }}
-                                        @endif
-                                    </th>
-                                </tr>
+
+
                                 <tr>
                                     <td colspan="4">Amoun Paid in Words:
                                         <span>{{ $utility->convertNumberToWords($total) }} Naira</span>

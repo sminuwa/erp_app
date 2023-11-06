@@ -149,7 +149,7 @@ class MisController extends Controller
     public function loadCustomerOrders(Request $request)
     { //return $request->type;
         $customer = Customer::find($request->customer_id);
-        $orders = Order::where('customer_id', $customer->id)->orderBy('id','desc')->get();
+        $orders = Order::where(['customer_id' => $customer->id, 'status'=>1])->orderBy('id','desc')->get();
 //        if (count($orders) > 1)
         $result = "<tr>";
         foreach ($orders as $order) {

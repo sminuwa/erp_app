@@ -38,12 +38,7 @@
             </a>
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-sm-6" id="load">
-                        @if (isset($order) && $order != null)
-                            @include('pages.inventories.credit_notes.load_products')
-                        @endif
-                    </div>
-                    <div class="col-sm-6">
+                    <div class="col-md-12">
                         <div class="container mt-5" style="max-height: 300px;overflow: scroll;">
                             <div class="card">
                                 <div class="card-header">
@@ -55,35 +50,38 @@
                                     <div id="table-container">
                                         <table class="table" id="example1" style="font-size: 12px;">
                                             <thead>
-                                                <tr>
-                                                    <th>Reference No</th>
-                                                    <th>Customer</th>
-                                                    <th>Date</th>
-                                                    <th>Action</th>
-                                                </tr>
+                                            <tr>
+                                                <th>Reference No</th>
+                                                <th>Customer</th>
+                                                <th>Date</th>
+                                                <th>Action</th>
+                                            </tr>
                                             </thead>
                                             <tbody id="table-body">
-                                                @foreach ($orders as $order)
-                                                    <tr>
-                                                        <td><a href="javascript:void(0)" class="invoice" onclick="load()"
-                                                                data-val="{{ $order->invoice_no }}">{{ $order->invoice_no }}</a>
-                                                        </td>
-                                                        <td>{{ $order->customer->name }}</td>
-                                                        <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}
-                                                        </td>
-                                                        <td style="text-align: right"><a href="javascript:void(0)"
-                                                                onclick="load()" class="invoice"
-                                                                data-val="{{ $order->invoice_no }}"><span
-                                                                    class=""></span>Select</a></td>
-                                                    </tr>
-                                                @endforeach
+                                            @foreach ($orders as $order)
+                                                <tr>
+                                                    <td><a href="javascript:void(0)" class="invoice" onclick="load()"
+                                                           data-val="{{ $order->invoice_no }}">{{ $order->invoice_no }}</a>
+                                                    </td>
+                                                    <td>{{ $order->customer->name }}</td>
+                                                    <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}
+                                                    </td>
+                                                    <td style="text-align: right"><a href="javascript:void(0)"
+                                                                                     onclick="load()" class="invoice"
+                                                                                     data-val="{{ $order->invoice_no }}"><span
+                                                                class=""></span>Select</a></td>
+                                                </tr>
+                                            @endforeach
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body table-responsive" id="load">
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card-body table-responsive">
                             <table id="store_data" class="table table-bordered table-striped text-left"
                                 style="font-size: 12px;">
                                 <thead>
@@ -156,6 +154,11 @@
                             </table>
 
                         </div>
+                    </div>
+                    <div class="col-md-6" id="load">
+                        @if (isset($order) && $order != null)
+                            @include('pages.inventories.credit_notes.load_products')
+                        @endif
                     </div>
                 </div>
             </div><!-- /.container-fluid -->

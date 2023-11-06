@@ -45,9 +45,10 @@ class CreditNoteController extends Controller
 
         if ($order == null)
             \Cart::clear();
+        $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
         $model = new Customer;
         $cart_products = \Cart::getContent();
-        return view('pages.inventories.credit_notes.create_credit_note', compact('orders', 'model', 'cart_products', 'order','stores'));
+        return view('pages.inventories.credit_notes.create_credit_note', compact('orders', 'customers', 'cart_products', 'order','stores'));
     }
     public function payCreditNote(Request $request)
     {

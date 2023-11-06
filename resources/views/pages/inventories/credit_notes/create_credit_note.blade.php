@@ -39,13 +39,60 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="container mt-5" style="max-height: 300px;overflow: scroll;">
+                        <div class="container mt-3">
                             <div class="card">
                                 <div class="card-header">
-                                    Previous Invoices
+                                    Credit Notes
                                 </div>
                                 <div class="card-body">
-                                    <h5 class="card-title">Invoices</h5>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            @hasanyrole('Super-admin|Admin')
+                                            <div class="form-group">
+                                                <label for="order_date">Sale Date</label>
+                                                <input type="text" name="order_date" class="form-control datepicker"
+                                                       value="{{ $order ? $order->order_date : date('Y-m-d') }}" />
+                                            </div>
+                                            @else
+                                                <input type="hidden" name="order_date" class="form-control datepicker"
+                                                       value="{{ date('Y-m-d') }}" />
+                                                @endhasanyrole
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Customer Type</label>
+                                                <select name="account_type" id="account_type" class="form-control" required>
+                                                    <option value="" disabled selected>Select...</option>
+                                                    <option value="Retail">Retail</option>
+                                                    <option value="Wholesale">WholeSale</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Customer</label>
+                                                <div class="form-group">
+                                                    <select name="customer_id" id="customer_record"
+                                                            class="form-control select2-single">
+                                                        <option value="">Select...</option>
+                                                        @foreach($customers as $customer)
+                                                            <option value="{{ $customer->id }}">
+                                                                {{ $customer->code }}-{{ $customer->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <div class="form-group">
+                                                        <span class="text text-danger ion-android-alert"
+                                                              id="credit_balance"></span>
+                                                    </div>
+                                                </div>
+                                                {{-- <div class="form-group" style="border: 1px solid rgba(64, 44, 45, 0.4)">
+                                                        <input type="text" class="form-control" name="reference" id="reference"
+                                                            placeholder="Reference" />
+                                                    </div> --}}
+                                                <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <input type="text" id="search" class="form-control mt-3" placeholder="Search">
                                     <div id="table-container">
                                         <table class="table" id="example1" style="font-size: 12px;">

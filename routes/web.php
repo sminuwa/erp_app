@@ -620,6 +620,7 @@ Route::middleware('auth')->group(function () {
     Route::get('load/account_name', [MisController::class, 'loadAccountName'])->name('ajax.load.account.name');
     Route::get('load/account_balance', [MisController::class, 'loadAccountBalance'])->name('ajax.load.account.balance');
     Route::get('load/customers', [MisController::class, 'loadCustomers'])->name('ajax.load.customers');
+    Route::get('load/customer-orders', [MisController::class, 'loadCustomerOrders'])->name('ajax.load.customer-orders');
     Route::get('load/suppliers', [MisController::class, 'loadSuppliers'])->name('ajax.load.suppliers');
     Route::get('load/store/product', [MisController::class, 'loadStoreProducts'])->name('ajax.load.store-products');
     Route::get('load/store/product/availabe', [MisController::class, 'loadStoreProductQuantity'])->name('ajax.load.quantity.available');

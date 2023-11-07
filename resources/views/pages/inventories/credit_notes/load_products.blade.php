@@ -102,7 +102,7 @@
             <textarea name="comment" placeholder="Comment" rows="5" cols="100" class="form-control"></textarea>
 
             <div class="form-group text-right mt-3">
-                <input type="submit" name="Submit" class=" btn btn-primary" value="Submit" />
+                <input type="submit" class=" btn btn-primary" value="Submit" />
             </div>
 
         </form>

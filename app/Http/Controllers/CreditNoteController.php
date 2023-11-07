@@ -55,6 +55,7 @@ class CreditNoteController extends Controller
     public function payCreditNote(Request $request)
     {
 //        return "To call your function";
+
         $order_id = $request->order_id;
         $comment = $request->comment;
         $order = Order::find($order_id);

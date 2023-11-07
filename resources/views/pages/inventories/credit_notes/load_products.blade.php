@@ -42,11 +42,26 @@
 
                             <form action="{{ route('credit.note.cart.update') }}" method="post" id="p{{ $product->id }}">
                                 @csrf
-                                @method('PUT')
+                                {{--@method('PUT')--}}
                                 <td>
-                                    <input type="text" name="quantity" id="quantity{{ $product->id }}"
-                                        class="form-control quantity" data-value="p{{ $product->id }}"
-                                        style="min-width:58px;" value="{{ $product->quantity }}" min="1"
+                                    <input type="hidden" name="sold_price"
+                                           id="price{{ $product->id }}" class="form-control"
+                                           style="min-width:65px;"
+                                           onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
+                                           value="{{ $product->price }}"
+                                           data-val="{{ $product->price }}"
+                                           data-value="p{{ $product->id }}">
+                                    <span style="color: red;" id="valid_price{{ $product->id }}"></span>
+                                    <input
+                                        type="text"
+                                        name="quantity"
+                                        id="quantity{{ $product->id }}"
+                                        class="form-control quantity"
+                                        data-value="p{{ $product->id }}"
+                                        style="min-width:58px;"
+                                        value="{{ $product->quantity }}"
+                                        min="1"
+                                        max-qty="{{ $product->quantity }}"
                                         required>
                                 </td>
                                 <td>
@@ -85,7 +100,7 @@
             </table>
         @endif
         <div class="alert alert-success">
-            Total : &#8358; <span id="total">{{ number_format(Cart::getTotal()) }}</span>
+            Total : &#8358; <span class="total">{{ number_format(Cart::getTotal()) }}</span>
         </div>
         <form action="{{ route('customers.credit.note.store') }}" method="POST">
             @csrf

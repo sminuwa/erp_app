@@ -224,6 +224,42 @@
 
             // }
 
+            var delay = (function() {
+                var timer = 0;
+                return function(callback, ms) {
+                    clearTimeout(timer);
+                    timer = setTimeout(callback, ms);
+                };
+            })();
+
+            $(document).on('keyup','.quantity', function() {
+                let id = $(this).attr('data-value');
+                $("#valid_qty" + id.substr(1)).html("");
+
+                delay(function() {
+
+                    $.ajax({
+                        url: $('#' + id).attr('action'),
+                        type: $('#' + id).attr('method'),
+                        //dataType: 'json',
+                        data: $('#' + id).serialize(),
+                        success: function(data) {
+                            console.log(data)
+                            id = id.substr(1);
+
+                            subtotal = $('#price' + id).val() * $('#quantity' + id).val();
+                            $('.subtotal' + id).text(formatMoney(subtotal));
+                            $('.total').text(formatMoney(data));
+                            $('.subtotal'+ id).text(formatMoney(data));
+                        },
+                        error: function(xhr, err) {
+
+                        }
+                    });
+
+                }, 500);
+            });
+
 
             function formatMoney(n, c, d, t) {
                 var c = isNaN(c = Math.abs(c)) ? 2 : c,

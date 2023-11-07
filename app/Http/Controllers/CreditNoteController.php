@@ -177,24 +177,33 @@ class CreditNoteController extends Controller
 
     public function updateCart(Request $request)
     {
+        return $request;
         $sold_price = $request->sold_price;
 
         \Cart::update(
-            $request->id,
-            [
+            $request->id, [
                 'quantity' => [
                     'relative' => false,
                     'value' => $request->quantity
                 ],
                 'price' => $sold_price,
-                'attributes' => array('cost_price' => $request->cost_price, 'selling_price' => $request->selling_price, 'code' => $request->code, 'discount' => $request->selling_price - $request->sold_price, 'qty_available' => $request->qty_available, 'store' => $request->store)
+                'attributes' => array(
+                    'cost_price' => $request->cost_price,
+                    'selling_price' => $request->selling_price,
+                    'code' => $request->code,
+                    'discount' => $request->selling_price - $request->sold_price,
+                    'qty_available' => $request->qty_available,
+                    'store' => $request->store
+                )
             ]
         );
 
         session()->flash('success', 'Item Cart is Updated Successfully !');
+
         if ($request->ajax()) {
             return \Cart::getTotal();
         }
+
         return redirect()->back();
     }
 

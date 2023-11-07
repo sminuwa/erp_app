@@ -229,8 +229,7 @@
                                                 <td class="text-left">{{ $product->attributes['code'] }} -
                                                     {{ $product->name }}</td>
                                                 <td>{{$product->attributes['unit']}}</td>
-                                                <form action="{{ route('cart.update') }}" method="post"
-                                                      id="p{{ $product->id }}">
+                                                <form action="{{ route('cart.update') }}" method="post" id="p{{ $product->id }}">
                                                     @csrf
                                                     @method('PUT')
                                                     <td>
@@ -242,13 +241,12 @@
                                                                    value="{{ $product->price }}"
                                                                    data-val="{{ $product->attributes['selling_price'] }}"
                                                                    data-value="p{{ $product->id }}">
-                                                            <span style="color: red;"
-                                                                  id="valid_price{{ $product->id }}"></span>
+                                                            <span style="color: red;" id="valid_price{{ $product->id }}"></span>
                                                         @else
                                                             <input type="text" name="selling_price"
                                                                    id="price{{ $product->id }}" class="form-control price"
                                                                    readonly style="min-width:65px;"
-                                                                   onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
+                                                                   onchange="validate(this.value, this.getAttribute('data-val'),this.getAttribute('id'))"
                                                                    value="{{ $product->price }}"
                                                                    data-val="{{ $product->attributes['selling_price'] }}"
                                                                    data-value="p{{ $product->id }}">
@@ -258,7 +256,8 @@
 
                                                     </td>
                                                     <td>
-                                                        <input type="text" name="quantity"
+                                                        <input type="text"
+                                                               name="quantity"
                                                                id="quantity{{ $product->id }}"
                                                                class="form-control quantity"
                                                                data-value="p{{ $product->id }}" style="min-width:58px;"

@@ -10,9 +10,9 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\StoreProduct;
 use App\Models\User;
-use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class CreditNoteController extends Controller
 {
@@ -55,13 +55,18 @@ class CreditNoteController extends Controller
     public function payCreditNote(Request $request)
     {
 //        return "To call your function";
-
         $order_id = $request->order_id;
         $comment = $request->comment;
         $order = Order::find($order_id);
-        $reference = $this->generateCreditNoteInvoice();
+        $credit_note_id = $request->credit_note_id;
+        $reference = CreditNote::generateNewNumber();
+        $credit_note = CreditNote::find($credit_note_id);
+
         DB::beginTransaction();
         try {
+            if(!$credit_note)
+                $credit_note = new CreditNote();
+            $credit_note->comment =
             //Bank Withdrawal
             DB::table('credit_notes')->insert([
                 'invoice_no' => $order->invoice_no,

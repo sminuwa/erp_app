@@ -118,6 +118,9 @@
                             @include('pages.inventories.credit_notes.load_products')
                         @endif--}}
                     </div>
+                    <div class="col-md-12 testinng">
+
+                    </div>
                 </div>
             </div><!-- /.container-fluid -->
         </section>
@@ -169,7 +172,6 @@
                         customer_id: $(this).val()
                     }
                 }).done(function(data) {
-                    console.log(data)
                     $(".customer-orders").html(data);
                 });
             });
@@ -224,6 +226,52 @@
 
             // }
 
+            /*var delay = (function() {
+                var timer = 0;
+                return function(callback, ms) {
+                    clearTimeout(timer);
+                    timer = setTimeout(callback, ms);
+                };
+            })();*/
+
+            $(document).on('keyup','.quantity', function() {
+                let id = $(this).attr('data-value');
+                $("#valid_qty" + id.substr(1)).html("");
+                if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
+                    'max-qty'))) {
+                    $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $('#quantity' +
+                        id.substr(1)).attr('max-qty') + ")");
+                    $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
+                    return false;
+                }
+                delay(function() {
+
+                    $.ajax({
+                        url: $('#' + id).attr('action'),
+                        type: $('#' + id).attr('method'),
+                        header: '',
+                        data: {
+                            quantity: $('#quantity' + (id.substr(1))).val(),
+                            store_product_id: id.substr(1),
+                            _token: "{{ csrf_token() }}"
+                        },
+                        //dataType: 'json',
+                        success: function(data) {
+                            console.log(data)
+                            id = id.substr(1);
+                            subtotal = $('#price' + id).val() * $('#quantity' + id).val();
+                            $('.subtotal' + id).text(formatMoney(subtotal));
+                            $('.total').text(formatMoney(data));
+                            $('.testinng').html(data);
+                        },
+                        error: function(xhr, err) {
+
+                        }
+                    });
+
+                }, 500);
+            });
+
 
             function formatMoney(n, c, d, t) {
                 var c = isNaN(c = Math.abs(c)) ? 2 : c,
@@ -274,44 +322,8 @@
                     timer = setTimeout(callback, ms);
                 };
             })();
-            $(document).on('keyup', '.quantity,.price', function() {
-                id = $(this).attr('data-value');
-                $("#valid_qty" + id.substr(1)).html("");
-                if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(
-                        1)).attr(
-                        'max-qty'))) {
-                    $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $(
-                        '#quantity' +
-                        id.substr(1)).attr('max-qty') + ")");
-                    $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
-                    return false;
-                }
-                delay(function() {
 
-                    $.ajax({
-                        url: $('#' + id).attr('action'),
-                        type: $('#' + id).attr('method'),
-                        header: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        data: $('#' + id).serialize(),
-                        success: function(data) {
-                            id = id.substr(1);
 
-                            subtotal = $('#price' + id).val() * $('#quantity' + id)
-                                .val();
-                            $('.subtotal' + id).text(formatMoney(subtotal));
-                            $('#total').text(formatMoney(data));
-                            $('#subtotal').text(formatMoney(data));
-                        },
-                        error: function(xhr, err) {
-                            //$('#total').text(formatMoney(data));
-                            //$('#subtotal').text(formatMoney(data));
-                        }
-                    });
-
-                }, 500);
-            });
         });
     </script>
 @endpush

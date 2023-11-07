@@ -38,23 +38,29 @@
                             <td>{{ $loop->iteration }}</td>
                             <td class="text-left">{{ $product->name }}</td>
                             <td class="text-left">{{ $product->attributes['unit'] }}</td>
+                            <td class="text-left">{{ $product->attributes['sold_price'] }}</td>
 
                             <form action="{{ route('credit.note.cart.update') }}" method="post" id="p{{ $product->id }}">
                                 @csrf
-                                @method('PUT')
                                 <td>
-                                    <input type="text" name="sold_price" id="price{{ $product->id }}"
-                                        class="form-control price" style="min-width:65px;"
-                                        onchange="validate(this.value, this.getAttribute('data-val'), this.getAttribute('id'))"
-                                        value="{{ $product->attributes['sold_price'] }}"
-                                        data-val="{{ $product->attributes['sold_price'] }}"
-                                        data-value="p{{ $product->id }}">
+                                    <input type="hidden" name="sold_price"
+                                           id="price{{ $product->id }}" class="form-control"
+                                           style="min-width:65px;"
+                                           onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
+                                           value="{{ $product->price }}"
+                                           data-val="{{ $product->price }}"
+                                           data-value="p{{ $product->id }}">
                                     <span style="color: red;" id="valid_price{{ $product->id }}"></span>
-                                </td>
-                                <td>
-                                    <input type="text" name="quantity" id="quantity{{ $product->id }}"
-                                        class="form-control quantity" data-value="p{{ $product->id }}"
-                                        style="min-width:58px;" value="{{ $product->quantity }}" min="1"
+                                    <input
+                                        type="text"
+                                        name="quantity"
+                                        id="quantity{{ $product->id }}"
+                                        class="form-control quantity"
+                                        data-value="p{{ $product->id }}"
+                                        style="min-width:58px;"
+                                        value="{{ $product->quantity }}"
+                                        min="1"
+                                        max-qty="{{ $product->quantity }}"
                                         required>
                                 </td>
                                 <td>
@@ -67,11 +73,6 @@
                                     value="{{ $product->attributes['cost_price'] }}">
                                 <input type="hidden" name="unit" class="form-control"
                                        value="{{ $product->attributes['unit'] }}">
-                                {{-- <td>
-                                <button type="submit" class="btn btn-sm btn-success">
-                                    <i class="fa fa-check-circle" aria-hidden="true"></i>
-                                </button>
-                            </td> --}}
                             </form>
 
                             <td>
@@ -93,13 +94,13 @@
             </table>
         @endif
         <div class="alert alert-success">
-            Total : &#8358; <span id="total">{{ number_format(Cart::getTotal()) }}</span>
+            Total : &#8358; <span class="total">{{ number_format(Cart::getTotal()) }}</span>
         </div>
         <form action="{{ route('customers.credit.note.store') }}" method="POST">
             @csrf
             <input type="hidden" name="order_id" id="order_id" value="{{ $order->id }}" />
             <input type="hidden" name="customer_id" id="customer_id" value="{{ $order->customer_id }}" />
-            <textarea name="comment" placeholder="Comment" rows="5" cols="100" class="form-control"></textarea>
+            <input name="comment" placeholder="Comment" class="form-control">
 
             <div class="form-group text-right mt-3">
                 <input type="submit" class=" btn btn-primary" value="Submit" />

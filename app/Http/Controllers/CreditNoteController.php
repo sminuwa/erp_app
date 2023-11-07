@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\CostPrice;
+use App\Classes\Transaction;
 use App\Models\AuditLog;
 use App\Models\CreditNote;
 use App\Models\CreditNoteDetail;
@@ -97,7 +99,7 @@ class CreditNoteController extends Controller
                     $credit_note_detail->save();
                 }
 
-                $action = "Create credit note with $credit_note->reference : $total";
+                $action = "Create/Updated credit note for $credit_note->reference : $total";
                 AuditLog::auditLog(Auth::id(), $action);
                 DB::commit();
             }
@@ -111,30 +113,41 @@ class CreditNoteController extends Controller
         }
         return redirect()->back();
     }
-    public function post(CreditNote $creditNote) {
-        $creditNote->status = 1;
-        $creditNote->posted_by = auth()->id();
-        $items = $creditNote->credit_note_items;
+    public function post(CreditNote $credit_note) {
+        $credit_note->status = 1;
+        $credit_note->posted_by = auth()->id();
+        $items = $credit_note->credit_note_items;
         DB::beginTransaction();
-        if($creditNote->save()){
-            $products = [];
+        if($credit_note->save()){
+            $products = $new_cost_price = [];
             foreach ($items as $item) {
-                $products[$item->store_product_id] = ['quantity'=>$item->quantity, 'cost_price'=>$item->cost_price,  'sold_price'=>$item->sold_price];
+                $products[$item->store_product_id] = [
+                    'quantity'=>$item->quantity,
+                    'cost_price'=>$item->cost_price,
+                    'sold_price'=>$item->sold_price];
+                $new_cost_price[$item->store_product_id] = [
+                    'quantity'=>$item->quantity,
+                    'price'=>$item->cost_price,
+                    'store_id'=>$item->store_product->store_id,
+                    'expiry_date'=>''];
             }
-            /*return Transaction::sale(
+            if(Transaction::credit_note(
                 $products,
-                $invoice->customer_id,
-                $invoice->reference,
-                $invoice->order_date);*/
-            if(Transaction::sale(
-                $products,
-                $creditNote->customer_id,
-                $creditNote->reference,
-                $creditNote->order_date)['status']
+                $credit_note->customer_id,
+                $credit_note->reference,
+                $credit_note->order_date)['status']
             ){
-                $action = "Invoice of $invoice->total for : " . $invoice->reference;
+
+                //update stock and calculate new cost price
+                if(CostPrice::newCostPrice(
+                    $new_cost_price,
+                    $credit_note->reference,
+                    $credit_note->branch_id)['status']
+                )
+
+                $action = "Credit Note of $credit_note->total for : " . $credit_note->reference;
                 AuditLog::auditLog(auth()->id(), $action);
-                session()->flash('app_message', 'Receipt generated successfully');
+                session()->flash('app_message', 'Credit note posted successfully');
                 DB::commit();
             }else {
                 DB::rollBack();

@@ -109,7 +109,7 @@ class CostPrice
         }
     }
 
-    public static function newCostPrice(array $products, $batch_no, $store_id = 278,  $branch_id = 2){
+    public static function newCostPrice(array $products, $batch_no,  $branch_id = 2){
         /*
          * branch id of the destination store
          * array of product list as follows
@@ -117,11 +117,13 @@ class CostPrice
          *  2 =>[
          *        quantity => 20,
          *        price => 300,
+         *        store => 2,
          *        expiry = null
          *      ]
          *  5 =>[
          *        quantity => 65,
          *        price => 1300,
+         *        store => 2,
          *        expiry = 2023-12-31
          *      ]
          * ]
@@ -166,6 +168,7 @@ class CostPrice
                 'total_new_cost' => ($products[$key]['quantity'] * $products[$key]['price']),
                 'quantity' => (($p['quantity']) + (isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0)),
                 'expiry_date' => $products[$key]['expiry_date'],
+                'store_id' => $products[$key]['store_id'],
             ];
         }
 
@@ -178,7 +181,7 @@ class CostPrice
                 'updated_by' => $user->id
             ];
             $store_products[] = [
-                'store_id'=>$store_id,
+                'store_id'=>$record['store_id'],
                 'product_id'=>$key,
                 'qty_available'=>$record['quantity']
             ];

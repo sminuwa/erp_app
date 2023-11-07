@@ -42,6 +42,10 @@ class CreditNote extends Model
         return $this->belongsTo(Branch::class);
     }
 
+    public function credit_note_items(){
+        return $this->hasMany(CreditNoteDetail::class,'credit_note_id');
+    }
+
     public function createdBy()
     {
         return $this->belongsTo(User::class,'created_by');

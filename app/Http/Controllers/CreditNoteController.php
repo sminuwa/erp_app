@@ -175,26 +175,16 @@ class CreditNoteController extends Controller
         }
     }
 
-    public function updateCart(Request $request)
+    public function updateCreditNoteCart(Request $request)
     {
-        return $request;
-        $sold_price = $request->sold_price;
+//        $sold_price = $request->sold_price;
 
         \Cart::update(
-            $request->id, [
+            $request->store_product_id, [
                 'quantity' => [
                     'relative' => false,
                     'value' => $request->quantity
-                ],
-                'price' => $sold_price,
-                'attributes' => array(
-                    'cost_price' => $request->cost_price,
-                    'selling_price' => $request->selling_price,
-                    'code' => $request->code,
-                    'discount' => $request->selling_price - $request->sold_price,
-                    'qty_available' => $request->qty_available,
-                    'store' => $request->store
-                )
+                ]
             ]
         );
 
@@ -204,7 +194,7 @@ class CreditNoteController extends Controller
             return \Cart::getTotal();
         }
 
-        return redirect()->back();
+        return \Cart::getTotal();
     }
 
     public function removeCart(Request $request, $id)

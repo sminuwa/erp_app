@@ -42,7 +42,6 @@
 
                             <form action="{{ route('credit.note.cart.update') }}" method="post" id="p{{ $product->id }}">
                                 @csrf
-                                {{--@method('PUT')--}}
                                 <td>
                                     <input type="hidden" name="sold_price"
                                            id="price{{ $product->id }}" class="form-control"
@@ -74,11 +73,6 @@
                                     value="{{ $product->attributes['cost_price'] }}">
                                 <input type="hidden" name="unit" class="form-control"
                                        value="{{ $product->attributes['unit'] }}">
-                                {{-- <td>
-                                <button type="submit" class="btn btn-sm btn-success">
-                                    <i class="fa fa-check-circle" aria-hidden="true"></i>
-                                </button>
-                            </td> --}}
                             </form>
 
                             <td>

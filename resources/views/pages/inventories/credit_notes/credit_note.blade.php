@@ -62,9 +62,9 @@
                                     class="table table-bordered table-striped text-left table-responsive-xl">
                                     <thead>
                                         <tr>
-                                            <th>Name</th>
                                             <th>Date</th>
-                                            <th>Reference No</th>
+                                            <th>Name</th>
+                                            <th>Reference</th>
                                             <th>Amount</th>
                                             <th>Posted By</th>
                                             <th>Actions</th>
@@ -72,9 +72,9 @@
                                     </thead>
                                     <tfoot>
                                         <tr>
-                                            <th>Name</th>
                                             <th>Date</th>
-                                            <th>Reference No</th>
+                                            <th>Reference</th>
+                                            <th>Name</th>
                                             <th>Amount</th>
                                             <th>Posted By</th>
                                             <th>Actions</th>
@@ -84,10 +84,9 @@
                                         @foreach ($payments as $payment)
                                             <tr>
 
-                                                <td>{{ $payment->customer->name ?? '' }}</td>
                                                 <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
-                                                </td>
-                                                <td>{{ $payment->reference_no }}</td>
+                                                <td>{{ $payment->reference }}</td>
+                                                <td>{{ $payment->customer->name ?? '' }}</td>
 
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
                                                 <td>{{ $payment->postedBy->name ?? '' }}</td>

@@ -837,6 +837,17 @@ Route::middleware('auth')->group(function () {
             Route::get('/us/user/loan/history', [ReportController::class, 'loanHistory'])->name('user.loan.history.report');
             Route::get('/us/user/loan/history/load', [ReportController::class, 'loadLoanHistory'])->name('ajax.load.user.loan.history.report');
             Route::get('/us/user/loan/history/print/{collector_id}', [ReportController::class, 'printLoanHistory'])->name('ajax.user.loan.history.report.print');
+
+            //New Reports
+            //AP/AR
+            //Account Balances and Statements
+             //Loan History
+             Route::group(['prefix'=>'ap_ar'], function() {
+                Route::get('/account_balances', [ReportController::class, 'accountBalance'])->name('account.balance.report');
+                Route::get('/account_balances/load', [ReportController::class, 'loadAccountBalance'])->name('ajax.load.account.balance.report');
+                Route::get('/account_balances/print/{collector_id}', [ReportController::class, 'printAccountBalance'])->name('ajax.account.balance.report.print');
+             });
+             
         }
     );
     Route::group(['prefix' => 'ap_ar_account'], function () {

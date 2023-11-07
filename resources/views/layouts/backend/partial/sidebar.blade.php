@@ -930,6 +930,75 @@
                                     </ul>
                                 </li>
                             @endcan
+                            @can('user.ledger.and.loan')
+                                <li class="nav-item has-treeview {{ Request::is('reports/ap_ar*') ? 'menu-open' : '' }}">
+                                    <a href="#" class="nav-link {{ Request::is('reports/ap_ar*') ? 'active' : '' }}">
+                                        <i class="ion-ios-time"></i>
+                                        <p>
+                                            AP/AR
+                                            <i class="right fa fa-angle-left"></i>
+                                        </p>
+                                    </a>
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            <a href="{{ route('account.balance.report') }}"
+                                                class="nav-link {{ Request::is('reports/us/user/ledger*') ? 'active' : '' }}">
+                                                <i class="ion-cash"></i>
+                                                <p>Account Balances/Statements</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('user.loan.balance.report') }}"
+                                                class="nav-link {{ Request::is('reports/us/loan/balance*') ? 'active' : '' }}">
+                                                <i class="ion-cash"></i>
+                                                <p>Trial Balance</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('user.loan.history.report') }}"
+                                                class="nav-link {{ Request::is('reports/pa/loan/history*') ? 'active' : '' }}">
+                                                <i class="ion-cash"></i>
+                                                <p>Income Statement</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('user.loan.history.report') }}"
+                                                class="nav-link {{ Request::is('reports/pa/loan/history*') ? 'active' : '' }}">
+                                                <i class="ion-cash"></i>
+                                                <p>Balance Sheet</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('user.loan.history.report') }}"
+                                                class="nav-link {{ Request::is('reports/pa/loan/history*') ? 'active' : '' }}">
+                                                <i class="ion-cash"></i>
+                                                <p>Cash Flow</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('user.loan.history.report') }}"
+                                                class="nav-link {{ Request::is('reports/pa/loan/history*') ? 'active' : '' }}">
+                                                <i class="ion-cash"></i>
+                                                <p>Financial Statistics</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('user.loan.history.report') }}"
+                                                class="nav-link {{ Request::is('reports/pa/loan/history*') ? 'active' : '' }}">
+                                                <i class="ion-cash"></i>
+                                                <p>User Daily Remittance</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('user.loan.history.report') }}"
+                                                class="nav-link {{ Request::is('reports/pa/loan/history*') ? 'active' : '' }}">
+                                                <i class="ion-cash"></i>
+                                                <p>Receipt/Payment/Interbank & Journal list</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
                 @endcan

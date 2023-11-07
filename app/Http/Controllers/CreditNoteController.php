@@ -130,7 +130,13 @@ class CreditNoteController extends Controller
                 'name' => $data->storeProduct->product->name ?? 'No name found',
                 'price' => $data->sold_price,
                 'quantity' => $qty,
-                'attributes' => array('cost_price' => $data->cost_price, 'selling_price' => $data->selling_price, 'discount' => 0),
+                'attributes' => array(
+                    'cost_price' => $data->cost_price,
+                    'selling_price' => $data->selling_price,
+                    'sold_price' => $data->sold_price,
+                    'discount' => 0,
+                    'unit' => $data->storeProduct->product->unit
+                ),
             ]);
         }
         $cart_products = \Cart::getContent();

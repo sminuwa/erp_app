@@ -42,6 +42,11 @@ class CreditNote extends Model
         return $this->belongsTo(Branch::class);
     }
 
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class,'created_by');
+    }
+
     public function postedBy()
     {
         return $this->belongsTo(User::class,'posted_by');

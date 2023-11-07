@@ -66,7 +66,7 @@
                                             <th>Name</th>
                                             <th>Reference</th>
                                             <th>Amount</th>
-                                            <th>Posted By</th>
+                                            <th>Created By</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -76,7 +76,7 @@
                                             <th>Reference</th>
                                             <th>Name</th>
                                             <th>Amount</th>
-                                            <th>Posted By</th>
+                                            <th>Created By</th>
                                             <th>Actions</th>
                                         </tr>
                                     </tfoot>
@@ -89,7 +89,7 @@
                                                 <td>{{ $payment->customer->name ?? '' }}</td>
 
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
-                                                <td>{{ $payment->postedBy->name ?? '' }}</td>
+                                                <td>{{ $payment->createdBy->name ?? '' }}</td>
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button"

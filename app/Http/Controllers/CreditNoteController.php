@@ -51,9 +51,10 @@ class CreditNoteController extends Controller
         $cart_products = \Cart::getContent();
         return view('pages.inventories.credit_notes.create_credit_note', compact('orders', 'customers', 'cart_products', 'order','stores'));
     }
+
     public function payCreditNote(Request $request)
     {
-        return "To call your function";
+//        return "To call your function";
         $order_id = $request->order_id;
         $comment = $request->comment;
         $order = Order::find($order_id);

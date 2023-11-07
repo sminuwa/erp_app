@@ -97,7 +97,7 @@
                                     </tr>
                                     </thead>
                                     <tbody id="table-body" class="customer-orders">
-                                    @foreach ($orders as $order)
+                                    {{--@foreach ($orders as $order)
                                         <tr>
                                             <td>
                                                 <a href="javascript:void(0)" class="invoice" onclick="load()"
@@ -105,7 +105,7 @@
                                             </td>
                                             <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</td>
                                         </tr>
-                                    @endforeach
+                                    @endforeach--}}
                                     </tbody>
                                 </table>
                             </div>
@@ -114,9 +114,9 @@
                     </div>
 
                     <div class="col-md-8" id="load">
-                        @if (isset($order) && $order != null)
+                        {{--@if (isset($order) && $order != null)
                             @include('pages.inventories.credit_notes.load_products')
-                        @endif
+                        @endif--}}
                     </div>
                 </div>
             </div><!-- /.container-fluid -->

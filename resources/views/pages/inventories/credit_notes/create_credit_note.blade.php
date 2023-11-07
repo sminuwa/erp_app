@@ -38,14 +38,14 @@
             </a>
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-md-8">
+                    <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
                                 Credit Notes
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-4">
                                         @hasanyrole('Super-admin|Admin')
                                         <div class="form-group">
                                             <label for="order_date">Date</label>
@@ -57,7 +57,7 @@
                                                    value="{{ date('Y-m-d') }}" />
                                             @endhasanyrole
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label>Customer Type</label>
                                             <select name="account_type" id="account_type" class="form-control" required>
@@ -67,27 +67,15 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label>Customer</label>
                                             <div class="form-group">
-                                                <select name="customer_id" id="customer_record" class="form-control customer_id ">
-                                                    {{--                                                        <option value="">Select...</option>--}}
-                                                    {{--@foreach($customers as $customer)
-                                                        <option value="{{ $customer->id }}">
-                                                            {{ $customer->code }}-{{ $customer->name }}</option>
-                                                    @endforeach--}}
-                                                </select>
+                                                <select name="customer_id" id="customer_record" class="form-control customer_id "></select>
                                                 <div class="form-group">
-                                                        <span class="text text-danger ion-android-alert"
-                                                              id="credit_balance"></span>
+                                                        <span class="text text-danger ion-android-alert" id="credit_balance"></span>
                                                 </div>
                                             </div>
-                                            {{-- <div class="form-group" style="border: 1px solid rgba(64, 44, 45, 0.4)">
-                                                    <input type="text" class="form-control" name="reference" id="reference"
-                                                        placeholder="Reference" />
-                                                </div> --}}
-                                            <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button>
                                         </div>
                                     </div>
                                 </div>
@@ -125,82 +113,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="card-body table-responsive">
-                            <table id="store_data" class="table table-bordered table-striped text-left"
-                                style="font-size: 12px;">
-                                <thead>
-                                    <tr>
-                                        <th>Store</th>
-                                        <th>Code</th>
-                                        <th>Item</th>
-                                        <th>Unit</th>
-                                        <th>QTY</th>
-                                        {{-- <th>Price</th> --}}
-                                        <th>Add To Cart</th>
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <tr>
-                                        <th>Store</th>
-                                        <th>Code</th>
-                                        <th>Name</th>
-                                        <th>Unit</th>
-                                        <th>QTY</th>
-                                        {{-- <th>Price</th> --}}
-                                        <th>Add To Cart</th>
-                                    </tr>
-                                </tfoot>
-                                <tbody>
-
-                                    @foreach ($stores as $key => $store)
-                                        <tr>
-                                            <form action="{{ route('credit.note.cart.store') }}" method="post">
-                                                @csrf
-                                                <input type="hidden" name="id" value="{{ $store->id }}">
-                                                <input type="hidden" name="order" value="{{ $order->id }}">
-                                                <input type="hidden" name="name" value="{{ $store->name }}">
-                                                <input type="hidden" name="code" value="{{ $store->code }}">
-                                                <input type="hidden" name="store" value="{{ $store->store }}">
-                                                <input type="hidden" name="qty" value="1">
-                                                <input type="hidden" name="selling_price"
-                                                    value="{{ $store->selling_price }}">
-                                                <input type="hidden" name="qty_available"
-                                                    value="{{ $store->qty_available }}">
-                                                <input type="hidden" name="sold_price"
-                                                    value="{{ $store->selling_price }}">
-                                                <input type="hidden" name="cost_price" value="{{ $store->cost_price }}">
-
-                                                <td>{{ ucwords($store->store) }}</td>
-                                                <td>{{ $store->code }}</td>
-                                                <td>{{ $store->name }}</td>
-                                                <td>{{ $store->unit }}</td>
-                                                <td align="center">{{ $store->qty_available }}</td>
-                                                {{-- <td align="right">
-                                                    {{ number_format($store->selling_price, 2) }}
-                                                </td> --}}
-                                                @if ($store->qty_available > 0 && $store->selling_price > 0)
-                                                    <td align="center">
-                                                        <button type="submit" class="btn btn-sm btn-success px-2">
-                                                            <i class="fa fa-cart-plus" aria-hidden="true"></i>
-                                                        </button>
-                                                    </td>
-                                                @else
-                                                    <td align="center">
-                                                        <span class="fa fa-crosshairs text text-danger"></span>
-                                                    </td>
-                                                @endif
-                                            </form>
-                                        </tr>
-                                    @endforeach
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
-                    </div>
-                    <div class="col-md-6" id="load">
+                    <div class="col-md-8" id="load">
                         @if (isset($order) && $order != null)
                             @include('pages.inventories.credit_notes.load_products')
                         @endif

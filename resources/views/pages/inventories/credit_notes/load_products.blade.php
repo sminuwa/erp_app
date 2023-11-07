@@ -6,7 +6,7 @@
             @if (isset($order))
                 {{ $order->invoice_no }}
             @elseif (Cart::getTotal() > 0)
-                {{ $invoice_no }}
+                {{ $reference }}
             @endif
 
         </h3>

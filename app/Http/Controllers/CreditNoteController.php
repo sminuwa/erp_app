@@ -7,6 +7,7 @@ use App\Models\CreditNote;
 use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\Order;
+use App\Models\OrderDetail;
 use App\Models\StoreProduct;
 use App\Models\User;
 use DB;
@@ -94,9 +95,9 @@ class CreditNoteController extends Controller
         $search_value = $request->refno;
 
         $payments = Order::where('status', 1)
-            ->where('invoice_no', 'LIKE', "%$search_value%")
+            ->where('reference', 'LIKE', "%$search_value%")
             ->where('branch_id', 'LIKE', User::userBranchAction())
-            ->orderBy('order_date', 'DESC')->get();
+            ->orderBy('id', 'DESC')->get();
         return view('pages.suppliers.credit_note', ['payments' => $payments]);
     }
     public function printCreditnoteReceipt(CreditNote $credit_note)
@@ -118,11 +119,11 @@ class CreditNoteController extends Controller
     }
     public function loadToCart(Request $request)
     {
-        $invoice_no = $request->invoice_no;
-        $order = Order::where('invoice_no', $invoice_no)->first();
-
+        $reference = $request->reference;
+        $order = Order::where('reference', $reference)->first();
+        $order_items = OrderDetail::where('order_id', $order->id)->where('status', 1)->get();
         \Cart::clear();
-        foreach ($order->order_items()->where('status', 1)->get() as $data) {
+        foreach ($order_items as $data) {
             $qty = $data->quantity == 0 ? 1 : $data->quantity;
             \Cart::add([
                 'id' => $data->store_product_id,
@@ -133,7 +134,7 @@ class CreditNoteController extends Controller
             ]);
         }
         $cart_products = \Cart::getContent();
-        return view('pages.inventories.credit_notes.load_products', ['cart_products' => $cart_products, 'invoice_no' => $invoice_no, 'order' => $order]);
+        return view('pages.inventories.credit_notes.load_products', ['cart_products' => $cart_products, 'reference' => $reference, 'order' => $order]);
     }
     public function addToCart(Request $request)
     {

@@ -177,7 +177,7 @@
             $(document).on('keyup', '#search', function() {
                 var searchText = $(this).val();
                 $.ajax({
-                    url: "{{ route('load.order.invoices') }}",
+                    url: "{{ route('load.order-invoices') }}",
                     method: 'GET',
                     data: {
                         search: searchText
@@ -203,14 +203,14 @@
 
             // function load() {
             $(document).on('click', '.invoice', function() {
-                var invoice_no = $(this).attr('data-val');
+                var reference = $(this).attr('data-val');
 
                 $('#load').html("<h3>Please wait... while it is loading...</h3>");
                 $.ajax({
-                    url: "{{ route('load.order.cart') }}",
+                    url: "{{ route('load.order-cart') }}",
                     method: 'GET',
                     data: {
-                        invoice_no: invoice_no
+                        reference: reference
                     },
                     success: function(response) {
 

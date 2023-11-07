@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
 use App\Models\CreditNote;
+use App\Models\CreditNoteDetail;
 use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\Order;
@@ -12,6 +13,7 @@ use App\Models\StoreProduct;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CreditNoteController extends Controller
@@ -61,21 +63,44 @@ class CreditNoteController extends Controller
         $credit_note_id = $request->credit_note_id;
         $reference = CreditNote::generateNewNumber();
         $credit_note = CreditNote::find($credit_note_id);
-
+        $total = \Cart::getTotal();
         DB::beginTransaction();
         try {
-            if(!$credit_note)
+            if(!$credit_note) {
                 $credit_note = new CreditNote();
-            $credit_note->comment =
-            //Bank Withdrawal
-            DB::table('credit_notes')->insert([
-                'invoice_no' => $order->invoice_no,
-                'reference_no' => $reference,
-                'customer_id' => $order->customer_id,
-                'amount' => $order->total,
-                'comment' => $request->comment,
-                'branch_id' => User::userBranchAction()
-            ]);
+                $credit_note->reference = $reference;
+                $credit_note->customer_id = $request->customer_id;
+                $credit_note->order_id = $request->order_id;
+                $credit_note->status = 0;
+                $credit_note->branch_id = $order->branch_id;
+                $credit_note->created_by = auth()->id();
+            }
+            $credit_note->comment = $request->comment;
+            $credit_note->amount = $total;
+            if($credit_note->save()){
+                CreditNoteDetail::where('credit_note_id',$credit_note->id)->delete();
+                $contents = \Cart::getContent();
+                foreach ($contents as $content) {
+                    $store = StoreProduct::find($content->id);
+                    $qtyAval = $store->qty_available;
+                    //$store->qty_available = $qtyAval - $content->quantity;
+                    $credit_note_detail = new CreditNoteDetail();
+                    $credit_note_detail->credit_note_id = $credit_note->id;
+                    $credit_note_detail->store_product_id = $content->id;
+                    $credit_note_detail->quantity = $content->quantity;
+                    $credit_note_detail->original_quantity_sold = $content->quantity;
+                    $credit_note_detail->selling_price = $content->attributes['selling_price'];
+                    $credit_note_detail->sold_price = $content->price;
+                    $credit_note_detail->cost_price = $content->attributes['cost_price'];
+                    $credit_note_detail->total = $content->getPriceSum();
+                    $credit_note_detail->avail_qty_before_sale = $qtyAval;
+                    $credit_note_detail->save();
+                }
+
+                $action = "Create credit note with $credit_note->reference : $total";
+                AuditLog::auditLog(Auth::id(), $action);
+                DB::commit();
+            }
             session()->flash('app_message', 'Credit note captured successfully');
             $action = "Posted credit note $order->invoice_no for customer: " . $order->customer->name;
             AuditLog::auditLog(Auth::id(), $action);
@@ -85,6 +110,38 @@ class CreditNoteController extends Controller
             throw $e;
         }
         return redirect()->back();
+    }
+    public function post(CreditNote $creditNote) {
+        $creditNote->status = 1;
+        $creditNote->posted_by = auth()->id();
+        $items = $creditNote->credit_note_items;
+        DB::beginTransaction();
+        if($creditNote->save()){
+            $products = [];
+            foreach ($items as $item) {
+                $products[$item->store_product_id] = ['quantity'=>$item->quantity, 'cost_price'=>$item->cost_price,  'sold_price'=>$item->sold_price];
+            }
+            /*return Transaction::sale(
+                $products,
+                $invoice->customer_id,
+                $invoice->reference,
+                $invoice->order_date);*/
+            if(Transaction::sale(
+                $products,
+                $creditNote->customer_id,
+                $creditNote->reference,
+                $creditNote->order_date)['status']
+            ){
+                $action = "Invoice of $invoice->total for : " . $invoice->reference;
+                AuditLog::auditLog(auth()->id(), $action);
+                session()->flash('app_message', 'Receipt generated successfully');
+                DB::commit();
+            }else {
+                DB::rollBack();
+                session()->flash('app_message', 'Something went wrong.');
+            }
+        }
+        return back();
     }
 
     public function searchCreditNote(Request $request)

@@ -92,26 +92,50 @@
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
                                                 <td>{{ $payment->postedBy->name ?? '' }}</td>
                                                 <td align="center">
-                                                    <a href="{{ route('customers.credit.note.print', $payment->id) }}"
-                                                        target="_BLANK" class="btn btn-secondary btn-sm">
-                                                        <i class="fa fa-print" aria-hidden="true"></i>
-                                                    </a>
-                                                    {{-- <a href="javascript:void(0)" data-toggle="modal"
-                                                        data-target="#payment_edit{{$payment->id}}"
-                                                        class="btn btn-primary btn-sm">
-                                                        <i class="fa fa-edit" aria-hidden="true"></i>
-                                                    </a> --}}
-                                                    <button class="btn btn-danger btn-sm" type="button"
-                                                        onclick="deleteItem({{ $payment->id }})">
-                                                        <i class="fa fa-trash" aria-hidden="true"></i>
-                                                    </button>
-                                                    <form id="delete-form-{{ $payment->id }}"
-                                                        action="{{ route('customers.credit.note.destroy', $payment->id) }}"
-                                                        method="post" style="display:none;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                    </form>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-default dropdown-toggle" type="button"
+                                                                id="dropdownMenuButton" data-toggle="dropdown"
+                                                                aria-haspopup="true" aria-expanded="false">
+                                                            Action
+                                                        </button>
+                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                            <a href="{{ route('credit.note.show', $payment->id) }}"
+                                                               class="dropdown-item">
+                                                                <i class="fa fa-eye" aria-hidden="true"></i> View
+                                                            </a>
+                                                            <a href="{{ route('credit.note.print', $payment->id) }}"
+                                                               target="_BLANK" class="dropdown-item">
+                                                                <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                            </a>
+                                                            @if ($payment->status == 0)
+                                                                <a href="{{ route('credit.note.edit', $payment->id) }}"
+                                                                   class="dropdown-item">
+                                                                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                                                </a>
+
+                                                                <form action="{{ route('credit.note.post', $payment->id) }}" method="post" onsubmit="return confirm('Are you sure you want to post this order?')">
+                                                                    @csrf
+                                                                    <button type="submit"
+                                                                            class="dropdown-item">
+                                                                        <i class="fa fa-close" aria-hidden="true"></i> Post
+                                                                    </button>
+                                                                </form>
+
+
+                                                                <form id="delete-form-{{ $payment->id }}" action="{{ route('credit.note.post', $payment->id) }}" method="post" onsubmit="return confirm('Are you sure you want to close this order?')">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button class="dropdown-item" type="submit">
+                                                                        <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                                                    </button>
+                                                                </form>
+
+                                                            @endif
+
+                                                        </div>
+                                                    </div>
                                                 </td>
+
                                             </tr>
                                             <div class="modal fade" id="payment_edit{{ $payment->id }}"
                                                 style="display: none;" aria-hidden="true">
@@ -293,7 +317,7 @@
                     $('.display').html(data);
                 });
             });
-           
+
         });
     </script>
 @endpush

@@ -317,7 +317,10 @@ Route::middleware('auth')->group(function () {
             Route::post('/cart', [CreditNoteController::class, 'addToCart'])->name('credit.note.cart.store');
             Route::post('/update/cart', [CreditNoteController::class, 'updateCreditNoteCart'])->name('credit.note.cart.update');
             Route::delete('/remove/{id}', [CreditNoteController::class, 'removeCart'])->name('credit.note.cart.remove');
-            Route::get('/print/receipt/{credit_note}', [CreditNoteController::class, 'printCreditNoteReceipt'])->name('customers.credit.note.print');
+            Route::get('/print/{credit_note}', [CreditNoteController::class, 'printCreditNoteReceipt'])->name('credit.note.print');
+            Route::get('/show/{credit_note}', [CreditNoteController::class, 'show'])->name('credit.note.show');
+            Route::post('/post/{credit_note}', [CreditNoteController::class, 'post'])->name('credit.note.post');
+            Route::get('/edit/{credit_note}', [CreditNoteController::class, 'edit'])->name('credit.note.edit');
         });
 
         Route::get('pos', [PosController::class, 'index'])->name('pos.index');

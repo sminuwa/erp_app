@@ -7,6 +7,7 @@ use App\Models\CreditNote;
 use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\Order;
+use App\Models\OrderDetail;
 use App\Models\StoreProduct;
 use App\Models\User;
 use DB;
@@ -50,9 +51,11 @@ class CreditNoteController extends Controller
         $cart_products = \Cart::getContent();
         return view('pages.inventories.credit_notes.create_credit_note', compact('orders', 'customers', 'cart_products', 'order','stores'));
     }
+
     public function payCreditNote(Request $request)
     {
-        return "To call your function";
+//        return "To call your function";
+
         $order_id = $request->order_id;
         $comment = $request->comment;
         $order = Order::find($order_id);
@@ -60,15 +63,6 @@ class CreditNoteController extends Controller
         DB::beginTransaction();
         try {
             //Bank Withdrawal
-            DB::table('bank_transactions')->insert([
-                'bank_account_id' => $order->customer_id,
-                'trans_date' => date('Y-m-d'),
-                'cr' => 0,
-                'dr' => $order->total,
-                'ref_no' => $order->invoice_no,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
             DB::table('credit_notes')->insert([
                 'invoice_no' => $order->invoice_no,
                 'reference_no' => $reference,
@@ -85,7 +79,6 @@ class CreditNoteController extends Controller
             DB::rollBack();
             throw $e;
         }
-
         return redirect()->back();
     }
 
@@ -94,9 +87,9 @@ class CreditNoteController extends Controller
         $search_value = $request->refno;
 
         $payments = Order::where('status', 1)
-            ->where('invoice_no', 'LIKE', "%$search_value%")
+            ->where('reference', 'LIKE', "%$search_value%")
             ->where('branch_id', 'LIKE', User::userBranchAction())
-            ->orderBy('order_date', 'DESC')->get();
+            ->orderBy('id', 'DESC')->get();
         return view('pages.suppliers.credit_note', ['payments' => $payments]);
     }
     public function printCreditnoteReceipt(CreditNote $credit_note)
@@ -118,22 +111,28 @@ class CreditNoteController extends Controller
     }
     public function loadToCart(Request $request)
     {
-        $invoice_no = $request->invoice_no;
-        $order = Order::where('invoice_no', $invoice_no)->first();
-
+        $reference = $request->reference;
+        $order = Order::where('reference', $reference)->first();
+        $order_items = OrderDetail::where('order_id', $order->id)->where('status', 1)->get();
         \Cart::clear();
-        foreach ($order->order_items()->where('status', 1)->get() as $data) {
+        foreach ($order_items as $data) {
             $qty = $data->quantity == 0 ? 1 : $data->quantity;
             \Cart::add([
                 'id' => $data->store_product_id,
                 'name' => $data->storeProduct->product->name ?? 'No name found',
                 'price' => $data->sold_price,
                 'quantity' => $qty,
-                'attributes' => array('cost_price' => $data->cost_price, 'selling_price' => $data->selling_price, 'discount' => 0),
+                'attributes' => array(
+                    'cost_price' => $data->cost_price,
+                    'selling_price' => $data->selling_price,
+                    'sold_price' => $data->sold_price,
+                    'discount' => 0,
+                    'unit' => $data->storeProduct->product->unit
+                ),
             ]);
         }
         $cart_products = \Cart::getContent();
-        return view('pages.inventories.credit_notes.load_products', ['cart_products' => $cart_products, 'invoice_no' => $invoice_no, 'order' => $order]);
+        return view('pages.inventories.credit_notes.load_products', ['cart_products' => $cart_products, 'reference' => $reference, 'order' => $order]);
     }
     public function addToCart(Request $request)
     {

@@ -312,8 +312,8 @@ Route::middleware('auth')->group(function () {
             Route::put('/update/{ledger}', [CreditNoteController::class, 'updateCreditnote'])->name('customers.credit.note.update');
             Route::delete('/delete/{ledger}', [CreditNoteController::class, 'deleteCreditNote'])->name('customers.credit.note.destroy');
             Route::post('/search', [CreditNoteController::class, 'searchCreditNote'])->name('customers.credit.note.search');
-            Route::get('/load_invoices', [CreditNoteController::class, 'loadInvoices'])->name('load.order.invoices');
-            Route::get('/load_cart', [CreditNoteController::class, 'loadToCart'])->name('load.order.cart');
+            Route::get('/load_invoices', [CreditNoteController::class, 'loadInvoices'])->name('load.order-invoices');
+            Route::get('/load_cart', [CreditNoteController::class, 'loadToCart'])->name('load.order-cart');
             Route::post('/cart', [CreditNoteController::class, 'addToCart'])->name('credit.note.cart.store');
             Route::put('/update-cart', [CreditNoteController::class, 'updateCart'])->name('credit.note.cart.update');
             Route::delete('/remove/{id}', [CreditNoteController::class, 'removeCart'])->name('credit.note.cart.remove');
@@ -906,7 +906,7 @@ Route::middleware('auth')->group(function () {
                 Route::put('/update/{ledger}', [DebitNoteController::class, 'updateDebitNote'])->name('suppliers.debit.note.update');
                 Route::delete('/delete/{ledger}', [DebitNoteController::class, 'deleteDebitNote'])->name('suppliers.debit.note.destroy');
                 Route::post('/search', [DebitNoteController::class, 'searchDebitNote'])->name('suppliers.debit.note.search');
-                Route::get('/load_invoices', [DebitNoteController::class, 'loadInvoices'])->name('suppliers.load.order.invoices');
+                Route::get('/load-invoices', [DebitNoteController::class, 'loadInvoices'])->name('suppliers.load.order.invoices');
                 Route::get('/load_cart', [DebitNoteController::class, 'loadToCart'])->name('suppliers.load.order.cart');
                 Route::post('/cart', [DebitNoteController::class, 'addToCart'])->name('debit.note.cart.store');
                 Route::put('/update-cart', [DebitNoteController::class, 'updateCart'])->name('debit.note.cart.update');
@@ -926,7 +926,7 @@ Route::middleware('auth')->group(function () {
                 Route::put('/update/{ledger}', [ReturnDebitController::class, 'updateReturnDebit'])->name('customers.return.debit.update');
                 Route::delete('/delete/{ledger}', [ReturnDebitController::class, 'deletReturnDebit'])->name('customers.return.debit.destroy');
                 Route::post('/search', [ReturnDebitController::class, 'searchReturnDebit'])->name('customers.return.debit.search');
-                Route::get('/load_invoices', [ReturnDebitController::class, 'loadInvoices'])->name('load.order.invoices');
+//                Route::get('/load_invoices', [ReturnDebitController::class, 'loadInvoices'])->name('load.order.invoices');
                 Route::get('/load_cart', [ReturnDebitController::class, 'loadToCart'])->name('load.order.cart');
                 Route::post('/cart', [ReturnDebitController::class, 'addToCart'])->name('return.debit.cart.store');
                 Route::put('/update-cart', [ReturnDebitController::class, 'updateCart'])->name('return.debit.cart.update');

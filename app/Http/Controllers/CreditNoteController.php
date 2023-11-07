@@ -63,15 +63,6 @@ class CreditNoteController extends Controller
         DB::beginTransaction();
         try {
             //Bank Withdrawal
-            DB::table('bank_transactions')->insert([
-                'bank_account_id' => $order->customer_id,
-                'trans_date' => date('Y-m-d'),
-                'cr' => 0,
-                'dr' => $order->total,
-                'ref_no' => $order->invoice_no,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
             DB::table('credit_notes')->insert([
                 'invoice_no' => $order->invoice_no,
                 'reference_no' => $reference,
@@ -88,7 +79,6 @@ class CreditNoteController extends Controller
             DB::rollBack();
             throw $e;
         }
-
         return redirect()->back();
     }
 

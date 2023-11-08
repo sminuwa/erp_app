@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GeneralAccount;
+use App\Models\GeneralAccountLedger;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Store;
@@ -226,7 +228,7 @@ class ReportController extends Controller
         $balance_b_d = $sum_cr_b_d - $sum_dr_b_d; //balance before date
         $ledgers = $query->orderBy('trans_date')->get();
 
-        return view('pages.reports.bank_and_expenses.load_bank_ledger', compact('ledgers', 'bank_account', 'from_date', 'to_date', 'balance_b_d','sum_cr_b_d','sum_dr_b_d'));
+        return view('pages.reports.bank_and_expenses.load_bank_ledger', compact('ledgers', 'bank_account', 'from_date', 'to_date', 'balance_b_d', 'sum_cr_b_d', 'sum_dr_b_d'));
     }
     public function printBankLedger($from_date, $to_date, $bank_account_id)
     {
@@ -236,7 +238,7 @@ class ReportController extends Controller
         $sum_dr_b_d = BankTransaction::where(['bank_account_id' => $bank_account_id, 'status' => 1])->where('trans_date', '<', $from_date)->sum('dr');
         $balance_b_d = $sum_cr_b_d - $sum_dr_b_d; //balance before date
         $ledgers = $query->orderBy('trans_date')->get();
-        return view('pages.reports.bank_and_expenses.print_ledger', compact('ledgers', 'bank_account', 'from_date', 'to_date', 'balance_b_d','sum_dr_b_d','sum_cr_b_d'));
+        return view('pages.reports.bank_and_expenses.print_ledger', compact('ledgers', 'bank_account', 'from_date', 'to_date', 'balance_b_d', 'sum_dr_b_d', 'sum_cr_b_d'));
     }
     public function generateBankDeposit()
     {
@@ -572,7 +574,10 @@ class ReportController extends Controller
             $record . "</td></tr>";
         }
 
-        return view('pages.reports.bank_and_expenses.load_daily_cash_report', ['result' => $record, 'from_date' => $request->from_date, 'to_date' => $request->to_date,
+        return view('pages.reports.bank_and_expenses.load_daily_cash_report', [
+            'result' => $record,
+            'from_date' => $request->from_date,
+            'to_date' => $request->to_date,
         ]);
     }
     public function printDailyReport($from_date, $to_date)
@@ -634,7 +639,10 @@ class ReportController extends Controller
             $record . "</td></tr>";
         }
 
-        return view('pages.reports.bank_and_expenses.print_daily_cash_report', ['result' => $record, 'from_date' => $from_date, 'to_date' => $to_date,
+        return view('pages.reports.bank_and_expenses.print_daily_cash_report', [
+            'result' => $record,
+            'from_date' => $from_date,
+            'to_date' => $to_date,
         ]);
     }
     public function storeLedger()
@@ -971,7 +979,7 @@ class ReportController extends Controller
             ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
             ->orderBy('order_date')
             ->get();
-        $total_cash = Order::where(['sold_by' => $staff_id, 'payment_mode' => 'Cash','status'=>1])->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])->sum('total');
+        $total_cash = Order::where(['sold_by' => $staff_id, 'payment_mode' => 'Cash', 'status' => 1])->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])->sum('total');
         $total_debtors = CustomerLedger::where(['user_id' => $staff_id])->whereBetween(DB::raw("DATE(date)"), [$from_date, $to_date])->sum('dr');
         if ($category_id == "%")
             $category_id = "all";
@@ -1023,7 +1031,7 @@ class ReportController extends Controller
             ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
             ->orderBy('order_date')
             ->get();
-        $total_cash = Order::where(['sold_by' => $staff_id, 'payment_mode' => 'Cash','status'=>1])->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])->sum('total');
+        $total_cash = Order::where(['sold_by' => $staff_id, 'payment_mode' => 'Cash', 'status' => 1])->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])->sum('total');
         $total_debtors = CustomerLedger::where(['user_id' => $staff_id])->whereBetween(DB::raw("DATE(date)"), [$from_date, $to_date])->sum('dr');
         $user = User::find($staff_id);
         return view('pages.reports.sales_and_cash_analysis.print_staff_sale_report', compact('sales', 'from_date', 'to_date', 'payment_mode', 'total_cash', 'total_debtors', 'user'));
@@ -1182,7 +1190,7 @@ class ReportController extends Controller
             if ($card->type == "Opening Balance") {
                 $name = "Opening Balance";
             }
-            
+
             $qty_sold = StockCard::where(['status' => 1, 'type' => 'Sale'])->where('id', '=', $card->id)->first();
             $qty_puchase = StockCard::where(['status' => 1, 'type' => 'Purchase'])->where('id', '=', $card->id)->first();
             $qty_adjust = StockCard::where(['status' => 1, 'type' => 'Adjustment'])->where('id', '=', $card->id)->first();
@@ -1196,7 +1204,7 @@ class ReportController extends Controller
                 number_format(optional($qty_tran_recv)->dr, 0) . "</td><td>" .
                 number_format(optional($qty_tran_recv)->cr, 0) . "</td><td>" .
                 $name . "</td><td>";
-                
+
             $balance = $qty_in_stock + optional($qty_puchase)->cr - optional($qty_sold)->dr + (optional($qty_adjust)->cr - optional($qty_adjust)->dr) + optional($qty_tran_recv)->cr - optional($qty_tran_recv)->dr;
             /*if ($count == 0) {
                 $in_stock = StockCard::where(['store_id' => $store_id, 'product_id' => $product_id, 'status' => 1])->where(DB::raw('DATE(date)'), '<', $card->date)->sum('cr');
@@ -1221,8 +1229,17 @@ class ReportController extends Controller
             ->join('products', 'products.id', 'store_products.product_id')
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->first();
-        return view('pages.reports.stock_control.load_stock_ledger_report', ['result' => $record, 'from_date' => $from_date, 'to_date' => $to_date, 'store_id' => $store_id, 'category_id' => $category_id, 'product_id' => $product_id, 'product' => $product
-            , 'qty_in_stock' => $qty_in_stock]);
+        return view('pages.reports.stock_control.load_stock_ledger_report', [
+            'result' => $record,
+            'from_date' => $from_date,
+            'to_date' => $to_date,
+            'store_id' => $store_id,
+            'category_id' => $category_id,
+            'product_id' => $product_id,
+            'product' => $product
+            ,
+            'qty_in_stock' => $qty_in_stock
+        ]);
     }
     public function printStockLedger($from_date, $to_date, $store_id, $category_id, $product_id)
     {
@@ -1318,8 +1335,17 @@ class ReportController extends Controller
             ->join('products', 'products.id', 'store_products.product_id')
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->first();
-        return view('pages.reports.stock_control.print_stock_ledger_report', ['result' => $record, 'from_date' => $from_date, 'to_date' => $to_date, 'store_id' => $store_id, 'category_id' => $category_id, 'product_id' => $product_id, 'product' => $product
-            , 'qty_in_stock' => $qty_in_stock]);
+        return view('pages.reports.stock_control.print_stock_ledger_report', [
+            'result' => $record,
+            'from_date' => $from_date,
+            'to_date' => $to_date,
+            'store_id' => $store_id,
+            'category_id' => $category_id,
+            'product_id' => $product_id,
+            'product' => $product
+            ,
+            'qty_in_stock' => $qty_in_stock
+        ]);
     }
 
     public function customerSaleReport()
@@ -1838,7 +1864,7 @@ class ReportController extends Controller
         }
 
         $sales = CustomerLedger::where('customer_id', 'LIKE', $customer_id)
-            ->where('type','Credit')
+            ->where('type', 'Credit')
             ->whereBetween('date', [$from_date, $to_date])
             ->where('branch_id', 'LIKE', User::userBranchAction())
             ->select('customers.name AS customer', DB::raw('SUM(cr) AS total'), DB::raw('SUM(dr) AS pay'), DB::raw('SUM(cr)-SUM(dr) AS due'))
@@ -1855,7 +1881,7 @@ class ReportController extends Controller
             $customer_id = '%';
         }
         $sales = CustomerLedger::where('customer_id', 'LIKE', $customer_id)
-            ->where('type','Credit')
+            ->where('type', 'Credit')
             ->whereBetween('date', [$from_date, $to_date])
             ->where('branch_id', 'LIKE', User::userBranchAction())
             ->select('customers.name AS customer', DB::raw('SUM(cr) AS total'), DB::raw('SUM(dr) AS pay'), DB::raw('SUM(cr)-SUM(dr) AS due'))
@@ -2778,5 +2804,15 @@ class ReportController extends Controller
             ->orderBy('products.name');
         $stores = $stores->get();
         return view('pages.reports.stock_control.print_available_stock', ['stores' => $stores]);
+    }
+    public function accountBalance(Request $request)
+    {
+        //return view('pages.reports.ap_ar.account_balances', ['model' => null]);
+       
+        $user_branch = User::userBranchAction();
+        $accounts = GeneralAccount::whereIn('class', ['A11','A12','A13'])->orderBy('number')->get();
+        $customers = Customer::whereIn('type', ['Retail', 'Wholesale'])->where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
+        $model = new GeneralAccountLedger();
+        return view('pages.reports.ap_ar.account_balances', compact('accounts', 'customers', 'model'));
     }
 }

@@ -153,8 +153,6 @@ class Transaction
         return $expense_suppliers;
 
 
-
-
     }
 
 

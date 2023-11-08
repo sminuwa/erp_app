@@ -33,10 +33,10 @@ class CreditNoteController extends Controller
         $user_branch = User::userBranchAction();
         $orders = Order::where('status', 1)
             ->where('branch_id', 'LIKE', $user_branch)
-            ->whereNotIn('invoice_no',DB::table('credit_notes')->select('invoice_no')->pluck('invoice_no')->toArray())
+            ->whereNotIn('invoice_no', DB::table('credit_notes')->select('invoice_no')->pluck('invoice_no')->toArray())
             ->orderBy('order_date', 'DESC')->take(20)->get();
 
-            $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
             ->join('products', 'products.id', 'store_products.product_id')
@@ -55,12 +55,12 @@ class CreditNoteController extends Controller
         $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
         $model = new Customer;
         $cart_products = \Cart::getContent();
-        return view('pages.inventories.credit_notes.create_credit_note', compact('orders', 'customers', 'cart_products', 'order','stores'));
+        return view('pages.inventories.credit_notes.create_credit_note', compact('orders', 'customers', 'cart_products', 'order', 'stores'));
     }
 
     public function payCreditNote(Request $request)
     {
-//        return "To call your function";
+        //        return "To call your function";
         $order_id = $request->order_id;
         $comment = $request->comment;
         $order = Order::find($order_id);
@@ -70,7 +70,7 @@ class CreditNoteController extends Controller
         $total = \Cart::getTotal();
         DB::beginTransaction();
         try {
-            if(!$credit_note) {
+            if (!$credit_note) {
                 $credit_note = new CreditNote();
                 $credit_note->reference = $reference;
                 $credit_note->customer_id = $request->customer_id;
@@ -81,8 +81,8 @@ class CreditNoteController extends Controller
             }
             $credit_note->comment = $request->comment;
             $credit_note->amount = $total;
-            if($credit_note->save()){
-                CreditNoteDetail::where('credit_note_id',$credit_note->id)->delete();
+            if ($credit_note->save()) {
+                CreditNoteDetail::where('credit_note_id', $credit_note->id)->delete();
                 $contents = \Cart::getContent();
                 foreach ($contents as $content) {
                     $store = StoreProduct::find($content->id);
@@ -115,43 +115,50 @@ class CreditNoteController extends Controller
         }
         return redirect()->back();
     }
-    public function post(CreditNote $credit_note) {
+    public function post(CreditNote $credit_note)
+    {
         $credit_note->status = 1;
         $credit_note->posted_by = auth()->id();
         $items = $credit_note->credit_note_items;
         DB::beginTransaction();
-        if($credit_note->save()){
+        if ($credit_note->save()) {
             $products = $new_cost_price = [];
             foreach ($items as $item) {
                 $products[$item->store_product_id] = [
-                    'quantity'=>$item->quantity,
-                    'cost_price'=>$item->cost_price,
-                    'sold_price'=>$item->sold_price];
+                    'quantity' => $item->quantity,
+                    'cost_price' => $item->cost_price,
+                    'sold_price' => $item->sold_price
+                ];
                 $new_cost_price[$item->store_product_id] = [
-                    'quantity'=>$item->quantity,
-                    'price'=>$item->cost_price,
-                    'store_id'=>$item->store_product->store_id,
-                    'expiry_date'=>''];
+                    'quantity' => $item->quantity,
+                    'price' => $item->cost_price,
+                    'store_id' => $item->store_product->store_id,
+                    'expiry_date' => ''
+                ];
             }
-            if(Transaction::credit_note(
-                $products,
-                $credit_note->customer_id,
-                $credit_note->reference,
-                $credit_note->order_date)['status']
-            ){
+            if (
+                Transaction::credit_note(
+                    $products,
+                    $credit_note->customer_id,
+                    $credit_note->reference,
+                    $credit_note->order_date
+                )['status']
+            ) {
 
                 //update stock and calculate new cost price
-                if(CostPrice::newCostPrice(
-                    $new_cost_price,
-                    $credit_note->reference,
-                    $credit_note->branch_id)['status']
+                if (
+                    CostPrice::newCostPrice(
+                        $new_cost_price,
+                        $credit_note->reference,
+                        $credit_note->branch_id
+                    )['status']
                 )
+                    $action = "Credit Note of $credit_note->total for : " . $credit_note->reference;
 
-                $action = "Credit Note of $credit_note->total for : " . $credit_note->reference;
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Credit note posted successfully');
                 DB::commit();
-            }else {
+            } else {
                 DB::rollBack();
                 session()->flash('app_message', 'Something went wrong.');
             }
@@ -174,6 +181,7 @@ class CreditNoteController extends Controller
         $payments = Order::where('status', 1)
             ->where('reference', 'LIKE', "%$search_value%")
             ->where('branch_id', 'LIKE', User::userBranchAction())
+            ->whereNotIn('id', DB::table('credit_notes')->pluck('order_id')->toArray())
             ->orderBy('id', 'DESC')->get();
         return view('pages.suppliers.credit_note', ['payments' => $payments]);
     }
@@ -264,10 +272,11 @@ class CreditNoteController extends Controller
 
     public function updateCreditNoteCart(Request $request)
     {
-//        $sold_price = $request->sold_price;
+        //        $sold_price = $request->sold_price;
 
         \Cart::update(
-            $request->store_product_id, [
+            $request->store_product_id,
+            [
                 'quantity' => [
                     'relative' => false,
                     'value' => $request->quantity

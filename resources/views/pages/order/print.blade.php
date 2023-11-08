@@ -21,7 +21,20 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
     <link rel="icon" href="{{ asset('assets/backend/img/policymaker.ico') }}" type="image/x-icon" />
+    <style>
+        @media print {
+            @page {
+                size: A5;
+                margin: 10px;
+            }
 
+            body {
+                margin: 10px;
+                font-size: 10px;
+                /* Adjust the font size as needed */
+            }
+        }
+    </style>
 </head>
 
 <body>

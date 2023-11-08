@@ -161,16 +161,16 @@
                                                     <td>{{ $order_detail->storeProduct->product->unit }}</td>
                                                     <td>{{ $order_detail->storeProduct->store->code }}</td>
                                                     <td align="center">{{ $order_detail->quantity }}</td>
-                                                    <td align="right">{{ number_format($order_detail->selling_price, 2) }}
+                                                    <td align="right">{{ number_format($order_detail->sold_price, 2) }}
                                                     </td>
                                                     <td align="right">
-                                                        {{ number_format($order_detail->selling_price * $order_detail->quantity, 2) }}
+                                                        {{ number_format($order_detail->sold_price * $order_detail->quantity, 2) }}
                                                     </td>
                                                 </tr>
-                                                @php $total += ($order_detail->selling_price * $order_detail->quantity);  @endphp
+                                                @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
                                             @endforeach
                                             <tr>
-                                                <th colspan="6" align="right">Total</th>
+                                                <th colspan="7" align="right">Total</th>
                                                 <th style="text-align: right">{{ number_format($total, 2, '.', ',') }}</th>
 
                                             </tr>

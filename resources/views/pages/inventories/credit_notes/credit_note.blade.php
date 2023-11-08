@@ -82,7 +82,7 @@
                                     </tfoot>
                                     <tbody>
                                         @foreach ($payments as $payment)
-                                            <tr>
+                                            <tr class="@if($payment->status == 0) bg-warning @endif">
 
                                                 <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                                                 <td>{{ $payment->reference }}</td>
@@ -116,7 +116,7 @@
                                                                     @csrf
                                                                     <button type="submit"
                                                                             class="dropdown-item">
-                                                                        <i class="fa fa-close" aria-hidden="true"></i> Post
+                                                                        <i class="fa fa-check" aria-hidden="true"></i> Post
                                                                     </button>
                                                                 </form>
 

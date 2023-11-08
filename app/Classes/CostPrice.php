@@ -144,22 +144,42 @@ class CostPrice
         foreach($products as $key=>$p){
             $product_ids[] = $key;
             $total_new_cost[$key] = intval($p['quantity']) * intval($p['price']);
+            $details = StoreProduct::selectRaw("
+                store_products.product_id,
+                qty_available,
+                (SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) as cost_price,
+                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key) as quantity,
+                ((SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) *
+                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key)) as total_existing_cost
+                ")
+                ->where('store_products.product_id', $key)->first();
+            $prices[$details->product_id] = [
+                'product_id' =>$details->product_id,
+                'cost_price' =>$details->cost_price,
+                'qty_available' =>$details->qty_available,
+                'total_quantity' =>$details->quantity,
+                'total_existing_cost' =>$details->total_existing_cost,
+            ];
         }
+//        $prices = (object)$prices;
+
         //get record of cost prices in the database
         $quantities = [];
-        $prices = StoreProduct::selectRaw("store_products.product_id, branch_product_prices.cost_price, sum(store_products.qty_available) as quantity, (branch_product_prices.cost_price * sum(store_products.qty_available)) as total_existing_cost")
+        /*$prices = StoreProduct::selectRaw("store_products.product_id, branch_product_prices.cost_price, sum(store_products.qty_available) as quantity, (branch_product_prices.cost_price * sum(store_products.qty_available)) as total_existing_cost")
         ->join('branch_product_prices', 'branch_product_prices.product_id', 'store_products.product_id')
-        ->whereIn('store_products.product_id', $product_ids)->where('branch_product_prices.branch_id', $branch_id)->groupBy('store_products.product_id')->get();
+        ->whereIn('store_products.product_id', $product_ids)->where('branch_product_prices.branch_id', $branch_id)->groupBy('store_products.product_id')->get();*/
+
         $old_product_costs = [];
         $old_product_quantity = [];
 //        return $prices;
         foreach($prices as $price){
-            $existing_cost[$price->product_id] = ['cost_price' => $price->cost_price, 'quantity'=>$price->quantity, 'total_existing_cost'=>$price->total_existing_cost];
+            $existing_cost[$price['product_id']] = ['cost_price' => $price['cost_price'], 'quantity'=>$price['total_quantity'], 'total_existing_cost'=>$price['total_existing_cost']];
         }
 
         foreach($products as $key=>$p){
-//            return isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0;
+//          return isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0;
             $records[$key] = [
+                'qty_available' => $prices[$key]['qty_available'] ?? 0,
                 'existing_quantity' => isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0,
                 'new_quantity' => $products[$key]['quantity'],
                 'existing_cost' => isset($existing_cost[$key]['cost_price']) ? $existing_cost[$key]['cost_price'] : 0,
@@ -183,13 +203,15 @@ class CostPrice
             $store_products[] = [
                 'store_id'=>$record['store_id'],
                 'product_id'=>$key,
-                'qty_available'=>$record['quantity']
+                'qty_available'=>$record['qty_available'] + $record['new_quantity']
             ];
             $batch[] = [
                 'batch_no' => $batch_no,
-                'existing_quantity' => $record['existing_quantity'],
+                'store_id' => $record['store_id'],
+                'product_id' => $key,
+                'existing_quantity' => $record['qty_available'],
                 'new_quantity' => $record['new_quantity'],
-                'total_quantity' => $record['quantity'],
+                'total_quantity' => $record['qty_available'] + $record['new_quantity'],
                 'existing_cost_price' => $record['existing_cost'],
                 'new_cost_price' => $record['new_cost'],
                 'created_by' => $user->id,

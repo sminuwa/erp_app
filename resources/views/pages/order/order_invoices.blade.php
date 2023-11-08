@@ -84,7 +84,7 @@
                                         @php $total = 0; @endphp
                                         @foreach ($orders as $order)
                                             @php $total = $total + $order->total; @endphp
-                                            <tr>
+                                            <tr class="@if($order->status == 0) bg-warning @endif">
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}
                                                 </td>

@@ -94,7 +94,12 @@ class OrderController extends Controller
             )
             ->where(
                 function ($query) use ($search_value) {
-                    $query->where('invoice_no', 'LIKE', "%$search_value%")
+                    $query->where('reference', 'LIKE', "%$search_value%")
+                    ->orWhere(
+                        'invoice_no',
+                        'LIKE',
+                        "%$search_value%"
+                    )
                         ->orWhere(
                             'customers.name',
                             'LIKE',

@@ -18,12 +18,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Order Invoice Details</h1>
+                        <h1>Proforma Invoice Details</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Order Invoice Details</li>
+                            <li class="breadcrumb-item active">Proforma Invoice Details</li>
                         </ol>
                     </div>
                 </div>
@@ -41,11 +41,11 @@
                                 <a href="javascript:history.back()" class="btn btn-primary btn-sm">
                                     <i class="fa fa-arrow-left"></i> Back
                                 </a>
-                                <a href="{{ route('order.invoice.index') }}" class="btn btn-secondary btn-sm ">
+                                <a href="{{ route('proforma.invoice.index') }}" class="btn btn-secondary btn-sm ">
                                     <i class="fa fa-plus-circle" aria-hidden="true"> New Order</i>
                                 </a>
 
-                                <a href="{{ route('order.invoice.print', $order->id) }}"
+                                <a href="{{ route('proformer.print', $order->id) }}"
                                    target="_BLANK" class="btn btn-dark btn-sm ">
                                     <i class="fa fa-print" aria-hidden="true"></i> Print
                                 </a>
@@ -125,7 +125,10 @@
                                         <thead>
                                         <tr>
                                             <th>S.N</th>
+                                            <th>Product Code</th>
                                             <th>Product Name</th>
+                                            <th>UTM</th>
+                                            <th>Store Code</th>
                                             <th>Quantity</th>
                                             <th>Unit Cost</th>
                                             <th>Subtotal</th>
@@ -139,7 +142,10 @@
                                         @foreach ($order_details as $order_detail)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $order_detail->storeProduct->product->code ?? "" }}</td>
                                                 <td>{{ $order_detail->storeProduct->product->name ?? "" }}</td>
+                                                <td>{{ $order_detail->storeProduct->product->unit ?? "" }}</td>
+                                                <td>{{ $order_detail->storeProduct->store->code ?? "" }}</td>
                                                 <td align="center">{{ $order_detail->quantity }}</td>
                                                 <td align="right">{{ number_format($order_detail->sold_price, 2) }}
                                                 </td>

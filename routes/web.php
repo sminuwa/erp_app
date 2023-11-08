@@ -297,11 +297,14 @@ Route::middleware('auth')->group(function () {
         Route::group(['prefix' => 'proforma'], function () {
             Route::get('/create', [PosController::class, 'index'])->name('proforma.index');
             Route::post('/proforma/create', [InvoiceController::class, 'final_proformer'])->name('proformer.create');
-            Route::get('/proforma/print/{customer_id}', [InvoiceController::class, 'print_proformer'])->name('proformer.print');
+            Route::get('/proforma/print/{order_id}', [InvoiceController::class, 'print_proformer'])->name('proformer.print');
+            Route::get('/proforma/edit/{order}', [InvoiceController::class, 'editProformer'])->name('proformer.edit');
+            Route::put('/proforma-invoice/update/{order}', [InvoiceController::class, 'UpdateProforma'])->name('order.invoice.update');
             Route::delete('/proforma-invoice/delete/{order}', [OrderController::class, 'destroy_proformer'])->name('proformer.destroy');
             Route::get('/proforma/show/{id}', [OrderController::class, 'proformer_show'])->name('proformer.show');
             Route::get('/', [OrderController::class, 'proformer_list'])->name('proformer.list');
             Route::post('/proforma/search', [OrderController::class, 'proformer_search'])->name('proformer.search');
+            
         });
 
         //Credit Notes
@@ -343,7 +346,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/download/{id}', [OrderController::class, 'download'])->name('orders.download');
         Route::get('/payment/print/{id}', [OrderController::class, 'printPayment'])->name('orders.payment.print');
         Route::post('/order/edit{order}', [OrderController::class, 'edit'])->name('orders.edit');
-        Route::get('/load/', [OrderController::class, 'load'])->name('orders.load');
+        Route::get('/load', [OrderController::class, 'load'])->name('orders.load');
         Route::get('/edit', [OrderController::class, 'loadEdit'])->name('orders.detail.edit');
         Route::delete('/destroy/item/{orderdetail}', [OrderController::class, 'removeItem'])->name('orders.detail.destroy');
         Route::put('/update/{orderdetail}', [OrderController::class, 'updateOrder'])->name('orders.update');

@@ -21,7 +21,20 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
     <link rel="icon" href="{{ asset('assets/backend/img/policymaker.ico') }}" type="image/x-icon" />
+    <style>
+        @media print {
+            @page {
+                size: A5;
+                margin: 10px;
+            }
 
+            body {
+                margin: 10px;
+                font-size: 10px;
+                /* Adjust the font size as needed */
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -65,7 +78,8 @@
                         <div class="col-sm-4 offset-3">
                             <address>
                                 <h5>BRANCH OFFICE</h5>
-                                Address <span class="ion-ios-contact-outline"></span>: {{ $order->branch?->address ?? ''}}
+                                Address <span class="ion-ios-contact-outline"></span>:
+                                {{ $order->branch?->address ?? '' }}
                                 <br>
                                 Phone <span class="ion-android-phone-portrait"></span>:
                                 {{ $order->branch->phone ?? '' }}
@@ -87,14 +101,14 @@
                         </div>
                         <div class="col-sm-3 invoice-col">
                             <div style="color:chocolate;">
-                                {{ QrCode::size(70)->generate($order->total) }}<br />
+                                {{ QrCode::size(70)->generate($order->total ?? 1) }}<br />
                                 <span style="font-size:28px;margin-top:-5px">
                                     Order Invoice
                                 </span>
                             </div>
                         </div>
                         <div class="col-sm-4">
-                            <b>Reference:</b> {{ $order->reference }}<br>
+                            <b>Reference:</b> {{ $order->reference ?? ''}}<br>
                             <b>Date and Time:
                                 {{ \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</b><br>
                             <b>Prepared By</b> <span class="ion-card"></span> {{ $order->sold->name }}<br />
@@ -126,9 +140,9 @@
                                     @foreach ($order_details as $order_detail)
                                         <tr>
                                             <td align="center">{{ $order_detail->quantity }}</td>
-                                            <td>{{ $order_detail->storeProduct->store->code ?? ''}}</td>
-                                            <td>{{ $order_detail->storeProduct->product->code ?? ''}}</td>
-                                            <td>{{ $order_detail->storeProduct->product->name ?? ''}}</td>
+                                            <td>{{ $order_detail->storeProduct->store->code ?? '' }}</td>
+                                            <td>{{ $order_detail->storeProduct->product->code ?? '' }}</td>
+                                            <td>{{ $order_detail->storeProduct->product->name ?? '' }}</td>
                                             <td align="right">
                                                 &#8358;{{ number_format($order_detail->sold_price, 2) }}
                                             </td>

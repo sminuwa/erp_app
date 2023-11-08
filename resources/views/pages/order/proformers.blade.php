@@ -40,10 +40,6 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-2">
-                                    @can('view.daily.sale')
-                                        <a href="{{ route('orders.approved') }}" class="btn btn-sm btn-secondary"
-                                            style="margin-left: 2px;"><span class="fa fa-list"> </span> View Sales </a>
-                                    @endcan
                                     @can('make.daily.sale')
                                         <a href="{{ route('proforma.index') }}" class="btn btn-sm btn-secondary"
                                             style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Proformer</a>
@@ -104,7 +100,10 @@
                                                             <i class="fa fa-eye" aria-hidden="true"></i>
                                                         </a>
                                                     @endcan
-
+                                                    <a href="{{ route('proformer.edit', $order->id) }}"
+                                                        class="btn btn-secondary btn-sm">
+                                                        <i class="fa fa-edit" aria-hidden="true"></i>
+                                                    </a>
                                                     <a href="{{ route('proformer.print', $order->id) }}"
                                                         target="_BLANK" class="btn btn-secondary btn-sm">
                                                         <i class="fa fa-print" aria-hidden="true"></i>

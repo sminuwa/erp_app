@@ -113,7 +113,7 @@ class CreditNoteController extends Controller
             DB::rollBack();
             throw $e;
         }
-        return redirect()->back();
+        return redirect()->route('credit.note.show', $credit_note->id);
     }
     public function post(CreditNote $credit_note)
     {

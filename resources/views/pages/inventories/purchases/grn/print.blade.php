@@ -21,7 +21,20 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
     <link rel="icon" href="{{ asset('assets/backend/img/policymaker.ico') }}" type="image/x-icon" />
+    <style>
+        @media print {
+            @page {
+                size: A5;
+                margin: 10px;
+            }
 
+            body {
+                margin: 10px;
+                font-size: 10px;
+                /* Adjust the font size as needed */
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -82,11 +95,13 @@
                     </div>
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
-                            <table class="table table-bordered text-left">
+                            <table class="table table-bordered text-left" style="width:80%">
                                 <thead>
                                     <tr>
                                         <th>S.N</th>
+                                        <th>Product Code</th>
                                         <th>Product Name</th>
+                                        <th>UTM</th>
                                         <th>Quantity</th>
                                         <th>Rate</th>
                                         <th>Store</th>
@@ -101,7 +116,9 @@
                                     @foreach ($purchase_details as $purchase_detail)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $purchase_detail->product->code }}</td>
                                             <td>{{ $purchase_detail->product->name }}</td>
+                                            <td>{{ $purchase_detail->product->unit }}</td>
                                             <td align="center">{{ $purchase_detail->qty_supplied }}</td>
                                             <td align="right">
                                                 &#8358;{{ number_format($purchase_detail->unit_price, 2) }}</td>
@@ -113,22 +130,22 @@
                                         @php $total += ($purchase_detail->unit_price * $purchase_detail->qty_supplied);  @endphp
                                     @endforeach
                                     <tr>
-                                        <th colspan="5" style="text-align: right">Total Amount</th>
+                                        <th colspan="7" style="text-align: right">Total Amount</th>
                                         <th style="text-align: right;">
                                             &#8358;{{ number_format($total, 2, '.', ',') }}</th>
                                     </tr>
                                     <tr>
-                                        <th colspan="5" style="text-align: right">Discount</th>
+                                        <th colspan="7" style="text-align: right">Discount</th>
                                         <th style="text-align: right;">
                                             &#8358;{{ number_format(0, 2, '.', ',') }}</th>
                                     </tr>
                                     <tr>
-                                        <th colspan="5" style="text-align: right">Amount Paid</th>
+                                        <th colspan="7" style="text-align: right">Amount Paid</th>
                                         <th style="text-align: right;">
                                             &#8358;{{ number_format($purchase->totalPaid(), 2, '.', ',') }}</th>
                                     </tr>
                                     <tr>
-                                        <th colspan="5" style="text-align: right">Balance</th>
+                                        <th colspan="7" style="text-align: right">Balance</th>
                                         <th style="text-align: right;">
                                             @if ($total - $purchase->totalPaid() < 0)
                                                 &#8358;({{ number_format(abs($total - $purchase->totalPaid()), 2) }})

@@ -1,34 +1,37 @@
 <div class="card card-default">
     <div class="card-header">
         <div class="row">
-            <div class="col-sm-9">
-                <h3>Details Purchase of <small>products by {{ $record->supplier->name }}</small>
-                </h3>
+            <div class="col-sm-6">
+                <h6>Details Purchase of <small>products by {{ $record->supplier->name }}</small>
+                </h6>
             </div>
-            <div class="col-sm-3 text-right">
+            <div class="col-sm-6 text-right">
                 <div class="btn-group">
                     @if ($record->status == 0)
-                    <form onsubmit="return confirm('Are you sure you want to approve?')"
-                    action="{{ route('purchase.request.approve', $record->id) }}" method="post" style="display: inline">
-                    {{ csrf_field() }}
-                    {{ method_field('POST') }}
-                    <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
-                        <i class="text-white fa fa-check"> Approve</i>
-                    </button>
-                </form>
+                        <form onsubmit="return confirm('Are you sure you want to link to GRN?')"
+                            action="{{ route('purchase.request.link', $record->id) }}" method="post"
+                            style="display: inline">
+                            {{ csrf_field() }}
+                            {{ method_field('POST') }}
+                            <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
+                                <i class="text-white fa fa-link"> Link</i>
+                            </button>
+                        </form>
+                        <a class="btn btn-secondary btn-sm" href="{{ route('purchases.request.edit', $record->id) }}">
+                            <span class="fa fa-pencil"> Edit</span>
+                        </a>
                     @endif
                     <a class="btn btn-secondary btn-sm" href="{{ route('purchases.request.index', $record->id) }}">
-                        <span class="fa fa-list"></span>
+                        <span class="fa fa-list"> List</span>
                     </a>
-                    <a class="btn btn-secondary btn-sm" href="{{ route('purchases.request.edit', $record->id) }}">
-                        <span class="fa fa-pencil"></span>
-                    </a>
+
                     <form onsubmit="return confirm('Are you sure you want to delete?')"
-                        action="{{ route('purchases.request.destroy', $record->id) }}" method="post" style="display: inline">
+                        action="{{ route('purchases.request.destroy', $record->id) }}" method="post"
+                        style="display: inline">
                         {{ csrf_field() }}
                         {{ method_field('DELETE') }}
                         <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
-                            <i class="text-danger fa fa-remove"></i>
+                            <i class="text-danger fa fa-remove"> Delete</i>
                         </button>
                     </form>
                 </div>

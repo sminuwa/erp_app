@@ -11,43 +11,61 @@
     </thead>
     <tbody>
         @foreach ($records as $record)
-            <tr>
+            <tr class="@if ($record->status == 0) bg-warning @endif">
                 <td> {{ optional($record->supplier)->code }} - {{ optional($record->supplier)->name }} </td>
                 <td> {{ $record->reference }} </td>
                 <td> {{ $record->purchase_date->toDayDateTimeString() }} </td>
                 <td style="text-align: right"> {{ number_format($record->totalProductCost()->total, 2) }} </td>
                 <td> {{ $record->status == 1 ? 'Completed' : 'Pending' }} </td>
                 <td>
-                    <a class="btn btn-secondary btn-sm" href="{{ route('purchases.show', $record->id) }}">
-                        <span class="fa fa-eye"></span>
-                    </a>
-                    @can('edit.item.purchase')
-                        <a class="btn btn-secondary btn-sm" href="{{ route('purchases.edit', $record->id) }}">
-                            <span class="fa fa-pencil"></span>
-                        </a>
-                    @endcan
-                    <a class="btn btn-primary btn-sm" href="{{ route('purchase.print', $record->id) }}"
-                        title="Print Invoice" target="_BLANK">
-                        <span class="fa fa-print"></span>
-                    </a>
-                    @can('delete.item.purchase')
-                        <form onsubmit="return confirm('Are you sure you want to cancel?')"
-                            action="{{ route('purchases.destroy', $record->id) }}" method="post" style="display: inline">
-                            {{ csrf_field() }}
-                            {{ method_field('DELETE') }}
-                            <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
-                                <i class="text-danger fa fa-remove"></i>
-                            </button>
-                        </form>
-                    @endcan
-                    @if ($record->waybill_no != null)
-                        <a class="btn btn-primary btn-sm" href="{{ route('purchase.waybill.print', $record->id) }}"
-                            title="Print Invoice" target="_BLANK">
-                            <span class="ion-printer"> Print Waybill</span>
-                        </a>
-                    @endif
-                    <a href="javascript:void(0)" data-toggle="modal" data-target="#customermodal{{ $loop->index + 1 }}"
-                        class="btn btn-sm btn-primary float-md-right">WayBill</a>
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Action
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="{{ route('purchases.show', $record->id) }}">
+                                <span class="fa fa-eye">View</span>
+                            </a>
+                            <form action="{{ route('purchase.approve', $record->id) }}" method="post"
+                                onsubmit="return confirm('Are you sure you want to post this order?')">
+                                @csrf
+                                <button type="submit" class="dropdown-item">
+                                    <i class="fa fa-check" aria-hidden="true"></i> Post
+                                </button>
+                            </form>
+                            @can('edit.item.purchase')
+                                <a class="dropdown-item" href="{{ route('purchases.edit', $record->id) }}">
+                                    <span class="fa fa-pencil"> Edit</span>
+                                </a>
+                            @endcan
+                            <a class="dropdown-item" href="{{ route('purchase.print', $record->id) }}"
+                                title="Print Invoice" target="_BLANK">
+                                <span class="fa fa-print"> Print</span>
+                            </a>
+                            @can('delete.item.purchase')
+                                <form onsubmit="return confirm('Are you sure you want to cancel?')"
+                                    action="{{ route('purchases.destroy', $record->id) }}" method="post"
+                                    style="display: inline">
+                                    {{ csrf_field() }}
+                                    {{ method_field('DELETE') }}
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="text-danger fa fa-remove"> Delete</i>
+                                    </button>
+                                </form>
+                            @endcan
+                            @if ($record->waybill_no != null)
+                                <a class="dropdown-item"
+                                    href="{{ route('purchase.waybill.print', $record->id) }}" title="Print Invoice"
+                                    target="_BLANK">
+                                    <span class="ion-printer">Waybill</span>
+                                </a>
+                            @endif
+                            <a href="javascript:void(0)" data-toggle="modal"
+                                data-target="#customermodal{{ $loop->index + 1 }}"
+                                class="dropdown-item float-md-right"><i class="fa fa-address-book"></i> WayBill Fill</a>
+                        </div>
+                    </div>
                 </td>
             </tr>
             <!--  modal create customer -->

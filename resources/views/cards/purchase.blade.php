@@ -13,7 +13,7 @@
                         {{ csrf_field() }}
                         {{ method_field('POST') }}
                         <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
-                            <i class="text-white fa fa-check"> Approve</i>
+                            <i class="text-white fa fa-check"> Post</i>
                         </button>
                     </form>
                     {{-- @endif --}}

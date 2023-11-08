@@ -92,6 +92,7 @@
                                 <th>S.N</th>
                                 <th>Code</th>
                                 <th>Description</th>
+                                <th>UTM</th>
                                 <th>Qty</th>
                                 <th>Price</th>
                                 <th>Sub Total</th>
@@ -127,6 +128,7 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td class="text-left">{{ $product->attributes['code'] }}</td>
                                     <td class="text-left">{{ $product->name }}</td>
+                                    <td class="text-left">{{ App\Models\Product::find($product->id)->unit }}</td>
                                     <form action="{{ route('purchase.cart.update') }}" method="post"
                                         id="p{{ $product->id }}">
                                         @csrf
@@ -150,7 +152,7 @@
                                         </td>
                                         <input type="hidden" name="id" class="form-control"
                                             value="{{ $product->id }}">
-                                        
+
 
                                     </form>
 
@@ -194,7 +196,7 @@
                     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
 
                     <div class="form-group">
-                        <label for="supplier_id">Supplier Name {{$model->supplier_id}}</label>
+                        <label for="supplier_id">Supplier Name {{ $model->supplier_id }}</label>
                         <select
                             class="form-control select2-single {{ $errors->has('supplier_id') ? ' is-invalid' : '' }}"
                             name="supplier_id" id="supplier_id" required="required" autocomplete="off">

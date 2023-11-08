@@ -53,12 +53,13 @@
                                 Purchased Products
                             </div>
                             <div class="card-body table-responsive">
-                                <table class="table table-bordered" id="record1">
+                                <table class="table table-bordered" id="record1" style="font-size: 12px;">
                                     <thead>
                                         <tr>
                                             <th>S/N</th>
                                             <th>Code</th>
                                             <th>Product</th>
+                                            <th>UTM</th>
                                             <th>QTY</th>
                                             <th>Price (&#8358;)</th>
                                             <th>Subtotal (&#8358;)</th>
@@ -72,6 +73,7 @@
                                                 <th>{{ $loop->index + 1 }}</th>
                                                 <td>{{ $product->product->code }}</td>
                                                 <td>{{ $product->product->name }}</td>
+                                                <td>{{ $product->product->unit }}</td>
                                                 <td>{{ number_format($product->qty_supplied, 0, '', ',') }}</td>
                                                 <td style="text-align: right">{{ number_format($product->unit_price, 2) }}
                                                 </td>
@@ -84,6 +86,7 @@
                                         @endforeach
                                     </tbody>
                                     <tfoot>
+                                        <th></th>
                                         <th></th>
                                         <th></th>
                                         <th></th>

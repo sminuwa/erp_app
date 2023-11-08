@@ -172,6 +172,7 @@
                         customer_id: $(this).val()
                     }
                 }).done(function(data) {
+                    console.log(data)
                     $(".customer-orders").html(data);
                 });
             });

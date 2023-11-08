@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Branch;
+use App\Models\CreditNote;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -147,9 +148,12 @@ class MisController extends Controller
     }
 
     public function loadCustomerOrders(Request $request)
-    { //return $request->type;
+    {   //return $request->type;
         $customer = Customer::find($request->customer_id);
-        $orders = Order::where(['customer_id' => $customer->id, 'status'=>1])->orderBy('id','desc')->get();
+        $credit_notes = CreditNote::where('customer_id', $customer->id)->pluck('order_id')->toArray();
+        $orders = Order::where(['customer_id' => $customer->id, 'status'=>1])
+            ->whereNotIn('id', $credit_notes)
+            ->orderBy('id','desc')->get();
 //        if (count($orders) > 1)
         $result = "<tr>";
         foreach ($orders as $order) {

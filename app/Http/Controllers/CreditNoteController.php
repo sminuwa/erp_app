@@ -11,8 +11,10 @@ use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\Setting;
 use App\Models\StoreProduct;
 use App\Models\User;
+use App\Models\Utility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -156,6 +158,14 @@ class CreditNoteController extends Controller
         }
         return back();
     }
+    public function show($id)
+    {
+        $order = CreditNote::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
+        $order_details = CreditNoteDetail::with('storeProduct')->where(['credit_note_id' => $id, 'status' => 1])->get();
+        //return $order_details;
+        $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
+        return view('pages.inventories.credit_notes.show', compact('order_details', 'order', 'company'));
+    }
 
     public function searchCreditNote(Request $request)
     {
@@ -169,7 +179,14 @@ class CreditNoteController extends Controller
     }
     public function printCreditnoteReceipt(CreditNote $credit_note)
     {
-        return view('pages.inventories.credit_notes.print_credit_note_receipt', ['payment' => $credit_note, 'setting' => Setting::first()]);
+        $order = CreditNote::with('customer')->where('id', $credit_note->id)->first();
+        //return $order;
+        $order_details = CreditNoteDetail::with('storeProduct')->where(['credit_note_id' => $credit_note->id, 'status' => 1])->get();
+        //return $order_details;
+        //$company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('created_at')->first();
+        $company = Setting::find(1);
+        $utility = new Utility();
+        return view('pages.inventories.credit_notes.print', compact('order_details', 'order', 'company', 'utility'));
     }
     public function loadInvoices(Request $request)
     {

@@ -38,7 +38,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <a href="{{ route('customers.credit.note.create') }}" class="btn btn-sm btn-secondary"
+                                    <a href="{{ route('credit.note.create') }}" class="btn btn-sm btn-secondary"
                                         style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Credit
                                         Note</a>
                                 </div>

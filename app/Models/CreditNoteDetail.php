@@ -52,4 +52,9 @@ class CreditNoteDetail extends Model
         return $this->hasOne(StoreProduct::class,'id', 'store_product_id');
     }
 
+    public function storeProduct()
+    {
+        return $this->belongsTo(StoreProduct::class);
+    }
+
 }

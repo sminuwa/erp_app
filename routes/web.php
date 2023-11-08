@@ -310,7 +310,7 @@ Route::middleware('auth')->group(function () {
         //Credit Notes
         Route::group(['prefix' => 'credit-note'], function () {
             Route::get('/', [CreditNoteController::class, 'customerCreditNote'])->name('customers.credit.note');
-            Route::get('/create/{order?}', [CreditNoteController::class, 'createCreditNote'])->name('customers.credit.note.create');
+            Route::get('/create/{order?}', [CreditNoteController::class, 'createCreditNote'])->name('credit.note.create');
             Route::post('/store', [CreditNoteController::class, 'payCreditNote'])->name('customers.credit.note.store');
             Route::put('/update/{ledger}', [CreditNoteController::class, 'updateCreditnote'])->name('customers.credit.note.update');
             Route::delete('/delete/{ledger}', [CreditNoteController::class, 'deleteCreditNote'])->name('customers.credit.note.destroy');

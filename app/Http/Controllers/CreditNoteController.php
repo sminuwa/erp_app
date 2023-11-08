@@ -129,7 +129,7 @@ class CreditNoteController extends Controller
                     'cost_price' => $item->cost_price,
                     'sold_price' => $item->sold_price
                 ];
-                $new_cost_price[$item->store_product_id] = [
+                $new_cost_price[$item->store_product->product_id] = [
                     'quantity' => $item->quantity,
                     'price' => $item->cost_price,
                     'store_id' => $item->store_product->store_id,

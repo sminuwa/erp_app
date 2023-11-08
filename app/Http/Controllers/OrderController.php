@@ -581,6 +581,23 @@ class OrderController extends Controller
         if($invoice->save()){
             $products = [];
             foreach ($items as $item) {
+                $store = StoreProduct::find($item->store_product_id);
+                DB::table('store_products')->where('id', $item->store_product_id)->update([
+                    'qty_available' => $store->qty_available - $item->quantity,
+                    'updated_at' => Carbon::now()
+                ]);
+
+                DB::table('stock_cards')->insert([
+                    'store_id' => $store->store->id,
+                    'product_id' => $store->product->id,
+                    'cr' => 0,
+                    'dr' => $item->quantity,
+                    'refno' => $invoice->reference,
+                    'type' => 'Sale',
+                    'date' => $invoice->order_date,
+                    'user_id' => auth()->id(),
+                    'priority' => 2,
+                ]);
                 $products[$item->store_product_id] = ['quantity'=>$item->quantity, 'cost_price'=>$item->cost_price,  'sold_price'=>$item->sold_price];
             }
             /*return Transaction::sale(
@@ -594,6 +611,7 @@ class OrderController extends Controller
                 $invoice->reference,
                 $invoice->order_date)['status']
             ){
+
                 $action = "Invoice of $invoice->total for : " . $invoice->reference;
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Receipt generated successfully');

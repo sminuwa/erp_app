@@ -197,7 +197,7 @@ class CostPrice
             $product_costs[] = [
                 'branch_id' => $branch_id,
                 'product_id' => $key,
-                'cost_price' => round(($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'],2),
+                'cost_price' => ($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'],
                 'updated_by' => $user->id
             ];
             $store_products[] = [
@@ -213,7 +213,7 @@ class CostPrice
                 'new_quantity' => $record['new_quantity'],
                 'total_quantity' => $record['qty_available'] + $record['new_quantity'],
                 'existing_cost_price' => $record['existing_cost'],
-                'new_cost_price' => $record['new_cost'],
+                'new_cost_price' => ($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'],
                 'created_by' => $user->id,
                 'expiry_date' => $record['expiry_date'],
             ];

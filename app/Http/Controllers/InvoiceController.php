@@ -228,12 +228,12 @@ class InvoiceController extends Controller
                         'updated_at' => Carbon::now()
                     ]);
 
-                    DB::table('store_products')->where('id', $content->id)->update([
+                    /*DB::table('store_products')->where('id', $content->id)->update([
                         'qty_available' => $qtyAval - $content->quantity,
                         'updated_at' => Carbon::now()
-                    ]);
+                    ]);*/
 
-                    DB::table('stock_cards')->insert([
+                    /*DB::table('stock_cards')->insert([
                         'store_id' => $store->store->id,
                         'product_id' => $store->product->id,
                         'cr' => 0,
@@ -245,7 +245,7 @@ class InvoiceController extends Controller
                         'priority' => 2,
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now()
-                    ]);
+                    ]);*/
                     $store_products[$content->id] = $content->quantity;
                 }
                 //Upate the Order table with the discount
@@ -1063,7 +1063,7 @@ class InvoiceController extends Controller
         //dd(\Cart::getContent());
     }
     public function editProformer(Proformer $order){
-        
+
             $user_branch = User::userBranchAction();
             $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
                 ->join('stores', 'stores.id', 'store_products.store_id')
@@ -1072,13 +1072,13 @@ class InvoiceController extends Controller
                 ->join('branch_product_prices', function ($join) {
                     $join->on('branch_product_prices.product_id', '=', 'products.id')
                         ->on('branch_product_prices.branch_id', '=', 'branches.id');
-    
+
                 })
                 ->where('stores.branch_id', 'LIKE', $user_branch)
                 ->where('branch_product_prices.status', 1)
                 ->orderBy('products.name')->orderBy('stores.name')->limit(100)->get();
             //TODO:: remove limit here
-    
+
             $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
             if (\Cart::getContent()->isEmpty()) {
                 foreach ($order->order_items()->get() as $item) {
@@ -1102,7 +1102,7 @@ class InvoiceController extends Controller
                             'unit'=>$item->storeProduct->product->unit
                         ),
                     ]);
-    
+
                 }
             }
                 $this->loadProformaToCart($order);

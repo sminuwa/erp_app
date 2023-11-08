@@ -23,7 +23,8 @@
                 <thead>
                     <tr>
                         <th>S.N</th>
-                        <th style="width:30%">Item</th>
+                        <th>Code</th>
+                        <th>Item</th>
                         <th>Unit</th>
                         <th>Price</th>
                         <th>Qty</th>
@@ -36,6 +37,7 @@
                     @foreach ($cart_products as $product)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
+                            <td class="text-left">{{ $product->code }}</td>
                             <td class="text-left">{{ $product->name }}</td>
                             <td class="text-left">{{ $product->attributes['unit'] }}</td>
                             <td class="text-left">{{ $product->attributes['sold_price'] }}</td>

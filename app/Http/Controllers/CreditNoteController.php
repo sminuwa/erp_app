@@ -187,6 +187,7 @@ class CreditNoteController extends Controller
     }
     public function printCreditnoteReceipt(CreditNote $credit_note)
     {
+
         $order = CreditNote::with('customer')->where('id', $credit_note->id)->first();
         //return $order;
         $order_details = CreditNoteDetail::with('storeProduct')->where(['credit_note_id' => $credit_note->id, 'status' => 1])->get();
@@ -195,6 +196,7 @@ class CreditNoteController extends Controller
         $company = Setting::find(1);
         $utility = new Utility();
         return view('pages.inventories.credit_notes.print', compact('order_details', 'order', 'company', 'utility'));
+
     }
     public function loadInvoices(Request $request)
     {

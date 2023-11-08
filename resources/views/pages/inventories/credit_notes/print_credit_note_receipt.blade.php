@@ -44,16 +44,17 @@
 
                         </div>
                         <!-- /.col -->
-                        <h4>CUSTOMER NAME: <small>{{$payment->customer->name}}</small></h4>
+                        <h4>CUSTOMER NAME: <small>{{$order->customer->code}}-{{$order->customer->name}}</small></h4>
                     </div>
 
                     <div class="row">
                         <div class="col-12 table-responsive">
-                            <table class="table table-bordered">
+                            {{-- <table class="table table-bordered">
                                 <thead>
                                     <tr>
                                         <th>DATE</th>
                                         <th>REF NO</th>
+                                        <th>CUSTOMER CODE</th>
                                         <th>CUSTOMER NAME</th>
                                         <th>AMOUNT</th>
                                     </tr>
@@ -64,7 +65,10 @@
                                             {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                                         </td>
                                         <td>
-                                            {{ $payment->reference_no }}
+                                            {{ $payment->reference }}
+                                        </td>
+                                        <td>
+                                            {{ $payment->customer->code }}
                                         </td>
                                         <td>
                                             {{ $payment->customer->name }}
@@ -85,6 +89,47 @@
                                             </p>
                                         </td>
                                         <td></td>
+                                    </tr>
+                                </tbody>
+                            </table> --}}
+                            <table class="table table-bordered text-left">
+                                <thead>
+                                    <tr>
+                                        <th>S.N</th>
+                                        <th>Code</th>
+                                        <th>Description</th>
+                                        <th>UTM</th>
+                                        <th>Store</th>
+                                        <th>Quantity</th>
+                                        <th>Unit Cost</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $total = 0;
+                                        $total_discount = 0;
+                                    @endphp
+                                    @foreach ($order_details as $order_detail)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $order_detail->store_product->product->code ?? "" }}</td>
+                                            <td>{{ $order_detail->store_product->product->name ?? "" }}</td>
+                                            <td>{{ $order_detail->store_product->product->unit ?? "" }}</td>
+                                            <td>{{ $order_detail->store_product->store->code ?? "" }}</td>
+                                            <td align="center">{{ $order_detail->quantity }}</td>
+                                            <td align="right">{{ number_format($order_detail->sold_price, 2) }}
+                                            </td>
+                                            <td align="right">
+                                                {{ number_format($order_detail->sold_price * $order_detail->quantity, 2) }}
+                                            </td>
+                                        </tr>
+                                        @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
+                                    @endforeach
+                                    <tr>
+                                        <th colspan="7" align="right">Total</th>
+                                        <th style="text-align: right">{{ number_format($total, 2, '.', ',') }}</th>
+
                                     </tr>
                                 </tbody>
                             </table>

@@ -11,6 +11,7 @@ use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\Setting;
 use App\Models\StoreProduct;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -177,7 +178,13 @@ class CreditNoteController extends Controller
     }
     public function printCreditnoteReceipt(CreditNote $credit_note)
     {
-        return view('pages.inventories.credit_notes.print_credit_note_receipt', ['payment' => $credit_note, 'setting' => Setting::first()]);
+        $order = $credit_note;
+        //$order = CreditNote::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
+        $order_details = CreditNoteDetail::with('store_product')->where(['credit_note_id' => $order->id, 'status' => 1])->get();
+        //return $order_details;
+        $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
+        return view('pages.inventories.credit_notes.print_credit_note_receipt', compact('order_details', 'order', 'company'));
+        //return view('pages.inventories.credit_notes.print_credit_note_receipt', ['payment' => $credit_note, 'setting' => Setting::first()]);
     }
     public function loadInvoices(Request $request)
     {
@@ -282,5 +289,13 @@ class CreditNoteController extends Controller
         session()->flash('success', 'Item Cart Remove Successfully !');
         return redirect()->route('customers.credit.note.create', Order::find($request->order));
         //return redirect()->back()->with('order',Order::find($request->order));
+    }
+    public function show($id)
+    {
+        $order = CreditNote::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
+        $order_details = CreditNoteDetail::with('store_product')->where(['credit_note_id' => $id, 'status' => 1])->get();
+        //return $order_details;
+        $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
+        return view('pages.inventories.credit_notes.show_credit_note', compact('order_details', 'order', 'company'));
     }
 }

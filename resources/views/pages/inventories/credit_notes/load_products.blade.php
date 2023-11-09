@@ -35,7 +35,7 @@
                 </thead>
                 <tbody>
                     @foreach ($cart_products as $product)
-                        <tr>
+                        <tr class="item{{ $product->id }}">
                             <td>{{ $loop->iteration }}</td>
                             <td class="text-left">{{ $product->code }}</td>
                             <td class="text-left">{{ $product->name }}</td>

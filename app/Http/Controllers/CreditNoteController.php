@@ -178,22 +178,24 @@ class CreditNoteController extends Controller
 //        return $credit_note;
         $customer = Customer::find($credit_note->customer_id);
         $credit_note_items = CreditNoteDetail::where('credit_note_id', $credit_note->id)->where('status', 1)->get();
-        \Cart::clear();
-        foreach ($credit_note_items as $data) {
-            $qty = $data->quantity == 0 ? 1 : $data->quantity;
-            \Cart::add([
-                'id' => $data->store_product_id,
-                'name' => $data->storeProduct->product->name ?? 'No name found',
-                'price' => $data->sold_price,
-                'quantity' => $qty,
-                'attributes' => array(
-                    'cost_price' => $data->cost_price,
-                    'selling_price' => $data->selling_price,
-                    'sold_price' => $data->sold_price,
-                    'discount' => 0,
-                    'unit' => $data->storeProduct->product->unit
-                ),
-            ]);
+        /*\Cart::clear();*/
+        if(\Cart::isEmpty()){
+            foreach ($credit_note_items as $data) {
+                $qty = $data->quantity == 0 ? 1 : $data->quantity;
+                \Cart::add([
+                    'id' => $data->store_product_id,
+                    'name' => $data->storeProduct->product->name ?? 'No name found',
+                    'price' => $data->sold_price,
+                    'quantity' => $qty,
+                    'attributes' => array(
+                        'cost_price' => $data->cost_price,
+                        'selling_price' => $data->selling_price,
+                        'sold_price' => $data->sold_price,
+                        'discount' => 0,
+                        'unit' => $data->storeProduct->product->unit
+                    ),
+                ]);
+            }
         }
         $cart_products = \Cart::getContent();
         return view('pages.inventories.credit_notes.edit_credit_note', compact('credit_note', 'cart_products', 'customer'));
@@ -331,9 +333,10 @@ class CreditNoteController extends Controller
 
     public function removeCart(Request $request, $id)
     {
-        \Cart::remove($request->id);
+        \Cart::remove($id);
         session()->flash('success', 'Item Cart Remove Successfully !');
-        return redirect()->route('customers.credit.note.create', Order::find($request->order));
+//        return \Cart::getContent();
+        return back();
         //return redirect()->back()->with('order',Order::find($request->order));
     }
 }

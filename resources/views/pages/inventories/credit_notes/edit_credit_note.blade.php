@@ -150,7 +150,7 @@
                                         </thead>
                                         <tbody>
                                         @foreach ($cart_products as $product)
-                                            <tr>
+                                            <tr class="item{{ $product->id }}">
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td class="text-left">{{ $product->code }}</td>
                                                 <td class="text-left">{{ $product->name }}</td>
@@ -200,7 +200,7 @@
                                                     <form id="delete-form-{{ $product->id }}"
                                                           action="{{ route('credit.note.cart.remove', $product->id) }}" method="post"
                                                           style="display:none;">
-                                                        <input type="hidden" name="order" id="order" value="{{ $credit_note->id }}" />
+                                                        <input type="hidden" name="credit_note_id" id="credit_note" value="{{ $credit_note->id }}" />
                                                         @csrf
                                                         @method('DELETE')
                                                     </form>

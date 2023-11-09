@@ -46,18 +46,13 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        @hasanyrole('Super-admin|Admin')
                                         <div class="form-group">
                                             <label for="order_date">Date</label>
-                                            <input type="text" name="order_date" class="form-control datepicker"
-                                                   value="{{ $credit_note ? $credit_note->order_date : date('Y-m-d') }}"
-
+                                            <input type="text" name="date" class="form-control datepicker"
+                                                   value="{{ $credit_note ? $credit_note->date : date('Y-m-d') }}"
+                                                   onchange="$('.date').val($(this).val())"
                                             />
                                         </div>
-                                        @else
-                                            <input type="hidden" name="order_date" class="form-control datepicker"
-                                                   value="{{ $credit_note ? $credit_note->date : date('Y-m-d') }}" />
-                                            @endhasanyrole
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
@@ -220,6 +215,7 @@
                                 </div>
                                 <form action="{{ route('credit.note.store') }}" method="POST">
                                     @csrf
+                                    <input type="hidden" name="date" class="date" value="{{ $credit_note->date }}" />
                                     <input type="hidden" name="credit_note_id" id="credit_note_id" value="{{ $credit_note->id }}" />
                                     <input type="hidden" name="customer_id" id="customer_id" value="{{ $credit_note->customer_id }}" />
                                     <input name="comment" placeholder="Comment" class="form-control">
@@ -386,7 +382,6 @@
                 }, 500);
             });
 
-
             function formatMoney(n, c, d, t) {
                 var c = isNaN(c = Math.abs(c)) ? 2 : c,
                     d = d == undefined ? "." : d,
@@ -397,7 +392,8 @@
                 return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ?
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
-            $(document).on('click', '.delete', function() {
+
+            $(document).on('click', '.delete', function(event) {
                 var id = $(this).attr('data-val');
                 const swalWithBootstrapButtons = swal.mixin({
                     confirmButtonClass: 'btn btn-success',

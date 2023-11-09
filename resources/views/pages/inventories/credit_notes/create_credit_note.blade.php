@@ -46,16 +46,15 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        @hasanyrole('Super-admin|Admin')
+
                                         <div class="form-group">
                                             <label for="date">Date</label>
-                                            <input type="text" name="date" class="form-control datepicker"
-                                                   value="{{ $order ? $order->order_date : date('Y-m-d') }}" />
+                                            <input type="text" name="date" class="form-control date_ datepicker"
+                                                   value="{{ $order ? $order->order_date : date('Y-m-d') }}"
+
+                                            />
                                         </div>
-                                        @else
-                                            <input type="hidden" name="date" class="form-control datepicker"
-                                                   value="{{ date('Y-m-d') }}" />
-                                            @endhasanyrole
+
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">

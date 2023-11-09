@@ -50,7 +50,7 @@
                                             <label for="order_date">Date</label>
                                             <input type="text" name="date" class="form-control datepicker"
                                                    value="{{ $credit_note ? $credit_note->date : date('Y-m-d') }}"
-                                                   onchange="$('.date').val($(this).val())"
+                                                   onchange="$('.date').val($(this).val())" required
                                             />
                                         </div>
                                     </div>

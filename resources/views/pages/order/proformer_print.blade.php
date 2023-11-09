@@ -103,7 +103,7 @@
                                 @php
                                     $uc = substr($order->invoice_no, 0, 6) . substr($order->invoice_no, 6, 10) + 3000;
                                 @endphp
-                                {{ QrCode::size(70)->backgroundColor(255, 55, 0)->generate("$order->total\n$uc\n\n.") }}<br />
+                                {{ QrCode::size(70)->generate($order->total) }}<br />
                                 <span style="font-size:28px;margin-top:-5px">
                                     Proformer Invoice
                                 </span>

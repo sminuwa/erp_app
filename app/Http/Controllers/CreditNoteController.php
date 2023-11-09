@@ -79,6 +79,7 @@ class CreditNoteController extends Controller
                 $credit_note->branch_id = $order->branch_id;
                 $credit_note->created_by = auth()->id();
             }
+            $credit_note->date = $request->date;
             $credit_note->comment = $request->comment;
             $credit_note->amount = $total;
             if ($credit_note->save()) {

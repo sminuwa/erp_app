@@ -67,8 +67,8 @@
                                     <thead>
                                         <tr>
                                             <th>Date</th>
+                                            <th>Reference</th>
                                             <th>Name</th>
-                                            <th>Invoice No</th>
                                             <th>Total</th>
                                             <th>Actions</th>
                                         </tr>
@@ -88,39 +88,45 @@
                                             <tr>
                                                 <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}
                                                 </td>
+                                                <td>{{ $order->reference }}</td>
                                                 <td>{{ $order->customer->name }}</td>
-                                                <td>{{ $order->invoice_no }}</td>
                                                 <td align="right">&#8358;{{ number_format($order->total, 2, '.', ',') }}
                                                 </td>
                                                 <td align="center">
-                                                    @can("verify.invoice")
-                                                        <a href="javascript:void(0)" data-toggle="modal"
-                                                            data-target="#order_detail_form{{ $order->id }}"
-                                                            data-val="{{ $order->id }}" class="btn btn-success btn-sm show">
-                                                            <i class="fa fa-eye" aria-hidden="true"></i>
-                                                        </a>
-                                                    @endcan
-                                                    <a href="{{ route('proformer.edit', $order->id) }}"
-                                                        class="btn btn-secondary btn-sm">
-                                                        <i class="fa fa-edit" aria-hidden="true"></i>
-                                                    </a>
-                                                    <a href="{{ route('proformer.print', $order->id) }}"
-                                                        target="_BLANK" class="btn btn-secondary btn-sm">
-                                                        <i class="fa fa-print" aria-hidden="true"></i>
-                                                    </a>
-
-                                                    @can('delete.daily.sale')
-                                                        <button class="btn btn-danger btn-sm" type="button"
-                                                            onclick="deleteItem({{ $order->id }})">
-                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-default dropdown-toggle" type="button"
+                                                                id="dropdownMenuButton" data-toggle="dropdown"
+                                                                aria-haspopup="true" aria-expanded="false">
+                                                            Action
                                                         </button>
-                                                        <form id="delete-form-{{ $order->id }}"
-                                                            action="{{ route('proformer.destroy', $order->id) }}" method="post"
-                                                            style="display:none;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                        </form>
-                                                    @endcan
+                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+
+                                                            <a href="{{ route('proformer.show', $order->id) }}"
+                                                               class="dropdown-item">
+                                                                <i class="fa fa-eye" aria-hidden="true"></i> View
+                                                            </a>
+
+                                                            <a href="{{ route('proformer.edit', $order->id) }}"
+                                                                class="dropdown-item">
+                                                                <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                                            </a>
+                                                            <a href="{{ route('proformer.print', $order->id) }}"
+                                                                target="_BLANK" class="dropdown-item">
+                                                                <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                            </a>
+
+                                                            <form id="delete-form-{{ $order->id }}"
+                                                                action="{{ route('proformer.destroy', $order->id) }}" method="post"
+                                                                style="display:none;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button class="dropdown-item" type="submit"
+                                                                        onclick="deleteItem({{ $order->id }})">
+                                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
                                                 </td>
                                             </tr>
                                             <div class="modal fade" id="order_detail_form{{ $order->id }}"
@@ -133,27 +139,15 @@
                                     <tfoot>
                                         <tr>
                                             <th>Date</th>
+                                            <th>Reference</th>
                                             <th>Name</th>
-                                            <th>Invoice No</th>
                                             <th style="text-align:right">&#8358;{{ number_format($total, 2, '.', ',') }}
                                             </th>
                                             <th>Actions</th>
                                         </tr>
                                     </tfoot>
                                 </table>
-                                <div class="row">
-                                    <div class="col-sm-2">
-                                        @can('view.customer.ledger')
-                                            <a href="javascript:void(0)" data-toggle="modal" data-target="#customer_ledgerform"
-                                                class="btn btn-sm btn-secondary" style="margin-left: 2px;">Customer Ledger </a>
-                                        @endcan
 
-                                    </div>
-                                    <div class="col-sm-6 text-danger">
-                                        <strong>Total Record is of
-                                            {{ number_format(App\Models\Order::count('*'), 0, ',', '') }}</strong>
-                                    </div>
-                                </div>
                             </div>
                             <!-- /.card-body -->
 

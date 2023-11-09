@@ -49,11 +49,11 @@
                                         @hasanyrole('Super-admin|Admin')
                                         <div class="form-group">
                                             <label for="order_date">Date</label>
-                                            <input type="text" name="order_date" class="form-control datepicker"
-                                                   value="{{ $credit_note ? $credit_note->order_date : date('Y-m-d') }}" />
+                                            <input type="text" name="date" class="form-control datepicker"
+                                                   value="{{ $credit_note ? $credit_note->date : date('Y-m-d') }}" />
                                         </div>
                                         @else
-                                            <input type="hidden" name="order_date" class="form-control datepicker"
+                                            <input type="hidden" name="date" class="form-control datepicker"
                                                    value="{{ $credit_note ? $credit_note->date : date('Y-m-d') }}" />
                                             @endhasanyrole
                                     </div>

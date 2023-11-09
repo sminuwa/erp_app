@@ -42,7 +42,7 @@
                                     <i class="fa fa-arrow-left"></i> Back
                                 </a>
                                 <a href="{{ route('proforma.index') }}" class="btn btn-secondary btn-sm ">
-                                    <i class="fa fa-plus-circle" aria-hidden="true"> New Order</i>
+                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> New Proforma
                                 </a>
 
                                 <a href="{{ route('proformer.print', $order->id) }}"
@@ -108,11 +108,6 @@
                                 <!-- /.col -->
                                 <div class="col-sm-4 invoice-col">
                                     <b>Reference No: {{ $order->reference }}</b><br><br>
-                                    <b>Order Status:</b>
-                                    {!!
-                                        $order->status == 0 ? '<span class="badge badge-warning">Pending</span>':
-                                        ($order->status == 1 ? '<span class="badge badge-success">Close</span>': '<span class="badge badge-success">Completed</span>' )
-                                    !!}
                                 </div>
                                 <!-- /.col -->
                             </div>

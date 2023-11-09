@@ -15,7 +15,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Edit Purchase (Request) of <small>products by {{ $model->supplier->name }}</small></h1>
+                        <h4>Edit Purchase (Request) of <small>products by {{ $model->supplier->name }}</small></h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -31,10 +31,10 @@
         <!-- Main content -->
         <section class="content">
             <a class="btn btn-secondary btn-sm" href="{{ route('purchases.request.create') }}">
-                <span class="fa fa-plus-circle"></span>
+                <span class="fa fa-plus-circle"> New Purchase Request</span>
             </a>
             <a class="btn btn-secondary btn-sm" href="{{ route('purchases.request.index') }}">
-                <span class="fa fa-list"></span>
+                <span class="fa fa-list">Purchases</span>
             </a>
             <div class="container-fluid">
                 <div class="row">

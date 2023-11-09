@@ -558,7 +558,7 @@ class PurchaseGRNController extends Controller
                 DB::commit();
             } else
                 DB::rollback();
-                session()->flash('app_message', 'Purchase sucessfully approved');
+                session()->flash('app_message', 'Purchase sucessfully posted');
         }
         return back()->with('success', 'Approved successfully');
     }

@@ -15,7 +15,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Edit Purchase of <small>products by {{ $model->supplier->name }}</small></h1>
+                        <h3>Edit Purchase of <small>products by {{ $model->supplier->name }}</small></h3>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">

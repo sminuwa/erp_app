@@ -356,8 +356,38 @@ class PurchaseRequestController extends Controller
             return back();
         }
     }
-    public function approve(Request $request, PurchaseRequest $purchase)
+    public function link(Request $request, PurchaseRequest $purchase)
     {
-        return $purchase;
+        if (\Cart::getContent()->isEmpty())
+            $this->loadToCart($purchase);
+        $cart_products = \Cart::getContent(); //$purchase->purchasedProducts;
+        //dd($cart_products);
+        return view('pages.inventories.purchases.grn.create', [
+            'model' => $purchase,
+            'products' => Product::all(),
+            'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->get(),
+            'categories' => Category::all(),
+            'cart_products' => $cart_products,
+            'type' => 'link',
+
+        ]);
+    }
+    public function close(Request $request, PurchaseRequest $purchase)
+    {
+        DB::beginTransaction();
+        try {
+            DB::table('purchase_requests')->where('id', $purchase->id)->update(['status' => 2, 'updated_by' => auth()->id(), 'updated_at' => Carbon::now()]);
+            DB::table('purchase_product_requests')->where('purchase_id', $purchase->id)->update(['status' => 2, 'updated_at' => Carbon::now()]);
+            $action = "Closed purchase request $purchase->reference";
+            AuditLog::auditLog(Auth::id(), $action);
+            session()->flash('app_message', 'Purchase was closed Successfully!');
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $e->getMessage();
+            session()->flash('app_message', 'Error whiling closing purchase!');
+            return redirect()->back();
+        }
+        return redirect()->back();
     }
 }

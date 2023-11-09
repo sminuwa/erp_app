@@ -88,12 +88,13 @@
                         No Product Added
                     </div>
                 @else
-                    <table class="table table-bordered table-striped text-center mb-3">
+                    <table class="table table-bordered table-striped text-center mb-3" style="font-size: 12px;">
                         <thead>
                             <tr>
                                 <th>S.N</th>
                                 <th>Code</th>
                                 <th>Description</th>
+                                <th>UTM</th>
                                 <th>Qty</th>
                                 <th>Price</th>
                                 <th>Sub Total</th>
@@ -131,6 +132,7 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td class="text-left">{{ $product->product->code ?? $product->attributes['code'] }}</td>
                                     <td class="text-left">{{ $product->product->name ?? $product->name }}</td>
+                                    <td class="text-left">{{ $product->product->unit ?? $product->unit }}</td>
                                     <form action="{{ route('purchase.request.cart.update') }}" method="post"
                                         id="p{{ $product->id }}">
                                         @csrf

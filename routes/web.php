@@ -981,9 +981,8 @@ Route::middleware('auth')->group(function () {
                 Route::post('/waybill/{purchase}', [PurchaseRequestController::class, 'generateWaybill'])->name('purchase.request.generate.waybill');
                 Route::get('/print/waybill/{purchase}', [PurchaseRequestController::class, 'printWaybill'])->name('purchase.request.waybill.print');
                 Route::post('/search', [PurchaseRequestController::class, 'search'])->name('purchases.request.search');
-                Route::post('/expense', [PurchaseRequestController::class, 'expense'])->name('purchases.request.expense.ajax.create');
-                Route::delete('/expense/delete/{expense}', [PurchaseRequestController::class, 'deleteExpense'])->name('delete.purchase.request.expense');
-                Route::post('/approve/{purchase}', [PurchaseRequestController::class, 'approve'])->name('purchase.request.approve');
+                Route::post('/close/{purchase}', [PurchaseRequestController::class, 'close'])->name('purchase.request.close');
+                Route::post('/approve/{purchase}', [PurchaseRequestController::class, 'link'])->name('purchase.request.link');
             }
         );
         Route::group(

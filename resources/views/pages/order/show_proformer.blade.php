@@ -41,7 +41,7 @@
                                 <a href="javascript:history.back()" class="btn btn-primary btn-sm">
                                     <i class="fa fa-arrow-left"></i> Back
                                 </a>
-                                <a href="{{ route('proforma.invoice.index') }}" class="btn btn-secondary btn-sm ">
+                                <a href="{{ route('proforma.index') }}" class="btn btn-secondary btn-sm ">
                                     <i class="fa fa-plus-circle" aria-hidden="true"> New Order</i>
                                 </a>
 
@@ -156,7 +156,7 @@
                                             @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
                                         @endforeach
                                         <tr>
-                                            <th colspan="4" align="right">Total</th>
+                                            <th colspan="7" align="right">Total</th>
                                             <th style="text-align: right">{{ number_format($total, 2, '.', ',') }}</th>
 
                                         </tr>

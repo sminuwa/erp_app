@@ -1145,6 +1145,7 @@ class InvoiceController extends Controller
         $tax = 0;
         $total = str_replace(',', '', \Cart::getTotal());
 
+
         $pay = $request->input('pay');
         //$due = $total - $pay;
         $order_id = $order->id;
@@ -1154,7 +1155,7 @@ class InvoiceController extends Controller
         DB::beginTransaction();
         try {
             $due_date = $request->input('due_date');
-            DB::table('order_invoices')->where('id', $order->id)->update([
+            DB::table('proformers')->where('id', $order->id)->update([
                 'reference' => $reference,
                 'customer_id' => $customer_id,
                 'pay' => 0,

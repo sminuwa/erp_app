@@ -115,14 +115,11 @@
                                                                 <i class="fa fa-print" aria-hidden="true"></i> Print
                                                             </a>
 
-                                                            <form id="delete-form-{{ $order->id }}"
-                                                                action="{{ route('proformer.destroy', $order->id) }}" method="post"
-                                                                style="display:none;">
+                                                            <form action="{{ route('proformer.delete', $order->id) }}" method="post" onsubmit="return confirm('Are you sure want to delete this proforma invoice?')">
                                                                 @csrf
-                                                                @method('DELETE')
-                                                                <button class="dropdown-item" type="submit"
-                                                                        onclick="deleteItem({{ $order->id }})">
-                                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                @method('POST')
+                                                                <button class="dropdown-item" type="submit">
+                                                                    <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                                                 </button>
                                                             </form>
                                                         </div>

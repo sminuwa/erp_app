@@ -48,12 +48,12 @@
                                     <div class="col-md-4">
                                         @hasanyrole('Super-admin|Admin')
                                         <div class="form-group">
-                                            <label for="order_date">Date</label>
-                                            <input type="text" name="order_date" class="form-control datepicker"
+                                            <label for="date">Date</label>
+                                            <input type="text" name="date" class="form-control datepicker"
                                                    value="{{ $order ? $order->order_date : date('Y-m-d') }}" />
                                         </div>
                                         @else
-                                            <input type="hidden" name="order_date" class="form-control datepicker"
+                                            <input type="hidden" name="date" class="form-control datepicker"
                                                    value="{{ date('Y-m-d') }}" />
                                             @endhasanyrole
                                     </div>

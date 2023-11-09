@@ -154,8 +154,8 @@ class CreditNoteController extends Controller
                         $credit_note->branch_id
                     )['status']
                 )
-                    $action = "Credit Note of $credit_note->total for : " . $credit_note->reference;
 
+                $action = "Credit Note of $credit_note->total for : " . $credit_note->reference;
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Credit note posted successfully');
                 DB::commit();

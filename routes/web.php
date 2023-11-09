@@ -3,6 +3,7 @@
 use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\GeneralAccountController;
 use App\Http\Controllers\JournalController;
+use App\Http\Controllers\ProformaInvoiceController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\InterBankController;
 use App\Http\Controllers\ReturnDebitController;
@@ -304,6 +305,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/proforma/show/{id}', [OrderController::class, 'proformer_show'])->name('proformer.show');
             Route::get('/', [OrderController::class, 'proformer_list'])->name('proformer.list');
             Route::post('/proforma/search', [OrderController::class, 'proformer_search'])->name('proformer.search');
+            Route::post('/delete/{proforma}', [ProformaInvoiceController::class, 'delete'])->name('proformer.delete');
 
         });
 

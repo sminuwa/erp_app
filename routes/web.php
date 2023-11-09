@@ -304,14 +304,14 @@ Route::middleware('auth')->group(function () {
             Route::get('/proforma/show/{id}', [OrderController::class, 'proformer_show'])->name('proformer.show');
             Route::get('/', [OrderController::class, 'proformer_list'])->name('proformer.list');
             Route::post('/proforma/search', [OrderController::class, 'proformer_search'])->name('proformer.search');
-            
+
         });
 
         //Credit Notes
         Route::group(['prefix' => 'credit-note'], function () {
-            Route::get('/', [CreditNoteController::class, 'customerCreditNote'])->name('customers.credit.note');
-            Route::get('/create/{order?}', [CreditNoteController::class, 'createCreditNote'])->name('credit.note.create');
-            Route::post('/store', [CreditNoteController::class, 'payCreditNote'])->name('customers.credit.note.store');
+            Route::get('/', [CreditNoteController::class, 'creditNote'])->name('customers.credit.note');
+            Route::get('/create/{order?}', [CreditNoteController::class, 'create'])->name('credit.note.create');
+            Route::post('/store', [CreditNoteController::class, 'store'])->name('credit.note.store');
             Route::put('/update/{ledger}', [CreditNoteController::class, 'updateCreditnote'])->name('customers.credit.note.update');
             Route::delete('/delete/{ledger}', [CreditNoteController::class, 'deleteCreditNote'])->name('customers.credit.note.destroy');
             Route::post('/search', [CreditNoteController::class, 'searchCreditNote'])->name('customers.credit.note.search');
@@ -324,6 +324,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/show/{credit_note}', [CreditNoteController::class, 'show'])->name('credit.note.show');
             Route::post('/post/{credit_note}', [CreditNoteController::class, 'post'])->name('credit.note.post');
             Route::get('/edit/{credit_note}', [CreditNoteController::class, 'edit'])->name('credit.note.edit');
+            Route::post('/delete/{credit_note}', [CreditNoteController::class, 'delete'])->name('credit.note.delete');
         });
 
         Route::get('pos', [PosController::class, 'index'])->name('pos.index');
@@ -853,7 +854,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('/account_balances/load', [ReportController::class, 'loadAccountBalance'])->name('ajax.load.account.balance.report');
                 Route::get('/account_balances/print/{collector_id}', [ReportController::class, 'printAccountBalance'])->name('ajax.account.balance.report.print');
              });
-             
+
         }
     );
     Route::group(['prefix' => 'ap_ar_account'], function () {

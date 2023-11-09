@@ -98,7 +98,7 @@
         <div class="alert alert-success">
             Total : &#8358; <span class="total">{{ number_format(Cart::getTotal()) }}</span>
         </div>
-        <form action="{{ route('customers.credit.note.store') }}" method="POST">
+        <form action="{{ route('credit.note.store') }}" method="POST">
             @csrf
             <input type="hidden" name="order_id" id="order_id" value="{{ $order->id }}" />
             <input type="hidden" name="customer_id" id="customer_id" value="{{ $order->customer_id }}" />

@@ -121,9 +121,9 @@
                                                                 </form>
 
 
-                                                                <form id="delete-form-{{ $payment->id }}" action="{{ route('credit.note.post', $payment->id) }}" method="post" onsubmit="return confirm('Are you sure you want to close this order?')">
+                                                                <form  action="{{ route('credit.note.delete', $payment->id) }}" method="post" onsubmit="return confirm('Are you sure you want to close this order?')">
                                                                     @csrf
-                                                                    @method('DELETE')
+                                                                    @method('POST')
                                                                     <button class="dropdown-item" type="submit">
                                                                         <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                                                     </button>

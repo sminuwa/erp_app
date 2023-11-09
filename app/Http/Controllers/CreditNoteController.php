@@ -22,13 +22,13 @@ use Illuminate\Support\Facades\DB;
 
 class CreditNoteController extends Controller
 {
-    public function customerCreditNote()
+    public function creditNote()
     {
         $payments = CreditNote::orderBy('credit_notes.created_at', 'DESC')->take(10)->get();
         $model = new CustomerLedger();
         return view('pages.inventories.credit_notes.credit_note', ['payments' => $payments, 'model' => $model]);
     }
-    public function createCreditNote(Order $order = null)
+    public function create(Order $order = null)
     {
         $user_branch = User::userBranchAction();
         $orders = Order::where('status', 1)
@@ -58,7 +58,7 @@ class CreditNoteController extends Controller
         return view('pages.inventories.credit_notes.create_credit_note', compact('orders', 'customers', 'cart_products', 'order', 'stores'));
     }
 
-    public function payCreditNote(Request $request)
+    public function store(Request $request)
     {
         //        return "To call your function";
         $order_id = $request->order_id;
@@ -106,7 +106,7 @@ class CreditNoteController extends Controller
                 DB::commit();
             }
             session()->flash('app_message', 'Credit note captured successfully');
-            $action = "Posted credit note $order->invoice_no for customer: " . $order->customer->name;
+            $action = "Posted credit note $credit_note->invoice_no for customer: " . $credit_note->customer->name;
             AuditLog::auditLog(Auth::id(), $action);
             DB::commit();
         } catch (\Exception $e) {
@@ -172,6 +172,39 @@ class CreditNoteController extends Controller
         //return $order_details;
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         return view('pages.inventories.credit_notes.show', compact('order_details', 'order', 'company'));
+    }
+    public function edit(CreditNote $credit_note){
+//        return $credit_note;
+        $customer = Customer::find($credit_note->customer_id);
+        $credit_note_items = CreditNoteDetail::where('credit_note_id', $credit_note->id)->where('status', 1)->get();
+        \Cart::clear();
+        foreach ($credit_note_items as $data) {
+            $qty = $data->quantity == 0 ? 1 : $data->quantity;
+            \Cart::add([
+                'id' => $data->store_product_id,
+                'name' => $data->storeProduct->product->name ?? 'No name found',
+                'price' => $data->sold_price,
+                'quantity' => $qty,
+                'attributes' => array(
+                    'cost_price' => $data->cost_price,
+                    'selling_price' => $data->selling_price,
+                    'sold_price' => $data->sold_price,
+                    'discount' => 0,
+                    'unit' => $data->storeProduct->product->unit
+                ),
+            ]);
+        }
+        $cart_products = \Cart::getContent();
+        return view('pages.inventories.credit_notes.edit_credit_note', compact('credit_note', 'cart_products', 'customer'));
+    }
+    public function delete(CreditNote $credit_note){
+
+        if($credit_note->delete()){
+            $action = "Deleted credit note with reference " . $credit_note->reference;
+            AuditLog::auditLog(auth()->id(), $action);
+            session()->flash('app_message', 'Credit note posted successfully');
+        }
+        return redirect()->back();
     }
 
     public function searchCreditNote(Request $request)

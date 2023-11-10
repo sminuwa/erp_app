@@ -201,7 +201,6 @@ class CreditNoteController extends Controller
         return view('pages.inventories.credit_notes.edit_credit_note', compact('credit_note', 'cart_products', 'customer'));
     }
     public function delete(CreditNote $credit_note){
-
         if($credit_note->delete()){
             $action = "Deleted credit note with reference " . $credit_note->reference;
             AuditLog::auditLog(auth()->id(), $action);
@@ -335,6 +334,9 @@ class CreditNoteController extends Controller
     {
         \Cart::remove($id);
         session()->flash('success', 'Item Cart Remove Successfully !');
+        if ($request->ajax()) {
+            return \Cart::getTotal();
+        }
 //        return \Cart::getContent();
         return back();
         //return redirect()->back()->with('order',Order::find($request->order));

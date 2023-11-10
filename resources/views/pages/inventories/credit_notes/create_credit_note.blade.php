@@ -171,7 +171,7 @@
                         customer_id: $(this).val()
                     }
                 }).done(function(data) {
-                    console.log(data)
+                    // console.log(data)
                     $(".customer-orders").html(data);
                 });
             });
@@ -191,7 +191,7 @@
 
                     },
                     error: function(error) {
-                        console.log(error);
+                        // console.log(error);
                     }
                 });
             });
@@ -219,7 +219,7 @@
                         $('#load').html(response);
                     },
                     error: function(error) {
-                        console.log(error);
+                        // console.log(error);
                     }
                 });
             });
@@ -257,7 +257,7 @@
                         },
                         //dataType: 'json',
                         success: function(data) {
-                            console.log(data)
+                            // console.log(data)
                             id = id.substr(1);
                             subtotal = $('#price' + id).val() * $('#quantity' + id).val();
                             $('.subtotal' + id).text(formatMoney(subtotal));
@@ -283,7 +283,9 @@
                 return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ?
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
-            $(document).on('click', '.delete', function() {
+
+            $(document).on('submit', '.deleteForm', function(event) {
+                event.preventDefault();
                 var id = $(this).attr('data-val');
                 const swalWithBootstrapButtons = swal.mixin({
                     confirmButtonClass: 'btn btn-success',
@@ -301,11 +303,17 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.value) {
-                        event.preventDefault();
-                        $('.item'+id).remove();
-                        $(document).on('submit','.deleteForm', function(e){
-                            e.preventDefault();
-                            console.log($(this).attr('action'))
+                        // $('.item'+id).remove();
+                        $.ajax({
+                            type: "POST",
+                            url: $(this).attr('action'),
+                            data: {
+                                id: id,
+                                _token: '{{ csrf_token() }}'
+                            }
+                        }).done(function(data) {
+                            $('.total').text(formatMoney(data));
+                            $('.item'+id).remove();
                         });
                         // return
                     } else if (

@@ -78,16 +78,16 @@
                             </form>
 
                             <td>
-                                <button class="btn btn-danger btn-sm delete" type="button"
-                                    data-val="{{ $product->id }}">
-                                    <i class="fa fa-trash" aria-hidden="true"></i>
-                                </button>
                                 <form class="deleteForm" id="delete-form-{{ $product->id }}"
                                     action="{{ route('credit.note.cart.remove', $product->id) }}" method="post"
-                                    style="display:none;">
+                                    data-val="{{ $product->id }}"
+                                    >
                                     <input type="hidden" name="order" id="order" value="{{ $order->id }}" />
                                     @csrf
-                                    @method('DELETE')
+                                    <button class="btn btn-danger btn-sm delete" type="submit"
+                                            >
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </button>
                                 </form>
                             </td>
                         </tr>

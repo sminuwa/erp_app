@@ -321,7 +321,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/load_cart', [CreditNoteController::class, 'loadToCart'])->name('load.order-cart');
             Route::post('/cart', [CreditNoteController::class, 'addToCart'])->name('credit.note.cart.store');
             Route::post('/update/cart', [CreditNoteController::class, 'updateCreditNoteCart'])->name('credit.note.cart.update');
-            Route::delete('/remove/{id}', [CreditNoteController::class, 'removeCart'])->name('credit.note.cart.remove');
+            Route::post('/remove/{id}', [CreditNoteController::class, 'removeCart'])->name('credit.note.cart.remove');
             Route::get('/print/{credit_note}', [CreditNoteController::class, 'printCreditNoteReceipt'])->name('credit.note.print');
             Route::get('/show/{credit_note}', [CreditNoteController::class, 'show'])->name('credit.note.show');
             Route::post('/post/{credit_note}', [CreditNoteController::class, 'post'])->name('credit.note.post');

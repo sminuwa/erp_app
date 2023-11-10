@@ -193,16 +193,15 @@
                                                 </form>
 
                                                 <td>
-                                                    <button class="btn btn-danger btn-sm delete" type="button"
-                                                            data-val="{{ $product->id }}">
-                                                        <i class="fa fa-trash" aria-hidden="true"></i>
-                                                    </button>
-                                                    <form id="delete-form-{{ $product->id }}"
+                                                    <form class="deleteForm" id="delete-form-{{ $product->id }}"
                                                           action="{{ route('credit.note.cart.remove', $product->id) }}" method="post"
-                                                          style="display:none;">
-                                                        <input type="hidden" name="credit_note_id" id="credit_note" value="{{ $credit_note->id }}" />
+                                                          data-val="{{ $product->id }}"
+                                                    >
                                                         @csrf
-                                                        @method('DELETE')
+                                                        <button class="btn btn-danger btn-sm delete" type="submit"
+                                                        >
+                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                        </button>
                                                     </form>
                                                 </td>
                                             </tr>
@@ -393,7 +392,8 @@
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
 
-            $(document).on('click', '.delete', function(event) {
+            $(document).on('submit', '.deleteForm', function(event) {
+                event.preventDefault();
                 var id = $(this).attr('data-val');
                 const swalWithBootstrapButtons = swal.mixin({
                     confirmButtonClass: 'btn btn-success',
@@ -411,8 +411,19 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.value) {
-                        event.preventDefault();
-                        document.getElementById('delete-form-' + id).submit();
+                        // $('.item'+id).remove();
+                        $.ajax({
+                            type: "POST",
+                            url: $(this).attr('action'),
+                            data: {
+                                id: id,
+                                _token: '{{ csrf_token() }}'
+                            }
+                        }).done(function(data) {
+                            $('.total').text(formatMoney(data));
+                            $('.item'+id).remove();
+                        });
+                        // return
                     } else if (
                         // Read more about handling dismissals
                         result.dismiss === swal.DismissReason.cancel

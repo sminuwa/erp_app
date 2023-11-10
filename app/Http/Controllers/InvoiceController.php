@@ -1104,7 +1104,7 @@ class InvoiceController extends Controller
 
                 }
             }
-                $this->loadProformaToCart($order);
+
             $cart_products = \Cart::getContent();
             //dd($cart_products);
             $categories = Category::orderBy('name', 'ASC')->get();

@@ -302,9 +302,12 @@
                 }).then((result) => {
                     if (result.value) {
                         event.preventDefault();
-                        document.getElementById('delete-form-' + id).submit();
                         $('.item'+id).remove();
-
+                        $(document).on('submit','.deleteForm', function(e){
+                            e.preventDefault();
+                            console.log($(this).attr('action'))
+                        });
+                        // return
                     } else if (
                         // Read more about handling dismissals
                         result.dismiss === swal.DismissReason.cancel

@@ -82,7 +82,7 @@
                                     data-val="{{ $product->id }}">
                                     <i class="fa fa-trash" aria-hidden="true"></i>
                                 </button>
-                                <form id="delete-form-{{ $product->id }}"
+                                <form class="deleteForm" id="delete-form-{{ $product->id }}"
                                     action="{{ route('credit.note.cart.remove', $product->id) }}" method="post"
                                     style="display:none;">
                                     <input type="hidden" name="order" id="order" value="{{ $order->id }}" />

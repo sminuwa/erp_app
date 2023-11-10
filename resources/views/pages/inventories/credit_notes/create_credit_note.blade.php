@@ -304,7 +304,7 @@
                         event.preventDefault();
                         document.getElementById('delete-form-' + id).submit();
                         $('.item'+id).remove();
-                        alert(id)
+
                     } else if (
                         // Read more about handling dismissals
                         result.dismiss === swal.DismissReason.cancel

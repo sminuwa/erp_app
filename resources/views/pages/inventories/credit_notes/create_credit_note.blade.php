@@ -117,9 +117,7 @@
                             @include('pages.inventories.credit_notes.load_products')
                         @endif--}}
                     </div>
-                    <div class="col-md-12 testinng">
 
-                    </div>
                 </div>
             </div><!-- /.container-fluid -->
         </section>
@@ -215,7 +213,6 @@
                         reference: reference
                     },
                     success: function(response) {
-
                         $('#load').html(response);
                     },
                     error: function(error) {
@@ -225,7 +222,6 @@
             });
 
             // }
-
             /*var delay = (function() {
                 var timer = 0;
                 return function(callback, ms) {
@@ -262,7 +258,6 @@
                             subtotal = $('#price' + id).val() * $('#quantity' + id).val();
                             $('.subtotal' + id).text(formatMoney(subtotal));
                             $('.total').text(formatMoney(data));
-                            $('.testinng').html(data);
                         },
                         error: function(xhr, err) {
 

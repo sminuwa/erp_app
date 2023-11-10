@@ -127,8 +127,6 @@ class PurchaseRequestController extends Controller
     }
     public function edit(Edit $request, PurchaseRequest $purchase)
     {
-
-
         if (\Cart::getContent()->isEmpty())
             $this->loadToCart($purchase);
         $cart_products = $purchase->purchasedProducts;

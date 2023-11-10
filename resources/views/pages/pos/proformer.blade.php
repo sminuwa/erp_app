@@ -40,7 +40,7 @@
                     <div class="col-md-12">
                         <div class="card">
                             <form
-                                action="{{ isset($order) ? route('order.invoice.update',$order->id) : route('proformer.create') }}"
+                                action="{{ isset($order) ? route('proformer.update',$order->id) : route('proformer.create') }}"
                                 method="post">
                                 @csrf
                                 @isset($order)

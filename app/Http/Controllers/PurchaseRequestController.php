@@ -159,6 +159,7 @@ class PurchaseRequestController extends Controller
                 'updated_at' => Carbon::now(),
             ]);
             DB::table('purchase_product_requests')->where('purchase_id', $purchase->id)->delete();
+            return \Cart::getContent();
             foreach (\Cart::getContent() as $product) {
                 $cart_attributes = $product->attributes;
                 //dd( $cart_attributes);

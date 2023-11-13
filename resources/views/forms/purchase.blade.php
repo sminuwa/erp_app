@@ -5,7 +5,7 @@
                 Products
             </div>
             <div class="card-body">
-                <form action="{{ route('purchases.cart.store') }}" method="POST">
+                <form action="{{ route('ajax.cart.add') }}" method="POST" class="addCartItemForm">
                     <input type="hidden" name="purchase_id" value="{{ $model->id }}" />
                     <input type="hidden" name="type" value="{{ $type }}" />
                     @csrf
@@ -20,7 +20,6 @@
                             </div>
                         @endif
                     </div> --}}
-
                     <div class="form-group">
                         <label for="product_id">Product Name</label>
                         <select
@@ -81,104 +80,7 @@
                 <i class="ion-android-cart"></i> Supplier Cart: <small>Purchased Products</small>
             </div>
             <div class="card-body table-responsive">
-                @if (Cart::getTotal() < 1)
-                    <div class="alert alert-danger">
-                        No Product Added
-                    </div>
-                @else
-                    <table class="table table-bordered table-striped text-center mb-3">
-                        <thead>
-                            <tr>
-                                <th>S.N</th>
-                                <th>Code</th>
-                                <th>Description</th>
-                                <th>UTM</th>
-                                <th>Qty</th>
-                                <th>Price</th>
-                                <th>Sub Total</th>
-                                <th><span class="ion-ios-trash"></span></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {{-- @foreach ($cart_products as $product)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td class="text-left">{{ $product->name }}</td>
-                                    <td>{{ $product->price }}</td>
-                                    <td>{{ number_format($product->quantity, 0, '', ',') }}</td>
-                                    <td style="text-align: right">
-                                        {{ number_format($product->price * $product->quantity, 2) }}
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-danger btn-sm" type="button"
-                                            onclick="deleteItem({{ $product->id }})">
-                                            <i class="fa fa-trash" aria-hidden="true"></i>
-                                        </button>
-                                        <form id="delete-form-{{ $product->id }}"
-                                            action="{{ route('purchases.cart.remove', $product->id) }}" method="post"
-                                            style="display:none;">
-                                            @csrf
-                                            @method('DELETE')
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach --}}
-                            @foreach ($cart_products as $product)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td class="text-left">{{ $product->attributes['code'] }}</td>
-                                    <td class="text-left">{{ $product->name }}</td>
-                                    <td class="text-left">{{ App\Models\Product::find($product->id)->unit }}</td>
-                                    <form action="{{ route('purchase.cart.update') }}" method="post"
-                                        id="p{{ $product->id }}">
-                                        @csrf
-                                        @method('PUT')
-                                        <td>
-                                            <input type="text" name="quantity" id="quantity{{ $product->id }}"
-                                                class="form-control quantity" data-value="p{{ $product->id }}"
-                                                style="min-width:58px;" value="{{ $product->quantity }}" min="1"
-                                                required>
-                                        </td>
-                                        <td>
-                                            <input type="text" name="cost_price" id="price{{ $product->id }}"
-                                                class="form-control price" style="min-width:65px;"
-                                                onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
-                                                value="{{ $product->price }}" data-val="{{ $product->price }}"
-                                                data-value="p{{ $product->id }}">
-                                        </td>
-
-                                        <td><span
-                                                class="subtotal{{ $product->id }}">{{ number_format($product->price * $product->quantity, 2) }}</span>
-                                        </td>
-                                        <input type="hidden" name="id" class="form-control"
-                                            value="{{ $product->id }}">
-
-
-                                    </form>
-
-                                    <td>
-                                        {{-- <button type="submit" class="btn btn-sm btn-success">
-                                                            <i class="fa fa-check-circle" aria-hidden="true"></i>
-                                                        </button> --}}
-                                        <button class="btn btn-danger btn-sm" type="button"
-                                            onclick="deleteItem({{ $product->id }})">
-                                            <i class="fa fa-trash" aria-hidden="true"></i>
-                                        </button>
-                                        <form id="delete-form-{{ $product->id }}"
-                                            action="{{ route('cart.remove', $product->id) }}" method="post"
-                                            style="display:none;">
-                                            @csrf
-                                            @method('DELETE')
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                @endif
-                <div class="alert alert-success" id="total">
-                    Total : <span id="total">{{ number_format(Cart::getTotal()) }}</span>
-                </div>
+                <div class="cart-container"></div>
             </div>
         </div>
     </div>

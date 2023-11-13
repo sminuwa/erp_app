@@ -35,8 +35,8 @@ class PurchaseRequestController extends Controller
     {
         \Cart::clear();
         return view('pages.inventories.purchases.request.index', [
-            'records' => PurchaseRequest::select('purchase_requests.*')->orderBy('reference', 'DESC')
-                ->join('suppliers', 'suppliers.id', 'purchase_requests.supplier_id')
+            'records' => PurchaseRequest::select('purchase_requests.*')->orderBy('purchase_requests.id', 'DESC')
+                ->with('supplier')
                 // ->where('branch_id', 'LIKE', User::userBranchAction())
                 ->take(10)->get()
         ]);
@@ -48,7 +48,7 @@ class PurchaseRequestController extends Controller
         $records = PurchaseRequest::select('purchase_requests.*')->where('invoice', 'LIKE', "%$search_value%")
             ->join('suppliers', 'suppliers.id', 'purchase_requests.supplier_id')
             ->where('purchase_requests.branch_id', 'LIKE', User::userBranchAction())
-            ->orderBy('purchase_date', 'DESC')->take(10)->get();
+            ->orderBy('id', 'DESC')->take(10)->get();
         return view('pages.inventories.purchases.request.index', [
             'records' => $records
         ]);

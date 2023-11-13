@@ -272,9 +272,8 @@ class PurchaseRequestController extends Controller
     public function loadToCart(PurchaseRequest $purchase)
     {
         //\Cart::clear();
-
         foreach ($purchase->purchasedProducts()->get() as $data) {
-            $qty = $data->qty_supplied == 0 ? 1 : $data->qty_supplied;
+            $qty = $data->quantity == 0 ? 1 : $data->quantity;
             $product = Product::find($data->product_id);
             \Cart::add([
                 'id' => $data->product_id,

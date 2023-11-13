@@ -234,7 +234,7 @@
             })
         })
 
-        //update card
+        //delete card
         $(document).on('submit','.deleteCartItem', function(e){
             e.preventDefault()
             $.ajax({
@@ -247,7 +247,17 @@
         })
 
 
-        //delete from card
+        //change store from card
+        $(document).on('submit','.changeCartItem', function(e){
+            e.preventDefault()
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'GET',
+            }).done(function(component){
+                // console.log(component)
+                $('.cart-container').html(component)
+            })
+        })
     </script>
 
     @stack('js')

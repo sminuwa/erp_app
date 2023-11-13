@@ -1041,6 +1041,7 @@ Route::middleware('auth')->group(function () {
         Route::get('cart/add', [CartController::class, 'addCartItem'])->name('ajax.cart.add');
         Route::get('cart/update/{id}', [CartController::class, 'updateCartItem'])->name('ajax.cart.update');
         Route::get('cart/delete/{id}', [CartController::class, 'deleteCartItem'])->name('ajax.cart.delete');
+        Route::get('cart/change-store/{id}', [CartController::class, 'changeStoreCartItem'])->name('ajax.cart.change-store');
     });
 
 

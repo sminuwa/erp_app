@@ -121,47 +121,24 @@ class CartController extends Controller
 
     public function addCartItem(Request $request)
     {
-//        return \Cart::getContent();
-//        return $request;
-        $validated = $request->validate([
-            'id' => 'required',
-            'name' => 'required',
-            'code' => 'required',
-            'sold_price' => 'required',
-            'qty' => 'required',
-            'cost_price' => 'required'
-        ]);
-        $customer = Customer::find($request->customer);
-//        $order = Customer::where('type', $customer->type)->get();
-//        return $order;
-        $qty = $request->qty;
-        $selling_price = $request->selling_price;
-        $cost_price = $request->cost_price;
+        $qty = $request->qty_supplied;
         $qty_available = $request->qty_available;
-        $store = $request->store;
-        $add = \Cart::add([
-            'id' => $request->id,
+        \Cart::add([
+            'id' => $request->product_id,
             'name' => $request->name,
-            'price' => $request->sold_price == 0 ? 1 :$request->sold_price ,
+            'price' => $request->unit_price == 0 ? 1 :$request->unit_price ,
             'quantity' => $qty == 0 ? 1 : $qty,
             'attributes' => array(
-                'cost_price' => $cost_price,
-                'code'=>$request->code,
-                'selling_price' => $selling_price,
-                'qty_available' => $qty_available,
+                'cost_price' => $request->unit_price ?? '',
+                'code'=> $request->code,
+                'selling_price' => $selling_price ?? '',
+                'qty_available' => $qty_available ?? '',
                 'discount' => 0,
-                'store'=> $store,
+                'store'=> $request->store ?? '',
                 'unit' =>$request->unit ?? ''
             ),
         ]);
-//        return \Cart::getContent();
-        if ($add) {
-            session()->flash('success', 'Product is Added to Cart Successfully !');
-            return back()->with(['customer'=> $customer]);
-        } else {
-            session()->flash('success','Product not added to cart');
-            return back()->with('customer', $customer);
-        }
+        return view('components.cart');
     }
 
     public function updateCartItem(Request $request, $id)

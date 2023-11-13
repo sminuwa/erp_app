@@ -179,7 +179,20 @@
             $('.cart-container').html(component)
         })
 
-        //add to card
+        //add cart item
+        $(document).on('submit','.addCartItemForm', function(e){
+            e.preventDefault()
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'GET',
+                data: $(this).serialize(),
+            }).done(function(component){
+                console.log(component)
+                $('.cart-container').html(component)
+            })
+        })
+
+        //update to card
         $(document).on('keyup','.quantity', function(){
             let id = $(this).attr('data-value');
             $("#valid_qty" + id.substr(1)).html("");

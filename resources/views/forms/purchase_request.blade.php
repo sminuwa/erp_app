@@ -5,7 +5,7 @@
                 Products
             </div>
             <div class="card-body">
-                <form action="{{ route('purchases.request.cart.store') }}" method="POST">
+                <form action="{{ route('ajax.cart.add') }}" method="POST" class="addCartItemForm">
                     <input type="hidden" name="purchase_id" value="{{ $model->id }}" />
                     <input type="hidden" name="type" value="{{ $type }}" />
                     @csrf

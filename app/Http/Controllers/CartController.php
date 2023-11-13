@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Darryldecode\Cart\Cart;
 use Brian2694\Toastr\Facades\Toastr;
@@ -121,21 +122,22 @@ class CartController extends Controller
 
     public function addCartItem(Request $request)
     {
+        $product = Product::find($request->product_id);
         $qty = $request->qty_supplied;
         $qty_available = $request->qty_available;
-        \Cart::add([
+        $add = \Cart::add([
             'id' => $request->product_id,
-            'name' => $request->name,
-            'price' => $request->unit_price == 0 ? 1 :$request->unit_price ,
+            'name' => $product->name,
+            'price' => $request->unit_price == 0 ? 1 : $request->unit_price ,
             'quantity' => $qty == 0 ? 1 : $qty,
             'attributes' => array(
                 'cost_price' => $request->unit_price ?? '',
-                'code'=> $request->code,
+                'code'=> $product->code,
                 'selling_price' => $selling_price ?? '',
                 'qty_available' => $qty_available ?? '',
                 'discount' => 0,
                 'store'=> $request->store ?? '',
-                'unit' =>$request->unit ?? ''
+                'unit' =>$product->unit ?? ''
             ),
         ]);
         return view('components.cart');
@@ -160,9 +162,9 @@ class CartController extends Controller
                 'price' => $request->price,
                 'attributes' => array(
                     'cost_price' => $request->price,
-                    'selling_price' => $request->selling_price,
+                    'selling_price' => $request->selling_price ?? '',
                     'code'=>$request->code,
-                    'discount' => $request->selling_price - $request->sold_price,
+                    'discount' => $request->selling_price - $request->sold_price ?? '',
                     'qty_available' => $request->qty_available,
                     'store'=>$request->store,
                     'unit'=>$request->unit,

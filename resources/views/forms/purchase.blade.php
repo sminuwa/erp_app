@@ -93,6 +93,7 @@
             </div>
             <div class="card-body">
                 <h5 class="card-title"></h5>
+
                 <form action="{{ isset($route) ? $route : route('purchases.store') }}" method="POST">
                     {{ csrf_field() }}
                     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
@@ -102,6 +103,9 @@
                         <select
                             class="form-control select2-single {{ $errors->has('supplier_id') ? ' is-invalid' : '' }}"
                             name="supplier_id" id="supplier_id" required="required" autocomplete="off">
+                            @if(isset($model->id))
+                                <option value="{{ $model->supplier->id }}">{{ $model->supplier->code }} - {{ $model->supplier->name }}</option>
+                            @endif
                             <option value="">Select...</option>
                             @if (isset($suppliers))
                                 @foreach ($suppliers as $data)

@@ -166,6 +166,67 @@
         });
     </script>
 
+
+    <script>
+        //cart activities
+
+        //load cart
+        $.ajax({
+            url: "{{ route('ajax.cart.load') }}",
+            type: 'GET',
+        }).done(function(component){
+            // console.log(component)
+            $('.cart-container').html(component)
+        })
+
+        //add to card
+        $(document).on('keyup','.quantity', function(){
+            let id = $(this).attr('data-value');
+            $("#valid_qty" + id.substr(1)).html("");
+            if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
+                'max-qty'))) {
+                $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $('#quantity' +
+                    id.substr(1)).attr('max-qty') + ")");
+                $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
+                return false;
+            }
+            $.ajax({
+                url: $('#' + id).attr('action'),
+                type: 'GET',
+                data: {
+                    store_product_id: id.substr(1),
+                    quantity: $('#quantity' + (id.substr(1))).val(),
+                    price: $("#price"+id.substr(1)).val(),
+                    unit: $("#unit"+id.substr(1)).val(),
+                    code: $("#code"+id.substr(1)).val(),
+                    _token: "{{ csrf_token() }}"
+                },
+            }).done(function(component){
+                console.log(component)
+                id = id.substr(1);
+                subtotal = $('#price' + id).val() * $('#quantity' + id).val();
+                $('.subtotal' + id).text(formatMoney(subtotal));
+                $('.totalCart').text(formatMoney(component));
+                // $('.cart-container').html(component)
+            })
+        })
+
+        //update card
+        $(document).on('submit','.deleteCartItem', function(e){
+            e.preventDefault()
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'GET',
+            }).done(function(component){
+                // console.log(component)
+                $('.cart-container').html(component)
+            })
+        })
+
+
+        //delete from card
+    </script>
+
     @stack('js')
 
 </body>

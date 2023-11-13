@@ -127,6 +127,7 @@ class PurchaseRequestController extends Controller
     }
     public function edit(Edit $request, PurchaseRequest $purchase)
     {
+//        return $purchase->purchasedProducts()->get()[0];
         if (\Cart::getContent()->isEmpty())
             $this->loadToCart($purchase);
         $cart_products = $purchase->purchasedProducts;
@@ -159,7 +160,7 @@ class PurchaseRequestController extends Controller
                 'updated_at' => Carbon::now(),
             ]);
             DB::table('purchase_product_requests')->where('purchase_id', $purchase->id)->delete();
-            return \Cart::getContent();
+
             foreach (\Cart::getContent() as $product) {
                 $cart_attributes = $product->attributes;
                 //dd( $cart_attributes);
@@ -271,6 +272,7 @@ class PurchaseRequestController extends Controller
     public function loadToCart(PurchaseRequest $purchase)
     {
         //\Cart::clear();
+
         foreach ($purchase->purchasedProducts()->get() as $data) {
             $qty = $data->qty_supplied == 0 ? 1 : $data->qty_supplied;
             $product = Product::find($data->product_id);
@@ -279,8 +281,18 @@ class PurchaseRequestController extends Controller
                 'name' => $product->name,
                 'price' => $data->unit_price,
                 'quantity' => $qty,
-                'attributes' => array('code' => $product->code),
+                'attributes' => array(
+                    'cost_price' => $data->unit_price,
+                    'code' => $data->product->code,
+                    'selling_price' => '',
+                    'qty_available' => '',
+                    'discount' => 0,
+                    'store' => '',
+                    'unit'=>$data->product->unit
+                ),
+
             ]);
+
         }
     }
     public function updateCart(Request $request)

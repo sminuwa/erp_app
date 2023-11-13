@@ -1036,6 +1036,12 @@ Route::middleware('auth')->group(function () {
 
     Route::get('generate/product_code', [MisController::class, 'generateProductCode'])->name('generate.productCode');
     Route::get('generate/customer_code', [MisController::class, 'nextCustomerCode'])->name('generate.customerCode');
+    Route::prefix('ajax')->group(function(){
+        Route::get('cart/load', [CartController::class, 'loadCartItem'])->name('ajax.cart.load');
+        Route::get('cart/add', [CartController::class, 'addCartItem'])->name('ajax.cart.add');
+        Route::get('cart/update/{id}', [CartController::class, 'updateCartItem'])->name('ajax.cart.update');
+        Route::get('cart/delete/{id}', [CartController::class, 'deleteCartItem'])->name('ajax.cart.delete');
+    });
 
 
 });

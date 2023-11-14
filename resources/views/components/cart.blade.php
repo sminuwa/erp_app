@@ -26,19 +26,19 @@
                 <td>{{ $loop->iteration }}</td>
                 @if($type == 'grn')
                 <td class="text-left">
-
                     <select
                         type="text"
-                        name="store_code"
-                        id="store_code{{ $product->id }}"
-                        class="form-control store_code"
+                        name="store_id"
+                        id="store_id{{ $product->id }}"
+                        class="form-control store_id"
                         data-value="p{{ $product->id }}"
                         style="min-width:58px;"
+                        onchange="$('#store_id{{ $product->id }}').val($(this).val())"
                         required>
                         <option value="">select..</option>
                         <?php $stores = \App\Models\Store::where('branch_id', auth()->user()->branch->id)->get(); ?>
                         @foreach($stores as $store)
-                            <option value="{{ $store->id }}" {{ $product->attributes['store_code'] == $store->code ? 'selected' :'' }}>{{ $store->code }}</option>
+                            <option value="{{ $store->id }}" {{ $product->attributes['store_id'] == $store->id ? 'selected' :'' }}>{{ $store->code }}</option>
                         @endforeach
                     </select>
                 </td>
@@ -79,6 +79,7 @@
                            value="{{ $product->attributes['cost_price'] ?? '' }}">
                     <input type="hidden" name="unit" id="unit{{ $product->id }}" class="form-control" value="{{ $product->attributes['unit'] ?? '' }}">
                     <input type="hidden" name="code" id="code{{ $product->id }}" class="form-control" value="{{ $product->attributes['code'] ?? '' }}">
+                    <input type="hidden" name="store_id" id="store_id{{ $product->id }}" class="form-control" value="{{ $product->attributes['code'] ?? '' }}">
                 </form>
 
                 <td>

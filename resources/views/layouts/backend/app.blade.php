@@ -166,8 +166,9 @@
         });
     </script>
 
-
     <script>
+
+
         function formatMoney(n, c, d, t) {
             var c = isNaN(c = Math.abs(c)) ? 2 : c,
                 d = d == undefined ? "." : d,
@@ -201,7 +202,7 @@
                 type: 'GET',
                 data: $(this).serialize()+'&type='+type,
             }).done(function(component){
-                console.log(component)
+                $(this).trigger("reset");
                 $('.cart-container').html(component)
             })
         })

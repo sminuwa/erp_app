@@ -287,7 +287,9 @@ class PurchaseRequestController extends Controller
                     'qty_available' => '',
                     'discount' => 0,
                     'store' => '',
-                    'unit'=>$data->product->unit
+                    'unit'=>$data->product->unit,
+                    'store_id'=>'',
+                    'store_code'=>'',
                 ),
 
             ]);

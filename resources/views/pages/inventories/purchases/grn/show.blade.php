@@ -27,7 +27,7 @@
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
                             <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
-                            <li class="breadcrumb-item active">Purchase/li>
+                            <li class="breadcrumb-item active">Purchase</li>
                         </ol>
                     </div>
                 </div>
@@ -44,10 +44,78 @@
                     <div class="alert alert-danger">{{ session('error') }}</div>
                 @endif
                 <div class="row">
-                    <div class="col-sm-6">
-                        @include('cards.purchase')
+                    <div class="col-sm-12">
+                        <div class="card card-default">
+                            <div class="card-header">
+                                <div class="row">
+                                    <div class="col-sm-8">
+                                        <h5>Details Purchase of <small>products by {{ $record->supplier->name }}</small>
+                                        </h5>
+                                    </div>
+                                    <div class="col-sm-2 text-right">
+                                        <div class="btn-group">
+                                            {{-- @if ($record->status == 0) --}}
+                                            <form onsubmit="return confirm('Are you sure you want to approve?')"
+                                                  action="{{ route('purchase.approve', $record->id) }}" method="post" style="display: inline">
+                                                {{ csrf_field() }}
+                                                {{ method_field('POST') }}
+                                                <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
+                                                    <i class="text-white fa fa-check"> Post</i>
+                                                </button>
+                                            </form>
+                                            {{-- @endif --}}
+                                            <a class="btn btn-secondary btn-sm" href="{{ route('purchases.index', $record->id) }}">
+                                                <span class="fa fa-list"></span>
+                                            </a>
+                                            <a class="btn btn-secondary btn-sm" href="{{ route('purchases.edit', $record->id) }}">
+                                                <span class="fa fa-pencil"></span>
+                                            </a>
+                                            <form onsubmit="return confirm('Are you sure you want to delete?')"
+                                                  action="{{ route('purchases.destroy', $record->id) }}" method="post" style="display: inline">
+                                                {{ csrf_field() }}
+                                                {{ method_field('DELETE') }}
+                                                <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
+                                                    <i class="text-danger fa fa-remove"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-block">
+                                <table class="table table-bordered table-striped">
+                                    <tbody>
+                                    <tr>
+                                        <th>Supplier</th>
+                                        <td>{{ optional($record->supplier)->name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>ATC/WayBill No</th>
+                                        <td>{{ $record->atc_no }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Purchase Date</th>
+                                        <td>{{ optional($record->purchase_date)->toDayDateTimeString() }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Truck No</th>
+                                        <td>{{ $record->truck_no }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Status</th>
+                                        <td>{{ $record->status === 1 ? 'Completed' : 'Pending' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Updated By</th>
+                                        <td>{{ $record->user->name ?? null }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        {{--@include('cards.purchase')--}}
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-12">
                         <div class="card">
                             <div class="card-header">
                                 Purchased Products
@@ -63,7 +131,6 @@
                                             <th>QTY</th>
                                             <th>Price (&#8358;)</th>
                                             <th>Subtotal (&#8358;)</th>
-                                            <th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -74,14 +141,13 @@
                                                 <td>{{ $product->product->code }}</td>
                                                 <td>{{ $product->product->name }}</td>
                                                 <td>{{ $product->product->unit }}</td>
-                                                <td>{{ number_format($product->qty_supplied, 0, '', ',') }}</td>
+                                                <td>{{ number_format($product->quantity, 0, '', ',') }}</td>
                                                 <td style="text-align: right">{{ number_format($product->unit_price, 2) }}
                                                 </td>
                                                 <td style="text-align: right">
-                                                    {{ number_format($product->qty_supplied * $product->unit_price, 2) }}
+                                                    {{ number_format($product->quantity * $product->unit_price, 2) }}
                                                 </td>
-                                                <td>{{ $product->status == 1 ? 'Completed' : 'Cancelled' }}</td>
-                                                @php $total += $product->unit_price * $product->qty_supplied; @endphp
+                                                @php $total += $product->unit_price * $product->quantity; @endphp
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -93,7 +159,7 @@
                                         <th></th>
                                         <th style="text-align: right">Total</th>
                                         <th style="text-align: right">&#8358;{{ number_format($total, 2) }}</th>
-                                        <th></th>
+
                                     </tfoot>
                                 </table>
                             </div>
@@ -101,7 +167,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6" id="expenses">
+                    <div class="col-md-12" id="expenses">
                         @if ($record->expenses()->count() > 0)
 
                             <table class="table table-bordered" id="record1">
@@ -153,12 +219,7 @@
 
                         @endif
                     </div>
-                    <div class="col-md-6">
-                        {{-- @if ($record->status == 0) --}}
-                            <button class="btn btn-primary btn-sm text-right right" data-toggle="modal" id="add-product-btn"
-                                data-target="#add-product-modal"><span class="fa fa-plus-circle"></span> Add Other Invoice </button>
-                        {{-- @endif --}}
-                    </div>
+
                 </div>
             </div><!-- /.container-fluid -->
         </section>

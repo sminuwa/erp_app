@@ -117,7 +117,7 @@ class PurchaseGRNController extends Controller
                     $product->purchase_id = $purchase->id;
                     $product->product_id = $cart->id;
                     $product->store_id = $cart_attributes['store_id'];
-                    $product->qty_supplied = $cart->quantity;
+                    $product->quantity = $cart->quantity;
                     $product->unit_price = $cart->price;
                     $product->selling_price = 0;
                     $product->status = 1;
@@ -138,16 +138,10 @@ class PurchaseGRNController extends Controller
             throw $e;
         }
         return redirect()->back();
-    } /**
-      * Show the form for editing the specified resource.
-      *
-      * @param  Edit  $request
-      * @param  Purchase  $purchase
-      * @return \Illuminate\Http\Response
-      */
+    }
+
     public function edit(Edit $request, Purchase $purchase)
     {
-
         if (\Cart::getContent()->isEmpty())
             $this->loadToCart($purchase);
         $cart_products = \Cart::getContent();
@@ -161,13 +155,7 @@ class PurchaseGRNController extends Controller
             'type' => 'edit',
 
         ]);
-    } /**
-      * Update a existing resource in storage.
-      *
-      * @param  Update  $request
-      * @param  Purchase  $purchase
-      * @return \Illuminate\Http\Response
-      */
+    }
     public function update(Update $request, Purchase $purchase)
     {
         //return "Cool";
@@ -290,14 +278,8 @@ class PurchaseGRNController extends Controller
         }
         \Cart::clear();
         return redirect()->back();
-    } /**
-      * Delete a  resource from  storage.
-      *
-      * @param  Destroy  $request
-      * @param  Purchase  $purchase
-      * @return \Illuminate\Http\Response
-      * @throws \Exception
-      */
+    }
+
     public function destroy(Destroy $request, Purchase $purchase)
     {
 
@@ -321,6 +303,7 @@ class PurchaseGRNController extends Controller
         }
         return redirect()->back();
     }
+
     public function addToCart(Request $request)
     {
         //return $request;
@@ -372,6 +355,7 @@ class PurchaseGRNController extends Controller
         foreach ($purchase->purchasedProducts()->get() as $data) {
             $qty = $data->quantity == 0 ? 1 : $data->quantity;
             $product = Product::find($data->product_id);
+            $store = Store::find($data->store_id);
             \Cart::add([
                 'id' => $data->product_id,
                 'name' => $product->name,
@@ -381,12 +365,12 @@ class PurchaseGRNController extends Controller
                     'cost_price' => $data->unit_price,
                     'code' => $data->product->code,
                     'selling_price' => '',
-                    'qty_available' => '',
+                    'qty_available' => $qty,
                     'discount' => 0,
                     'store' => '',
                     'unit'=>$data->product->unit,
-                    'store_id'=>'',
-                    'store_code'=>'',
+                    'store_id'=> $data->store_id,
+                    'store_code'=> $store->code,
                 ),
 
             ]);

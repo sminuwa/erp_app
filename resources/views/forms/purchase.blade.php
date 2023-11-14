@@ -64,7 +64,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="invoice">ATC/WayBill No</label>
-                                <input type="text" class="form-control {{ $errors->has('atc_no') ? ' is-invalid' : '' }}" name="atc_no" id="atc_no" value="{{ old('invoice', $model->invoice) }}" placeholder="" maxlength="191" required="required">
+                                <input type="text" class="form-control {{ $errors->has('atc_no') ? ' is-invalid' : '' }}" name="atc_no" id="atc_no" value="{{ old('invoice', $model->atc_no) }}" placeholder="" maxlength="191" required="required">
                                 @if ($errors->has('atc_no'))
                                     <div class="invalid-feedback">
                                         <strong>{{ $errors->first('atc_no') }}</strong>
@@ -78,7 +78,7 @@
                                 <input type="text"
                                        class="form-control {{ $errors->has('truck_no') ? ' is-invalid' : '' }}"
                                        name="truck_no" id="truck_no"
-                                       value="{{ old('truck_no', $model->vehicle_reg_no) }}" placeholder=""
+                                       value="{{ old('truck_no', $model->truck_no) }}" placeholder=""
                                        maxlength="191">
                                 @if ($errors->has('truck_no'))
                                     <div class="invalid-feedback">

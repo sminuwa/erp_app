@@ -208,7 +208,7 @@
         })
 
         //update to card
-        $(document).on('keyup','.quantity', function(){
+        $(document).on('keyup','.quantity, .price', function(){
             let id = $(this).attr('data-value');
             $("#valid_qty" + id.substr(1)).html("");
             if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(

@@ -46,18 +46,20 @@
                 <td class="text-left">{{ $product->attributes['code'] ?? '' }}</td>
                 <td class="text-left">{{ $product->name }}</td>
                 <td class="text-left">{{ $product->attributes['unit'] ?? '' }}</td>
-                <td class="text-left">{{ $product->price ?? 0.0 }}</td>
+
 
                 <form action="{{ route('ajax.cart.update', $product->id) }}" method="post" id="p{{ $product->id }}">
                     @csrf
-                    <td>
-                        <input type="hidden" name="price"
-                               id="price{{ $product->id }}" class="form-control"
+                    <td class="text-left">
+                        <input type="text" name="price"
+                               id="price{{ $product->id }}" class="form-control price"
                                style="min-width:65px;"
                                onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
                                value="{{ $product->price }}"
                                data-val="{{ $product->price }}"
                                data-value="p{{ $product->id }}">
+                    </td>
+                    <td>
                         <span style="color: red;" id="valid_price{{ $product->id }}"></span>
                         <input
                             type="text"
@@ -68,15 +70,13 @@
                             style="min-width:58px;"
                             value="{{ $product->quantity }}"
                             min="1"
-{{--                            max-qty="{{ $product->quantity ? $product->quantity : 10000 }}"--}}
                             required>
                     </td>
                     <td>
                         <span class="subtotal{{ $product->id }}">{{ number_format($product->price * $product->quantity, 2) }}</span>
                     </td>
                     <input type="hidden" name="id" class="form-control" value="{{ $product->id }}">
-                    <input type="hidden" name="cost_price" class="form-control"
-                           value="{{ $product->attributes['cost_price'] ?? '' }}">
+                    <input type="hidden" name="cost_price" class="form-control" value="{{ $product->attributes['cost_price'] ?? '' }}">
                     <input type="hidden" name="unit" id="unit{{ $product->id }}" class="form-control" value="{{ $product->attributes['unit'] ?? '' }}">
                     <input type="hidden" name="code" id="code{{ $product->id }}" class="form-control" value="{{ $product->attributes['code'] ?? '' }}">
                     <input type="hidden" name="store_id" id="store_id{{ $product->id }}" class="form-control" value="{{ $product->attributes['store_id'] ?? '' }}">

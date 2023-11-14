@@ -157,7 +157,7 @@ class CartController extends Controller
             $percent = $request->percent;
             $sold_price = ceil($request->cost_price + ($request->cost_price / 100) * $percent);
         }
-
+        $store = Store::find($request->store_id);
         \Cart::update(
             $request->store_product_id,
             [
@@ -175,7 +175,7 @@ class CartController extends Controller
                     'store'=>$request->store,
                     'unit'=>$request->unit,
                     'store_id' =>$request->store_id ?? '',
-                    'store_code' =>$product->unit ?? '',
+                    'store_code' =>$store->code ?? '',
                 )
             ]
         );

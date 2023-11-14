@@ -8,9 +8,10 @@
             <div class="card-body">
                 <h5 class="card-title"></h5>
 
-                <form action="{{ isset($route) ? $route : route('purchases.store') }}" method="POST">
+                <form action="{{ route('purchases.store') }}" method="POST">
                     {{ csrf_field() }}
                     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
+                    <input type="hidden" name="purchase_id" value="{{ isset($model->id) ? $model->id : '' }}" />
 
                     <div class="row">
                         <div class="col-md-12">
@@ -63,15 +64,10 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="invoice">ATC/WayBill No</label>
-                                <input type="hidden"
-                                       class="form-control {{ $errors->has('old_invoice') ? ' is-invalid' : '' }}"
-                                       name="old_invoice" id="old_invoice" value="{{ old('old_invoice', $model->invoice) }}">
-                                <input type="text" class="form-control {{ $errors->has('invoice') ? ' is-invalid' : '' }}"
-                                       name="invoice" id="invoice" value="{{ old('invoice', $model->invoice) }}"
-                                       placeholder="" maxlength="191" required="required">
-                                @if ($errors->has('invoice'))
+                                <input type="text" class="form-control {{ $errors->has('atc_no') ? ' is-invalid' : '' }}" name="atc_no" id="atc_no" value="{{ old('invoice', $model->invoice) }}" placeholder="" maxlength="191" required="required">
+                                @if ($errors->has('atc_no'))
                                     <div class="invalid-feedback">
-                                        <strong>{{ $errors->first('invoice') }}</strong>
+                                        <strong>{{ $errors->first('atc_no') }}</strong>
                                     </div>
                                 @endif
                             </div>
@@ -80,20 +76,19 @@
                             <div class="form-group">
                                 <label for="vehicle_reg_no">Truck No</label>
                                 <input type="text"
-                                       class="form-control {{ $errors->has('vehicle_reg_no') ? ' is-invalid' : '' }}"
-                                       name="vehicle_reg_no" id="vehicle_reg_no"
-                                       value="{{ old('vehicle_reg_no', $model->vehicle_reg_no) }}" placeholder=""
+                                       class="form-control {{ $errors->has('truck_no') ? ' is-invalid' : '' }}"
+                                       name="truck_no" id="truck_no"
+                                       value="{{ old('truck_no', $model->vehicle_reg_no) }}" placeholder=""
                                        maxlength="191">
-                                @if ($errors->has('vehicle_reg_no'))
+                                @if ($errors->has('truck_no'))
                                     <div class="invalid-feedback">
-                                        <strong>{{ $errors->first('vehicle_reg_no') }}</strong>
+                                        <strong>{{ $errors->first('truck_no') }}</strong>
                                     </div>
                                 @endif
                             </div>
                         </div>
                         <div class="col-md-4"></div>
                     </div>
-                    <input type="hidden" name="updated_by" value="{{ Auth::id() }}" />
                     <div class="form-group text-right ">
                         <input type="submit" class="btn btn-primary" value="Save" />
                     </div>

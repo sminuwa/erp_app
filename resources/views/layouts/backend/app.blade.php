@@ -218,27 +218,33 @@
                 $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
                 return false;
             }
+            updateCart(id)
+
+        })
+
+        function updateCart(formId){
             $.ajax({
-                url: $('#' + id).attr('action'),
+                url: $('#' + formId).attr('action'),
                 type: 'GET',
                 data: {
-                    store_product_id: id.substr(1),
-                    quantity: $('#quantity' + (id.substr(1))).val(),
-                    price: $("#price"+id.substr(1)).val(),
-                    unit: $("#unit"+id.substr(1)).val(),
-                    code: $("#code"+id.substr(1)).val(),
+                    store_product_id: formId.substr(1),
+                    quantity: $('#quantity' + (formId.substr(1))).val(),
+                    price: $("#price"+formId.substr(1)).val(),
+                    unit: $("#unit"+formId.substr(1)).val(),
+                    code: $("#code"+formId.substr(1)).val(),
+                    store_id: $("#store_id"+formId.substr(1)).val(),
                     type: type,
                     _token: "{{ csrf_token() }}"
                 },
             }).done(function(component){
                 console.log(component)
-                id = id.substr(1);
-                subtotal = $('#price' + id).val() * $('#quantity' + id).val();
-                $('.subtotal' + id).text(formatMoney(subtotal));
+                formId = formId.substr(1);
+                subtotal = $('#price' + formId).val() * $('#quantity' + formId).val();
+                $('.subtotal' + formId).text(formatMoney(subtotal));
                 $('.totalCart').text(formatMoney(component));
                 // $('.cart-container').html(component)
             })
-        })
+        }
 
         //delete card
         $(document).on('submit','.deleteCartItem', function(e){
@@ -257,18 +263,10 @@
 
 
         //change store from card
-        $(document).on('submit','.changeStoreCartForm', function(e){
-            e.preventDefault()
-            $.ajax({
-                url: $(this).attr('action'),
-                type: 'GET',
-                data: {
-                    type : type
-                }
-            }).done(function(component){
-                // console.log(component)
-                $('.cart-container').html(component)
-            })
+        $(document).on('change','.store_code', function(){
+            let id = $(this).attr('data-value');
+            updateCart(id)
+
         })
     </script>
 

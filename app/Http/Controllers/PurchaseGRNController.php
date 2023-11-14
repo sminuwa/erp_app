@@ -38,12 +38,7 @@ use App\Models\User;
 
 class PurchaseGRNController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @param  Index  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function index(Index $request)
     {
         \Cart::clear();
@@ -55,6 +50,7 @@ class PurchaseGRNController extends Controller
             'suppliers' => Supplier::where('code', 'like', 'TS%')->orderBy('name')->get(),
         ]);
     }
+
     public function search(Request $request)
     {
         \Cart::clear();
@@ -67,13 +63,7 @@ class PurchaseGRNController extends Controller
             'records' => $records
         ]);
     }
-    /**
-     * Display the specified resource.
-     *
-     * @param  Show  $request
-     * @param  Purchase  $purchase
-     * @return \Illuminate\Http\Response
-     */
+
     public function show(Show $request, Purchase $purchase)
     {
         $suppliers = Supplier::orderBy('name')->get();
@@ -82,12 +72,8 @@ class PurchaseGRNController extends Controller
             'suppliers' => $suppliers,
         ]);
 
-    } /**
-      * Show the form for creating a new resource.
-      *
-      * @param  Create  $request
-      * @return \Illuminate\Http\Response
-      */
+    }
+
     public function create(Create $request)
     {
         //\Cart::clear();
@@ -101,136 +87,54 @@ class PurchaseGRNController extends Controller
             'type' => 'create',
 
         ]);
-    } /**
-      * Store a newly created resource in storage.
-      *
-      * @param  Store  $request
-      * @return \Illuminate\Http\Response
-      */
-    public function store(StoreRequest $request)
+    }
+    public function store(Request $request)
     {
-
-        $amount = 0;
         DB::beginTransaction();
         try {
             $purchase_datetime = date('Y-m-d H:i:s', strtotime("$request->purchase_date $request->purchase_time"));
-            $purchase_id = DB::table('purchases')->insertGetId([
-                'supplier_id' => $request->supplier_id,
-                'reference' => Purchase::generateNewNumber(),
-                'invoice' => $request->invoice,
-                'purchase_date' => $purchase_datetime,
-                'purchase_mode' => 'Cash',
-                'vehicle_reg_no' => $request->vehicle_reg_no,
-                'source_store_id' => $request->source_store_id,
-                'destination_store_id' => $request->source_store_id,
-                'status' => 0,
-                'updated_by' => $request->updated_by,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
-
-            foreach (\Cart::getContent() as $product) {
-                $cart_attributes = $product->attributes;
-                //dd( $cart_attributes);
-
-                $selling_price = $product->price;
-                //This will be uncommented later if the logic has changed
-                //$selling_price = optional(BranchProductPrice::find($product->id))->selling_price;
-                DB::table('purchase_products')->insert([
-                    'purchase_id' => $purchase_id,
-                    'product_id' => $product->id,
-                    'qty_supplied' => $product->quantity,
-                    'unit_price' => $product->price,
-                    'selling_price' => $selling_price == null ? 0 : $selling_price,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ]);
-                // $record = StoreProduct::where(['store_id' => $request->source_store_id, 'product_id' => $product->id])->first();
-                // if ($record != null) {
-                //     DB::table('store_products')->where([
-                //         'store_id' => $request->source_store_id,
-                //         'product_id' => $product->id
-                //     ])->increment('qty_available', $product->quantity);
-                // } else {
-                //     DB::table('store_products')->insert([
-                //         'store_id' => $request->source_store_id,
-                //         'product_id' => $product->id,
-                //         'qty_available' => $product->quantity,
-                //         'created_at' => Carbon::now(),
-                //         'updated_at' => Carbon::now()
-                //     ]);
-                // }
-
-                // BranchProductPrice::updateOrCreate(
-                //     ['product_id' => $product->id, 'store_id' => $request->source_store_id],
-                //     [
-                //         'cost_price' => $product->price,
-                //         'created_at' => Carbon::now(),
-                //         'updated_at' => Carbon::now(),
-                //         'updated_by' => Auth::id()
-                //     ]
-                // );
-
-                // DB::table('transfer_products')->insert([
-                //     'source_store_id' => $request->source_store_id,
-                //     'purchase_id' => $purchase_id,
-                //     'product_id' => $product->id,
-                //     'destination_store_id' => $request->source_store_id,
-                //     'qty_transfered' => $product->quantity,
-                //     'qty_available' => $product->quantity,
-                //     'transfered_by' => $request->updated_by,
-                //     'status' => 'Completed',
-                //     'nature' => 'Purchase',
-                //     'stock_in_out' => 'in',
-                //     'created_at' => Carbon::now(),
-                //     'updated_at' => Carbon::now()
-                // ]);
-                // $amount += $product->price * $product->quantity;
-                // DB::table('stock_cards')->insert([
-                //     'store_id' => $request->source_store_id,
-                //     'product_id' => $product->id,
-                //     'cr' => $product->quantity,
-                //     'dr' => 0,
-                //     'refno' => $request->invoice,
-                //     'type' => 'Purchase',
-                //     'date' => $purchase_datetime,
-                //     'user_id' => Auth::id(),
-                //     'priority' => 3,
-                //     'created_at' => Carbon::now(),
-                //     'updated_at' => Carbon::now()
-                // ]);
+            $purchase_date = $request->purchase_date;
+            $purchase_id = $request->purchase_id;
+            $purchase = Purchase::find($purchase_id);
+            if(!$purchase){
+                $purchase = new Purchase();
+                $purchase->reference = Purchase::generateNewNumber();
+                $purchase->created_by = auth()->id();
+            }else{
+                $purchase->updated_by = $request->updated_by;
+            }
+            $purchase->supplier_id = $request->supplier_id;
+            $purchase->atc_no = $request->atc_no;
+            $purchase->purchase_date = $purchase_date;
+            $purchase->purchase_mode = 'Cash';
+            $purchase->truck_no = $request->truck_no;
+            $purchase->status = 0;
+            if($purchase->save()){
+                PurchaseProduct::where('purchase_id',$purchase->id)->delete();
+                foreach (\Cart::getContent() as $cart) {
+                    $product = new PurchaseProduct();
+                    $cart_attributes = $cart->attributes;
+                    $product->purchase_id = $purchase->id;
+                    $product->product_id = $cart->id;
+                    $product->store_id = $cart_attributes['store_id'];
+                    $product->qty_supplied = $cart->quantity;
+                    $product->unit_price = $cart->price;
+                    $product->selling_price = 0;
+                    $product->status = 1;
+                    $product->save();
+                }
+                Transaction::purchases($purchase->id, $purchase_date);
+                $action = "Made a purchase with reference $request->reference from supplier: " . Supplier::find($request->supplier_id)->name;
+                AuditLog::auditLog(Auth::id(), $action);
+                DB::commit();
+                session()->flash('app_message', 'Purchase saved successfully');
+                \Cart::clear();
+                return redirect()->route('purchases.index');
             }
 
-
-
-            // if ($request->purchase_mode == "Credit") {
-            //     $cr = $amount;
-            //     $dr = 0;
-            //     DB::table('suppliers')->where(['id' => $request->supplier_id])->where('branch_id', 'LIKE', User::userBranchAction())->increment('opening_balance', $cr);
-            // }
-
-            // DB::table('supplier_ledgers')->insert([
-            //     'supplier_id' => $request->supplier_id,
-            //     'purchase_id' => $purchase_id,
-            //     'description' => 'Purchase of products',
-            //     'payment_mode' => $request->purchase_mode,
-            //     'Ref' => $request->invoice,
-            //     'cr' => $cr,
-            //     'dr' => $dr,
-            //     'date' => Carbon::now(),
-            //     'created_at' => Carbon::now(),
-            //     'updated_at' => Carbon::now(),
-            // ]);
-            Transaction::purchases($purchase_id, $purchase_datetime);
-            $action = "Made a purchase with invoice $request->invoice from supplier: " . Supplier::find($request->supplier_id)->name;
-            AuditLog::auditLog(Auth::id(), $action);
-            DB::commit();
-            session()->flash('app_message', 'Purchase saved successfully');
-            \Cart::clear();
-            return redirect()->route('purchases.index');
         } catch (\Exception $e) {
             DB::rollBack();
-            session()->flash('app_message', 'Something is wrong while saving Purchase');
+            session()->flash('app_message', 'Something is wrong while saving Purchase. '.$e);
             throw $e;
         }
         return redirect()->back();
@@ -466,14 +370,25 @@ class PurchaseGRNController extends Controller
     {
         //\Cart::clear();
         foreach ($purchase->purchasedProducts()->get() as $data) {
-            $qty = $data->qty_supplied == 0 ? 1 : $data->qty_supplied;
+            $qty = $data->quantity == 0 ? 1 : $data->quantity;
             $product = Product::find($data->product_id);
             \Cart::add([
                 'id' => $data->product_id,
                 'name' => $product->name,
                 'price' => $data->unit_price,
                 'quantity' => $qty,
-                'attributes' => array('code' => $product->code),
+                'attributes' => array(
+                    'cost_price' => $data->unit_price,
+                    'code' => $data->product->code,
+                    'selling_price' => '',
+                    'qty_available' => '',
+                    'discount' => 0,
+                    'store' => '',
+                    'unit'=>$data->product->unit,
+                    'store_id'=>'',
+                    'store_code'=>'',
+                ),
+
             ]);
         }
     }

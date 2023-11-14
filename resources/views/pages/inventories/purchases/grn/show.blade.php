@@ -36,78 +36,68 @@
 
         <!-- Main content -->
         <section class="content">
-            <div class="container-fluid">
+
+            <div class="container">
+
                 @if(session()->has('message'))
                     <div class="alert alert-success">{{ session('message') }}</div>
                 @endif
                 @if(session()->has('error'))
                     <div class="alert alert-danger">{{ session('error') }}</div>
                 @endif
+                    <div class="btn-group">
+                        <a class="btn btn-secondary btn-sm" href="{{ route('purchases.index', $record->id) }}">
+                            <span class="fa fa-list"></span> List
+                        </a>
+                         @if ($record->status == 0)
+                            <a class="btn btn-secondary btn-sm" href="{{ route('purchases.edit', $record->id) }}">
+                                <span class="fa fa-pencil"></span> Edit
+                            </a>
+                            <form onsubmit="return confirm('Are you sure you want to approve?')"
+                                  action="{{ route('purchase.approve', $record->id) }}" method="post" style="display: inline">
+                                {{ csrf_field() }}
+                                {{ method_field('POST') }}
+                                <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
+                                    <i class="text-white fa fa-check"></i> Post
+                                </button>
+                            </form>
+                            <form onsubmit="return confirm('Are you sure you want to delete?')"
+                                  action="{{ route('purchases.destroy', $record->id) }}" method="post" style="display: inline">
+                                {{ csrf_field() }}
+                                {{ method_field('DELETE') }}
+                                <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
+                                    <i class="text-danger fa fa-remove"></i> Delete
+                                </button>
+                            </form>
+
+                         @else
+
+                         @endif
+                        <a class="btn btn-secondary btn-sm" href="{{ route('purchase.print', $record->id) }}">
+                            <span class="fa fa-print"></span> Print
+                        </a>
+
+                    </div>
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="card card-default">
                             <div class="card-header">
-                                <div class="row">
-                                    <div class="col-sm-8">
-                                        <h5>Details Purchase of <small>products by {{ $record->supplier->name }}</small>
-                                        </h5>
-                                    </div>
-                                    <div class="col-sm-2 text-right">
-                                        <div class="btn-group">
-                                            {{-- @if ($record->status == 0) --}}
-                                            <form onsubmit="return confirm('Are you sure you want to approve?')"
-                                                  action="{{ route('purchase.approve', $record->id) }}" method="post" style="display: inline">
-                                                {{ csrf_field() }}
-                                                {{ method_field('POST') }}
-                                                <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
-                                                    <i class="text-white fa fa-check"> Post</i>
-                                                </button>
-                                            </form>
-                                            {{-- @endif --}}
-                                            <a class="btn btn-secondary btn-sm" href="{{ route('purchases.index', $record->id) }}">
-                                                <span class="fa fa-list"></span>
-                                            </a>
-                                            <a class="btn btn-secondary btn-sm" href="{{ route('purchases.edit', $record->id) }}">
-                                                <span class="fa fa-pencil"></span>
-                                            </a>
-                                            <form onsubmit="return confirm('Are you sure you want to delete?')"
-                                                  action="{{ route('purchases.destroy', $record->id) }}" method="post" style="display: inline">
-                                                {{ csrf_field() }}
-                                                {{ method_field('DELETE') }}
-                                                <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
-                                                    <i class="text-danger fa fa-remove"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
+                                <h5>GRN No.:: {{ $record->reference }} ({{ $record->status === 0 ? 'Pending' : 'Posted' }})</h5>
                             </div>
                             <div class="card-block">
                                 <table class="table table-bordered table-striped">
                                     <tbody>
                                     <tr>
                                         <th>Supplier</th>
-                                        <td>{{ optional($record->supplier)->name }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>ATC/WayBill No</th>
-                                        <td>{{ $record->atc_no }}</td>
+                                        <td colspan="5">{{ optional($record->supplier)->name }}</td>
                                     </tr>
                                     <tr>
                                         <th>Purchase Date</th>
                                         <td>{{ optional($record->purchase_date)->toDayDateTimeString() }}</td>
-                                    </tr>
-                                    <tr>
+                                        <th>ATC/WayBill No</th>
+                                        <td >{{ $record->atc_no }}</td>
                                         <th>Truck No</th>
                                         <td>{{ $record->truck_no }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Status</th>
-                                        <td>{{ $record->status === 1 ? 'Completed' : 'Pending' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Updated By</th>
-                                        <td>{{ $record->user->name ?? null }}</td>
                                     </tr>
                                     </tbody>
                                 </table>

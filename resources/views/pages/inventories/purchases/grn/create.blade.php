@@ -28,13 +28,14 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('purchases.create') }}">
-                <span class="fa fa-plus-circle"> New Purchase (GRN)</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('purchases.index') }}">
-                <span class="fa fa-list"> Purchases</span>
-            </a>
-            <div class="container-fluid">
+
+            <div class="container">
+                <a class="btn btn-secondary btn-sm" href="{{ route('purchases.create') }}">
+                    <span class="fa fa-plus-circle"> New Purchase (GRN)</span>
+                </a>
+                <a class="btn btn-secondary btn-sm" href="{{ route('purchases.index') }}">
+                    <span class="fa fa-list"> Purchases</span>
+                </a>
                 <div class="row">
                     <div class='col-md-12'>
                         @include('forms.purchase')

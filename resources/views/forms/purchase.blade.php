@@ -207,7 +207,4 @@
 </div>
 
 
-<div class="row table-responsive">
 
-</div>
-</div>

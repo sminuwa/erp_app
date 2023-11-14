@@ -89,7 +89,6 @@
 
                                                     </td>
                                                     <td>{{ \App\Models\Store::find($attr['store_id'])->name }}</td>
-                                                    </td>
                                                     <td>
                                                         <button class="btn btn-danger btn-sm" type="button"
                                                             onclick="deleteItem({{ $product->id }})">
@@ -185,7 +184,7 @@
 
             $(document).on("change", "#product_id,#store_id", function(event) {
                 $("#available_qty").val("");
-                
+
                 $.ajax({
                     url: "{{ route('ajax.load.quantity.available') }}",
                     type: 'GET',

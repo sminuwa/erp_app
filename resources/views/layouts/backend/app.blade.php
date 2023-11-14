@@ -180,10 +180,14 @@
         };
         //cart activities
 
+        console.log($('input[name=cart_page_type]').val())
         //load cart
         $.ajax({
             url: "{{ route('ajax.cart.load') }}",
             type: 'GET',
+            data: {
+                type : $('input[name=cart_page_type]').val()
+            }
         }).done(function(component){
             // console.log(component)
             $('.cart-container').html(component)
@@ -248,7 +252,7 @@
 
 
         //change store from card
-        $(document).on('submit','.changeCartItem', function(e){
+        $(document).on('submit','.changeStoreCartForm', function(e){
             e.preventDefault()
             $.ajax({
                 url: $(this).attr('action'),

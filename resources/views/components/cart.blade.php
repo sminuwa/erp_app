@@ -7,6 +7,9 @@
         <thead>
         <tr>
             <th>S.N</th>
+            @if($type == 'grn')
+            <th>Store</th>
+            @endif
             <th>Code</th>
             <th>Item</th>
             <th>Unit</th>
@@ -21,6 +24,27 @@
         @foreach (\Cart::getContent() as $product)
             <tr class="item{{ $product->id }}">
                 <td>{{ $loop->iteration }}</td>
+                @if($type == 'grn')
+                <td class="text-left">
+                    {{ $product->attributes['store_code'] ?? '' }}
+                    <select
+                        type="text"
+                        name="store_code"
+                        id="store_code{{ $product->id }}"
+                        class="form-control store_code"
+                        data-value="p{{ $product->id }}"
+                        style="min-width:58px;"
+                        value="{{ $product->quantity }}"
+                        min="1"
+                        required>
+                        <option value="">select..</option>
+                        <?php $stores = \App\Models\Store::where('branch_id', auth()->user()->branch->id)->get(); ?>
+                        @foreach($stores as $store)
+                            <option value="{{ $store->id }}">{{ $store->code }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                @endif
                 <td class="text-left">{{ $product->attributes['code'] ?? '' }}</td>
                 <td class="text-left">{{ $product->name }}</td>
                 <td class="text-left">{{ $product->attributes['unit'] ?? '' }}</td>
@@ -77,5 +101,5 @@
     </table>
 @endif
 <div class="alert alert-success">
-    Total : &#8358; <span class="totalCart">{{ number_format(\Cart::getTotal()) }}</span>
+    Total : &#8358; <span class="totalCart">{{ number_format(\Cart::getTotal(),2) }}</span>
 </div>

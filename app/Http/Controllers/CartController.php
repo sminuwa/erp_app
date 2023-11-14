@@ -116,8 +116,9 @@ class CartController extends Controller
     }
 
 
-    public function loadCartItem(){
-        return view('components.cart');
+    public function loadCartItem(Request $request){
+        $type =$request->type;
+        return view('components.cart', compact('type'));
     }
 
     public function addCartItem(Request $request)
@@ -137,10 +138,12 @@ class CartController extends Controller
                 'qty_available' => $qty_available ?? '',
                 'discount' => 0,
                 'store'=> $request->store ?? '',
-                'unit' =>$product->unit ?? ''
+                'unit' =>$product->unit ?? '',
+                'store_code' =>$product->unit ?? '',
             ),
         ]);
-        return view('components.cart');
+        $type =$request->type;
+        return view('components.cart', compact('type'));
     }
 
     public function updateCartItem(Request $request, $id)
@@ -168,18 +171,21 @@ class CartController extends Controller
                     'qty_available' => $request->qty_available,
                     'store'=>$request->store,
                     'unit'=>$request->unit,
+                    'store_code' =>$product->unit ?? '',
                 )
             ]
         );
         if ($request->ajax()) {
             return \Cart::getTotal();
         }
-        return view('components.cart');
+        $type =$request->type;
+        return view('components.cart', compact('type'));
     }
 
-    public function deleteCartItem($id){
+    public function deleteCartItem(Request $request, $id){
         \Cart::remove($id);
-        return view('components.cart');
+        $type =$request->type;
+        return view('components.cart', compact('type'));
     }
 
 }

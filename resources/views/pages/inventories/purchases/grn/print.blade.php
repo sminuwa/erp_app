@@ -14,7 +14,7 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
     <!-- IonIcons -->
-    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+{{--    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">--}}
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('assets/backend/css/adminlte.min.css') }}">
     <!-- Google Font: Source Sans Pro -->
@@ -135,26 +135,7 @@
                                         <th style="text-align: right;">
                                             &#8358;{{ number_format($total, 2, '.', ',') }}</th>
                                     </tr>
-                                    <tr>
-                                        <th colspan="7" style="text-align: right">Discount</th>
-                                        <th style="text-align: right;">
-                                            &#8358;{{ number_format(0, 2, '.', ',') }}</th>
-                                    </tr>
-                                    <tr>
-                                        <th colspan="7" style="text-align: right">Amount Paid</th>
-                                        <th style="text-align: right;">
-                                            &#8358;{{ number_format($purchase->totalPaid(), 2, '.', ',') }}</th>
-                                    </tr>
-                                    <tr>
-                                        <th colspan="7" style="text-align: right">Balance</th>
-                                        <th style="text-align: right;">
-                                            @if ($total - $purchase->totalPaid() < 0)
-                                                &#8358;({{ number_format(abs($total - $purchase->totalPaid()), 2) }})
-                                            @else
-                                                &#8358;{{ number_format($total - $purchase->totalPaid(), 2) }}
-                                            @endif
-                                        </th>
-                                    </tr>
+
                                     <tr>
                                         <td colspan="2"><span style='font-size:14px;'></span>Amoun Paid in Words:
                                         </td>

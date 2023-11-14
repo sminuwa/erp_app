@@ -104,6 +104,16 @@
     </div>
 </div>
 <div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="ion-android-cart"></i> Supplier Cart: <small>Purchased Products</small>
+            </div>
+            <div class="card-body table-responsive">
+                <div class="cart-container"></div>
+            </div>
+        </div>
+    </div>
     <div class="col-sm-4">
         <div class="card">
             <div class="card-header">
@@ -152,8 +162,8 @@
                     <div class="form-group">
                         <label for="qty_supplied">Quantity</label>
                         <input type="number"
-                            class="form-control {{ $errors->has('qty_supplied') ? ' is-invalid' : '' }}"
-                            name="qty_supplied" id="qty_supplied" placeholder="" required="required">
+                               class="form-control {{ $errors->has('qty_supplied') ? ' is-invalid' : '' }}"
+                               name="qty_supplied" id="qty_supplied" placeholder="" required="required">
                         @if ($errors->has('qty_supplied'))
                             <div class="invalid-feedback">
                                 <strong>{{ $errors->first('qty_supplied') }}</strong>
@@ -163,8 +173,8 @@
                     <div class="form-group">
                         <label for="unit_price">Cost Price</label>
                         <input type="text"
-                            class="form-control {{ $errors->has('unit_price') ? ' is-invalid' : '' }}"
-                            name="unit_price" id="unit_price" placeholder="" required="required">
+                               class="form-control {{ $errors->has('unit_price') ? ' is-invalid' : '' }}"
+                               name="unit_price" id="unit_price" placeholder="" required="required">
                         @if ($errors->has('unit_price'))
                             <div class="invalid-feedback">
                                 <strong>{{ $errors->first('unit_price') }}</strong>
@@ -191,16 +201,6 @@
                             Cart</button>
                     </div>
                 </form>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-8">
-        <div class="card">
-            <div class="card-header">
-                <i class="ion-android-cart"></i> Supplier Cart: <small>Purchased Products</small>
-            </div>
-            <div class="card-body table-responsive">
-                <div class="cart-container"></div>
             </div>
         </div>
     </div>

@@ -73,7 +73,7 @@
                          @else
 
                          @endif
-                        <a class="btn btn-secondary btn-sm" href="{{ route('purchase.print', $record->id) }}">
+                        <a class="btn btn-secondary btn-sm" href="{{ route('purchase.print', $record->id) }}" target="_blank">
                             <span class="fa fa-print"></span> Print
                         </a>
 

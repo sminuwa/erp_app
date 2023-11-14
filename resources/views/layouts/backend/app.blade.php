@@ -180,13 +180,13 @@
         };
         //cart activities
 
-        console.log($('input[name=cart_page_type]').val())
+        let type = $('input[name=cart_page_type]').val();
         //load cart
         $.ajax({
             url: "{{ route('ajax.cart.load') }}",
             type: 'GET',
             data: {
-                type : $('input[name=cart_page_type]').val()
+                type : type
             }
         }).done(function(component){
             // console.log(component)
@@ -199,7 +199,7 @@
             $.ajax({
                 url: $(this).attr('action'),
                 type: 'GET',
-                data: $(this).serialize(),
+                data: $(this).serialize()+'&type='+type,
             }).done(function(component){
                 console.log(component)
                 $('.cart-container').html(component)
@@ -226,6 +226,7 @@
                     price: $("#price"+id.substr(1)).val(),
                     unit: $("#unit"+id.substr(1)).val(),
                     code: $("#code"+id.substr(1)).val(),
+                    type: type,
                     _token: "{{ csrf_token() }}"
                 },
             }).done(function(component){
@@ -244,6 +245,9 @@
             $.ajax({
                 url: $(this).attr('action'),
                 type: 'GET',
+                data: {
+                    type : type
+                }
             }).done(function(component){
                 // console.log(component)
                 $('.cart-container').html(component)
@@ -257,6 +261,9 @@
             $.ajax({
                 url: $(this).attr('action'),
                 type: 'GET',
+                data: {
+                    type : type
+                }
             }).done(function(component){
                 // console.log(component)
                 $('.cart-container').html(component)

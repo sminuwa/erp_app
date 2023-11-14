@@ -1,4 +1,4 @@
-<input name="cart_page_type" type="hidden" value="grn">
+
 <div class="row">
     <div class="col-sm-12">
         <div class="card">
@@ -108,18 +108,30 @@
         <div class="card">
             <div class="card-header">
                 <i class="ion-android-cart"></i> Supplier Cart: <small>Purchased Products</small>
+                <div class="float-right">
+                    <a href="javascript:void(0)" data-toggle="modal"
+                       data-target="#add_product_form"
+                       class="btn btn-sm btn-secondary float-md-right"
+                       style="margin-left: 2px;"><i class="fa fa-plus"></i> Add Product </a>
+                </div>
             </div>
             <div class="card-body table-responsive">
                 <div class="cart-container"></div>
             </div>
         </div>
     </div>
-    <div class="col-sm-4">
-        <div class="card">
-            <div class="card-header">
-                Products
+</div>
+
+<div class="modal fade" id="add_product_form" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add product to cart</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
             </div>
-            <div class="card-body">
+            <div class="modal-body">
                 <form action="{{ route('ajax.cart.add') }}" method="POST" class="addCartItemForm">
                     <input type="hidden" name="purchase_id" value="{{ $model->id }}" />
                     <input type="hidden" name="type" value="{{ $type }}" />
@@ -205,6 +217,4 @@
         </div>
     </div>
 </div>
-
-
 

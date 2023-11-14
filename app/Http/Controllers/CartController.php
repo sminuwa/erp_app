@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\Product;
+use App\Models\Store;
 use Illuminate\Http\Request;
 use Darryldecode\Cart\Cart;
 use Brian2694\Toastr\Facades\Toastr;
@@ -124,6 +125,7 @@ class CartController extends Controller
     public function addCartItem(Request $request)
     {
         $product = Product::find($request->product_id);
+        $store = Store::find($request->store_id);
         $qty = $request->qty_supplied;
         $qty_available = $request->qty_available;
         $add = \Cart::add([
@@ -139,7 +141,8 @@ class CartController extends Controller
                 'discount' => 0,
                 'store'=> $request->store ?? '',
                 'unit' =>$product->unit ?? '',
-                'store_code' =>$product->unit ?? '',
+                'store_id' =>$request->store_id ?? '',
+                'store_code' =>$store->code ?? '',
             ),
         ]);
         $type =$request->type;
@@ -171,6 +174,7 @@ class CartController extends Controller
                     'qty_available' => $request->qty_available,
                     'store'=>$request->store,
                     'unit'=>$request->unit,
+                    'store_id' =>$request->store_id ?? '',
                     'store_code' =>$product->unit ?? '',
                 )
             ]

@@ -13,7 +13,7 @@
                     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
 
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label for="supplier_id">Supplier Name {{ $model->supplier_id }}</label>
                                 <select
@@ -170,6 +170,21 @@
                                 <strong>{{ $errors->first('unit_price') }}</strong>
                             </div>
                         @endif
+                    </div>
+                    <div class="form-group">
+                        <label for="source_store_id">Store</label>
+                        <select
+                            class="form-control select2-single {{ $errors->has('source_store_id') ? ' is-invalid' : '' }}"
+                            name="store_id" id="store_id" required="required">
+                            @if (isset($stores))
+                                <option value="">Select...</option>
+                                @foreach ($stores as $data)
+                                    <option value="{{ $data->id }}"
+                                        {{ $data->id == $model->source_store_id ? 'selected' : '' }}>
+                                        {{ $data->code }}-{{ $data->name }}</option>
+                                @endforeach
+                            @endif
+                        </select>
                     </div>
                     <div class="form-group text-right ">
                         <button type="submit" class="btn btn-primary"><span class="ion-android-cart"> </span>Add to

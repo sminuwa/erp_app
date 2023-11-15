@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.0.2",
+        "ext-intl": "*",
         "barryvdh/laravel-dompdf": "^1.0",
         "brian2694/laravel-toastr": "^5.5",
         "darryldecode/cart": "^4.2",
@@ -22,8 +23,7 @@
         "munafio/chatify": "^1.5",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-permission": "^5.5",
-        "yoeunes/toastr": "^1.2",
-      "ext-intl": "*"
+        "yoeunes/toastr": "^1.2"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.9",

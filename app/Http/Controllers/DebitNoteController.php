@@ -31,7 +31,7 @@ class DebitNoteController extends Controller
     {
         $user_branch = User::userBranchAction();
         $purchases = Purchase::where('status', 1)
-            ->whereNotIn('reference', DB::table('debit_notes')->select('reference_no')->pluck('reference_no')->toArray())
+            ->whereNotIn('reference', DB::table('debit_notes')->select('reference')->pluck('reference')->toArray())
             ->orderBy('purchase_date', 'DESC')->take(20)->get();
 
         //$suppliers = Supplier::where('branch_id', $user_branch)->get();

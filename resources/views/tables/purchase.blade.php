@@ -40,8 +40,8 @@
                                 </a>
                             @endcan
                             <a class="dropdown-item" href="{{ route('purchase.print', $record->id) }}"
-                                title="Print Invoice" target="_BLANK">
-                                <span class="fa fa-print"> Print</span>
+                                title="Print GRN" target="_BLANK">
+                                <span class="fa fa-print"></span> Print
                             </a>
                             @can('delete.item.purchase')
                                 <form onsubmit="return confirm('Are you sure you want to cancel?')"

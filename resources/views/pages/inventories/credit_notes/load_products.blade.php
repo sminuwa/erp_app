@@ -35,7 +35,7 @@
                 </thead>
                 <tbody>
                     @foreach ($cart_products as $product)
-                        <tr>
+                        <tr class="item{{ $product->id }}">
                             <td>{{ $loop->iteration }}</td>
                             <td class="text-left">{{ $product->code }}</td>
                             <td class="text-left">{{ $product->name }}</td>
@@ -78,16 +78,16 @@
                             </form>
 
                             <td>
-                                <button class="btn btn-danger btn-sm delete" type="button"
-                                    data-val="{{ $product->id }}">
-                                    <i class="fa fa-trash" aria-hidden="true"></i>
-                                </button>
-                                <form id="delete-form-{{ $product->id }}"
+                                <form class="deleteForm" id="delete-form-{{ $product->id }}"
                                     action="{{ route('credit.note.cart.remove', $product->id) }}" method="post"
-                                    style="display:none;">
+                                    data-val="{{ $product->id }}"
+                                    >
                                     <input type="hidden" name="order" id="order" value="{{ $order->id }}" />
                                     @csrf
-                                    @method('DELETE')
+                                    <button class="btn btn-danger btn-sm delete" type="submit"
+                                            >
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </button>
                                 </form>
                             </td>
                         </tr>
@@ -100,12 +100,13 @@
         </div>
         <form action="{{ route('credit.note.store') }}" method="POST">
             @csrf
+            <input type="hidden" name="date" class="date" value="" />
             <input type="hidden" name="order_id" id="order_id" value="{{ $order->id }}" />
             <input type="hidden" name="customer_id" id="customer_id" value="{{ $order->customer_id }}" />
             <input name="comment" placeholder="Comment" class="form-control">
 
             <div class="form-group text-right mt-3">
-                <input type="submit" class=" btn btn-primary" value="Submit" />
+                <input type="submit" onclick="$('.date').val($('.date_').val())" class=" btn btn-primary" value="Submit" />
             </div>
 
         </form>

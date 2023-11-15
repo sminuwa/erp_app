@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Product;
+use App\Models\Store;
 use Illuminate\Http\Request;
 use Darryldecode\Cart\Cart;
 use Brian2694\Toastr\Facades\Toastr;
@@ -48,8 +50,8 @@ class CartController extends Controller
                 'selling_price' => $selling_price,
                 'qty_available' => $qty_available,
                 'discount' => 0,
-                'store'=>$store,
-                'unit' =>$request->unit
+                'store'=> $store,
+                'unit' =>$request->unit ?? ''
             ),
         ]);
 //        return \Cart::getContent();
@@ -112,6 +114,82 @@ class CartController extends Controller
         session()->flash('success', 'All Item Cart Clear Successfully !');
 
         return redirect()->back();
+    }
+
+
+    public function loadCartItem(Request $request){
+        $type =$request->type;
+        return view('components.cart', compact('type'));
+    }
+
+    public function addCartItem(Request $request)
+    {
+        $product = Product::find($request->product_id);
+        $store = Store::find($request->store_id);
+        $qty = $request->qty_supplied;
+        $qty_available = $request->qty_available;
+        $add = \Cart::add([
+            'id' => $request->product_id,
+            'name' => $product->name,
+            'price' => $request->unit_price == 0 ? 1 : $request->unit_price ,
+            'quantity' => $qty == 0 ? 1 : $qty,
+            'attributes' => array(
+                'cost_price' => $request->unit_price ?? '',
+                'code'=> $product->code,
+                'selling_price' => $selling_price ?? '',
+                'qty_available' => $qty_available ?? '',
+                'discount' => 0,
+                'store'=> $request->store ?? '',
+                'unit' =>$product->unit ?? '',
+                'store_id' =>$request->store_id ?? '',
+                'store_code' =>$store->code ?? '',
+            ),
+        ]);
+        $type =$request->type;
+        return view('components.cart', compact('type'));
+    }
+
+    public function updateCartItem(Request $request, $id)
+    {
+//        return $request;
+        $sold_price = $request->sold_price;
+        if ($request->has('percent')) {
+            $percent = $request->percent;
+            $sold_price = ceil($request->cost_price + ($request->cost_price / 100) * $percent);
+        }
+        $store = Store::find($request->store_id);
+        \Cart::update(
+            $request->store_product_id,
+            [
+                'quantity' => [
+                    'relative' => false,
+                    'value' => $request->quantity
+                ],
+                'price' => $request->price,
+                'attributes' => array(
+                    'cost_price' => $request->price,
+                    'selling_price' => $request->selling_price ?? '',
+                    'code'=>$request->code,
+                    'discount' => $request->selling_price - $request->sold_price ?? '',
+                    'qty_available' => $request->qty_available,
+                    'store'=>$request->store,
+                    'unit'=>$request->unit,
+                    'store_id' =>$request->store_id ?? '',
+                    'store_code' =>$store->code ?? '',
+                )
+            ]
+        );
+        if ($request->ajax()) {
+            return \Cart::getTotal();
+        }
+        $type =$request->type;
+        return view('components.cart', compact('type'));
+    }
+
+    public function deleteCartItem(Request $request, $id){
+        \Cart::remove($id);
+        $type =$request->type;
+        return view('components.cart', compact('type'));
     }
 
 }

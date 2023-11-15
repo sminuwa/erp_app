@@ -95,6 +95,10 @@ class PurchaseRequest extends Model
         return $this->hasMany(PurchaseExpense::class,'purchase_id');
     }
 
+    public function updatedBy(){
+        return $this->belongsTo(User::class,'updated_by');
+    }
+
     public static function generateNewNumber($prefix = 'PUR', $length = 4){
         $prefix = $prefix.date('ym').auth()->user()->branch->code;
         $record = self::where('reference', 'like', '%'.$prefix.'%')->orderBy('reference', 'desc')->first();

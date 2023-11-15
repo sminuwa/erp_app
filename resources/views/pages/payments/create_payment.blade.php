@@ -115,7 +115,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="account_id">Account</label>
+                                        <label for="account_id">Bank/Cashbook</label>
                                         <select class="form-control select2-single {{ $errors->has('account_id') ? ' is-invalid' : '' }}"
                                                 name="account_id" id="account_id" required="required">
                                             <option value="">Select...</option>

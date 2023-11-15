@@ -14,7 +14,7 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
     <!-- IonIcons -->
-    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+{{--    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">--}}
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('assets/backend/css/adminlte.min.css') }}">
     <!-- Google Font: Source Sans Pro -->
@@ -38,7 +38,7 @@
 </head>
 
 <body>
-    <div class="container-fluid">
+    <div class="container">
         <div class="row">
             <div class="col-12">
                 <!-- Main content -->
@@ -47,8 +47,8 @@
                     <div class="row">
                         <div class="col-12">
                             <h4>
-                                <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:80px;height:80px;"
-                                    alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
+                                <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" width="80"
+                                    alt="Albabello Logo" class="" style="opacity: .8">
                                 <small class="float-right">Date: {{ date('l, d-M-Y h:i:s A') }}</small>
                             </h4>
                         </div>
@@ -78,24 +78,25 @@
                                 {{ $purchase->supplier->phone }}<br>
                                 Email <span class="ion-email"></span>: {{ $purchase->supplier->email }}
                             </address>
+                            <b>Truck No: {{ $purchase->truck_no }}</b><br>
+                            <b>Reference: {{ $purchase->reference }}</b><br>
+                            <b>ATC/WayBill No.: {{ $purchase->atc_no }}</b><br>
+                            <b>Date: {{ $purchase->purchase_date->toFormattedDateString() }}</b><br>
                         </div>
                     </div>
                     <!-- /.row -->
 
                     <!-- Table row -->
                     <div class="row">
-                        <div class="col-sm-6">
-                            <h3 style="text-align: right;">Purchase Invoice</h3>
+                        <div class="col-sm-12 text-center">
+                            {{ QrCode::size(100)->generate($purchase->reference) }}
+                            <h3>Purchase GRN</h3>
                         </div>
-                        <div class="col-sm-6" style="text-align: right;">
-                            <b>Truck No: {{ $purchase->vehicle_reg_no }}</b><br>
-                            <b>Invoice No: {{ $purchase->invoice }}</b><br>
-                            <b>Date: {{ $purchase->purchase_date->toFormattedDateString() }}</b><br>
-                        </div>
+
                     </div>
                     <div class="row" style="line-height: 0.4">
-                        <div class="col-12 table-responsive">
-                            <table class="table table-bordered text-left" style="width:80%">
+                        <div class="col-12">
+                            <table class="table table-bordered text-left">
                                 <thead>
                                     <tr>
                                         <th>S.N</th>
@@ -119,41 +120,22 @@
                                             <td>{{ $purchase_detail->product->code }}</td>
                                             <td>{{ $purchase_detail->product->name }}</td>
                                             <td>{{ $purchase_detail->product->unit }}</td>
-                                            <td align="center">{{ $purchase_detail->qty_supplied }}</td>
+                                            <td align="center">{{ $purchase_detail->quantity }}</td>
                                             <td align="right">
                                                 &#8358;{{ number_format($purchase_detail->unit_price, 2) }}</td>
-                                            <td>{{ $purchase->sourceStore->name }}</td>
+                                            <td>{{ $purchase->sourceStore->name ?? null }}</td>
                                             <td align="right">
-                                                &#8358;{{ number_format($purchase_detail->unit_price * $purchase_detail->qty_supplied, 2) }}
+                                                &#8358;{{ number_format($purchase_detail->unit_price * $purchase_detail->quantity, 2) }}
                                             </td>
                                         </tr>
-                                        @php $total += ($purchase_detail->unit_price * $purchase_detail->qty_supplied);  @endphp
+                                        @php $total += ($purchase_detail->unit_price * $purchase_detail->quantity);  @endphp
                                     @endforeach
                                     <tr>
                                         <th colspan="7" style="text-align: right">Total Amount</th>
                                         <th style="text-align: right;">
                                             &#8358;{{ number_format($total, 2, '.', ',') }}</th>
                                     </tr>
-                                    <tr>
-                                        <th colspan="7" style="text-align: right">Discount</th>
-                                        <th style="text-align: right;">
-                                            &#8358;{{ number_format(0, 2, '.', ',') }}</th>
-                                    </tr>
-                                    <tr>
-                                        <th colspan="7" style="text-align: right">Amount Paid</th>
-                                        <th style="text-align: right;">
-                                            &#8358;{{ number_format($purchase->totalPaid(), 2, '.', ',') }}</th>
-                                    </tr>
-                                    <tr>
-                                        <th colspan="7" style="text-align: right">Balance</th>
-                                        <th style="text-align: right;">
-                                            @if ($total - $purchase->totalPaid() < 0)
-                                                &#8358;({{ number_format(abs($total - $purchase->totalPaid()), 2) }})
-                                            @else
-                                                &#8358;{{ number_format($total - $purchase->totalPaid(), 2) }}
-                                            @endif
-                                        </th>
-                                    </tr>
+
                                     <tr>
                                         <td colspan="2"><span style='font-size:14px;'></span>Amoun Paid in Words:
                                         </td>
@@ -164,37 +146,36 @@
                                     </tr>
                                 </tbody>
                             </table>
-                            <br />
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    Signature<br>
-                                    _______________________________________<br><br>
-                                    For: {{App\Models\User::UserBranchName()->long_name}}
 
-                                </div>
-                                <div class="col-sm-4">
-                                    Supplier's Signature<br>
-                                    _______________________________________<br>
-                                </div>
-                                <div class="col-sm-4" style="text-align: right">
-                                    @php
-                                        $uc = substr($purchase->invoice_no, 0, 6);
-                                    @endphp
-                                    {{ QrCode::size(100)->backgroundColor(255, 55, 0)->generate("$total\n$uc\n$purchase->invoice\n\n.") }}
-                                </div>
-                            </div>
-                            <table class="table">
-                                <tr>
-                                    <td style='border-style:none;'>Printed On:
-                                        {{ \Carbon\Carbon::now()->toFormattedDateString() }}<br /><br><br>
-                                        Printed By: {{ Auth::user()->name }}
-                                    </td>
-                                </tr>
-
-                            </table>
                         </div>
                         <!-- /.col -->
                     </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            Signature<br>
+                            _______________________________________<br><br>
+                            For: {{App\Models\User::UserBranchName()->long_name}}
+
+                        </div>
+                        <div class="col-sm-4">
+                            Supplier's Signature<br>
+                            _______________________________________<br>
+                        </div>
+                        <div class="col-sm-4" style="text-align: right">
+                            @php
+                                $uc = substr($purchase->reference, 0, 6);
+                            @endphp
+
+                        </div>
+                    </div>
+                    <table class="table">
+                        <tr>
+                            <td style='border-style:none;'>Printed On:
+                                {{ \Carbon\Carbon::now()->toFormattedDateString() }}<br /><br><br>
+                                Printed By: {{ Auth::user()->name }}
+                            </td>
+                        </tr>
+                    </table>
                     <!-- /.row -->
                     <!-- /.invoice -->
                 </div><!-- /.col -->

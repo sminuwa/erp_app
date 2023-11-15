@@ -300,7 +300,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/proforma/create', [InvoiceController::class, 'final_proformer'])->name('proformer.create');
             Route::get('/proforma/print/{order_id}', [InvoiceController::class, 'print_proformer'])->name('proformer.print');
             Route::get('/proforma/edit/{order}', [InvoiceController::class, 'editProformer'])->name('proformer.edit');
-            Route::put('/proforma-invoice/update/{order}', [InvoiceController::class, 'UpdateProforma'])->name('order.invoice.update');
+            Route::put('/proforma-invoice/update/{order}', [InvoiceController::class, 'UpdateProforma'])->name('proformer.update');
             Route::delete('/proforma-invoice/delete/{order}', [OrderController::class, 'destroy_proformer'])->name('proformer.destroy');
             Route::get('/proforma/show/{id}', [OrderController::class, 'proformer_show'])->name('proformer.show');
             Route::get('/', [OrderController::class, 'proformer_list'])->name('proformer.list');
@@ -321,7 +321,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/load_cart', [CreditNoteController::class, 'loadToCart'])->name('load.order-cart');
             Route::post('/cart', [CreditNoteController::class, 'addToCart'])->name('credit.note.cart.store');
             Route::post('/update/cart', [CreditNoteController::class, 'updateCreditNoteCart'])->name('credit.note.cart.update');
-            Route::delete('/remove/{id}', [CreditNoteController::class, 'removeCart'])->name('credit.note.cart.remove');
+            Route::post('/remove/{id}', [CreditNoteController::class, 'removeCart'])->name('credit.note.cart.remove');
             Route::get('/print/{credit_note}', [CreditNoteController::class, 'printCreditNoteReceipt'])->name('credit.note.print');
             Route::get('/show/{credit_note}', [CreditNoteController::class, 'show'])->name('credit.note.show');
             Route::post('/post/{credit_note}', [CreditNoteController::class, 'post'])->name('credit.note.post');
@@ -970,28 +970,26 @@ Route::middleware('auth')->group(function () {
                 Route::post('/approve/{purchase}', [PurchaseGRNController::class, 'approve'])->name('purchase.approve');
             }
         );
-        Route::group(
-            ['prefix' => 'purchases/request'],
-            function () {
-                Route::get('/index', [PurchaseRequestController::class, 'index'])->name('purchases.request.index');
-                Route::get('/create', [PurchaseRequestController::class, 'create'])->name('purchases.request.create');
-                Route::get('/show/{purchase}', [PurchaseRequestController::class, 'show'])->name('purchases.request.show');
-                Route::post('/store', [PurchaseRequestController::class, 'store'])->name('purchases.request.store');
-                Route::get('/edit/{purchase}', [PurchaseRequestController::class, 'edit'])->name('purchases.request.edit');
-                Route::put('/update/{purchase}', [PurchaseRequestController::class, 'update'])->name('purchases.request.update');
-                Route::put('/purchase/update-cart', [PurchaseRequestController::class, 'updateCart'])->name('purchase.request.cart.update');
-                Route::delete('/delete/{purchase}', [PurchaseRequestController::class, 'destroy'])->name('purchases.request.destroy');
-                Route::post('/cart', [PurchaseRequestController::class, 'addToCart'])->name('purchases.request.cart.store');
-                Route::delete('/remove/{id}', [PurchaseRequestController::class, 'removeCart'])->name('purchases.request.cart.remove');
-                Route::post('/clear', [PurchaseRequestController::class, 'clearAllCart'])->name('purchases.request.cart.clear');
-                Route::get('/print/{purchase}', [PurchaseRequestController::class, 'printInvoice'])->name('purchase.request.print');
-                Route::post('/waybill/{purchase}', [PurchaseRequestController::class, 'generateWaybill'])->name('purchase.request.generate.waybill');
-                Route::get('/print/waybill/{purchase}', [PurchaseRequestController::class, 'printWaybill'])->name('purchase.request.waybill.print');
-                Route::post('/search', [PurchaseRequestController::class, 'search'])->name('purchases.request.search');
-                Route::post('/close/{purchase}', [PurchaseRequestController::class, 'close'])->name('purchase.request.close');
-                Route::post('/approve/{purchase}', [PurchaseRequestController::class, 'link'])->name('purchase.request.link');
-            }
-        );
+        Route::group(['prefix' => 'purchases/request'], function () {
+            Route::get('/index', [PurchaseRequestController::class, 'index'])->name('purchases.request.index');
+            Route::get('/create', [PurchaseRequestController::class, 'create'])->name('purchases.request.create');
+            Route::get('/show/{purchase}', [PurchaseRequestController::class, 'show'])->name('purchases.request.show');
+            Route::post('/store', [PurchaseRequestController::class, 'store'])->name('purchases.request.store');
+            Route::get('/edit/{purchase}', [PurchaseRequestController::class, 'edit'])->name('purchases.request.edit');
+            Route::put('/update/{purchase}', [PurchaseRequestController::class, 'update'])->name('purchases.request.update');
+            Route::put('/purchase/update-cart', [PurchaseRequestController::class, 'updateCart'])->name('purchase.request.cart.update');
+            Route::delete('/delete/{purchase}', [PurchaseRequestController::class, 'destroy'])->name('purchases.request.destroy');
+            Route::post('/cart', [PurchaseRequestController::class, 'addToCart'])->name('purchases.request.cart.store');
+            Route::delete('/remove/{id}', [PurchaseRequestController::class, 'removeCart'])->name('purchases.request.cart.remove');
+            Route::post('/clear', [PurchaseRequestController::class, 'clearAllCart'])->name('purchases.request.cart.clear');
+            Route::get('/print/{purchase}', [PurchaseRequestController::class, 'printInvoice'])->name('purchase.request.print');
+            Route::post('/waybill/{purchase}', [PurchaseRequestController::class, 'generateWaybill'])->name('purchase.request.generate.waybill');
+            Route::get('/print/waybill/{purchase}', [PurchaseRequestController::class, 'printWaybill'])->name('purchase.request.waybill.print');
+            Route::post('/search', [PurchaseRequestController::class, 'search'])->name('purchases.request.search');
+            Route::post('/close/{purchase}', [PurchaseRequestController::class, 'close'])->name('purchase.request.close');
+            Route::post('/approve/{purchase}', [PurchaseRequestController::class, 'link'])->name('purchase.request.link');
+        });
+
         Route::group(
             ['prefix' => 'interstore/transfer'],
             function () {
@@ -1042,6 +1040,13 @@ Route::middleware('auth')->group(function () {
 
     Route::get('generate/product_code', [MisController::class, 'generateProductCode'])->name('generate.productCode');
     Route::get('generate/customer_code', [MisController::class, 'nextCustomerCode'])->name('generate.customerCode');
+    Route::prefix('ajax')->group(function(){
+        Route::get('cart/load', [CartController::class, 'loadCartItem'])->name('ajax.cart.load');
+        Route::get('cart/add', [CartController::class, 'addCartItem'])->name('ajax.cart.add');
+        Route::get('cart/update/{id}', [CartController::class, 'updateCartItem'])->name('ajax.cart.update');
+        Route::get('cart/delete/{id}', [CartController::class, 'deleteCartItem'])->name('ajax.cart.delete');
+        Route::get('cart/change-store/{id}', [CartController::class, 'changeStoreCartItem'])->name('ajax.cart.change-store');
+    });
 
 
 });

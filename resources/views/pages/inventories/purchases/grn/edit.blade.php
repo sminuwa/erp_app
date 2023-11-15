@@ -6,7 +6,7 @@
 @endpush
 
 @section('content')
-
+    <input name="cart_page_type" type="hidden" value="grn">
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
@@ -41,10 +41,7 @@
                     <div class='col-md-12'>
                         <div class='card'>
                             <div class="card-body">
-                                @include('forms.purchase', [
-                                    'route' => route('purchases.update', $model->id),
-                                    'method' => 'PUT',
-                                ])
+                                @include('forms.purchase')
                             </div>
                         </div>
                     </div>

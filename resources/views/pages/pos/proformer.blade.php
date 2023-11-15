@@ -40,7 +40,7 @@
                     <div class="col-md-12">
                         <div class="card">
                             <form
-                                action="{{ isset($order) ? route('order.invoice.update',$order->id) : route('proformer.create') }}"
+                                action="{{ isset($order) ? route('proformer.update',$order->id) : route('proformer.create') }}"
                                 method="post">
                                 @csrf
                                 @isset($order)
@@ -64,11 +64,11 @@
                                                 <select
                                                     name="account_type" id="account_type" class="form-control" required>
                                                     <option value="" disabled selected>Select...</option>
-                                                    <option value="Retail" @if(session()->has('customer') && session('customer')->type == 'Retail') selected @endif
-                                                        {{ (isset($order) && $order->customer->type) == 'Retail' ? 'selected' : '' }}>
+                                                    <option value="Retail"
+                                                        {{ ((isset($order) && $order->customer->type=='Retail') || session()->has('customer') && session('customer')->type == 'Retail') ? 'selected' : '' }}>
                                                         Retail</option>
-                                                    <option value="Wholesale" @if(session()->has('customer') && session('customer')->type == 'Wholesale') selected @endif
-                                                        {{ (isset($order) && $order->customer->type) == 'WholeSale' ? 'selected' : '' }}>
+                                                    <option value="Wholesale"
+                                                        {{ ((isset($order) && $order->customer->type=='Wholesale') || session()->has('customer') && session('customer')->type == 'Wholesale') ? 'selected' : '' }}>
                                                         WholeSale</option>
                                                 </select>
                                             </div>
@@ -107,7 +107,7 @@
 
                         </div>
                     </div>
-                    <div class="col-md-6 cart-container">
+                    <div class="col-md-6 ">
                         <!-- general form elements -->
                         <div class="card">
                             <div class="card-header">

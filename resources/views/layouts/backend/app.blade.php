@@ -166,6 +166,110 @@
         });
     </script>
 
+    <script>
+
+
+        function formatMoney(n, c, d, t) {
+            var c = isNaN(c = Math.abs(c)) ? 2 : c,
+                d = d == undefined ? "." : d,
+                t = t == undefined ? "," : t,
+                s = n < 0 ? "-" : "",
+                i = String(parseInt(n = Math.abs(Number(n) || 0).toFixed(c))),
+                j = (j = i.length) > 3 ? j % 3 : 0;
+            return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ?
+                d + Math.abs(n - i).toFixed(c).slice(2) : "");
+        };
+        //cart activities
+
+        let type = $('input[name=cart_page_type]').val();
+        //load cart
+        $.ajax({
+            url: "{{ route('ajax.cart.load') }}",
+            type: 'GET',
+            data: {
+                type : type
+            }
+        }).done(function(component){
+            // console.log(component)
+            $('.cart-container').html(component)
+        })
+
+        //add cart item
+        $(document).on('submit','.addCartItemForm', function(e){
+            e.preventDefault()
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'GET',
+                data: $(this).serialize()+'&type='+type,
+            }).done(function(component){
+                $(this).trigger("reset");
+                $('.cart-container').html(component)
+            })
+        })
+
+        //update to card
+        $(document).on('keyup','.quantity, .price', function(){
+            let id = $(this).attr('data-value');
+            $("#valid_qty" + id.substr(1)).html("");
+            if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
+                'max-qty'))) {
+                $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $('#quantity' +
+                    id.substr(1)).attr('max-qty') + ")");
+                $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
+                return false;
+            }
+            updateCart(id)
+
+        })
+
+        function updateCart(formId){
+            $.ajax({
+                url: $('#' + formId).attr('action'),
+                type: 'GET',
+                data: {
+                    store_product_id: formId.substr(1),
+                    quantity: $('#quantity' + (formId.substr(1))).val(),
+                    price: $("#price"+formId.substr(1)).val(),
+                    unit: $("#unit"+formId.substr(1)).val(),
+                    code: $("#code"+formId.substr(1)).val(),
+                    store_id: $("#store_id"+formId.substr(1)).val(),
+                    type: type,
+                    _token: "{{ csrf_token() }}"
+                },
+            }).done(function(component){
+                console.log(component)
+                formId = formId.substr(1);
+                subtotal = $('#price' + formId).val() * $('#quantity' + formId).val();
+                $('.subtotal' + formId).text(formatMoney(subtotal));
+                $('.totalCart').text(formatMoney(component));
+                // $('.cart-container').html(component)
+            })
+        }
+
+        //delete card
+        $(document).on('submit','.deleteCartItem', function(e){
+            e.preventDefault()
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'GET',
+                data: {
+                    type : type
+                }
+            }).done(function(component){
+                // console.log(component)
+                $('.cart-container').html(component)
+            })
+        })
+
+
+        //change store from card
+        $(document).on('change','.store_code', function(){
+            let id = $(this).attr('data-value');
+            updateCart(id)
+
+        })
+    </script>
+
     @stack('js')
 
 </body>

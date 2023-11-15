@@ -46,16 +46,15 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        @hasanyrole('Super-admin|Admin')
+
                                         <div class="form-group">
                                             <label for="date">Date</label>
-                                            <input type="text" name="date" class="form-control datepicker"
-                                                   value="{{ $order ? $order->order_date : date('Y-m-d') }}" />
+                                            <input type="text" name="date" class="form-control date_ datepicker"
+                                                   value="{{ $order ? $order->order_date : date('Y-m-d') }}"
+                                                    required
+                                            />
                                         </div>
-                                        @else
-                                            <input type="hidden" name="date" class="form-control datepicker"
-                                                   value="{{ date('Y-m-d') }}" />
-                                            @endhasanyrole
+
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
@@ -118,9 +117,7 @@
                             @include('pages.inventories.credit_notes.load_products')
                         @endif--}}
                     </div>
-                    <div class="col-md-12 testinng">
 
-                    </div>
                 </div>
             </div><!-- /.container-fluid -->
         </section>
@@ -172,7 +169,7 @@
                         customer_id: $(this).val()
                     }
                 }).done(function(data) {
-                    console.log(data)
+                    // console.log(data)
                     $(".customer-orders").html(data);
                 });
             });
@@ -192,7 +189,7 @@
 
                     },
                     error: function(error) {
-                        console.log(error);
+                        // console.log(error);
                     }
                 });
             });
@@ -216,17 +213,15 @@
                         reference: reference
                     },
                     success: function(response) {
-
                         $('#load').html(response);
                     },
                     error: function(error) {
-                        console.log(error);
+                        // console.log(error);
                     }
                 });
             });
 
             // }
-
             /*var delay = (function() {
                 var timer = 0;
                 return function(callback, ms) {
@@ -258,12 +253,11 @@
                         },
                         //dataType: 'json',
                         success: function(data) {
-                            console.log(data)
+                            // console.log(data)
                             id = id.substr(1);
                             subtotal = $('#price' + id).val() * $('#quantity' + id).val();
                             $('.subtotal' + id).text(formatMoney(subtotal));
                             $('.total').text(formatMoney(data));
-                            $('.testinng').html(data);
                         },
                         error: function(xhr, err) {
 
@@ -284,7 +278,9 @@
                 return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ?
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
-            $(document).on('click', '.delete', function() {
+
+            $(document).on('submit', '.deleteForm', function(event) {
+                event.preventDefault();
                 var id = $(this).attr('data-val');
                 const swalWithBootstrapButtons = swal.mixin({
                     confirmButtonClass: 'btn btn-success',
@@ -302,8 +298,19 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.value) {
-                        event.preventDefault();
-                        document.getElementById('delete-form-' + id).submit();
+                        // $('.item'+id).remove();
+                        $.ajax({
+                            type: "POST",
+                            url: $(this).attr('action'),
+                            data: {
+                                id: id,
+                                _token: '{{ csrf_token() }}'
+                            }
+                        }).done(function(data) {
+                            $('.total').text(formatMoney(data));
+                            $('.item'+id).remove();
+                        });
+                        // return
                     } else if (
                         // Read more about handling dismissals
                         result.dismiss === swal.DismissReason.cancel

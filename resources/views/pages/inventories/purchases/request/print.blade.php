@@ -44,45 +44,69 @@
                 <!-- Main content -->
                 <div class="invoice p-3 mb-3">
                     <!-- title row -->
-                    <div class="row">
-                        <div class="col-12">
-                            <h4>
-                                <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:80px;height:80px;"
-                                    alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
-                                <small class="float-right">Date: {{ date('l, d-M-Y h:i:s A') }}</small>
-                            </h4>
-                        </div>
-                        <!-- /.col -->
-                    </div>
                     <!-- info row -->
-                    <div class="row">
+                    <div class="row invoice-info">
                         <div class="col-sm-4">
                             <address>
-                                <strong>{{ config('app.name') }}  </strong><br>
+                                <h5>HEAD OFFICE</h5>
                                 Address <span class="ion-ios-contact-outline"></span>: {{ $company->address }}
-                                {{ $company->city }} , {{ $company->country }}<br>
+                                {{ $company->city }} - {{ $company->zip_code }},
+                                {{ $company->country }}<br>
                                 Phone <span class="ion-android-phone-portrait"></span>:
                                 {{ $company->mobile }}
                                 {{ $company->phone !== null ? ', 0' . $company->phone : '' }}
                                 <br>
                                 Email <span class="ion-email"></span>: {{ $company->email }}
-                                <br>
-                                <b>Request No: {{ $purchase->reference }}</b><br>
-                                <b>Reference: {{ $purchase->invoice }}</b><br>
-                                <b>Date: {{ $purchase->purchase_date->toFormattedDateString() }}</b><br>
                             </address>
                         </div>
+                        <!-- /.col -->
 
+                        <!-- /.col -->
+                        <div class="col-sm-4 offset-3">
+                            <address>
+                                <h5>BRANCH OFFICE</h5>
+                                Address <span class="ion-ios-contact-outline"></span>: {{ $purchase->branch?->address }}
+                                <br>
+                                Phone <span class="ion-android-phone-portrait"></span>:
+                                {{ $purchase->branch->phone }}
+                                <br>
+                                Email <span class="ion-email"></span>: {{ $purchase->branch?->email }}
+                            </address>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 invoice-col">
+                            <address>
+                                <b>Supplier Name:</b> {{ $purchase->supplier->code }} - {{ $purchase->supplier->name }}<br />
+                                <b>Address:</b> <span class="ion-ios-contact-outline"></span>
+                                {{ $purchase->supplier->address }}<br>
+                                <b>Phone:</b> <span class="ion-android-phone-portrait"></span>
+                                {{ $purchase->supplier->phone }}<br>
+                            </address>
+                        </div>
+                        <div class="col-sm-3 invoice-col">
+                            <div>
+                                {{--@php
+                                    $uc = substr($order->reference, 0, 6) . substr($order->reference, 6, 10) + 3000;
+                                @endphp--}}
+                                {{ QrCode::size(70)->generate($purchase->reference) }}<br />
+                                <span style="font-size:28px;margin-top:-5px">
+                                     Purchase Request
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <b>Invoice No:</b> {{ $purchase->reference }}<br>
+                            <b>Date and Time: {{ \Carbon\Carbon::parse($purchase->created_at)->toFormattedDateString() }}</b><br>
+                            <b>Prepared By</b> <span class="ion-card"></span> {{ $purchase->updatedBy?->name }}<br />
+                            <b>Printed By <span class="ion-printer"></span>
+                                &nbsp;&nbsp;{{ Auth::user()->name }}</span><span>
+                        </div>
                     </div>
                     <!-- /.row -->
 
-                    <!-- Table row -->
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <h3 style="text-align: center;">Purchase Request</h3>
-                        </div>
 
-                    </div>
                     <div class="row" style="line-height: 0.5">
                         <div class="col-12 table-responsive">
                             <table class="table table-bordered text-left" style="width:80%">
@@ -122,7 +146,7 @@
                                         <th style="text-align: right;">
                                             &#8358;{{ number_format($total, 2, '.', ',') }}</th>
                                     </tr>
-                                    
+
                                     <tr>
                                         <td colspan="4"><span style='font-size:14px;'></span>Total in Words:
                                         </td>
@@ -145,12 +169,7 @@
                                     Supplier's Signature<br>
                                     _______________________________________<br>
                                 </div>
-                                <div class="col-sm-4" style="text-align: right">
-                                    @php
-                                        $uc = substr($purchase->invoice_no, 0, 6);
-                                    @endphp
-                                    {{ QrCode::size(100)->backgroundColor(255, 55, 0)->generate("$total\n$uc\n$purchase->invoice\n\n.") }}
-                                </div>
+
                             </div>
                             <table class="table">
                                 <tr>

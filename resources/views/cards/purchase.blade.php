@@ -56,7 +56,7 @@
                 </tr>
                 <tr>
                     <th>Store/Shop</th>
-                    <td> {{ $record->sourceStore->name }} </td>
+                    <td> {{ $record->sourceStore->name ?? null }} </td>
                 </tr>
                 <tr>
                     <th>Status</th>
@@ -64,7 +64,7 @@
                 </tr>
                 <tr>
                     <th>Updated By</th>
-                    <td>{{ $record->user->name }}</td>
+                    <td>{{ $record->user->name ?? null }}</td>
                 </tr>
             </tbody>
         </table>

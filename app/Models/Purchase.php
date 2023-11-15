@@ -52,7 +52,7 @@ class Purchase extends Model
     }
     public function totalProductCost()
     {
-        return $this->purchasedProducts()->select(DB::raw('sum(qty_supplied * unit_price) as total'))->first();
+        return $this->purchasedProducts()->select(DB::raw('sum(quantity * unit_price) as total'))->first();
     }
     public function totalPaid()
     {

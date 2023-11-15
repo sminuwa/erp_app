@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 @property timestamp $updated_at updated at
 @property Branch $branch belongsTo
 @property Supplier $supplier belongsTo
-   
+
  */
 class DebitNote extends Model
 {
@@ -29,13 +29,14 @@ class DebitNote extends Model
      * Mass assignable columns
      */
     protected $fillable = [
-        'reference_no',
+        'reference',
         'invoice_no',
         'supplier_id',
         'amount',
         'branch_id',
         'comment',
-        'posted_by'
+        'created_by',
+        'posted_by',
     ];
 
     /**
@@ -67,5 +68,21 @@ class DebitNote extends Model
         return $this->belongsTo(User::class, 'posted_by');
     }
 
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public static function generateNewNumber($prefix = 'DBN', $length = 4)
+    {
+        $prefix = $prefix . date('ym') . auth()->user()->branch->code;
+        $record = self::where('reference', 'like', '%' . $prefix . '%')->orderBy('reference', 'desc')->first();
+        if ($record) {
+            $number = $record->reference;
+            $new = intval(substr($number, strlen($prefix))) + 1;
+            return $prefix . str_pad($new, $length, 0, STR_PAD_LEFT);
+        }
+        return $prefix . str_pad(1, $length, 0, STR_PAD_LEFT);
+    }
 
 }

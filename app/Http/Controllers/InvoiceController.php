@@ -300,7 +300,6 @@ class InvoiceController extends Controller
         return redirect()->route('orders.show', $invoice->id);
 
     }
-
     public function final_proformer(Request $request)
     {
         $invoice = $this->generateProfomerInvoice('PFI');
@@ -417,7 +416,6 @@ class InvoiceController extends Controller
     {
         $invoice = $this->generateProfomerInvoice('ODR');
         $inputs = $request->except('_token');
-
 
         $rules = [];
 
@@ -874,6 +872,7 @@ class InvoiceController extends Controller
         //TODO:: remove limit here
 
         $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
+
         if (\Cart::getContent()->isEmpty()) {
             foreach ($order->order_items()->get() as $item) {
                 $selling_price = $item->selling_price;
@@ -899,7 +898,7 @@ class InvoiceController extends Controller
 
             }
         }
-            $this->loadOrderInvoiceToCart($order);
+
         $cart_products = \Cart::getContent();
         //dd($cart_products);
         $categories = Category::orderBy('name', 'ASC')->get();
@@ -1105,7 +1104,7 @@ class InvoiceController extends Controller
 
                 }
             }
-                $this->loadProformaToCart($order);
+
             $cart_products = \Cart::getContent();
             //dd($cart_products);
             $categories = Category::orderBy('name', 'ASC')->get();

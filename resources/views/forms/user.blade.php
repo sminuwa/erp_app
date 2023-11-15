@@ -14,7 +14,7 @@
     <div class="form-group">
         <label for="user_code">User Code</label>
         <input type="text" class="form-control {{ $errors->has('user_code') ? ' is-invalid' : '' }}" name="user_code"
-            id="user_code" value="{{ old('user_code', $model->user_code) }}" placeholder="" maxlength="3"
+            id="user_code" value="{{ old('user_code', $model->user_code) }}" placeholder="" maxlength="15"
             required="required">
         @if ($errors->has('user_code'))
             <div class="invalid-feedback">
@@ -25,7 +25,7 @@
     <div class="form-group">
         <label for="email">Email</label>
         <input type="text" class="form-control {{ $errors->has('email') ? ' is-invalid' : '' }}" name="email"
-            id="email" value="{{ old('email', $model->email) }}" placeholder="" maxlength="50" required="required">
+            id="email" value="{{ old('email', $model->email) }}" placeholder="" maxlength="100" required="required">
         @if ($errors->has('email'))
             <div class="invalid-feedback">
                 <strong>{{ $errors->first('email') }}</strong>

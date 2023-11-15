@@ -2931,7 +2931,7 @@ class ReportController extends Controller
         $balance = $credit_sum - $debit_sum;
         $branch = Branch::find($branch_id);
 
-        return view('pages.reports.ap_ar.trial_balance.load_general_ledger', compact('ledgers', 'branch', 'from_date', 'to_date', 'balance', 'credit_sum', 'debit_sum'));
+        return view('pages.reports.ap_ar.trial_balance.load', compact('ledgers', 'branch', 'from_date', 'to_date', 'balance', 'credit_sum', 'debit_sum'));
     }
 
     public function printTrialBalance($from, $to, Branch $branch)

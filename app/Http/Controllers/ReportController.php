@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Branch;
 use App\Models\GeneralAccount;
 use App\Models\GeneralAccountLedger;
 use Illuminate\Http\Request;
@@ -45,6 +46,7 @@ class ReportController extends Controller
             'categories' => Category::orderBy('name')->get(),
         ]);
     }
+
     public function loadStockTransferReport(Request $request)
     {
         //return $request->stock_in_out;
@@ -137,6 +139,7 @@ class ReportController extends Controller
             'categories' => Category::orderBy('name')->get(),
         ]);
     }
+
     public function loadStockInReport(Request $request)
     {
         //return $request->stock_in_out;
@@ -217,6 +220,7 @@ class ReportController extends Controller
             'bank_accounts' => BankAccount::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('account_name')->get()
         ]);
     }
+
     public function loadBankLedger(Request $request)
     {
         $from_date = $request->from_date;
@@ -230,6 +234,7 @@ class ReportController extends Controller
 
         return view('pages.reports.bank_and_expenses.load_bank_ledger', compact('ledgers', 'bank_account', 'from_date', 'to_date', 'balance_b_d', 'sum_cr_b_d', 'sum_dr_b_d'));
     }
+
     public function printBankLedger($from_date, $to_date, $bank_account_id)
     {
         $bank_account = BankAccount::find($bank_account_id);
@@ -240,10 +245,12 @@ class ReportController extends Controller
         $ledgers = $query->orderBy('trans_date')->get();
         return view('pages.reports.bank_and_expenses.print_ledger', compact('ledgers', 'bank_account', 'from_date', 'to_date', 'balance_b_d', 'sum_dr_b_d', 'sum_cr_b_d'));
     }
+
     public function generateBankDeposit()
     {
         return view('pages.reports.bank_and_expenses.bank_deposit');
     }
+
     public function loadBankDeposit(Request $request)
     {
         $from_date = $request->from_date;
@@ -257,6 +264,7 @@ class ReportController extends Controller
         return view('pages.reports.bank_and_expenses.load_bank_deposit', ['deposits' => $deposits, 'from_date' => $from_date, 'to_date' => $to_date]);
 
     }
+
     public function printBankDeposit($from_date, $to_date)
     {
         $query = CashMovement::select('cash_movements.*')
@@ -267,10 +275,12 @@ class ReportController extends Controller
         $deposits = $query->orderBy('date_deposit', 'DESC')->get();
         return view('pages.reports.bank_and_expenses.print_bank_deposit', ['deposits' => $deposits, 'from_date' => $from_date, 'to_date' => $to_date]);
     }
+
     public function generateBankWithdraw()
     {
         return view('pages.reports.bank_and_expenses.bank_withdraw');
     }
+
     public function loadBankWithdraw(Request $request)
     {
         $from_date = $request->from_date;
@@ -284,6 +294,7 @@ class ReportController extends Controller
         return view('pages.reports.bank_and_expenses.load_bank_withdraw', ['withdraws' => $withdraws, 'from_date' => $from_date, 'to_date' => $to_date]);
 
     }
+
     public function printBankWithdraw($from_date, $to_date)
     {
         $query = CashMovement::select('cash_movements.*')
@@ -299,6 +310,7 @@ class ReportController extends Controller
     {
         return view('pages.reports.bank_and_expenses.cash_transfer', ['users' => User::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('name')->get()]);
     }
+
     public function loadCashTransfer(Request $request)
     {
         $from_date = $request->from_date;
@@ -317,6 +329,7 @@ class ReportController extends Controller
         return view('pages.reports.bank_and_expenses.load_cash_transfer', ['withdraws' => $withdraws, 'from_date' => $from_date, 'to_date' => $to_date, 'user_id' => $user_id]);
 
     }
+
     public function printCashTransfer($from_date, $to_date, $user_id)
     {
         if ($user_id == 'all')
@@ -331,20 +344,24 @@ class ReportController extends Controller
         $user_id = 'all';
         return view('pages.reports.bank_and_expenses.print_cash_transfer', ['withdraws' => $withdraws, 'from_date' => $from_date, 'to_date' => $to_date, 'user_id' => $user_id]);
     }
+
     public function generateBankBalance()
     {
         $records = BankAccount::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('account_name')->get();
         return view('pages.reports.bank_and_expenses.generate_bank_balance', compact('records'));
     }
+
     public function printBankBalance()
     {
         $records = BankAccount::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('account_name')->get();
         return view('pages.reports.bank_and_expenses.print_bank_balance', compact('records'));
     }
+
     public function generateChequeCollected()
     {
         return view('pages.reports.bank_and_expenses.cheque_collected');
     }
+
     public function loadChequeCollected(Request $request)
     {
         $from_date = $request->from_date;
@@ -362,6 +379,7 @@ class ReportController extends Controller
         return view('pages.reports.bank_and_expenses.load_cheque_collected', ['ledgers' => $ledgers, 'from_date' => $from_date, 'to_date' => $to_date, 'balance_b_d' => $balance_b_d]);
 
     }
+
     public function printChequeCollected($from_date, $to_date)
     {
         $query = CustomerLedger::where('payment_mode', '=', 'Cheque')
@@ -375,10 +393,12 @@ class ReportController extends Controller
             ->where('date', '<', $from_date)->sum('dr');
         return view('pages.reports.bank_and_expenses.print_cheque_collected', ['ledgers' => $ledgers, 'from_date' => $from_date, 'to_date' => $to_date, 'balance_b_d' => $balance_b_d]);
     }
+
     public function generateConsolidatedExpense()
     {
         return view('pages.reports.bank_and_expenses.consolidated_expense', ['items' => ExpenseItem::orderBy('name')->get()]);
     }
+
     public function loadConsolidatedExpense(Request $request)
     {
         $from_date = $request->from_date;
@@ -398,6 +418,7 @@ class ReportController extends Controller
         return view('pages.reports.bank_and_expenses.load_consolidated_expense', ['expenses' => $expenses, 'from_date' => $from_date, 'to_date' => $to_date, 'item_id' => $item_id]);
 
     }
+
     public function printConsolidatedExpense($from_date, $to_date, $item_id)
     {
         if ($item_id == "all")
@@ -419,6 +440,7 @@ class ReportController extends Controller
     {
         return view('pages.reports.bank_and_expenses.expense_item', ['items' => ExpenseItem::orderBy('name')->get()]);
     }
+
     public function loadExpenseItem(Request $request)
     {
         $from_date = $request->from_date;
@@ -435,6 +457,7 @@ class ReportController extends Controller
         return view('pages.reports.bank_and_expenses.load_expense_item', ['expenses' => $expenses, 'from_date' => $from_date, 'to_date' => $to_date, 'item_id' => $item_id]);
 
     }
+
     public function printExpenseItem($from_date, $to_date, $item_id)
     {
         if ($item_id == "all")
@@ -447,6 +470,7 @@ class ReportController extends Controller
 
         return view('pages.reports.bank_and_expenses.print_expense_item', ['expenses' => $expenses, 'from_date' => $from_date, 'to_date' => $to_date, 'item_id' => $item_id]);
     }
+
     //Stock and Control Reports
     public function generateCurrentStock()
     {
@@ -455,6 +479,7 @@ class ReportController extends Controller
             'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('name')->get()
         ]);
     }
+
     public function loadCurrentStock(Request $request)
     {
         $categor_id = $request->category_id;
@@ -487,6 +512,7 @@ class ReportController extends Controller
             $store_id = "all";
         return view('pages.reports.stock_control.load_stock', ['stores' => $stores, 'product_id' => $product_id, 'category_id' => $categor_id, 'store_id' => $store_id]);
     }
+
     public function printCurrentStock($store_id, $categor_id, $product_id)
     {
         if ($categor_id == "all")
@@ -511,10 +537,12 @@ class ReportController extends Controller
             ->get();
         return view('pages.reports.stock_control.print_current_stock', ['stores' => $stores]);
     }
+
     public function dailyReport()
     {
         return view('pages.reports.bank_and_expenses.daily_cash_report');
     }
+
     public function loadDailyReport(Request $request)
     {
         $startDate = $request->from_date;
@@ -580,6 +608,7 @@ class ReportController extends Controller
             'to_date' => $request->to_date,
         ]);
     }
+
     public function printDailyReport($from_date, $to_date)
     {
         $startDate = $from_date;
@@ -645,6 +674,7 @@ class ReportController extends Controller
             'to_date' => $to_date,
         ]);
     }
+
     public function storeLedger()
     {
         return view('pages.reports.stock_control.store_ledger_report', [
@@ -653,6 +683,7 @@ class ReportController extends Controller
             'categories' => Category::orderBy('name')->get(),
         ]);
     }
+
     public function loadStoreLedger(Request $request)
     {
         $product_id = $request->product_id;
@@ -691,6 +722,7 @@ class ReportController extends Controller
             $store_id = "all";
         return view('pages.reports.stock_control.load_store_ledger', ['stores' => $stores, 'product_id' => $product_id, 'category_id' => $category_id, 'store_id' => $store_id]);
     }
+
     public function printstoreLedger($store_id, $category_id, $product_id)
     {
 
@@ -728,6 +760,7 @@ class ReportController extends Controller
             $store_id = "all";
         return view('pages.reports.stock_control.print_store_ledger', ['stores' => $stores, 'product_id' => $product_id, 'category_id' => $category_id, 'store_id' => $store_id]);
     }
+
     public function stockAdjustment()
     {
         return view('pages.reports.stock_control.stock_adjustment_report', [
@@ -736,6 +769,7 @@ class ReportController extends Controller
             'categories' => Category::orderBy('name')->get(),
         ]);
     }
+
     public function loadStockAdjustment(Request $request)
     {
         $from_date = $request->from_date;
@@ -808,7 +842,8 @@ class ReportController extends Controller
             ->get();
         return view('pages.reports.stock_control.print_stock_adjutment', compact('stores', 'from_date', 'to_date'));
     }
-    //Sales and Cash Analysis    
+
+    //Sales and Cash Analysis
     public function generalSaleReport()
     {
         return view('pages.reports.sales_and_cash_analysis.general_sale', [
@@ -817,6 +852,7 @@ class ReportController extends Controller
             'categories' => Category::orderBy('name')->get(),
         ]);
     }
+
     public function loadGeneralSaleReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -882,6 +918,7 @@ class ReportController extends Controller
 
         return view('pages.reports.sales_and_cash_analysis.load_general_sale_report', compact('sales', 'from_date', 'to_date', 'product_id', 'store_id', 'category_id', 'customer_id', 'payment_mode', 'credit_walkedin'));
     }
+
     public function printGeneralSaleReport($from_date, $to_date, $store_id, $category_id, $product_id, $customer_id, $payment_mode, $credit_walkedin)
     {
         if ($product_id == 'all') {
@@ -935,6 +972,7 @@ class ReportController extends Controller
             'users' => User::orderBy('name')->get(),
         ]);
     }
+
     public function loadStaffSaleReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -994,6 +1032,7 @@ class ReportController extends Controller
         $user = User::find($staff_id);
         return view('pages.reports.sales_and_cash_analysis.load_staff_sale_report', compact('sales', 'from_date', 'to_date', 'product_id', 'store_id', 'category_id', 'staff_id', 'payment_mode', 'total_cash', 'total_debtors', 'user'));
     }
+
     public function printStaffSaleReport($from_date, $to_date, $store_id, $category_id, $product_id, $staff_id, $payment_mode)
     {
         if ($product_id == 'all') {
@@ -1045,6 +1084,7 @@ class ReportController extends Controller
             'categories' => Category::orderBy('name')->get(),
         ]);
     }
+
     public function loadPreviousStockBalance(Request $request)
     {
         $from_date = $request->from_date;
@@ -1121,6 +1161,7 @@ class ReportController extends Controller
             ->get();
         return view('pages.reports.stock_control.print_previous_stock_balance', compact('stores', 'from_date', 'to_date'));
     }
+
     public function stockLedger()
     {
         return view('pages.reports.stock_control.stock_ledger_report', [
@@ -1129,6 +1170,7 @@ class ReportController extends Controller
             'categories' => Category::orderBy('name')->get(),
         ]);
     }
+
     public function loadStockLedger(Request $request)
     {
         $startDate = $request->from_date;
@@ -1241,6 +1283,7 @@ class ReportController extends Controller
             'qty_in_stock' => $qty_in_stock
         ]);
     }
+
     public function printStockLedger($from_date, $to_date, $store_id, $category_id, $product_id)
     {
         $startDate = new Carbon($from_date);
@@ -1356,6 +1399,7 @@ class ReportController extends Controller
             'categories' => Category::orderBy('name')->get(),
         ]);
     }
+
     public function loadCustomerSaleReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -1419,6 +1463,7 @@ class ReportController extends Controller
 
         return view('pages.reports.sales_and_cash_analysis.load_report_with_common_name', compact('sales', 'from_date', 'to_date', 'product_id', 'store_id', 'category_id', 'customer', 'payment_mode', 'credit_walkedin', 'matching'));
     }
+
     public function printCustomerSaleReport($from_date, $to_date, $store_id, $category_id, $product_id, $payment_mode, $customer, $credit_walkedin, $matching)
     {
 
@@ -1477,6 +1522,7 @@ class ReportController extends Controller
             'customers' => Customer::orderBy('name')->where('type', 'Credit')->get(),
         ]);
     }
+
     public function loadDebtorBalanceReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -1506,6 +1552,7 @@ class ReportController extends Controller
             $customer_id = "all";
         return view('pages.reports.sales_and_cash_analysis.load_debtor_balance_report', compact('sales', 'from_date', 'to_date', 'customer_id'));
     }
+
     public function printDebtorBalanceReport($from_date, $to_date, $customer_id)
     {
 
@@ -1536,6 +1583,7 @@ class ReportController extends Controller
     {
         return view('pages.reports.sales_and_cash_analysis.most_sold_item_report');
     }
+
     public function loadMostSoldItemReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -1558,6 +1606,7 @@ class ReportController extends Controller
             ->get();
         return view('pages.reports.sales_and_cash_analysis.load_most_sold_item_report', compact('sales', 'from_date', 'to_date', 'number_limit'));
     }
+
     public function printMostSoldItemReport($from_date, $to_date, $number_limit)
     {
         $sales = DB::table('orders')
@@ -1585,6 +1634,7 @@ class ReportController extends Controller
             'categories' => Category::orderBy('name')->get(),
         ]);
     }
+
     public function loadItemSoldReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -1641,6 +1691,7 @@ class ReportController extends Controller
 
         return view('pages.reports.sales_and_cash_analysis.load_item_sold_report', compact('sales', 'from_date', 'to_date', 'product_id', 'store_id', 'category_id', 'customer_id', 'credit_walkedin'));
     }
+
     public function printItemSoldReport($from_date, $to_date, $store_id, $category_id, $product_id, $customer_id, $credit_walkedin)
     {
         if ($product_id == 'all') {
@@ -1682,6 +1733,7 @@ class ReportController extends Controller
             $product_id = "all";
         return view('pages.reports.sales_and_cash_analysis.print_item_sold_report', compact('sales', 'from_date', 'to_date', 'category_id', 'product_id'));
     }
+
     public function trackDiscount()
     {
         return view('pages.reports.sales_and_cash_analysis.track_discount_report', [
@@ -1690,6 +1742,7 @@ class ReportController extends Controller
             'categories' => Category::orderBy('name')->get(),
         ]);
     }
+
     public function loadTrackDiscount(Request $request)
     {
         $from_date = $request->from_date;
@@ -1753,6 +1806,7 @@ class ReportController extends Controller
 
         return view('pages.reports.sales_and_cash_analysis.load_track_discount_report', compact('sales', 'from_date', 'to_date', 'product_id', 'store_id', 'category_id', 'customer_id', 'credit_walkedin', 'lower', 'upper'));
     }
+
     public function printTrackDiscount($from_date, $to_date, $store_id, $category_id, $product_id, $customer_id, $credit_walkedin, $lower, $upper)
     {
         if ($product_id == 'all') {
@@ -1804,6 +1858,7 @@ class ReportController extends Controller
     {
         return view('pages.reports.sales_and_cash_analysis.most_sold_item_by_quantity_report');
     }
+
     public function loadSoldItemQuantityReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -1827,6 +1882,7 @@ class ReportController extends Controller
             ->get()->take($number_limit);
         return view('pages.reports.sales_and_cash_analysis.load_most_sold_item_quantity_report', compact('sales', 'from_date', 'to_date', 'number_limit'));
     }
+
     public function printSoldItemQuantityReport($from_date, $to_date, $number_limit)
     {
         $sales = DB::table('orders')
@@ -1847,12 +1903,14 @@ class ReportController extends Controller
             ->get();
         return view('pages.reports.sales_and_cash_analysis.print_most_sold_item_by_quantity_report', compact('sales', 'from_date', 'to_date', 'number_limit'));
     }
+
     public function customerDebtReport()
     {
         return view('pages.reports.customer_ledger_analysis.customer_total_debt_report', [
             'customers' => Customer::orderBy('name')->where('type', 'Credit')->get(),
         ]);
     }
+
     public function loadCustomerDebtReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -1874,6 +1932,7 @@ class ReportController extends Controller
             $customer_id = "all";
         return view('pages.reports.customer_ledger_analysis.load_customer_total_debt_report', compact('sales', 'from_date', 'to_date', 'customer_id'));
     }
+
     public function printCustomerDebtReport($from_date, $to_date, $customer_id)
     {
 
@@ -1898,6 +1957,7 @@ class ReportController extends Controller
             'customers' => Customer::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('name')->where('type', 'Credit')->get(),
         ]);
     }
+
     public function loadCustomerBalanceDetailReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -1919,6 +1979,7 @@ class ReportController extends Controller
             $customer_id = "all";
         return view('pages.reports.customer_ledger_analysis.load_customer_balance_details_report', compact('sales', 'from_date', 'to_date', 'customer_id'));
     }
+
     public function printCustomerBalanceDetailReport($from_date, $to_date, $customer_id)
     {
 
@@ -1944,6 +2005,7 @@ class ReportController extends Controller
             'customers' => Customer::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('name')->where('type', 'Credit')->get(),
         ]);
     }
+
     public function loadAgeingReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -1973,6 +2035,7 @@ class ReportController extends Controller
             $to_date = "all";
         return view('pages.reports.customer_ledger_analysis.load_ageing_report', compact('sales', 'from_date', 'to_date', 'customer_id'));
     }
+
     public function printAgeingReport($from_date, $to_date, $customer_id)
     {
 
@@ -2006,6 +2069,7 @@ class ReportController extends Controller
             'customers' => Customer::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('name')->where('type', 'Credit')->get(),
         ]);
     }
+
     public function loadLastTransaction(Request $request)
     {
         $from_date = $request->from_date;
@@ -2028,6 +2092,7 @@ class ReportController extends Controller
             $customer_id = "all";
         return view('pages.reports.customer_ledger_analysis.load_customer_last_transaction_report', compact('sales', 'from_date', 'to_date', 'customer_id'));
     }
+
     public function printLastTransaction($from_date, $to_date, $customer_id)
     {
 
@@ -2054,6 +2119,7 @@ class ReportController extends Controller
             'customers' => Customer::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('name')->where('type', 'Credit')->get(),
         ]);
     }
+
     public function loadCustomerPaymentReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -2077,6 +2143,7 @@ class ReportController extends Controller
             $customer_id = "all";
         return view('pages.reports.customer_ledger_analysis.load_customer_payment_report', compact('sales', 'from_date', 'to_date', 'customer_id'));
     }
+
     public function printCustomerPaymentReport($from_date, $to_date, $customer_id)
     {
 
@@ -2105,6 +2172,7 @@ class ReportController extends Controller
             'customers' => Customer::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('name')->where('type', 'Credit')->get(),
         ]);
     }
+
     public function loadDebtorPaymentOverDueReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -2132,6 +2200,7 @@ class ReportController extends Controller
             $customer_id = "all";
         return view('pages.reports.customer_ledger_analysis.load_debtor_payment_overdue_report', compact('sales', 'from_date', 'to_date', 'customer_id'));
     }
+
     public function printDebtorPaymentOverDueReport($from_date, $to_date, $customer_id)
     {
 
@@ -2162,6 +2231,7 @@ class ReportController extends Controller
             'customers' => Customer::where('branch_id', 'LIKE', User::userBranchAction())->where('type', 'Credit')->get()
         ]);
     }
+
     public function loadDeletedSaleReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -2192,6 +2262,7 @@ class ReportController extends Controller
             $customer_id = "all";
         return view('pages.reports.customer_ledger_analysis.load_deleted_sales_report', compact('sales', 'from_date', 'to_date', 'customer_id'));
     }
+
     public function printDeletedSaleReport($from_date, $to_date, $customer_id)
     {
         $sales = DB::table('orders')
@@ -2221,6 +2292,7 @@ class ReportController extends Controller
             'suppliers' => Supplier::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('name')->get(),
         ]);
     }
+
     public function loadSupplierBalanceReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -2244,6 +2316,7 @@ class ReportController extends Controller
 
         return view('pages.reports.supplier_ledger_analysis.load_supplier_payment_report', compact('sales', 'from_date', 'to_date', 'supplier_id'));
     }
+
     public function printSupplierBalanceReport($from_date, $to_date, $supplier_id)
     {
 
@@ -2263,12 +2336,14 @@ class ReportController extends Controller
             $supplier_id = "all";
         return view('pages.reports.supplier_ledger_analysis.print_supplier_payment_report', compact('sales', 'from_date', 'to_date', 'supplier_id'));
     }
+
     public function supplierDebtReport()
     {
         return view('pages.reports.supplier_ledger_analysis.supplier_total_debt_report', [
             'suppliers' => Supplier::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('name')->get(),
         ]);
     }
+
     public function loadSupplierDebtReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -2292,6 +2367,7 @@ class ReportController extends Controller
             $supplier_id = "all";
         return view('pages.reports.supplier_ledger_analysis.load_supplier_total_debt_report', compact('sales', 'from_date', 'to_date', 'supplier_id'));
     }
+
     public function printSupplierDebtReport($from_date, $to_date, $supplier_id)
     {
 
@@ -2311,12 +2387,14 @@ class ReportController extends Controller
             $supplier_id = "all";
         return view('pages.reports.supplier_ledger_analysis.print_supplier_total_debt_report', compact('sales', 'from_date', 'to_date', 'supplier_id'));
     }
+
     public function creditNoteReport()
     {
         return view('pages.reports.supplier_ledger_analysis.creditor_note_report', [
             'suppliers' => Supplier::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('name')->get(),
         ]);
     }
+
     public function loadCreditNoteReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -2337,6 +2415,7 @@ class ReportController extends Controller
             $supplier_id = "all";
         return view('pages.reports.supplier_ledger_analysis.load_creditor_note_report', compact('sales', 'from_date', 'to_date', 'supplier_id'));
     }
+
     public function printCreditNoteReport($from_date, $to_date, $supplier_id)
     {
 
@@ -2361,6 +2440,7 @@ class ReportController extends Controller
             'suppliers' => Supplier::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('name')->get(),
         ]);
     }
+
     public function loadSupplierPaymentReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -2384,6 +2464,7 @@ class ReportController extends Controller
             $supplier_id = "all";
         return view('pages.reports.purchase_analysis.load_supplier_payment_report', compact('sales', 'from_date', 'to_date', 'supplier_id'));
     }
+
     public function printSupplierPaymentReport($from_date, $to_date, $supplier_id)
     {
 
@@ -2414,6 +2495,7 @@ class ReportController extends Controller
             'suppliers' => Supplier::where('branch_id', 'LIKE', User::userBranchAction())->get(),
         ]);
     }
+
     public function loadPurchasesReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -2469,9 +2551,9 @@ class ReportController extends Controller
             $purchase_mode = "all";
 
 
-
         return view('pages.reports.purchase_analysis.load_supplier_transaction_report', compact('sales', 'from_date', 'to_date', 'product_id', 'store_id', 'category_id', 'supplier_id', 'purchase_mode'));
     }
+
     public function printPurchasesReport($from_date, $to_date, $store_id, $category_id, $product_id, $supplier_id, $purchase_mode)
     {
         if ($product_id == 'all') {
@@ -2519,6 +2601,7 @@ class ReportController extends Controller
             'suppliers' => Supplier::where('branch_id', 'LIKE', User::userBranchAction())->get(),
         ]);
     }
+
     public function loadPurchaseCheckReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -2574,9 +2657,9 @@ class ReportController extends Controller
             $purchase_mode = "all";
 
 
-
         return view('pages.reports.purchase_analysis.load_purchase_transaction_check_report', compact('sales', 'from_date', 'to_date', 'product_id', 'store_id', 'category_id', 'supplier_id', 'purchase_mode'));
     }
+
     public function printPurchaseCheckReport($from_date, $to_date, $store_id, $category_id, $product_id, $supplier_id, $purchase_mode)
     {
         if ($product_id == 'all') {
@@ -2621,6 +2704,7 @@ class ReportController extends Controller
             'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('id')->get()
         ]);
     }
+
     public function loadTotalPurchaseItemReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -2653,6 +2737,7 @@ class ReportController extends Controller
 
         return view('pages.reports.purchase_analysis.load_total_purchase_item_report', compact('sales', 'from_date', 'to_date', 'store_id'));
     }
+
     public function printTotalPurchaseItemReport($from_date, $to_date, $store_id)
     {
 
@@ -2686,6 +2771,7 @@ class ReportController extends Controller
             'users' => User::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('name')->get(),
         ]);
     }
+
     public function viewLogs(Request $request)
     {
         $records = AuditLog::whereDate(DB::raw('DATE(created_at)'), '>=', $request->from_date)->whereDate(DB::raw('DATE(created_at)'), '<=', $request->to_date)->where('user_id', $request->user_id)->latest()->get();
@@ -2696,6 +2782,7 @@ class ReportController extends Controller
             'to_date' => $request->to_date
         ]);
     }
+
     public function printLogs($from_date, $to_date, $user_id)
     {
         $records = AuditLog::whereDate(DB::raw('DATE(created_at)'), '>=', $from_date)->whereDate(DB::raw('DATE(created_at)'), '<=', $to_date)->where('user_id', $user_id)->latest()->get();
@@ -2706,10 +2793,12 @@ class ReportController extends Controller
             'to_date' => $to_date
         ]);
     }
+
     public function loanBalance()
     {
         return view('pages.reports.user_ledger_and_loan.user_loan_balance', ['users' => LoanCollector::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('name')->get()]);
     }
+
     public function loadLoanBalance(Request $request)
     {
         $collector_id = $request->user_id;
@@ -2726,6 +2815,7 @@ class ReportController extends Controller
             $collector_id = "all";
         return view('pages.reports.user_ledger_and_loan.load_user_loan_balance', ['records' => $records, 'user_id' => $collector_id]);
     }
+
     public function printLoanBalance($collector_id)
     {
         if ($collector_id == "all")
@@ -2746,6 +2836,7 @@ class ReportController extends Controller
     {
         return view('pages.reports.user_ledger_and_loan.user_loan_history', ['users' => LoanCollector::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('name')->get()]);
     }
+
     public function loadLoanHistory(Request $request)
     {
         $collector_id = $request->user_id;
@@ -2764,6 +2855,7 @@ class ReportController extends Controller
         $collector = LoanCollector::find($collector_id);
         return view('pages.reports.user_ledger_and_loan.load_user_loan_history', ['records' => $records, 'collector' => $collector]);
     }
+
     public function printLoanHistory($collector_id)
     {
         if ($collector_id == "all")
@@ -2781,6 +2873,7 @@ class ReportController extends Controller
         $collector = LoanCollector::find($collector_id);
         return view('pages.reports.user_ledger_and_loan.print_user_loan_history', ['records' => $records, 'collector' => $collector]);
     }
+
     public function printAvailableStock(Request $request)
     {
         $categor_id = $request->categor_id;
@@ -2805,14 +2898,59 @@ class ReportController extends Controller
         $stores = $stores->get();
         return view('pages.reports.stock_control.print_available_stock', ['stores' => $stores]);
     }
+
     public function accountBalance(Request $request)
     {
         //return view('pages.reports.ap_ar.account_balances', ['model' => null]);
-       
+
         $user_branch = User::userBranchAction();
-        $accounts = GeneralAccount::whereIn('class', ['A11','A12','A13'])->orderBy('number')->get();
+        $accounts = GeneralAccount::whereIn('class', ['A11', 'A12', 'A13'])->orderBy('number')->get();
         $customers = Customer::whereIn('type', ['Retail', 'Wholesale'])->where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
         $model = new GeneralAccountLedger();
         return view('pages.reports.ap_ar.account_balances', compact('accounts', 'customers', 'model'));
     }
+
+    public function trialBalance()
+    {
+        $branches = Branch::select(['id', 'name', 'code'])->orderBy('name')->get();
+
+        return view('pages.reports.ap_ar.trial_balance.index', compact('branches'));
+    }
+
+    public function loadTrialBalance(Request $request)
+    {
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
+        $branch_id = $request->branch_id;
+
+        $query = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id);
+        $ledgers = $query->orderBy('date')->orderBy('general_account_ledgers.id')->get();
+
+        $credit_sum = $query->sum('credit');
+        $debit_sum = $query->sum('debit');
+        $balance = $credit_sum - $debit_sum;
+        $branch = Branch::find($branch_id);
+
+        return view('pages.reports.ap_ar.trial_balance.load', compact('ledgers', 'branch', 'from_date', 'to_date', 'balance', 'credit_sum', 'debit_sum'));
+    }
+
+    public function printTrialBalance($from, $to, Branch $branch)
+    {
+        $query = $this->generalAccountLedgerBy($from, $to, $branch->id);
+        $ledgers = $query->orderBy('date')->orderBy('general_account_ledgers.id')->get();
+
+        $credit_sum = $query->sum('credit');
+        $debit_sum = $query->sum('debit');
+        $balance = $credit_sum - $debit_sum;
+
+        return view('pages.reports.ap_ar.trial_balance.print', compact('ledgers', 'branch', 'from', 'to', 'balance', 'credit_sum', 'debit_sum'));
+    }
+
+    private function generalAccountLedgerBy($from_date, $to_date, $branch_id)
+    {
+        return GeneralAccountLedger::join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+            ->where('general_account_ledgers.branch_id', 'like', $branch_id)
+            ->whereBetween('date', [$from_date, $to_date]);
+    }
+
 }

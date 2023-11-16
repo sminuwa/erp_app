@@ -955,7 +955,7 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="{{ route('user.loan.balance.report') }}"
+                                            <a href="{{ route('trial.balance.report') }}"
                                                 class="nav-link {{ Request::is('reports/us/loan/balance*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Trial Balance</p>

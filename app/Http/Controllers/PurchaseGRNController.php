@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\CostPrice;
 use App\Classes\Transaction;
 use App\Models\GeneralAccount;
 use App\Models\PurchaseExpense;
@@ -99,6 +100,7 @@ class PurchaseGRNController extends Controller
             if(!$purchase){
                 $purchase = new Purchase();
                 $purchase->reference = Purchase::generateNewNumber();
+                $purchase->branch_id = auth()->user()->branch->id;
                 $purchase->created_by = auth()->id();
             }else{
                 $purchase->updated_by = $request->updated_by;
@@ -123,7 +125,7 @@ class PurchaseGRNController extends Controller
                     $product->status = 1;
                     $product->save();
                 }
-                Transaction::purchases($purchase->id, $purchase_date);
+                /*Transaction::purchases($purchase->id, $purchase_date);*/
                 $action = "Made a purchase with reference $request->reference from supplier: " . Supplier::find($request->supplier_id)->name;
                 AuditLog::auditLog(Auth::id(), $action);
                 DB::commit();
@@ -463,10 +465,30 @@ class PurchaseGRNController extends Controller
     }
     public function post(Request $request, Purchase $purchase)
     {
+        $items = $purchase->purchasedProducts;
         DB::beginTransaction();
         $purchase->status = 1;
+        $purchase->posted_by = auth()->id();
         if ($purchase->save()) {
-            if (Transaction::purchases($purchase->id, $purchase->date)['status']) {
+            $new_cost_price = [];
+            foreach ($items as $item) {
+                $new_cost_price[$item->product_id] = [
+                    'quantity' => $item->quantity,
+                    'price' => $item->unit_price,
+                    'store_id' => $item->store_id,
+                    'expiry_date' => $item->expire_date,
+                ];
+            }
+            if (
+                Transaction::purchases($purchase->id, $purchase->purchase_date)['status']
+                && CostPrice::newCostPrice(
+                    $new_cost_price,
+                    $purchase->reference,
+                    $purchase->branch_id
+                )['status']
+            ) {
+                $action = "Posted purchase GRN with reference $request->reference from supplier: " . Supplier::find($purchase->supplier_id)->name;
+                AuditLog::auditLog(Auth::id(), $action);
                 DB::commit();
             } else
                 DB::rollback();

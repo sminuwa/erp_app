@@ -107,7 +107,6 @@ class InvoiceController extends Controller
         return view('pages.order.order_invoice_print', compact('order_details', 'order', 'company', 'utility'));
     }
 
-
     public function order_print($order_id)
     {
         $order = OrderInvoice::with('customer')->where('id', $order_id)->first();
@@ -119,7 +118,6 @@ class InvoiceController extends Controller
         $utility = new Utility();
         return view('pages.order.order_print', compact('order_details', 'order', 'company', 'utility'));
     }
-
 
     public function final_invoice(Request $request)
     {

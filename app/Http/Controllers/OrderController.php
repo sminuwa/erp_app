@@ -545,7 +545,6 @@ class OrderController extends Controller
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         return view('pages.customer.print', compact('dates', 'customer', 'company'));
     }
-
     public function transfer(Request $request)
     {
         if (Auth::user()->can('transfer.sale.to.user')) {

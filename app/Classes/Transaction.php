@@ -41,13 +41,13 @@ class Transaction
                 'category_name' => $item->product->category->name,
                 'asset_account_id' => $item->product->category->asset_account,
                 'cost_account_id' => $item->product->category->cost_account,
-                'amount' => ($item->unit_price * $item->qty_supplied),
+                'amount' => ($item->unit_price * $item->quantity),
             ];
             $product_amounts[] = [
                 'id' => $item->product_id,
-                'amount' => ($item->unit_price * $item->qty_supplied)
+                'amount' => ($item->unit_price * $item->quantity)
             ];
-            $amount += ($item->unit_price * $item->qty_supplied);
+            $amount += ($item->unit_price * $item->quantity);
         }
         foreach($product_categories as $key=>$value){
             if(isset($categories[$value['category_id']])){

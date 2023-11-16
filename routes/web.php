@@ -964,6 +964,7 @@ Route::middleware('auth')->group(function () {
                 Route::post('/expense', [PurchaseGRNController::class, 'expense'])->name('purchases.expense.ajax.create');
                 Route::delete('/expense/delete/{expense}', [PurchaseGRNController::class, 'deleteExpense'])->name('delete.purchase.expense');
                 Route::post('/approve/{purchase}', [PurchaseGRNController::class, 'approve'])->name('purchase.approve');
+                Route::post('/post/{purchase}', [PurchaseGRNController::class, 'post'])->name('purchases.post');
             }
         );
         Route::group(['prefix' => 'purchases/request'], function () {

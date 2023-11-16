@@ -461,4 +461,17 @@ class PurchaseGRNController extends Controller
         }
         return back()->with('success', 'Approved successfully');
     }
+    public function post(Request $request, Purchase $purchase)
+    {
+        DB::beginTransaction();
+        $purchase->status = 1;
+        if ($purchase->save()) {
+            if (Transaction::purchases($purchase->id, $purchase->date)['status']) {
+                DB::commit();
+            } else
+                DB::rollback();
+            session()->flash('app_message', 'Purchase successfully posted');
+        }
+        return back();
+    }
 }

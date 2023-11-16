@@ -27,7 +27,7 @@
                             <a class="dropdown-item" href="{{ route('purchases.show', $record->id) }}">
                                 <span class="fa fa-eye">View</span>
                             </a>
-                            <form action="{{ route('purchase.approve', $record->id) }}" method="post"
+                            <form action="{{ route('purchase.post', $record->id) }}" method="post"
                                 onsubmit="return confirm('Are you sure you want to post this order?')">
                                 @csrf
                                 <button type="submit" class="dropdown-item">

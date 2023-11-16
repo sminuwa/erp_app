@@ -53,8 +53,8 @@
                             <a class="btn btn-secondary btn-sm" href="{{ route('purchases.edit', $record->id) }}">
                                 <span class="fa fa-pencil"></span> Edit
                             </a>
-                            <form onsubmit="return confirm('Are you sure you want to approve?')"
-                                  action="{{ route('purchase.approve', $record->id) }}" method="post" style="display: inline">
+                            <form onsubmit="return confirm('Are you sure you want to post this GRN?')"
+                                  action="{{ route('purchase.post', $record->id) }}" method="post" style="display: inline">
                                 {{ csrf_field() }}
                                 {{ method_field('POST') }}
                                 <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">

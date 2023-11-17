@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\StockCard;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\StockAdjustment;
@@ -43,25 +44,16 @@ class StockAdjustmentController extends Controller
             ->join('stores', 'stores.id', 'stock_adjustments.store_id')
             ->where('stores.branch_id', 'LIKE', User::userBranchAction())
             ->groupBy('refno')->get()]);
-    } /**
-  * Display the specified resource.
-  *
-  * @param  Show  $request
-  * @param  StockAdjustment  $stockadjustment
-  * @return \Illuminate\Http\Response
-  */
+    }
+
     public function show(Show $request, StockAdjustment $stockadjustment)
     {
         return view('pages.stock_adjustments.show', [
             'record' => $stockadjustment,
         ]);
 
-    } /**
-  * Show the form for creating a new resource.
-  *
-  * @param  Create  $request
-  * @return \Illuminate\Http\Response
-  */
+    }
+
     public function create(Create $request)
     {
 
@@ -78,12 +70,8 @@ class StockAdjustmentController extends Controller
             'adjusment_products' => $cartItems,
             'refno' => $this->generateRefNo(),
         ]);
-    } /**
-  * Store a newly created resource in storage.
-  *
-  * @param  Store  $request
-  * @return \Illuminate\Http\Response
-  */
+    }
+
     public function store(Request $request)
     {
         $model = new StockAdjustment;
@@ -91,7 +79,6 @@ class StockAdjustmentController extends Controller
         try {
             if (\Cart::session('_token')->getContent()->count() > 0) {
 
-                $refno = $request->refno;
                 foreach (\Cart::session('_token')->getContent() as $product) {
                     $attribute = $product->attributes;
                     $store_id = $attribute['store_id'];
@@ -99,34 +86,21 @@ class StockAdjustmentController extends Controller
                     $product_id = $attribute['product_id'];
                     $sign = $attribute['sign'];
                     $adjusted_qty = $product->quantity;
+                    $reference = StockAdjustment::generateNewNumber();
                     if ($sign == "-")
                         $adjusted_qty = 0 - $adjusted_qty;
                     StoreProduct::where(['store_id' => $store_id, 'product_id' => $product_id])->increment('qty_available', $adjusted_qty);
                     DB::table('stock_adjustments')->insert([
+                        'reference' => $reference,
                         'store_id' => $store_id,
                         'product_id' => $product_id,
                         'adjusted_qty' => $adjusted_qty,
                         'available_qty' => $available_qty,
                         'adjusted_by' => Auth::id(),
-                        'refno' => $refno,
                         'date' => $request->date,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now()
                     ]);
-                    DB::table('stock_cards')->insert([
-                        'store_id' => $store_id,
-                        'product_id' => $product_id,
-                        'cr' => $adjusted_qty > 0 ? $adjusted_qty : 0,
-                        'dr' => $adjusted_qty < 0 ? abs($adjusted_qty) : 0,
-                        'refno' => $refno,
-                        'type' => 0,
-                        'date' => $request->date,
-                        'user_id' => Auth::id(),
-                        'priority' => 5,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now()
-                    ]);
-                    $action = "Adjusted stock $refno : " . $adjusted_qty;
+
+                    $action = "Adjusted stock $reference : " . $adjusted_qty;
                     AuditLog::auditLog(Auth::id(), $action);
                     session()->flash('app_message', 'Stock transfered successfully');
                     DB::commit();

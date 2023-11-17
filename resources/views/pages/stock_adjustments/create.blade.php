@@ -43,6 +43,35 @@
                                 <i class="ion-android-cart"></i> Stock Adjustment Cart
                             </div>
                             <div class="card-body table-responsive">
+                                <form action="{{ isset($route) ? $route : route('stock_adjustments.store') }}"
+                                      method="POST">
+                                    {{ csrf_field() }}
+                                    <input type="hidden" name="_method"
+                                           value="{{ isset($method) ? $method : 'POST' }}" />
+                                    <div class="form-group">
+                                        <label for="date">Date</label>
+                                        <div class="input-group">
+                                            <input type="text" autocomplete="off"
+                                                   class="form-control datepicker {{ $errors->has('date') ? ' is-invalid' : '' }}"
+                                                   name="date" id="date"
+                                                   value="{{ old('date', $model->date) != null ? old('date', $model->date) : date('Y-m-d') }}"
+                                                   placeholder="" required="required">
+                                            <div class="input-group-addon">
+                                                <label for="date" class="fa fa-calendar">
+                                                </label>
+                                            </div>
+                                        </div>
+                                        @if ($errors->has('date'))
+                                            <div class="invalid-feedback">
+                                                <strong>{{ $errors->first('date') }}</strong>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="hidden" name="adjusted_by" id="adjusted_by"
+                                               value="{{ Auth::id() }}" required="required">
+                                    </div>
+
                                 @if (count($adjusment_products) < 1)
                                     <div class="alert alert-danger">
                                         No Product Added
@@ -106,47 +135,7 @@
                                         </tbody>
                                     </table>
                                 @endif
-                                <form action="{{ isset($route) ? $route : route('stock_adjustments.store') }}"
-                                    method="POST">
-                                    {{ csrf_field() }}
-                                    <input type="hidden" name="_method"
-                                        value="{{ isset($method) ? $method : 'POST' }}" />
-                                    <div class="form-group">
-                                        <label for="refno">Stock Adjustement ID</label>
-                                        <input type="text"
-                                            class="form-control {{ $errors->has('refno') ? ' is-invalid' : '' }}"
-                                            name="refno" id="refno"
-                                            value="{{ old('refno', $model->refno) == null ? $refno : old('refno', $model->refno) }}"
-                                            placeholder="" maxlength="15" required="required">
-                                        @if ($errors->has('refno'))
-                                            <div class="invalid-feedback">
-                                                <strong>{{ $errors->first('refno') }}</strong>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="date">Date</label>
-                                        <div class="input-group">
-                                            <input type="text" autocomplete="off"
-                                                class="form-control datepicker {{ $errors->has('date') ? ' is-invalid' : '' }}"
-                                                name="date" id="date"
-                                                value="{{ old('date', $model->date) != null ? old('date', $model->date) : date('Y-m-d') }}"
-                                                placeholder="" required="required">
-                                            <div class="input-group-addon">
-                                                <label for="date" class="fa fa-calendar">
-                                                </label>
-                                            </div>
-                                        </div>
-                                        @if ($errors->has('date'))
-                                            <div class="invalid-feedback">
-                                                <strong>{{ $errors->first('date') }}</strong>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="hidden" name="adjusted_by" id="adjusted_by"
-                                            value="{{ Auth::id() }}" required="required">
-                                    </div>
+
                                     <div class="form-group text-right ">
                                         <button type="submit" class="btn btn-success"><span class="ui-icon-clock">
                                                 Adjust</span></button>

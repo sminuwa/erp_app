@@ -5,7 +5,7 @@
 @endpush
 
 @section('content')
-
+    <input name="cart_page_type" type="hidden" value="interstore">
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
@@ -29,92 +29,37 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('interstore.index') }}">
-                <span class="fa fa-list"></span>
-            </a>
-            <div class="container-fluid">
+            <div class="container">
+                <a class="btn btn-secondary btn-sm" href="{{ route('interstore.index') }}">
+                    <span class="fa fa-list"></span> Interstore List
+                </a>
                 <div class="row">
-                    <div class='col-md-4'>
-                        @include('forms.interstore_transfer')
-                    </div>
-                    <div class="col-md-8">
+                    <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
                                 <i class="ion-android-cart"></i> Transfer Product Cart
+                                <div class="float-right">
+                                    <a href="javascript:void(0)" data-toggle="modal"
+                                       data-target="#add_product_form"
+                                       class="btn btn-sm btn-secondary float-md-right"
+                                       style="margin-left: 2px;"><i class="fa fa-plus"></i> Add Product </a>
+                                </div>
                             </div>
                             <div class="card-body table-responsive">
-                                @if (count($transfer_products) < 1)
-                                    <div class="alert alert-danger">
-                                        No Product Added
-                                    </div>
-                                @else
-                                    <table class="table table-bordered table-striped mb-3">
+                                <form action="{{ isset($route) ? $route : route('interstore.store') }}" method="POST">
+                                <div class="form-group">
+                                    <label for="transfer_date">Date</label>
+                                    <input type="text" name="transfer_date" class="form-control datepicker"
+                                           value="{{ isset($model->transfer_date) ? $model->transfer_date : old('transfer_date', date('Y-m-d')) }}" />
+                                </div>
 
-                                        <thead>
-                                            <tr>
-                                                <td colspan="6" style="line-height: 0.4 !important;text-align: right">
-                                                    <form method="POST"
-                                                        action="{{ route('interstore.cart.clear') }}">
-                                                        @csrf
-                                                        <div class="row">
-                                                            <div class="offset-10 col-sm-2">
-                                                                <button type="submit" class="btn-danger btn btn-sm"><span
-                                                                        class="ion-trash-a text text-white"></span> Clear
-                                                                    All</button>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>S.N</th>
-                                                <th>Code</th>
-                                                <th>Name</th>
-                                                <th>Qty</th>
-                                                <th>Source Store</th>
-                                                <th>Destination Store</th>
-                                                <th><span class="ion-ios-trash"></span></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($transfer_products as $product)
-                                                <tr>
-                                                    @php $attr = $product->attributes @endphp
-                                                    <td>{{ $loop->iteration }}</td>
-                                                    <td class="text-left">{{ $product->attributes['code'] }}</td>
-                                                    <td class="text-left">{{ $product->name }}</td>
-                                                    <td>{{ number_format($product->quantity, 0, '', ',') }}</td>
-                                                    <td>{{ \App\Models\Store::find($attr['source_store_id'])->name }}</td>
-                                                    <td>{{ \App\Models\Store::find($attr['destination_store_id'])->name }}
-                                                    </td>
-                                                    <td>
-                                                        <button class="btn btn-danger btn-sm" type="button"
-                                                            onclick="deleteItem({{ $product->id }})">
-                                                            <i class="fa fa-trash" aria-hidden="true"></i>
-                                                        </button>
-                                                        <form id="delete-form-{{ $product->id }}"
-                                                            action="{{ route('interstore.cart.remove', $product->id) }}"
-                                                            method="post" style="display:none;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                @endif
-                                <form action="{{ isset($route) ? $route : route('interstore.store') }}"
-                                    method="POST">
+                                <div class="cart-container"></div>
+
                                     {{ csrf_field() }}
                                     <input type="hidden" name="_method"
                                         value="{{ isset($method) ? $method : 'POST' }}" />
 
-                                    <div class="form-group">
-                                        <label for="transfer_date">Date</label>
-                                        <input type="text" name="transfer_date" class="form-control datepicker"
-                                            value="{{ isset($model->transfer_date) ? $model->transfer_date : old('transfer_date', date('Y-m-d')) }}" />
-                                    </div>
+
                                     @if (isset($model) && $model->status != null)
                                         <div class="form-check">
                                             <input
@@ -140,11 +85,10 @@
                                             value="{{ Auth::id() }}" required="required">
                                     </div>
                                     <div class="form-group text-right ">
-                                        <button type="submit" class="btn btn-success"><span class="ion-forward">
-                                                Transfer</span></button>
+                                        <button type="submit" class="btn btn-success"><span class="ion-forward">Transfer</span></button>
                                     </div>
                                 </form>
-                            </div>
+                                </div>
 
                         </div>
                     </div>
@@ -155,6 +99,107 @@
     </div>
     <!-- /.content-wrapper -->
 
+    <div class="modal fade" id="add_product_form" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add product to cart</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('ajax.cart.add') }}" method="POST" class="addCartItemForm">
+                        {{ csrf_field() }}
+                        <div class="form-group">
+                            <label for="source_store_id">Source Store</label>
+                            <select class="form-control select2-single {{ $errors->has('source_store_id') ? ' is-invalid' : '' }}"
+                                    name="source_store_id" id="source_store_id" required="required">
+                                <option value="">Select...</option>
+                                @if (isset($stores))
+                                    @foreach ($stores as $data)
+                                        <option value="{{ $data->id }}"
+                                            {{ $data->id == old('source_store_id', $model->source_store_id) ? 'selected' : '' }}>
+                                            {{ $data->code }}-{{ $data->name }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            @if ($errors->has('source_store_id'))
+                                <div class="invalid-feedback">
+                                    <strong>{{ $errors->first('source_store_id') }}</strong>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="form-group">
+                            <label for="product_id">Product</label>
+                            <select class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
+                                    name="product_id" id="product_id" required="required">
+                                <option value="">Select...</option>
+
+                                @if (old('category_id', $model->category_id))
+                                    @foreach (\App\Models\Product::where('category_id', old('category_id'))->get() as $data)
+                                        <option value="{{ $data->id }}"
+                                            {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>
+                                            {{ $data->code }}-{{ $data->name }}</option>
+                                    @endforeach
+                                @else
+                                    @if (isset($products))
+                                        @foreach ($products as $data)
+                                            <option value="{{ $data->id }}"
+                                                {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>
+                                                {{ $data->code }}-{{ $data->name }}</option>
+                                        @endforeach
+                                    @endif
+                                @endif
+
+                            </select>
+                            <div class="input-group-prepend">
+                                <p class="text text-danger" id="available"></p>
+                            </div>
+                            @if ($errors->has('product_id'))
+                                <div class="invalid-feedback">
+                                    <strong>{{ $errors->first('product_id') }}</strong>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="form-group">
+                            <label for="destination_store_id">Destination Store</label>
+                            <select class="form-control select2-single {{ $errors->has('destination_store_id') ? ' is-invalid' : '' }}"
+                                    name="destination_store_id" id="destination_store_id" required="required">
+                                <option value="">Select...</option>
+                                @if (isset($stores))
+                                    @foreach ($stores as $data)
+                                        <option value="{{ $data->id }}"
+                                            {{ $data->id == old('destination_store_id', $model->destination_store_id) ? 'selected' : '' }}>
+                                            {{ $data->code }}-{{ $data->name }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            @if ($errors->has('destination_store_id'))
+                                <div class="invalid-feedback">
+                                    <strong>{{ $errors->first('destination_store_id') }}</strong>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="form-group">
+                            <label for="qty_transfered">Qty</label>
+                            <input type="number" class="form-control {{ $errors->has('qty_transfered') ? ' is-invalid' : '' }}"
+                                   name="qty_transfered" id="qty_transfered" value="{{ $model->qty_transfered }}" placeholder=""
+                                   required="required">
+                            @if ($errors->has('qty_transfered'))
+                                <div class="invalid-feedback">
+                                    <strong>{{ $errors->first('qty_transfered') }}</strong>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="form-group text-right ">
+                            <button type="submit" class="btn btn-primary"><span class="ion-ios-cart-outline"></span> Add to Cart</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('js')
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>

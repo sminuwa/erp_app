@@ -38,7 +38,8 @@ class InterStoreTransferController extends Controller
      */
     public function index(Index $request)
     {
-        \Cart::session('_token')->clear();
+//        \Cart::session('_token')->clear();
+        \Cart::clear();
         $records = TransferProduct::where(['nature' => 'Transfer', 'stock_in_out' => 'out', 'transfer_products.status' => 1])
             ->where('stores.branch_id', 'LIKE', User::userBranchAction())
             ->where('transfer_products.type', 'interstore')
@@ -91,13 +92,13 @@ class InterStoreTransferController extends Controller
         $model = new TransferProduct;
         DB::beginTransaction();
         try {
-            if (\Cart::session('_token')->getContent()->count() > 0) {
+            if (\Cart::getContent()->count() > 0) {
                 $transfer_id = $this->getNextTransferID();
-                $refno = $this->generateRefNo();
+                $reference = TransferProduct::generateNewNumber();
                 $source_qty_available = 0;
                 $destination_qty_available = 0; // get qty before transfer
 
-                foreach (\Cart::session('_token')->getContent() as $product) {
+                foreach (\Cart::getContent() as $product) {
                     $attribute = $product->attributes;
                     $source_store_id = $attribute['source_store_id'];
                     $destination_store_id = $attribute['destination_store_id'];
@@ -131,7 +132,7 @@ class InterStoreTransferController extends Controller
                     }
 
                     DB::table('transfer_products')->insert([
-                        'reference' => TransferProduct::generateNewNumber(),
+                        'reference' => $reference,
                         'transfer_id' => $transfer_id,
                         'source_store_id' => $source_store_id,
                         'product_id' => $product_id,
@@ -142,14 +143,14 @@ class InterStoreTransferController extends Controller
                         'status' => 'Completed',
                         'nature' => 'Transfer',
                         'stock_in_out' => 'out',
-                        'refno' => $refno,
+                        'refno' => $reference,
                         'type' => 'interstore',
                         'transfer_date' => $request->transfer_date,
                         'vehicle_no' => $request->vehicle_no,
                     ]);
 
                     DB::table('transfer_products')->insert([
-                        'reference' => TransferProduct::generateNewNumber(),
+                        'reference' => $reference,
                         'transfer_id' => $transfer_id,
                         'source_store_id' => $destination_store_id,
                         'product_id' => $product_id,
@@ -160,7 +161,7 @@ class InterStoreTransferController extends Controller
                         'status' => 'Completed',
                         'nature' => 'Transfer',
                         'stock_in_out' => 'in',
-                        'refno' => $refno,
+                        'refno' => $reference,
                         'type' => 'interstore',
                         'transfer_date' => $request->transfer_date,
                         'vehicle_no' => $request->vehicle_no,
@@ -171,7 +172,7 @@ class InterStoreTransferController extends Controller
                         'product_id' => $product_id,
                         'cr' => 0,
                         'dr' => $product->quantity,
-                        'refno' => $refno,
+                        'refno' => $reference,
                         'type' => 0,
                         'date' => $request->transfer_date,
                         'user_id' => Auth::id(),
@@ -184,7 +185,7 @@ class InterStoreTransferController extends Controller
                         'product_id' => $product_id,
                         'cr' => $product->quantity,
                         'dr' => 0,
-                        'refno' => $refno,
+                        'refno' => $reference,
                         'type' => 0,
                         'date' => $request->transfer_date,
                         'user_id' => Auth::id(),
@@ -202,15 +203,10 @@ class InterStoreTransferController extends Controller
             session()->flash('app_message', 'Something is wrong while transfering stock');
             throw $ex;
         }
-        \Cart::session('_token')->clear();
-        return redirect()->back();
-    } /**
-      * Show the form for editing the specified resource.
-      *
-      * @param  Edit  $request
-      * @param  TransferProduct  $transferproduct
-      * @return \Illuminate\Http\Response
-      */
+        \Cart::clear();
+        return redirect()->route('interstore.index');
+    }
+
     public function edit(Edit $request, TransferProduct $transferproduct)
     {
         //\Cart::session('_token')->clear();
@@ -329,8 +325,10 @@ class InterStoreTransferController extends Controller
         \Cart::session('_token')->clear();
         return redirect()->back();
     }
+
     public function addToCart(Request $request)
     {
+
         $validated = $request->validate([
             'product_id' => 'required',
             'source_store_id' => 'required',

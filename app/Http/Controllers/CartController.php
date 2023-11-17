@@ -118,34 +118,74 @@ class CartController extends Controller
 
 
     public function loadCartItem(Request $request){
-        $type =$request->type;
+        $type = $request->type;
         return view('components.cart', compact('type'));
     }
 
     public function addCartItem(Request $request)
     {
-        $product = Product::find($request->product_id);
-        $store = Store::find($request->store_id);
-        $qty = $request->qty_supplied;
-        $qty_available = $request->qty_available;
-        $add = \Cart::add([
-            'id' => $request->product_id,
-            'name' => $product->name,
-            'price' => $request->unit_price == 0 ? 1 : $request->unit_price ,
-            'quantity' => $qty == 0 ? 1 : $qty,
-            'attributes' => array(
-                'cost_price' => $request->unit_price ?? '',
-                'code'=> $product->code,
-                'selling_price' => $selling_price ?? '',
-                'qty_available' => $qty_available ?? '',
-                'discount' => 0,
-                'store'=> $request->store ?? '',
-                'unit' =>$product->unit ?? '',
-                'store_id' =>$request->store_id ?? '',
-                'store_code' =>$store->code ?? '',
-            ),
-        ]);
         $type =$request->type;
+        if($type == 'interstore'){
+            $product = Product::find($request->product_id);
+            $add = \Cart::add([
+                'id' => $this->generateRandomString(),
+                'name' => $product->name,
+                'price' => 0,
+                'quantity' => $request->qty_transfered,
+                'attributes' => array(
+                    'source_store_id' => $request->source_store_id,
+                    'destination_store_id' => $request->destination_store_id,
+                    'product_id' => $request->product_id,
+                    'code' => $product->code,
+                ),
+            ]);
+        }
+        elseif($type == 'grn') {
+            $product = Product::find($request->product_id);
+            $store = Store::find($request->store_id);
+            $qty = $request->qty_supplied;
+            $qty_available = $request->qty_available;
+            $add = \Cart::add([
+                'id' => $request->product_id,
+                'name' => $product->name,
+                'price' => $request->unit_price == 0 ? 1 : $request->unit_price,
+                'quantity' => $qty == 0 ? 1 : $qty,
+                'attributes' => array(
+                    'cost_price' => $request->unit_price ?? '',
+                    'code' => $product->code,
+                    'selling_price' => $selling_price ?? '',
+                    'qty_available' => $qty_available ?? '',
+                    'discount' => 0,
+                    'store' => $request->store ?? '',
+                    'unit' => $product->unit ?? '',
+                    'store_id' => $request->store_id ?? '',
+                    'store_code' => $store->code ?? '',
+                ),
+            ]);
+        }
+        elseif($type == 'request') {
+            $product = Product::find($request->product_id);
+            $store = Store::find($request->store_id);
+            $qty = $request->qty_supplied;
+            $qty_available = $request->qty_available;
+            $add = \Cart::add([
+                'id' => $request->product_id,
+                'name' => $product->name,
+                'price' => $request->unit_price == 0 ? 1 : $request->unit_price,
+                'quantity' => $qty == 0 ? 1 : $qty,
+                'attributes' => array(
+                    'cost_price' => $request->unit_price ?? '',
+                    'code' => $product->code,
+                    'selling_price' => $selling_price ?? '',
+                    'qty_available' => $qty_available ?? '',
+                    'discount' => 0,
+                    'store' => $request->store ?? '',
+                    'unit' => $product->unit ?? '',
+                    'store_id' => $request->store_id ?? '',
+                    'store_code' => $store->code ?? '',
+                ),
+            ]);
+        }
         return view('components.cart', compact('type'));
     }
 
@@ -190,6 +230,17 @@ class CartController extends Controller
         \Cart::remove($id);
         $type =$request->type;
         return view('components.cart', compact('type'));
+    }
+
+    public function generateRandomString($length = 5)
+    {
+        $characters = '0123456789';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
     }
 
 }

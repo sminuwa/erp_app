@@ -5,6 +5,7 @@
 @endpush
 
 @section('content')
+    <input name="cart_page_type" type="hidden" value="request">
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">

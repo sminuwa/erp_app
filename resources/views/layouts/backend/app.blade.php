@@ -190,7 +190,7 @@
                 type : type
             }
         }).done(function(component){
-            // console.log(component)
+            console.log(component)
             $('.cart-container').html(component)
         })
 
@@ -202,7 +202,9 @@
                 type: 'GET',
                 data: $(this).serialize()+'&type='+type,
             }).done(function(component){
-                $(this).trigger("reset");
+                $('.addCartItemForm')[0].reset();
+                $('.select2-single').val(null).trigger('change');
+                console.log(component)
                 $('.cart-container').html(component)
             })
         })

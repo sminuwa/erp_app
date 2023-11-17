@@ -3,14 +3,14 @@
         <thead>
             <tr>
                 <th>S/N</th>
+                <th>Date</th>
+                <th>Reference</th>
                 <th>Product</th>
                 <th>Source Store</th>
                 <th>Destination Store</th>
                 <th>Qty Transfered </th>
                 {{-- <th>Stock In/Out </th> --}}
-                <th>Transfered No </th>
                 <th>Transfered By </th>
-                <th>Date</th>
                 <th>Status</th>
                 <th>&nbsp;</th>
             </tr>
@@ -19,14 +19,15 @@
             @foreach ($records as $record)
                 <tr>
                     <td>{{ $loop->index + 1 }}</td>
+                    <td> {{ $record->transfer_date }} </td>
+                    <td> {{ $record->reference }} </td>
                     <td>{{ $record->product->code }} - {{ $record->product->name }} </td>
                     <td> {{ $record->source->code }} - {{ $record->source->name }} </td>
                     <td> {{ $record->destination->code }} - {{ $record->destination->name }} </td>
                     <td> {{ $record->qty_transfered }} </td>
-                    <td> {{ $record->refno }} </td>
+
                     {{-- <td> {{ $record->stock_in_out }} </td> --}}
                     <td> {{ optional($record->user)->name }} </td>
-                    <td> {{ $record->transfer_date }} </td>
                     <td> {{ $record->status == 1 ? 'Completed' : 'Cancelled' }} </td>
                     <td>
                         <a class="btn btn-secondary btn-sm" title="Stock Tranfer Report" target="_BLANK"

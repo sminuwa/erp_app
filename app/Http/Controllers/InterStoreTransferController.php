@@ -43,7 +43,7 @@ class InterStoreTransferController extends Controller
             ->where('stores.branch_id', 'LIKE', User::userBranchAction())
             ->where('transfer_products.type', 'interstore')
             ->join('stores', 'stores.id', 'transfer_products.source_store_id')
-            ->groupBy(['refno', 'source_store_id', 'product_id'])->orderBy('transfer_products.created_at', 'DESC')->take(10)->get();
+            ->groupBy(['refno', 'source_store_id', 'product_id'])->orderBy('transfer_products.id', 'DESC')->take(10)->get();
         return view('pages.inventories.transfers.inter_store.index', ['records' => $records]);
     }
     public function search(Index $request)

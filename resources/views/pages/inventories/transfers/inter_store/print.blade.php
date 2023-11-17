@@ -67,11 +67,11 @@
                                             <td>{{ $transfer->destination->code }} - {{ $transfer->destination->name }}</td>
                                             <td>{{ $transfer->qty_transfered }}</td>
                                             <td>{{ $transfer->refno }}</td>
-                                            <td>{{ $transfer->created_at->toFormattedDateString() }}</td>
+                                            <td>{{ $transfer->transfer_date }}</td>
                                         </tr>
                                     @endforeach
                                     <tr>
-                                        <th colspan="8" style="text-align: center">TRANSFER BY: {{ucfirst($transfer->user->name)}}</th>
+                                        <th colspan="8" style="text-align: center">TRANSFER BY: {{ucfirst($transfer->user->name ?? null)}}</th>
                                     </tr>
                                 </tbody>
                             </table>

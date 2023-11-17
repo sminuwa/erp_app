@@ -216,7 +216,7 @@ class CostPrice
         }
 
         DB::beginTransaction();
-        StockCard::createRecord($stock_card_param,$batch_no, $date, $type);
+        StockCard::createBatchRecord($stock_card_param,$batch_no, $date, $type);
         if(
             StoreProduct::upsert($store_products, ['store_id','product_id'])
             && BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id'])

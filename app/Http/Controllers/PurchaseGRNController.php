@@ -414,7 +414,7 @@ class PurchaseGRNController extends Controller
         $purchase->driver_name = $request->driver_name;
         $purchase->transporter_phone = $request->transporter_phone;
         $purchase->warehouse = $request->warehouse;
-        $purchase->vehicle_reg_no = $request->vehicle_reg_no;
+        $purchase->truck_no = $request->vehicle_reg_no;
         $purchase->transporter = $request->transporter;
         $purchase->save();
         return back();
@@ -484,7 +484,9 @@ class PurchaseGRNController extends Controller
                 && CostPrice::newCostPrice(
                     $new_cost_price,
                     $purchase->reference,
-                    $purchase->branch_id
+                    $purchase->branch_id,
+                    $purchase->purchase_date,
+                    TRANSACTION_TYPE_GRN
                 )['status']
             ) {
                 $action = "Posted purchase GRN with reference $request->reference from supplier: " . Supplier::find($purchase->supplier_id)->name;

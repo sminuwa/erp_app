@@ -3,6 +3,7 @@
 namespace App\Classes;
 
 use App\Models\BranchProductPrice;
+use App\Models\StockCard;
 use App\Models\Store;
 use App\Models\StoreProduct;
 use App\Models\StoreProductBatch;
@@ -109,7 +110,7 @@ class CostPrice
         }
     }
 
-    public static function newCostPrice(array $products, $batch_no,  $branch_id = 2){
+    public static function newCostPrice(array $products, $batch_no, $branch_id = 2, $date, $type = TRANSACTION_TYPE_OPENING_BALANCE){
         /*
          * branch id of the destination store
          * array of product list as follows
@@ -117,13 +118,13 @@ class CostPrice
          *  2 =>[
          *        quantity => 20,
          *        price => 300,
-         *        store => 2,
+         *        store_id => 2,
          *        expiry = null
          *      ]
          *  5 =>[
          *        quantity => 65,
          *        price => 1300,
-         *        store => 2,
+         *        store_id => 2,
          *        expiry = 2023-12-31
          *      ]
          * ]
@@ -161,17 +162,6 @@ class CostPrice
                 'total_existing_cost' =>$details->total_existing_cost,
             ];
         }
-//        $prices = (object)$prices;
-
-        //get record of cost prices in the database
-        $quantities = [];
-        /*$prices = StoreProduct::selectRaw("store_products.product_id, branch_product_prices.cost_price, sum(store_products.qty_available) as quantity, (branch_product_prices.cost_price * sum(store_products.qty_available)) as total_existing_cost")
-        ->join('branch_product_prices', 'branch_product_prices.product_id', 'store_products.product_id')
-        ->whereIn('store_products.product_id', $product_ids)->where('branch_product_prices.branch_id', $branch_id)->groupBy('store_products.product_id')->get();*/
-
-        $old_product_costs = [];
-        $old_product_quantity = [];
-//        return $prices;
         foreach($prices as $price){
             $existing_cost[$price['product_id']] = ['cost_price' => $price['cost_price'], 'quantity'=>$price['total_quantity'], 'total_existing_cost'=>$price['total_existing_cost']];
         }
@@ -192,8 +182,14 @@ class CostPrice
             ];
         }
 
-        $store_products = $product_costs = $batch = [];
+        $store_products = $product_costs = $batch = $stock_card_param =  [];
         foreach($records as $key=>$record){
+            $stock_card_param[] = [
+                'store_id'=>$record['store_id'],
+                'product_id' => $key,
+                'quantity' => $record['new_quantity'],
+                'is_credit' => true,
+            ];
             $product_costs[] = [
                 'branch_id' => $branch_id,
                 'product_id' => $key,
@@ -220,7 +216,7 @@ class CostPrice
         }
 
         DB::beginTransaction();
-
+        StockCard::createRecord($stock_card_param,$batch_no, $date, $type);
         if(
             StoreProduct::upsert($store_products, ['store_id','product_id'])
             && BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id'])
@@ -233,4 +229,7 @@ class CostPrice
         }
 
     }
+
+
+
 }

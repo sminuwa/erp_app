@@ -119,7 +119,7 @@ class StockAdjustmentController extends Controller
                         'cr' => $adjusted_qty > 0 ? $adjusted_qty : 0,
                         'dr' => $adjusted_qty < 0 ? abs($adjusted_qty) : 0,
                         'refno' => $refno,
-                        'type' => 'Adjustment',
+                        'type' => 0,
                         'date' => $request->date,
                         'user_id' => Auth::id(),
                         'priority' => 5,

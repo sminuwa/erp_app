@@ -47,31 +47,27 @@
                     </div>
 
                     <div class="row" style="line-height: 0.4">
-                        <div class="col-12 table-responsive">
+                        <div class="col-12">
                             <table class="table table-bordered text-left">
                                 <thead>
                                     <tr>
                                         <th style="width:250px;">Item Name</th>
                                         <th>From Store</th>
                                         <th>To Store</th>
-                                        <th>QTY BF/T<br/><br/>Transfer</th>
-                                        <th>QTY <br/><br/>AF/T</th>
+                                        <th>Transferred QTY</th>
                                         <th>TRF No</th>
                                         <th>Date <br/><br/>Transfer</th>
-                                        <th>Vehicle No</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($transfers as $transfer)
                                         <tr>
-                                            <td>{{ $transfer->product->name }}</td>
-                                            <td>{{ $transfer->source->name }}</td>
-                                            <td>{{ $transfer->destination->name }}</td>
-                                            <td>{{ $transfer->qty_available }}</td>
+                                            <td>{{ $transfer->product->code }} - {{ $transfer->product->name }}</td>
+                                            <td>{{ $transfer->source->code }} - {{ $transfer->source->name }}</td>
+                                            <td>{{ $transfer->destination->code }} - {{ $transfer->destination->name }}</td>
                                             <td>{{ $transfer->qty_transfered }}</td>
                                             <td>{{ $transfer->refno }}</td>
                                             <td>{{ $transfer->created_at->toFormattedDateString() }}</td>
-                                            <td>{{ $transfer->vehicle_no }}</td>
                                         </tr>
                                     @endforeach
                                     <tr>

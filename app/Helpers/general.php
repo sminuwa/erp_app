@@ -1,5 +1,14 @@
 <?php
 
+const TRANSACTION_TYPE_OPENING_BALANCE = 0;
+const TRANSACTION_TYPE_GRN = 1;
+const TRANSACTION_TYPE_INTERSITE = 2;
+const TRANSACTION_TYPE_INTERSTORE = 3;
+const TRANSACTION_TYPE_ADJUSTMENT = 4;
+const TRANSACTION_TYPE_SALE = 5;
+const TRANSACTION_TYPE_CREDIT_NOTE = 6;
+const TRANSACTION_TYPE_RETURN_DEBIT = 7;
+
 function app_name($type = 'full', $style = 'uppercase')
 {
     if ($type == 'abbr') {

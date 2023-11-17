@@ -109,18 +109,7 @@
                                     {{ csrf_field() }}
                                     <input type="hidden" name="_method"
                                         value="{{ isset($method) ? $method : 'POST' }}" />
-                                    <div class="form-group">
-                                        <label for="vehicle_no">Vehicle No</label>
-                                        <input type="text"
-                                            class="form-control {{ $errors->has('vehicle_no') ? ' is-invalid' : '' }}"
-                                            name="vehicle_no" id="vehicle_no"
-                                            value="{{ old('vehicle_no', $model->vehicle_no) }}" placeholder="Vehicle No">
-                                        @if ($errors->has('vehicle_no'))
-                                            <div class="invalid-feedback">
-                                                <strong>{{ $errors->first('vehicle_no') }}</strong>
-                                            </div>
-                                        @endif
-                                    </div>
+
                                     <div class="form-group">
                                         <label for="transfer_date">Date</label>
                                         <input type="text" name="transfer_date" class="form-control datepicker"
@@ -181,7 +170,7 @@
             //             store_id: $("#source_store_id").val()
             //         }
             //     }).done(function(msg) {
-                    
+
             //         $("#product_id").html("<option value=''>--select--</option>" + msg);
             //     });
             // });

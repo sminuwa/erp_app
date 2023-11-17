@@ -4,7 +4,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 /**
  @property bigint $source_store_id source store id @property bigint $product_id product id @property bigint $destination_store_id destination store id @property int $qty_transfered qty transfered @property int $qty_available qty available @property bigint $transfered_by transfered by @property timestamp $created_at created at @property timestamp $updated_at updated at
- 
+
  */
 class TransferProduct extends Model
 
@@ -44,6 +44,18 @@ class TransferProduct extends Model
     public function transferProducts()
     {
         return $this->where(['transfer_id'=>$this->transfer_id,'stock_in_out'=>'out']);
+    }
+
+    public static function generateNewNumber($prefix = 'ITS', $length = 4)
+    {
+        $prefix = $prefix . date('ym') . auth()->user()->branch->code;
+        $record = self::where('reference', 'like', '%' . $prefix . '%')->orderBy('reference', 'desc')->first();
+        if ($record) {
+            $number = $record->reference;
+            $new = intval(substr($number, strlen($prefix))) + 1;
+            return $prefix . str_pad($new, $length, 0, STR_PAD_LEFT);
+        }
+        return $prefix . str_pad(1, $length, 0, STR_PAD_LEFT);
     }
 
 }

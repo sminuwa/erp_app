@@ -113,8 +113,8 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $purchase_detail->product->name }}</td>
-                                            <td align="center">{{ $purchase_detail->qty_supplied }}</td>
-                                            <td>{{ $purchase->sourceStore->name }}</td>
+                                            <td align="center">{{ $purchase_detail->quantity }}</td>
+                                            <td>{{ $purchase->store?->name ?? null }}</td>
                                         </tr>
                                     @endforeach
                                     <tr>

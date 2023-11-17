@@ -57,25 +57,15 @@ class InterStoreTransferController extends Controller
             ->groupBy(['refno', 'source_store_id', 'product_id'])->orderBy('transfer_products.created_at', 'DESC')->get();
         return view('pages.inventories.transfers.inter_store.index', ['records' => $records]);
     }
-    /**
-     * Display the specified resource.
-     *
-     * @param  Show  $request
-     * @param  TransferProduct  $transferproduct
-     * @return \Illuminate\Http\Response
-     */
+
     public function show(Show $request, TransferProduct $transferproduct)
     {
         return view('pages.inventories.transfers.inter_store.show', [
             'record' => $transferproduct,
         ]);
 
-    } /**
-      * Show the form for creating a new resource.
-      *
-      * @param  Create  $request
-      * @return \Illuminate\Http\Response
-      */
+    }
+
     public function create(Create $request)
     {
         //\Cart::session('_token')->clear();
@@ -94,12 +84,8 @@ class InterStoreTransferController extends Controller
             'stores' => $stores,
             'transfer_products' => $cartItems,
         ]);
-    } /**
-      * Store a newly created resource in storage.
-      *
-      * @param  Store  $request
-      * @return \Illuminate\Http\Response
-      */
+    }
+
     public function store(StoreRequest $request)
     {
         $model = new TransferProduct;
@@ -145,6 +131,7 @@ class InterStoreTransferController extends Controller
                     }
 
                     DB::table('transfer_products')->insert([
+                        'reference' => TransferProduct::generateNewNumber(),
                         'transfer_id' => $transfer_id,
                         'source_store_id' => $source_store_id,
                         'product_id' => $product_id,
@@ -159,11 +146,10 @@ class InterStoreTransferController extends Controller
                         'type' => 'interstore',
                         'transfer_date' => $request->transfer_date,
                         'vehicle_no' => $request->vehicle_no,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now()
                     ]);
 
                     DB::table('transfer_products')->insert([
+                        'reference' => TransferProduct::generateNewNumber(),
                         'transfer_id' => $transfer_id,
                         'source_store_id' => $destination_store_id,
                         'product_id' => $product_id,
@@ -178,8 +164,7 @@ class InterStoreTransferController extends Controller
                         'type' => 'interstore',
                         'transfer_date' => $request->transfer_date,
                         'vehicle_no' => $request->vehicle_no,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now()
+
                     ]);
                     DB::table('stock_cards')->insert([
                         'store_id' => $source_store_id,
@@ -187,7 +172,7 @@ class InterStoreTransferController extends Controller
                         'cr' => 0,
                         'dr' => $product->quantity,
                         'refno' => $refno,
-                        'type' => 'Transfer',
+                        'type' => 0,
                         'date' => $request->transfer_date,
                         'user_id' => Auth::id(),
                         'priority' => 4,
@@ -200,7 +185,7 @@ class InterStoreTransferController extends Controller
                         'cr' => $product->quantity,
                         'dr' => 0,
                         'refno' => $refno,
-                        'type' => 'Transfer',
+                        'type' => 0,
                         'date' => $request->transfer_date,
                         'user_id' => Auth::id(),
                         'created_at' => Carbon::now(),

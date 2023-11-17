@@ -3,7 +3,7 @@
         <thead>
             <tr>
                 <th>S/N</th>
-                <th>Reference No</th>
+                <th>Reference</th>
                 <th>Requested By</th>
                 <th>Date Requsted</th>
                 <th>Approved By</th>
@@ -16,7 +16,7 @@
             @foreach ($records as $record)
                 <tr>
                     <td>{{ $loop->index + 1 }}</td>
-                    <td> {{ $record->reference_no }} </td>
+                    <td> {{ $record->reference }} </td>
                     <td> {{ $record->requestedBy->name ?? '' }} </td>
                     <td> {{ optional($record->created_at)->toDayDateTimeString() }} </td>
                     <td> {{ $record->approvedBy->name ?? '' }} </td>

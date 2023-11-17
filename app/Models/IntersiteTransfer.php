@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 @property timestamp $updated_at updated at
 @property DestinationBranch $branch belongsTo
 @property SourceBranch $branch belongsTo
-   
+
  */
 class IntersiteTransfer extends Model
 {
@@ -84,5 +84,17 @@ class IntersiteTransfer extends Model
     public function requestProducts()
     {
         return $this->hasMany(IntersiteTransferProduct::class);
+    }
+
+    public static function generateNewNumber($prefix = 'ITB', $length = 4)
+    {
+        $prefix = $prefix . date('ym') . auth()->user()->branch->code;
+        $record = self::where('reference', 'like', '%' . $prefix . '%')->orderBy('reference', 'desc')->first();
+        if ($record) {
+            $number = $record->reference;
+            $new = intval(substr($number, strlen($prefix))) + 1;
+            return $prefix . str_pad($new, $length, 0, STR_PAD_LEFT);
+        }
+        return $prefix . str_pad(1, $length, 0, STR_PAD_LEFT);
     }
 }

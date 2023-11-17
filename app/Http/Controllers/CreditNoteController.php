@@ -151,7 +151,9 @@ class CreditNoteController extends Controller
                     CostPrice::newCostPrice(
                         $new_cost_price,
                         $credit_note->reference,
-                        $credit_note->branch_id
+                        $credit_note->branch_id,
+                        $credit_note->date,
+                        TRANSACTION_TYPE_CREDIT_NOTE,
                     )['status']
                 )
 

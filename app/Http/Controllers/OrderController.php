@@ -592,7 +592,7 @@ class OrderController extends Controller
                     'cr' => 0,
                     'dr' => $item->quantity,
                     'refno' => $invoice->reference,
-                    'type' => 'Sale',
+                    'type' => 0,
                     'date' => $invoice->order_date,
                     'user_id' => auth()->id(),
                     'priority' => 2,

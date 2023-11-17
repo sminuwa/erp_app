@@ -112,7 +112,7 @@ class InterSiteTransferController extends Controller
                 $refno = $this->generateRefNo();
                 $transfer_branch_id = $request->transfer_branch_id;
                 $transfer_id = DB::table('intersite_transfers')->insertGetId([
-                    'reference_no' => $refno,
+                    'reference' => $refno,
                     'source_branch_id' => User::userBranchAction(),
                     'destination_branch_id' => $transfer_branch_id,
                     'requested_by' => Auth::id(),
@@ -136,7 +136,7 @@ class InterSiteTransferController extends Controller
                         'updated_at' => Carbon::now()
                     ]);
 
-                    $action = "Made transfer request of product from " . Store::find($source_store_id)->name . " to  branch" . Store::find($transfer_branch_id)->name;
+                    $action = "Made transfer request of product from " . Branch::find(User::userBranchAction())->name . " to  branch" . Branch::find($transfer_branch_id)->name;
                     AuditLog::auditLog(Auth::id(), $action);
                     session()->flash('app_message', 'Stock transfered successfully');
                     DB::commit();
@@ -182,7 +182,7 @@ class InterSiteTransferController extends Controller
       * @return \Illuminate\Http\Response
       */
     public function update(Update $request, IntersiteTransfer $intersiteTransfer)
-    { 
+    {
         // $source_qty = 0;
         // $destination_qty = 0;
         // if ($transferproduct->status == 'Cancelled' && $request->status == 'Completed') {
@@ -208,7 +208,7 @@ class InterSiteTransferController extends Controller
                     'reference_no' => $reference_no,
                 ],
             [
-                
+
                 'source_branch_id' => User::userBranchAction(),
                 'destination_branch_id' => $transfer_branch_id,
                 'requested_by' => Auth::id(),
@@ -258,7 +258,7 @@ class InterSiteTransferController extends Controller
             //     'updated_at' => Carbon::now()
             // ]);
 
-           
+
             if ($intersiteTransfer->save()) {
                 $action = "Updated stock transfer made from " . Store::find($request->source_store_id)?->name . " to " . Store::find($request->destination_store_id)?->name;
                 AuditLog::auditLog(Auth::id(), $action);

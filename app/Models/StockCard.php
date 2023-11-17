@@ -60,19 +60,19 @@ class StockCard extends Model
         $cards = [];
         foreach($records as $record){
             $credit = $debit = $qty_after =$qty_before  = 0;
-            $store_product = self::where(['store_id'=>$record->store_id, 'product_id'=>$record->product_id])->first();
+            $store_product = self::where(['store_id'=>$record['store_id'], 'product_id'=>$record['product_id']])->first();
             if($store_product){
                 $qty_available = $store_product->qty_available;
                 $qty_before = $qty_available;
                 $qty_after = $qty_available - $record->quantity;
                 if($record->is_credit) // meaning if record type is credit then assign the quantity to credit else debit
-                    $credit = $record->quantity;
+                    $credit = $record['quantity'];
                 else
-                    $debit = $record->quantity;;
+                    $debit = $record['quantity'];;
             }
             $cards[] = [
-                'store_id' => $record->store_id,
-                'product_id' => $record->product_id,
+                'store_id' => $record['store_id'],
+                'product_id' => $record['product_id'],
                 'cr' => $credit,
                 'dr' => $debit,
                 'qty_before' => $qty_before,

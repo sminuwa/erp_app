@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\UserImport;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -20,6 +22,7 @@ use App\Models\Role;
 use App\Http\Requests\ModelHasPermissionRequest;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 /**
  * Description of UserController
@@ -42,12 +45,12 @@ class UserController extends Controller
 
         return view('pages.users.index', ['records' => User::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get()]);
     } /**
-  * Display the specified resource.
-  *
-  * @param  Show  $request
-  * @param  User  $user
-  * @return \Illuminate\Http\Response
-  */
+      * Display the specified resource.
+      *
+      * @param  Show  $request
+      * @param  User  $user
+      * @return \Illuminate\Http\Response
+      */
 
     public function show(Show $request, User $user)
     {
@@ -57,11 +60,11 @@ class UserController extends Controller
         ]);
 
     } /**
-  * Show the form for creating a new resource.
-  *
-  * @param  Create  $request
-  * @return \Illuminate\Http\Response
-  */
+      * Show the form for creating a new resource.
+      *
+      * @param  Create  $request
+      * @return \Illuminate\Http\Response
+      */
     public function create(Create $request)
     {
         $user_branch = Auth::user()->branch_id;
@@ -75,11 +78,11 @@ class UserController extends Controller
 
         ]);
     } /**
-  * Store a newly created resource in storage.
-  *
-  * @param  Store  $request
-  * @return \Illuminate\Http\Response
-  */
+      * Store a newly created resource in storage.
+      *
+      * @param  Store  $request
+      * @return \Illuminate\Http\Response
+      */
     public function store(Store $request)
     {
         $model = new User;
@@ -91,18 +94,17 @@ class UserController extends Controller
             AuditLog::auditLog(Auth::id(), $action);
             session()->flash('app_message', 'User saved successfully');
             return redirect()->route('users.index');
-        }
-        else {
+        } else {
             session()->flash('app_message', 'Something is wrong while saving User');
         }
         return redirect()->back();
     } /**
-  * Show the form for editing the specified resource.
-  *
-  * @param  Edit  $request
-  * @param  User  $user
-  * @return \Illuminate\Http\Response
-  */
+      * Show the form for editing the specified resource.
+      *
+      * @param  Edit  $request
+      * @param  User  $user
+      * @return \Illuminate\Http\Response
+      */
     public function edit(Edit $request, User $user)
     {
         $user_branch = Auth::user()->branch_id;
@@ -115,12 +117,12 @@ class UserController extends Controller
             'branches' => Branch::where('id', 'LIKE', $user_branch)->get(),
         ]);
     } /**
-  * Update a existing resource in storage.
-  *
-  * @param  Update  $request
-  * @param  User  $user
-  * @return \Illuminate\Http\Response
-  */
+      * Update a existing resource in storage.
+      *
+      * @param  Update  $request
+      * @param  User  $user
+      * @return \Illuminate\Http\Response
+      */
     public function update(Update $request, User $user)
     {
         $user->fill($request->all());
@@ -130,27 +132,25 @@ class UserController extends Controller
             AuditLog::auditLog(Auth::id(), $action);
             session()->flash('app_message', 'User successfully updated');
             return redirect()->route('users.index');
-        }
-        else {
+        } else {
             session()->flash('app_error', 'Something is wrong while updating User');
         }
         return redirect()->back();
     } /**
-  * Delete a  resource from  storage.
-  *
-  * @param  Destroy  $request
-  * @param  User  $user
-  * @return \Illuminate\Http\Response
-  * @throws \Exception
-  */
+      * Delete a  resource from  storage.
+      *
+      * @param  Destroy  $request
+      * @param  User  $user
+      * @return \Illuminate\Http\Response
+      * @throws \Exception
+      */
     public function destroy(Destroy $request, User $user)
     {
         if ($user->delete()) {
             $action = "Updated a user: " . $user->name;
             AuditLog::auditLog(Auth::id(), $action);
             session()->flash('app_message', 'User successfully deleted');
-        }
-        else {
+        } else {
             session()->flash('app_error', 'Error occurred while deleting User');
         }
 
@@ -174,8 +174,7 @@ class UserController extends Controller
                 $action = "Assigned role to the user: " . $user->name;
                 AuditLog::auditLog(Auth::id(), $action);
                 session()->flash('app_message', 'Role successfully saved');
-            }
-            else {
+            } else {
                 session()->flash('app_error', 'Role has already been assigned');
             }
         }
@@ -187,7 +186,8 @@ class UserController extends Controller
             session()->flash('app_message', 'Role successfully revoked');
         }
         //ActivityLog::create(['action'=>"Assigned user to a role $user->name.'-'.$request->role->name",'user_id'=>Auth::id()]);
-        return redirect()->route('users.show', ['user' => $user,
+        return redirect()->route('users.show', [
+            'user' => $user,
             'permissions' => $user->getPermisions(),
             'roles' => Role::orderBy('name'),
         ]);
@@ -209,7 +209,8 @@ class UserController extends Controller
             $action = "Assigned permission to the user: " . $user->name;
             AuditLog::auditLog(Auth::id(), $action);
         }
-        return redirect()->route('user.assign.role', ['user' => $user,
+        return redirect()->route('user.assign.role', [
+            'user' => $user,
             'permissions' => $user->getPermisions(),
             'roles' => $user->getRoles()
         ]);
@@ -222,10 +223,61 @@ class UserController extends Controller
         $user->save();
         $action = "Block/Enable user account: " . $user->name;
         AuditLog::auditLog(Auth::id(), $action);
-        return redirect()->route('user.assign.role', ['user' => $user,
+        return redirect()->route('user.assign.role', [
+            'user' => $user,
             'permissions' => $user->getPermisions(),
             'roles' => $user->getRoles()
         ]);
     }
+    public function importForm()
+    {
+        return view('pages.users.import');
+    }
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx',
+        ]);
 
+        $file = $request->file('file');
+        $import = new UserImport();
+        $rows = Excel::toCollection($import, $file)->first();
+        $user_branch = User::userBranchAction();
+        $password = bcrypt($request->default_password);
+        $faileds = [];
+        $count = 0;
+        $data = array();
+        try {
+            foreach ($rows as $row) {
+
+
+                User::updateOrInsert(
+                    ['user_code' => $row['user_code']],
+                    [
+                        'name' => trim($row['firstname'] . ' ' . $row['surname'] . ' ' . $row['othernames']),
+                        'firstname' => $row['firstname'],
+                        'surname' => $row['surname'],
+                        'othernames' => $row['othernames'],
+                        'gender' => $row['gender'],
+                        'marital_status' => $row['marital_status'],
+                        'username' => $row['username'],
+                        'email' => $row['email'],
+                        'phone' => $row['phone'],
+                        'personnel_number' => $row['personnel_number'],
+                        'branch_id' => Branch::where('code', trim($row['branch_code']))->first()->id ?? 0,
+                        'password' => $password,
+                        'created_by' => Auth::id(),
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]
+                );
+                $count++;
+            }
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
+        //dd($faileds);
+        session()->flash('app_message', 'File imported and records updated/inserted successfully!');
+        return view('pages.users.import', ['count' => $count]);
+    }
 }

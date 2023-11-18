@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\CustomerImport;
+use App\Models\Branch;
 use App\Models\Category;
 use App\Models\CreditNote;
 use App\Models\Order;
@@ -26,6 +28,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Setting;
 use App\Models\AuditLog;
 use App\Models\User;
+use Maatwebsite\Excel\Facades\Excel;
 
 /**
  * Description of CustomerController
@@ -79,14 +82,14 @@ class CustomerController extends Controller
       */
     public function store(Store $request)
     {
-//        return $request;
+        //        return $request;
         $model = new Customer;
         $model->fill($request->all());
         $model->type = $request->account_type == 'R' ? 'Retail' : "Wholesale";
         $model->branch_id = $request->branch_id;
         $model->relation_officer = $request->relation_officer;
         if ($model->save()) {
-            $model->code = Customer::generateNewCode($request->branch_id,$request->account_type);
+            $model->code = Customer::generateNewCode($request->branch_id, $request->account_type);
             $model->save();
             $action = "Added a new credit customer : " . $model->name;
             AuditLog::auditLog(Auth::id(), $action);
@@ -326,10 +329,10 @@ class CustomerController extends Controller
         $user_branch = User::userBranchAction();
         $orders = Order::where('status', 1)
             ->where('branch_id', 'LIKE', $user_branch)
-            ->whereNotIn('invoice_no',DB::table('credit_notes')->select('invoice_no')->pluck('invoice_no')->toArray())
+            ->whereNotIn('invoice_no', DB::table('credit_notes')->select('invoice_no')->pluck('invoice_no')->toArray())
             ->orderBy('order_date', 'DESC')->take(20)->get();
 
-            $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
             ->join('products', 'products.id', 'store_products.product_id')
@@ -347,7 +350,7 @@ class CustomerController extends Controller
             \Cart::clear();
         $model = new Customer;
         $cart_products = \Cart::getContent();
-        return view('pages.inventories.credit_notes.create_credit_note', compact('orders', 'model', 'cart_products', 'order','stores'));
+        return view('pages.inventories.credit_notes.create_credit_note', compact('orders', 'model', 'cart_products', 'order', 'stores'));
     }
     public function payCreditNote(Request $request)
     {
@@ -500,6 +503,49 @@ class CustomerController extends Controller
         return redirect()->route('customers.credit.note.create', Order::find($request->order));
         //return redirect()->back()->with('order',Order::find($request->order));
     }
+    public function importForm()
+    {
+        return view('pages.customers.import');
+    }
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx',
+        ]);
 
+        $file = $request->file('file');
+        $import = new CustomerImport();
+        $rows = Excel::toCollection($import, $file)->first();
+        $user_branch = User::userBranchAction();
+        $faileds = [];
+        $count = 0;
+        $data = array();
+        try {
+            foreach ($rows as $row) {
+                Customer::updateOrInsert(
+                    ['code' => $row['code']],
+                    [
+                        'name' => trim($row['name']),
+                        'email' => $row['email'],
+                        'phone' => $row['phone'],
+                        'address' => $row['address'],
+                        'type' => $row['customer_type'],
+                        'credit_limit' => $row['credit_limit'],
+                        'branch_id' => Branch::where('code', trim($row['branch_code']))->first()->id ?? 0,
+                        'relation_officer' => User::where('user_code', $row['relation_officer_code'])->first()->id ?? 0,
+                        'referred_by' => User::where('user_code', $row['referer_code'])->first()->id ?? 0,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]
+                );
+                $count++;
+            }
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
+        //dd($faileds);
+        session()->flash('app_message', 'File imported and records updated/inserted successfully!');
+        return view('pages.customers.import', ['count' => $count]);
+    }
 }
 

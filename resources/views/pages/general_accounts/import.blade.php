@@ -33,15 +33,15 @@
         <!-- Main content -->
         <section class="content">
             <a class="btn btn-secondary btn-sm" href="{{ route('general_accounts.create') }}">
-                <span class="fa fa-plus-circle"></span>
+                <span class="fa fa-plus-circle"> New General Account</span>
             </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('general_accounts.index') }}">
-                <span class="fa fa-list"></span>
+            <a class="btn btn-secondary btn-sm" href="{{ url('upload_templates/general_accounts_template.xlsx') }}">
+                <span class="fa fa-download"> Template</span>
             </a><br/>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 table-responsive">
-                        <form action="{{ route('price.import.form') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('general_accounts.import') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <input type="file" name="file" class="form-control">
                             <button type="submit" class="btn btn-primary">Import</button>

@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\BranchImport;
+use App\Models\Company;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
@@ -14,6 +18,7 @@ use App\Http\Requests\Branches\Update;
 use App\Http\Requests\Branches\Destroy;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 /**
@@ -132,5 +137,47 @@ class BranchController extends Controller
         }
 
         return redirect()->back();
+    }
+    public function importForm()
+    {
+        return view('pages.branches.import');
+    }
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx',
+        ]);
+
+        $file = $request->file('file');
+        $import = new BranchImport();
+        $rows = Excel::toCollection($import, $file)->first();
+        $user_branch = User::userBranchAction();
+        $faileds = [];
+        $count = 0;
+        $data = array();
+        try {
+            foreach ($rows as $row) {
+                Branch::updateOrInsert(
+                    ['code' => $row['code']],
+                    [
+                        'name' => trim($row['name']),
+                        'short_name' => $row['short_name'],
+                        'long_name' => $row['name'],
+                        'company_id' => Company::where('code', trim($row['company_code']))->first()->id ?? 0,
+                        'email' => $row['email'],
+                        'phone' => $row['phone'],
+                        'address' => $row['address'],
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]
+                );
+                $count++;
+            }
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
+        //dd($faileds);
+        session()->flash('app_message', 'File imported and records updated/inserted successfully!');
+        return view('pages.branches.import', ['count' => $count]);
     }
 }

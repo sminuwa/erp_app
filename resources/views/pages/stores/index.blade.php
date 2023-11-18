@@ -32,11 +32,14 @@
         <!-- Main content -->
         <section class="content">
             <a class="btn btn-secondary btn-sm" href="{{ route('stores.create') }}">
-                <span class="fa fa-plus-circle"></span>
+                <span class="fa fa-plus-circle"> New Store</span>
+            </a>
+            <a class="btn btn-secondary btn-sm" href="{{ route('stores.import.form') }}">
+                <span class="fa fa-upload"> Upload Users</span>
             </a>
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-sm-8 table-responsive">
+                    <div class="col-sm-12 table-responsive">
                         @include('tables.store')
                     </div>
                 </div>

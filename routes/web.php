@@ -145,6 +145,10 @@ Route::middleware('auth')->group(function () {
                 Route::get('/edit/{branch}', [BranchController::class, 'edit'])->name('branches.edit');
                 Route::put('/update/{branch}', [BranchController::class, 'update'])->name('branches.update');
                 Route::delete('/delete/{branch}', [BranchController::class, 'destroy'])->name('branches.destroy');
+
+                 //Import Branches
+                 Route::get('/import/form', [BranchController::class, 'importForm'])->name('branches.import.form');
+                 Route::post('/import', [BranchController::class, 'import'])->name('branches.import');
             }
         );
         Route::group(
@@ -157,6 +161,10 @@ Route::middleware('auth')->group(function () {
                 Route::get('/edit/{store}', [StoreController::class, 'edit'])->name('stores.edit');
                 Route::put('/update/{store}', [StoreController::class, 'update'])->name('stores.update');
                 Route::delete('/delete/{store}', [StoreController::class, 'destroy'])->name('stores.destroy');
+
+                  //Import Stores
+                  Route::get('/import/form', [StoreController::class, 'importForm'])->name('stores.import.form');
+                  Route::post('/import', [StoreController::class, 'import'])->name('stores.import');
             }
         );
         Route::group(
@@ -208,7 +216,8 @@ Route::middleware('auth')->group(function () {
                         Route::get('/cost/price', [MisController::class, 'getCostPrice'])->name('ajax.load.product.price'); //This is cost price
                         Route::get('/cost/selling_price', [MisController::class, 'getSellingPrice'])->name('ajax.load.product.selling_price');
                         Route::get('/selling/price', [MisController::class, 'getLastTwoSellingPrice'])->name('ajax.load.selling.price');
-
+                        
+                        //Import Prices
                         Route::get('/import/form', [BranchProductPriceController::class, 'importForm'])->name('price.import.form');
                         Route::post('/import', [BranchProductPriceController::class, 'import'])->name('price.import');
                     }
@@ -934,6 +943,7 @@ Route::middleware('auth')->group(function () {
                 Route::put('/update/{chartofaccount}', [ChartOfAccountController::class, 'update'])->name('chart_of_accounts.update');
                 Route::delete('/delete/{chartofaccount}', [ChartOfAccountController::class, 'destroy'])->name('chart_of_accounts.destroy');
 
+                //Import CoAs
                 Route::get('/import/form', [ChartOfAccountController::class, 'importForm'])->name('chart_of_accounts.import.form');
                 Route::post('/import', [ChartOfAccountController::class, 'import'])->name('chart_of_accounts.import');
             }

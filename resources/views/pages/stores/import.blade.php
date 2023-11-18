@@ -1,11 +1,12 @@
 @extends('layouts.backend.app')
 
-@section('title', 'Dashboard')
+@section('title', 'Prices')
 
 @push('css')
     <!-- DataTables -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
 @endpush
+
 @section('content')
 
     <!-- Content Wrapper. Contains page content -->
@@ -16,12 +17,13 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Manage General Accounts</h4>
+                        <h4>Import Stores</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">General Accounts</li>
+                            <li class="breadcrumb-item"><a href="{{ route('stores.index') }}">Stores</a></li>
+                            <li class="breadcrumb-item active">Import</li>
                         </ol>
                     </div>
                 </div>
@@ -30,16 +32,24 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('general_accounts.create') }}">
-                <span class="fa fa-plus-circle"> New General Account</span>
+            <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.create') }}">
+                <span class="fa fa-plus-circle"> New Store</span>
             </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('general_accounts.import.form') }}">
-                <span class="fa fa-upload"> Upload General Account</span>
-            </a><br/>
+            <a class="btn btn-secondary btn-sm" href="{{ url('upload_templates/stores_template.xlsx') }}">
+                <span class="fa fa-download"> Template</span>
+            </a>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 table-responsive">
-                        @include('tables.general_account')
+                        <form action="{{ route('stores.import') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <input type="file" name="file" class="form-control">
+                            <button type="submit" class="btn btn-primary">Import</button>
+                        </form>
+                        @if (isset($count))
+                            <h4 class="text text-success">A total of {{$count}} branches were successfully uploaded</h4>
+                           
+                        @endif
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
@@ -49,6 +59,7 @@
     <!-- /.content-wrapper -->
 
 @endsection
+
 @push('js')
     <!-- DataTables -->
     <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>

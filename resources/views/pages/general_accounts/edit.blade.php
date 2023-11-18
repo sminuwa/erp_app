@@ -33,10 +33,10 @@
 		<!-- Main content -->
 		<section class="content">
             <a class="btn btn-secondary btn-sm" href="{{ route('general_accounts.create') }}">
-                <span class="fa fa-plus-circle"></span>
+                <span class="fa fa-plus-circle"> New G. Account</span>
             </a>
             <a class="btn btn-secondary btn-sm" href="{{ route('general_accounts.index') }}">
-                <span class="fa fa-list"></span>
+                <span class="fa fa-list"> View G. Accounts</span>
             </a><br/>
 			<div class="container-fluid">
                 <div class="row">

@@ -74,11 +74,11 @@ class GeneralAccountController extends Controller
         $description = $request->description;
         $is_control = $request->is_control;
         $status = $request->status;
-        if($record = GeneralAccount::createRecord($class, $description, $is_control, $status)){
+        if ($record = GeneralAccount::createRecord($class, $description, $is_control, $status)) {
             AuditLog::auditLog(auth()->id(), "Added General account $record->number");
-            session()->flash('app_message', 'General Account create successfully ('.$record->number.')');
+            session()->flash('app_message', 'General Account create successfully (' . $record->number . ')');
             return redirect()->route('general_accounts.index');
-        }else {
+        } else {
             session()->flash('app_message', 'Something is wrong while saving GeneralAccount');
             return back()->with('app_message', 'Something is wrong while saving GeneralAccount');
         }
@@ -165,8 +165,9 @@ class GeneralAccountController extends Controller
         $user_branch = User::userBranchAction();
         try {
             foreach ($rows as $row) {
+                $branch_id = Branch::where('code', $row['branch_code'])->first() ?? '';
                 GeneralAccount::updateOrInsert(
-                    ['branch_id' => $user_branch, 'class' => $row['class'], 'number' => $row['number']],
+                    ['class' => $row['class'], 'number' => $row['number'], 'branch_id' => $branch_id,],
                     [
                         'branch_id' => $user_branch,
                         'class' => $row['class'],
@@ -176,7 +177,7 @@ class GeneralAccountController extends Controller
                         'updated_at' => Carbon::now(),
                     ]
                 );
-                $count++;
+               
 
             }
         } catch (\Exception $exception) {

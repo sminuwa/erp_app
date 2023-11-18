@@ -33,10 +33,10 @@
 		<!-- Main content -->
 		<section class="content">
             <a class="btn btn-secondary btn-sm" href="{{ route('chart_of_accounts.create') }}">
-                <span class="fa fa-plus-circle"></span>
+                <span class="fa fa-plus-circle">New CoA</span>
             </a>
             <a class="btn btn-secondary btn-sm" href="{{ route('chart_of_accounts.index') }}">
-                <span class="fa fa-list"></span>
+                <span class="fa fa-list"> View CoAs</span>
             </a><br/>
 			<div class="container-fluid">
                 <div class="row">

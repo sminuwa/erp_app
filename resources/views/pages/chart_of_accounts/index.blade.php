@@ -31,10 +31,10 @@
         <!-- Main content -->
         <section class="content">
             <a class="btn btn-secondary btn-sm" href="{{ route('chart_of_accounts.create') }}">
-                <span class="fa fa-plus-circle"></span>
+                <span class="fa fa-plus-circle"> New CoA</span>
             </a>
             <a class="btn btn-secondary btn-sm" href="{{ route('chart_of_accounts.import.form') }}">
-                <span class="fa fa-upload"></span>
+                <span class="fa fa-upload"> Upload CoA</span>
             </a><br/>
             <div class="container-fluid">
                 <div class="row">

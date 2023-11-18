@@ -1,6 +1,6 @@
 @extends('layouts.backend.app')
 
-@section('title', 'Dashboard')
+@section('title', 'Prices')
 
 @push('css')
     <!-- DataTables -->
@@ -17,12 +17,13 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Manage Products</h4>
+                        <h4>Import Suppliers</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Products</li>
+                            <li class="breadcrumb-item"><a href="{{ route('suppliers.index') }}">Suppliers</a></li>
+                            <li class="breadcrumb-item active">Import</li>
                         </ol>
                     </div>
                 </div>
@@ -31,16 +32,24 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('products.create') }}">
-                <span class="fa fa-plus-circle"> New Product</span>
+            <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.create') }}">
+                <span class="fa fa-plus-circle"> New Supplier</span>
             </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('products.import.form') }}">
-                <span class="fa fa-upload"> Upload Products</span>
+            <a class="btn btn-secondary btn-sm" href="{{ url('upload_templates/suppliers_template.xlsx') }}">
+                <span class="fa fa-download"> Template</span>
             </a>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 table-responsive">
-                        @include('tables.product')
+                        <form action="{{ route('suppliers.import') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <input type="file" name="file" class="form-control">
+                            <button type="submit" class="btn btn-primary">Import</button>
+                        </form>
+                        @if (isset($count))
+                            <h4 class="text text-success">A total of {{$count}} suppliers were successfully uploaded</h4>
+                           
+                        @endif
                     </div>
                 </div>
             </div><!-- /.container-fluid -->

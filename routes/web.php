@@ -103,6 +103,10 @@ Route::middleware('auth')->group(function () {
                 Route::get('/edit/{category}', [CategoryController::class, 'edit'])->name('categories.edit');
                 Route::put('/update/{category}', [CategoryController::class, 'update'])->name('categories.update');
                 Route::delete('/delete/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+
+                //Import Categories
+                Route::get('/import/form', [CategoryController::class, 'importForm'])->name('categories.import.form');
+                Route::post('/import', [CategoryController::class, 'import'])->name('categories.import');
             }
         );
 
@@ -183,6 +187,10 @@ Route::middleware('auth')->group(function () {
                         Route::put('/update/{product}', [ProductController::class, 'update'])->name('products.update');
                         Route::delete('/delete/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
                         Route::match(['GET', 'POST'], '/update/purchase_price', [ProductController::class, 'purchasePrice'])->name('products.purchase_prices');
+
+                        //Import Products
+                        Route::get('/import/form', [ProductController::class, 'importForm'])->name('products.import.form');
+                        Route::post('/import', [ProductController::class, 'import'])->name('products.import');
                     }
                 );
                 Route::group(
@@ -201,7 +209,7 @@ Route::middleware('auth')->group(function () {
                         Route::get('/cost/selling_price', [MisController::class, 'getSellingPrice'])->name('ajax.load.product.selling_price');
                         Route::get('/selling/price', [MisController::class, 'getLastTwoSellingPrice'])->name('ajax.load.selling.price');
 
-                        Route::get('/import', [BranchProductPriceController::class, 'importForm'])->name('price.import.form');
+                        Route::get('/import/form', [BranchProductPriceController::class, 'importForm'])->name('price.import.form');
                         Route::post('/import', [BranchProductPriceController::class, 'import'])->name('price.import');
                     }
                 );
@@ -374,7 +382,7 @@ Route::middleware('auth')->group(function () {
                     Route::delete('/delete/{customer}', [CustomerController::class, 'destroy'])->name('customers.destroy');
 
                     //Import Customers
-                    Route::get('/import', [CustomerController::class, 'importForm'])->name('customers.import.form');
+                    Route::get('/import/form', [CustomerController::class, 'importForm'])->name('customers.import.form');
                     Route::post('/import', [CustomerController::class, 'import'])->name('customers.import');
 
                 }
@@ -483,6 +491,10 @@ Route::middleware('auth')->group(function () {
                     Route::delete('/delete/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
                     Route::get('/opening_balance', [SupplierController::class, 'createOpeningBalance'])->name('suppliers.create.opening_balance');
                     Route::post('/opening_balance/store', [SupplierController::class, 'openingBalanceStore'])->name('suppliers.opening_balance.store');
+
+                    //Import Suppliers
+                    Route::get('/import/form', [SupplierController::class, 'importForm'])->name('suppliers.import.form');
+                    Route::post('/import', [SupplierController::class, 'import'])->name('suppliers.import');
                 }
             );
             Route::group(
@@ -530,7 +542,7 @@ Route::middleware('auth')->group(function () {
                     Route::put('/update/{user}', [UserController::class, 'update'])->name('users.update');
                     Route::delete('/delete/{user}', [UserController::class, 'destroy'])->name('users.destroy');
                     //Import Users
-                    Route::get('/import', [UserController::class, 'importForm'])->name('users.import.form');
+                    Route::get('/import/form', [UserController::class, 'importForm'])->name('users.import.form');
                     Route::post('/import', [UserController::class, 'import'])->name('users.import');
 
                     //Roles
@@ -922,7 +934,7 @@ Route::middleware('auth')->group(function () {
                 Route::put('/update/{chartofaccount}', [ChartOfAccountController::class, 'update'])->name('chart_of_accounts.update');
                 Route::delete('/delete/{chartofaccount}', [ChartOfAccountController::class, 'destroy'])->name('chart_of_accounts.destroy');
 
-                Route::get('/import', [ChartOfAccountController::class, 'importForm'])->name('chart_of_accounts.import.form');
+                Route::get('/import/form', [ChartOfAccountController::class, 'importForm'])->name('chart_of_accounts.import.form');
                 Route::post('/import', [ChartOfAccountController::class, 'import'])->name('chart_of_accounts.import');
             }
         );
@@ -936,7 +948,7 @@ Route::middleware('auth')->group(function () {
                 Route::put('/update/{generalaccount}', [GeneralAccountController::class, 'update'])->name('general_accounts.update');
                 Route::delete('/delete/{generalaccount}', [GeneralAccountController::class, 'destroy'])->name('general_accounts.destroy');
 
-                Route::get('/import', [GeneralAccountController::class, 'importForm'])->name('general_accounts.import.form');
+                Route::get('/import/form', [GeneralAccountController::class, 'importForm'])->name('general_accounts.import.form');
                 Route::post('/import', [GeneralAccountController::class, 'import'])->name('general_accounts.import');
             }
         );

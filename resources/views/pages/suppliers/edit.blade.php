@@ -30,17 +30,15 @@
         <!-- Main content -->
         <section class="content">
             <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.create') }}">
-                <span class="fa fa-plus-circle"></span>
+                <span class="fa fa-plus-circle"> New Suppliers</span>
+            </a>
+            <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.import.form') }}">
+                <span class="fa fa-upload"> Upload Suppliers</span>
             </a>
             <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.index') }}">
-                <span class="fa fa-list"></span>
+                <span class="fa fa-list"> View Suppliers</span>
             </a>
-            <a href="{{ route('suppliers.payments') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                    class="fa fa-list"> </span> Payments</a>
-            <a href="{{ route('bank.ledger') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                    class="ion-model-s"> </span> Bank Ledger</a>
-            <a href="javascript:void(0)" data-toggle="modal" data-target="#supplier_ledgerform"
-                class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;">Supplier Ledger </a>
+            
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>

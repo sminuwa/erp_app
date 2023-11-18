@@ -29,10 +29,10 @@
         <!-- Main content -->
         <section class="content">
             <a class="btn btn-secondary btn-sm" href="{{ route('products.create') }}">
-                <span class="fa fa-plus-circle"></span>
+                <span class="fa fa-plus-circle" New Product></span>
             </a>
             <a class="btn btn-secondary btn-sm" href="{{ route('products.index') }}">
-                <span class="fa fa-list"></span>
+                <span class="fa fa-list"> View Products</span>
             </a>
             <div class="container-fluid">
                 <div class="row">

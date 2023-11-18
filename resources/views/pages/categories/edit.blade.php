@@ -32,10 +32,13 @@
 		<!-- Main content -->
 		<section class="content">
             <a class="btn btn-secondary btn-sm" href="{{ route('categories.create') }}">
-                <span class="fa fa-plus-circle"></span>
+                <span class="fa fa-plus-circle"> New Categories</span>
+            </a>
+			<a class="btn btn-secondary btn-sm" href="{{ route('categories.import.form') }}">
+                <span class="fa fa-upload"> Upload Categories</span>
             </a>
             <a class="btn btn-secondary btn-sm" href="{{ route('categories.index') }}">
-                <span class="fa fa-list"></span>
+                <span class="fa fa-list"> View Categories</span>
             </a>
 			<div class="container-fluid">
                 <div class="row">

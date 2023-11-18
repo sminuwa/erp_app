@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\ProductImport;
 use App\Models\Company;
 use App\Models\DosageForm;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
@@ -19,6 +22,7 @@ use App\Models\Category;
 use App\Models\BranchProductPrice;
 use Illuminate\Support\Facades\Auth;
 use App\Models\AuditLog;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 /**
@@ -37,7 +41,7 @@ class ProductController extends Controller
      */
     public function index(Index $request)
     {
-        return view('pages.products.index', ['records' => Product::orderBy('created_at', 'desc')->get()]);
+        return view('pages.products.index', ['records' => Product::orderBy('name')->get()]);
     } /**
       * Display the specified resource.
       *
@@ -72,10 +76,10 @@ class ProductController extends Controller
     {
 
 
-//        $model = new Product;
+        //        $model = new Product;
 //        $model->fill($request->except(['shortcut']));
-        if ($model = Product::createRecord($request->comany_id,$request->category_id, $request->name, $request->barcode, $request->expiry_status, $request->status)) {
-//            $model->addStoreProduct();
+        if ($model = Product::createRecord($request->comany_id, $request->category_id, $request->name, $request->barcode, $request->expiry_status, $request->status)) {
+            //            $model->addStoreProduct();
             $action = "Added a new product: " . $model->name;
             AuditLog::auditLog(Auth::id(), $action);
             session()->flash('app_message', 'Product saved successfully');
@@ -147,9 +151,10 @@ class ProductController extends Controller
         return redirect()->back();
     }
 
-    public function purchasePrice(Request $request){
+    public function purchasePrice(Request $request)
+    {
         $method = $request->method();
-        switch($method){
+        switch ($method) {
             case 'GET':
                 return view('pages.purchase_prices.create');
             case 'POST':
@@ -165,7 +170,48 @@ class ProductController extends Controller
                 }
                 return back();
 
-            default: return back();
+            default:
+                return back();
         }
+    }
+    public function importForm()
+    {
+        return view('pages.products.import');
+    }
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx',
+        ]);
+
+        $file = $request->file('file');
+        $import = new ProductImport();
+        $rows = Excel::toCollection($import, $file)->first();
+        $user_branch = User::userBranchAction();
+        $faileds = [];
+        $count = 0;
+        $data = array();
+        try {
+            foreach ($rows as $row) {
+                Product::updateOrInsert(
+                    ['code' => $row['code']],
+                    [
+                        'name' => trim($row['name']),
+                        'unit' => $row['unit_of_measure'],
+                        'category_id' => Category::where('code', trim($row['category_code']))->first()->id ?? 0,
+                        'company_id' => Company::where('code', trim($row['company_code']))->first()->id ?? 0,
+                        'barcode' => $row['barcode'],
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]
+                );
+                $count++;
+            }
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
+        //dd($faileds);
+        session()->flash('app_message', 'File imported and records updated/inserted successfully!');
+        return view('pages.products.import', ['count' => $count]);
     }
 }

@@ -4,7 +4,6 @@
     </div>
 @else
     @if($type == 'interstore')
-
         <table class="table table-bordered table-striped mb-3">
 
             <thead>
@@ -137,6 +136,9 @@
             @endforeach
             </tbody>
         </table>
+        <div class="alert alert-success">
+            Total : &#8358; <span class="totalCart">{{ number_format(\Cart::getTotal(),2) }}</span>
+        </div>
     @elseif($type=='request')
         <table class="table table-bordered table-striped text-center" style="font-size: 12px;">
             <thead>
@@ -209,9 +211,61 @@
             @endforeach
             </tbody>
         </table>
+        <div class="alert alert-success">
+            Total : &#8358; <span class="totalCart">{{ number_format(\Cart::getTotal(),2) }}</span>
+        </div>
+    @elseif($type == 'adjustment')
+        <table class="table table-bordered table-striped mb-3">
+
+            <thead>
+            <tr>
+                <th>S.N</th>
+                <th>Name</th>
+                <th>Qty</th>
+                <th>Store</th>
+                <th><span class="ion-ios-trash"></span></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (\Cart::getContent() as $product)
+                <tr>
+                    @php $attr = $product->attributes @endphp
+                    <td>{{ $loop->iteration }}</td>
+                    <td class="text-left">{{ $product->name }}</td>
+                    <form action="{{ route('ajax.cart.update', $product->id) }}" method="post" id="p{{ $product->id }}">
+                        <td>
+                            <span style="color: red;" id="valid_price{{ $product->id }}"></span>
+                            <input
+                                type="text"
+                                name="quantity"
+                                id="quantity{{ $product->id }}"
+                                class="form-control quantity"
+                                data-value="p{{ $product->id }}"
+                                style="min-width:58px;"
+                                value="{{ $product->quantity }}"
+                                min="1"
+                                required>
+                        </td>
+                        <input type="hidden" name="id" class="form-control" value="{{ $product->id }}">
+                        <input type="hidden" name="product_id" class="form-control" value="{{ $attr->product_id }}">
+                        <input type="hidden" name="store_id" class="form-control" value="{{ $attr->store_id }}">
+                    </form>
+                    <td>{{ \App\Models\Store::find($attr->store_id)->name ?? null }}</td>
+{{--                    <td>{{ $product->attributes->store_id }}</td>--}}
+                    <td class="text-right">
+                        <form class="deleteForm deleteCartItem" id="delete-form-{{ $product->id }}"
+                              action="{{ route('ajax.cart.delete', $product->id) }}" method="post"
+                              data-val="{{ $product->id }}">
+                            @csrf
+                            <button class="btn btn-danger btn-sm delete" type="submit">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
     @endif
 @endif
-<div class="alert alert-success">
-    Total : &#8358; <span class="totalCart">{{ number_format(\Cart::getTotal(),2) }}</span>
-</div>
 

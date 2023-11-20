@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdditionalInvoiceController;
 use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\GeneralAccountController;
 use App\Http\Controllers\JournalController;
@@ -912,6 +913,17 @@ Route::middleware('auth')->group(function () {
         //     Route::post('/store', [App\Http\Controllers\Inventory\PurchaseController::class, 'store'])->name('inventories.purchases.store');
         // });
         //Debit Notes
+        Route::group(['prefix' => 'additional-invoice'], function () {
+            Route::get('/', [AdditionalInvoiceController::class, 'index'])->name('purchase.additional-invoice.index');
+            Route::get('/create', [AdditionalInvoiceController::class, 'create'])->name('purchase.additional-invoice.create');
+            Route::get('/edit/{invoice}', [AdditionalInvoiceController::class, 'edit'])->name('purchase.additional-invoice.edit');
+            Route::post('/store', [AdditionalInvoiceController::class, 'store'])->name('purchase.additional-invoice.store');
+            Route::post('/post/{invoice}', [AdditionalInvoiceController::class, 'post'])->name('purchase.additional-invoice.post');
+            Route::post('/reverse/{invoice}', [AdditionalInvoiceController::class, 'reverse'])->name('purchase.additional-invoice.reverse');
+            Route::get('/print/{invoice}', [AdditionalInvoiceController::class, 'print'])->name('purchase.additional-invoice.print');
+
+        });
+
         Route::group(['prefix' => 'debit-note'], function () {
             Route::get('/', [DebitNoteController::class, 'supplierDebitNote'])->name('suppliers.debit.note');
             Route::get('/create/{purchase?}', [DebitNoteController::class, 'createDebitNote'])->name('suppliers.debit.note.create');
@@ -926,8 +938,7 @@ Route::middleware('auth')->group(function () {
             Route::delete('/remove/{id}', [DebitNoteController::class, 'removeCart'])->name('debit.note.cart.remove');
             Route::get('/print/receipt/{debit_note}', [DebitNoteController::class, 'printDebitNoteReceipt'])->name('suppliers.debit.note.print');
             Route::post('/expense', [DebitNoteController::class, 'expense'])->name('update.purchases.expense.ajax.create');
-        }
-        );
+        });
 
         //Return and Debit
         Route::group(

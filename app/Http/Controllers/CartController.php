@@ -186,39 +186,103 @@ class CartController extends Controller
                 ),
             ]);
         }
+        elseif($type == 'adjustment') {
+            $add = \Cart::add([
+                'id' => $this->generateRandomString(),
+                'name' => Product::find($request->product_id)->name,
+                'price' => 0, //Thos is not applicable here
+                'quantity' => abs($request->adjusted_qty),
+                'attributes' => array(
+                    'store_id' => $request->store_id,
+                    'product_id' => $request->product_id,
+                    'available_qty' => $request->available_qty,
+                ),
+            ]);
+        }
+
         return view('components.cart', compact('type'));
     }
 
     public function updateCartItem(Request $request, $id)
     {
 //        return $request;
-        $sold_price = $request->sold_price;
-        if ($request->has('percent')) {
-            $percent = $request->percent;
-            $sold_price = ceil($request->cost_price + ($request->cost_price / 100) * $percent);
+
+        $type =$request->type;
+
+        if($type == 'grn') {
+            $sold_price = $request->sold_price;
+            if ($request->has('percent')) {
+                $percent = $request->percent;
+                $sold_price = ceil($request->cost_price + ($request->cost_price / 100) * $percent);
+            }
+            $store = Store::find($request->store_id);
+            \Cart::update(
+                $request->store_product_id,
+                [
+                    'quantity' => [
+                        'relative' => false,
+                        'value' => $request->quantity
+                    ],
+                    'price' => $request->price,
+                    'attributes' => array(
+                        'cost_price' => $request->price,
+                        'selling_price' => $request->selling_price ?? '',
+                        'code'=>$request->code,
+                        'discount' => $request->selling_price - $request->sold_price ?? '',
+                        'qty_available' => $request->qty_available,
+                        'store'=>$request->store,
+                        'unit'=>$request->unit,
+                        'store_id' =>$request->store_id ?? '',
+                        'store_code' =>$store->code ?? '',
+                    )
+                ]
+            );
         }
-        $store = Store::find($request->store_id);
-        \Cart::update(
-            $request->store_product_id,
-            [
+        elseif($type == 'request') {
+            $sold_price = $request->sold_price;
+            if ($request->has('percent')) {
+                $percent = $request->percent;
+                $sold_price = ceil($request->cost_price + ($request->cost_price / 100) * $percent);
+            }
+            $store = Store::find($request->store_id);
+            \Cart::update(
+                $request->store_product_id, [
+                    'quantity' => [
+                        'relative' => false,
+                        'value' => $request->quantity
+                    ],
+                    'price' => $request->price,
+                    'attributes' => array(
+                        'cost_price' => $request->price,
+                        'selling_price' => $request->selling_price ?? '',
+                        'code'=>$request->code,
+                        'discount' => $request->selling_price - $request->sold_price ?? '',
+                        'qty_available' => $request->qty_available,
+                        'store'=>$request->store,
+                        'unit'=>$request->unit,
+                        'store_id' =>$request->store_id ?? '',
+                        'store_code' =>$store->code ?? '',
+                    )
+                ]
+            );
+        }
+        elseif($type == 'adjustment') {
+            return $request;
+            \Cart::update(
+                $request->store_product_id, [
                 'quantity' => [
                     'relative' => false,
                     'value' => $request->quantity
                 ],
-                'price' => $request->price,
+                'name' => Product::find($request->product_id)->name,
+                'price' => 0, //Thos is not applicable here
                 'attributes' => array(
-                    'cost_price' => $request->price,
-                    'selling_price' => $request->selling_price ?? '',
-                    'code'=>$request->code,
-                    'discount' => $request->selling_price - $request->sold_price ?? '',
-                    'qty_available' => $request->qty_available,
-                    'store'=>$request->store,
-                    'unit'=>$request->unit,
-                    'store_id' =>$request->store_id ?? '',
-                    'store_code' =>$store->code ?? '',
-                )
-            ]
-        );
+                    'store_id' => $request->store_id,
+                    'product_id' => $request->product_id,
+                    'available_qty' => $request->available_qty,
+                ),
+            ]);
+        }
         if ($request->ajax()) {
             return \Cart::getTotal();
         }

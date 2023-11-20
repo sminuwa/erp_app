@@ -213,14 +213,8 @@ class StockAdjustmentController extends Controller
         }
         \Cart::session('_token')->clear();
         return redirect()->route('stock_adjustments.index');
-    } /**
-  * Delete a  resource from  storage.
-  *
-  * @param  Destroy  $request
-  * @param  StockAdjustment  $stockadjustment
-  * @return \Illuminate\Http\Response
-  * @throws \Exception
-  */
+    }
+
     public function destroy(Destroy $request, StockAdjustment $stockadjustment)
     {
         DB::beginTransaction();
@@ -251,6 +245,7 @@ class StockAdjustmentController extends Controller
         \Cart::session('_token')->clear();
         return redirect()->route('stock_adjustments.index');
     }
+
     public function addToCart(Request $request)
     {
         $validated = $request->validate([

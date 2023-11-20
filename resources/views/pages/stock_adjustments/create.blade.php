@@ -5,7 +5,7 @@
 @endpush
 
 @section('content')
-
+    <input name="cart_page_type" type="hidden" value="adjustment">
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
@@ -29,215 +29,77 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('stock_adjustments.index') }}">
-                <span class="fa fa-list"></span>
-            </a>
-            <div class="container-fluid">
+            <div class="container">
+                <a class="btn btn-secondary btn-sm" href="{{ route('stock_adjustments.index') }}">
+                    <span class="fa fa-list"></span>
+                </a>
                 <div class="row">
-                    <div class='col-md-4'>
-                        <form action="{{ isset($route) ? $route : route('stock_adjustments.cart') }}" method="POST">
-                            {{ csrf_field() }}
-                            <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
-                            <div class="form-group">
-                                <label for="store_id">Store</label>
-                                <select class="form-control select2-single {{ $errors->has('store_id') ? ' is-invalid' : '' }}" name="store_id"
-                                        id="store_id" required="required">
-                                    <option value="">Select...</option>
-                                    @if (isset($stores))
-                                        @foreach ($stores as $data)
-                                            <option value="{{ $data->id }}" {{ old('store_id') == $data->id ? 'selected' : '' }}>
-                                                {{ $data->code }}-{{ $data->name }}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                                @if ($errors->has('store_id'))
-                                    <div class="invalid-feedback">
-                                        <strong>{{ $errors->first('store_id') }}</strong>
-                                    </div>
-                                @endif
-                            </div>
-                            {{-- <div class="form-group">
-                                <label for="category_id">Group </label>
-                                <select class="form-control select2-single {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
-                                    name="category_id" id="category_id" required="required">
-                                    <option value="">Select...</option>
-                                    @if (isset($stores))
-                                        @foreach ($categories as $data)
-                                            <option value="{{ $data->id }}" {{ $data->id == old('category_id') ? 'selected' : '' }}>
-                                                {{ $data->name }}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                                @if ($errors->has('category_id'))
-                                    <div class="invalid-feedback">
-                                        <strong>{{ $errors->first('category_id') }}</strong>
-                                    </div>
-                                @endif
-                            </div> --}}
 
-                            <div class="form-group">
-                                <label for="product_id">Product</label>
-                                <select class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
-                                        name="product_id" id="product_id" required="required">
-                                    <option value="">Select...</option>
-
-                                    @if (old('category_id', optional(optional($model->product)->category)->id))
-                                        @foreach (\App\Models\Product::where('category_id', old('category_id'))->get() as $data)
-                                            <option value="{{ $data->id }}">
-                                                {{ $data->code }}-{{ $data->name }}</option>
-                                        @endforeach
-                                    @else
-                                        @if (isset($products))
-                                            @foreach ($products as $data)
-                                                <option value="{{ $data->id }}">
-                                                    {{ $data->code }}-{{ $data->name }}</option>
-                                            @endforeach
-                                        @endif
-                                    @endif
-
-                                </select>
-                                <div class="input-group-prepend">
-                                    <p class="text text-danger" id="available"></p>
-                                </div>
-                                @if ($errors->has('product_id'))
-                                    <div class="invalid-feedback">
-                                        <strong>{{ $errors->first('product_id') }}</strong>
-                                    </div>
-                                @endif
-                            </div>
-                            <div class="form-group">
-                                <label for="available_qty">Available Qty</label>
-                                <input type="number" class="form-control {{ $errors->has('available_qty') ? ' is-invalid' : '' }}" readonly
-                                       name="available_qty" id="available_qty" value="" placeholder="">
-                                @if ($errors->has('available_qty'))
-                                    <div class="invalid-feedback">
-                                        <strong>{{ $errors->first('available_qty') }}</strong>
-                                    </div>
-                                @endif
-                            </div>
-                            <div class="form-group">
-                                <span>Type Number: </span>
-                                <label for="adjusted_qty">Adjusted Qty</label>
-                                <input type="number" class="form-control {{ $errors->has('adjusted_qty') ? ' is-invalid' : '' }}"
-                                       name="adjusted_qty" id="adjusted_qty" value="" placeholder="" required="required" min="1">
-                                @if ($errors->has('adjusted_qty'))
-                                    <div class="invalid-feedback">
-                                        <strong>{{ $errors->first('adjusted_qty') }}</strong>
-                                    </div>
-                                @endif
-                            </div>
-                            <input type="radio"  name="operation" value="1" {{ $model->qty > 0  ? 'checked' : '' }}> Add (+)<br>
-                            <input type="radio" name="operation" value="-1" {{ !$model->qty < 0 ? 'checked' : '' }}> Subtract(-)<br>
-                            <div class="form-group text-right ">
-                                <button type="submit" class="btn btn-primary"><i class="fa fa-cart-plus"> Add to Cart</i></button>
-                            </div>
-                        </form>
-
-                    </div>
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
                                 <i class="ion-android-cart"></i> Stock Adjustment Cart
+                                <div class="float-right">
+                                    <a href="javascript:void(0)" data-toggle="modal"
+                                       data-target="#add_product_form"
+                                       class="btn btn-sm btn-secondary float-md-right"
+                                       style="margin-left: 2px;"><i class="fa fa-plus"></i> Add Product </a>
+                                </div>
                             </div>
-                            <div class="card-body table-responsive">
+                            <div class="card-body">
                                 <form action="{{ isset($route) ? $route : route('stock_adjustments.store') }}"
                                       method="POST">
                                     {{ csrf_field() }}
-                                    <input type="hidden" name="_method"
-                                           value="{{ isset($method) ? $method : 'POST' }}" />
-                                    <div class="form-group">
-                                        <label for="date">Date</label>
-                                        <div class="input-group">
-                                            <input type="text" autocomplete="off"
-                                                   class="form-control datepicker {{ $errors->has('date') ? ' is-invalid' : '' }}"
-                                                   name="date" id="date"
-                                                   value="{{ old('date', $model->date) != null ? old('date', $model->date) : date('Y-m-d') }}"
-                                                   placeholder="" required="required">
-                                            <div class="input-group-addon">
-                                                <label for="date" class="fa fa-calendar">
-                                                </label>
+                                    <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
+                                    <input type="hidden" name="adjusted_by" id="adjusted_by" value="{{ Auth::id() }}" required="required">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="date">Date</label>
+                                                <div class="input-group">
+                                                    <input type="text" autocomplete="off"
+                                                           class="form-control datepicker {{ $errors->has('date') ? ' is-invalid' : '' }}"
+                                                           name="date" id="date"
+                                                           value="{{ old('date', $model->date) != null ? old('date', $model->date) : date('Y-m-d') }}"
+                                                           placeholder="" required="required">
+                                                </div>
+                                                @if ($errors->has('date'))
+                                                    <div class="invalid-feedback">
+                                                        <strong>{{ $errors->first('date') }}</strong>
+                                                    </div>
+                                                @endif
                                             </div>
                                         </div>
-                                        @if ($errors->has('date'))
-                                            <div class="invalid-feedback">
-                                                <strong>{{ $errors->first('date') }}</strong>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="date">Operation</label>
+                                                <div class="input-group">
+                                                    <select type="text"
+                                                           class="form-control {{ $errors->has('operation') ? ' is-invalid' : '' }}"
+                                                           name="operation" id="operation"
+                                                           value="{{ old('operation', $model->date) != null ? old('operation', $model->date) : date('Y-m-d') }}"
+                                                            required>
+                                                        <option value="">select...</option>
+                                                        <option value="in">In</option>
+                                                        <option value="out">Out</option>
+
+                                                    </select>
+                                                </div>
+                                                @if ($errors->has('date'))
+                                                    <div class="invalid-feedback">
+                                                        <strong>{{ $errors->first('date') }}</strong>
+                                                    </div>
+                                                @endif
                                             </div>
-                                        @endif
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <input type="hidden" name="adjusted_by" id="adjusted_by"
-                                               value="{{ Auth::id() }}" required="required">
-                                    </div>
-
-                                @if (count($adjusment_products) < 1)
-                                    <div class="alert alert-danger">
-                                        No Product Added
-                                    </div>
-                                @else
-                                    <table class="table table-bordered table-striped mb-3">
-
-                                        <thead>
-                                            <tr>
-                                                <td colspan="6" style="line-height: 0.4 !important;text-align: right">
-                                                    <form method="POST"
-                                                        action="{{ route('stock_adjustments.cart.clear') }}">
-                                                        @csrf
-                                                        <div class="row">
-                                                            <div class="offset-10 col-sm-2">
-                                                                <button type="submit" class="btn-danger btn btn-sm"><span
-                                                                        class="ion-trash-a text text-white"></span> Clear
-                                                                    All</button>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>S.N</th>
-                                                <th>Name</th>
-                                                <th>Qty</th>
-                                                <th>Store</th>
-                                                <th><span class="ion-ios-trash"></span></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($adjusment_products as $product)
-                                                <tr>
-                                                    @php $attr = $product->attributes @endphp
-                                                    <td>{{ $loop->iteration }}</td>
-                                                    <td class="text-left">{{ $product->name }}</td>
-                                                    <td>
-                                                        @if ($attr['sign'] == '-')
-                                                            -{{ number_format($product->quantity, 0, '', ',') }}
-                                                        @else
-                                                            {{ number_format($product->quantity, 0, '', ',') }}
-                                                        @endif
-
-                                                    </td>
-                                                    <td>{{ \App\Models\Store::find($attr['store_id'])->name }}</td>
-                                                    <td>
-                                                        <button class="btn btn-danger btn-sm" type="button"
-                                                            onclick="deleteItem({{ $product->id }})">
-                                                            <i class="fa fa-trash" aria-hidden="true"></i>
-                                                        </button>
-                                                        <form id="delete-form-{{ $product->id }}"
-                                                            action="{{ route('stock_adjustments.cart.remove', $product->id) }}"
-                                                            method="post" style="display:none;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                @endif
 
                                     <div class="form-group text-right ">
-                                        <button type="submit" class="btn btn-success"><span class="ui-icon-clock">
-                                                Adjust</span></button>
+                                        <button type="submit" class="btn btn-success"><span class="ui-icon-clock">Adjust</span></button>
                                     </div>
                                 </form>
+
+                                <div class="cart-container"></div>
                             </div>
 
                         </div>
@@ -249,6 +111,88 @@
     </div>
     <!-- /.content-wrapper -->
 
+    <div class="modal fade" id="add_product_form" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add product to cart</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('ajax.cart.add') }}" method="POST" class="addCartItemForm">
+                        {{ csrf_field() }}
+                        <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
+                        <div class="form-group">
+                            <label for="store_id">Store</label>
+                            <select class="form-control select2-single {{ $errors->has('store_id') ? ' is-invalid' : '' }}" name="store_id"
+                                    id="store_id" required="required">
+                                <option value="">Select...</option>
+                                @if (isset($stores))
+                                    @foreach ($stores as $data)
+                                        <option value="{{ $data->id }}" {{ old('store_id') == $data->id ? 'selected' : '' }}>
+                                            {{ $data->code }}-{{ $data->name }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            @if ($errors->has('store_id'))
+                                <div class="invalid-feedback">
+                                    <strong>{{ $errors->first('store_id') }}</strong>
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="form-group">
+                            <label for="product_id">Product</label>
+                            <select class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
+                                    name="product_id" id="product_id" required="required">
+                                <option value="">Select...</option>
+
+                                @if (old('category_id', optional(optional($model->product)->category)->id))
+                                    @foreach (\App\Models\Product::where('category_id', old('category_id'))->get() as $data)
+                                        <option value="{{ $data->id }}">
+                                            {{ $data->code }}-{{ $data->name }}</option>
+                                    @endforeach
+                                @else
+                                    @if (isset($products))
+                                        @foreach ($products as $data)
+                                            <option value="{{ $data->id }}">
+                                                {{ $data->code }}-{{ $data->name }}</option>
+                                        @endforeach
+                                    @endif
+                                @endif
+
+                            </select>
+                            <div class="input-group-prepend">
+                                <p class="text text-danger" id="available"></p>
+                            </div>
+                            @if ($errors->has('product_id'))
+                                <div class="invalid-feedback">
+                                    <strong>{{ $errors->first('product_id') }}</strong>
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="form-group">
+                            <label for="adjusted_qty">Adjusted Qty</label>
+                            <input type="number" class="form-control {{ $errors->has('adjusted_qty') ? ' is-invalid' : '' }}"
+                                   name="adjusted_qty" id="adjusted_qty" value="" placeholder="" required="required" min="1">
+                            @if ($errors->has('adjusted_qty'))
+                                <div class="invalid-feedback">
+                                    <strong>{{ $errors->first('adjusted_qty') }}</strong>
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="form-group text-right ">
+                            <button type="submit" class="btn btn-primary"><i class="fa fa-cart-plus"> Add to Cart</i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('js')
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>

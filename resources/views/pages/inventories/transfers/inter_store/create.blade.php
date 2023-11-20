@@ -45,20 +45,16 @@
                                        style="margin-left: 2px;"><i class="fa fa-plus"></i> Add Product </a>
                                 </div>
                             </div>
-                            <div class="card-body table-responsive">
+                            <div class="card-body">
                                 <form action="{{ isset($route) ? $route : route('interstore.store') }}" method="POST">
                                 <div class="form-group">
                                     <label for="transfer_date">Date</label>
                                     <input type="text" name="transfer_date" class="form-control datepicker"
                                            value="{{ isset($model->transfer_date) ? $model->transfer_date : old('transfer_date', date('Y-m-d')) }}" />
                                 </div>
-
-                                <div class="cart-container"></div>
-
                                     {{ csrf_field() }}
                                     <input type="hidden" name="_method"
                                         value="{{ isset($method) ? $method : 'POST' }}" />
-
 
                                     @if (isset($model) && $model->status != null)
                                         <div class="form-check">
@@ -88,7 +84,8 @@
                                         <button type="submit" class="btn btn-success"><span class="ion-forward">Transfer</span></button>
                                     </div>
                                 </form>
-                                </div>
+                                <div class="cart-container"></div>
+                            </div>
 
                         </div>
                     </div>

@@ -16,7 +16,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Debit Note</h4>
+                        <h4>New Additional Invoice</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -24,7 +24,7 @@
                             <li class="breadcrumb-item"><a href="{{ route('suppliers.index') }}">Supplier</a></li>
                             <li class="breadcrumb-item"><a href="{{ route('suppliers.payments') }}">Supplier Payment</a>
                             </li>
-                            <li class="breadcrumb-item active">Credit Note</li>
+                            <li class="breadcrumb-item active">Additional Invoice</li>
                         </ol>
                     </div>
                 </div>
@@ -33,15 +33,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('customers.credit.note') }}">
-                <span class="fa fa-list"> Credit Notes</span>
-            </a>
-            <div class="container-fluid">
+
+            <div class="container">
+                <a class="btn btn-secondary btn-sm" href="{{ route('purchase.additional-invoice.index') }}">
+                    <span class="fa fa-list"></span> Additional Invoice List
+                </a>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                Credit Notes
+                                New Additional Invoice
                             </div>
                             <div class="card-body">
                                 <div class="row">
@@ -50,18 +51,18 @@
                                         <div class="form-group">
                                             <label for="date">Date</label>
                                             <input type="text" name="date" class="form-control date_ datepicker"
-                                                   value="{{ $purchase ? $purchase->purchase_date : date('Y-m-d') }}" required
+                                                   value="{{ isset($invoice) ? $invoice->date : date('Y-m-d') }}" required
                                             />
                                         </div>
 
                                     </div>
                                     <div class="col-md-8">
                                         <div class="form-group">
-                                            <label>Supplier</label>
-                                            <select name="supplier_id" id="supplier_id" class="form-control" required>
+                                            <label>Purchase</label>
+                                            <select name="purchase_id" id="purchase_id" class="form-control" required>
                                                 <option value="" disabled selected>Select...</option>
-                                                @foreach($suppliers as $supplier)
-                                                    <option value="{{$supplier->id}}">{{ $supplier->code }} - {{ $supplier->name }}</option>
+                                                @foreach($purchases as $purchase)
+                                                    <option value="{{$purchase->id}}">{{ $purchase->reference }} - {{ $purchase->supplier->name ?? null }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -76,8 +77,46 @@
                                 <h3 class="card-title">Invoices</h3>
                             </div>
                             <div class="card-body">
-                                <input type="text" id="search" class="form-control" placeholder="Search">
-                                <table class="table" id="" style="font-size: 12px;">
+                                <form action="{{ route('purchase.additional-invoice.store') }}" method="post">
+                                    @csrf
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Supplier</label>
+                                                <select name="supplier_id" id="supplier_id" class="form-control" required>
+                                                    <option value="" disabled selected>Select...</option>
+                                                    @foreach($suppliers as $supplier)
+                                                        <option value="{{$supplier->id}}">{{ $supplier->code }} - {{ $supplier->name ?? null }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="date">Amount</label>
+                                                <input type="number" name="amount" id="amount" class="form-control"
+                                                       placeholder="Amount"
+                                                       value="{{ isset($invoice) ? $invoice->amount : '' }}" required
+                                                />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="date">Description</label>
+                                                <input type="text" name="description" id="description" class="form-control"
+                                                       placeholder="Description"
+                                                       value="{{ isset($invoice) ? $invoice->description : '' }}" required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12 text-right">
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </div>
+                                    </div>
+                                </form>
+<!--                                <input type="text" id="search" class="form-control" placeholder="Search">-->
+<!--                                <table class="table" id="" style="font-size: 12px;">
                                     <thead>
                                     <tr>
                                         <th>Date</th>
@@ -91,7 +130,7 @@
                                     <tbody id="table-body" class="load-invoices">
 
                                     </tbody>
-                                </table>
+                                </table>-->
                             </div>
 
                         </div>
@@ -179,7 +218,7 @@
                 });
             });
 
-            $(document).on('change', '#supplier_id', function() {
+            $(document).on('change', '#purchase_id', function() {
                 var searchText = $(this).val();
                 $.ajax({
                     url: "{{ route('load.order-invoices') }}",

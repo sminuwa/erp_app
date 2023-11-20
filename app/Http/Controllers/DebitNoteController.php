@@ -29,6 +29,35 @@ class DebitNoteController extends Controller
     }
     public function createDebitNote(Purchase $purchase = null)
     {
+
+        $user_branch = User::userBranchAction();
+        $orders = Order::where('status', 1)
+            ->where('branch_id', 'LIKE', $user_branch)
+            ->whereNotIn('invoice_no', \Illuminate\Support\Facades\DB::table('credit_notes')->select('invoice_no')->pluck('invoice_no')->toArray())
+            ->orderBy('order_date', 'DESC')->take(20)->get();
+
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
+            ->join('stores', 'stores.id', 'store_products.store_id')
+            ->join('branches', 'branches.id', 'stores.branch_id')
+            ->join('products', 'products.id', 'store_products.product_id')
+            ->join('branch_product_prices', function ($join) {
+                $join->on('branch_product_prices.product_id', '=', 'products.id')
+                    ->on('branch_product_prices.branch_id', '=', 'branches.id');
+
+            })
+            ->where('stores.branch_id', 'LIKE', $user_branch)
+            ->where('branch_product_prices.status', 1)
+            ->where('store_products.qty_available', '>', 0)
+            ->orderBy('products.name')->orderBy('stores.name')->get();
+
+        if ($purchase == null)
+            \Cart::clear();
+        $suppliers = Supplier::orderBy('code', 'asc')->get();
+        $model = new Supplier;
+        $cart_products = \Cart::getContent();
+        return view('pages.inventories.debit_notes.create_debit_note', compact('orders', 'suppliers', 'cart_products', 'purchase', 'stores'));
+        /*
+
         $user_branch = User::userBranchAction();
         $purchases = Purchase::where('status', 1)
             ->whereNotIn('reference', DB::table('debit_notes')->select('reference')->pluck('reference')->toArray())
@@ -41,8 +70,9 @@ class DebitNoteController extends Controller
             \Cart::clear();
         $model = new Supplier;
         $cart_products = \Cart::getContent();
-        return view('pages.inventories.debit_notes.create_debit_note', compact('purchases', 'model', 'cart_products', 'purchase', 'suppliers'));
+        return view('pages.inventories.debit_notes.create_debit_note', compact('purchases', 'model', 'cart_products', 'purchase', 'suppliers'));*/
     }
+
     public function expense(Request $request)
     {
         DB::table('purchase_expenses')->updateOrInsert(['purchase_id' => $request->purchase_id, 'supplier_id' => $request->supplier_id, 'description' => $request->description], ['amount' => $request->amount, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()]);
@@ -51,6 +81,7 @@ class DebitNoteController extends Controller
         $cart_products = PurchaseExpense::where('purchase_id', $request->purchase_id)->get();
         return view('pages.inventories.debit_notes.create_debit_note', compact('cart_products'));
     }
+
     public function payDebitNote(Request $request)
     {
         return "To call your function for debit note";
@@ -106,6 +137,7 @@ class DebitNoteController extends Controller
     }
     public function loadInvoices(Request $request)
     {
+        $supplier_id = $request->supplier_id;
         $word_search = $request->search;
         if (strlen($word_search) > 0) {
             $purchases = Purchase::where('status', 1)
@@ -115,7 +147,8 @@ class DebitNoteController extends Controller
         } else {
             $purchases = Purchase::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('purchase_date', 'DESC')->take(20)->get();
         }
-        return view('pages.inventories.debit_notes.load_order_invoices', ['purchases' => $purchases]);
+        $invoices = PurchaseExpense::where('supplier_id', $supplier_id)->get();
+        return view('pages.inventories.debit_notes.load-invoices', ['invoices' => $invoices]);
     }
     public function loadToCart(Request $request)
     {

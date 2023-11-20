@@ -273,6 +273,14 @@
                         </li>
 
                         <li class="nav-item">
+                            <a href="{{route('purchase.additional-invoice.index')}}"
+                               class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>Additional Invoice</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
                             <a href="{{route('intersite.index')}}"
                                class="nav-link ">
                                 <i class="ion-card"></i>
@@ -312,13 +320,7 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a href="{{route('suppliers.debit.note')}}"
-                               class="nav-link ">
-                                <i class="ion-card"></i>
-                                <p>Additional Invoice</p>
-                            </a>
-                        </li>
+
                     </ul>
                 </li>
 <!--

@@ -22,7 +22,8 @@
 					<div class="col-sm-6">
 						<ol class="breadcrumb float-sm-right">
 							<li class="breadcrumb-item"><a href="{{route('home')}}">Home</a></li>
-							<li class="breadcrumb-item active">User</li>
+							<li class="breadcrumb-item"><a href="{{route('users.index')}}">Users</a></li>
+							<li class="breadcrumb-item active">Edit</li>
 						</ol>
 					</div>
 				</div>
@@ -32,10 +33,13 @@
 		<!-- Main content -->
 		<section class="content">
             <a class="btn btn-secondary btn-sm" href="{{ route('users.create') }}">
-                <span class="fa fa-plus-circle"></span>
+                <span class="fa fa-plus-circle"> New User</span>
+            </a>
+			<a class="btn btn-secondary btn-sm" href="{{ route('users.import.form') }}">
+                <span class="fa fa-upload"> Upload Users</span>
             </a>
             <a class="btn btn-secondary btn-sm" href="{{ route('users.index') }}">
-                <span class="fa fa-list"></span>
+                <span class="fa fa-list"> View Users</span>
             </a>
 			<div class="container-fluid">
                 <div class="row">

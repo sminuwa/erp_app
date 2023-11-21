@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\CategoryImport;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
@@ -14,6 +17,7 @@ use App\Http\Requests\Categories\Update;
 use App\Http\Requests\Categories\Destroy;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 /**
@@ -140,5 +144,44 @@ class CategoryController extends Controller
         }
 
         return redirect()->back();
+    }
+    public function importForm()
+    {
+        return view('pages.categories.import');
+    }
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx',
+        ]);
+
+        $file = $request->file('file');
+        $import = new CategoryImport();
+        $rows = Excel::toCollection($import, $file)->first();
+        $user_branch = User::userBranchAction();
+        $faileds = [];
+        $count = 0;
+        $data = array();
+        try {
+            foreach ($rows as $row) {
+                Category::updateOrInsert(
+                    ['code' => $row['code']],
+                    [
+                        'name' => trim($row['name']),
+                        'asset_account' => $row['asset_account'],
+                        'cost_account' => $row['cost_account'],
+                        'revenue_account' => $row['revenue_account'],
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]
+                );
+                $count++;
+            }
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
+        //dd($faileds);
+        session()->flash('app_message', 'File imported and records updated/inserted successfully!');
+        return view('pages.categories.import', ['count' => $count]);
     }
 }

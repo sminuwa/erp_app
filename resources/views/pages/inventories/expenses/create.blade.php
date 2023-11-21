@@ -39,7 +39,7 @@
                     <span class="fa fa-list"></span> Additional Invoice List
                 </a>
                 <div class="row">
-                    <div class="col-md-12">
+<!--                    <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
                                 New Additional Invoice
@@ -70,7 +70,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
@@ -79,6 +79,32 @@
                             <div class="card-body">
                                 <form action="{{ route('purchase.additional-invoice.store') }}" method="post">
                                     @csrf
+                                    <input type="hidden" name="invoice_id" value="{{ isset($invoice) ? $invoice->id : '' }}">
+                                    <div class="row">
+                                        <div class="col-md-4">
+
+                                            <div class="form-group">
+                                                <label for="date">Date</label>
+                                                <input type="text" name="date" class="form-control date_ datepicker"
+                                                       value="{{ isset($invoice) ? $invoice->date : date('Y-m-d') }}" required
+                                                />
+                                            </div>
+
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="form-group">
+                                                <label>Purchase</label>
+                                                <select name="purchase_id" id="purchase_id" class="form-control" required>
+                                                    <option value="" disabled selected>Select...</option>
+                                                    @foreach($purchases as $purchase)
+                                                        <option value="{{$purchase->id}}" @if(isset($invoice->id)) {{ $invoice->purchase_id == $purchase->id ? 'selected' : '' }} @endif>
+                                                            {{ $purchase->reference }} - {{ $purchase->supplier->name ?? null }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group">
@@ -86,7 +112,9 @@
                                                 <select name="supplier_id" id="supplier_id" class="form-control" required>
                                                     <option value="" disabled selected>Select...</option>
                                                     @foreach($suppliers as $supplier)
-                                                        <option value="{{$supplier->id}}">{{ $supplier->code }} - {{ $supplier->name ?? null }}</option>
+                                                        <option value="{{$supplier->id}}" @if(isset($invoice->id)) {{ $invoice->supplier_id == $supplier->id ? 'selected' : '' }} @endif>
+                                                            {{ $supplier->code }} - {{ $supplier->name ?? null }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                             </div>

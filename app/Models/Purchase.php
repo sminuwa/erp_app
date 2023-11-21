@@ -54,6 +54,10 @@ class Purchase extends Model
     {
         return $this->purchasedProducts()->select(DB::raw('sum(quantity * unit_price) as total'))->first();
     }
+    public function totalExpenseCost()
+    {
+        return $this->expenses()->where('status', 1)->select(DB::raw('sum(amount) as total'))->first();
+    }
     public function totalPaid()
     {
         if ($this->purchase_mode == 'Cash')
@@ -76,6 +80,12 @@ class Purchase extends Model
             return $prefix.str_pad($new, $length,0,STR_PAD_LEFT);
         }
         return $prefix.str_pad(1, $length,0,STR_PAD_LEFT);
+    }
+
+    public function total_expense(){
+        $total_grn = $this->totalProductCost();
+        $total_expense = $this->totalExpenseCost();
+        return (intval($total_grn->total) + intval($total_expense->total));
     }
 
 }

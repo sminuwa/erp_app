@@ -32,10 +32,10 @@
         <!-- Main content -->
         <section class="content">
             <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.create') }}">
-                <span class="fa fa-plus-circle"></span>
+                <span class="fa fa-plus-circle"> New Price</span>
             </a>
             <a class="btn btn-secondary btn-sm" href="{{ route('price.import.form') }}">
-                <span class="fa fa-upload"></span>
+                <span class="fa fa-upload"> Upload Prices</span>
             </a>
             <div class="container-fluid">
                 <div class="row">

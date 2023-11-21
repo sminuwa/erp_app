@@ -32,8 +32,12 @@
         <!-- Main content -->
         <section class="content">
             <a class="btn btn-secondary btn-sm" href="{{ route('customers.create') }}">
-                <span class="fa fa-plus-circle"></span>
+                <span class="fa fa-plus-circle"> New Customer</span>
             </a>
+            <a class="btn btn-secondary btn-sm" href="{{ route('customers.import.form') }}">
+                <span class="fa fa-upload"> Upload Customers</span>
+            </a>
+
             <a href="javascript:void(0)" data-toggle="modal" data-target="#customer_ledgerform"
                             class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span class="fa fa-money"> Customer Ledger</span> </a>
             <div class="container-fluid">

@@ -32,27 +32,36 @@
                     @endif
                 </td>
                 <td>
-                    @can('view.customer.ledger')
-                        <a class="btn btn-secondary btn-sm" title="View Ledger"
-                            href="{{ route('customers.show', $record->id) }}">
-                            <span class="fa fa-eye"></span>
-                        </a>
-                    @endcan
-                    @can('edit.customer')
-                        <a class="btn btn-secondary btn-sm" href="{{ route('customers.edit', $record->id) }}">
-                            <span class="fa fa-pencil"></span>
-                        </a>
-                    @endcan
-                    @can('delete.customer')
-                        <form onsubmit="return confirm('Are you sure you want to delete?')"
-                            action="{{ route('customers.destroy', $record->id) }}" method="post" style="display: inline">
-                            {{ csrf_field() }}
-                            {{ method_field('DELETE') }}
-                            <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
-                                <i class="text-danger fa fa-remove"></i>
-                            </button>
-                        </form>
-                    @endcan
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Action
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            @can('view.customer.ledger')
+                                <a class="dropdown-item" title="View Ledger"
+                                    href="{{ route('customers.show', $record->id) }}">
+                                    <span class="fa fa-eye">  View</span>
+                                </a>
+                            @endcan
+                            @can('edit.customer')
+                                <a class="dropdown-item" href="{{ route('customers.edit', $record->id) }}">
+                                    <span class="fa fa-pencil"> Edit</span>
+                                </a>
+                            @endcan
+                            @can('delete.customer')
+                                <form onsubmit="return confirm('Are you sure you want to delete?')"
+                                    action="{{ route('customers.destroy', $record->id) }}" method="post"
+                                    style="display: inline">
+                                    {{ csrf_field() }}
+                                    {{ method_field('DELETE') }}
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="text-danger fa fa-remove"> Delete</i>
+                                    </button>
+                                </form>
+                            @endcan
+                        </div>
+                    </div>
                 </td>
             </tr>
         @endforeach

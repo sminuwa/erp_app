@@ -17,6 +17,14 @@ class PurchaseExpense extends Model
         return $this->belongsTo(Supplier::class);
     }
 
+    public function createdBy(){
+        return $this->belongsTo(User::class,'created_by');
+    }
+
+    public function postedBy(){
+        return $this->belongsTo(User::class,'posted_by');
+    }
+
     public static function generateNewNumber($prefix = 'PNV', $length = 4){
         $prefix = $prefix.date('ym').auth()->user()->branch->code;
         $record = self::where('reference', 'like', '%'.$prefix.'%')->orderBy('reference', 'desc')->first();

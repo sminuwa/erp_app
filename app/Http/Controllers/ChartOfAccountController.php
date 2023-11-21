@@ -147,6 +147,7 @@ class ChartOfAccountController extends Controller
         $import = new ChartOfAccountImport();
         $rows = Excel::toCollection($import, $file)->first();
         $user_branch = User::userBranchAction();
+        $count = 0;
         try {
             foreach ($rows as $row) {
 
@@ -160,7 +161,7 @@ class ChartOfAccountController extends Controller
                         'updated_at' => Carbon::now(),
                     ]
                 );
-
+                $count++;
             }
         } catch (\Exception $exception) {
             return $exception->getMessage();

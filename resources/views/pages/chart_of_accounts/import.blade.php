@@ -33,19 +33,23 @@
         <!-- Main content -->
         <section class="content">
             <a class="btn btn-secondary btn-sm" href="{{ route('chart_of_accounts.create') }}">
-                <span class="fa fa-plus-circle"></span>
+                <span class="fa fa-plus-circle">New CoA</span>
             </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('chart_of_accounts.index') }}">
-                <span class="fa fa-list"></span>
-            </a><br/>
+            <a class="btn btn-secondary btn-sm" href="{{ url('upload_templates/coa_template.xlsx') }}">
+                <span class="fa fa-download"> Template</span>
+            </a>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 table-responsive">
-                        <form action="{{ route('price.import.form') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('chart_of_accounts.import') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <input type="file" name="file" class="form-control">
                             <button type="submit" class="btn btn-primary">Import</button>
                         </form>
+                        @if (isset($count))
+                        <h4 class="text text-success">A total of {{$count}} stores were successfully uploaded</h4>
+                       
+                    @endif
                     </div>
                 </div>
             </div><!-- /.container-fluid -->

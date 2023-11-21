@@ -32,10 +32,13 @@
 		<!-- Main content -->
 		<section class="content">
             <a class="btn btn-secondary btn-sm" href="{{ route('branches.create') }}">
-                <span class="fa fa-plus-circle"></span>
+                <span class="fa fa-plus-circle"> New Branch</span>
+            </a>
+			<a class="btn btn-secondary btn-sm" href="{{ route('branches.import.form') }}">
+                <span class="fa fa-upload"> Upload Prices</span>
             </a>
             <a class="btn btn-secondary btn-sm" href="{{ route('branches.index') }}">
-                <span class="fa fa-list"></span>
+                <span class="fa fa-list"> View Branches</span>
             </a>
 			<div class="container-fluid">
                 <div class="row">

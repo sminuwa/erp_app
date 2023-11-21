@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\SupplierImport;
+use App\Models\Branch;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Supplier;
@@ -23,6 +25,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Category;
 use App\Models\AuditLog;
 use App\Models\User;
+use Maatwebsite\Excel\Facades\Excel;
 
 /**
  * Description of SupplierController
@@ -590,5 +593,46 @@ class SupplierController extends Controller
         AuditLog::auditLog(Auth::id(), $action);
         session()->flash('app_message', 'Supplier opening balance successfully defined');
         return redirect()->route('suppliers.index');
+    }
+    public function importForm()
+    {
+        return view('pages.suppliers.import');
+    }
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx',
+        ]);
+
+        $file = $request->file('file');
+        $import = new SupplierImport();
+        $rows = Excel::toCollection($import, $file)->first();
+        $user_branch = User::userBranchAction();
+        $faileds = [];
+        $count = 0;
+        $data = array();
+        try {
+            foreach ($rows as $row) {
+                Supplier::updateOrInsert(
+                    ['code' => $row['code']],
+                    [
+                        'name' => trim($row['name']),
+                        'email' => $row['email'],
+                        'phone' => $row['phone'],
+                        'address' => $row['address'],
+                        'category' => Category::where('code', trim($row['category_code']))->first()->id ?? 0,
+                        'branch_id' => Branch::where('code', trim($row['branch_code']))->first()->id ?? 0,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]
+                );
+                $count++;
+            }
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
+        //dd($faileds);
+        session()->flash('app_message', 'File imported and records updated/inserted successfully!');
+        return view('pages.suppliers.import', ['count' => $count]);
     }
 }

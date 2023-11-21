@@ -32,10 +32,13 @@
 		<!-- Main content -->
 		<section class="content">
             <a class="btn btn-secondary btn-sm" href="{{ route('stores.create') }}">
-                <span class="fa fa-plus-circle"></span>
+                <span class="fa fa-plus-circle"> New Store</span>
+            </a>
+			<a class="btn btn-secondary btn-sm" href="{{ route('stores.import.form') }}">
+                <span class="fa fa-upload"> Upload Users</span>
             </a>
             <a class="btn btn-secondary btn-sm" href="{{ route('stores.index') }}">
-                <span class="fa fa-list"></span>
+                <span class="fa fa-list"> View Stores</span>
             </a>
 			<div class="container-fluid">
                 <div class="row">

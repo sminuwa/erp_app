@@ -32,7 +32,10 @@
         <!-- Main content -->
         <section class="content">
             <a class="btn btn-secondary btn-sm" href="{{ route('users.create') }}">
-                <span class="fa fa-plus-circle"></span>
+                <span class="fa fa-plus-circle"> New User</span>
+            </a>
+            <a class="btn btn-secondary btn-sm" href="{{ route('users.import.form') }}">
+                <span class="fa fa-upload"> Upload Users</span>
             </a>
             <div class="container-fluid">
                 <div class="row">

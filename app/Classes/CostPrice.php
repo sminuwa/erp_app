@@ -197,58 +197,15 @@ class CostPrice
             ];
         }
 
-
-        /*foreach($prices as $price){
-            $existing_cost[$price['product_id']] = ['cost_price' => $price['cost_price'], 'quantity'=>$price['total_quantity'], 'total_existing_cost'=>$price['total_existing_cost']];
-        }*/
-
-        /*foreach($products as $key=>$p){
-//          return isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0;
-            $records[$key] = [
-                'qty_available' => $prices[$key]['qty_available'] ?? 0,
-                'existing_quantity' => isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0,
-                'new_quantity' => $products[$key]['quantity'],
-                'existing_cost' => isset($existing_cost[$key]['cost_price']) ? $existing_cost[$key]['cost_price'] : 0,
-                'new_cost' => $products[$key]['price'],
-                'total_existing_cost' => isset($existing_cost[$key]['total_existing_cost']) ? $existing_cost[$key]['total_existing_cost'] : 0,
-                'total_new_cost' => ($products[$key]['quantity'] * $products[$key]['price']),
-                'quantity' => (($p['quantity']) + (isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0)),
-                'expiry_date' => $products[$key]['expiry_date'],
-                'store_id' => $products[$key]['store_id'],
-            ];
-        }*/
-
         $store_products = $product_costs = $batch = $stock_card_param =  [];
         foreach($percentages as $key=>$percentage){
-            /*$stock_card_param[] = [
-                'store_id'=>$record['store_id'],
-                'product_id' => $key,
-                'quantity' => $record['new_quantity'],
-                'is_credit' => true,
-            ];*/
+
             $product_costs[] = [
                 'branch_id' => $purchase_grn->branch_id,
                 'product_id' => $key,
                 'cost_price' => $percentage['final_cost'],
                 'updated_by' => $user->id
             ];
-            /*$store_products[] = [
-                'store_id'=>$record['store_id'],
-                'product_id'=>$key,
-                'qty_available'=>$record['qty_available'] + $record['new_quantity']
-            ];*/
-            /*$batch[] = [
-                'batch_no' => $batch_no,
-                'store_id' => $record['store_id'],
-                'product_id' => $key,
-                'existing_quantity' => $record['qty_available'],
-                'new_quantity' => $record['new_quantity'],
-                'total_quantity' => $record['qty_available'] + $record['new_quantity'],
-                'existing_cost_price' => $record['existing_cost'],
-                'new_cost_price' => ($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'],
-                'created_by' => $user->id,
-                'expiry_date' => $record['expiry_date'],
-            ];*/
         }
 
 

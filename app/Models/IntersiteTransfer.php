@@ -62,26 +62,47 @@ class IntersiteTransfer extends Model
         return $this->belongsTo(Branch::class, 'destination_branch_id');
     }
 
-    /**
-     * sourceBranch
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
+    public function destination()
+    {
+        return $this->belongsTo(Branch::class, 'destination_branch_id');
+    }
+
     public function sourceBranch()
     {
         return $this->belongsTo(Branch::class, 'source_branch_id');
     }
 
-    public function requestedBy()
+    public function source()
     {
-        return $this->belongsTo(User::class, 'requested_by');
+        return $this->belongsTo(Branch::class, 'source_branch_id');
     }
-    public function approvedBy()
+
+    public function createdBy()
     {
-        return $this->belongsTo(User::class, 'approved_by');
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function postedBy()
+    {
+        return $this->belongsTo(User::class, 'posted_by');
+    }
+
+    public function receivedBy()
+    {
+        return $this->belongsTo(User::class, 'received_by');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 
     public function requestProducts()
+    {
+        return $this->hasMany(IntersiteTransferProduct::class);
+    }
+
+    public function products()
     {
         return $this->hasMany(IntersiteTransferProduct::class);
     }

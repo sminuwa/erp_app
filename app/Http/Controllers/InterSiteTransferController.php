@@ -396,11 +396,11 @@ class InterSiteTransferController extends Controller
         $no = $this->getNextTransferID();
         return "TR" . date('y') . '' . date('m') . str_pad(($no), 4, "0", STR_PAD_LEFT);
     }
-    public function printStockTransfer($transfer_id)
+    public function printStockTransfer(IntersiteTransfer $intersite)
     {
-        return view('pages.inventories.transfers.inter_site.print')->with(['transfers' => TransferProduct::where(['transfer_id' => $transfer_id, 'stock_in_out' => 'out'])->get()]);
+        return view('pages.inventories.transfers.inter_site.print')->with(['transfers' => TransferProduct::where(['transfer_id' => $intersite->id, 'stock_in_out' => 'out'])->get()]);
     }
-    public function approve(IntersiteTransfer $intersiteTransfer)
+    public function approve(IntersiteTransfer $intersite)
     {
         echo "Waiting for function to call\n";
         return $intersiteTransfer->reference_no;

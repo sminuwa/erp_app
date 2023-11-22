@@ -108,7 +108,7 @@
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <label>Supplier</label>
+                                                <label>Supplier/Transporter</label>
                                                 <select name="supplier_id" id="supplier_id" class="form-control" required>
                                                     <option value="" disabled selected>Select...</option>
                                                     @foreach($suppliers as $supplier)
@@ -130,7 +130,7 @@
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <label for="date">Description</label>
+                                                <label for="date">Description/WayBill</label>
                                                 <input type="text" name="description" id="description" class="form-control"
                                                        placeholder="Description"
                                                        value="{{ isset($invoice) ? $invoice->description : '' }}" required

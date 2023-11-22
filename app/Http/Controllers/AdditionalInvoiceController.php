@@ -72,7 +72,7 @@ class AdditionalInvoiceController extends Controller
         $invoice->posted_by = auth()->id();
         if ($invoice->save()) {
             if (
-                Transaction::additional_invoince($purchase->id, $purchase->purchase_date)['status']
+                CostPrice::additionalInvoiceCostPrice($invoice->purchase_id, $invoice->id,TRANSACTION_TYPE_GRN, 'A')['status']
             ) {
                 $action = "Posted additional invoice with reference $invoice->reference for supplier: " . $supplier->name;
                 AuditLog::auditLog(Auth::id(), $action);
@@ -90,7 +90,7 @@ class AdditionalInvoiceController extends Controller
         $invoice->updated_by = auth()->id();
         DB::beginTransaction();
         if($invoice->save()){
-            if(Transaction::reversal($invoice->reference)['status']){
+            if(CostPrice::additionalInvoiceCostPriceReversal($invoice->purchase_id,$invoice->id,TRANSACTION_TYPE_GRN, 'A')['status']){
                 $action = "Invoice reversed : " . $invoice->reference;
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Invoice reversed successfully');
@@ -104,6 +104,6 @@ class AdditionalInvoiceController extends Controller
     }
 
     public function print(PurchaseExpense $invoice){
-
+        return view('pages.inventories.expenses.print',compact('invoice'));
     }
 }

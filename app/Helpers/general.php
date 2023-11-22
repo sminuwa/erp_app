@@ -47,3 +47,10 @@ function in_array_r($needle, $haystack, $strict = true) {
 
     return false;
 }
+
+function currency_sign($currency = 'NG')
+{
+    if ($currency == 'NG')
+        return "₦";
+    return "₦";
+}

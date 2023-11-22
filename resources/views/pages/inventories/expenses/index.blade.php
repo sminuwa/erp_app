@@ -99,11 +99,12 @@
                                                                     <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                                                 </a>
                                                             @else
-                                                                <a href="{{ route('purchase.additional-invoice.reverse',[$invoice->id]) }}"
-                                                                   onclick="return confirm('Are you sure you want reverse this invoice?')"
-                                                                   class="dropdown-item">
-                                                                    <i class="fa fa-reply" aria-hidden="true"></i> Reverse
-                                                                </a>
+                                                                <form action="{{ route('purchase.additional-invoice.reverse', $invoice->id) }}" method="post" onsubmit="return confirm('Are you sure you want reverse this invoice?')">
+                                                                    @csrf
+                                                                    <button type="submit" class="dropdown-item">
+                                                                        <i class="fa fa-reply" aria-hidden="true"></i> Reverse
+                                                                    </button>
+                                                                </form>
                                                             @endif
                                                                 <a href="{{ route('purchase.additional-invoice.print', $invoice->id) }}" target="_blank"
                                                                    class="dropdown-item">

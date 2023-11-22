@@ -3,13 +3,14 @@
 namespace App\Classes;
 
 use App\Models\BranchProductPrice;
+use App\Models\Purchase;
 use App\Models\PurchaseExpense;
 use App\Models\StockCard;
 use App\Models\Store;
 use App\Models\StoreProduct;
 use App\Models\StoreProductBatch;
 use Illuminate\Support\Facades\DB;
-use Purchase;
+
 
 class CostPrice
 {

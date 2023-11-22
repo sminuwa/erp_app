@@ -1130,6 +1130,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/clear', [InterSiteTransferController::class, 'clearAllCart'])->name('intersite.cart.clear');
             Route::get('/print/{intersite}', [InterSiteTransferController::class, 'printStockTransfer'])->name('intersite.print');
             Route::post('/delete/{intersite}', [InterSiteTransferController::class, 'delete'])->name('intersite.delete');
+            Route::post('/post/{intersite}', [InterSiteTransferController::class, 'post'])->name('intersite.post');
         });
 
     });

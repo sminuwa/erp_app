@@ -91,7 +91,7 @@
                                                                 <span class="fa fa-print"></span> Print
                                                             </a>
                                                             @if($intersite->status == 0)
-                                                                <form action="{{ route('purchase.additional-invoice.post', $intersite->id) }}" method="post" onsubmit="return confirm('Are you sure you want post this invoice?')">
+                                                                <form action="{{ route('intersite.post', $intersite->id) }}" method="post" onsubmit="return confirm('Are you sure you want post this invoice?')">
                                                                     @csrf
                                                                     <button type="submit" class="dropdown-item">
                                                                         <i class="fa fa-check" aria-hidden="true"></i> Post

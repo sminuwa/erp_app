@@ -36,50 +36,49 @@
 
         <!-- Main content -->
         <section class="content">
-            <div class="container-fluid">
+            <div class="container">
+                <a class="btn btn-secondary btn-sm"
+                   href="{{ route('intersite.index', $record->id) }}">
+                    <span class="fa fa-list"></span> Instersites
+                </a>
+
+                <a class="btn btn-secondary btn-sm" title="Print" target="_BLANK"
+                   href="{{ route('intersite.print', $record->id) }}">
+                    <span class="fa fa-print"></span> Print
+                </a>
+                @if ($record->status == 0)
+                    <form onsubmit="return confirm('Are you sure you want to post this intersite?')"
+                          action="{{ route('intersite.post', $record->id) }}"
+                          method="post" style="display: inline">
+                        {{ csrf_field() }}
+                        <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
+                            <i class="text-white fa fa-check"></i> Post
+                        </button>
+                    </form>
+
+                    <a class="btn btn-secondary btn-sm"
+                       href="{{ route('intersite.edit', $record->id) }}">
+                        <span class="fa fa-pencil"></span> Edit
+                    </a>
+
+                    <form onsubmit="return confirm('Are you sure you want to delete this intersite?')"
+                          action="{{ route('intersite.delete', $record->id) }}"
+                          method="post" style="display: inline">
+                        {{ csrf_field() }}
+                        <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
+                            <i class="text-danger fa fa-remove"></i> Delete
+                        </button>
+                    </form>
+                @endif
                 <div class="row">
-                    <div class="col-sm-4">
-                        <div class="card card-default">
+                    <div class="col-sm-12">
+                        <div class="card">
                             <div class="card-header">
                                 <div class="row">
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-12">
                                         <h5>Intersite Transfer Request <small>products by
-                                                {{ $record->reference_no }}</small>
+                                                {{ $record->reference }}</small>
                                         </h5>
-                                    </div>
-                                    <div class="col-sm-6 text-right">
-                                        <div class="btn-group">
-                                            @if ($record->status == 'Pending')
-                                                <form onsubmit="return confirm('Are you sure you want to approve?')"
-                                                    action="{{ route('intersite.approve', $record->id) }}"
-                                                    method="post" style="display: inline">
-                                                    {{ csrf_field() }}
-                                                    {{ method_field('PUT') }}
-                                                    <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
-                                                        <i class="text-white fa fa-check"> Approve</i>
-                                                    </button>
-                                                </form>
-                                            @endif
-                                            <a class="btn btn-secondary btn-sm"
-                                                href="{{ route('intersite.index', $record->id) }}">
-                                                <span class="fa fa-list"></span>
-                                            </a>
-                                            <a class="btn btn-secondary btn-sm"
-                                                href="{{ route('intersite.edit', $record->id) }}">
-                                                <span class="fa fa-pencil"></span>
-                                            </a>
-                                            @if ($record->status == 'Pending')
-                                                <form onsubmit="return confirm('Are you sure you want to delete?')"
-                                                    action="{{ route('intersite.destroy', $record->id) }}"
-                                                    method="post" style="display: inline">
-                                                    {{ csrf_field() }}
-                                                    {{ method_field('DELETE') }}
-                                                    <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
-                                                        <i class="text-danger fa fa-remove"></i>
-                                                    </button>
-                                                </form>
-                                            @endif
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -121,7 +120,7 @@
                         </div>
 
                     </div>
-                    <div class="col-sm-8">
+                    <div class="col-sm-12">
                         <div class="card">
                             <div class="card-header">
                                 Request Products

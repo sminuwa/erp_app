@@ -20,25 +20,6 @@
         @endif
     </div>
 
-    {{-- <div class="form-group">
-        <label for="category_id">Category</label>
-        <select type="number" class="form-control {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
-            name="category_id" id="category_id" required="required">
-            <option value="">Select...</option>
-            @if (isset($categories))
-                @foreach ($categories as $data)
-                    <option value="{{ $data->id }}"
-                        {{ $data->id == old('category_id', optional($model->product)->category_id) ? 'selected' : '' }}>
-                        {{ $data->name }}</option>
-                @endforeach
-            @endif
-        </select>
-        @if ($errors->has('category_id'))
-            <div class="invalid-feedback">
-                <strong>{{ $errors->first('category_id') }}</strong>
-            </div>
-        @endif
-    </div> --}}
     <div class="form-group">
         <label for="product_id">Product</label>
         <select class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
@@ -71,13 +52,13 @@
             </div>
         @endif
     </div>
-    
+
     {{-- <div class="form-group">
         <label for="destination_store_id">Destination Store</label>
         <select class="form-control select2-single {{ $errors->has('destination_store_id') ? ' is-invalid' : '' }}"
             name="destination_store_id" id="destination_store_id" required="required">
             <option value="">Select...</option>
-           
+
         </select>
         @if ($errors->has('destination_store_id'))
             <div class="invalid-feedback">

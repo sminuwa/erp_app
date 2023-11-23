@@ -228,16 +228,7 @@
             $.ajax({
                 url: $('#' + formId).attr('action'),
                 type: 'GET',
-                data: {
-                    store_product_id: formId.substr(1),
-                    quantity: $('#quantity' + (formId.substr(1))).val(),
-                    price: $("#price"+formId.substr(1)).val(),
-                    unit: $("#unit"+formId.substr(1)).val(),
-                    code: $("#code"+formId.substr(1)).val(),
-                    store_id: $("#store_id"+formId.substr(1)).val(),
-                    type: type,
-                    _token: "{{ csrf_token() }}"
-                },
+                data: $('#'+formId).serialize()+'&type='+type,
             }).done(function(component){
                 console.log(component)
                 formId = formId.substr(1);

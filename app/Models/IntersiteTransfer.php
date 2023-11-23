@@ -107,6 +107,11 @@ class IntersiteTransfer extends Model
         return $this->hasMany(IntersiteTransferProduct::class);
     }
 
+    public function receivedProducts()
+    {
+        return $this->hasMany(IntersiteTransferReceive::class);
+    }
+
     public static function generateNewNumber($prefix = 'ITB', $length = 4)
     {
         $prefix = $prefix . date('ym') . auth()->user()->branch->code;
@@ -117,5 +122,22 @@ class IntersiteTransfer extends Model
             return $prefix . str_pad($new, $length, 0, STR_PAD_LEFT);
         }
         return $prefix . str_pad(1, $length, 0, STR_PAD_LEFT);
+    }
+
+    public function scopePending($query){
+        return $query->where('intersite_transfers.status', 0);
+    }
+
+    public function scopePosted($query){
+        return $query->where('intersite_transfers.status', 1);
+    }
+
+
+    public function scopeReceived($query){
+        return $query->where('intersite_transfers.status', 3);
+    }
+
+    public function scopeNotPending($query){
+        $query->where('intersite_transfers.status', '!=', 0);
     }
 }

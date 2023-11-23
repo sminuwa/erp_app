@@ -77,7 +77,7 @@
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td class="text-left">{{ $product->name }}</td>
                                                     <td>{{ number_format($product->quantity, 0, '', ',') }}</td>
-                                                    <td>{{ \App\Models\Store::find($attr['source_store_id'])->name }}</td>
+                                                    <td>{{ \App\Models\Store::find($attr['store_id'])->name }}</td>
 
 
                                                     <td>
@@ -182,7 +182,7 @@
 
 @push('js')
     <script type="text/javascript">
-        <!-- DataTables 
+        <!-- DataTables
         -->
     <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
     <!-- SlimScroll -->

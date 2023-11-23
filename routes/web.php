@@ -1117,11 +1117,12 @@ Route::middleware('auth')->group(function () {
         );
         Route::group(['prefix' => 'intersite/transfer'], function () {
             Route::get('/index', [InterSiteTransferController::class, 'index'])->name('intersite.index');
+            Route::get('/received', [InterSiteTransferController::class, 'received'])->name('intersite.received');
             Route::post('/search', [InterSiteTransferController::class, 'search'])->name('intersite.search');
             Route::get('/create', [InterSiteTransferController::class, 'create'])->name('intersite.create');
             Route::get('/show/{intersiteTransfer}', [InterSiteTransferController::class, 'show'])->name('intersite.show');
             Route::post('/store', [InterSiteTransferController::class, 'store'])->name('intersite.store');
-            Route::get('/edit/{intersiteTransfer}', [InterSiteTransferController::class, 'edit'])->name('intersite.edit');
+            Route::get('/edit/{intersite}', [InterSiteTransferController::class, 'edit'])->name('intersite.edit');
             Route::put('/update/{intersiteTransfer}', [InterSiteTransferController::class, 'update'])->name('intersite.update');
             Route::put('/approve/{intersiteTransfer}', [InterSiteTransferController::class, 'approve'])->name('intersite.approve');
             Route::delete('/delete/{intersiteTransfer}', [InterSiteTransferController::class, 'destroy'])->name('intersite.destroy');
@@ -1131,6 +1132,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/print/{intersite}', [InterSiteTransferController::class, 'printStockTransfer'])->name('intersite.print');
             Route::post('/delete/{intersite}', [InterSiteTransferController::class, 'delete'])->name('intersite.delete');
             Route::post('/post/{intersite}', [InterSiteTransferController::class, 'post'])->name('intersite.post');
+            Route::post('/receive/{intersite}', [InterSiteTransferController::class, 'receive'])->name('intersite.receive');
+            Route::post('/add-to-store', [InterSiteTransferController::class, 'addToStore'])->name('intersite.add-to-store');
         });
 
     });

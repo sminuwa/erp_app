@@ -64,8 +64,8 @@ class StockCard extends Model
             if($store_product){
                 $qty_available = $store_product->qty_available;
                 $qty_before = $qty_available;
-                $qty_after = $qty_available - $record->quantity;
-                if($record->is_credit == true) // meaning if record type is credit then assign the quantity to credit else debit
+                $qty_after = $qty_available - $record['quantity'];
+                if($record['is_credit'] == true) // meaning if record type is credit then assign the quantity to credit else debit
                     $credit = $record['quantity'];
                 else
                     $debit = $record['quantity'];;

@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Model;
 @property SourceStore $store belongsTo
 @property Product $product belongsTo
 @property IntersiteTransfer $intersiteTransfer belongsTo
-   
+
  */
 class IntersiteTransferProduct extends Model
 {
@@ -87,7 +87,15 @@ class IntersiteTransferProduct extends Model
         return $this->belongsTo(IntersiteTransfer::class, 'intersite_transfer_id');
     }
 
+    public function intersite()
+    {
+        return $this->belongsTo(IntersiteTransfer::class, 'intersite_transfer_id');
+    }
 
+    public function totalReceive(){
+        $products = IntersiteTransferReceive::where(['intersite_transfer_id'=> $this->intersite_transfer_id, 'product_id'=>$this->product_id, 'source_store_id'=>$this->store_id])->first();
+        return ($products->quantity ?? 0);
+    }
 
 
 }

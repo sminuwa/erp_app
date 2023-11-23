@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BranchProductPrice;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Store;
@@ -140,7 +141,22 @@ class CartController extends Controller
                 ),
             ]);
         }
-        elseif($type == 'grn') {
+        if($type == 'intersite'){
+            $product = Product::find($request->product_id);
+            $cost_price = BranchProductPrice::where(['product_id'=>$request->product_id, 'branch_id'=>auth()->user()->branch->id])->first();
+            $add = \Cart::add([
+                'id' => $this->generateRandomString(),
+                'name' => $product->name,
+                'price' => $cost_price->cost_price ?? 1,
+                'quantity' => $request->quantity,
+                'attributes' => array(
+                    'store_id' => $request->store_id,
+                    'product_id' => $request->product_id,
+                    'code' => $product->code,
+                ),
+            ]);
+        }
+        if($type == 'grn') {
             $product = Product::find($request->product_id);
             $store = Store::find($request->store_id);
             $qty = $request->qty_supplied;
@@ -163,7 +179,7 @@ class CartController extends Controller
                 ),
             ]);
         }
-        elseif($type == 'request') {
+        if($type == 'request') {
             $product = Product::find($request->product_id);
             $store = Store::find($request->store_id);
             $qty = $request->qty_supplied;
@@ -186,7 +202,7 @@ class CartController extends Controller
                 ),
             ]);
         }
-        elseif($type == 'adjustment') {
+        if($type == 'adjustment') {
             $add = \Cart::add([
                 'id' => $this->generateRandomString(),
                 'name' => Product::find($request->product_id)->name,
@@ -217,7 +233,7 @@ class CartController extends Controller
             }
             $store = Store::find($request->store_id);
             \Cart::update(
-                $request->store_product_id,
+                $request->id,
                 [
                     'quantity' => [
                         'relative' => false,
@@ -238,7 +254,7 @@ class CartController extends Controller
                 ]
             );
         }
-        elseif($type == 'request') {
+        if($type == 'request') {
             $sold_price = $request->sold_price;
             if ($request->has('percent')) {
                 $percent = $request->percent;
@@ -246,7 +262,7 @@ class CartController extends Controller
             }
             $store = Store::find($request->store_id);
             \Cart::update(
-                $request->store_product_id, [
+                $request->id, [
                     'quantity' => [
                         'relative' => false,
                         'value' => $request->quantity
@@ -266,10 +282,9 @@ class CartController extends Controller
                 ]
             );
         }
-        elseif($type == 'adjustment') {
-            return $request;
+        if($type == 'adjustment') {
             \Cart::update(
-                $request->store_product_id, [
+                $request->id, [
                 'quantity' => [
                     'relative' => false,
                     'value' => $request->quantity
@@ -280,6 +295,23 @@ class CartController extends Controller
                     'store_id' => $request->store_id,
                     'product_id' => $request->product_id,
                     'available_qty' => $request->available_qty,
+                ),
+            ]);
+        }
+        if($type == 'intersite') {
+            $product = Product::find($request->product_id);
+            \Cart::update(
+                $request->id, [
+                'quantity' => [
+                    'relative' => false,
+                    'value' => $request->quantity
+                ],
+                'name' => $product->name,
+                'price' => $request->cost_price, //This is not applicable here
+                'attributes' => array(
+                    'store_id' => $request->store_id,
+                    'product_id' => $request->product_id,
+                    'code' => $request->code,
                 ),
             ]);
         }

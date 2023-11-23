@@ -46,6 +46,16 @@
                    href="{{ route('intersite.print', $record->id) }}">
                     <span class="fa fa-print"></span> Print
                 </a>
+                @if ($record->status == 1 && $record->destination_branch_id == auth()->user()->branch->id)
+                    <form action="{{ route('intersite.receive', $record->id) }}"
+                          style="display:inline;"
+                          method="post" onsubmit="return confirm('Are you sure you want receive this invoice?')">
+                        @csrf
+                        <button type="submit" class="btn btn-success btn-sm">
+                            <i class="fa fa-check" aria-hidden="true"></i> Receive
+                        </button>
+                    </form>
+                @endif
                 @if ($record->status == 0)
                     <form onsubmit="return confirm('Are you sure you want to post this intersite?')"
                           action="{{ route('intersite.post', $record->id) }}"
@@ -76,43 +86,40 @@
                             <div class="card-header">
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        <h5>Intersite Transfer Request <small>products by
-                                                {{ $record->reference }}</small>
+                                        <h5>Intersite Transfer
                                         </h5>
                                     </div>
                                 </div>
                             </div>
                             <div class="card-block">
-                                <table class="table table-bordered table-striped">
+                                <table class="table table-striped">
                                     <tbody>
-
                                         <tr>
-                                            <th>Invoice</th>
-                                            <td>{{ $record->refno }}</td>
+                                            <th>Reference</th>
+                                            <td colspan="3">{{ $record->reference }}</td>
                                         </tr>
                                         <tr>
-                                            <th>Request Date</th>
-                                            <td>{{ optional($record->created_at)->toDayDateTimeString() }}</td>
-                                        </tr>
-                                        <tr>
+                                            <th>Date</th>
+                                            <td>{{ $record->date }}</td>
                                             <th>Truck No</th>
                                             <td>{{ $record->vehicle_no }}</td>
                                         </tr>
                                         <tr>
-                                            <th>Transfer to Branch</th>
-                                            <td> {{ $record->destinationBranch->code ?? '' }}-{{ $record->destinationBranch->name ?? '' }} </td>
+
                                         </tr>
                                         <tr>
-                                            <th>Status</th>
-                                            <td>{{ $record->status}}</td>
+                                            <th>Source</th>
+                                            <td> {{ $record->source->code ?? '' }}-{{ $record->source->name ?? '' }} </td>
+                                            <th>Destination</th>
+                                            <td> {{ $record->destination->code ?? '' }}-{{ $record->destination->name ?? '' }} </td>
                                         </tr>
                                         <tr>
-                                            <th>Requested By</th>
-                                            <td>{{ $record->requestedBy->name ?? ''}}</td>
+                                            <th>Created By</th>
+                                            <td colspan="3">{{ $record->createdBy->name ?? ''}}</td>
                                         </tr>
                                         <tr>
-                                            <th>Approved By</th>
-                                            <td>{{ $record->approvedBy->name ?? ''}}</td>
+                                            <th>Received By</th>
+                                            <td colspan="3">{{ $record->receivedBy->name ?? ''}}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -132,26 +139,34 @@
                                             <th>S/N</th>
                                             <th>Code</th>
                                             <th>Description</th>
-                                            <th>QTY</th>
-                                            {{-- <th>Price (&#8358;)</th>
-                                            <th>Subtotal (&#8358;)</th> --}}
-                                            <th>Status</th>
+                                            <th>Quantity</th>
+                                            <th>Received</th>
+                                            <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $total = 0; @endphp
-                                        @foreach ($record->requestProducts()->get() as $product)
+                                        @foreach ($record->products as $product)
                                             <tr>
                                                 <th>{{ $loop->index + 1 }}</th>
                                                 <td>{{ $product->product->code }}</td>
                                                 <td>{{ $product->product->name }}</td>
-                                                <td>{{ number_format($product->quantity_requested, 0, '', ',') }}</td>
-                                                {{-- <td style="text-align: right">{{ number_format($product->cost_price, 2) }}
+                                                <td>{{ ($product->quantity - $product->totalReceive()) }}</td>
+                                                <td>{{ ($product->totalReceive()) }}</td>
+                                                <td class="text-right">
+                                                    @if(($product->quantity - $product->totalReceive()) > 0)
+                                                    @if($product->intersite->status == 2 && $product->intersite->destination_branch_id == auth()->user()->branch->id)
+                                                        <a href="javascript:void(0)" data-toggle="modal"
+                                                           data-target="#add_store_product_form"
+                                                           class="btn btn-sm btn-success add-product"
+                                                           data-product-id="{{ $product->product_id }}"
+                                                           data-store-id="{{ $product->store_id }}"
+                                                           data-quantity="{{ $product->quantity }}"
+                                                           data-cost="{{ $product->cost_price }}"
+                                                           ><i class="fa fa-plus"></i> Add Product </a>
+                                                    @endif
+                                                    @endif
                                                 </td>
-                                                <td style="text-align: right">
-                                                    {{ number_format($product->quantity_requested * $product->cost_price, 2) }}
-                                                </td> --}}
-                                                <td>{{ $product->status == 1 ? 'Completed' : 'Pending' }}</td>
                                                 @php $total += $product->cost_price * $product->quantity_requested; @endphp
                                             </tr>
                                         @endforeach
@@ -169,12 +184,97 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-sm-12">
+                        <div class="card">
+                            <div class="card-header">
+                                Received Products
+                            </div>
+                            <div class="card-body table-responsive">
+                                <table class="table table-bordered" id="record1">
+                                    <thead>
+                                    <tr>
+                                        <th>S/N</th>
+                                        <th>Product</th>
+                                        <th>Store</th>
+                                        <th>Quantity</th>
+
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @php $total = 0; @endphp
+                                    @foreach ($record->receivedProducts as $product)
+                                        <tr>
+                                            <th>{{ $loop->iteration }}</th>
+                                            <td>{{ $product->product->code }} - {{ $product->product->name }}</td>
+                                            <td>{{ $product->store->code }} - {{ $product->store->name }}</td>
+                                            <td>{{ $product->quantity }}</td>
+                                            @php $total += $product->cost_price * $product->quantity_requested; @endphp
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div><!-- /.container-fluid -->
         </section>
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
+
+    <div class="modal fade" id="add_store_product_form" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add product to store</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('intersite.add-to-store') }}" method="POST" >
+                        {{ csrf_field() }}
+                        <input type="hidden" name="intersite_transfer_id" value="{{ $record->id }}">
+                        <input type="hidden" name="source_store_id" value="">
+                        <input type="hidden" name="product_id" value="">
+                        <input type="hidden" name="total_quantity" value="">
+                        <input type="hidden" name="cost_price" value="">
+                        <div class="form-group">
+                            <label for="source_store_id">Store</label>
+                            <select class="form-control select2-single {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
+                                    name="store_id" id="store_id" required="required">
+                                <option value="">Select...</option>
+                                @if (isset($stores))
+                                    @foreach ($stores as $data)
+                                        <option value="{{ $data->id }}">
+                                            {{ $data->code }}-{{ $data->name }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="quantity">Quantity</label>
+                            <input type="number" class="form-control"
+                                   name="quantity" id="quantity" placeholder="Quantity"
+                                   required="required">
+                        </div>
+                        <input type="hidden" value="0" name="cost_price" id="cost_price"/>
+                        <div class="form-group text-right ">
+                            <button type="submit" class="btn btn-primary"><span class="ion-ios-cart-outline"></span> Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('js')
@@ -187,26 +287,26 @@
     <script src="{{ asset('assets/backend/plugins/fastclick/fastclick.js') }}"></script>
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script type="text/javascript">
-        $(function() {
-            $("#record1").DataTable();
-            $('body').on('submit', '.create-form', function(e) {
-                e.preventDefault();
-                $.ajax({
-                    type: 'POST',
-                    url: $(this).attr('action'),
-                    data: $(this).serialize(),
-                    beforeSend: function() {
-                        $('.close-modal').trigger('click')
-                    },
-                    success: function(response) {
-                        $('#expenses').html(response)
-                        //console.log(response)
-                    }
-                })
-            });
 
-
-        });
+        $(document).on('click', '.add-product', function(){
+            let item = $(this)
+            let s_id = item.data('store-id')
+            let p_id = item.data('product-id')
+            let qty = item.data('quantity')
+            let cost = item.data('cost')
+            let destination_store = $('select[name=store_id]')
+            let quantity = $('input[name=quantity]')
+            let source_store_id = $('input[name=source_store_id]')
+            let product_id = $('input[name=product_id]')
+            let total_quantity = $('input[name=total_quantity]')
+            let cost_price = $('input[name=cost_price]')
+            source_store_id.val(s_id)
+            product_id.val(p_id)
+            total_quantity.val(qty)
+            cost_price.val(cost)
+            quantity.attr('maxlength',total_quantity)
+            quantity.val(qty)
+        })
 
         function deleteItem(id) {
             const swalWithBootstrapButtons = swal.mixin({

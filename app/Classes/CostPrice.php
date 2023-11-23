@@ -362,6 +362,7 @@ class CostPrice
         $total_new_cost = $records = [];
         foreach($products as $key=>$p){
             $product_ids[] = $key;
+            $store_id = $p['store_id'];
             $total_new_cost[$key] = intval($p['quantity']) * intval($p['price']);
             $details = StoreProduct::selectRaw("
                 store_products.product_id,
@@ -371,7 +372,7 @@ class CostPrice
                 ((SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) *
                 (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key)) as total_existing_cost
                 ")
-                ->where('store_products.product_id', $key)->first();
+                ->where(['store_products.product_id'=>$key, 'store_products.store_id'=>$store_id])->first();
             $prices[$details->product_id] = [
                 'product_id' =>$details->product_id,
                 'cost_price' =>$details->cost_price,
@@ -380,9 +381,12 @@ class CostPrice
                 'total_existing_cost' =>$details->total_existing_cost,
             ];
         }
+
         foreach($prices as $price){
             $existing_cost[$price['product_id']] = ['cost_price' => $price['cost_price'], 'quantity'=>$price['total_quantity'], 'total_existing_cost'=>$price['total_existing_cost']];
         }
+
+
 
         foreach($products as $key=>$p){
 //          return isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0;
@@ -399,6 +403,7 @@ class CostPrice
                 'store_id' => $products[$key]['store_id'],
             ];
         }
+
 
         $store_products = $product_costs = $batch = $stock_card_param =  [];
         foreach($records as $key=>$record){

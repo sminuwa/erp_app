@@ -15,7 +15,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Intersite Transfer</h4>
+                        <h4>Receive Intersite Transfer</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -35,8 +35,8 @@
                 <a class="btn btn-secondary btn-sm" href="{{ route('intersite.create') }}">
                     <span class="fa fa-plus-circle"></span> New Intersite
                 </a>
-                <a class="btn btn-success btn-sm" href="{{ route('intersite.received') }}">
-                    <span class="fa fa-truck"></span> Intersite Receive <i class="badge badge-danger">{{ isset($posted) ? $posted : 0 }} Received</i>
+                <a class="btn btn-primary btn-sm" href="{{ route('intersite.index') }}">
+                    <span class="fa fa-truck"></span> My Intersites <i class="badge badge-danger">{{ isset($pending) ? $pending : 0 }} Pending</i>
                 </a>
                 <div class="card">
                     <div class="card-body">
@@ -80,8 +80,8 @@
                                                 <td> {{ $intersite->receivedBy->name ?? ''}}</td>
                                                 <td>
                                                     {!!
-                                                        $intersite->status == 0 ? '<span class="badge badge-warning">Pending</span>':
-                                                        ($intersite->status == 1 ? '<span class="badge badge-success">Posted</span>': '<span class="badge badge-success">Received</span>' )
+                                                        $intersite->status == 1 ? '<span class="badge badge-warning">In Transit</span>':
+                                                        ($intersite->status == 2 ? '<span class="badge badge-success">Received</span>': '' )
                                                     !!}
                                                 </td>
                                                 <td>
@@ -98,21 +98,11 @@
                                                                href="{{ route('intersite.print', $intersite->id) }}">
                                                                 <span class="fa fa-print"></span> Print
                                                             </a>
-                                                            @if($intersite->status == 0)
-                                                                <form action="{{ route('intersite.post', $intersite->id) }}" method="post" onsubmit="return confirm('Are you sure you want post this invoice?')">
+                                                            @if($intersite->status == 1)
+                                                                <form action="{{ route('intersite.receive', $intersite->id) }}" method="post" onsubmit="return confirm('Are you sure you want post this invoice?')">
                                                                     @csrf
-                                                                    <button type="submit" class="dropdown-item">
-                                                                        <i class="fa fa-check" aria-hidden="true"></i> Post
-                                                                    </button>
-                                                                </form>
-                                                                <a class="dropdown-item" href="{{ route('intersite.edit', $intersite->id) }}">
-                                                                    <span class="fa fa-pencil"></span> Edit
-                                                                </a>
-                                                                <form onsubmit="return confirm('Are you sure you want to delete this intersite ?')"
-                                                                      action="{{ route('intersite.delete', $intersite->id) }}" method="post">
-                                                                    {{ csrf_field() }}
-                                                                    <button type="submit" class="dropdown-item">
-                                                                        <i class="text-danger fa fa-remove"></i> Delete
+                                                                    <button type="submit" class="dropdown-item text-success">
+                                                                        <i class="fa fa-check" aria-hidden="true"></i> Receive
                                                                     </button>
                                                                 </form>
                                                             @endif

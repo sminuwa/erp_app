@@ -72,21 +72,22 @@
 
 
                         <td>
-                            <button class="btn btn-danger btn-sm" type="button"
-                                    onclick="deleteItem({{ $product->id }})">
-                                <i class="fa fa-trash" aria-hidden="true"></i>
-                            </button>
-                            <form id="delete-form-{{ $product->id }}"
-                                  action="{{ route('cart.remove', $product->id) }}"
-                                  method="post" style="display:none;">
+                            <form class="deleteForm deleteCartItem" id="delete-form-{{ $product->id }}"
+                                  action="{{ route('ajax.cart.delete', $product->id) }}" method="post"
+                                  data-val="{{ $product->id }}">
                                 @csrf
-                                @method('DELETE')
+                                <button class="btn btn-danger btn-sm delete" type="submit">
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                </button>
                             </form>
                         </td>
                     </tr>
                 @endforeach
                 </tbody>
             </table>
+            <div class="alert alert-success">
+                Total : &#8358; <span class="totalCart">{{ number_format(\Cart::getTotal(),2) }}</span>
+            </div>
     @endif
     @if($type == 'interstore')
         <table class="table table-bordered table-striped mb-3">

@@ -9,56 +9,50 @@
                    style="font-size: 12px;">
                 <thead>
                 <tr>
-                    {{-- <th>S.N</th> --}}
                     <th>Store</th>
                     <th style="width:30%">Code</th>
                     <th>Unit</th>
                     <th>Price</th>
                     <th>Qty</th>
                     <th>Total</th>
-                    {{-- <th><span class="ion-refresh"></span></th> --}}
                     <th><span class="ion-ios-trash"></span></th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach (\Cart::getContent() as $product)
                     <tr>
-                        {{-- <td>{{ $loop->iteration }}</td> --}}
                         <td class="text-left">{{ $product->attributes['store'] }}</td>
-                        <td class="text-left">{{ $product->attributes['code'] }} -
-                            {{ $product->name }}</td>
-{{--                        <td>{{$product->attributes['unit']}}</td>--}}
-                        <form action="{{ route('ajax.cart.update', $product->id) }}" method="post" id="p{{ $product->id }}">
-                            @csrf
+                        <td class="text-left">{{ $product->attributes['code'] }} -{{ $product->name }}</td>
                             <td>
-                                <select name="unit" class="form-control"
-                                        id="unit{{ $product->id }}" class="form-control unit_measure"
-                                        style="min-width:65px;">
-                                    <option>{{ $product->attributes['unit'] }}</option>
-                                </select>
+                                <?php
+                                    $units = \App\Models\ProductUnitMeasure::join('products', 'products.id', 'product_unit_measures.product_id')
+                                    ->where('products.code', $product->attributes['code'])->select('product_unit_measures.*')->get();
+                                ?>
+                                <form action="{{ route('ajax.cart.update', $product->id) }}" method="post" id="p{{ $product->id }}">
+                                    @csrf
+                                    <select name="unit" class="form-control"
+                                            id="unit{{ $product->id }}" class="form-control unit_measure"
+                                            style="min-width:65px;">
+                                        <option>{{ $product->attributes['unit'] }}</option>
+                                        @foreach($units as $unit)
+                                            <option>{{ $unit->code }}</option>
+                                        @endforeach
+                                    </select>
+                                    <input type="hidden" name="id" class="form-control" value="{{ $product->id }}">
+                                    <input type="hidden" name="selling_price" class="form-control" value="{{ $product->attributes['selling_price'] }}">
+                                    <input type="hidden" name="cost_price" class="form-control" value="{{ $product->attributes['cost_price'] }}">
+                                    <input type="hidden" name="qty_available" class="form-control" value="{{ $product->attributes['qty_available'] }}">
+                                </form>
                             </td>
                             <td>
-                                @can('edit.daily.sale')
-                                    <input type="text" name="sold_price"
-                                           id="price{{ $product->id }}" class="form-control price"
-                                           style="min-width:65px;"
-                                           onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
-                                           value="{{ $product->price }}"
-                                           data-val="{{ $product->attributes['selling_price'] }}"
-                                           data-value="p{{ $product->id }}">
-                                    <span style="color: red;" id="valid_price{{ $product->id }}"></span>
-                                @else
-                                    <input type="text" name="selling_price"
-                                           id="price{{ $product->id }}" class="form-control price"
-                                           readonly style="min-width:65px;"
-                                           onchange="validate(this.value, this.getAttribute('data-val'),this.getAttribute('id'))"
-                                           value="{{ $product->price }}"
-                                           data-val="{{ $product->attributes['selling_price'] }}"
-                                           data-value="p{{ $product->id }}">
-                                    <span style="color: red;"
-                                          id="valid_price{{ $product->id }}"></span>
-                                @endcan
-
+                                <input type="text" name="sold_price"
+                                       id="price{{ $product->id }}" class="form-control price"
+                                       style="min-width:65px;"
+                                       onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
+                                       value="{{ $product->price }}"
+                                       data-val="{{ $product->attributes['selling_price'] }}"
+                                       data-value="p{{ $product->id }}">
+                                <span style="color: red;" id="valid_price{{ $product->id }}"></span>
                             </td>
                             <td>
                                 <input type="text"
@@ -75,21 +69,7 @@
                             <td><span
                                     class="subtotal{{ $product->id }}">{{ number_format($product->price * $product->quantity, 2) }}</span>
                             </td>
-                            <input type="hidden" name="id" class="form-control"
-                                   value="{{ $product->id }}">
-                            <input type="hidden" name="selling_price" class="form-control"
-                                   value="{{ $product->attributes['selling_price'] }}">
-                            <input type="hidden" name="cost_price" class="form-control"
-                                   value="{{ $product->attributes['cost_price'] }}">
-                            <input type="hidden" name="qty_available" class="form-control"
-                                   value="{{ $product->attributes['qty_available'] }}">
 
-                            {{-- <td>
-                                <button type="submit" class="btn btn-sm btn-success">
-                                    <i class="fa fa-check-circle" aria-hidden="true"></i>
-                                </button>
-                            </td> --}}
-                        </form>
 
                         <td>
                             <button class="btn btn-danger btn-sm" type="button"

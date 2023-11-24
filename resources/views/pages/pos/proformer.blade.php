@@ -186,7 +186,7 @@
                         </div>
                         <!-- /.card -->
                     </div>
-                    <div class="col-md-6 cart-container">
+                    <div class="col-md-6">
 
                         <div class="card card-default">
                             <div class="card-header">

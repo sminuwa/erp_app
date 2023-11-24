@@ -289,7 +289,7 @@ class CustomerController extends Controller
     }
     public function getCustomerCreditLimit(Request $request)
     {
-        return Customer::find($request->customer_id)->credit_limit;
+        return Customer::find($request->customer_id)->credit_limit ?? 0;
     }
     public function updateCreditLimit(Request $request)
     {

@@ -8,7 +8,7 @@
 @endpush
 
 @section('content')
-
+    <input name="cart_page_type" type="hidden" value="proforma">
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
@@ -25,16 +25,12 @@
                 </div>
             </div><!-- /.container-fluid -->
         </section>
-        <div class="row">
-            <div class="col-sm-2">
-                <a href="{{ route('proformer.list') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                        class="fa fa-list"> </span> Proforma List</a>
 
-            </div>
-        </div>
         <!-- Main content -->
         <section class="content">
-            <div class="container-fluid">
+            <div class="container">
+                <a href="{{ route('proformer.list') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
+                        class="fa fa-list"> </span> Proforma List</a>
                 <div class="row">
                     <!-- left column -->
                     <div class="col-md-12">

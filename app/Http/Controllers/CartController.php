@@ -33,8 +33,6 @@ class CartController extends Controller
             'cost_price' => 'required'
         ]);
         $customer = Customer::find($request->customer);
-//        $order = Customer::where('type', $customer->type)->get();
-//        return $order;
         $qty = $request->qty;
         $selling_price = $request->selling_price;
         $cost_price = $request->cost_price;
@@ -216,15 +214,46 @@ class CartController extends Controller
             ]);
         }
 
+        if($type == 'order') {
+//            return $request;
+            $customer = Customer::find($request->customer);
+            $qty = $request->qty;
+            $selling_price = $request->selling_price;
+            $cost_price = $request->cost_price;
+            $qty_available = $request->qty_available;
+            $store = $request->store;
+            $add = \Cart::add([
+                'id' => $request->id,
+                'name' => $request->name,
+                'price' => $request->sold_price == 0 ? 1 : $request->sold_price ,
+                'quantity' => $qty == 0 ? 1 : $qty,
+                'attributes' => array(
+                    'cost_price' => $cost_price,
+                    'code'=>$request->code,
+                    'selling_price' => $selling_price,
+                    'qty_available' => $qty_available,
+                    'discount' => 0,
+                    'store'=> $store,
+                    'unit' =>$request->unit ?? '',
+                    'product_id' =>$product->id ?? ''
+                ),
+            ]);
+        }
+
+        if($type == 'invoice') {
+
+        }
+
+        if($type == 'proforma') {
+
+        }
+
         return view('components.cart', compact('type'));
     }
 
     public function updateCartItem(Request $request, $id)
     {
-//        return $request;
-
         $type =$request->type;
-
         if($type == 'grn') {
             $sold_price = $request->sold_price;
             if ($request->has('percent')) {
@@ -315,6 +344,37 @@ class CartController extends Controller
                     'code' => $request->code,
                 ),
             ]);
+        }
+        if($type == 'order') {
+            return $request;
+            $sold_price = $request->sold_price;
+            \Cart::update(
+                $request->id,
+                [
+                    'quantity' => [
+                        'relative' => false,
+                        'value' => $request->quantity
+                    ],
+                    'price' => $sold_price,
+                    'attributes' => array(
+                        'cost_price' => $request->cost_price,
+                        'selling_price' => $request->selling_price,
+                        'code'=>$request->code,
+                        'discount' => $request->selling_price - $request->sold_price,
+                        'qty_available' => $request->qty_available,
+                        'store'=>$request->store,
+                        'unit'=>$request->unit,
+                    )
+                ]
+            );
+        }
+
+        if($type == 'invoice') {
+
+        }
+
+        if($type == 'proforma') {
+
         }
         if ($request->ajax()) {
             return \Cart::getTotal();

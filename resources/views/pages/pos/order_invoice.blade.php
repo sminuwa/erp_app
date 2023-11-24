@@ -8,7 +8,7 @@
 @endpush
 
 @section('content')
-
+    <input name="cart_page_type" type="hidden" value="order">
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
@@ -25,16 +25,12 @@
                 </div>
             </div><!-- /.container-fluid -->
         </section>
-        <div class="row">
-            <div class="col-sm-2">
-                <a href="{{ route('order.invoice.list') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                        class="fa fa-list"> </span> Order List</a>
 
-            </div>
-        </div>
         <!-- Main content -->
         <section class="content">
-            <div class="container-fluid">
+            <div class="container">
+                <a href="{{ route('order.invoice.list') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
+                        class="fa fa-list"> </span> Order List</a>
                 <div class="row">
                     <!-- left column -->
                     <div class="col-md-12">
@@ -106,7 +102,7 @@
 
                         </div>
                     </div>
-                    <div class="col-md-6 ">
+                    <div class="col-md-5 ">
                         <!-- general form elements -->
                         <div class="card">
                             <div class="card-header">
@@ -118,7 +114,7 @@
                             </div>
                             <!-- /.card-header -->
                             @can('view.sale.products')
-                                <div class="card-body table-responsive" id="load">
+                                <div class="card-body" id="load">
                                     <table id="example1" class="table table-bordered table-striped text-left"
                                         style="font-size: 12px;">
                                         <thead>
@@ -142,41 +138,35 @@
                                         <tbody>
                                             @foreach ($stores as $key => $store)
                                                 <tr>
-                                                    <form action="{{ route('cart.store') }}" method="post">
-                                                        @csrf
-                                                        <input type="hidden" name="customer" class="customer" value="@if(session()->has('customer')) {{ session('customer')->id }} @endif">
-                                                        <input type="hidden" name="id" value="{{ $store->id }}">
-                                                        <input type="hidden" name="name" value="{{ $store->name }}">
-                                                        <input type="hidden" name="code" value="{{ $store->code }}">
-                                                        <input type="hidden" name="store" value="{{ $store->store }}">
-                                                        <input type="hidden" name="unit" value="{{ $store->unit }}">
-                                                        <input type="hidden" name="qty" value="1">
-                                                        <input type="hidden" name="selling_price"
-                                                            value="{{ $store->selling_price }}">
-                                                        <input type="hidden" name="qty_available"
-                                                            value="{{ $store->qty_available }}">
-                                                        <input type="hidden" name="sold_price"
-                                                            value="{{ $store->selling_price }}">
-                                                        <input type="hidden" name="cost_price"
-                                                            value="{{ $store->cost_price }}">
+                                                    <td>{{ ucwords($store->store) }}</td>
+                                                    <td>{{ $store->code }}</td>
+                                                    <td>{{ $store->name }}</td>
+                                                    <td>{{ $store->unit }}</td>
+                                                    <td align="center">
+                                                        <form action="{{ route('ajax.cart.add') }}" method="POST" class="addCartItemForm">
+                                                            @csrf
+                                                            <input type="hidden" name="customer" class="customer" value="">
+                                                            <input type="hidden" name="id" value="{{ $store->id }}">
+                                                            <input type="hidden" name="name" value="{{ $store->name }}">
+                                                            <input type="hidden" name="code" value="{{ $store->code }}">
+                                                            <input type="hidden" name="store" value="{{ $store->store }}">
+                                                            <input type="hidden" name="unit" value="{{ $store->unit }}">
+                                                            <input type="hidden" name="qty" value="1">
+                                                            <input type="hidden" name="selling_price"
+                                                                   value="{{ $store->selling_price }}">
+                                                            <input type="hidden" name="qty_available"
+                                                                   value="{{ $store->qty_available }}">
+                                                            <input type="hidden" name="sold_price"
+                                                                   value="{{ $store->selling_price }}">
+                                                            <input type="hidden" name="cost_price"
+                                                                   value="{{ $store->cost_price }}">
 
+                                                            <button type="submit" class="btn btn-sm btn-success px-2">
+                                                                <i class="fa fa-cart-plus" aria-hidden="true"></i>
+                                                            </button>
+                                                        </form>
 
-                                                        <td>{{ ucwords($store->store) }}</td>
-                                                        <td>{{ $store->code }}</td>
-                                                        <td>{{ $store->name }}</td>
-                                                        <td>{{ $store->unit }}</td>
-{{--                                                        @if ($store->qty_available > 0 && $store->selling_price > 0)--}}
-                                                            <td align="center">
-                                                                <button type="submit" class="btn btn-sm btn-success px-2">
-                                                                    <i class="fa fa-cart-plus" aria-hidden="true"></i>
-                                                                </button>
-                                                            </td>
-                                                        {{--@else
-                                                            <td align="center">
-                                                                <span class="fa fa-crosshairs text text-danger"></span>
-                                                            </td>
-                                                        @endif--}}
-                                                    </form>
+                                                    </td>
                                                 </tr>
                                             @endforeach
 
@@ -190,7 +180,7 @@
                         </div>
                         <!-- /.card -->
                     </div>
-                    <div class="col-md-6 cart-container">
+                    <div class="col-md-7 ">
 
                         <div class="card card-default">
                             <div class="card-header">
@@ -201,120 +191,8 @@
                                 </h3>
                             </div>
                             <!-- /.card-header -->
-                            <div class="card-body table-responsive" id="load_cart">
-                                @if (Cart::getTotal() < 1)
-                                    <div class="alert alert-danger">
-                                        No Product Added
-                                    </div>
-                                @else
-                                    <table class="table table-bordered table-striped text-center"
-                                        style="font-size: 12px;">
-                                        <thead>
-                                            <tr>
-                                                {{-- <th>S.N</th> --}}
-                                                <th>Store</th>
-                                                <th style="width:30%">Code</th>
-                                                <th>Unit</th>
-                                                <th>Price</th>
-                                                <th>Qty</th>
-                                                <th>Total</th>
-                                                {{-- <th><span class="ion-refresh"></span></th> --}}
-                                                <th><span class="ion-ios-trash"></span></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($cart_products as $product)
-                                                <tr>
-                                                    {{-- <td>{{ $loop->iteration }}</td> --}}
-                                                    <td class="text-left">{{ $product->attributes['store'] }}</td>
-                                                    <td class="text-left">{{ $product->attributes['code'] }} -
-                                                        {{ $product->name }}</td>
-                                                    <td>{{ $product->attributes['unit'] }}</td>
-                                                    <form action="{{ route('cart.update') }}" method="post"
-                                                        id="p{{ $product->id }}">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <td>
-                                                            @can('edit.daily.sale')
-                                                                <input type="text" name="sold_price"
-                                                                    id="price{{ $product->id }}" class="form-control price"
-                                                                    style="min-width:65px;"
-                                                                    onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
-                                                                    value="{{ $product->price }}"
-                                                                    data-val="{{ $product->attributes['selling_price'] }}"
-                                                                    data-value="p{{ $product->id }}">
-                                                                <span style="color: red;"
-                                                                    id="valid_price{{ $product->id }}"></span>
-                                                            @else
-                                                                <input type="text" name="selling_price"
-                                                                    id="price{{ $product->id }}" class="form-control price"
-                                                                    readonly style="min-width:65px;"
-                                                                    onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
-                                                                    value="{{ $product->price }}"
-                                                                    data-val="{{ $product->attributes['selling_price'] }}"
-                                                                    data-value="p{{ $product->id }}">
-                                                                <span style="color: red;"
-                                                                    id="valid_price{{ $product->id }}"></span>
-                                                            @endcan
+                            <div class="card-body cart-container">
 
-                                                        </td>
-                                                        <td>
-                                                            <input type="text" name="quantity"
-                                                                id="quantity{{ $product->id }}"
-                                                                class="form-control quantity"
-                                                                data-value="p{{ $product->id }}" style="min-width:58px;"
-                                                                value="{{ $product->quantity }}" min="1"
-                                                                max-qty="{{ $product->attributes['qty_available'] }}"
-                                                                required>
-                                                            <span style="color: red;"
-                                                                id="valid_qty{{ $product->id }}"></span>
-                                                        </td>
-                                                        <td><span
-                                                                class="subtotal{{ $product->id }}">{{ number_format($product->price * $product->quantity, 2) }}</span>
-                                                        </td>
-                                                        <input type="hidden" name="id" class="form-control"
-                                                            value="{{ $product->id }}">
-                                                        <input type="hidden" name="selling_price" class="form-control"
-                                                            value="{{ $product->attributes['selling_price'] }}">
-                                                        <input type="hidden" name="cost_price" class="form-control"
-                                                            value="{{ $product->attributes['cost_price'] }}">
-                                                        <input type="hidden" name="qty_available" class="form-control"
-                                                            value="{{ $product->attributes['qty_available'] }}">
-                                                        <input type="hidden" name="unit" class="form-control"
-                                                               value="{{ $product->attributes['unit'] }}">
-                                                        {{-- <td>
-                                                            <button type="submit" class="btn btn-sm btn-success">
-                                                                <i class="fa fa-check-circle" aria-hidden="true"></i>
-                                                            </button>
-                                                        </td> --}}
-                                                    </form>
-
-                                                    <td>
-                                                        <button class="btn btn-danger btn-sm" type="button"
-                                                            onclick="deleteItem({{ $product->id }})">
-                                                            <i class="fa fa-trash" aria-hidden="true"></i>
-                                                        </button>
-                                                        <form id="delete-form-{{ $product->id }}"
-                                                            action="{{ route('cart.remove', $product->id) }}"
-                                                            method="post" style="display:none;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                @endif
-
-                                {{-- <div class="alert alert-info">
-                                    <p>Quantity : {{ Cart::getTotalQuantity() }}</p>
-                                    <p>Sub Total : &#8358; <span
-                                            id="subtotal">{{ number_format(Cart::getSubTotal(), 2) }}</span></p>
-                                </div> --}}
-                                <div class="alert alert-success">
-                                    Total : &#8358; <span id="total">{{ number_format(Cart::getTotal()) }}</span>
-                                </div>
                             </div>
                             <!-- /.card-body -->
                         </div>
@@ -331,153 +209,6 @@
     </div> <!-- Content Wrapper end -->
 
     <!--  modal create customer -->
-    <div class="modal fade" id="customermodal" style="display: none;" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add new Customer</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="post" action="{{ route('customers.store') }}">
-                        @csrf
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Name</label>
-                                    <input type="text" class="form-control" name="name"
-                                        value="{{ old('name') }}" placeholder="Enter Name">
-                                </div>
-                                <div class="form-group">
-                                    <label>Phone</label>
-                                    <input type="text" class="form-control" name="phone"
-                                        value="{{ old('phone') }}" placeholder="Enter Phone">
-                                </div>
-                                <div class="form-group">
-                                    <label>Address</label>
-                                    <input type="text" class="form-control" name="address"
-                                        value="{{ old('address') }}" placeholder="Enter Address">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Credit Limit</label>
-                                    <input type="text" class="form-control" name="credit_limit"
-                                        value="{{ old('credit_limit') }}" placeholder="Credit Limit">
-                                </div>
-                            </div>
-                            <input type="hidden" name="modal" value="modal" />
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-dark" data-dismiss="modal"><i class="fa fa-times"></i>
-                                Close
-                            </button>
-                            <button type="submit" class="btn btn-info px-3"><i class="icon-trash"></i> Save
-                            </button>
-                        </div>
-                        @method('post')
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div><!-- End modal delete -->
-    <!--  modal create customer -->
-    <div class="modal fade" id="credit_limitform" style="display: none;" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Increase Customer Credit Limit</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="post" action="{{ route('customers.update.credit_limit') }}">
-                        @csrf
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Existing Amount</label>
-                                    <input type="text" class="form-control" name="amount" value=""
-                                        id="existing_amount">
-                                </div>
-                                <div class="form-group">
-                                    <label>New Amount:</label>
-                                    <input type="text" class="form-control" name="new_amount"
-                                        value="{{ old('new_amount') }}" placeholder="Enter the amount" required>
-                                </div>
-                                <input type="hidden" class="form-control" name="customer_id" id="credit_limit_customer"
-                                    value="">
-                            </div>
-                        </div>
-                        <input type="hidden" name="modal" value="modal" />
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-dark" data-dismiss="modal"><i class="fa fa-times"></i>
-                        Close
-                    </button>
-                    <button type="submit" class="btn btn-info px-3"><i class="icon-trash"></i> Save
-                    </button>
-                </div>
-                @method('post')
-                </form>
-            </div>
-        </div>
-    </div>
-    </div><!-- End modal delete -->
-    <div class="modal fade" id="customer_ledgerform" style="display: none;" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Customer Ledger</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="get" action="{{ route('ajax.general.customer.ledger') }}" id="ledger_form"
-                        target="_BLANK">
-                        @csrf
-                        <div class="form-group">
-                            <label for="from_date">From Date</label>
-                            <input type="text" class="form-control datepicker" name="from_date" id="from_date"
-                                placeholder="" autocomplete="off">
-                        </div>
-                        <div class="form-group">
-                            <label for="to_date">To Date</label>
-                            <input type="text" class="form-control datepicker" name="to_date" id="to_date"
-                                placeholder="" autocomplete="off">
-                        </div>
-                        <div class="form-group">
-                            &nbsp;&nbsp;
-                            <label for="customer_id">Customer</label>
-                            <select class="form-control select2-single" name="customer_id" id="customer_id" required>
-                                @php
-                                    $customers = clone $customers;
-                                @endphp
-                                <option value="">Select...</option>
-                                @foreach ($customers as $data)
-                                    <option value="{{ $data->id }}">{{ $data->code }}-{{ $data->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <input type="hidden" name="print" value="print" />
-                        <input type="hidden" name="modal" value="modal" />
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-dark" data-dismiss="modal"><i class="fa fa-times"></i>
-                                Close
-                            </button>
-                            <button type="submit" class="btn btn-info px-3"><i class="icon-trash"></i> Generate
-                            </button>
-                        </div>
-                        @method('post')
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 
 

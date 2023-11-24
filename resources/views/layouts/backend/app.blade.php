@@ -87,6 +87,7 @@
 
     <!-- REQUIRED SCRIPTS -->
     <!-- jQuery -->
+
     <script src="{{ asset('assets/backend/plugins/jquery/jquery.min.js') }}"></script>
     <!-- Bootstrap -->
     <script src="{{ asset('assets/backend/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
@@ -100,7 +101,9 @@
     {{--<script src="{{ asset('assets/backend/plugins/datepicker/datepicker-bootstrap.min.js') }}"></script> --}}
     <script src="{{ asset('assets/backend/plugins/datepicker/moment-with-locales.js') }}"></script>
     <script src="{{ asset('assets/backend/plugins/datepicker/jquery.datetimepicker.js') }}"></script>
-    <script src="{{ asset('commons/js/custom-ajax.js') }}"></script>
+{{--    <script src="{{ asset('commons/js/custom-ajax.js') }}"></script>--}}
+
+
     <script>
         @if ($errors->any())
             @foreach ($errors->all() as $error)
@@ -168,20 +171,10 @@
 
     <script>
 
-
-        function formatMoney(n, c, d, t) {
-            var c = isNaN(c = Math.abs(c)) ? 2 : c,
-                d = d == undefined ? "." : d,
-                t = t == undefined ? "," : t,
-                s = n < 0 ? "-" : "",
-                i = String(parseInt(n = Math.abs(Number(n) || 0).toFixed(c))),
-                j = (j = i.length) > 3 ? j % 3 : 0;
-            return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ?
-                d + Math.abs(n - i).toFixed(c).slice(2) : "");
-        };
         //cart activities
-
         let type = $('input[name=cart_page_type]').val();
+        let cart_container = $('.cart-container');
+
         //load cart
         $.ajax({
             url: "{{ route('ajax.cart.load') }}",
@@ -190,9 +183,11 @@
                 type : type
             }
         }).done(function(component){
-            console.log(component)
-            $('.cart-container').html(component)
+            // console.log(component)
+            cart_container.html(component)
         })
+
+
 
         //add cart item
         $(document).on('submit','.addCartItemForm', function(e){
@@ -204,27 +199,44 @@
             }).done(function(component){
                 $('.addCartItemForm')[0].reset();
                 $('.select2-single').val(null).trigger('change');
-                console.log(component)
-                $('.cart-container').html(component)
+                // console.log(component)
+                cart_container.html(component)
             })
         })
 
         //update to card
         $(document).on('keyup','.quantity, .price', function(){
             let id = $(this).attr('data-value');
-            $("#valid_qty" + id.substr(1)).html("");
-            if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
-                'max-qty'))) {
-                $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $('#quantity' +
-                    id.substr(1)).attr('max-qty') + ")");
-                $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
-                return false;
+            if(type == 'invoice'){
+                $("#valid_qty" + id.substr(1)).html("");
+                if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
+                    'max-qty'))) {
+                    $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $('#quantity' +
+                        id.substr(1)).attr('max-qty') + ")");
+                    $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
+                    return false;
+                }
             }
             updateCart(id)
 
         })
 
         function updateCart(formId){
+            let form = $('#' + formId);
+            console.log(form)
+            $.ajax({
+                url: form.attr('action'),
+                type: 'GET',
+                data: form.serialize()+'&type='+type,
+            }).done(function(component){
+                console.log(component)
+                formId = formId.substr(1);
+                subtotal = $('#price' + formId).val() * $('#quantity' + formId).val();
+                $('.subtotal' + formId).text(formatMoney(subtotal));
+                $('.totalCart').text(formatMoney(component));
+            })
+        }
+        /*function updateCart(formId){
             $.ajax({
                 url: $('#' + formId).attr('action'),
                 type: 'GET',
@@ -237,7 +249,7 @@
                 $('.totalCart').text(formatMoney(component));
                 // $('.cart-container').html(component)
             })
-        }
+        }*/
 
         //delete card
         $(document).on('submit','.deleteCartItem', function(e){
@@ -250,7 +262,7 @@
                 }
             }).done(function(component){
                 // console.log(component)
-                $('.cart-container').html(component)
+                cart_container.html(component)
             })
         })
 
@@ -261,6 +273,24 @@
             updateCart(id)
 
         })
+
+        //change unit measure
+        $(document).on('change','.unit_measure', function(){
+            let id = $(this).attr('data-value');
+            updateCart(id)
+        })
+
+        function formatMoney(n, c, d, t) {
+            var c = isNaN(c = Math.abs(c)) ? 2 : c,
+                d = d == undefined ? "." : d,
+                t = t == undefined ? "," : t,
+                s = n < 0 ? "-" : "",
+                i = String(parseInt(n = Math.abs(Number(n) || 0).toFixed(c))),
+                j = (j = i.length) > 3 ? j % 3 : 0;
+            return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ?
+                d + Math.abs(n - i).toFixed(c).slice(2) : "");
+        };
+
     </script>
 
     @stack('js')

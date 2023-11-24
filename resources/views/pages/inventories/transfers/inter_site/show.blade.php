@@ -155,16 +155,16 @@
                                                 <td>{{ ($product->totalReceive()) }}</td>
                                                 <td class="text-right">
                                                     @if(($product->quantity - $product->totalReceive()) > 0)
-                                                    @if($product->intersite->status == 2 && $product->intersite->destination_branch_id == auth()->user()->branch->id)
-                                                        <a href="javascript:void(0)" data-toggle="modal"
-                                                           data-target="#add_store_product_form"
-                                                           class="btn btn-sm btn-success add-product"
-                                                           data-product-id="{{ $product->product_id }}"
-                                                           data-store-id="{{ $product->store_id }}"
-                                                           data-quantity="{{ $product->quantity }}"
-                                                           data-cost="{{ $product->cost_price }}"
-                                                           ><i class="fa fa-plus"></i> Add Product </a>
-                                                    @endif
+                                                        @if($product->intersite->status == 2 && $product->intersite->destination_branch_id == auth()->user()->branch->id)
+                                                            <a href="javascript:void(0)" data-toggle="modal"
+                                                               data-target="#add_store_product_form"
+                                                               class="btn btn-sm btn-success add-product"
+                                                               data-product-id="{{ $product->product_id }}"
+                                                               data-store-id="{{ $product->store_id }}"
+                                                               data-quantity="{{ $product->quantity }}"
+                                                               data-cost="{{ $product->cost_price }}"
+                                                               ><i class="fa fa-plus"></i> Add Product </a>
+                                                        @endif
                                                     @endif
                                                 </td>
                                                 @php $total += $product->cost_price * $product->quantity_requested; @endphp

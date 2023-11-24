@@ -1045,7 +1045,7 @@ Route::middleware('auth')->group(function () {
                 Route::put('/update/{ledger}', [ReturnDebitController::class, 'updateReturnDebit'])->name('customers.return.debit.update');
                 Route::delete('/delete/{ledger}', [ReturnDebitController::class, 'deletReturnDebit'])->name('customers.return.debit.destroy');
                 Route::post('/search', [ReturnDebitController::class, 'searchReturnDebit'])->name('customers.return.debit.search');
-                //                Route::get('/load_invoices', [ReturnDebitController::class, 'loadInvoices'])->name('load.order.invoices');
+                                Route::get('/load_invoices', [ReturnDebitController::class, 'loadInvoices'])->name('load.order.invoices');
                 Route::get('/load_cart', [ReturnDebitController::class, 'loadToCart'])->name('load.order.cart');
                 Route::post('/cart', [ReturnDebitController::class, 'addToCart'])->name('return.debit.cart.store');
                 Route::put('/update-cart', [ReturnDebitController::class, 'updateCart'])->name('return.debit.cart.update');

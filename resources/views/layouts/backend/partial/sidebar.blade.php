@@ -312,15 +312,6 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a href="{{route('suppliers.debit.note')}}"
-                               class="nav-link ">
-                                <i class="ion-card"></i>
-                                <p>Debit Note</p>
-                            </a>
-                        </li>
-
-
                     </ul>
                 </li>
 <!--

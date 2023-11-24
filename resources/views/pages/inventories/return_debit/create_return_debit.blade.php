@@ -115,7 +115,7 @@
                                             <form action="{{ route('return.debit.cart.store') }}" method="post">
                                                 @csrf
                                                 <input type="hidden" name="id" value="{{ $store->id }}">
-                                                <input type="hidden" name="order" value="{{ $order->id }}">
+                                                <input type="hidden" name="order" value="{{ isset($order->id) ? $order->id: '' }}">
                                                 <input type="hidden" name="name" value="{{ $store->name }}">
                                                 <input type="hidden" name="code" value="{{ $store->code }}">
                                                 <input type="hidden" name="store" value="{{ $store->store }}">

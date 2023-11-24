@@ -278,7 +278,7 @@
             <tr>
                 <th>S.N</th>
                 <th>Name</th>
-                <th>Qty</th>
+                <th>Quantity</th>
                 <th>Store</th>
                 <th><span class="ion-ios-trash"></span></th>
             </tr>
@@ -289,24 +289,26 @@
                     @php $attr = $product->attributes @endphp
                     <td>{{ $loop->iteration }}</td>
                     <td class="text-left">{{ $product->name }}</td>
-                    <form action="{{ route('ajax.cart.update', $product->id) }}" method="post" id="p{{ $product->id }}">
-                        <td>
-                            <span style="color: red;" id="valid_price{{ $product->id }}"></span>
-                            <input
-                                type="text"
-                                name="quantity"
-                                id="quantity{{ $product->id }}"
-                                class="form-control quantity"
-                                data-value="p{{ $product->id }}"
-                                style="min-width:58px;"
-                                value="{{ $product->quantity }}"
-                                min="1"
-                                required>
-                        </td>
-                        <input type="hidden" name="id" class="form-control" value="{{ $product->id }}">
-                        <input type="hidden" name="product_id" class="form-control" value="{{ $attr->product_id }}">
-                        <input type="hidden" name="store_id" class="form-control" value="{{ $attr->store_id }}">
-                    </form>
+
+                    <td>
+                        <form action="{{ route('ajax.cart.update', $product->id) }}" method="post" id="p{{ $product->id }}">
+                        <span style="color: red;" id="valid_price{{ $product->id }}"></span>
+                        <input
+                            type="text"
+                            name="quantity"
+                            id="quantity{{ $product->id }}"
+                            class="form-control quantity"
+                            data-value="p{{ $product->id }}"
+                            style="min-width:58px;"
+                            value="{{ $product->quantity }}"
+                            min="1"
+                            required>
+                            <input type="hidden" name="id" class="form-control" value="{{ $product->id }}">
+                            <input type="hidden" name="product_id" class="form-control" value="{{ $attr->product_id }}">
+                            <input type="hidden" name="store_id" class="form-control" value="{{ $attr->store_id }}">
+                        </form>
+                    </td>
+
                     <td>{{ \App\Models\Store::find($attr->store_id)->name ?? null }}</td>
 {{--                    <td>{{ $product->attributes->store_id }}</td>--}}
                     <td class="text-right">

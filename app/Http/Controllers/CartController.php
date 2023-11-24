@@ -283,13 +283,14 @@ class CartController extends Controller
             );
         }
         if($type == 'adjustment') {
+            $product = Product::find($request->product_id);
             \Cart::update(
                 $request->id, [
                 'quantity' => [
                     'relative' => false,
                     'value' => $request->quantity
                 ],
-                'name' => Product::find($request->product_id)->name,
+                'name' => $product->name,
                 'price' => 0, //Thos is not applicable here
                 'attributes' => array(
                     'store_id' => $request->store_id,

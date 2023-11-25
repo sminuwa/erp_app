@@ -187,7 +187,6 @@
                                 <h3 class="card-title">
                                     <i class="fa fa-shopping-cart"></i>
                                     Cart
-
                                 </h3>
                             </div>
                             <!-- /.card-header -->

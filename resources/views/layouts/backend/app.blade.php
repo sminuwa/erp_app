@@ -31,6 +31,7 @@
 
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datepicker/jquery.datetimepicker.css') }}">
     <link rel="stylesheet" href="{{ asset('commons/css/custom-style.css') }}">
+    <link rel="stylesheet" href="{{ asset('commons/css/custom-table.css') }}">
 
     <style>
         .floating-label{
@@ -57,6 +58,9 @@
         .datepicker {
             padding: .375rem .75rem;
         }
+
+
+
     </style>
 
     @stack('css')
@@ -192,14 +196,23 @@
         //add cart item
         $(document).on('submit','.addCartItemForm', function(e){
             e.preventDefault()
+            if(type === 'order' || type === 'proforma' || type === 'invoice') {
+                if ($('input[name=customer]').val() == '') {
+                    alert("Please select customer")
+                    return;
+                }
+            }
             $.ajax({
                 url: $(this).attr('action'),
                 type: 'GET',
                 data: $(this).serialize()+'&type='+type,
             }).done(function(component){
-                $('.addCartItemForm')[0].reset();
-                $('.select2-single').val(null).trigger('change');
-                // console.log(component)
+                //reset input only
+                if(type !== 'order' && type !== 'proforma' && type !== 'invoice') {
+                    $('.addCartItemForm')[0].reset();
+                    $('.select2-single').val(null).trigger('change');
+                }
+                console.log(component)
                 cart_container.html(component)
             })
         })
@@ -207,6 +220,7 @@
         //update to card
         $(document).on('keyup','.quantity, .price', function(){
             let id = $(this).attr('data-value');
+
             if(type == 'invoice'){
                 $("#valid_qty" + id.substr(1)).html("");
                 if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
@@ -221,9 +235,8 @@
 
         })
 
-        function updateCart(formId){
+        function updateCart(formId, formData = ''){
             let form = $('#' + formId);
-            console.log(form)
             $.ajax({
                 url: form.attr('action'),
                 type: 'GET',
@@ -236,26 +249,12 @@
                 $('.totalCart').text(formatMoney(component));
             })
         }
-        /*function updateCart(formId){
-            $.ajax({
-                url: $('#' + formId).attr('action'),
-                type: 'GET',
-                data: $('#'+formId).serialize()+'&type='+type,
-            }).done(function(component){
-                console.log(component)
-                formId = formId.substr(1);
-                subtotal = $('#price' + formId).val() * $('#quantity' + formId).val();
-                $('.subtotal' + formId).text(formatMoney(subtotal));
-                $('.totalCart').text(formatMoney(component));
-                // $('.cart-container').html(component)
-            })
-        }*/
 
         //delete card
-        $(document).on('submit','.deleteCartItem', function(e){
+        $(document).on('click','.deleteCartItem', function(e){
             e.preventDefault()
             $.ajax({
-                url: $(this).attr('action'),
+                url: $(this).attr('url'),
                 type: 'GET',
                 data: {
                     type : type

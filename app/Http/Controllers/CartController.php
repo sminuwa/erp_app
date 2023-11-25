@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\BranchProductPrice;
 use App\Models\Customer;
 use App\Models\Product;
+use App\Models\ProductUnitMeasure;
 use App\Models\Store;
+use App\Models\StoreProduct;
 use Illuminate\Http\Request;
 use Darryldecode\Cart\Cart;
 use Brian2694\Toastr\Facades\Toastr;
@@ -214,18 +216,26 @@ class CartController extends Controller
             ]);
         }
 
-        if($type == 'order') {
-//            return $request;
+        if($type == 'order' || $type=='proforma' || $type == 'invoice') {
             $customer = Customer::find($request->customer);
+            $store_product = StoreProduct::find($request->id);
+            $product_id = $store_product->product_id;
+            $prices = BranchProductPrice::where(['product_id'=>$product_id,'branch_id'=>auth()->user()->branch->id])->first();
+            $selling_price = 0;
+            if($prices){
+                if($customer->type == 'Retail')
+                    $selling_price = $prices->retail_selling_price;
+                if($customer->type == 'Wholesale')
+                    $selling_price = $prices->whole_selling_price;
+            }
             $qty = $request->qty;
-            $selling_price = $request->selling_price;
             $cost_price = $request->cost_price;
             $qty_available = $request->qty_available;
             $store = $request->store;
             $add = \Cart::add([
                 'id' => $request->id,
                 'name' => $request->name,
-                'price' => $request->sold_price == 0 ? 1 : $request->sold_price ,
+                'price' => $selling_price,
                 'quantity' => $qty == 0 ? 1 : $qty,
                 'attributes' => array(
                     'cost_price' => $cost_price,
@@ -235,7 +245,6 @@ class CartController extends Controller
                     'discount' => 0,
                     'store'=> $store,
                     'unit' =>$request->unit ?? '',
-                    'product_id' =>$product->id ?? ''
                 ),
             ]);
         }
@@ -345,23 +354,37 @@ class CartController extends Controller
                 ),
             ]);
         }
-        if($type == 'order') {
-            return $request;
+        if($type == 'order' || $type=='proforma' || $type == 'invoice') {
+            $unit = $request->unit;
+            $store_product_id = $request->id;
+            $selling_price = $request->selling_price;
             $sold_price = $request->sold_price;
+            $store_product = StoreProduct::find($store_product_id);
+            $product_id = $store_product->product_id;
+            $store_id = $store_product->store_id;
+            $unit_measure = ProductUnitMeasure::where(['product_id'=> $product_id, 'code'=>$unit])->first();
+            if($unit_measure && $unit_measure->value > 1) {
+                if($unit_measure->type == 'division')
+                    $sold_price = roundDown(($selling_price / ($unit_measure->value ?? 1)),50);
+                if($unit_measure->type == 'multiple')
+                    $sold_price = roundDown(($selling_price * ($unit_measure->value ?? 1)),50);
+            }else{
+                $sold_price = $selling_price;
+            }
             \Cart::update(
                 $request->id,
                 [
                     'quantity' => [
                         'relative' => false,
-                        'value' => $request->quantity
+                        'value' => $request->quantity ?? 1
                     ],
                     'price' => $sold_price,
                     'attributes' => array(
                         'cost_price' => $request->cost_price,
                         'selling_price' => $request->selling_price,
-                        'code'=>$request->code,
                         'discount' => $request->selling_price - $request->sold_price,
                         'qty_available' => $request->qty_available,
+                        'code'=>$request->code,
                         'store'=>$request->store,
                         'unit'=>$request->unit,
                     )

@@ -130,7 +130,7 @@
 
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-5">
                         <!-- general form elements -->
                         <div class="card">
                             <div class="card-header">
@@ -196,7 +196,7 @@
 
                                             @foreach ($stores as $key => $store)
                                                 <tr>
-                                                    <form action="{{ route('cart.store') }}" method="post">
+                                                    <form action="{{ route('ajax.cart.add') }}" method="POST" class="addCartItemForm">
                                                         @csrf
                                                         <input type="hidden" name="customer" class="customer" value="@if(session()->has('customer')) {{ session('customer')->id }} @endif">
                                                         <input type="hidden" name="id" value="{{ $store->id }}">
@@ -247,7 +247,7 @@
                         </div>
                         <!-- /.card -->
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-7">
                         <div class="card card-default">
                             <div class="card-header">
                                 <h3 class="card-title">
@@ -257,120 +257,8 @@
                                 </h3>
                             </div>
                             <!-- /.card-header -->
-                            <div class="card-body table-responsive" id="load_cart">
-                                @if (Cart::getTotal() < 1)
-                                    <div class="alert alert-danger">
-                                        No Product Added
-                                    </div>
-                                @else
-                                    <table class="table table-bordered table-striped text-center"
-                                        style="font-size: 12px;">
-                                        <thead>
-                                            <tr>
-                                                {{-- <th>S.N</th> --}}
-                                                <th>Store</th>
-                                                <th style="width:30%">Code</th>
-                                                <th>Unit</th>
-                                                <th>Price</th>
-                                                <th>Qty</th>
-                                                <th>Total</th>
-                                                {{-- <th><span class="ion-refresh"></span></th> --}}
-                                                <th><span class="ion-ios-trash"></span></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($cart_products as $product)
-                                                <tr>
-                                                    {{-- <td>{{ $loop->iteration }}</td> --}}
-                                                    <td class="text-left">{{ $product->attributes['store'] }}</td>
-                                                    <td class="text-left">{{ $product->attributes['code'] }}
-                                                        {{ $product->name }}</td>
-                                                    <td>{{ $product->attributes['unit'] }}</td>
-                                                    <form action="{{ route('cart.update') }}" method="post"
-                                                        id="p{{ $product->id }}">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <td>
-                                                            @can('edit.daily.sale')
-                                                                <input type="text" name="sold_price"
-                                                                    id="price{{ $product->id }}" class="form-control price"
-                                                                    style="min-width:65px;"
-                                                                    onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
-                                                                    value="{{ $product->price }}"
-                                                                    data-val="{{ $product->attributes['cost_price'] }}"
-                                                                    data-value="p{{ $product->id }}">
-                                                                <span style="color: red;"
-                                                                    id="valid_price{{ $product->id }}"></span>
-                                                            @else
-                                                                <input type="text" name="sold_price"
-                                                                    id="price{{ $product->id }}" class="form-control price"
-                                                                    readonly style="min-width:65px;"
-                                                                    onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
-                                                                    value="{{ $product->price }}"
-                                                                    data-val="{{ $product->attributes['selling_price'] }}"
-                                                                    data-value="p{{ $product->id }}">
-                                                                <span style="color: red;"
-                                                                    id="valid_price{{ $product->id }}"></span>
-                                                            @endcan
+                            <div class="card-body cart-container">
 
-                                                        </td>
-                                                        <td>
-                                                            <input type="text" name="quantity"
-                                                                id="quantity{{ $product->id }}"
-                                                                class="form-control quantity"
-                                                                data-value="p{{ $product->id }}" style="min-width:58px;"
-                                                                value="{{ $product->quantity }}" min="1"
-                                                                max-qty="{{ $product->attributes['qty_available'] }}"
-                                                                required>
-                                                            <span style="color: red;"
-                                                                id="valid_qty{{ $product->id }}"></span>
-                                                        </td>
-                                                        <td><span
-                                                                class="subtotal{{ $product->id }}">{{ number_format($product->price * $product->quantity, 2) }}</span>
-                                                        </td>
-                                                        <input type="hidden" name="id" class="form-control"
-                                                            value="{{ $product->id }}">
-                                                        <input type="hidden" name="selling_price" class="form-control"
-                                                            value="{{ $product->attributes['selling_price'] }}">
-                                                        <input type="hidden" name="cost_price" class="form-control"
-                                                            value="{{ $product->attributes['cost_price'] }}">
-                                                        <input type="hidden" name="qty_available" class="form-control"
-                                                            value="{{ $product->attributes['qty_available'] }}">
-                                                        <input type="hidden" name="unit" class="form-control"
-                                                               value="{{ $product->attributes['unit'] }}">
-                                                        {{-- <td>
-                                                            <button type="submit" class="btn btn-sm btn-success">
-                                                                <i class="fa fa-check-circle" aria-hidden="true"></i>
-                                                            </button>
-                                                        </td> --}}
-                                                    </form>
-
-                                                    <td>
-                                                        <button class="btn btn-danger btn-sm" type="button"
-                                                            onclick="deleteItem({{ $product->id }})">
-                                                            <i class="fa fa-trash" aria-hidden="true"></i>
-                                                        </button>
-                                                        <form id="delete-form-{{ $product->id }}"
-                                                            action="{{ route('cart.remove', $product->id) }}"
-                                                            method="post" style="display:none;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                @endif
-
-                                {{-- <div class="alert alert-info">
-                                    <p>Quantity : {{ Cart::getTotalQuantity() }}</p>
-                                    <p>Sub Total : &#8358; <span
-                                            id="subtotal">{{ number_format(Cart::getSubTotal(), 2) }}</span></p>
-                                </div> --}}
-                                <div class="alert alert-success">
-                                    Total : &#8358; <span id="total">{{ number_format(Cart::getTotal()) }}</span>
-                                </div>
                             </div>
                             <!-- /.card-body -->
                         </div>

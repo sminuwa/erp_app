@@ -54,3 +54,13 @@ function currency_sign($currency = 'NG')
         return "₦";
     return "₦";
 }
+
+
+function ceiling($num, $nearest){
+    return ceil($num / $nearest) * $nearest;
+}
+
+function roundDown($number, $nearest){
+    $result = ($number - fmod($number, $nearest)) + $nearest;
+    return $result;
+}

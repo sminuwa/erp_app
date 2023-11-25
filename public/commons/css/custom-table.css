@@ -1,0 +1,66 @@
+:root {
+    --table-text-size: 14px;
+    --table-cell-padding: 8px 10px;
+}
+
+.c-table{
+    width: 100%;
+    display: table;
+}
+.c-caption{  /*table caption*/
+    display: table-caption;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+}
+.c-thead{ /*<thead>*/
+    display: table-header-group;
+    /*background-color: gray;*/
+    font-weight: bold;
+    font-size: var(--table-text-size);
+}
+.c-tbody{ /*<tbody>*/
+    display: table-row-group
+}
+.c-tfoot{ /*<tfoot>*/
+    display: table-footer-group;
+    /*background-color: gray;*/
+    font-weight: bold;
+    font-size: var(--table-text-size);
+    color: rgba(255, 255, 255, 0.45);
+}
+.c-col{ /* <col> */
+    display: table-column
+}
+.c-colgroup{ /* colgroup */
+    display: table-column-group
+}
+.c-tr{ /* <tr> */
+    display: table-row;
+}
+.c-h-cell{
+    display: table-cell;
+    padding: var(--table-cell-padding);
+    text-align: justify;
+    border-bottom: 1px solid #dee2e6;
+}
+.c-f-cell{
+    display: table-cell;
+    padding: var(--table-cell-padding);
+    text-align: justify;
+    border-bottom: 1px solid #dee2e6;
+}
+.c-cell{ /*<td>, <th> */
+    padding: var(--table-cell-padding);
+    display: table-cell;
+    margin: 0 auto;
+    border-bottom:1px solid #dee2e6;
+}
+.c-table-bordered .c-f-cell,
+.c-table-bordered .c-h-cell,
+.c-table-bordered .c-cell {
+    border:1px solid #dee2e6;
+}
+.c-table-striped .c-tbody .c-tr:nth-child(odd) {
+    background-color: rgba(0, 0, 0, .05);
+}

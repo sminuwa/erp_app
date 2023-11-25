@@ -183,7 +183,7 @@ class DebitNoteController extends Controller
         $purchase_id = $request->purchase_id;
         $reference = $request->reference;
         $add = \Cart::add([
-            'id' => $this->generateRandomString(),
+            'id' => generateRandomString(),
             'name' => $request->description,
             'price' => $request->amount,
             'quantity' => 1,

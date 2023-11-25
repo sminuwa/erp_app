@@ -337,7 +337,7 @@ class InterStoreTransferController extends Controller
         ]);
         $product = Product::find($request->product_id);
         $add = \Cart::session('_token')->add([
-            'id' => $this->generateRandomString(),
+            'id' => generateRandomString(),
             'name' => $product->name,
             'price' => 0,
             //Thos is not applicable here
@@ -384,7 +384,7 @@ class InterStoreTransferController extends Controller
             $product = Product::find($data->product_id);
             \Cart::session('_token')->add([
 
-                'id' => $this->generateRandomString(),
+                'id' => generateRandomString(),
                 'name' => $product->name,
                 'price' => 0,
                 'quantity' => $data->qty_transfered,

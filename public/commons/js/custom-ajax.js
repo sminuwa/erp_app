@@ -62,3 +62,119 @@ function mySelect2(){
         containerCssClass: ':all:'
     });
 }
+
+
+//cart activities
+let type = $('input[name=cart_page_type]').val();
+let cart_container = $('.cart-container');
+
+//load cart
+$.ajax({
+    url: "/ajax/cart/load",
+    type: 'GET',
+    data: {
+        type : type
+    }
+}).done(function(component){
+    // console.log(component)
+    cart_container.html(component)
+})
+
+
+
+//add cart item
+$(document).on('submit','.addCartItemForm', function(e){
+    e.preventDefault()
+    if(type === 'order' || type === 'proforma' || type === 'invoice') {
+        if ($('input[name=customer]').val() == '') {
+            alert("Please select customer")
+            return;
+        }
+    }
+    $.ajax({
+        url: $(this).attr('action'),
+        type: 'GET',
+        data: $(this).serialize()+'&type='+type,
+    }).done(function(component){
+        //reset input only
+        if(type !== 'order' && type !== 'proforma' && type !== 'invoice') {
+            $('.addCartItemForm')[0].reset();
+            $('.select2-single').val(null).trigger('change');
+        }
+        console.log(component)
+        cart_container.html(component)
+    })
+})
+
+//update to card
+$(document).on('keyup','.quantity, .price', function(){
+    let id = $(this).attr('data-value');
+
+    if(type == 'invoice'){
+        $("#valid_qty" + id.substr(1)).html("");
+        if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
+            'max-qty'))) {
+            $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $('#quantity' +
+                id.substr(1)).attr('max-qty') + ")");
+            $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
+            return false;
+        }
+    }
+    updateCart(id)
+
+})
+
+function updateCart(formId, formData = ''){
+    let form = $('#' + formId);
+    $.ajax({
+        url: form.attr('action'),
+        type: 'GET',
+        data: form.serialize()+'&type='+type,
+    }).done(function(component){
+        console.log(component)
+        formId = formId.substr(1);
+        subtotal = $('#price' + formId).val() * $('#quantity' + formId).val();
+        $('.subtotal' + formId).text(formatMoney(subtotal));
+        $('.totalCart').text(formatMoney(component));
+    })
+}
+
+//delete card
+$(document).on('click','.deleteCartItem', function(e){
+    e.preventDefault()
+    $.ajax({
+        url: $(this).attr('url'),
+        type: 'GET',
+        data: {
+            type : type
+        }
+    }).done(function(component){
+        // console.log(component)
+        cart_container.html(component)
+    })
+})
+
+
+//change store from card
+$(document).on('change','.store_code', function(){
+    let id = $(this).attr('data-value');
+    updateCart(id)
+
+})
+
+//change unit measure
+$(document).on('change','.unit_measure', function(){
+    let id = $(this).attr('data-value');
+    updateCart(id)
+})
+
+function formatMoney(n, c, d, t) {
+    var c = isNaN(c = Math.abs(c)) ? 2 : c,
+        d = d == undefined ? "." : d,
+        t = t == undefined ? "," : t,
+        s = n < 0 ? "-" : "",
+        i = String(parseInt(n = Math.abs(Number(n) || 0).toFixed(c))),
+        j = (j = i.length) > 3 ? j % 3 : 0;
+    return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ?
+        d + Math.abs(n - i).toFixed(c).slice(2) : "");
+};

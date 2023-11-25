@@ -406,7 +406,7 @@ class InterSiteTransferController extends Controller
         ]);
         $product = Product::find($request->product_id);
         $add = \Cart::add([
-            'id' => $this->generateRandomString(),
+            'id' => generateRandomString(),
             'name' => $product->name,
             'price' => $request->cost_price ?? 1,
             'quantity' => $request->quantity_requested,
@@ -449,7 +449,7 @@ class InterSiteTransferController extends Controller
             if ($data != null) {
                 $product = Product::find($data->product_id);
                 \Cart::add([
-                    'id' => $this->generateRandomString(),
+                    'id' => generateRandomString(),
                     'name' => $product->name,
                     'price' => $data->cost_price,
                     'quantity' => $data->quantity,

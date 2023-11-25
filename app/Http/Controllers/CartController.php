@@ -129,7 +129,7 @@ class CartController extends Controller
         if($type == 'interstore'){
             $product = Product::find($request->product_id);
             $add = \Cart::add([
-                'id' => $this->generateRandomString(),
+                'id' => generateRandomString(),
                 'name' => $product->name,
                 'price' => 0,
                 'quantity' => $request->qty_transfered,
@@ -145,7 +145,7 @@ class CartController extends Controller
             $product = Product::find($request->product_id);
             $cost_price = BranchProductPrice::where(['product_id'=>$request->product_id, 'branch_id'=>auth()->user()->branch->id])->first();
             $add = \Cart::add([
-                'id' => $this->generateRandomString(),
+                'id' => generateRandomString(),
                 'name' => $product->name,
                 'price' => $cost_price->cost_price ?? 1,
                 'quantity' => $request->quantity,
@@ -203,8 +203,9 @@ class CartController extends Controller
             ]);
         }
         if($type == 'adjustment') {
+//            return $request;
             $add = \Cart::add([
-                'id' => $this->generateRandomString(),
+                'id' => generateRandomString(),
                 'name' => Product::find($request->product_id)->name,
                 'price' => 0, //Thos is not applicable here
                 'quantity' => abs($request->adjusted_qty),
@@ -215,7 +216,6 @@ class CartController extends Controller
                 ),
             ]);
         }
-
         if($type == 'order' || $type=='proforma' || $type == 'invoice') {
             $customer = Customer::find($request->customer);
             $store_product = StoreProduct::find($request->id);
@@ -247,14 +247,6 @@ class CartController extends Controller
                     'unit' =>$request->unit ?? '',
                 ),
             ]);
-        }
-
-        if($type == 'invoice') {
-
-        }
-
-        if($type == 'proforma') {
-
         }
 
         return view('components.cart', compact('type'));
@@ -392,13 +384,6 @@ class CartController extends Controller
             );
         }
 
-        if($type == 'invoice') {
-
-        }
-
-        if($type == 'proforma') {
-
-        }
         if ($request->ajax()) {
             return \Cart::getTotal();
         }

@@ -32,12 +32,7 @@ use App\Models\User;
 
 class StockAdjustmentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @param  Index  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function index(Index $request)
     {
         return view('pages.stock_adjustments.index', ['records' => StockAdjustment::select('stock_adjustments.*')->latest('date')
@@ -74,6 +69,8 @@ class StockAdjustmentController extends Controller
 
     public function store(Request $request)
     {
+
+        return \Cart::getContent();
         $model = new StockAdjustment;
         DB::beginTransaction();
         try {
@@ -114,13 +111,8 @@ class StockAdjustmentController extends Controller
         }
         \Cart::session('_token')->clear();
         return redirect()->back();
-    } /**
-  * Show the form for editing the specified resource.
-  *
-  * @param  Edit  $request
-  * @param  StockAdjustment  $stockadjustment
-  * @return \Illuminate\Http\Response
-  */
+    }
+
     public function edit(Edit $request, StockAdjustment $stockadjustment)
     {
         //return $stockadjustment;
@@ -140,13 +132,8 @@ class StockAdjustmentController extends Controller
             'adjusment_products' => $cartItems,
             'refno' => $this->generateRefNo(),
         ]);
-    } /**
-  * Update a existing resource in storage.
-  *
-  * @param  Update  $request
-  * @param  StockAdjustment  $stockadjustment
-  * @return \Illuminate\Http\Response
-  */
+    }
+
     public function update(Update $request, StockAdjustment $stockadjustment)
     {
 
@@ -258,7 +245,7 @@ class StockAdjustmentController extends Controller
         if ($request->operation == -1)
             $sign = "-";
         $add = \Cart::session('_token')->add([
-            'id' => $this->generateRandomString(),
+            'id' => generateRandomString(),
             'name' => Product::find($request->product_id)->name,
             'price' => 0, //Thos is not applicable here
             'quantity' => abs($request->adjusted_qty),
@@ -306,7 +293,7 @@ class StockAdjustmentController extends Controller
                 $sign = "-";
             \Cart::session('_token')->add([
 
-                'id' => $this->generateRandomString(),
+                'id' => generateRandomString(),
                 'name' => Product::find($data->product_id)->name,
                 'price' => 0,
                 'quantity' => abs($data->adjusted_qty),
@@ -344,16 +331,7 @@ class StockAdjustmentController extends Controller
 
         return redirect()->back();
     }
-    public function generateRandomString($length = 5)
-    {
-        $characters = '0123456789';
-        $charactersLength = strlen($characters);
-        $randomString = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[rand(0, $charactersLength - 1)];
-        }
-        return $randomString;
-    }
+
     public function getNextTransferID()
     {
         $no = DB::table('stock_adjustments')->select(DB::raw('MAX(id) as max'))->first();

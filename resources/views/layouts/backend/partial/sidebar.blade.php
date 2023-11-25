@@ -460,41 +460,6 @@
                                     <p>Manage General Accounts</p>
                                 </a>
                             </li>
-
-<!--                            <li class="nav-item">
-                                <a href="{{ route('bank_accounts.index') }}"
-                                   class="nav-link {{ Request::is('settings/bank_accounts/*') ? 'active' : '' }}">
-                                    <i class="ion-ios-pricetag-outline"></i>
-                                    <p>Manage Chart of Accounts</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ route('bank_accounts.index') }}"
-                                   class="nav-link {{ Request::is('settings/bank_accounts/*') ? 'active' : '' }}">
-                                    <i class="ion-ios-pricetag-outline"></i>
-                                    <p>Manage General Accounts</p>
-                                </a>
-                            </li>-->
-
-                            @can('view.bank.account')
-                                <li class="nav-item">
-                                    <a href="{{ route('bank_accounts.index') }}"
-                                        class="nav-link {{ Request::is('settings/bank_accounts/*') ? 'active' : '' }}">
-                                        <i class="ion-ios-pricetag-outline"></i>
-                                        <p>Manage Bank Accounts</p>
-                                    </a>
-                                </li>
-                            @endcan
-                            {{--@can('view.loan.collector')
-                                <li class="nav-item">
-                                    <a href="{{ route('loan_collectors.index') }}"
-                                        class="nav-link {{ Request::is('settings/loan/collector/*') ? 'active' : '' }}">
-                                        <i class="ion-code-working"></i>
-                                        <p>Manage Loan Collectors</p>
-                                    </a>
-                                </li>
-                            @endcan--}}
                             @can('view.product')
                                 <li class="nav-item">
                                     <a href="{{ route('companies.index') }}"
@@ -504,7 +469,6 @@
                                     </a>
                                 </li>
                             @endcan
-
                         </ul>
                     </li>
                 @endcan

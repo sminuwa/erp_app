@@ -10,11 +10,11 @@ use Illuminate\Database\Eloquent\Model;
 @property decimal $quantity quantity
 @property timestamp $created_at created at
 @property timestamp $updated_at updated at
-   
+
  */
-class InterstoreTransferDetail extends Model 
+class InterstoreTransferDetail extends Model
 {
-    
+
     /**
     * Database table name
     */
@@ -34,6 +34,18 @@ class InterstoreTransferDetail extends Model
     */
     protected $dates=[];
 
+
+    public function source(){
+        return $this->belongsTo(Store::class,'source_store_id');
+    }
+
+    public function destination(){
+        return $this->belongsTo(Store::class, 'destination_store_id');
+    }
+
+    public function product(){
+        return $this->belongsTo(Product::class,'product_id');
+    }
 
 
 

@@ -12,7 +12,7 @@
         <!-- Content Header (Page header) -->
         <!-- Content Header (Page header) -->
         <section class="content-header">
-            <div class="container-fluid">
+            <div class="container">
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <h4>Interstore Stock Transfer</h4>
@@ -60,12 +60,7 @@
                                             <th>S/N</th>
                                             <th>Date</th>
                                             <th>Reference</th>
-                                            <th>Product</th>
-                                            <th>Source Store</th>
-                                            <th>Destination Store</th>
-                                            <th>Qty Transfered </th>
-                                            {{-- <th>Stock In/Out </th> --}}
-                                            <th>Transfered By </th>
+                                            <th>Created By</th>
                                             <th>Status</th>
                                             <th>&nbsp;</th>
                                         </tr>
@@ -73,23 +68,16 @@
                                         <tbody>
                                         @foreach ($records as $record)
                                             <tr>
-                                                <td>{{ $loop->index + 1 }}</td>
-                                                <td> {{ $record->transfer_date }} </td>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td> {{ $record->date }} </td>
                                                 <td> {{ $record->reference }} </td>
-                                                <td>{{ $record->product->code }} - {{ $record->product->name }} </td>
-                                                <td> {{ $record->source->code }} - {{ $record->source->name }} </td>
-                                                <td> {{ $record->destination->code }} - {{ $record->destination->name }} </td>
-                                                <td> {{ $record->qty_transfered }} </td>
-
-                                                {{-- <td> {{ $record->stock_in_out }} </td> --}}
-                                                <td> {{ optional($record->user)->name }} </td>
-                                                <td> {{ $record->status == 1 ? 'Completed' : 'Cancelled' }} </td>
+                                                <td> {{ $record->createdBy->name ?? null }} </td>
+                                                <td> Completed </td>
                                                 <td>
-                                                    <a class="btn btn-secondary btn-sm" title="Stock Tranfer Report" target="_BLANK"
-                                                       href="{{ route('interstore.print', $record->transfer_id) }}">
+                                                    <a class="btn btn-secondary btn-sm" target="_BLANK"
+                                                       href="{{ route('interstore.print', $record->id) }}">
                                                         <span class="fa fa-print"></span> Print
                                                     </a>
-
                                                 </td>
                                             </tr>
                                         @endforeach

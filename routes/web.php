@@ -1111,7 +1111,7 @@ Route::middleware('auth')->group(function () {
                 Route::post('/cart', [InterStoreTransferController::class, 'addToCart'])->name('interstore.cart');
                 Route::delete('/remove/{id}', [InterStoreTransferController::class, 'removeCart'])->name('interstore.cart.remove');
                 Route::post('/clear', [InterStoreTransferController::class, 'clearAllCart'])->name('interstore.cart.clear');
-                Route::get('/print/{transfer_id}', [InterStoreTransferController::class, 'printStockTransfer'])->name('interstore.print');
+                Route::get('/print/{interstoreTransfer}', [InterStoreTransferController::class, 'print'])->name('interstore.print');
 
             }
         );

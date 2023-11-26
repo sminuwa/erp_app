@@ -9,7 +9,7 @@
             <div class="card-block">
                 <table class="table table-bordered table-striped">
                     <tbody>
-                        
+
                         <tr>
                             <th>Date</th>
                             <td>{{ \Carbon\Carbon::parse($record->date)->toFormattedDateString() }}</td>
@@ -19,8 +19,8 @@
                             <td>{{ $record->refno }}</td>
                         </tr>
                         <tr>
-                            <th>Adjusted By</th>
-                            <td>{{ $record->user->name }}</td>
+                            <th>Created By</th>
+                            <td>{{ $record->createdBy->name }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -39,28 +39,28 @@
                 </tr>
             </thead>
             <tbody>
-                
-                @foreach ($record->AdjustedProducts()->get() as $record)
+
+                @foreach ($record->products as $record)
                     <tr>
-                        <td> {{ $record->store->name }} </td>
-                        <td> {{ $record->product->category->name }} </td>
-                        <td> {{ $record->product->name }} </td>
-                        <td> {{ $record->available_qty }} </td>
-                        <td> {{ $record->adjusted_qty }} </td>
-                       
+                        <td> {{ $record->store->name ?? null }} </td>
+                        <td> {{ $record->product->category->name ?? null }} </td>
+                        <td> {{ $record->product->name ?? null }} </td>
+                        <td> {{ $record->available_qty ?? null }} </td>
+                        <td> {{ $record->quantity ?? null }} </td>
+
                         <td><a class="btn btn-secondary btn-sm" href="{{ route('stock_adjustments.edit', $record->id) }}">
                                 <span class="fa fa-pencil"></span>
                             </a>
                         </td>
                     </tr>
                 @endforeach
-                
+
             </tbody>
         </table>
        </div>
-        
+
             <div class="text text-danger">
-                Total : 
+                Total :
                 {{ $record->count() }}
             </div>
         </div>

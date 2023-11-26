@@ -9,6 +9,7 @@ use App\Models\GeneralAccountLedger;
 use App\Models\IntersiteTransfer;
 use App\Models\Purchase;
 use App\Models\PurchaseExpense;
+use App\Models\StockAdjustment;
 use App\Models\Store;
 use App\Models\StoreProduct;
 use App\Models\Supplier;
@@ -30,71 +31,71 @@ class Transaction
          * */
         $user = auth()->user();
         $branch = $user->branch;
-        if($type == 'GRN') {
-            $purchase_grn = Purchase::find($purchase_id);
-            $supplier = $purchase_grn->supplier;
-            $items = $purchase_grn->purchasedProducts;
-            $expenses = $purchase_grn->expenses;
-            $amount = $expense_amount = 0;
-            $expense_suppliers = $product_categories = $product_amounts = $product_percentages = [];
-            $products = $categories = [];
-            foreach ($items as $item) {
-                $product_categories[] = [
-                    'id' => $item->product_id,
-                    'category_id' => $item->product->category->id,
-                    'category_name' => $item->product->category->name,
-                    'asset_account_id' => $item->product->category->asset_account,
-                    'cost_account_id' => $item->product->category->cost_account,
-                    'amount' => ($item->unit_price * $item->quantity),
-                ];
-                $product_amounts[] = [
-                    'id' => $item->product_id,
-                    'amount' => ($item->unit_price * $item->quantity)
-                ];
-                $amount += ($item->unit_price * $item->quantity);
-            }
-            foreach ($product_categories as $key => $value) {
-                if (isset($categories[$value['category_id']])) {
-                    $categories[$value['category_id']]['amount'] += $value['amount'];
-                    continue;
-                }
-                $categories[$value['category_id']] = [
-                    'category_id' => $value['category_id'],
-                    'category_name' => $value['category_name'],
-                    'asset_account_id' => $value['asset_account_id'],
-                    'cost_account_id' => $value['cost_account_id'],
-                    'amount' => $value['amount'],
-                ];
-            }
 
-            $supplier_ledger = $asset_account = $cost_account = [];
-            foreach ($categories as $cat) {
-                $asset_account[] = [
-                    'model_id' => $cat['asset_account_id'],
-                    'model_name' => 'GeneralAccount',
-                    'branch_id' => $branch->id,
-                    'description' => $purchase_grn->atc_no,
-                    'reference' => $purchase_grn->reference,
-                    'credit' => 0,
-                    'debit' => $cat['amount'],
-                    'date' => $date,
-                    'user_id' => auth()->id(),
-                    'receipt_no' => 'A' . $purchase_grn->reference
-                ];
+        $purchase_grn = Purchase::find($purchase_id);
+        $supplier = $purchase_grn->supplier;
+        $items = $purchase_grn->purchasedProducts;
+        $expenses = $purchase_grn->expenses;
+        $amount = $expense_amount = 0;
+        $expense_suppliers = $product_categories = $product_amounts = $product_percentages = [];
+        $products = $categories = [];
+        foreach ($items as $item) {
+            $product_categories[] = [
+                'id' => $item->product_id,
+                'category_id' => $item->product->category->id,
+                'category_name' => $item->product->category->name,
+                'asset_account_id' => $item->product->category->asset_account,
+                'cost_account_id' => $item->product->category->cost_account,
+                'amount' => ($item->unit_price * $item->quantity),
+            ];
+            $product_amounts[] = [
+                'id' => $item->product_id,
+                'amount' => ($item->unit_price * $item->quantity)
+            ];
+            $amount += ($item->unit_price * $item->quantity);
+        }
+        foreach ($product_categories as $key => $value) {
+            if (isset($categories[$value['category_id']])) {
+                $categories[$value['category_id']]['amount'] += $value['amount'];
+                continue;
             }
-            $supplier_ledger[] = [
-                'model_id' => $purchase_grn->supplier_id,
-                'model_name' => 'Supplier',
+            $categories[$value['category_id']] = [
+                'category_id' => $value['category_id'],
+                'category_name' => $value['category_name'],
+                'asset_account_id' => $value['asset_account_id'],
+                'cost_account_id' => $value['cost_account_id'],
+                'amount' => $value['amount'],
+            ];
+        }
+
+        $supplier_ledger = $asset_account = $cost_account = [];
+        foreach ($categories as $cat) {
+            $asset_account[] = [
+                'model_id' => $cat['asset_account_id'],
+                'model_name' => 'GeneralAccount',
                 'branch_id' => $branch->id,
                 'description' => $purchase_grn->atc_no,
                 'reference' => $purchase_grn->reference,
-                'credit' => $amount,
-                'debit' => 0,
-                'date' => $date,
+                'credit' => 0,
+                'debit' => $cat['amount'],
+                'date' => $purchase_grn->purchase_date,
                 'user_id' => auth()->id(),
-                'receipt_no' => 'S' . $purchase_grn->reference
+                'receipt_no' => 'A' . $purchase_grn->reference
             ];
         }
+        $supplier_ledger[] = [
+            'model_id' => $purchase_grn->supplier_id,
+            'model_name' => 'Supplier',
+            'branch_id' => $branch->id,
+            'description' => $purchase_grn->atc_no,
+            'reference' => $purchase_grn->reference,
+            'credit' => $amount,
+            'debit' => 0,
+            'date' => $purchase_grn->purchase_date,
+            'user_id' => auth()->id(),
+            'receipt_no' => 'S' . $purchase_grn->reference
+        ];
+
         $general_account_ledger = array_merge($asset_account, $cost_account, $supplier_ledger);
         if(GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])){
             return ['status'=>true, 'message'=>'success'];
@@ -277,6 +278,89 @@ class Transaction
 
     }
 
+    public static function stock_adjustment($stock_adjustment_id){
+        /*
+         * supplier payment
+         * additional invoice payment
+         * $formula A=Amount, Q = Quantity, W = weight
+         * Find percentage of each total product prices
+         * Add percentage of the total cost to total products price
+         * New Cost Price = Divide the new total product price by number of quantity of each product
+         * New cost price to be added to product categories
+         *
+         * */
+        $user = auth()->user();
+        $branch = $user->branch;
+        $stock = StockAdjustment::find($stock_adjustment_id);
+        $control_account = GeneralAccountControl::where('code', 'Adjustment')->first();
+        $items = $stock->products;
+        $amount = $expense_amount = 0;
+        $expense_suppliers = $product_categories = $product_amounts = $product_percentages = [];
+        $products = $categories = [];
+        foreach ($items as $item) {
+            $product_categories[] = [
+                'id' => $item->product_id,
+                'category_id' => $item->product->category->id,
+                'category_name' => $item->product->category->name,
+                'asset_account_id' => $item->product->category->asset_account,
+                'cost_account_id' => $item->product->category->cost_account,
+                'amount' => ($item->cost_price * $item->quantity),
+            ];
+            $product_amounts[] = [
+                'id' => $item->product_id,
+                'amount' => ($item->cost_price * $item->quantity)
+            ];
+            $amount += ($item->cost_price * $item->quantity);
+        }
+
+        foreach ($product_categories as $key => $value) {
+            if (isset($categories[$value['category_id']])) {
+                $categories[$value['category_id']]['amount'] += $value['amount'];
+                continue;
+            }
+            $categories[$value['category_id']] = [
+                'category_id' => $value['category_id'],
+                'category_name' => $value['category_name'],
+                'asset_account_id' => $value['asset_account_id'],
+                'cost_account_id' => $value['cost_account_id'],
+                'amount' => $value['amount'],
+            ];
+        }
+        $control_account_ledger = $asset_account = $cost_account = [];
+        foreach ($categories as $cat) {
+            $asset_account[] = [
+                'model_id' => $cat['asset_account_id'],
+                'model_name' => 'GeneralAccount',
+                'branch_id' => $branch->id,
+                'description' => $stock->description,
+                'reference' => $stock->reference,
+                'credit' => ($stock->operation != 'in' ? $cat['amount'] : 0 ),// credit if out
+                'debit' => ($stock->operation == 'in'? $cat['amount'] : 0), // debit if in
+                'date' => $stock->date,
+                'user_id' => auth()->id(),
+                'receipt_no' => 'A' . $stock->reference
+            ];
+        }
+        $control_account_ledger[] = [
+            'model_id' => $control_account->general_account_id,
+            'model_name' => 'GeneralAccount',
+            'branch_id' => $branch->id,
+            'description' => $stock->description,
+            'reference' => $stock->reference,
+            'credit' => ($stock->operation == 'in' ? $amount : 0 ),// credit if in
+            'debit' => ($stock->operation != 'in' ? $amount : 0 ), // debit if out
+            'date' => $stock->date,
+            'user_id' => auth()->id(),
+            'receipt_no' => 'S' . ($stock->operation == 'in' ? "IN_" : "OUT_" ).$stock->reference
+        ];
+
+        $general_account_ledger = array_merge($asset_account, $cost_account, $control_account_ledger);
+        if(GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])){
+            return ['status'=>true, 'message'=>'success'];
+        }
+        return ['status'=>false, 'message'=>'Something went wrong.'];
+
+    }
 
     public static function purchase_invoices($purchase_id, $invoice_id, $formula = 'A'){
         /*
@@ -381,9 +465,6 @@ class Transaction
         }
 
     }
-
-
-
 
     public static function sale(array $store_product, int $customer_id, string $reference, $date){
         /*

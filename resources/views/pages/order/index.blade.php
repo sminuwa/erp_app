@@ -48,7 +48,7 @@
                             <div class="row">
                                 <div class="col-sm-2">
                                     @can('view.daily.sale')
-                                        <a href="{{ route('orders.approved') }}" class="btn btn-sm btn-secondary"
+                                        <a href="{{ route('invoice.index') }}" class="btn btn-sm btn-secondary"
                                             style="margin-left: 2px;"><span class="fa fa-list"> </span> List </a>
                                     @endcan
                                     @can('make.daily.sale')
@@ -158,9 +158,8 @@
                                                                     </button>
                                                                 </form>
 
-                                                                <form id="delete-form-{{ $order->id }}" action="{{ route('orders.destroy', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to close this invoice?')">
+                                                                <form id="delete-form-{{ $order->id }}" action="{{ route('invoice.delete', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to close this invoice?')">
                                                                     @csrf
-                                                                    @method('DELETE')
                                                                     <button class="dropdown-item" type="submit">
                                                                         <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                                                     </button>

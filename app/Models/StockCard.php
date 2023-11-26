@@ -42,12 +42,12 @@ class StockCard extends Model
          *    [ store_id => 1,
          *      product_id => 2,
          *      quantity => 210,
-         *      is_credit => true
+         *      operation => 'out
          *    ],
          *    [ store_id => 1,
          *      product_id => 2,
          *      quantity => 210,
-         *      is_credit => false
+         *      operation => 'in'
          *    ]
          *  ]
          * then calculate quantity before and quantity after from the store_product table record
@@ -60,15 +60,19 @@ class StockCard extends Model
         $cards = [];
         foreach($records as $record){
             $credit = $debit = $qty_after =$qty_before  = 0;
-            $store_product = self::where(['store_id'=>$record['store_id'], 'product_id'=>$record['product_id']])->first();
+            $store_product = StoreProduct::where(['store_id'=>$record['store_id'], 'product_id'=>$record['product_id']])->first();
             if($store_product){
-                $qty_available = $store_product->qty_available;
-                $qty_before = $qty_available;
-                $qty_after = $qty_available - $record['quantity'];
-                if($record['is_credit'] == true) // meaning if record type is credit then assign the quantity to credit else debit
+                $qty_before = $store_product->qty_available;
+                if($record['operation'] == 'in') // meaning if record type is credit then assign the quantity to credit else debit
+                {
                     $credit = $record['quantity'];
-                else
-                    $debit = $record['quantity'];;
+                    $qty_after = ($qty_before + $record['quantity']);
+                }
+                else{
+                    $debit = $record['quantity'];
+                    $qty_after = $qty_before - $record['quantity'];
+                }
+
             }
             $cards[] = [
                 'store_id' => $record['store_id'],
@@ -84,12 +88,10 @@ class StockCard extends Model
                 'priority' => $type,
             ];
         }
-
-        DB::beginTransaction();
         if(StockCard::upsert($cards, ['store_id', 'product_id'])){
-            DB::commit();
+            return true;
         }else{
-            DB::rollBack();
+            return false;
         }
 
     }

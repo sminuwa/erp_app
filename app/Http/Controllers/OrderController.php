@@ -570,7 +570,7 @@ class OrderController extends Controller
             $orders = $orders->where('sold_by', Auth::id());
         $orders = $orders->whereBetween('order_date', [date('Y-m-d',strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])
             ->orderBy('id', 'desc')->get();
-        return view('pages.order.approved_orders', compact('orders'));
+        return view('pages.order.index', compact('orders'));
     }
     public function post(Order $invoice) {
         $invoice->status = 1;
@@ -748,6 +748,7 @@ class OrderController extends Controller
         $orders = Order::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('order_status', 'approved')->whereDate('order_date', date('Y-m-d'))->get();
         return view('pages.order.approved_orders', compact('orders'));
     }
+
 
     //order
     public function order_invoice_list()

@@ -82,9 +82,9 @@
                     <div class="col-sm-12">
                         <div class="card card-default">
                             <div class="card-header">
-                                <h5>GRN No.:: {{ $record->reference }} ({{ $record->status === 0 ? 'Pending' : 'Posted' }})</h5>
+                                <h4 class="card-title">GRN No.:: {{ $record->reference }} ({{ $record->status === 0 ? 'Pending' : 'Posted' }})</h4>
                             </div>
-                            <div class="card-block">
+                            <div class="card-body">
                                 <table class="table table-bordered table-striped">
                                     <tbody>
                                     <tr>
@@ -108,10 +108,12 @@
                     <div class="col-sm-12">
                         <div class="card">
                             <div class="card-header">
-                                Purchased Products
+                                <h4 class="card-title">
+                                    Purchased Products
+                                </h4>
                             </div>
-                            <div class="card-body table-responsive">
-                                <table class="table table-bordered" id="record1" style="font-size: 12px;">
+                            <div class="card-body">
+                                <table class="table table-bordered table-striped"  style="font-size: 12px;">
                                     <thead>
                                         <tr>
                                             <th>S/N</th>
@@ -157,56 +159,61 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12" id="expenses">
+                    <div class="col-md-12">
                         @if ($record->expenses()->count() > 0)
-
-                            <table class="table table-bordered" id="record1">
-                                <thead>
-                                    <tr>
-                                        <th>S/N</th>
-                                        <th>General Account</th>
-                                        <th>Description</th>
-                                        <th>Amount</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @php $total_expense = 0; @endphp
-                                    @foreach ($record->expenses()->get() as $expense)
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">Additional Invoices</h4>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-bordered table-striped" id=""  style="font-size: 12px;">
+                                        <thead>
                                         <tr>
-                                            @php $total_expense +=$expense->amount; @endphp
-                                            <td>{{ $loop->index + 1 }}</td>
-                                            <td>{{ $expense->supplier->name ?? '' }}</td>
-                                            <td>{{ $expense->description }}</td>
-                                            <td style="text-align: right;"> {{ number_format($expense->amount, 2) }}</td>
-                                            <td style="text-align: right;">
-                                                @if ($record->status == 0)
-                                                    <button class="btn btn-danger btn-sm" type="button"
-                                                        onclick="deleteItem({{ $expense->id }})">
-                                                        <i class="fa fa-trash" aria-hidden="true"></i>
-                                                    </button>
-                                                    <form id="delete-form-{{ $expense->id }}"
-                                                        action="{{ route('delete.purchase.expense', $expense->id) }}"
-                                                        method="post" style="display:none;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                    </form>
-                                                @endif
-                                            </td>
+                                            <th>S/N</th>
+                                            <th>General Account</th>
+                                            <th>Description</th>
+                                            <th>Amount</th>
+                                            <th>Action</th>
                                         </tr>
-                                    @endforeach
-                                <tfoot>
-                                    <tr>
-                                        <td></td>
-                                        <td colspan="2">Total</td>
-                                        <td style="text-align: right;">
-                                            {{ number_format($total_expense, 2) }}</td>
-                                        <td></td>
-                                    </tr>
-                                </tfoot>
-                                </tbody>
-                            </table>
-
+                                        </thead>
+                                        <tbody>
+                                        @php $total_expense = 0; @endphp
+                                        @foreach ($record->expenses()->get() as $expense)
+                                            <tr>
+                                                @php $total_expense +=$expense->amount; @endphp
+                                                <td>{{ $loop->index + 1 }}</td>
+                                                <td>{{ $expense->supplier->code ?? '' }} - {{ $expense->supplier->name ?? '' }}</td>
+                                                <td>{{ $expense->description }}</td>
+                                                <td style="text-align: right;"> {{ number_format($expense->amount, 2) }}</td>
+                                                <td style="text-align: right;">
+                                                    @if ($record->status == 0)
+                                                        <button class="btn btn-danger btn-sm" type="button"
+                                                                onclick="deleteItem({{ $expense->id }})">
+                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                        </button>
+                                                        <form id="delete-form-{{ $expense->id }}"
+                                                              action="{{ route('delete.purchase.expense', $expense->id) }}"
+                                                              method="post" style="display:none;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                        </form>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        <tfoot>
+                                        <tr>
+                                            <td></td>
+                                            <td colspan="2">Total</td>
+                                            <td style="text-align: right;">
+                                                {{ number_format($total_expense, 2) }}</td>
+                                            <td></td>
+                                        </tr>
+                                        </tfoot>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         @endif
                     </div>
 
@@ -215,58 +222,7 @@
         </section>
         <!-- /.content -->
     </div>
-    <!-- /.content-wrapper -->
-    <div class="modal fade" id="add-product-modal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Additional Invoices</h5>
-                    <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form class="create-form" action="{{ route('purchases.expense.ajax.create') }}" method="POST">
-                        <input type="hidden" name="purchase_id" id="purchase_id" value="{{ $record->id }}" />
-                        @csrf
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label for="name">Account</label>
-                                    <select name="supplier_id" id="supplier_id" class="form-control select2-single" required>
-                                        <option value="">Select...</option>
-                                        @foreach ($suppliers as $supplier)
-                                            <option value="{{ $supplier->id }}">
-                                                {{ $supplier->code }}{{ $supplier->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label for="description">Description</label>
-                                    <textarea name="description" id="description" class="form-control" required></textarea>
-                                </div>
-                            </div>
 
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label for="amount">Amount</label>
-                                    <input type="number" class="form-control" name="amount" id="amount"
-                                        placeholder="Amount" required>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group text-right ">
-                            <button type="submit" class="btn btn-primary"><span class="fa fa-plus-circle">
-                                </span> Add Invoice</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 
 @push('js')

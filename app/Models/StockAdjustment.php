@@ -24,6 +24,7 @@ class StockAdjustment extends Model
      * Date time columns.
      */
     protected $dates = ['date'];
+    private mixed $operation;
 
     public function store()
     {
@@ -33,9 +34,16 @@ class StockAdjustment extends Model
     {
         return $this->belongsTo(Product::class);
     }
-    public function user()
-    {
-        return $this->belongsTo(User::class , 'adjusted_by', 'id');
+
+    public function branch(){
+        return $this->belongsTo(Branch::class,'branch_id');
+    }
+
+    public function createdBy(){
+        return $this->belongsTo(User::class,'created_by');
+    }
+    public function postedBy(){
+        return $this->belongsTo(User::class,'posted_by');
     }
 
     public function adjustedProducts()

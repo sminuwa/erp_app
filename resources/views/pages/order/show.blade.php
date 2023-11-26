@@ -77,9 +77,8 @@
                                         </button>
                                     </form>
 
-                                    <form class="d-inline" id="delete-form-{{ $order->id }}" action="{{ route('orders.destroy', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to close this invoice?')">
+                                    <form class="d-inline" id="delete-form-{{ $order->id }}" action="{{ route('invoice.delete', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to close this invoice?')">
                                         @csrf
-                                        @method('DELETE')
                                         <button class="btn btn-danger btn-sm " type="submit">
                                             <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                         </button>

@@ -68,15 +68,14 @@ Route::middleware('auth')->group(function () {
             function () {
                 Route::get('/index', [StockAdjustmentController::class, 'index'])->name('stock_adjustments.index');
                 Route::get('/create', [StockAdjustmentController::class, 'create'])->name('stock_adjustments.create');
-                Route::get('/show/{stockadjustment}', [StockAdjustmentController::class, 'show'])->name('stock_adjustments.show');
+                Route::get('/show/{stockAdjustment}', [StockAdjustmentController::class, 'show'])->name('stock_adjustments.show');
                 Route::post('/store', [StockAdjustmentController::class, 'store'])->name('stock_adjustments.store');
-                Route::get('/edit/{stockadjustment}', [StockAdjustmentController::class, 'edit'])->name('stock_adjustments.edit');
+                Route::get('/edit/{stockAdjustment}', [StockAdjustmentController::class, 'edit'])->name('stock_adjustments.edit');
                 Route::put('/update/{stockadjustment}', [StockAdjustmentController::class, 'update'])->name('stock_adjustments.update');
                 Route::delete('/delete/{stockadjustment}', [StockAdjustmentController::class, 'destroy'])->name('stock_adjustments.destroy');
-                Route::post('/cart', [StockAdjustmentController::class, 'addToCart'])->name('stock_adjustments.cart');
-                Route::delete('/remove/{id}', [StockAdjustmentController::class, 'removeCart'])->name('stock_adjustments.cart.remove');
-                Route::post('/clear', [StockAdjustmentController::class, 'clearAllCart'])->name('stock_adjustments.cart.clear');
-                Route::get('/print/{refno}', [StockAdjustmentController::class, 'printStockAdjustment'])->name('stock_adjustments.print');
+                Route::get('/print/{stockAdjustment}', [StockAdjustmentController::class, 'print'])->name('stock_adjustments.print');
+                Route::post('/post/{stockAdjustment}', [StockAdjustmentController::class, 'post'])->name('stock_adjustments.post');
+                Route::post('/delete/{stockAdjustment}', [StockAdjustmentController::class, 'delete'])->name('stock_adjustments.delete');
                 Route::put('/cart/update', [StockAdjustmentController::class, 'updateCart'])->name('stock_adjustments.cart.update');
             }
         );
@@ -305,13 +304,14 @@ Route::middleware('auth')->group(function () {
 
         //Invoices
         Route::group(['prefix' => 'invoice'], function () {
-            Route::get('/approved', [OrderController::class, 'invoice_list'])->name('orders.approved');
+            Route::get('/', [OrderController::class, 'invoice_list'])->name('invoice.index');
             Route::post('/invoice', [InvoiceController::class, 'final_invoice'])->name('invoice.create');
             Route::put('/invoice/update/{order}', [InvoiceController::class, 'updateInvoice'])->name('invoice.update');
             Route::get('/print/{customer_id}', [InvoiceController::class, 'print'])->name('invoice.print');
             Route::post('/invoice-final', [InvoiceController::class, 'final_invoice'])->name('invoice.final_invoice');
             Route::get('/show/{id}', [OrderController::class, 'show'])->name('orders.show');
-            Route::delete('/delete/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+//            Route::delete('/delete/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+            Route::post('/delete/{invoice}', [InvoiceController::class, 'delete'])->name('invoice.delete');
             Route::post('/post/{invoice}', [OrderController::class, 'post'])->name('invoice.post');
             Route::get('pos/edit/{order}', [PosController::class, 'edit'])->name('pos.edit');
         });

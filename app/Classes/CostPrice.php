@@ -328,7 +328,7 @@ class CostPrice
 
     }
 
-    public static function newCostPrice(array $products, $batch_no, $branch_id = 2, $date, $type = TRANSACTION_TYPE_OPENING_BALANCE){
+    public static function newCostPrice(array $products, $batch_no, $branch_id = 2, $date, $type = TRANSACTION_TYPE_OPENING_BALANCE, $operation = 'in'){
         /*
          * branch id of the destination store
          * array of product list as follows
@@ -360,6 +360,20 @@ class CostPrice
         $user = auth()->user();
         $product_ids = [];
         $total_new_cost = $records = [];
+        //check if products are in the store if not add them
+        $products_id = $stores_id = [];
+        DB::beginTransaction();
+        foreach($products as $key=>$value){
+            if (!StoreProduct::where(['product_id'=>$key, 'store_id'=>$value['store_id']])->first()) {
+                StoreProduct::create([
+                    'product_id' => $key,
+                    'store_id' => $value['store_id'],
+                    'qty_available' => 0,
+                ]);
+            }
+        }
+        DB::commit();
+
         foreach($products as $key=>$p){
             $product_ids[] = $key;
             $store_id = $p['store_id'];
@@ -386,8 +400,6 @@ class CostPrice
             $existing_cost[$price['product_id']] = ['cost_price' => $price['cost_price'], 'quantity'=>$price['total_quantity'], 'total_existing_cost'=>$price['total_existing_cost']];
         }
 
-
-
         foreach($products as $key=>$p){
 //          return isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0;
             $records[$key] = [
@@ -404,55 +416,79 @@ class CostPrice
             ];
         }
 
-
         $store_products = $product_costs = $batch = $stock_card_param =  [];
-        foreach($records as $key=>$record){
-            $stock_card_param[] = [
-                'store_id'=>$record['store_id'],
-                'product_id' => $key,
-                'quantity' => $record['new_quantity'],
-                'is_credit' => true,
-            ];
-            $product_costs[] = [
-                'branch_id' => $branch_id,
-                'product_id' => $key,
-                'cost_price' => ($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'],
-                'updated_by' => $user->id
-            ];
-            $store_products[] = [
-                'store_id'=>$record['store_id'],
-                'product_id'=>$key,
-                'qty_available'=>$record['qty_available'] + $record['new_quantity']
-            ];
-            $batch[] = [
-                'batch_no' => $batch_no,
-                'store_id' => $record['store_id'],
-                'product_id' => $key,
-                'existing_quantity' => $record['qty_available'],
-                'new_quantity' => $record['new_quantity'],
-                'total_quantity' => $record['qty_available'] + $record['new_quantity'],
-                'existing_cost_price' => $record['existing_cost'],
-                'new_cost_price' => ($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'],
-                'created_by' => $user->id,
-                'expiry_date' => $record['expiry_date'],
-            ];
+        if($operation == 'in') {
+            foreach ($records as $key => $record) {
+                $stock_card_param[] = [
+                    'store_id' => $record['store_id'],
+                    'product_id' => $key,
+                    'quantity' => $record['new_quantity'],
+                    'operation' => $operation,
+                ];
+                $product_costs[] = [
+                    'branch_id' => $branch_id,
+                    'product_id' => $key,
+                    'cost_price' => ($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'],
+                    'updated_by' => $user->id
+                ];
+                $store_products[] = [
+                    'store_id' => $record['store_id'],
+                    'product_id' => $key,
+                    'qty_available' => $record['qty_available'] + $record['new_quantity']
+                ];
+                $batch[] = [
+                    'batch_no' => $batch_no,
+                    'store_id' => $record['store_id'],
+                    'product_id' => $key,
+                    'existing_quantity' => $record['qty_available'],
+                    'new_quantity' => $record['new_quantity'],
+                    'total_quantity' => $record['qty_available'] + $record['new_quantity'],
+                    'existing_cost_price' => $record['existing_cost'],
+                    'new_cost_price' => ($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'],
+                    'created_by' => $user->id,
+                    'expiry_date' => $record['expiry_date'],
+                ];
+            }
+            DB::beginTransaction();
+            if(
+                StockCard::createBatchRecord($stock_card_param,$batch_no, $date, $type)
+                && StoreProduct::upsert($store_products, ['store_id','product_id'])
+                && BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id'])
+                && StoreProductBatch::upsert($batch, ['batch_no'])
+            ){
+                DB::commit();
+                return ['status'=>true, 'message'=>'success'];
+            }else{
+                DB::rollBack();
+                return ['status'=>false, 'message'=>'Something went wrong.'];
+            }
         }
-
-        DB::beginTransaction();
-        StockCard::createBatchRecord($stock_card_param,$batch_no, $date, $type);
-        if(
-            StoreProduct::upsert($store_products, ['store_id','product_id'])
-            && BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id'])
-            && StoreProductBatch::upsert($batch, ['batch_no'])
-        ){
-            DB::commit();
-            return ['status'=>true, 'message'=>'success'];
-        }else{
-            return ['status'=>false, 'message'=>'Something went wrong.'];
+        if($operation == 'out') {
+            foreach ($records as $key => $record) {
+                $stock_card_param[] = [
+                    'store_id' => $record['store_id'],
+                    'product_id' => $key,
+                    'quantity' => $record['new_quantity'],
+                    'operation' => $operation,
+                ];
+                $store_products[] = [
+                    'store_id' => $record['store_id'],
+                    'product_id' => $key,
+                    'qty_available' => $record['qty_available'] - $record['new_quantity']
+                ];
+            }
+            DB::beginTransaction();
+            if( StockCard::createBatchRecord($stock_card_param,$batch_no, $date, $type)
+                && StoreProduct::upsert($store_products, ['store_id','product_id'])
+            ){
+                DB::commit();
+                return ['status'=>true, 'message'=>'success'];
+            }else{
+                DB::rollBack();
+                return ['status'=>false, 'message'=>'Something went wrong.'];
+            }
         }
-
+        return ['status'=>false, 'message'=>'Something went wrong.'];
     }
-
-
 
 }

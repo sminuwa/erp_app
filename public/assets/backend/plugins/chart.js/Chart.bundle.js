@@ -14096,7 +14096,7 @@
 
                     // Find first (starting) corner with fallback to 'bottom'
                     var borders = ['bottom', 'left', 'top', 'right'];
-                    var startCorner = borders.indexOf(borderSkipped, 0);
+                    var startCorner = binvoice.indexOf(borderSkipped, 0);
                     if (startCorner === -1) {
                         startCorner = 0;
                     }

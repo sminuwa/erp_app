@@ -26,7 +26,7 @@
         </section>
         <div class="row">
             <div class="col-sm-2">
-                <a href="{{ route('orders.approved') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
+                <a href="{{ route('invoice.index') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
                         class="fa fa-list"> </span> Sales </a>
             </div>
         </div>
@@ -266,7 +266,7 @@
                                                         @method('PUT')
                                                         <td>
                                                             @can('edit.daily.sale')
-                                                               
+
                                                                 <input type="text" name="sold_price"
                                                                     id="price{{ $product->id }}" class="form-control price"
                                                                     style="min-width:65px;"
@@ -933,10 +933,10 @@
                     //dataType: 'json',
                     data: $('#' + id).serialize(),
                     success: function(data) {
-                        
+
                         id = id.substr(1);
                         percentage_price = parseFloat($('#cp' + id).val()) + (($('#cp' + id).val()/100)*percentage);
-                       
+
                         subtotal = Math.ceil(percentage_price * $('#quantity' + id).val());
 
                         $('#price' + id).val(Math.ceil(percentage_price));

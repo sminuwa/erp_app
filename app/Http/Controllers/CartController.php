@@ -204,6 +204,7 @@ class CartController extends Controller
         }
         if($type == 'adjustment') {
             $product = Product::find($request->product_id);
+            // get the unit cost
             $add = \Cart::add([
                 'id' => generateRandomString(),
                 'name' => $product->name,

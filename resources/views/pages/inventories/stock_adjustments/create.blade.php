@@ -78,8 +78,8 @@
                                                            class="form-control {{ $errors->has('operation') ? ' is-invalid' : '' }}"
                                                            name="operation" id="operation" required>
                                                         <option value="" diabled="disabled">select...</option>
-                                                        <option value="in">In</option>
-                                                        <option value="out">Out</option>
+                                                        <option value="in" {{ isset($model->id) ? ($model->operation == 'in' ?'selected':'' ) : '' }}>In</option>
+                                                        <option value="out" {{ isset($model->id) ? ($model->operation == 'out' ?'selected':'' ) : '' }}>Out</option>
 
                                                     </select>
                                                 </div>
@@ -97,7 +97,7 @@
                                                     <input type="text"
                                                            class="form-control {{ $errors->has('description') ? ' is-invalid' : '' }}"
                                                            name="description" id="description"
-                                                           value="{{ old('description', $model->description) != null ? old('description', $model->date) : '' }}"
+                                                           value="{{ old('description', $model->description) != null ? old('description', $model->description) : '' }}"
                                                            placeholder="Descriptionn" required="required">
                                                 </div>
                                                 @if ($errors->has('description'))
@@ -164,21 +164,10 @@
                             <select class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
                                     name="product_id" id="product_id" required="required">
                                 <option value="">Select...</option>
-
-                                @if (old('category_id', optional(optional($model->product)->category)->id))
-                                    @foreach (\App\Models\Product::where('category_id', old('category_id'))->get() as $data)
-                                        <option value="{{ $data->id }}">
-                                            {{ $data->code }}-{{ $data->name }}</option>
-                                    @endforeach
-                                @else
-                                    @if (isset($products))
-                                        @foreach ($products as $data)
-                                            <option value="{{ $data->id }}">
-                                                {{ $data->code }}-{{ $data->name }}</option>
-                                        @endforeach
-                                    @endif
-                                @endif
-
+                                @foreach ($products as $data)
+                                    <option value="{{ $data->id }}">
+                                        {{ $data->code }} - {{ $data->name }}</option>
+                                @endforeach
                             </select>
                             <div class="input-group-prepend">
                                 <p class="text text-danger" id="available"></p>
@@ -206,8 +195,7 @@
                             <input type="text" autocomplete="off"
                                    class="form-control datepicker {{ $errors->has('expiry_date') ? ' is-invalid' : '' }}"
                                    name="expiry_date" id="expiry_date"
-                                   value="{{ old('expiry_date', $model->date) != null ? old('expiry_date', $model->date) : '' }}"
-                                   placeholder="Expiry Date (Optional)" required="required">
+                                   placeholder="Expiry Date (Optional)">
                             @if ($errors->has('expiry_date'))
                                 <div class="invalid-feedback">
                                     <strong>{{ $errors->first('expiry_date') }}</strong>

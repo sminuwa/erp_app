@@ -1,6 +1,6 @@
 @extends('layouts.backend.app')
 
-@section('title', 'Roles')
+@section('title', 'Stock Adjustment')
 
 @push('css')
 @endpush
@@ -51,18 +51,52 @@
                                     </thead>
                                     <tbody>
                                     @foreach ($records as $record)
-                                        <tr>
+                                        <tr class="@if($record->status == 0) bg-warning @endif">
                                             <td> {{ \Carbon\Carbon::parse($record->date)->toFormattedDateString() }} </td>
                                             <td> {{ $record->reference }} </td>
-                                            <td> {{ $record->operation }} </td>
+                                            <td class="text-center">
+                                                {!! $record->operation ? '<span class="badge badge-success">In</span>' : '<span class="badge badge-danger">Out</span>' !!}
+                                            </td>
                                             <td> {{ $record->description ?? null }} </td>
                                             <td> {{ $record->createdBy->name ?? null }} </td>
-                                            <td style="text-align: right">
-                                                @can('make.stock.adjustment')
-                                                    <a class="btn btn-secondary btn-sm" href="{{ route('stock_adjustments.show', $record->id) }}">
-                                                        <span class="fa fa-eye"></span>
-                                                    </a>
-                                                @endcan
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton"
+                                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        Action
+                                                    </button>
+                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                        <a class="dropdown-item" href="{{ route('stock_adjustments.show', $record->id) }}">
+                                                            <span class="fa fa-eye"></span> View
+                                                        </a>
+                                                        <a class="dropdown-item" href="{{ route('stock_adjustments.print', $record->id) }}"
+                                                           title="Print GRN" target="_BLANK">
+                                                            <span class="fa fa-print"></span> Print
+                                                        </a>
+                                                        @if ($record->status == 0)
+                                                            <form action="{{ route('stock_adjustments.post', $record->id) }}" method="post"
+                                                                  onsubmit="return confirm('Are you sure you want to post this order?')">
+                                                                @csrf
+                                                                <button type="submit" class="dropdown-item">
+                                                                    <i class="fa fa-check" aria-hidden="true"></i> Post
+                                                                </button>
+                                                            </form>
+                                                            <a class="dropdown-item" href="{{ route('stock_adjustments.edit', $record->id) }}">
+                                                                <span class="fa fa-pencil"></span> Edit
+                                                            </a>
+                                                            <form onsubmit="return confirm('Are you sure you want to cancel?')"
+                                                                  action="{{ route('stock_adjustments.delete', $record->id) }}"
+                                                                  method="post"
+                                                                  style="display: inline">
+                                                                {{ csrf_field() }}
+                                                                <button type="submit" class="dropdown-item">
+                                                                    <i class="text-danger fa fa-remove"></i> Delete
+                                                                </button>
+                                                            </form>
+
+                                                        @endif
+                                                    </div>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach

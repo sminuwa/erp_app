@@ -1209,4 +1209,23 @@ class InvoiceController extends Controller
         session()->flash('Proforma invoice updated successfully');
         return redirect()->route('proformer.show', $order_id);
     }
+    public function delete(Request $request, Order $invoice){
+        $method = $request->method();
+        $invoice_id = $invoice->id;
+        if($method == 'POST'){
+            if($invoice->status == 0){
+                DB::beginTransaction();
+                if($invoice->delete()){
+                    OrderDetail::where('order_id',$invoice_id)->delete();
+                    session()->flash('app_message', 'Invoice deleted successfully!');
+                    DB::commit();
+                }
+            }else
+                session()->flash('app_error', 'Invoice cannot be deleted!');
+        }else{
+            session()->flash('app_error', 'Invalid request methods.');
+            DB::rollBack();
+        }
+        return redirect()->route('invoice.index');
+    }
 }

@@ -26,7 +26,7 @@
         </section>
         <div class="row">
             <div class="col-sm-2">
-                <a href="{{ route('orders.approved') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
+                <a href="{{ route('invoice.index') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
                         class="fa fa-list"> </span> Sales </a>
             </div>
         </div>

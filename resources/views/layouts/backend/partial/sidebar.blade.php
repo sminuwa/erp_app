@@ -43,134 +43,6 @@
                         </p>
                     </a>
                 </li>
-<!--                <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
-                        <i class="ion-android-list"></i>
-                        <p>
-                            Transactions
-                            <i class="right fa fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        @can('verify.invoice')
-                            <li class="nav-item">
-                                <a href="{{ route('orders.approved') }}"
-                                    class="nav-link {{ Request::is('orders/approved') ? 'active' : '' }}">
-                                    <i class="nav-icon ion-cash"></i>
-                                    <p>Verify/Invoice</p>
-                                </a>
-                            </li>
-                        @endcan
-                        @can('view.expenditure')
-                            <li class="nav-item">
-                                <a href="{{ route('expenses.index') }}"
-                                    class="nav-link {{ Request::is('expenses/expenditures*') ? 'active' : '' }}">
-                                    <i class="ion-card"></i>
-                                    <p>Expenditure</p>
-                                </a>
-                            </li>
-                        @endcan
-                        @can('view.deposit.withdraw')
-                            <li class="nav-item">
-                                <a href="{{ route('cash_movements.create') }}"
-                                    class="nav-link {{ Request::is('cash/movement/*') ? 'active' : '' }}">
-                                    <i class="ion-social-euro-outline"></i>
-                                    <p>Bank Deposit & Withdrawal</p>
-                                </a>
-                            </li>
-                        @endcan
-                        @can('make.bank.deposit')
-                            <li class="nav-item">
-                                <a href="{{ route('deposits.create') }}"
-                                    class="nav-link {{ Request::is('cash/movement/*') ? 'active' : '' }}">
-                                    <i class="ion-jet"></i>
-                                    <p>Bank Deposit</p>
-                                </a>
-                            </li>
-                        @endcan
-                        @can('make.bank.withdraw')
-                            <li class="nav-item">
-                                <a href="{{ route('withdraw.create') }}"
-                                    class="nav-link {{ Request::is('cash/movement/*') ? 'active' : '' }}">
-                                    <i class="ion-model-s"></i>
-                                    <p>Bank Withdraw</p>
-                                </a>
-                            </li>
-                        @endcan
-                        @can('view.daily.sale')
-                            <li class="nav-item">
-                                <a href="{{ route('orders.approved') }}"
-                                    class="nav-link {{ Request::is('orders/approved') ? 'active' : '' }}">
-                                    <i class="nav-icon ion-cash"></i>
-                                    <p>Daily Sales</p>
-                                </a>
-                            </li>
-                        @endcan
-                        @can('view.stock.transfer')
-                            <li class="nav-item">
-                                <a href="{{ route('interstore.index') }}"
-                                    class="nav-link {{ Request::is('products/transfer/*') ? 'active' : '' }}">
-                                    <i class="ion-ios-fastforward"></i>
-                                    <p>Stock Transfer</p>
-                                </a>
-                            </li>
-                        @endcan
-                        @can('view.item.purchase')
-                            <li class="nav-item">
-                                <a href="{{ route('purchases.index') }}"
-                                    class="nav-link {{ Request::is('products/purchases/*') ? 'active' : '' }}">
-                                    <i class="ion-ios-pricetag"></i>
-                                    <p>Purchases</p>
-                                </a>
-                            </li>
-                        @endcan
-                        @can('view.creditor.payment')
-                            <li class="nav-item">
-                                <a href="{{ route('suppliers.payments') }}"
-                                    class="nav-link {{ Request::is('suppliers/pay/*') ? 'active' : '' }}">
-                                    <i class="ion-social-angular-outline"></i>
-                                    <p>Supplier Payments</p>
-                                </a>
-                            </li>
-                        @endcan
-                        @can('view.loan.granted')
-                            <li class="nav-item">
-                                <a href="{{ route('loans.index') }}"
-                                    class="nav-link {{ Request::is('loan/grant/*') ? 'active' : '' }}">
-                                    <i class="ion-social-sass"></i>
-                                    <p>Grant Loan</p>
-                                </a>
-                            </li>
-                        @endcan
-                        @can('view.loan.payment')
-                            <li class="nav-item">
-                                <a href="{{ route('loan_payments.index') }}"
-                                    class="nav-link {{ Request::is('loan/payment/*') ? 'active' : '' }}">
-                                    <i class="ion-volume-mute"></i>
-                                    <p>Loan Payment</p>
-                                </a>
-                            </li>
-                        @endcan
-                        @can('view.credit.note')
-                            <li class="nav-item">
-                                <a href="{{ route('suppliers.credit.note') }}"
-                                    class="nav-link {{ Request::is('suppliers/pay/credit-note/*') ? 'active' : '' }}">
-                                    <i class="ion-volume-mute"></i>
-                                    <p>Credit Note</p>
-                                </a>
-                            </li>
-                        @endcan
-                        @can('view.stock.adjustment')
-                            <li class="nav-item">
-                                <a href="{{ route('stock_adjustments.index') }}"
-                                    class="nav-link {{ Request::is('transaction/stock_adjustment/*') ? 'active' : '' }}">
-                                    <i class="ion-ios-plus-outline"></i>
-                                    <p>Stock Adjustment</p>
-                                </a>
-                            </li>
-                        @endcan
-                    </ul>
-                </li>-->
                 <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
                         <i class="ion-android-list"></i>
@@ -227,7 +99,7 @@
                         </li>
                         @can('make.daily.sale')
                         <li class="nav-item">
-                            <a href="{{ route('orders.approved') }}"
+                            <a href="{{ route('invoice.index') }}"
                                class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Invoice (POS)</p>

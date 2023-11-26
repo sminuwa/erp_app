@@ -113,7 +113,6 @@ class CostPrice
         }
     }
 
-
     public static function additionalInvoiceCostPrice($purchase_id, $invoice_id, $type = TRANSACTION_TYPE_GRN, $formula="A"){
 
         /*
@@ -325,6 +324,189 @@ class CostPrice
             }
         }
         return ['status'=>false, 'message'=>'Something went wrong.'];
+
+    }
+
+    public static function interstore(array $products, $batch_no, $branch_id = 2, $date, $type = TRANSACTION_TYPE_INTERSTORE, $operation = 'in'){
+        /*
+         * branch id of the destination store
+         * array of product list as follows
+         * [
+         *  2 =>[
+         *        quantity => 20,
+         *        price => 300,
+         *        source_store_id => 2,
+         *        destination_store_id => 2,
+         *        expiry = null
+         *      ]
+         *  5 =>[
+         *        quantity => 65,
+         *        price => 1300,
+         *        source_store_id => 2,
+         *        destination_store_id => 2,
+         *        expiry = 2023-12-31
+         *      ]
+         * ]
+         *
+         * */
+        // get the existing qty
+        // get the existing cost
+        // total existing cost = existing qty * existing cost
+        // get new quantity
+        // get new cost
+        // total new cost = new qty * new cost
+        // qty = existing qty + new qty
+        // cost = (total existing cost + total new cost) / qty
+
+        $user = auth()->user();
+        $product_ids = [];
+        $total_new_cost = $records = [];
+        //check if products are in the store if not add them
+        $products_id = $stores_id = [];
+        DB::beginTransaction();
+        foreach($products as $key=>$value){
+            if (!StoreProduct::where(['product_id'=>$key, 'store_id'=>$value['destination_store_id']])->first()) {
+                StoreProduct::create([
+                    'product_id' => $key,
+                    'store_id' => $value['destination_store_id'],
+                    'qty_available' => 0,
+                ]);
+            }
+        }
+        DB::commit();
+        $s = 'source';
+        $d = 'destination';
+        foreach($products as $key=>$p){
+            $product_ids[] = $key;
+            $source_store_id = $p['source_store_id'];
+            $destination_store_id = $p['destination_store_id'];
+            $total_new_cost[$key] = intval($p['quantity']) * intval($p['price']);
+            $source_details = StoreProduct::selectRaw("
+                store_products.product_id,
+                qty_available,
+                (SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) as cost_price,
+                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key) as quantity,
+                ((SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) *
+                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key)) as total_existing_cost
+                ")
+                ->where(['store_products.product_id'=>$key, 'store_products.store_id'=>$source_store_id])->first();
+            $destination_details = StoreProduct::selectRaw("
+                store_products.product_id,
+                qty_available,
+                (SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) as cost_price,
+                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key) as quantity,
+                ((SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) *
+                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key)) as total_existing_cost
+                ")
+                ->where(['store_products.product_id'=>$key, 'store_products.store_id'=>$destination_store_id])->first();
+            $prices[$s][$source_details->product_id] = [
+                'product_id' =>$source_details->product_id,
+                'cost_price' =>$source_details->cost_price,
+                'qty_available' =>$source_details->qty_available,
+                'total_quantity' =>$source_details->quantity,
+                'total_existing_cost' =>$source_details->total_existing_cost,
+            ];
+            $prices[$d][$destination_details->product_id] = [
+                'product_id' =>$destination_details->product_id,
+                'cost_price' =>$destination_details->cost_price,
+                'qty_available' =>$destination_details->qty_available,
+                'total_quantity' =>$destination_details->quantity,
+                'total_existing_cost' =>$destination_details->total_existing_cost,
+            ];
+        }
+
+
+        foreach($prices as $key=>$price){
+            foreach($price as $p){
+                $existing_cost[$key][$p['product_id']] = ['cost_price' => $p['cost_price'], 'quantity'=>$p['total_quantity'], 'total_existing_cost'=>$p['total_existing_cost']];
+            }
+        }
+
+        foreach($products as $key=>$p){
+//          return isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0;
+            $records[$s][$key] = [
+                'qty_available' => $prices[$s][$key]['qty_available'] ?? 0,
+                'existing_quantity' => isset($existing_cost[$s][$key]['quantity']) ? $existing_cost[$s][$key]['quantity'] : 0,
+                'new_quantity' => $products[$key]['quantity'],
+                'existing_cost' => isset($existing_cost[$s][$key]['cost_price']) ? $existing_cost[$s][$key]['cost_price'] : 0,
+                'new_cost' => $products[$key]['price'],
+                'total_existing_cost' => isset($existing_cost[$s][$key]['total_existing_cost']) ? $existing_cost[$s][$key]['total_existing_cost'] : 0,
+                'total_new_cost' => ($products[$key]['quantity'] * $products[$key]['price']),
+                'quantity' => (($p['quantity']) + (isset($existing_cost[$s][$key]['quantity']) ? $existing_cost[$s][$key]['quantity'] : 0)),
+                'expiry_date' => $products[$key]['expiry_date'],
+                'store_id' => $products[$key]['source_store_id'],
+            ];
+            $records[$d][$key] = [
+                'qty_available' => $prices[$d][$key]['qty_available'] ?? 0,
+                'existing_quantity' => isset($existing_cost[$d][$key]['quantity']) ? $existing_cost[$d][$key]['quantity'] : 0,
+                'new_quantity' => $products[$key]['quantity'],
+                'existing_cost' => isset($existing_cost[$d][$key]['cost_price']) ? $existing_cost[$d][$key]['cost_price'] : 0,
+                'new_cost' => $products[$key]['price'],
+                'total_existing_cost' => isset($existing_cost[$d][$key]['total_existing_cost']) ? $existing_cost[$d][$key]['total_existing_cost'] : 0,
+                'total_new_cost' => ($products[$key]['quantity'] * $products[$key]['price']),
+                'quantity' => (($p['quantity']) + (isset($existing_cost[$d][$key]['quantity']) ? $existing_cost[$d][$key]['quantity'] : 0)),
+                'expiry_date' => $products[$key]['expiry_date'],
+                'store_id' => $products[$key]['destination_store_id'],
+            ];
+        }
+
+        $source_store_products = $destination_store_products = $source_stock_card_param = $destination_stock_card_param = [];
+        foreach ($records as $key => $record) {
+            foreach($record as $k=> $r) {
+                if($key == $s){
+                    $source_stock_card_param[] = [
+                        'store_id' => $r['store_id'],
+                        'product_id' => $k,
+                        'quantity' => $r['new_quantity'],
+                        'operation' => 'out',
+                    ];
+                    $source_store_products[] = [
+                        'store_id' => $r['store_id'],
+                        'product_id' => $k,
+                        'qty_available' => $r['qty_available'] - $r['new_quantity']
+                    ];
+                }
+                if($key == $d) {
+                    $destination_stock_card_param[] = [
+                        'store_id' => $r['store_id'],
+                        'product_id' => $k,
+                        'quantity' => $r['new_quantity'],
+                        'operation' => 'in',
+                    ];
+                    $destination_store_products[] = [
+                        'store_id' => $r['store_id'],
+                        'product_id' => $k,
+                        'qty_available' => $r['qty_available'] + $r['new_quantity']
+                    ];
+                    $batch[] = [
+                        'batch_no' => $batch_no,
+                        'store_id' => $r['store_id'],
+                        'product_id' => $k,
+                        'existing_quantity' => $r['qty_available'],
+                        'new_quantity' => $r['new_quantity'],
+                        'total_quantity' => $r['qty_available'] + $r['new_quantity'],
+                        'existing_cost_price' => $r['existing_cost'],
+                        'new_cost_price' => $r['existing_cost'],
+                        'created_by' => $user->id,
+                        'expiry_date' => $r['expiry_date'],
+                    ];
+                }
+
+            }
+        }
+        $stock_card_param = array_merge($source_stock_card_param, $destination_stock_card_param);
+        $store_products = array_merge($source_store_products, $destination_store_products);
+        DB::beginTransaction();
+        if(StockCard::createBatchRecord($stock_card_param,$batch_no, $date, $type)
+            && StoreProduct::upsert($store_products, ['store_id','product_id'])
+            && StoreProductBatch::upsert($batch, ['batch_no'])
+        ){
+            DB::commit();
+            return ['status'=>true, 'message'=>'success'];
+        }else{
+            DB::rollBack();
+            return ['status'=>false, 'message'=>'Something went wrong.'];
+        }
 
     }
 

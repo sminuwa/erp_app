@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\CostPrice;
+use App\Models\InterstoreTransfer;
+use App\Models\InterstoreTransferDetail;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\TransferProduct;
@@ -30,12 +33,7 @@ use App\Models\User;
 
 class InterStoreTransferController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @param  Index  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function index(Index $request)
     {
 //        \Cart::session('_token')->clear();
@@ -47,6 +45,7 @@ class InterStoreTransferController extends Controller
             ->groupBy(['refno', 'source_store_id', 'product_id'])->orderBy('transfer_products.id', 'DESC')->take(10)->get();
         return view('pages.inventories.transfers.inter_store.index', ['records' => $records]);
     }
+
     public function search(Index $request)
     {
         $refno = $request->refno;
@@ -89,118 +88,55 @@ class InterStoreTransferController extends Controller
 
     public function store(StoreRequest $request)
     {
-        $model = new TransferProduct;
-        DB::beginTransaction();
+        $user = auth()->user();
+        $branch = $user->branch;
         try {
-            if (\Cart::getContent()->count() > 0) {
-                $transfer_id = $this->getNextTransferID();
-                $reference = TransferProduct::generateNewNumber();
-                $source_qty_available = 0;
-                $destination_qty_available = 0; // get qty before transfer
-
-                foreach (\Cart::getContent() as $product) {
-                    $attribute = $product->attributes;
-                    $source_store_id = $attribute['source_store_id'];
-                    $destination_store_id = $attribute['destination_store_id'];
-                    $product_id = $attribute['product_id'];
-                    //Get qty before transfer
-                    $source_qty_available = StoreProduct::where(['store_id' => $source_store_id, 'product_id' => $product_id])->first()->qty_available;
-                    $record = StoreProduct::where(['store_id' => $destination_store_id, 'product_id' => $product_id])->first();
-                    $destination_qty_available = optional($record)->qty_available;
-                    if ($record != null) {
-                        DB::table('store_products')->where([
-                            'store_id' => $source_store_id,
-                            'product_id' => $product_id
-                        ])->decrement('qty_available', $product->quantity);
-                        DB::table('store_products')->where([
-                            'store_id' => $destination_store_id,
-                            'product_id' => $product_id
-                        ])->increment('qty_available', $product->quantity);
-                    } else {
-
-                        DB::table('store_products')->where([
-                            'store_id' => $source_store_id,
-                            'product_id' => $product_id
-                        ])->decrement('qty_available', $product->quantity);
-                        DB::table('store_products')->insert([
-                            'store_id' => $destination_store_id,
-                            'product_id' => $product_id,
-                            'qty_available' => $product->quantity,
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now()
-                        ]);
+            $interstore = new InterstoreTransfer();
+            $interstore->date = $request->date;
+            $interstore->branch_id = $branch->id;
+            $interstore->reference = InterstoreTransfer::generateNewNumber();
+            $interstore->created_by = $user->id;
+            DB::beginTransaction();
+            if($interstore->save()) {
+                $items = \Cart::getContent();
+                if (count($items) > 0) {
+                    $transfer_id = $this->getNextTransferID();
+                    $new_cost_price = [];
+                    foreach ($items as $item) {
+                        $new_cost_price[$item->attributes['product_id']] = [
+                            'quantity' => $item->quantity,
+                            'price' => $item->price,
+                            'source_store_id' => $item->attributes['source_store_id'],
+                            'destination_store_id' => $item->attributes['destination_store_id'],
+                            'expiry_date' => $item->attributes['expiry_date'] ?? '',
+                        ];
+                        $detail = new InterstoreTransferDetail();
+                        $detail->interstore_transfer_id = $interstore->id;
+                        $detail->product_id = $item->attributes['product_id'];
+                        $detail->source_store_id = $item->attributes['source_store_id'];
+                        $detail->destination_store_id = $item->attributes['destination_store_id'];
+                        $detail->quantity = $item->quantity;
+                        $detail->expiry_date = $item->attributes['expiry_date'] ?? '';
+                        $detail->save();
                     }
-
-                    DB::table('transfer_products')->insert([
-                        'reference' => $reference,
-                        'transfer_id' => $transfer_id,
-                        'source_store_id' => $source_store_id,
-                        'product_id' => $product_id,
-                        'destination_store_id' => $destination_store_id,
-                        'qty_transfered' => $product->quantity,
-                        'qty_available' => $source_qty_available,
-                        'transfered_by' => Auth::id(),
-                        'status' => 'Completed',
-                        'nature' => 'Transfer',
-                        'stock_in_out' => 'out',
-                        'refno' => $reference,
-                        'type' => 'interstore',
-                        'transfer_date' => $request->transfer_date,
-                        'vehicle_no' => $request->vehicle_no,
-                    ]);
-
-                    DB::table('transfer_products')->insert([
-                        'reference' => $reference,
-                        'transfer_id' => $transfer_id,
-                        'source_store_id' => $destination_store_id,
-                        'product_id' => $product_id,
-                        'destination_store_id' => $destination_store_id,
-                        'qty_transfered' => $product->quantity,
-                        'qty_available' => $destination_qty_available,
-                        'transfered_by' => Auth::id(),
-                        'status' => 'Completed',
-                        'nature' => 'Transfer',
-                        'stock_in_out' => 'in',
-                        'refno' => $reference,
-                        'type' => 'interstore',
-                        'transfer_date' => $request->transfer_date,
-                        'vehicle_no' => $request->vehicle_no,
-
-                    ]);
-                    DB::table('stock_cards')->insert([
-                        'store_id' => $source_store_id,
-                        'product_id' => $product_id,
-                        'cr' => 0,
-                        'dr' => $product->quantity,
-                        'refno' => $reference,
-                        'type' => 0,
-                        'date' => $request->transfer_date,
-                        'user_id' => Auth::id(),
-                        'priority' => 4,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now()
-                    ]);
-                    DB::table('stock_cards')->insert([
-                        'store_id' => $destination_store_id,
-                        'product_id' => $product_id,
-                        'cr' => $product->quantity,
-                        'dr' => 0,
-                        'refno' => $reference,
-                        'type' => 0,
-                        'date' => $request->transfer_date,
-                        'user_id' => Auth::id(),
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now()
-                    ]);
-                    $action = "Transfered product from " . Store::find($source_store_id)->name . " to " . Store::find($destination_store_id)->name;
-                    AuditLog::auditLog(Auth::id(), $action);
-                    session()->flash('app_message', 'Stock transfered successfully');
-                    DB::commit();
+                    if (
+                        CostPrice::interstore(
+                            $new_cost_price,
+                            $interstore->reference,
+                            $interstore->branch_id,
+                            $interstore->date)['status']
+                    ) {
+                        $action = "Created interstore transfer with reference : " . $interstore->reference;
+                        AuditLog::auditLog(Auth::id(), $action);
+                        session()->flash('app_message', 'Transfer created successfully');
+                        DB::commit();
+                    }
                 }
             }
+
         } catch (\Exception $ex) {
             DB::rollBack();
-            session()->flash('app_message', 'Something is wrong while transfering stock');
+            session()->flash('app_error', 'Something is wrong while creating interstore transfer');
             throw $ex;
         }
         \Cart::clear();

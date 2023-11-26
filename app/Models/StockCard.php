@@ -88,6 +88,7 @@ class StockCard extends Model
                 'priority' => $type,
             ];
         }
+
         if(StockCard::upsert($cards, ['store_id', 'product_id'])){
             return true;
         }else{

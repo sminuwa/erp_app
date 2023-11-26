@@ -48,9 +48,9 @@
                             <div class="card-body">
                                 <form action="{{ isset($route) ? $route : route('interstore.store') }}" method="POST">
                                 <div class="form-group">
-                                    <label for="transfer_date">Date</label>
-                                    <input type="text" name="transfer_date" class="form-control datepicker"
-                                           value="{{ isset($model->transfer_date) ? $model->transfer_date : old('transfer_date', date('Y-m-d')) }}" />
+                                    <label for="date">Date</label>
+                                    <input type="text" name="date" class="form-control datepicker"
+                                           value="{{ isset($model->date) ? $model->date : old('date', date('Y-m-d')) }}" />
                                 </div>
                                     {{ csrf_field() }}
                                     <input type="hidden" name="_method"

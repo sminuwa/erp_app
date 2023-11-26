@@ -91,6 +91,14 @@ $(document).on('submit','.addCartItemForm', function(e){
             return;
         }
     }
+
+    if(type === 'adjustment') {
+        if ($('select[name=operation]').val() == '') {
+            alert("Please select operation")
+            return;
+        }
+    }
+
     $.ajax({
         url: $(this).attr('action'),
         type: 'GET',

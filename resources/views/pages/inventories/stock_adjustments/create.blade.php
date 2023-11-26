@@ -11,7 +11,7 @@
         <!-- Content Header (Page header) -->
         <!-- Content Header (Page header) -->
         <section class="content-header">
-            <div class="container-fluid">
+            <div class="container">
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <h4>Stock Adjustment</h4>
@@ -31,7 +31,7 @@
         <section class="content">
             <div class="container">
                 <a class="btn btn-secondary btn-sm" href="{{ route('stock_adjustments.index') }}">
-                    <span class="fa fa-list"></span>
+                    <span class="fa fa-list"></span> List
                 </a>
                 <div class="row">
 
@@ -47,13 +47,12 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form action="{{ isset($route) ? $route : route('stock_adjustments.store') }}"
-                                      method="POST">
+                                <form action="{{ isset($route) ? $route : route('stock_adjustments.store') }}" method="POST">
                                     {{ csrf_field() }}
                                     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
-                                    <input type="hidden" name="adjusted_by" id="adjusted_by" value="{{ Auth::id() }}" required="required">
+                                    <input type="hidden" name="stock_adjustment_id" value="{{ isset($model->id) ? $model->id : '' }}" />
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-3">
                                             <div class="form-group">
                                                 <label for="date">Date</label>
                                                 <div class="input-group">
@@ -70,24 +69,40 @@
                                                 @endif
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-3">
                                             <div class="form-group">
                                                 <label for="date">Operation</label>
                                                 <div class="input-group">
                                                     <select type="text"
+                                                            onchange="$('.operation').val($(this).val())"
                                                            class="form-control {{ $errors->has('operation') ? ' is-invalid' : '' }}"
-                                                           name="operation" id="operation"
-                                                           value="{{ old('operation', $model->date) != null ? old('operation', $model->date) : date('Y-m-d') }}"
-                                                            required>
-                                                        <option value="">select...</option>
+                                                           name="operation" id="operation" required>
+                                                        <option value="" diabled="disabled">select...</option>
                                                         <option value="in">In</option>
                                                         <option value="out">Out</option>
 
                                                     </select>
                                                 </div>
-                                                @if ($errors->has('date'))
+                                                @if ($errors->has('operation'))
                                                     <div class="invalid-feedback">
-                                                        <strong>{{ $errors->first('date') }}</strong>
+                                                        <strong>{{ $errors->first('operation') }}</strong>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="date">Description</label>
+                                                <div class="input-group">
+                                                    <input type="text"
+                                                           class="form-control {{ $errors->has('description') ? ' is-invalid' : '' }}"
+                                                           name="description" id="description"
+                                                           value="{{ old('description', $model->description) != null ? old('description', $model->date) : '' }}"
+                                                           placeholder="Descriptionn" required="required">
+                                                </div>
+                                                @if ($errors->has('description'))
+                                                    <div class="invalid-feedback">
+                                                        <strong>{{ $errors->first('description') }}</strong>
                                                     </div>
                                                 @endif
                                             </div>
@@ -124,6 +139,7 @@
                     <form action="{{ route('ajax.cart.add') }}" method="POST" class="addCartItemForm">
                         {{ csrf_field() }}
                         <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
+                        <input type="hidden" name="operation" class="operation" required="required">
                         <div class="form-group">
                             <label for="store_id">Store</label>
                             <select class="form-control select2-single {{ $errors->has('store_id') ? ' is-invalid' : '' }}" name="store_id"
@@ -175,12 +191,26 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="adjusted_qty">Adjusted Qty</label>
-                            <input type="number" class="form-control {{ $errors->has('adjusted_qty') ? ' is-invalid' : '' }}"
-                                   name="adjusted_qty" id="adjusted_qty" value="" placeholder="" required="required" min="1">
-                            @if ($errors->has('adjusted_qty'))
+                            <label for="quantity">Quantity</label>
+                            <input type="number" class="form-control {{ $errors->has('quantity') ? ' is-invalid' : '' }}"
+                                   name="quantity" id="quantity" value="" placeholder="Quantity" required="required" min="1">
+                            @if ($errors->has('quantity'))
                                 <div class="invalid-feedback">
-                                    <strong>{{ $errors->first('adjusted_qty') }}</strong>
+                                    <strong>{{ $errors->first('quantity') }}</strong>
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="form-group">
+                            <label for="quantity">Expiry Date</label>
+                            <input type="text" autocomplete="off"
+                                   class="form-control datepicker {{ $errors->has('expiry_date') ? ' is-invalid' : '' }}"
+                                   name="expiry_date" id="expiry_date"
+                                   value="{{ old('expiry_date', $model->date) != null ? old('expiry_date', $model->date) : '' }}"
+                                   placeholder="Expiry Date (Optional)" required="required">
+                            @if ($errors->has('expiry_date'))
+                                <div class="invalid-feedback">
+                                    <strong>{{ $errors->first('expiry_date') }}</strong>
                                 </div>
                             @endif
                         </div>

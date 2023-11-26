@@ -321,9 +321,10 @@
             <div class="c-thead">
                 <div class="c-tr">
                     <div class="c-h-cell">S.N</div>
+                    <div class="c-h-cell">Store</div>
                     <div class="c-h-cell">Name</div>
                     <div class="c-h-cell">Quantity</div>
-                    <div class="c-h-cell">Store</div>
+                    <div class="c-h-cell">Expiry Date</div>
                     <div class="c-h-cell"><span class="ion-ios-trash"></span></div>
                 </div>
             </div>
@@ -332,11 +333,14 @@
                 <form class="c-tr" action="{{ route('ajax.cart.update', $product->id) }}" method="post" id="p{{ $product->id }}">
                     @csrf
                     @php $attr = $product->attributes @endphp
-                    <input type="hidden" name="id" class="form-control" value="{{ $product->id }}">
-                    <input type="hidden" name="product_id" class="form-control" value="{{ $attr->product_id }}">
-                    <input type="hidden" name="store_id" class="form-control" value="{{ $attr->store_id }}">
+                    <input type="hidden" name="id" value="{{ $product->id }}">
+                    <input type="hidden" name="product_id" value="{{ $attr->product_id }}">
+                    <input type="hidden" name="store_id" value="{{ $attr->store_id }}">
+                    <input type="hidden" name="expiry_date" value="{{ $attr->expiry_date }}">
+                    <input type="hidden" name="operation" class="form-control operation" value="{{ $attr->operation }}">
                     <div class="c-cell">{{ $loop->iteration }}</div>
-                    <div class="c-cell text-left">{{ $product->name }}</div>
+                    <div class="c-cell">{{ \App\Models\Store::find($attr->store_id)->code ?? null }}</div>
+                    <div class="c-cell text-left">{{ $product->attributes['code'] ?? null }} - {{ $product->name }}</div>
                     <div class="c-cell">
                         <span style="color: red;" id="valid_price{{ $product->id }}"></span>
                         <input
@@ -350,7 +354,7 @@
                             min="1"
                             required>
                     </div>
-                    <div class="c-cell">{{ \App\Models\Store::find($attr->store_id)->name ?? null }}</div>
+                    <div class="c-cell text-left">{{ $product->attributes['expiry_date'] ?? null }}</div>
                     <div class="c-cell">
                         <a url="{{ route('ajax.cart.delete', $product->id) }}" class="btn btn-danger btn-sm deleteCartItem">
                             <i class="fa fa-trash" aria-hidden="true"></i>

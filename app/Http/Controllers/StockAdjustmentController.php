@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\StockAdjustmentDetail;
 use App\Models\StockCard;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -35,15 +36,15 @@ class StockAdjustmentController extends Controller
 
     public function index(Index $request)
     {
-        return view('pages.stock_adjustments.index', ['records' => StockAdjustment::select('stock_adjustments.*')->latest('date')
-            ->join('stores', 'stores.id', 'stock_adjustments.store_id')
-            ->where('stores.branch_id', 'LIKE', User::userBranchAction())
-            ->groupBy('refno')->get()]);
+        $user = auth()->user();
+        $branch = $user->branch;
+        $records = StockAdjustment::where(['branch_id'=>$branch->id])->orderBy('reference', 'desc')->get();
+        return view('pages.inventories.stock_adjustments.index',compact('records'));
     }
 
     public function show(Show $request, StockAdjustment $stockadjustment)
     {
-        return view('pages.stock_adjustments.show', [
+        return view('pages.inventories.stock_adjustments.show', [
             'record' => $stockadjustment,
         ]);
 
@@ -55,9 +56,9 @@ class StockAdjustmentController extends Controller
         $products = Product::select('products.id', 'products.name','code')->join('store_products', 'store_products.product_id', 'products.id')->get();
         $categories = Category::all(['id', 'name']);
         $stores = Store::where('branch_id', 'LIKE', User::userBranchAction())->get();
-        $cartItems = \Cart::session('_token')->getContent(); //\Cart::getContent();
+        $cartItems = \Cart::getContent(); //\Cart::getContent();
 
-        return view('pages.stock_adjustments.create', [
+        return view('pages.inventories.stock_adjustments.create', [
             'model' => new StockAdjustment,
             'products' => $products,
             'categories' => $categories,
@@ -69,39 +70,46 @@ class StockAdjustmentController extends Controller
 
     public function store(Request $request)
     {
-
-        return \Cart::getContent();
-        $model = new StockAdjustment;
+        $user = auth()->user();
+        $branch = $user->branch;
+        $stock_adjustment_id = $request->stock_adjustment_id;
+        $operation = $request->operation;
+        $date = $request->date;
+        $description = $request->description;
+        $stock = StockAdjustment::find($stock_adjustment_id);
+        $items = \Cart::getContent();
         DB::beginTransaction();
         try {
-            if (\Cart::session('_token')->getContent()->count() > 0) {
-
-                foreach (\Cart::session('_token')->getContent() as $product) {
-                    $attribute = $product->attributes;
-                    $store_id = $attribute['store_id'];
-                    $available_qty = $attribute['available_qty'];
-                    $product_id = $attribute['product_id'];
-                    $sign = $attribute['sign'];
-                    $adjusted_qty = $product->quantity;
-                    $reference = StockAdjustment::generateNewNumber();
-                    if ($sign == "-")
-                        $adjusted_qty = 0 - $adjusted_qty;
-                    StoreProduct::where(['store_id' => $store_id, 'product_id' => $product_id])->increment('qty_available', $adjusted_qty);
-                    DB::table('stock_adjustments')->insert([
-                        'reference' => $reference,
-                        'store_id' => $store_id,
-                        'product_id' => $product_id,
-                        'adjusted_qty' => $adjusted_qty,
-                        'available_qty' => $available_qty,
-                        'adjusted_by' => Auth::id(),
-                        'date' => $request->date,
-                    ]);
-
-                    $action = "Adjusted stock $reference : " . $adjusted_qty;
-                    AuditLog::auditLog(Auth::id(), $action);
-                    session()->flash('app_message', 'Stock transfered successfully');
-                    DB::commit();
+            if(!$stock){
+                $stock = new StockAdjustment();
+                $stock->reference = StockAdjustment::generateNewNumber();
+                $stock->created_by = auth()->id();
+                $stock->status = 0;
+            }
+            $stock->branch_id = $branch->id;
+            $stock->operation = $operation;
+            $stock->description = $description;
+            if($stock->save()){
+                if (count($items) > 0) {
+                    StockAdjustmentDetail::where('stock_adjustment_id', $stock->stock_adjustment_id)->delete();
+                    foreach ($items as $product) {
+                        $detail = new StockAdjustmentDetail();
+                        $attribute = $product->attributes;
+                        $detail->stock_adjustment_id = $stock->id;
+                        $detail->store_id = $attribute['store_id'];
+                        $detail->product_id = $attribute['product_id'];
+                        $detail->quantity = $product->quantity;
+                        $detail->cost_price = $product->price;
+                        $detail->expiry_date = $attribute['expiry_date'];
+                        $detail->save();
+                    }
                 }
+                $action = "Stock Adjustment created $stock->reference";
+                AuditLog::auditLog(Auth::id(), $action);
+                session()->flash('app_message', 'Stock Adjustment successfully');
+                DB::commit();
+            }else{
+                DB::rollBack();
             }
         }
         catch (\Exception $ex) {
@@ -109,7 +117,7 @@ class StockAdjustmentController extends Controller
             session()->flash('app_message', 'Something is wrong while transfering stock');
             throw $ex;
         }
-        \Cart::session('_token')->clear();
+        \Cart::clear();
         return redirect()->back();
     }
 
@@ -119,12 +127,12 @@ class StockAdjustmentController extends Controller
         $products = Product::select('products.id', 'products.name')->join('store_products', 'store_products.product_id', 'products.id')->get();
         $categories = Category::all(['id', 'name']);
         $stores = Store::where('id', 'LIKE', User::userBranchAction())->get();
-        //\Cart::session('_token')->clear();
-        if (\Cart::session('_token')->isEmpty())
+        //\Cart::clear();
+        if (\Cart::isEmpty())
             $this->loadToCart($stockadjustment);
-        $cartItems = \Cart::session('_token')->getContent(); //\Cart::getContent();
+        $cartItems = \Cart::getContent(); //\Cart::getContent();
 
-        return view('pages.stock_adjustments.edit', [
+        return view('pages.inventories.stock_adjustments.edit', [
             'model' => $stockadjustment,
             'products' => $products,
             'categories' => $categories,
@@ -141,10 +149,10 @@ class StockAdjustmentController extends Controller
 
         try {
 
-            if (\Cart::session('_token')->getContent()->count() > 0) {
+            if (\Cart::getContent()->count() > 0) {
 
                 $refno = $request->refno;
-                foreach (\Cart::session('_token')->getContent() as $product) {
+                foreach (\Cart::getContent() as $product) {
                     $attribute = $product->attributes;
                     $store_id = $attribute['store_id'];
                     $product_id = $attribute['product_id'];
@@ -186,7 +194,7 @@ class StockAdjustmentController extends Controller
                     $action = "updated stock adjustment $refno : " . $adjusted_qty;
                     AuditLog::auditLog(Auth::id(), $action);
                     DB::commit();
-                    \Cart::session('_token')->clear();
+                    \Cart::clear();
                     return redirect()->route('stock_adjustments.index');
                 }
             }
@@ -194,11 +202,11 @@ class StockAdjustmentController extends Controller
         catch (\Exception $ex) {
             DB::rollBack();
             session()->flash('app_message', 'Something is wrong while adjusting stock');
-            \Cart::session('_token')->clear();
+            \Cart::clear();
             return redirect()->route('stock_adjustments.index');
             throw $ex;
         }
-        \Cart::session('_token')->clear();
+        \Cart::clear();
         return redirect()->route('stock_adjustments.index');
     }
 
@@ -229,7 +237,7 @@ class StockAdjustmentController extends Controller
             session()->flash('app_message', 'Something is wrong while deleting stock adjustment');
             throw $ex;
         }
-        \Cart::session('_token')->clear();
+        \Cart::clear();
         return redirect()->route('stock_adjustments.index');
     }
 
@@ -244,7 +252,7 @@ class StockAdjustmentController extends Controller
         $sign = "+";
         if ($request->operation == -1)
             $sign = "-";
-        $add = \Cart::session('_token')->add([
+        $add = \Cart::add([
             'id' => generateRandomString(),
             'name' => Product::find($request->product_id)->name,
             'price' => 0, //Thos is not applicable here
@@ -270,7 +278,7 @@ class StockAdjustmentController extends Controller
     }
     public function removeCart(Request $request, $id)
     {
-        \Cart::session('_token')->remove($request->id);
+        \Cart::remove($request->id);
         session()->flash('app_message', 'Item Cart Remove Successfully !');
 
         return redirect()->back();
@@ -278,29 +286,28 @@ class StockAdjustmentController extends Controller
 
     public function clearAllCart()
     {
-        \Cart::session('_token')->clear();
+        \Cart::clear();
 
         session()->flash('app_message', 'All Item Cart Clear Successfully !');
 
         return redirect()->back();
     }
-    public function loadToCart(StockAdjustment $adjustment)
+    public function loadToCart($items)
     {
-        \Cart::session('_token')->clear();
-        $sign = "+";
-        foreach ($adjustment->adjustedProducts()->get() as $data) {
-            if ($data->adjusted_qty < 0)
-                $sign = "-";
-            \Cart::session('_token')->add([
-
+        \Cart::clear();
+        foreach ($items as $data) {
+            $product = Product::find($data->product_id);
+            \Cart::add([
                 'id' => generateRandomString(),
-                'name' => Product::find($data->product_id)->name,
+                'name' => $product->name,
                 'price' => 0,
-                'quantity' => abs($data->adjusted_qty),
-                'attributes' => array('store_id' => $data->store_id,
+                'quantity' => abs($data->quantity),
+                'attributes' => array(
                     'available_qty' => $data->available_qty,
+                    'store_id' => $data->store_id,
                     'product_id' => $data->product_id,
-                    'sign' => $sign
+                    'code' => $product->code,
+                    'operation' => $items->stockAdjustment->operation ?? 'in',
                 ),
             ]);
             $sign = "+";
@@ -312,7 +319,7 @@ class StockAdjustmentController extends Controller
         $sign = "+";
         if ($request->quantity < 0)
             $sign = "-";
-        \Cart::session('_token')->update(
+        \Cart::update(
             $request->id,
         [
             'quantity' => [
@@ -326,7 +333,7 @@ class StockAdjustmentController extends Controller
             )
         ]
         );
-        //dd(\Cart::session('_token')->getContent());
+        //dd(\Cart::getContent());
         session()->flash('success', 'Item Cart is Updated Successfully !');
 
         return redirect()->back();
@@ -344,6 +351,6 @@ class StockAdjustmentController extends Controller
     }
     public function printStockAdjusment($refno)
     {
-        return view('pages.transfer_products.print')->with(['transfers' => StockAdjustment::where(['refno' => $refno])->get()]);
+        return view('pages.inventories.transfer_products.print')->with(['transfers' => StockAdjustment::where(['refno' => $refno])->get()]);
     }
 }

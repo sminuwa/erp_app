@@ -14,7 +14,7 @@ use Carbon\Carbon;
 use DateTime;
 /**
  @property varchar $name name @property varchar $email email @property varchar $phone phone @property enum $gender gender @property varchar $user_code user code @property bigint $branch_id branch id @property tinyint $status status @property timestamp $email_verified_at email verified at @property varchar $password password @property varchar $remember_token remember token @property timestamp $created_at created at @property timestamp $updated_at updated at
- 
+
  */
 class User extends Authenticatable
 {
@@ -63,11 +63,10 @@ class User extends Authenticatable
     }
     public static function userBranchAction()
     {
-        $user_branch = Auth::user()->branch_id;
+        return Auth::user()->branch_id;
         /*if (Auth::user()->hasAnyRole('Super-admin')) {
          $user_branch = '%';
          }*/
-        return $user_branch;
     }
     public static function UserBranchName(){
         return Branch::where('id',User::userBranchAction())->first();
@@ -83,7 +82,7 @@ class User extends Authenticatable
     //Customers who have not potronize for more than two weeks
     public static function overTwoWeeks()
     {
-        
+
         $customers = Order::select('customers.*')->distinct()
             ->join('customers', 'customers.id', 'orders.customer_id')
             ->where('type', 'Credit')->where('customers.branch_id', 'LIKE', User::userBranchAction())

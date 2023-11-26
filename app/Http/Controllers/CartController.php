@@ -203,16 +203,18 @@ class CartController extends Controller
             ]);
         }
         if($type == 'adjustment') {
-//            return $request;
+            $product = Product::find($request->product_id);
             $add = \Cart::add([
                 'id' => generateRandomString(),
-                'name' => Product::find($request->product_id)->name,
+                'name' => $product->name,
                 'price' => 0, //Thos is not applicable here
-                'quantity' => abs($request->adjusted_qty),
+                'quantity' => abs($request->quantity),
                 'attributes' => array(
                     'store_id' => $request->store_id,
                     'product_id' => $request->product_id,
                     'available_qty' => $request->available_qty,
+                    'expiry_date' => $request->expiry_date ?? '',
+                    'code' => $product->code,
                 ),
             ]);
         }
@@ -326,6 +328,8 @@ class CartController extends Controller
                     'store_id' => $request->store_id,
                     'product_id' => $request->product_id,
                     'available_qty' => $request->available_qty,
+                    'code' => $product->code,
+                    'expiry_date' => $request->expiry_date ?? '',
                 ),
             ]);
         }

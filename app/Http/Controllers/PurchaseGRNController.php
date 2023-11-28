@@ -126,7 +126,7 @@ class PurchaseGRNController extends Controller
                     $product->save();
                 }
                 /*Transaction::purchases($purchase->id, $purchase_date);*/
-                $action = "Made a purchase with reference $request->reference from supplier: " . Supplier::find($request->supplier_id)->name;
+                $action = "Made a purchase with reference $request->reference from supplier: " . Supplier::find($request->supplier_id)?->name;
                 AuditLog::auditLog(Auth::id(), $action);
                 DB::commit();
                 session()->flash('app_message', 'Purchase saved successfully');

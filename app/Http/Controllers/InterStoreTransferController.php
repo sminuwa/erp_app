@@ -91,7 +91,7 @@ class InterStoreTransferController extends Controller
             if($interstore->save()) {
                 $items = \Cart::getContent();
                 if (count($items) > 0) {
-                    $transfer_id = $this->getNextTransferID();
+                    //$transfer_id = $this->getNextTransferID();
                     $new_cost_price = [];
                     foreach ($items as $item) {
                         $new_cost_price[$item->attributes['product_id']] = [

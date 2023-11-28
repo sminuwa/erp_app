@@ -46,7 +46,7 @@ class PurchaseGRNController extends Controller
         return view('pages.inventories.purchases.grn.index', [
             'records' => Purchase::select('purchases.*')->orderBy('reference', 'DESC')
                 ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
-                // ->where('branch_id', 'LIKE', User::userBranchAction())
+                ->where('branch_id', 'LIKE', User::userBranchAction())
                 ->take(10)->get(),
             'suppliers' => Supplier::where('code', 'like', 'TS%')->orderBy('name')->get(),
         ]);
@@ -58,7 +58,7 @@ class PurchaseGRNController extends Controller
         $search_value = $request->refno;
         $records = Purchase::select('purchases.*')->where('invoice', 'LIKE', "%$search_value%")
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
-            // ->where('branch_id', 'LIKE', User::userBranchAction())
+            ->where('branch_id', 'LIKE', User::userBranchAction())
             ->orderBy('purchase_date', 'DESC')->take(10)->get();
         return view('pages.inventories.purchases.grn.index', [
             'records' => $records
@@ -97,12 +97,12 @@ class PurchaseGRNController extends Controller
             $purchase_date = $request->purchase_date;
             $purchase_id = $request->purchase_id;
             $purchase = Purchase::find($purchase_id);
-            if(!$purchase){
+            if (!$purchase) {
                 $purchase = new Purchase();
                 $purchase->reference = Purchase::generateNewNumber();
                 $purchase->branch_id = auth()->user()->branch->id;
                 $purchase->created_by = auth()->id();
-            }else{
+            } else {
                 $purchase->updated_by = $request->updated_by;
             }
             $purchase->supplier_id = $request->supplier_id;
@@ -111,8 +111,8 @@ class PurchaseGRNController extends Controller
             $purchase->purchase_mode = 'Cash';
             $purchase->truck_no = $request->truck_no;
             $purchase->status = 0;
-            if($purchase->save()){
-                PurchaseProduct::where('purchase_id',$purchase->id)->delete();
+            if ($purchase->save()) {
+                PurchaseProduct::where('purchase_id', $purchase->id)->delete();
                 foreach (\Cart::getContent() as $cart) {
                     $product = new PurchaseProduct();
                     $cart_attributes = $cart->attributes;
@@ -136,7 +136,7 @@ class PurchaseGRNController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            session()->flash('app_message', 'Something is wrong while saving Purchase. '.$e);
+            session()->flash('app_message', 'Something is wrong while saving Purchase. ' . $e);
             throw $e;
         }
         return redirect()->back();
@@ -370,9 +370,9 @@ class PurchaseGRNController extends Controller
                     'qty_available' => $qty,
                     'discount' => 0,
                     'store' => '',
-                    'unit'=>$data->product->unit,
-                    'store_id'=> $data->store_id,
-                    'store_code'=> $store->code,
+                    'unit' => $data->product->unit,
+                    'store_id' => $data->store_id,
+                    'store_code' => $store->code,
                 ),
 
             ]);
@@ -459,7 +459,7 @@ class PurchaseGRNController extends Controller
                 DB::commit();
             } else
                 DB::rollback();
-                session()->flash('app_message', 'Purchase sucessfully posted');
+            session()->flash('app_message', 'Purchase sucessfully posted');
         }
         return back()->with('success', 'Approved successfully');
     }

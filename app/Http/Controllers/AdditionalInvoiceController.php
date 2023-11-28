@@ -9,6 +9,7 @@ use App\Models\Purchase;
 use App\Models\PurchaseExpense;
 use App\Models\Receipt;
 use App\Models\Supplier;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,12 +18,14 @@ class AdditionalInvoiceController extends Controller
 {
     //
     public function index(Request $request){
-        $invoices = PurchaseExpense::orderBy('id','desc')->get();
+        $purchases = Purchase::where('branch_id',User::userBranchAction())->get()->pluck('id')->toArray();
+        $invoices = PurchaseExpense::whereIn('purchase_id',$purchases)->orderBy('id','desc')->get();
         return view('pages.inventories.expenses.index', compact('invoices'));
     }
 
     public function create(){
-        $purchases = Purchase::orderBy('id','desc')->get();
+        
+        $purchases = Purchase::where('branch_id',User::userBranchAction())->orderBy('id','desc')->get();
         $suppliers = Supplier::orderBy('code','asc')->get();
         return view('pages.inventories.expenses.create',compact('purchases', 'suppliers'));
     }

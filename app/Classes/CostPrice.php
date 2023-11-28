@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\DB;
 class CostPrice
 {
 
-    public static function returnDebitFormula(array $products, $batch_no, $store_id = 278,  $branch_id = 2){
+    public static function returnDebitFormula(array $products, $batch_no, $store_id = 278, $branch_id = 2)
+    {
         /*
          * branch id of the destination store
          * array of product list as follows
@@ -44,7 +45,7 @@ class CostPrice
         $user = auth()->user();
         $product_ids = [];
         $total_new_cost = $records = [];
-        foreach($products as $key=>$p){
+        foreach ($products as $key => $p) {
             $product_ids[] = $key;
             $total_new_cost[$key] = intval($p['quantity']) * intval($p['price']);
         }
@@ -55,13 +56,13 @@ class CostPrice
             ->whereIn('store_products.product_id', $product_ids)->where('branch_product_prices.branch_id', $branch_id)->groupBy('store_products.product_id')->get();
         $old_product_costs = [];
         $old_product_quantity = [];
-//        return $prices;
-        foreach($prices as $price){
-            $existing_cost[$price->product_id] = ['cost_price' => $price->cost_price, 'quantity'=>$price->quantity, 'total_existing_cost'=>$price->total_existing_cost];
+        //        return $prices;
+        foreach ($prices as $price) {
+            $existing_cost[$price->product_id] = ['cost_price' => $price->cost_price, 'quantity' => $price->quantity, 'total_existing_cost' => $price->total_existing_cost];
         }
 
-        foreach($products as $key=>$p){
-//            return isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0;
+        foreach ($products as $key => $p) {
+            //            return isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0;
             $records[$key] = [
                 'existing_quantity' => isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0,
                 'return_quantity' => $products[$key]['quantity'],
@@ -75,17 +76,17 @@ class CostPrice
         }
 
         $store_products = $product_costs = $batch = [];
-        foreach($records as $key=>$record){
+        foreach ($records as $key => $record) {
             $product_costs[] = [
                 'branch_id' => $branch_id,
                 'product_id' => $key,
-                'cost_price' => round(($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'],2),
+                'cost_price' => round(($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'], 2),
                 'updated_by' => $user->id
             ];
             $store_products[] = [
-                'store_id'=>$store_id,
-                'product_id'=>$key,
-                'qty_available'=>$record['quantity']
+                'store_id' => $store_id,
+                'product_id' => $key,
+                'qty_available' => $record['quantity']
             ];
             $batch[] = [
                 'batch_no' => $batch_no,
@@ -101,19 +102,20 @@ class CostPrice
 
         DB::beginTransaction();
 
-        if(
-            StoreProduct::upsert($store_products, ['store_id','product_id'])
+        if (
+            StoreProduct::upsert($store_products, ['store_id', 'product_id'])
             && BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id'])
             && StoreProductBatch::upsert($batch, ['batch_no'])
-        ){
+        ) {
             DB::commit();
-            return ['status'=>true, 'message'=>'success'];
-        }else{
-            return ['status'=>false, 'message'=>'Something went wrong.'];
+            return ['status' => true, 'message' => 'success'];
+        } else {
+            return ['status' => false, 'message' => 'Something went wrong.'];
         }
     }
 
-    public static function additionalInvoiceCostPrice($purchase_id, $invoice_id, $type = TRANSACTION_TYPE_GRN, $formula="A"){
+    public static function additionalInvoiceCostPrice($purchase_id, $invoice_id, $type = TRANSACTION_TYPE_GRN, $formula = "A")
+    {
 
         /*
          * branch id of the destination store
@@ -159,7 +161,7 @@ class CostPrice
         }
 
 
-        foreach($products as $key=>$p){
+        foreach ($products as $key => $p) {
             $product_ids[] = $key;
             $total_new_cost[$key] = intval($p['quantity']) * intval($p['price']);
             $details = StoreProduct::selectRaw("
@@ -171,34 +173,36 @@ class CostPrice
                 (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key)) as total_existing_cost
                 ")
                 ->where('store_products.product_id', $key)->first();
-            $prices[$details->product_id] = [
-                'product_id' =>$details->product_id,
-                'grn_cost' =>intval($p['quantity']) * intval($p['price']),
-                'cost_price' =>$details->cost_price,
-                'qty_available' =>$details->qty_available,
-                'total_quantity' =>$details->quantity,
-                'total_existing_cost' =>$details->total_existing_cost,
-            ];
+            if ($details != null) {
+                $prices[$details->product_id] = [
+                    'product_id' => $details->product_id,
+                    'grn_cost' => intval($p['quantity']) * intval($p['price']),
+                    'cost_price' => $details->cost_price,
+                    'qty_available' => $details->qty_available,
+                    'total_quantity' => $details->quantity,
+                    'total_existing_cost' => $details->total_existing_cost,
+                ];
+            }
         }
 
-        foreach($prices as $key=>$value){
+        foreach ($prices as $key => $value) {
             $percent = ($value['grn_cost'] / $total_grn) * 100;
-            $percentages[$key]=[
-                'product_id'=>$value['product_id'],
-                'invoice_amount'=>$invoice->amount,
-                'percentage'=>$percent,
+            $percentages[$key] = [
+                'product_id' => $value['product_id'],
+                'invoice_amount' => $invoice->amount,
+                'percentage' => $percent,
                 'total_amount' => ($value['grn_cost'] / $total_grn) * $invoice->amount,
                 'total_existing_cost' => $value['total_existing_cost'],
                 'total_quantity' => $value['total_quantity'],
                 'final_cost' => (
-                                (($value['grn_cost'] / $total_grn) * $invoice->amount)
-                                    + $value['total_existing_cost'])
-                                        / $value['total_quantity'],
+                    (($value['grn_cost'] / $total_grn) * $invoice->amount)
+                    + $value['total_existing_cost'])
+                    / $value['total_quantity'],
             ];
         }
 
-        $store_products = $product_costs = $batch = $stock_card_param =  [];
-        foreach($percentages as $key=>$percentage){
+        $store_products = $product_costs = $batch = $stock_card_param = [];
+        foreach ($percentages as $key => $percentage) {
 
             $product_costs[] = [
                 'branch_id' => $purchase_grn->branch_id,
@@ -211,17 +215,18 @@ class CostPrice
 
         DB::beginTransaction();
 
-        if(BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id'])){
-            if(Transaction::purchase_invoices($purchase_grn->id, $invoice->id, $formula)['status']){
+        if (BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id'])) {
+            if (Transaction::purchase_invoices($purchase_grn->id, $invoice->id, $formula)['status']) {
                 DB::commit();
-                return ['status'=>true, 'message'=>'success'];
+                return ['status' => true, 'message' => 'success'];
             }
         }
-        return ['status'=>false, 'message'=>'Something went wrong.'];
+        return ['status' => false, 'message' => 'Something went wrong.'];
 
     }
 
-    public static function additionalInvoiceCostPriceReversal($purchase_id, $invoice_id, $type = TRANSACTION_TYPE_GRN, $formula="A"){
+    public static function additionalInvoiceCostPriceReversal($purchase_id, $invoice_id, $type = TRANSACTION_TYPE_GRN, $formula = "A")
+    {
 
         /*
          * branch id of the destination store
@@ -267,7 +272,7 @@ class CostPrice
         }
 
 
-        foreach($products as $key=>$p){
+        foreach ($products as $key => $p) {
             $product_ids[] = $key;
             $total_new_cost[$key] = intval($p['quantity']) * intval($p['price']);
             $details = StoreProduct::selectRaw("
@@ -280,21 +285,21 @@ class CostPrice
                 ")
                 ->where('store_products.product_id', $key)->first();
             $prices[$details->product_id] = [
-                'product_id' =>$details->product_id,
-                'grn_cost' =>intval($p['quantity']) * intval($p['price']),
-                'cost_price' =>$details->cost_price,
-                'qty_available' =>$details->qty_available,
-                'total_quantity' =>$details->quantity,
-                'total_existing_cost' =>$details->total_existing_cost,
+                'product_id' => $details->product_id,
+                'grn_cost' => intval($p['quantity']) * intval($p['price']),
+                'cost_price' => $details->cost_price,
+                'qty_available' => $details->qty_available,
+                'total_quantity' => $details->quantity,
+                'total_existing_cost' => $details->total_existing_cost,
             ];
         }
 
-        foreach($prices as $key=>$value){
+        foreach ($prices as $key => $value) {
             $percent = ($value['grn_cost'] / $total_grn) * 100;
-            $percentages[$key]=[
-                'product_id'=>$value['product_id'],
-                'invoice_amount'=>$invoice->amount,
-                'percentage'=>$percent,
+            $percentages[$key] = [
+                'product_id' => $value['product_id'],
+                'invoice_amount' => $invoice->amount,
+                'percentage' => $percent,
                 'total_amount' => ($value['grn_cost'] / $total_grn) * $invoice->amount,
                 'total_existing_cost' => $value['total_existing_cost'],
                 'total_quantity' => $value['total_quantity'],
@@ -303,8 +308,8 @@ class CostPrice
             ];
         }
 
-        $store_products = $product_costs = $batch = $stock_card_param =  [];
-        foreach($percentages as $key=>$percentage){
+        $store_products = $product_costs = $batch = $stock_card_param = [];
+        foreach ($percentages as $key => $percentage) {
 
             $product_costs[] = [
                 'branch_id' => $purchase_grn->branch_id,
@@ -317,17 +322,18 @@ class CostPrice
 
         DB::beginTransaction();
 
-        if(BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id'])){
-            if(Transaction::reversal($invoice->reference)['status']){
+        if (BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id'])) {
+            if (Transaction::reversal($invoice->reference)['status']) {
                 DB::commit();
-                return ['status'=>true, 'message'=>'success'];
+                return ['status' => true, 'message' => 'success'];
             }
         }
-        return ['status'=>false, 'message'=>'Something went wrong.'];
+        return ['status' => false, 'message' => 'Something went wrong.'];
 
     }
 
-    public static function interstore(array $products, $batch_no, $branch_id = 2, $date, $type = TRANSACTION_TYPE_INTERSTORE, $operation = 'in'){
+    public static function interstore(array $products, $batch_no, $branch_id = 2, $date, $type = TRANSACTION_TYPE_INTERSTORE, $operation = 'in')
+    {
         /*
          * branch id of the destination store
          * array of product list as follows
@@ -364,8 +370,8 @@ class CostPrice
         //check if products are in the store if not add them
         $products_id = $stores_id = [];
         DB::beginTransaction();
-        foreach($products as $key=>$value){
-            if (!StoreProduct::where(['product_id'=>$key, 'store_id'=>$value['destination_store_id']])->first()) {
+        foreach ($products as $key => $value) {
+            if (!StoreProduct::where(['product_id' => $key, 'store_id' => $value['destination_store_id']])->first()) {
                 StoreProduct::create([
                     'product_id' => $key,
                     'store_id' => $value['destination_store_id'],
@@ -376,7 +382,7 @@ class CostPrice
         DB::commit();
         $s = 'source';
         $d = 'destination';
-        foreach($products as $key=>$p){
+        foreach ($products as $key => $p) {
             $product_ids[] = $key;
             $source_store_id = $p['source_store_id'];
             $destination_store_id = $p['destination_store_id'];
@@ -389,7 +395,7 @@ class CostPrice
                 ((SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) *
                 (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key)) as total_existing_cost
                 ")
-                ->where(['store_products.product_id'=>$key, 'store_products.store_id'=>$source_store_id])->first();
+                ->where(['store_products.product_id' => $key, 'store_products.store_id' => $source_store_id])->first();
             $destination_details = StoreProduct::selectRaw("
                 store_products.product_id,
                 qty_available,
@@ -398,32 +404,32 @@ class CostPrice
                 ((SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) *
                 (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key)) as total_existing_cost
                 ")
-                ->where(['store_products.product_id'=>$key, 'store_products.store_id'=>$destination_store_id])->first();
+                ->where(['store_products.product_id' => $key, 'store_products.store_id' => $destination_store_id])->first();
             $prices[$s][$source_details->product_id] = [
-                'product_id' =>$source_details->product_id,
-                'cost_price' =>$source_details->cost_price,
-                'qty_available' =>$source_details->qty_available,
-                'total_quantity' =>$source_details->quantity,
-                'total_existing_cost' =>$source_details->total_existing_cost,
+                'product_id' => $source_details->product_id,
+                'cost_price' => $source_details->cost_price,
+                'qty_available' => $source_details->qty_available,
+                'total_quantity' => $source_details->quantity,
+                'total_existing_cost' => $source_details->total_existing_cost,
             ];
             $prices[$d][$destination_details->product_id] = [
-                'product_id' =>$destination_details->product_id,
-                'cost_price' =>$destination_details->cost_price,
-                'qty_available' =>$destination_details->qty_available,
-                'total_quantity' =>$destination_details->quantity,
-                'total_existing_cost' =>$destination_details->total_existing_cost,
+                'product_id' => $destination_details->product_id,
+                'cost_price' => $destination_details->cost_price,
+                'qty_available' => $destination_details->qty_available,
+                'total_quantity' => $destination_details->quantity,
+                'total_existing_cost' => $destination_details->total_existing_cost,
             ];
         }
 
 
-        foreach($prices as $key=>$price){
-            foreach($price as $p){
-                $existing_cost[$key][$p['product_id']] = ['cost_price' => $p['cost_price'], 'quantity'=>$p['total_quantity'], 'total_existing_cost'=>$p['total_existing_cost']];
+        foreach ($prices as $key => $price) {
+            foreach ($price as $p) {
+                $existing_cost[$key][$p['product_id']] = ['cost_price' => $p['cost_price'], 'quantity' => $p['total_quantity'], 'total_existing_cost' => $p['total_existing_cost']];
             }
         }
 
-        foreach($products as $key=>$p){
-//          return isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0;
+        foreach ($products as $key => $p) {
+            //          return isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0;
             $records[$s][$key] = [
                 'qty_available' => $prices[$s][$key]['qty_available'] ?? 0,
                 'existing_quantity' => isset($existing_cost[$s][$key]['quantity']) ? $existing_cost[$s][$key]['quantity'] : 0,
@@ -452,8 +458,8 @@ class CostPrice
 
         $source_store_products = $destination_store_products = $source_stock_card_param = $destination_stock_card_param = [];
         foreach ($records as $key => $record) {
-            foreach($record as $k=> $r) {
-                if($key == $s){
+            foreach ($record as $k => $r) {
+                if ($key == $s) {
                     $source_stock_card_param[] = [
                         'store_id' => $r['store_id'],
                         'product_id' => $k,
@@ -466,7 +472,7 @@ class CostPrice
                         'qty_available' => $r['qty_available'] - $r['new_quantity']
                     ];
                 }
-                if($key == $d) {
+                if ($key == $d) {
                     $destination_stock_card_param[] = [
                         'store_id' => $r['store_id'],
                         'product_id' => $k,
@@ -497,20 +503,22 @@ class CostPrice
         $stock_card_param = array_merge($source_stock_card_param, $destination_stock_card_param);
         $store_products = array_merge($source_store_products, $destination_store_products);
         DB::beginTransaction();
-        if(StockCard::createBatchRecord($stock_card_param,$batch_no, $date, $type)
-            && StoreProduct::upsert($store_products, ['store_id','product_id'])
+        if (
+            StockCard::createBatchRecord($stock_card_param, $batch_no, $date, $type)
+            && StoreProduct::upsert($store_products, ['store_id', 'product_id'])
             && StoreProductBatch::upsert($batch, ['batch_no'])
-        ){
+        ) {
             DB::commit();
-            return ['status'=>true, 'message'=>'success'];
-        }else{
+            return ['status' => true, 'message' => 'success'];
+        } else {
             DB::rollBack();
-            return ['status'=>false, 'message'=>'Something went wrong.'];
+            return ['status' => false, 'message' => 'Something went wrong.'];
         }
 
     }
 
-    public static function newCostPrice(array $products, $batch_no, $branch_id = 2, $date, $type = TRANSACTION_TYPE_OPENING_BALANCE, $operation = 'in'){
+    public static function newCostPrice(array $products, $batch_no, $branch_id = 2, $date, $type = TRANSACTION_TYPE_OPENING_BALANCE, $operation = 'in')
+    {
         /*
          * branch id of the destination store
          * array of product list as follows
@@ -545,8 +553,8 @@ class CostPrice
         //check if products are in the store if not add them
         $products_id = $stores_id = [];
         DB::beginTransaction();
-        foreach($products as $key=>$value){
-            if (!StoreProduct::where(['product_id'=>$key, 'store_id'=>$value['store_id']])->first()) {
+        foreach ($products as $key => $value) {
+            if (!StoreProduct::where(['product_id' => $key, 'store_id' => $value['store_id']])->first()) {
                 StoreProduct::create([
                     'product_id' => $key,
                     'store_id' => $value['store_id'],
@@ -556,7 +564,7 @@ class CostPrice
         }
         DB::commit();
 
-        foreach($products as $key=>$p){
+        foreach ($products as $key => $p) {
             $product_ids[] = $key;
             $store_id = $p['store_id'];
             $total_new_cost[$key] = intval($p['quantity']) * intval($p['price']);
@@ -568,22 +576,22 @@ class CostPrice
                 ((SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) *
                 (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key)) as total_existing_cost
                 ")
-                ->where(['store_products.product_id'=>$key, 'store_products.store_id'=>$store_id])->first();
+                ->where(['store_products.product_id' => $key, 'store_products.store_id' => $store_id])->first();
             $prices[$details->product_id] = [
-                'product_id' =>$details->product_id,
-                'cost_price' =>$details->cost_price,
-                'qty_available' =>$details->qty_available,
-                'total_quantity' =>$details->quantity,
-                'total_existing_cost' =>$details->total_existing_cost,
+                'product_id' => $details->product_id,
+                'cost_price' => $details->cost_price,
+                'qty_available' => $details->qty_available,
+                'total_quantity' => $details->quantity,
+                'total_existing_cost' => $details->total_existing_cost,
             ];
         }
 
-        foreach($prices as $price){
-            $existing_cost[$price['product_id']] = ['cost_price' => $price['cost_price'], 'quantity'=>$price['total_quantity'], 'total_existing_cost'=>$price['total_existing_cost']];
+        foreach ($prices as $price) {
+            $existing_cost[$price['product_id']] = ['cost_price' => $price['cost_price'], 'quantity' => $price['total_quantity'], 'total_existing_cost' => $price['total_existing_cost']];
         }
 
-        foreach($products as $key=>$p){
-//          return isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0;
+        foreach ($products as $key => $p) {
+            //          return isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0;
             $records[$key] = [
                 'qty_available' => $prices[$key]['qty_available'] ?? 0,
                 'existing_quantity' => isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0,
@@ -598,8 +606,8 @@ class CostPrice
             ];
         }
 
-        $store_products = $product_costs = $batch = $stock_card_param =  [];
-        if($operation == 'in') {
+        $store_products = $product_costs = $batch = $stock_card_param = [];
+        if ($operation == 'in') {
             foreach ($records as $key => $record) {
                 $stock_card_param[] = [
                     'store_id' => $record['store_id'],
@@ -632,20 +640,20 @@ class CostPrice
                 ];
             }
             DB::beginTransaction();
-            if(
-                StockCard::createBatchRecord($stock_card_param,$batch_no, $date, $type)
-                && StoreProduct::upsert($store_products, ['store_id','product_id'])
+            if (
+                StockCard::createBatchRecord($stock_card_param, $batch_no, $date, $type)
+                && StoreProduct::upsert($store_products, ['store_id', 'product_id'])
                 && BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id'])
                 && StoreProductBatch::upsert($batch, ['batch_no'])
-            ){
+            ) {
                 DB::commit();
-                return ['status'=>true, 'message'=>'success'];
-            }else{
+                return ['status' => true, 'message' => 'success'];
+            } else {
                 DB::rollBack();
-                return ['status'=>false, 'message'=>'Something went wrong.'];
+                return ['status' => false, 'message' => 'Something went wrong.'];
             }
         }
-        if($operation == 'out') {
+        if ($operation == 'out') {
             foreach ($records as $key => $record) {
                 $stock_card_param[] = [
                     'store_id' => $record['store_id'],
@@ -660,17 +668,18 @@ class CostPrice
                 ];
             }
             DB::beginTransaction();
-            if( StockCard::createBatchRecord($stock_card_param,$batch_no, $date, $type)
-                && StoreProduct::upsert($store_products, ['store_id','product_id'])
-            ){
+            if (
+                StockCard::createBatchRecord($stock_card_param, $batch_no, $date, $type)
+                && StoreProduct::upsert($store_products, ['store_id', 'product_id'])
+            ) {
                 DB::commit();
-                return ['status'=>true, 'message'=>'success'];
-            }else{
+                return ['status' => true, 'message' => 'success'];
+            } else {
                 DB::rollBack();
-                return ['status'=>false, 'message'=>'Something went wrong.'];
+                return ['status' => false, 'message' => 'Something went wrong.'];
             }
         }
-        return ['status'=>false, 'message'=>'Something went wrong.'];
+        return ['status' => false, 'message' => 'Something went wrong.'];
     }
 
 }

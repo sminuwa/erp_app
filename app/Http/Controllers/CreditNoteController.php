@@ -24,7 +24,8 @@ class CreditNoteController extends Controller
 {
     public function creditNote()
     {
-        $payments = CreditNote::orderBy('credit_notes.created_at', 'DESC')->take(10)->get();
+        $user_branch = User::userBranchAction();
+        $payments = CreditNote::where('branch_id', $user_branch)->orderBy('credit_notes.created_at', 'DESC')->take(10)->get();
         $model = new CustomerLedger();
         return view('pages.inventories.credit_notes.credit_note', ['payments' => $payments, 'model' => $model]);
     }
@@ -36,7 +37,7 @@ class CreditNoteController extends Controller
             ->whereNotIn('invoice_no', DB::table('credit_notes')->select('invoice_no')->pluck('invoice_no')->toArray())
             ->orderBy('order_date', 'DESC')->take(20)->get();
 
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price','retail_selling_price', 'cost_price', 'unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
             ->join('products', 'products.id', 'store_products.product_id')
@@ -45,7 +46,7 @@ class CreditNoteController extends Controller
                     ->on('branch_product_prices.branch_id', '=', 'branches.id');
 
             })
-            ->where('stores.branch_id', 'LIKE', $user_branch)
+            //->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('branch_product_prices.status', 1)
             ->where('store_products.qty_available', '>', 0)
             ->orderBy('products.name')->orderBy('stores.name')->get();
@@ -157,7 +158,7 @@ class CreditNoteController extends Controller
                     )['status']
                 )
 
-                $action = "Credit Note of $credit_note->total for : " . $credit_note->reference;
+                    $action = "Credit Note of $credit_note->total for : " . $credit_note->reference;
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Credit note posted successfully');
                 DB::commit();
@@ -176,12 +177,13 @@ class CreditNoteController extends Controller
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         return view('pages.inventories.credit_notes.show', compact('order_details', 'order', 'company'));
     }
-    public function edit(CreditNote $credit_note){
-//        return $credit_note;
+    public function edit(CreditNote $credit_note)
+    {
+        //        return $credit_note;
         $customer = Customer::find($credit_note->customer_id);
         $credit_note_items = CreditNoteDetail::where('credit_note_id', $credit_note->id)->where('status', 1)->get();
         /*\Cart::clear();*/
-        if(\Cart::isEmpty()){
+        if (\Cart::isEmpty()) {
             foreach ($credit_note_items as $data) {
                 $qty = $data->quantity == 0 ? 1 : $data->quantity;
                 \Cart::add([
@@ -202,8 +204,9 @@ class CreditNoteController extends Controller
         $cart_products = \Cart::getContent();
         return view('pages.inventories.credit_notes.edit_credit_note', compact('credit_note', 'cart_products', 'customer'));
     }
-    public function delete(CreditNote $credit_note){
-        if($credit_note->delete()){
+    public function delete(CreditNote $credit_note)
+    {
+        if ($credit_note->delete()) {
             $action = "Deleted credit note with reference " . $credit_note->reference;
             AuditLog::auditLog(auth()->id(), $action);
             session()->flash('app_message', 'Credit note posted successfully');
@@ -339,7 +342,7 @@ class CreditNoteController extends Controller
         if ($request->ajax()) {
             return \Cart::getTotal();
         }
-//        return \Cart::getContent();
+        //        return \Cart::getContent();
         return back();
         //return redirect()->back()->with('order',Order::find($request->order));
     }

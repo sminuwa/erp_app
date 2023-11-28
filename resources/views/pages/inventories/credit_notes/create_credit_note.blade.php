@@ -70,7 +70,7 @@
                                         <div class="form-group">
                                             <label>Customer</label>
                                             <div class="form-group">
-                                                <select name="customer_id" id="customer_record" class="form-control customer_id "></select>
+                                                <select name="customer_id" id="customer_record" class="form-control select2-single customer_id "></select>
                                                 <div class="form-group">
                                                         <span class="text text-danger ion-android-alert" id="credit_balance"></span>
                                                 </div>

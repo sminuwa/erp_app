@@ -4,21 +4,11 @@
 
     <div class="form-group">
         <label for="name">Name</label>
-        <input type="text" class="form-control {{ $errors->has('name') ? ' is-invalid' : '' }}" name="name" id="name"
-            value="{{ old('name', $model->name) }}" placeholder="" maxlength="191" required="required">
+        <input type="text" class="form-control {{ $errors->has('name') ? ' is-invalid' : '' }}" name="name"
+            id="name" value="{{ old('name', $model->name) }}" placeholder="" maxlength="191" required="required">
         @if ($errors->has('name'))
             <div class="invalid-feedback">
                 <strong>{{ $errors->first('name') }}</strong>
-            </div>
-        @endif
-    </div>
-    <div class="form-group">
-        <label for="code">Code</label>
-        <input type="text" class="form-control {{ $errors->has('code') ? ' is-invalid' : '' }}" name="code" id="code"
-            value="{{ old('code', $model->code) }}" placeholder="" maxlength="191" required="required">
-        @if ($errors->has('code'))
-            <div class="invalid-feedback">
-                <strong>{{ $errors->first('code') }}</strong>
             </div>
         @endif
     </div>
@@ -33,6 +23,21 @@
             </div>
         @endif
     </div>
+    @if (!isset($model->code))
+        <div class="form-group">
+            <label for="code">Type</label>
+            <input type="radio" class="type" name="type" id="type" value="TS" required="required"
+                {{ old('type', substr($model->code, 0, 2)) == 'TS' ? 'checked' : '' }} /> Transpoter
+            <input type="radio" class="type" name="type" id="type"
+                {{ old('type', substr($model->code, 0, 2)) == 'TS' ? 'checked' : '' }} value="MS"
+                required="required" /> Supplier
+            @if ($errors->has('code'))
+                <div class="invalid-feedback">
+                    <strong>{{ $errors->first('code') }}</strong>
+                </div>
+            @endif
+        </div>
+    @endif
     @if (!isset($model->code))
         <div class="form-group">
             <label for="code">Supplier Code</label>

@@ -166,7 +166,7 @@ class SupplierController extends Controller
         else {
             $no = $no->id + 1;
         }
-        return 'S' . str_pad($no, 3, "0", STR_PAD_LEFT);
+        return str_pad($no, 3, "0", STR_PAD_LEFT);
     }
 
     public function runninigBalance($supplier_id)

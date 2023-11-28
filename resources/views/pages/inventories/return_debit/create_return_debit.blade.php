@@ -136,7 +136,7 @@
                                                 {{-- <td align="right">
                                                     {{ number_format($store->selling_price, 2) }}
                                                 </td> --}}
-                                                @if ($store->qty_available > 0 && $store->selling_price > 0)
+                                                @if ($store->retail_selling_price > 0 || $store->whole_selling_price > 0)
                                                     <td align="center">
                                                         <button type="submit" class="btn btn-sm btn-success px-2">
                                                             <i class="fa fa-cart-plus" aria-hidden="true"></i>

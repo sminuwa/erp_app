@@ -94,7 +94,7 @@
                                         <div class="col-md-8">
                                             <div class="form-group">
                                                 <label>Purchase</label>
-                                                <select name="purchase_id" id="purchase_id" class="form-control" required>
+                                                <select name="purchase_id" id="purchase_id" class="form-control select2-single" required>
                                                     <option value="" disabled selected>Select...</option>
                                                     @foreach($purchases as $purchase)
                                                         <option value="{{$purchase->id}}" @if(isset($invoice->id)) {{ $invoice->purchase_id == $purchase->id ? 'selected' : '' }} @endif>
@@ -109,7 +109,7 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Supplier/Transporter</label>
-                                                <select name="supplier_id" id="supplier_id" class="form-control" required>
+                                                <select name="supplier_id" id="supplier_id" class="form-control select2-single" required>
                                                     <option value="" disabled selected>Select...</option>
                                                     @foreach($suppliers as $supplier)
                                                         <option value="{{$supplier->id}}" @if(isset($invoice->id)) {{ $invoice->supplier_id == $supplier->id ? 'selected' : '' }} @endif>

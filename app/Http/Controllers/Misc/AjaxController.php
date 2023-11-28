@@ -12,6 +12,7 @@ use App\Models\GeneralAccount;
 use App\Models\Product;
 use App\Models\Store;
 use App\Models\Supplier;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AjaxController extends Controller
@@ -22,7 +23,8 @@ class AjaxController extends Controller
     }
 
     public function customers(){
-        $records = Customer::orderBy('code','asc')->get();
+        $user_branch = User::userBranchAction();
+        $records = Customer::where('branch_id',$user_branch)->orderBy('code','asc')->get();
         return view('misc.ajax.customers', compact('records'));
     }
 

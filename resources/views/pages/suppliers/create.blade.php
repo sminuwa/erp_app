@@ -48,7 +48,7 @@
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
-	<div class="modal fade" id="supplier_ledgerform" style="display: none;" aria-hidden="true">
+    <div class="modal fade" id="supplier_ledgerform" style="display: none;" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -100,5 +100,14 @@
     </div>
 @endsection
 @push('js')
-    <script type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function(e) {
+            initial = $('#code').val();
+            $(document).on('change', '.type', function(e) {
+                $('#code').val("");
+                code = $(this).val();
+                $('#code').val(code + initial);
+            })
+        });
+    </script>
 @endpush

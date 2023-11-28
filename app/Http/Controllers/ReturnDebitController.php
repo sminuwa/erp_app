@@ -18,7 +18,7 @@ class ReturnDebitController extends Controller
 {
     public function customerReturnDebit()
     {
-        $payments = ReturnDebit::orderBy('return_debits.created_at', 'DESC')->take(10)->get();
+        $payments = ReturnDebit::where('branch_id', User::userBranchAction())->orderBy('return_debits.created_at', 'DESC')->take(10)->get();
         $model = new CustomerController();
         return view('pages.inventories.return_debit.return_debit', ['payments' => $payments, 'model' => $model]);
     }
@@ -27,10 +27,10 @@ class ReturnDebitController extends Controller
         $user_branch = User::userBranchAction();
         $orders = Order::where('status', 1)
             ->where('branch_id', 'LIKE', $user_branch)
-            ->whereNotIn('invoice_no', DB::table('credit_notes')->select('invoice_no')->pluck('invoice_no')->toArray())
+            ->whereNotIn('reference', DB::table('credit_notes')->select('reference')->pluck('reference')->toArray())
             ->orderBy('order_date', 'DESC')->take(20)->get();
 
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price','retail_selling_price','whole_selling_price', 'cost_price', 'unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
             ->join('products', 'products.id', 'store_products.product_id')
@@ -41,7 +41,7 @@ class ReturnDebitController extends Controller
             })
             ->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('branch_product_prices.status', 1)
-            ->where('store_products.qty_available', '>', 0)
+            //->where('store_products.qty_available', '>', 0)
             ->orderBy('products.name')->orderBy('stores.name')->get();
 
         if ($order == null)
@@ -217,7 +217,8 @@ class ReturnDebitController extends Controller
         return redirect()->route('customers.return.debit.create', Order::find($request->order));
         //return redirect()->back()->with('order',Order::find($request->order));
     }
-    public function deletReturnDebit(Request $request, ReturnDebit $returnDebit){
+    public function deletReturnDebit(Request $request, ReturnDebit $returnDebit)
+    {
         //return "To call your function 8888";
         $reference = $returnDebit;
         DB::beginTransaction();
@@ -232,9 +233,9 @@ class ReturnDebitController extends Controller
             //     'created_at' => Carbon::now(),
             //     'updated_at' => Carbon::now(),
             // ]);
-            
+
             $returnDebit->returnItems()->delete();
-             $returnDebit->delete();   
+            $returnDebit->delete();
             session()->flash('app_message', 'Return and debit deleted successfully');
             $action = "Deleted return and debit with reference $reference";
             AuditLog::auditLog(Auth::id(), $action);

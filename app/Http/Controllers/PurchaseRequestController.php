@@ -37,7 +37,7 @@ class PurchaseRequestController extends Controller
         return view('pages.inventories.purchases.request.index', [
             'records' => PurchaseRequest::select('purchase_requests.*')->orderBy('purchase_requests.id', 'DESC')
                 ->with('supplier')
-                // ->where('branch_id', 'LIKE', User::userBranchAction())
+                ->where('branch_id', 'LIKE', User::userBranchAction())
                 ->take(10)->get()
         ]);
     }

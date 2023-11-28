@@ -24,7 +24,7 @@ class CartController extends Controller
 
     public function addToCart(Request $request)
     {
-//        return \Cart::getContent();
+        //        return \Cart::getContent();
 //        return $request;
         $validated = $request->validate([
             'id' => 'required',
@@ -43,24 +43,24 @@ class CartController extends Controller
         $add = \Cart::add([
             'id' => $request->id,
             'name' => $request->name,
-            'price' => $request->sold_price == 0 ? 1 :$request->sold_price ,
+            'price' => $request->sold_price == 0 ? 1 : $request->sold_price,
             'quantity' => $qty == 0 ? 1 : $qty,
             'attributes' => array(
                 'cost_price' => $cost_price,
-                'code'=>$request->code,
+                'code' => $request->code,
                 'selling_price' => $selling_price,
                 'qty_available' => $qty_available,
                 'discount' => 0,
-                'store'=> $store,
-                'unit' =>$request->unit ?? ''
+                'store' => $store,
+                'unit' => $request->unit ?? ''
             ),
         ]);
-//        return \Cart::getContent();
+        //        return \Cart::getContent();
         if ($add) {
             session()->flash('success', 'Product is Added to Cart Successfully !');
-            return back()->with(['customer'=> $customer]);
+            return back()->with(['customer' => $customer]);
         } else {
-            session()->flash('success','Product not added to cart');
+            session()->flash('success', 'Product not added to cart');
             return back()->with('customer', $customer);
         }
     }
@@ -84,11 +84,11 @@ class CartController extends Controller
                 'attributes' => array(
                     'cost_price' => $request->cost_price,
                     'selling_price' => $request->selling_price,
-                    'code'=>$request->code,
+                    'code' => $request->code,
                     'discount' => $request->selling_price - $request->sold_price,
                     'qty_available' => $request->qty_available,
-                    'store'=>$request->store,
-                    'unit'=>$request->unit,
+                    'store' => $request->store,
+                    'unit' => $request->unit,
                 )
             ]
         );
@@ -118,15 +118,16 @@ class CartController extends Controller
     }
 
 
-    public function loadCartItem(Request $request){
+    public function loadCartItem(Request $request)
+    {
         $type = $request->type;
         return view('components.cart', compact('type'));
     }
 
     public function addCartItem(Request $request)
     {
-        $type =$request->type;
-        if($type == 'interstore'){
+        $type = $request->type;
+        if ($type == 'interstore') {
             $product = Product::find($request->product_id);
             $add = \Cart::add([
                 'id' => generateRandomString(),
@@ -141,9 +142,9 @@ class CartController extends Controller
                 ),
             ]);
         }
-        if($type == 'intersite'){
+        if ($type == 'intersite') {
             $product = Product::find($request->product_id);
-            $cost_price = BranchProductPrice::where(['product_id'=>$request->product_id, 'branch_id'=>auth()->user()->branch->id])->first();
+            $cost_price = BranchProductPrice::where(['product_id' => $request->product_id, 'branch_id' => auth()->user()->branch->id])->first();
             $add = \Cart::add([
                 'id' => generateRandomString(),
                 'name' => $product->name,
@@ -156,7 +157,31 @@ class CartController extends Controller
                 ),
             ]);
         }
-        if($type == 'grn') {
+        if ($type == 'grn') {
+            $product = Product::find($request->product_id);
+            $store = Store::find($request->store_id);
+            $qty = $request->qty_supplied;
+            $qty_available = $request->qty_available;
+            $selling_price = $request->seller_price;
+            $add = \Cart::add([
+                'id' => $request->product_id,
+                'name' => $product->name,
+                'price' => $request->unit_price == 0 ? 1 : $request->unit_price,
+                'quantity' => $qty == 0 ? 1 : $qty,
+                'attributes' => array(
+                    'cost_price' => $request->unit_price ?? '',
+                    'code' => $product->code,
+                    'selling_price' => $selling_price ?? '',
+                    'qty_available' => $qty_available ?? '',
+                    'discount' => 0,
+                    'store' => $request->store ?? '',
+                    'unit' => $product->unit ?? '',
+                    'store_id' => $request->store_id ?? '',
+                    'store_code' => $store->code ?? '',
+                ),
+            ]);
+        }
+        if ($type == 'request') {
             $product = Product::find($request->product_id);
             $store = Store::find($request->store_id);
             $qty = $request->qty_supplied;
@@ -179,30 +204,7 @@ class CartController extends Controller
                 ),
             ]);
         }
-        if($type == 'request') {
-            $product = Product::find($request->product_id);
-            $store = Store::find($request->store_id);
-            $qty = $request->qty_supplied;
-            $qty_available = $request->qty_available;
-            $add = \Cart::add([
-                'id' => $request->product_id,
-                'name' => $product->name,
-                'price' => $request->unit_price == 0 ? 1 : $request->unit_price,
-                'quantity' => $qty == 0 ? 1 : $qty,
-                'attributes' => array(
-                    'cost_price' => $request->unit_price ?? '',
-                    'code' => $product->code,
-                    'selling_price' => $selling_price ?? '',
-                    'qty_available' => $qty_available ?? '',
-                    'discount' => 0,
-                    'store' => $request->store ?? '',
-                    'unit' => $product->unit ?? '',
-                    'store_id' => $request->store_id ?? '',
-                    'store_code' => $store->code ?? '',
-                ),
-            ]);
-        }
-        if($type == 'adjustment') {
+        if ($type == 'adjustment') {
             $product = Product::find($request->product_id);
             // get the unit cost
             $add = \Cart::add([
@@ -219,16 +221,16 @@ class CartController extends Controller
                 ),
             ]);
         }
-        if($type == 'order' || $type=='proforma' || $type == 'invoice') {
+        if ($type == 'order' || $type == 'proforma' || $type == 'invoice') {
             $customer = Customer::find($request->customer);
             $store_product = StoreProduct::find($request->id);
             $product_id = $store_product->product_id;
-            $prices = BranchProductPrice::where(['product_id'=>$product_id,'branch_id'=>auth()->user()->branch->id])->first();
+            $prices = BranchProductPrice::where(['product_id' => $product_id, 'branch_id' => auth()->user()->branch->id])->first();
             $selling_price = 0;
-            if($prices){
-                if($customer->type == 'Retail')
+            if ($prices) {
+                if ($customer->type == 'Retail')
                     $selling_price = $prices->retail_selling_price;
-                if($customer->type == 'Wholesale')
+                if ($customer->type == 'Wholesale')
                     $selling_price = $prices->whole_selling_price;
             }
             $qty = $request->qty;
@@ -242,12 +244,12 @@ class CartController extends Controller
                 'quantity' => $qty == 0 ? 1 : $qty,
                 'attributes' => array(
                     'cost_price' => $cost_price,
-                    'code'=>$request->code,
+                    'code' => $request->code,
                     'selling_price' => $selling_price,
                     'qty_available' => $qty_available,
                     'discount' => 0,
-                    'store'=> $store,
-                    'unit' =>$request->unit ?? '',
+                    'store' => $store,
+                    'unit' => $request->unit ?? '',
                 ),
             ]);
         }
@@ -257,12 +259,13 @@ class CartController extends Controller
 
     public function updateCartItem(Request $request, $id)
     {
-        $type =$request->type;
-        if($type == 'grn') {
+        $type = $request->type;
+        if ($type == 'grn') {
             $sold_price = $request->sold_price;
             if ($request->has('percent')) {
                 $percent = $request->percent;
-                $sold_price = ceil($request->cost_price + ($request->cost_price / 100) * $percent);
+                $cost_price = floatval(str_replace(',', '', $request->cost_price));
+                $sold_price = ceil($cost_price + ($cost_price / 100) * $percent);
             }
             $store = Store::find($request->store_id);
             \Cart::update(
@@ -276,26 +279,28 @@ class CartController extends Controller
                     'attributes' => array(
                         'cost_price' => $request->price,
                         'selling_price' => $request->selling_price ?? '',
-                        'code'=>$request->code,
+                        'code' => $request->code,
                         'discount' => $request->selling_price - $request->sold_price ?? '',
                         'qty_available' => $request->qty_available,
-                        'store'=>$request->store,
-                        'unit'=>$request->unit,
-                        'store_id' =>$request->store_id ?? '',
-                        'store_code' =>$store->code ?? '',
+                        'store' => $request->store,
+                        'unit' => $request->unit,
+                        'store_id' => $request->store_id ?? '',
+                        'store_code' => $store->code ?? '',
                     )
                 ]
             );
         }
-        if($type == 'request') {
+        if ($type == 'request') {
             $sold_price = $request->sold_price;
             if ($request->has('percent')) {
                 $percent = $request->percent;
-                $sold_price = ceil($request->cost_price + ($request->cost_price / 100) * $percent);
+                $cost_price = floatval(str_replace(',', '', $request->cost_price));
+                $sold_price = ceil($cost_price + ($cost_price / 100) * $percent);
             }
             $store = Store::find($request->store_id);
             \Cart::update(
-                $request->id, [
+                $request->id,
+                [
                     'quantity' => [
                         'relative' => false,
                         'value' => $request->quantity
@@ -304,70 +309,75 @@ class CartController extends Controller
                     'attributes' => array(
                         'cost_price' => $request->price,
                         'selling_price' => $request->selling_price ?? '',
-                        'code'=>$request->code,
+                        'code' => $request->code,
                         'discount' => $request->selling_price - $request->sold_price ?? '',
                         'qty_available' => $request->qty_available,
-                        'store'=>$request->store,
-                        'unit'=>$request->unit,
-                        'store_id' =>$request->store_id ?? '',
-                        'store_code' =>$store->code ?? '',
+                        'store' => $request->store,
+                        'unit' => $request->unit,
+                        'store_id' => $request->store_id ?? '',
+                        'store_code' => $store->code ?? '',
                     )
                 ]
             );
         }
-        if($type == 'adjustment') {
+        if ($type == 'adjustment') {
             $product = Product::find($request->product_id);
             \Cart::update(
-                $request->id, [
-                'quantity' => [
-                    'relative' => false,
-                    'value' => $request->quantity
-                ],
-                'name' => $product->name,
-                'price' => 0, //Thos is not applicable here
-                'attributes' => array(
-                    'store_id' => $request->store_id,
-                    'product_id' => $request->product_id,
-                    'available_qty' => $request->available_qty,
-                    'code' => $product->code,
-                    'expiry_date' => $request->expiry_date ?? '',
-                ),
-            ]);
+                $request->id,
+                [
+                    'quantity' => [
+                        'relative' => false,
+                        'value' => $request->quantity
+                    ],
+                    'name' => $product->name,
+                    'price' => 0, //Thos is not applicable here
+                    'attributes' => array(
+                        'store_id' => $request->store_id,
+                        'product_id' => $request->product_id,
+                        'available_qty' => $request->available_qty,
+                        'code' => $product->code,
+                        'expiry_date' => $request->expiry_date ?? '',
+                    ),
+                ]
+            );
         }
-        if($type == 'intersite') {
+        if ($type == 'intersite') {
             $product = Product::find($request->product_id);
             \Cart::update(
-                $request->id, [
-                'quantity' => [
-                    'relative' => false,
-                    'value' => $request->quantity
-                ],
-                'name' => $product->name,
-                'price' => $request->cost_price, //This is not applicable here
-                'attributes' => array(
-                    'store_id' => $request->store_id,
-                    'product_id' => $request->product_id,
-                    'code' => $request->code,
-                ),
-            ]);
+                $request->id,
+                [
+                    'quantity' => [
+                        'relative' => false,
+                        'value' => $request->quantity
+                    ],
+                    'name' => $product->name,
+                    'price' => $request->cost_price, //This is not applicable here
+                    'attributes' => array(
+                        'store_id' => $request->store_id,
+                        'product_id' => $request->product_id,
+                        'code' => $request->code,
+                    ),
+                ]
+            );
         }
-        if($type == 'order' || $type=='proforma' || $type == 'invoice') {
+        if ($type == 'order' || $type == 'proforma' || $type == 'invoice') {
             $unit = $request->unit;
             $store_product_id = $request->id;
-            $selling_price = $request->selling_price;
-            $sold_price = $request->sold_price;
+            $selling_price = str_replace(',', '', $request->selling_price);
+            $sold_price = str_replace(',', '', $request->sold_price);
             $store_product = StoreProduct::find($store_product_id);
             $product_id = $store_product->product_id;
             $store_id = $store_product->store_id;
-            $unit_measure = ProductUnitMeasure::where(['product_id'=> $product_id, 'code'=>$unit])->first();
-            if($unit_measure && $unit_measure->value > 1) {
-                if($unit_measure->type == 'division')
-                    $sold_price = roundDown(($selling_price / ($unit_measure->value ?? 1)),50);
-                if($unit_measure->type == 'multiple')
-                    $sold_price = roundDown(($selling_price * ($unit_measure->value ?? 1)),50);
-            }else{
+            $unit_measure = ProductUnitMeasure::where(['product_id' => $product_id, 'code' => $unit])->first();
+            if ($unit_measure && $unit_measure->value > 1) {
+                if ($unit_measure->type == 'division')
+                    $sold_price = roundDown(($selling_price / ($unit_measure->value ?? 1)), 50);
+                if ($unit_measure->type == 'multiple')
+                    $sold_price = roundDown(($selling_price * ($unit_measure->value ?? 1)), 50);
+            } else {
                 $sold_price = $selling_price;
             }
+            $discount = ($selling_price > 0 ? $selling_price : 0) - ($sold_price > 0 ? $sold_price : 0);
             \Cart::update(
                 $request->id,
                 [
@@ -377,13 +387,13 @@ class CartController extends Controller
                     ],
                     'price' => $sold_price,
                     'attributes' => array(
-                        'cost_price' => $request->cost_price,
-                        'selling_price' => $request->selling_price,
-                        'discount' => $request->selling_price - $request->sold_price,
+                        'cost_price' => str_replace(' ', '', $request->cost_price),
+                        'selling_price' => $selling_price,
+                        'discount' => $discount > 0 ? $discount : 0,
                         'qty_available' => $request->qty_available,
-                        'code'=>$request->code,
-                        'store'=>$request->store,
-                        'unit'=>$request->unit,
+                        'code' => $request->code,
+                        'store' => $request->store,
+                        'unit' => $request->unit,
                     )
                 ]
             );
@@ -392,13 +402,14 @@ class CartController extends Controller
         if ($request->ajax()) {
             return \Cart::getTotal();
         }
-        $type =$request->type;
+        $type = $request->type;
         return view('components.cart', compact('type'));
     }
 
-    public function deleteCartItem(Request $request, $id){
+    public function deleteCartItem(Request $request, $id)
+    {
         \Cart::remove($id);
-        $type =$request->type;
+        $type = $request->type;
         return view('components.cart', compact('type'));
     }
 

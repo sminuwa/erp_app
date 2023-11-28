@@ -158,7 +158,7 @@ class ProductController extends Controller
             case 'GET':
                 return view('pages.purchase_prices.create');
             case 'POST':
-                $product_id = $request->purchase_price;
+                $product_id = $request->product_id;
                 $purchase_price = $request->purchase_price;
                 $product = Product::find($product_id);
                 if (($product->purchase_price = $purchase_price) && $product->save()) {

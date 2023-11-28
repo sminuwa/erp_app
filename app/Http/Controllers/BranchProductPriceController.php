@@ -93,26 +93,31 @@ class BranchProductPriceController extends Controller
         $count = 0;
         //$model = new BranchProductPrice;
         //$model->fill($request->all());
-        $status = BranchProductPrice::updateOrCreate([
-            'branch_id' => $request->branch_id,
-            'product_id' => $request->product_id,
-            'status' => $request->status
-        ], [
-            'selling_price' => $request->selling_price,
-            //'cost_price'=>$request->cost_price,
-            'updated_by' => Auth::id(),
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now()
-        ]);
-        if ($status) {
-            $action = "Set a product price to $request->selling_price for " . Product::find($request->product_id)->name;
-            AuditLog::auditLog(Auth::id(), $action);
-            session()->flash('app_message', 'Branch product price saved successfully');
-//            return redirect()->route('branch_product_prices.index');
-            return redirect()->back()->with('app_message','Branch product price saved successfully');
-        } else {
-            session()->flash('app_message', 'Something is wrong while saving branch product price');
+        try {
+            $status = BranchProductPrice::updateOrCreate([
+                'branch_id' => $request->branch_id,
+                'product_id' => $request->product_id,
+                'status' => $request->status
+            ], [
+                'selling_price' => $request->selling_price,
+                //'cost_price'=>$request->cost_price,
+                'updated_by' => Auth::id(),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ]);
+            if ($status) {
+                $action = "Set a product price to $request->selling_price for " . Product::find($request->product_id)->name;
+                AuditLog::auditLog(Auth::id(), $action);
+                session()->flash('app_message', 'Branch product price saved successfully');
+                //            return redirect()->route('branch_product_prices.index');
+                return redirect()->back()->with('app_message', 'Branch product price saved successfully');
+            } else {
+                session()->flash('app_message', 'Something is wrong while saving branch product price');
+            }
+        } catch (\Exception $e) {
+            return $e->getMessage();
         }
+
         return redirect()->back();
     } /**
       * Show the form for editing the specified resource.

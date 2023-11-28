@@ -148,7 +148,7 @@ class CartController extends Controller
             $add = \Cart::add([
                 'id' => generateRandomString(),
                 'name' => $product->name,
-                'price' => $cost_price->cost_price ?? 1,
+                'price' => str_replace(',', '', $cost_price->cost_price) ?? 1,
                 'quantity' => $request->quantity,
                 'attributes' => array(
                     'store_id' => $request->store_id,
@@ -162,11 +162,12 @@ class CartController extends Controller
             $store = Store::find($request->store_id);
             $qty = $request->qty_supplied;
             $qty_available = $request->qty_available;
-            $selling_price = $request->seller_price;
+            $selling_price = str_replace(',', '', $request->seller_price);
+            $unit_price = str_replace(',', '', $request->unit_price);
             $add = \Cart::add([
                 'id' => $request->product_id,
                 'name' => $product->name,
-                'price' => $request->unit_price == 0 ? 1 : $request->unit_price,
+                'price' => $unit_price == 0 ? 1 : $unit_price,
                 'quantity' => $qty == 0 ? 1 : $qty,
                 'attributes' => array(
                     'cost_price' => $request->unit_price ?? '',
@@ -186,10 +187,11 @@ class CartController extends Controller
             $store = Store::find($request->store_id);
             $qty = $request->qty_supplied;
             $qty_available = $request->qty_available;
+            $unit_price = str_replace(',', '', $request->unit_price);
             $add = \Cart::add([
                 'id' => $request->product_id,
                 'name' => $product->name,
-                'price' => $request->unit_price == 0 ? 1 : $request->unit_price,
+                'price' => $unit_price == 0 ? 1 : $unit_price,
                 'quantity' => $qty == 0 ? 1 : $qty,
                 'attributes' => array(
                     'cost_price' => $request->unit_price ?? '',
@@ -210,7 +212,7 @@ class CartController extends Controller
             $add = \Cart::add([
                 'id' => generateRandomString(),
                 'name' => $product->name,
-                'price' => 0, //Thos is not applicable here
+                'price' => 1, //This is not applicable here
                 'quantity' => abs($request->quantity),
                 'attributes' => array(
                     'store_id' => $request->store_id,
@@ -229,12 +231,12 @@ class CartController extends Controller
             $selling_price = 0;
             if ($prices) {
                 if ($customer->type == 'Retail')
-                    $selling_price = $prices->retail_selling_price;
+                    $selling_price = str_replace(',', '', $prices->retail_selling_price);
                 if ($customer->type == 'Wholesale')
-                    $selling_price = $prices->whole_selling_price;
+                    $selling_price = str_replace(',', '', $prices->whole_selling_price);
             }
             $qty = $request->qty;
-            $cost_price = $request->cost_price;
+            $cost_price = str_replace(',', '', $request->cost_price);
             $qty_available = $request->qty_available;
             $store = $request->store;
             $add = \Cart::add([
@@ -305,12 +307,12 @@ class CartController extends Controller
                         'relative' => false,
                         'value' => $request->quantity
                     ],
-                    'price' => $request->price,
+                    'price' => str_replace(',', '', $request->price),
                     'attributes' => array(
-                        'cost_price' => $request->price,
-                        'selling_price' => $request->selling_price ?? '',
+                        'cost_price' => str_replace(',', '', $request->price),
+                        'selling_price' => str_replace(',', '', $request->selling_price) ?? '',
                         'code' => $request->code,
-                        'discount' => $request->selling_price - $request->sold_price ?? '',
+                        'discount' => str_replace(',', '', $request->selling_price - $request->sold_price) ?? '',
                         'qty_available' => $request->qty_available,
                         'store' => $request->store,
                         'unit' => $request->unit,
@@ -330,7 +332,7 @@ class CartController extends Controller
                         'value' => $request->quantity
                     ],
                     'name' => $product->name,
-                    'price' => 0, //Thos is not applicable here
+                    'price' => 1, //Thos is not applicable here
                     'attributes' => array(
                         'store_id' => $request->store_id,
                         'product_id' => $request->product_id,
@@ -351,7 +353,7 @@ class CartController extends Controller
                         'value' => $request->quantity
                     ],
                     'name' => $product->name,
-                    'price' => $request->cost_price, //This is not applicable here
+                    'price' => str_replace(',', '', $request->cost_price), //This is not applicable here
                     'attributes' => array(
                         'store_id' => $request->store_id,
                         'product_id' => $request->product_id,

@@ -27,7 +27,7 @@ class PosController extends Controller
         $user_branch = User::userBranchAction();
         $category_id = 0;
         $store_id = 0;
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.code AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.code AS store', 'qty_available', 'selling_price','retail_selling_price', 'cost_price', 'unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
             ->join('products', 'products.id', 'store_products.product_id')

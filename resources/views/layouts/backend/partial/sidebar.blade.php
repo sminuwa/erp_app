@@ -250,6 +250,15 @@
                                     </a>
                                 </li>
                             @endcan
+                            @can('view.product')
+                                <li class="nav-item">
+                                    <a href="{{ route('product_unit_measures.index') }}"
+                                        class="nav-link {{ Request::is('settings/products/manage/unit/*') ? 'active' : '' }}">
+                                        <i class="ion-ios-cart-outline"></i>
+                                        <p>Manage UTM</p>
+                                    </a>
+                                </li>
+                            @endcan
                             @can('view.product.price')
                                 <li class="nav-item">
                                     <a href="{{ route('branch_product_prices.create') }}"

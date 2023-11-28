@@ -4,6 +4,7 @@ use App\Http\Controllers\AdditionalInvoiceController;
 use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\GeneralAccountController;
 use App\Http\Controllers\JournalController;
+use App\Http\Controllers\ProductUnitMeasureController;
 use App\Http\Controllers\ProformaInvoiceController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\InterBankController;
@@ -199,6 +200,22 @@ Route::middleware('auth')->group(function () {
                         //Import Products
                         Route::get('/import/form', [ProductController::class, 'importForm'])->name('products.import.form');
                         Route::post('/import', [ProductController::class, 'import'])->name('products.import');
+                    }
+                );
+                Route::group(
+                    ['utm' => 'manage'],
+                    function () {
+                        Route::get('/index', [ProductUnitMeasureController::class, 'index'])->name('product_unit_measures.index');
+                        Route::get('/create', [ProductUnitMeasureController::class, 'create'])->name('product_unit_measures.create');
+                        Route::get('/show/{productunitmeasure}', [ProductUnitMeasureController::class, 'show'])->name('product_unit_measures.show');
+                        Route::post('/store', [ProductUnitMeasureController::class, 'store'])->name('product_unit_measures.store');
+                        Route::get('/edit/{productunitmeasure}', [ProductUnitMeasureController::class, 'edit'])->name('product_unit_measures.edit');
+                        Route::put('/update/{productunitmeasure}', [ProductUnitMeasureController::class, 'update'])->name('product_unit_measures.update');
+                        Route::delete('/delete/{productunitmeasure}', [ProductUnitMeasureController::class, 'destroy'])->name('product_unit_measures.destroy');
+                        
+                        //Import Products
+                        Route::get('/import/form', [ProductUnitMeasureController::class, 'importForm'])->name('product_unit_measures.import.form');
+                        Route::post('/import', [ProductUnitMeasureController::class, 'import'])->name('product_unit_measures.import');
                     }
                 );
                 Route::group(

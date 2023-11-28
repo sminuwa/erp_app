@@ -17,12 +17,13 @@
 			<div class="container-fluid">
 				<div class="row mb-2">
 					<div class="col-sm-6">
-						<h1>Edit Product <small>{{$model->name}}</small></h1>
+						<h1>Edit Product Unit of Measure<small>{{$model->product->code}}</small></h1>
 					</div>
 					<div class="col-sm-6">
 						<ol class="breadcrumb float-sm-right">
 							<li class="breadcrumb-item"><a href="{{route('home')}}">Home</a></li>
-							<li class="breadcrumb-item active">products</li>
+                            <li class="breadcrumb-item"><a href="{{ route('product_unit_measures.index') }}">UTM</a></li>
+							<li class="breadcrumb-item active">Edit</li>
 						</ol>
 					</div>
 				</div>
@@ -31,22 +32,22 @@
 
 		<!-- Main content -->
 		<section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('products.create') }}">
-                <span class="fa fa-plus-circle">New Product</span>
+            <a class="btn btn-secondary btn-sm" href="{{ route('product_unit_measures.create') }}">
+                <span class="fa fa-plus-circle"> New UTM</span>
             </a>
 			<a class="btn btn-secondary btn-sm" href="{{ route('categories.import.form') }}">
-                <span class="fa fa-upload"> Upload Categories</span>
+                <span class="fa fa-upload"> Upload UTM</span>
             </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('products.index') }}">
-                <span class="fa fa-list"> View Product</span>
+            <a class="btn btn-secondary btn-sm" href="{{ route('product_unit_measures.index') }}">
+                <span class="fa fa-list"> View UTM</span>
             </a>
 			<div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>
                         <div class='card'>
                             <div class="card-body">
-                                @include('forms.product', [
-                                    'route' => route('products.update', $model->id),
+                                @include('forms.product_unit_measure', [
+                                    'route' => route('product_unit_measures.update', $model->id),
                                     'method' => 'PUT',
                                 ])
                             </div>

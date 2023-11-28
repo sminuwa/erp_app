@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+
 /**
    @property bigint $product_id product id
 @property varchar $code code
@@ -11,30 +12,35 @@ use Illuminate\Database\Eloquent\Model;
 @property timestamp $updated_at updated at
    
  */
-class ProductUnitMeasure extends Model 
+class ProductUnitMeasure extends Model
 {
-    const TYPE_DIVISION='division';
+    const TYPE_DIVISION = 'division';
 
-const TYPE_MULTIPLE='multiple';
+    const TYPE_MULTIPLE = 'multiple';
 
     /**
-    * Database table name
-    */
+     * Database table name
+     */
     protected $table = 'product_unit_measures';
 
     /**
-    * Mass assignable columns
-    */
-    protected $fillable=['product_id',
-'code',
-'type',
-'amount'];
+     * Mass assignable columns
+     */
+    protected $fillable = [
+        'product_id',
+        'code',
+        'type',
+        'value'
+    ];
 
     /**
-    * Date time columns.
-    */
-    protected $dates=[];
-
+     * Date time columns.
+     */
+    protected $dates = [];
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
 
 
 

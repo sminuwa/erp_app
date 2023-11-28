@@ -14,7 +14,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Add Products</h4>
+                        <h4>Add Unit of Measures</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -28,16 +28,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('products.create') }}">
-                <span class="fa fa-plus-circle">New Product</span>
+            <a class="btn btn-secondary btn-sm" href="{{ route('product_unit_measures.create') }}">
+                <span class="fa fa-plus-circle">New Product </span>
             </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('products.index') }}">
-                <span class="fa fa-list"> View Products</span>
+            <a class="btn btn-secondary btn-sm" href="{{ route('product_unit_measures.index') }}">
+                <span class="fa fa-list"> View UTM</span>
             </a>
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>
-                        @include('forms.product')
+                        @include('forms.product_unit_measure')
                     </div>
                 </div>
             </div><!-- /.container-fluid -->

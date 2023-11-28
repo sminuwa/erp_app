@@ -235,7 +235,7 @@
                                                             </td>
                                                         @else
                                                             <td align="center">
-                                                                <span class="fa fa-crosshairs text text-danger"></span>
+                                                                <span class="fa fa-crosshairs text text-danger" title="Selling price not set!"></span>
                                                             </td>
                                                         @endif
                                                     </form>

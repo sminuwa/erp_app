@@ -99,14 +99,15 @@ class BranchProductPriceController extends Controller
                 'product_id' => $request->product_id,
                 'status' => $request->status
             ], [
-                'selling_price' => $request->selling_price,
+                'retail_selling_price' => str_replace(',', '', $request->retail_selling_price),
+                'whole_selling_price' => str_replace(',', '', $request->whole_selling_price),
                 //'cost_price'=>$request->cost_price,
                 'updated_by' => Auth::id(),
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ]);
             if ($status) {
-                $action = "Set a product price to $request->selling_price for " . Product::find($request->product_id)->name;
+                $action = "Set a product price to $request->retail_selling_price , $request->whole_selling_price for " . Product::find($request->product_id)->name;
                 AuditLog::auditLog(Auth::id(), $action);
                 session()->flash('app_message', 'Branch product price saved successfully');
                 //            return redirect()->route('branch_product_prices.index');

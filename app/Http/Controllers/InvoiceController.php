@@ -831,7 +831,7 @@ class InvoiceController extends Controller
     public function linkOrderInvoice(Request $request, OrderInvoice $order)
     {
         $user_branch = User::userBranchAction();
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price','retail_selling_price', 'cost_price')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('products', 'products.id', 'store_products.product_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
@@ -840,9 +840,9 @@ class InvoiceController extends Controller
                     ->on('branch_product_prices.branch_id', '=', 'branches.id');
 
             })
-            ->where('stores.branch_id', 'LIKE', $user_branch)
+            //->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('branch_product_prices.status', 1)
-            ->orderBy('products.name')->orderBy('stores.name')->limit(100)->get();
+            ->orderBy('products.name')->orderBy('stores.name')->get();
         //TODO:: remove limit here
         $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name');
         if (\Cart::getContent()->isEmpty())

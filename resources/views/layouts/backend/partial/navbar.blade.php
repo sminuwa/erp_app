@@ -141,7 +141,7 @@
                         <select class="form-control select2-single" name="branch" id="branch" required>
                             <option value="">Select...</option>
                             @foreach (App\Models\Branch::orderBy('name')->get() as $data)
-                                <option value="{{ $data->id }}">{{ $data->name }}
+                                <option value="{{ $data->id }}">{{ $data->code }}-{{ $data->name }}
                                 </option>
                             @endforeach
                         </select>

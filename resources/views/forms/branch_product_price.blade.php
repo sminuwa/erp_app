@@ -45,13 +45,24 @@
     </div>
 
     <div class="form-group">
-        <label for="selling_price">Selling Price</label>
-        <input type="text" class="form-control {{ $errors->has('selling_price') ? ' is-invalid' : '' }}"
-            name="selling_price" id="selling_price" value="{{ old('selling_price', $model->selling_price) }}"
+        <label for="retail_selling_price">Retail Price</label>
+        <input type="text" class="form-control {{ $errors->has('retail_selling_price') ? ' is-invalid' : '' }}"
+            name="retail_selling_price" id="retail_selling_price" value="{{ old('retail_selling_price', $model->retail_selling_price) }}"
             placeholder="" required="required">
-        @if ($errors->has('selling_price'))
+        @if ($errors->has('retail_selling_price'))
             <div class="invalid-feedback">
-                <strong>{{ $errors->first('selling_price') }}</strong>
+                <strong>{{ $errors->first('retail_selling_price') }}</strong>
+            </div>
+        @endif
+    </div>
+    <div class="form-group">
+        <label for="whole_selling_price">Wholesale Price</label>
+        <input type="text" class="form-control {{ $errors->has('whole_selling_price') ? ' is-invalid' : '' }}"
+            name="whole_selling_price" id="whole_selling_price" value="{{ old('whole_selling_price', $model->whole_selling_price) }}"
+            placeholder="" required="required">
+        @if ($errors->has('whole_selling_price'))
+            <div class="invalid-feedback">
+                <strong>{{ $errors->first('whole_selling_price') }}</strong>
             </div>
         @endif
     </div>

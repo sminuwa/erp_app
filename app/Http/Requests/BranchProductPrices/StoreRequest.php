@@ -28,7 +28,8 @@ class StoreRequest extends FormRequest
         return [
 			'branch_id' => 'required|exists:branches,id',
 			'product_id' => 'required|numeric|exists:products,id',
-			'selling_price' => 'required|numeric',
+			'retail_selling_price' => 'required|numeric',
+			'whole_selling_price' => 'required|numeric',
 			'status' => 'required',
 			'updated_by' => 'required|numeric',
         ];

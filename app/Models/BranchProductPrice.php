@@ -18,7 +18,7 @@ class BranchProductPrice extends Model
     /**
      * Mass assignable columns
      */
-    protected $fillable = ['branch_id', 'product_id', 'selling_price','cost_price', 'status', 'updated_by'];
+    protected $fillable = ['branch_id', 'product_id', 'selling_price','cost_price', 'status', 'updated_by','retail_selling_price','whole_selling_price'];
 
     /**
      * Date time columns.

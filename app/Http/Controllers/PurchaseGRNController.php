@@ -46,8 +46,8 @@ class PurchaseGRNController extends Controller
         return view('pages.inventories.purchases.grn.index', [
             'records' => Purchase::select('purchases.*')->orderBy('reference', 'DESC')
                 ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
-                ->where('branch_id', 'LIKE', User::userBranchAction())
-                ->take(10)->get(),
+                ->where('purchases.branch_id', 'LIKE', User::userBranchAction())
+                ->get(),
             'suppliers' => Supplier::where('code', 'like', 'TS%')->orderBy('name')->get(),
         ]);
     }

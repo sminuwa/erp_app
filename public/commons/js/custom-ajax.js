@@ -117,7 +117,7 @@ $(document).on('submit','.addCartItemForm', function(e){
 //update to card
 $(document).on('keyup','.quantity, .price', function(){
     let id = $(this).attr('data-value');
-
+    
     if(type == 'invoice'){
         $("#valid_qty" + id.substr(1)).html("");
         if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
@@ -134,6 +134,7 @@ $(document).on('keyup','.quantity, .price', function(){
 
 function updateCart(formId, formData = ''){
     let form = $('#' + formId);
+   
     $.ajax({
         url: form.attr('action'),
         type: 'GET',

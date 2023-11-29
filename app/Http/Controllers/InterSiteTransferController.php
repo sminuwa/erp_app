@@ -41,42 +41,43 @@ class InterSiteTransferController extends Controller
     public function index(Index $request)
     {
         \Cart::clear();
-        $posted =  IntersiteTransfer::where('destination_branch_id', User::userBranchAction())
+        $posted = IntersiteTransfer::where('destination_branch_id', User::userBranchAction())
             ->posted()->count();
         $records = IntersiteTransfer::where('source_branch_id', User::userBranchAction())
             ->orderBy('id', 'desc')
             ->get();
-        return view('pages.inventories.transfers.inter_site.index',compact('records', 'posted'));
+        return view('pages.inventories.transfers.inter_site.index', compact('records', 'posted'));
     }
 
     public function received(Request $request)
     {
         \Cart::clear();
-        $pending =  IntersiteTransfer::where('source_branch_id', User::userBranchAction())
+        $pending = IntersiteTransfer::where('source_branch_id', User::userBranchAction())
             ->pending()->count();
         $records = IntersiteTransfer::where('destination_branch_id', User::userBranchAction())
             ->notPending()
             ->orderBy('id', 'desc')
             ->get();
-        return view('pages.inventories.transfers.inter_site.received',compact('records', 'pending'));
+        return view('pages.inventories.transfers.inter_site.received', compact('records', 'pending'));
     }
 
-    public function post(IntersiteTransfer $intersite){
+    public function post(IntersiteTransfer $intersite)
+    {
         $user = auth()->user();
         $intersite->status = 1;
-        $intersite->posted_by =$user->id;
+        $intersite->posted_by = $user->id;
         DB::beginTransaction();
-        if($intersite->save()){
+        if ($intersite->save()) {
             $items = $intersite->products;
-            foreach($items as $item){
-                StoreProduct::where(['store_id'=>$item->store_id, 'product_id'=>$item->product_id])->decrement('qty_available',$item->quantity);
+            foreach ($items as $item) {
+                StoreProduct::where(['store_id' => $item->store_id, 'product_id' => $item->product_id])->decrement('qty_available', $item->quantity);
             }
-            if(Transaction::intersite_post($intersite->id)['status']) {
+            if (Transaction::intersite_post($intersite->id)['status']) {
                 $action = "Posted intersite transfer of product from " . $user->branch->name . " to  branch" . Branch::find($intersite->destination_branch_id)->name;
                 AuditLog::auditLog(Auth::id(), $action);
                 session()->flash('app_message', 'Intersite transfer saved successfully');
                 DB::commit();
-            }else{
+            } else {
                 DB::rollBack();
             }
         }
@@ -89,13 +90,13 @@ class InterSiteTransferController extends Controller
         $intersite->status = 2;
         $intersite->received_by = $user->id;
         DB::beginTransaction();
-        if($intersite->save()){
-            if(Transaction::intersite_receive($intersite->id)['status']) {
+        if ($intersite->save()) {
+            if (Transaction::intersite_receive($intersite->id)['status']) {
                 $action = "Received intersite transfer of product from " . $user->branch->name . " to  branch" . Branch::find($intersite->destination_branch_id)->name;
                 AuditLog::auditLog(Auth::id(), $action);
                 session()->flash('app_message', 'Intersite transfer saved successfully');
                 DB::commit();
-            }else{
+            } else {
                 DB::rollBack();
             }
         }
@@ -122,7 +123,8 @@ class InterSiteTransferController extends Controller
 
     }
 
-    public function addToStore(Request $request){
+    public function addToStore(Request $request)
+    {
         $user = auth()->user();
         $intersite_transfer_id = $request->intersite_transfer_id;
         $source_store_id = $request->source_store_id;
@@ -130,7 +132,7 @@ class InterSiteTransferController extends Controller
         $store_id = $request->store_id;
         $quantity = $request->quantity;
         $intersite = IntersiteTransfer::find($intersite_transfer_id);
-        $record = IntersiteTransferProduct::where(['intersite_transfer_id'=>$intersite_transfer_id, 'store_id'=>$source_store_id, 'product_id'=>$product_id])->first();
+        $record = IntersiteTransferProduct::where(['intersite_transfer_id' => $intersite_transfer_id, 'store_id' => $source_store_id, 'product_id' => $product_id])->first();
         $cost_price = $record->cost_price;
         $total_quantity = $record->quantity;
         DB::beginTransaction();
@@ -160,7 +162,7 @@ class InterSiteTransferController extends Controller
             TRANSACTION_TYPE_INTERSITE
         );*/
         if (
-             CostPrice::newCostPrice(
+            CostPrice::newCostPrice(
                 $new_cost_price,
                 $intersite->reference,
                 $user->branch->id,
@@ -181,8 +183,11 @@ class InterSiteTransferController extends Controller
     {
         //\Cart::session('_token')->clear();
 
-        $products = Product::select('products.id', 'products.name', 'products.code')
+        $products = Product::select('products.id', 'products.name', 'products.code','qty_available')
             ->join('store_products', 'store_products.product_id', 'products.id')
+            ->join('stores', 'stores.id', 'store_products.store_id')
+            ->join('branches', 'branches.id', 'stores.branch_id')
+            ->where('stores.branch_id', User::userBranchAction())
             ->where('qty_available', '>', 0)->get();
         $categories = Category::all(['id', 'name']);
         $stores = Store::where('branch_id', 'LIKE', User::userBranchAction())->get();
@@ -211,7 +216,7 @@ class InterSiteTransferController extends Controller
         $intersite = IntersiteTransfer::find($intersite_id);
         DB::beginTransaction();
         try {
-            if(!$intersite){
+            if (!$intersite) {
                 $intersite = new IntersiteTransfer();
                 $intersite->reference = IntersiteTransfer::generateNewNumber();
                 $intersite->created_by = auth()->id();
@@ -222,7 +227,7 @@ class InterSiteTransferController extends Controller
             $intersite->vehicle_no = $vehicle_no;
             $intersite->description = $description;
             $intersite->date = $date;
-            if($intersite->save()){
+            if ($intersite->save()) {
                 if (\Cart::getContent()->count() > 0) {
                     IntersiteTransferProduct::where('intersite_transfer_id', $intersite->id)->delete();
                     foreach (\Cart::getContent() as $product) {
@@ -243,13 +248,13 @@ class InterSiteTransferController extends Controller
                 session()->flash('app_message', 'Intersite transfer saved successfully');
                 DB::commit();
                 \Cart::clear();
-            }else{
+            } else {
                 DB::rollBack();
                 session()->flash('app_message', 'Something went wrong.');
             }
         } catch (\Exception $ex) {
             DB::rollBack();
-            session()->flash('app_message', 'Something went wrong. '.$ex->getMessage());
+            session()->flash('app_message', 'Something went wrong. ' . $ex->getMessage());
             throw $ex;
         }
         return redirect()->back();
@@ -266,7 +271,7 @@ class InterSiteTransferController extends Controller
             if(\Cart::getContent()->attributes['intersite_id'] == $intersite->id)
                 \Cart::clear();
         }*/
-        if(\Cart::isEmpty())
+        if (\Cart::isEmpty())
             $this->loadToCart($items);
         $cartItems = \Cart::getContent();
 
@@ -308,14 +313,15 @@ class InterSiteTransferController extends Controller
                 [
                     'reference_no' => $reference_no,
                 ],
-            [
+                [
 
-                'source_branch_id' => User::userBranchAction(),
-                'destination_branch_id' => $transfer_branch_id,
-                'requested_by' => Auth::id(),
-                'date_requested' => date('Y-m-d'),
-                'vehicle_no' => $request->vehicle_no,
-            ]);
+                    'source_branch_id' => User::userBranchAction(),
+                    'destination_branch_id' => $transfer_branch_id,
+                    'requested_by' => Auth::id(),
+                    'date_requested' => date('Y-m-d'),
+                    'vehicle_no' => $request->vehicle_no,
+                ]
+            );
             foreach (\Cart::getContent() as $product) {
                 $attribute = $product->attributes;
                 $source_store_id = $attribute['source_store_id'];
@@ -337,7 +343,7 @@ class InterSiteTransferController extends Controller
                     ]
                 );
 
-                $action = "Modified transfer request of product from " . (Store::find($source_store_id)?->name). " to  branch " . (Branch::find($transfer_branch_id)?->name);
+                $action = "Modified transfer request of product from " . (Store::find($source_store_id)?->name) . " to  branch " . (Branch::find($transfer_branch_id)?->name);
                 AuditLog::auditLog(Auth::id(), $action);
                 session()->flash('app_message', 'Stock transfered successfully');
                 DB::commit();

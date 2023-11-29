@@ -123,7 +123,6 @@ class InvoiceController extends Controller
     {
         $invoice_id = $request->invoice_id;
 
-//        $invoice = $this->generateInvoice();
         $inputs = $request->except('_token');
         $rules = [];
         $rules = [
@@ -139,19 +138,15 @@ class InvoiceController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
+
         $customer_id = $request->input('customer_id');
-        //Check to make sure that the amount has not exceeded the credit limit set for the customer
-        if ((\Cart::getTotal() + Customer::find($customer_id)->runningBalance()) > Customer::find($customer_id)->credit_limit) {
+
+        $total_sales = \Cart::getTotal();
+        //Check to make sure that the amount has not exceeded the credit limit set for the customer.
+        if (Transaction::check_transaction_limit($customer_id, $total_sales) == false) {
             session()->flash('app_error', 'The amount has exceeded the customer credit limit');
             return redirect()->back();
         }
-
-        // if ($request->has('customer') && ($request->customer != "")) {
-        //     $customer_id = Customer::insertGetId(['name' => $request->customer, 'phone' => $request->phone, 'address' => $request->address, 'branch_id' => User::userBranchAction()]);
-        // }
-        /*$customer = Customer::findOrFail($customer_id);*/
-        /*$items = $this->orderItems();
-        $status = Transaction::sale($items, $customer->id, $invoice, $request->order_date);*/
 
         $sub_total = str_replace(',', '', \Cart::getSubTotal());
         $tax = 0;
@@ -180,7 +175,7 @@ class InvoiceController extends Controller
             }
 
             $invoice = Order::find($invoice_id);
-            if(!$invoice){
+            if (!$invoice) {
                 $invoice = new \App\Models\Order();
                 $invoice->reference = $reference;
                 $invoice->branch_id = User::userBranchAction();
@@ -188,7 +183,7 @@ class InvoiceController extends Controller
                 $invoice->sold_by = Auth::id();
                 $invoice->customer_id = $customer_id;
                 $invoice->invoice_no = $reference;
-            }else{
+            } else {
                 $invoice->order_invoice_id = $request->order_invoice_id ?? 0;
             }
             $invoice->pay = $payment_mode == "Credit" ? $amount_paid : $total;
@@ -199,8 +194,8 @@ class InvoiceController extends Controller
             $invoice->vat = $tax;
             $invoice->total = $total;
             $invoice->status = 0;
-            if($invoice->save()){
-                OrderDetail::where('order_id',$invoice->id)->delete();
+            if ($invoice->save()) {
+                OrderDetail::where('order_id', $invoice->id)->delete();
                 $contents = \Cart::getContent();
                 $products = [];
                 $total_discount = 0;
@@ -229,9 +224,9 @@ class InvoiceController extends Controller
                     /*DB::table('store_products')->where('id', $content->id)->update([
                         'qty_available' => $qtyAval - $content->quantity,
                         'updated_at' => Carbon::now()
-                    ]);*/
+                    ]);
 
-                    /*DB::table('stock_cards')->insert([
+                    DB::table('stock_cards')->insert([
                         'store_id' => $store->store->id,
                         'product_id' => $store->product->id,
                         'cr' => 0,
@@ -248,41 +243,14 @@ class InvoiceController extends Controller
                 }
                 //Upate the Order table with the discount
                 DB::table('orders')->where('id', $invoice->id)->increment('discount', $total_discount);
-                DB::table('bank_accounts')->where(['account_type' => 'Cash'])->where('branch_id', 'LIKE', User::userBranchAction())->increment('account_balance', ($total - $total_discount));
 
-                $bank_account = DB::table('bank_accounts')->where(['account_type' => 'Cash'])->where('branch_id', 'LIKE', User::userBranchAction())->first();
-                DB::table('customer_ledgers')->insert([
-                    'customer_id' => $customer_id,
-                    'order_id' => $invoice->id,
-                    'systemid' => $invoice,
-                    'description' => 'Cash sales',
-                    'Ref' => 'Nil',
-                    'cr' => $total,
-                    'dr' => 0,
-                    'payment_mode' => $payment_mode,
-                    'bank_account_id' => $bank_account->id,
-                    'date' => $request->order_date,
-                    //date('Y-m-d'),
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ]);
-                //Bank Deposit
-                DB::table('bank_transactions')->insert([
-                    'bank_account_id' => $bank_account->id,
-                    'trans_date' => $request->order_date,
-                    //date('Y-m-d'),
-                    'cr' => $total,
-                    'dr' => 0,
-                    'ref_no' => $invoice,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ]);
                 DB::table('order_invoices')->where('id', $request->order_invoice_id)->update([
                     'status' => 3,
                     'approved_by' => auth()->id(),
                     'updated_at' => Carbon::now()
                 ]);
-                /*Transaction::sale($store_products, $customer_id, $reference, $order_date);*/
+
+                //Transaction::sale($store_products, $customer_id, $reference, $order_date);
 
                 $action = "Made a sell of $invoice: $total";
                 AuditLog::auditLog(Auth::id(), $action);
@@ -831,7 +799,7 @@ class InvoiceController extends Controller
     public function linkOrderInvoice(Request $request, OrderInvoice $order)
     {
         $user_branch = User::userBranchAction();
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price','retail_selling_price', 'cost_price')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'retail_selling_price', 'cost_price')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('products', 'products.id', 'store_products.product_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
@@ -890,7 +858,7 @@ class InvoiceController extends Controller
                         'qty_available' => $qty_available,
                         'discount' => 0,
                         'store' => $store,
-                        'unit'=>$item->storeProduct->product->unit
+                        'unit' => $item->storeProduct->product->unit
                     ),
                 ]);
 
@@ -912,7 +880,7 @@ class InvoiceController extends Controller
             $store = $item->storeProduct->store->name;
             $qty = $item->quantity;
             $store_products = StoreProduct::find($item->store_product_id);
-            if ($store_products && $store_products->qty_available > 0){
+            if ($store_products && $store_products->qty_available > 0) {
                 $add = \Cart::add([
                     'id' => $item->store_product_id,
                     'name' => $item->storeProduct->product->name,
@@ -925,7 +893,7 @@ class InvoiceController extends Controller
                         'qty_available' => $qty_available,
                         'discount' => 0,
                         'store' => $store,
-                        'unit'=>$item->storeProduct->product->unit
+                        'unit' => $item->storeProduct->product->unit
                     ),
                 ]);
             }
@@ -1038,7 +1006,7 @@ class InvoiceController extends Controller
             $store = $item->storeProduct->store->name;
             $qty = $item->quantity;
             $store_products = StoreProduct::find($item->store_product_id);
-            if ($store_products && $store_products->qty_available > 0){
+            if ($store_products && $store_products->qty_available > 0) {
                 $add = \Cart::add([
                     'id' => $item->store_product_id,
                     'name' => $item->storeProduct->product->name,
@@ -1051,7 +1019,7 @@ class InvoiceController extends Controller
                         'qty_available' => $qty_available,
                         'discount' => 0,
                         'store' => $store,
-                        'unit'=>$item->storeProduct->product->unit
+                        'unit' => $item->storeProduct->product->unit
                     ),
                 ]);
             }
@@ -1059,55 +1027,56 @@ class InvoiceController extends Controller
 
         //dd(\Cart::getContent());
     }
-    public function editProformer(Proformer $order){
+    public function editProformer(Proformer $order)
+    {
 
-            $user_branch = User::userBranchAction();
-            $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
-                ->join('stores', 'stores.id', 'store_products.store_id')
-                ->join('products', 'products.id', 'store_products.product_id')
-                ->join('branches', 'branches.id', 'stores.branch_id')
-                ->join('branch_product_prices', function ($join) {
-                    $join->on('branch_product_prices.product_id', '=', 'products.id')
-                        ->on('branch_product_prices.branch_id', '=', 'branches.id');
+        $user_branch = User::userBranchAction();
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
+            ->join('stores', 'stores.id', 'store_products.store_id')
+            ->join('products', 'products.id', 'store_products.product_id')
+            ->join('branches', 'branches.id', 'stores.branch_id')
+            ->join('branch_product_prices', function ($join) {
+                $join->on('branch_product_prices.product_id', '=', 'products.id')
+                    ->on('branch_product_prices.branch_id', '=', 'branches.id');
 
-                })
-                ->where('stores.branch_id', 'LIKE', $user_branch)
-                ->where('branch_product_prices.status', 1)
-                ->orderBy('products.name')->orderBy('stores.name')->limit(100)->get();
-            //TODO:: remove limit here
+            })
+            ->where('stores.branch_id', 'LIKE', $user_branch)
+            ->where('branch_product_prices.status', 1)
+            ->orderBy('products.name')->orderBy('stores.name')->limit(100)->get();
+        //TODO:: remove limit here
 
-            $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
-            if (\Cart::getContent()->isEmpty()) {
-                foreach ($order->order_items()->get() as $item) {
-                    $selling_price = $item->selling_price;
-                    $cost_price = $item->cost_price;
-                    $qty_available = $item->qty_available;
-                    $store = $item->storeProduct->store->name;
-                    $qty = $item->quantity == 0 ? 1 : $item->quantity;
-                    $add = \Cart::add([
-                        'id' => $item->store_product_id,
-                        'name' => $item->storeProduct->product->name,
-                        'price' => $item->sold_price,
-                        'quantity' => $qty,
-                        'attributes' => array(
-                            'cost_price' => $cost_price,
-                            'code' => $item->storeProduct->product->code,
-                            'selling_price' => $selling_price,
-                            'qty_available' => $qty_available,
-                            'discount' => 0,
-                            'store' => $store,
-                            'unit'=>$item->storeProduct->product->unit
-                        ),
-                    ]);
+        $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
+        if (\Cart::getContent()->isEmpty()) {
+            foreach ($order->order_items()->get() as $item) {
+                $selling_price = $item->selling_price;
+                $cost_price = $item->cost_price;
+                $qty_available = $item->qty_available;
+                $store = $item->storeProduct->store->name;
+                $qty = $item->quantity == 0 ? 1 : $item->quantity;
+                $add = \Cart::add([
+                    'id' => $item->store_product_id,
+                    'name' => $item->storeProduct->product->name,
+                    'price' => $item->sold_price,
+                    'quantity' => $qty,
+                    'attributes' => array(
+                        'cost_price' => $cost_price,
+                        'code' => $item->storeProduct->product->code,
+                        'selling_price' => $selling_price,
+                        'qty_available' => $qty_available,
+                        'discount' => 0,
+                        'store' => $store,
+                        'unit' => $item->storeProduct->product->unit
+                    ),
+                ]);
 
-                }
             }
+        }
 
-            $cart_products = \Cart::getContent();
-            //dd($cart_products);
-            $categories = Category::orderBy('name', 'ASC')->get();
-            $store = Store::where('id', 'LIKE', $user_branch)->get();
-            return view('pages.pos.proformer', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'order'));
+        $cart_products = \Cart::getContent();
+        //dd($cart_products);
+        $categories = Category::orderBy('name', 'ASC')->get();
+        $store = Store::where('id', 'LIKE', $user_branch)->get();
+        return view('pages.pos.proformer', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'order'));
     }
     public function updateProforma(Request $request, Proformer $order)
     {
@@ -1209,20 +1178,21 @@ class InvoiceController extends Controller
         session()->flash('Proforma invoice updated successfully');
         return redirect()->route('proformer.show', $order_id);
     }
-    public function delete(Request $request, Order $invoice){
+    public function delete(Request $request, Order $invoice)
+    {
         $method = $request->method();
         $invoice_id = $invoice->id;
-        if($method == 'POST'){
-            if($invoice->status == 0){
+        if ($method == 'POST') {
+            if ($invoice->status == 0) {
                 DB::beginTransaction();
-                if($invoice->delete()){
-                    OrderDetail::where('order_id',$invoice_id)->delete();
+                if ($invoice->delete()) {
+                    OrderDetail::where('order_id', $invoice_id)->delete();
                     session()->flash('app_message', 'Invoice deleted successfully!');
                     DB::commit();
                 }
-            }else
+            } else
                 session()->flash('app_error', 'Invoice cannot be deleted!');
-        }else{
+        } else {
             session()->flash('app_error', 'Invalid request methods.');
             DB::rollBack();
         }

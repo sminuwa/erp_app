@@ -18,7 +18,8 @@
             </div>
             <div class="c-tbody">
             @foreach (\Cart::getContent() as $product)
-                <form class="c-tr" action="{{ route('ajax.cart.update', $product->id) }}" method="post" id="p{{ $product->id }}">
+                <form class="c-tr" action="{{ route('ajax.cart.update', $product->id) }}" method="get" id="p{{ $product->id }}">
+                    @csrf
                     <input type="hidden" name="id" value="{{ $product->id }}">
                     <input type="hidden" name="selling_price" value="{{ $product->attributes['selling_price'] }}">
                     <input type="hidden" name="cost_price" value="{{ $product->attributes['cost_price'] }}">
@@ -101,7 +102,8 @@
             </div>
             <div class="c-tbody">
             @foreach (\Cart::getContent()  as $product)
-                <form class="c-tr" action="{{ route('ajax.cart.update', $product->id) }}" method="post" id="p{{ $product->id }}">
+                <form class="c-tr" action="{{ route('ajax.cart.update', $product->id) }}" method="get" id="p{{ $product->id }}">
+                    @csrf
                     @php $attr = $product->attributes @endphp
                     <div class="c-cell">{{ $loop->iteration }}</div>
                     <div class="c-cell" class="text-left">{{ $product->attributes['code'] }}</div>
@@ -133,7 +135,7 @@
             </div>
             <div class="c-tbody">
             @foreach (\Cart::getContent() as $product)
-                <form class="c-tr" action="{{ route('ajax.cart.update', $product->id) }}" method="post" id="p{{ $product->id }}">
+                <form class="c-tr" action="{{ route('ajax.cart.update', $product->id) }}" method="get" id="p{{ $product->id }}">
                     @csrf
                     <input type="hidden" name="id" class="form-control" value="{{ $product->id }}">
                     <input type="hidden" name="cost_price" class="form-control" value="{{ $product->price ?? '' }}">
@@ -188,7 +190,7 @@
             <div class="c-tbody">
             @foreach (\Cart::getContent() as $product)
 
-                <form class="c-tr" action="{{ route('ajax.cart.update', $product->id) }}" method="post" id="p{{ $product->id }}">
+                <form class="c-tr" action="{{ route('ajax.cart.update', $product->id) }}" method="get" id="p{{ $product->id }}">
                     @csrf
                     <input type="hidden" name="id" class="form-control" value="{{ $product->id }}">
                     <input type="hidden" name="cost_price" class="form-control" value="{{ $product->attributes['cost_price'] ?? '' }}">
@@ -269,7 +271,7 @@
             </div>
             <div class="c-tbody">
             @foreach (\Cart::getContent() as $product)
-                <form class="c-tr" action="{{ route('ajax.cart.update', $product->id) }}" method="post" id="p{{ $product->id }}">
+                <form class="c-tr" action="{{ route('ajax.cart.update', $product->id) }}" method="get" id="p{{ $product->id }}">
                     @csrf
                     <input type="hidden" name="id" class="form-control" value="{{ $product->id }}">
                     <input type="hidden" name="cost_price" class="form-control" value="{{ $product->attributes['cost_price'] ?? '' }}">
@@ -330,7 +332,7 @@
             </div>
             <div class="c-tbody">
             @foreach (\Cart::getContent() as $product)
-                <form class="c-tr" action="{{ route('ajax.cart.update', $product->id) }}" method="post" id="p{{ $product->id }}">
+                <form class="c-tr" action="{{ route('ajax.cart.update', $product->id) }}" method="get" id="p{{ $product->id }}">
                     @csrf
                     @php $attr = $product->attributes @endphp
                     <input type="hidden" name="id" value="{{ $product->id }}">

@@ -70,6 +70,7 @@ class StockAdjustmentController extends Controller
 
     public function store(Request $request)
     {
+        
         $user = auth()->user();
         $branch = $user->branch;
         $stock_adjustment_id = $request->stock_adjustment_id;
@@ -78,6 +79,7 @@ class StockAdjustmentController extends Controller
         $description = $request->description;
         $stock = StockAdjustment::find($stock_adjustment_id);
         $items = \Cart::getContent();
+        
         DB::beginTransaction();
         try {
             if(!$stock){
@@ -89,6 +91,7 @@ class StockAdjustmentController extends Controller
             $stock->branch_id = $branch->id;
             $stock->operation = $operation;
             $stock->description = $description;
+            $stock->date = $date;
             if($stock->save()){
                 if (count($items) > 0) {
                     StockAdjustmentDetail::where('stock_adjustment_id', $stock->id)->delete();

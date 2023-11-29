@@ -22,12 +22,12 @@ class PosController extends Controller
     {
         if (!(strpos(url()->previous(), 'pos') || strpos(url()->previous(), 'proformer') || strpos(url()->previous(), 'order_invoice'))) //Clear the cart after leaving the POS page
         {
-//            \Cart::clear();
+            //            \Cart::clear();
         }
         $user_branch = User::userBranchAction();
         $category_id = 0;
         $store_id = 0;
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.code AS store', 'qty_available', 'selling_price','retail_selling_price', 'cost_price', 'unit')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.code AS store', 'qty_available', 'selling_price', 'retail_selling_price', 'cost_price', 'unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
             ->join('products', 'products.id', 'store_products.product_id')
@@ -37,10 +37,9 @@ class PosController extends Controller
 
             })
 
-            ->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('branch_product_prices.status', 1);
-//            ->orderBy('products.code','asc')
-            //->limit(100);
+        //            ->orderBy('products.code','asc')
+        //->limit(100);
         //TODO:: remove limit here
         if ($request->has('category_id') && $request->has('store_id')) {
             $category_id = $request->category_id;
@@ -52,7 +51,10 @@ class PosController extends Controller
             $stores = $stores->where('store_products.store_id', 'LIKE', $store_id)
                 ->where('products.category_id', 'LIKE', $category_id);
         }
-
+        if (request()->routeIs('invoice.index')) {
+            $stores = $stores->where('stores.branch_id', 'LIKE', $user_branch)
+            ->where('store_products.qty_available', '>', 0);
+        }
         $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name');
         $cart_products = \Cart::getContent();
         $categories = Category::orderBy('name', 'ASC')->get();
@@ -67,8 +69,8 @@ class PosController extends Controller
             $stores = $stores->get();
             return view('pages.pos.order_invoice', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no'));
         }
-        $stores = $stores->where('store_products.qty_available', '>', 0)
-            ->orderBy('products.name')->orderBy('stores.name')->get();
+        
+        $stores = $stores->orderBy('products.name')->orderBy('stores.name')->get();
         return view('pages.pos.index', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no'));
     }
 
@@ -79,7 +81,7 @@ class PosController extends Controller
         $category_id = 0;
         $store_id = 0;
         $user_branch = User::userBranchAction();
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price','unit')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('products', 'products.id', 'store_products.product_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
@@ -136,7 +138,7 @@ class PosController extends Controller
                     'qty_available' => $qty_available,
                     'discount' => 0,
                     'store' => $store,
-                    'unit'=>$data->storeProduct->product->unit
+                    'unit' => $data->storeProduct->product->unit
                 ),
             ]);
         }

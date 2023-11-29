@@ -39,7 +39,7 @@ class Customer extends Model
     }
     public function runningBalance()
     {
-        return $this->ledgers()->sum('cr') - $this->ledgers->sum('dr');
+        return $this->ledgers()->sum('cr')-$this->ledgers()->sum('dr');
     }
     public function branch()
     {

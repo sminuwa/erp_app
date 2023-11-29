@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductUnitMeasure;
 use App\Models\Store;
 use App\Models\StoreProduct;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Darryldecode\Cart\Cart;
 use Brian2694\Toastr\Facades\Toastr;
@@ -206,13 +207,21 @@ class CartController extends Controller
                 ),
             ]);
         }
+
         if ($type == 'adjustment') {
+
             $product = Product::find($request->product_id);
             // get the unit cost
+            $query = BranchProductPrice::where(['branch_id' => User::userBranchAction(), 'product_id' => $request->product_id])->first();
+            $cost_price = str_replace(',', '', $query->cost_price ?? 0);
+            if ($request->cost_price != null) {
+                $cost_price = $request->cost_price;
+            }
+           
             $add = \Cart::add([
                 'id' => generateRandomString(),
                 'name' => $product->name,
-                'price' => 1, //This is not applicable here
+                'price' => $cost_price, //This is not applicable here
                 'quantity' => abs($request->quantity),
                 'attributes' => array(
                     'store_id' => $request->store_id,
@@ -363,6 +372,7 @@ class CartController extends Controller
             );
         }
         if ($type == 'order' || $type == 'proforma' || $type == 'invoice') {
+
             $unit = $request->unit;
             $store_product_id = $request->id;
             $selling_price = str_replace(',', '', $request->selling_price);
@@ -376,10 +386,12 @@ class CartController extends Controller
                     $sold_price = roundDown(($selling_price / ($unit_measure->value ?? 1)), 50);
                 if ($unit_measure->type == 'multiple')
                     $sold_price = roundDown(($selling_price * ($unit_measure->value ?? 1)), 50);
-            } else {
-                $sold_price = $selling_price;
             }
+            // else {
+            //     return $sold_price = $selling_price;
+            // }
             $discount = ($selling_price > 0 ? $selling_price : 0) - ($sold_price > 0 ? $sold_price : 0);
+
             \Cart::update(
                 $request->id,
                 [

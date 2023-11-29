@@ -272,229 +272,38 @@
             });
         });
 
-        function formatMoney(n, c, d, t) {
-            var c = isNaN(c = Math.abs(c)) ? 2 : c,
-                d = d == undefined ? "." : d,
-                t = t == undefined ? "," : t,
-                s = n < 0 ? "-" : "",
-                i = String(parseInt(n = Math.abs(Number(n) || 0).toFixed(c))),
-                j = (j = i.length) > 3 ? j % 3 : 0;
-            return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ?
-                d + Math.abs(n - i).toFixed(c).slice(2) : "");
-        }
+       
 
-        function deleteItem(id) {
-            const swalWithBootstrapButtons = swal.mixin({
-                confirmButtonClass: 'btn btn-success',
-                cancelButtonClass: 'btn btn-danger',
-                buttonsStyling: false,
-            })
+     
 
-            swalWithBootstrapButtons({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.value) {
-                    event.preventDefault();
-                    document.getElementById('delete-form-' + id).submit();
-                } else if (
-                    // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
-                ) {
-                    swalWithBootstrapButtons(
-                        'Cancelled',
-                        'Your data is safe :)',
-                        'error'
-                    )
-                }
-            })
-        }
+        
 
-        $(function() {
-            $('#account_number,#account_name').hide();
-            $('#payment_mode').on("change", function() {
-                if ($(this).val() != "Cash") {
-                    $('#bank_account_id,#account_name').removeAttr('disabled');
-                    $('#account_number,#account_name').show();
-                    $("#bank_account_id").html(" < option value = '' > Loading... < /option>");
-                    $.ajax({
-                        url: "{{ route('ajax.loadBankAccounts') }}",
-                        type: 'GET',
-                        data: {
-                            payment_mode: $("#payment_mode").val()
-                        }
-                    }).done(function(msg) {
-                        $("#bank_account_id").html("<option value=''>--select--</option>" + msg);
-                    });
-                } else {
-                    $('#bank_account_id,#account_name').attr('disabled', 'disabled');
-                    $('#account_number,#account_name').hide();
-                }
+        // $('.quantity,.price').keyup(function() {
+        //     id = $(this).attr('data-value');
+            
+        //     $("#valid_qty" + id.substr(1)).html("");
+        //     delay(function() {
 
-            });
+        //         $.ajax({
+        //             url: $('#' + id).attr('action'),
+        //             type: $('#' + id).attr('method'),
+        //             //dataType: 'json',
+        //             data: $('#' + id).serialize(),
+        //             success: function(data) {
+        //                 id = id.substr(1);
 
+        //                 subtotal = $('#price' + id).val() * $('#quantity' + id).val();
+        //                 $('.subtotal' + id).text(formatMoney(subtotal));
+        //                 $('#total').text(formatMoney(data));
+        //                 $('#subtotal').text(formatMoney(data));
+        //             },
+        //             error: function(xhr, err) {
+        //                 //$('#total').text(formatMoney(data));
+        //                 //$('#subtotal').text(formatMoney(data));
+        //             }
+        //         });
 
-            $('#bank_account_id').on("change", function() {
-                bank_account_id = $(this).val();
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route('ajax.load.account.name') }}",
-                    data: {
-                        bank_account_id: bank_account_id
-                    }
-                }).done(function(data) {
-                    $("#account_name").val(data);
-                });
-            });
-
-            function formatMoney(n, c, d, t) {
-                var c = isNaN(c = Math.abs(c)) ? 2 : c,
-                    d = d == undefined ? "." : d,
-                    t = t == undefined ? "," : t,
-                    s = n < 0 ? "-" : "",
-                    i = String(parseInt(n = Math.abs(Number(n) || 0).toFixed(c))),
-                    j = (j = i.length) > 3 ? j % 3 : 0;
-                return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ?
-                    d + Math.abs(n - i).toFixed(c).slice(2) : "");
-            };
-
-        });
-
-        var delay = (function() {
-            var timer = 0;
-            return function(callback, ms) {
-                clearTimeout(timer);
-                timer = setTimeout(callback, ms);
-            };
-        })();
-
-
-        $('.quantity,.price').keyup(function() {
-            id = $(this).attr('data-value');
-            $("#valid_qty" + id.substr(1)).html("");
-            // if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
-            //         'max-qty'))) {
-            //     $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $('#quantity' +
-            //         id.substr(1)).attr('max-qty') + ")");
-            //     $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
-            //     return false;
-            // }
-            delay(function() {
-
-                $.ajax({
-                    url: $('#' + id).attr('action'),
-                    type: $('#' + id).attr('method'),
-                    //dataType: 'json',
-                    data: $('#' + id).serialize(),
-                    success: function(data) {
-                        id = id.substr(1);
-
-                        subtotal = $('#price' + id).val() * $('#quantity' + id).val();
-                        $('.subtotal' + id).text(formatMoney(subtotal));
-                        $('#total').text(formatMoney(data));
-                        $('#subtotal').text(formatMoney(data));
-                    },
-                    error: function(xhr, err) {
-                        //$('#total').text(formatMoney(data));
-                        //$('#subtotal').text(formatMoney(data));
-                    }
-                });
-
-            }, 500);
-        });
-        // detect when a barcode is scanned
-        // let code = "";
-        // let barcode ="";
-        // $(document).on('input', '#barcode', function(e) {
-        //     // var barcode = $(this).val();
-        //     // alert($('#barcode').val());
-        //     if (e.keyCode === 13) {
-        //         if (code.length >= 10) {
-        //             barcode = code;
-        //         }
-        //     } else {
-        //         code = code + e.key;
-        //     }
-
-        //     // send the barcode to the server to add the product to the cart
-        //     $.ajax({
-        //         url: "{{ route('barcode.search.product') }}",
-        //         type: 'GET',
-        //         data: {
-        //             barcode: barcode
-        //         },
-        //         dataType: 'html',
-        //         success: function(response) {
-        //             // update the cart items container with the new cart data
-        //             $('#load_cart').html(response);
-
-        //         },
-        //         error: function(xhr, status, error) {
-        //             // display an error message
-        //             alert('An error occurred while adding the product to cart.');
-        //         }
-        //     });
-        //     // clear the barcode input field
-        //     //$(this).val('');
+        //     }, 500);
         // });
-
-        //     let UPC = '';
-        // document.addEventListener("keydown", function(e) {
-        //     const textInput = e.key || String.fromCharCode(e.keyCode);
-        //     const targetName = e.target.localName;
-        //     let newUPC = '';
-        //     if (textInput && textInput.length === 1 && targetName !== 'input'){
-        //         newUPC = UPC+textInput;
-
-        //       if (newUPC.length >= 6) {
-        //         console.log('barcode scanned:  ', newUPC);
-        //       }
-        //    }
-        // });
-        let code = "";
-        let reading = false;
-
-        document.addEventListener('keypress', e => {
-            //usually scanners throw an 'Enter' key at the end of read
-            if (e.keyCode === 13) {
-                if (code.length >= 5) {
-                    //code = code.substr(2, code.length - 3);
-                    alert(code);
-                    $.ajax({
-                        url: "{{ route('barcode.search.product') }}",
-                        type: 'GET',
-                        data: {
-                            barcode: code
-                        },
-                        dataType: 'html',
-                        success: function(response) {
-                            // update the cart items container with the new cart data
-                            $('#load_cart').html(response);
-                            $('#barcode').val("")
-                        },
-                        error: function(xhr, status, error) {
-                            // display an error message
-                            alert('An error occurred while adding the product to cart.');
-                        }
-                    });
-                }
-            } else {
-                code += e.key; //while this is not an 'enter' it stores the every key
-            }
-
-            //run a timeout of 200ms at the first read and clear everything
-            if (!reading) {
-                reading = true;
-                setTimeout(() => {
-                    code = "";
-                    reading = false;
-                }, 200); //200 works fine for me but you can adjust it
-            }
-        });
     </script>
 @endpush

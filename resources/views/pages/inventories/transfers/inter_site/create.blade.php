@@ -39,24 +39,22 @@
                             <div class="card-header">
                                 <i class="ion-android-cart"></i> Transfer Product Cart
                                 <div class="float-right">
-                                    <a href="javascript:void(0)" data-toggle="modal"
-                                       data-target="#add_product_form"
-                                       class="btn btn-sm btn-secondary float-md-right"
-                                       style="margin-left: 2px;"><i class="fa fa-plus"></i> Add Product </a>
+                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
+                                        class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
+                                            class="fa fa-plus"></i> Add Product </a>
                                 </div>
                             </div>
                             <div class="card-body">
                                 <form action="{{ route('intersite.store') }}" method="POST">
                                     {{ csrf_field() }}
-                                    <input type="hidden" name="intersite_id" value="{{ isset($instersite) ? $intersite->id : '' }}" />
+                                    <input type="hidden" name="intersite_id"
+                                        value="{{ isset($instersite) ? $intersite->id : '' }}" />
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="transfer_date">Date</label>
-                                                <input type="text"
-                                                       name="date"
-                                                       class="form-control datepicker"
-                                                       value="{{ isset($intersite->date) ? $intersite->date : old('date', date('Y-m-d')) }}" />
+                                                <input type="text" name="date" class="form-control datepicker"
+                                                    value="{{ isset($intersite->date) ? $intersite->date : old('date', date('Y-m-d')) }}" />
                                             </div>
                                         </div>
                                         <div class="col-md-4">
@@ -86,9 +84,10 @@
                                             <div class="form-group">
                                                 <label for="vehicle_no">Vehicle No</label>
                                                 <input type="text"
-                                                       class="form-control {{ $errors->has('vehicle_no') ? ' is-invalid' : '' }}"
-                                                       name="vehicle_no" id="vehicle_no"
-                                                       value="{{ old('vehicle_no', $model->vehicle_no) }}" placeholder="Vehicle No">
+                                                    class="form-control {{ $errors->has('vehicle_no') ? ' is-invalid' : '' }}"
+                                                    name="vehicle_no" id="vehicle_no"
+                                                    value="{{ old('vehicle_no', $model->vehicle_no) }}"
+                                                    placeholder="Vehicle No">
                                                 @if ($errors->has('vehicle_no'))
                                                     <div class="invalid-feedback">
                                                         <strong>{{ $errors->first('vehicle_no') }}</strong>
@@ -132,7 +131,7 @@
                         <div class="form-group">
                             <label for="source_store_id">Source Store</label>
                             <select class="form-control select2-single {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
-                                    name="store_id" id="store_id" required="required">
+                                name="store_id" id="store_id" required="required">
                                 <option value="">Select...</option>
                                 @if (isset($stores))
                                     @foreach ($stores as $data)
@@ -151,8 +150,9 @@
 
                         <div class="form-group">
                             <label for="product_id">Product</label>
-                            <select class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
-                                    name="product_id" id="product_id" required="required">
+                            <select
+                                class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
+                                name="product_id" id="product_id" required="required">
                                 <option value="">Select...</option>
 
                                 @if (old('category_id', $model->category_id))
@@ -164,7 +164,7 @@
                                 @else
                                     @if (isset($products))
                                         @foreach ($products as $data)
-                                            <option value="{{ $data->id }}"
+                                            <option value="{{ $data->id }}" data-value="{{ $data->qty_available }}"
                                                 {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>
                                                 {{ $data->code }}-{{ $data->name }}</option>
                                         @endforeach
@@ -184,18 +184,19 @@
 
                         <div class="form-group">
                             <label for="quantity">Qty</label>
-                            <input type="number" class="form-control {{ $errors->has('quantity') ? ' is-invalid' : '' }}"
-                                   name="quantity" id="quantity" value="{{ $model->quantity }}" placeholder=""
-                                   required="required">
+                            <input type="number"
+                                class="form-control {{ $errors->has('quantity') ? ' is-invalid' : '' }}" name="quantity"
+                                id="quantity" value="{{ $model->quantity }}" placeholder="" required="required">
                             @if ($errors->has('quantity'))
                                 <div class="invalid-feedback">
                                     <strong>{{ $errors->first('quantity') }}</strong>
                                 </div>
                             @endif
                         </div>
-                        <input type="hidden" value="0" name="cost_price" id="cost_price"/>
+                        <input type="hidden" value="0" name="cost_price" id="cost_price" />
                         <div class="form-group text-right ">
-                            <button type="submit" class="btn btn-primary"><span class="ion-ios-cart-outline"></span> Add to Cart</button>
+                            <button type="submit" class="btn btn-primary" onclick="validateQuantity()"><span class="ion-ios-cart-outline"></span> Add
+                                to Cart</button>
                         </div>
                     </form>
                 </div>
@@ -206,6 +207,39 @@
 @push('js')
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script type="text/javascript">
+        function validateQuantity() {
+            var selectedOption = $('#product_id').find(':selected');
+            var qty_available = selectedOption.attr('data-value');
+            var enteredQuantity = $('#quantity').val();
+
+            if (enteredQuantity > qty_available) {
+                // Display an error message
+                $('#available').text('Quantity exceeds available quantity.');
+                return false;
+            } else {
+                // Reset the error message and submit the form
+                $('#available').text('');
+                $('#addCartItemForm').submit();
+            }
+        }
+        $(document).ready(function() {
+            // Listen for change event on the select element
+            $('#product_id').change(function() {
+                // Get the selected option
+                var selectedOption = $(this).find(':selected');
+
+                // Get the value of the data-value attribute
+                var qty_available = selectedOption.attr('data-value');
+
+                // Log or use the dataValue as needed
+                $('#quantity').attr('max', qty_available);
+                $('#available').html(qty_available);
+            });
+        });
+
+        function validate() {
+
+        }
         $(function() {
             // $(document).on("change", "#category_id,#source_store_id", function(event) {
             //     $("#product_id").html(" < option value = '' > Loading... < /option>");

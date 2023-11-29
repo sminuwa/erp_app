@@ -40,66 +40,74 @@
                             <div class="col-sm-12">
                                 <table class="table table-bordered table-striped" id="record1">
                                     <thead>
-                                    <tr>
-                                        <th>Date </th>
-                                        <th>Reference </th>
-                                        <th>Operation </th>
-                                        <th>Description </th>
-                                        <th>Created By </th>
-                                        <th>&nbsp;</th>
-                                    </tr>
+                                        <tr>
+                                            <th>Date </th>
+                                            <th>Reference </th>
+                                            <th>Operation </th>
+                                            <th>Description </th>
+                                            <th>Created By </th>
+                                            <th>&nbsp;</th>
+                                        </tr>
                                     </thead>
                                     <tbody>
-                                    @foreach ($records as $record)
-                                        <tr class="@if($record->status == 0) bg-warning @endif">
-                                            <td> {{ \Carbon\Carbon::parse($record->date)->toFormattedDateString() }} </td>
-                                            <td> {{ $record->reference }} </td>
-                                            <td class="text-center">
-                                                {!! $record->operation ? '<span class="badge badge-success">In</span>' : '<span class="badge badge-danger">Out</span>' !!}
-                                            </td>
-                                            <td> {{ $record->description ?? null }} </td>
-                                            <td> {{ $record->createdBy->name ?? null }} </td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton"
-                                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                        Action
-                                                    </button>
-                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                        <a class="dropdown-item" href="{{ route('stock_adjustments.show', $record->id) }}">
-                                                            <span class="fa fa-eye"></span> View
-                                                        </a>
-                                                        <a class="dropdown-item" href="{{ route('stock_adjustments.print', $record->id) }}"
-                                                           title="Print GRN" target="_BLANK">
-                                                            <span class="fa fa-print"></span> Print
-                                                        </a>
-                                                        @if ($record->status == 0)
-                                                            <form action="{{ route('stock_adjustments.post', $record->id) }}" method="post"
-                                                                  onsubmit="return confirm('Are you sure you want to post this order?')">
-                                                                @csrf
-                                                                <button type="submit" class="dropdown-item">
-                                                                    <i class="fa fa-check" aria-hidden="true"></i> Post
-                                                                </button>
-                                                            </form>
-                                                            <a class="dropdown-item" href="{{ route('stock_adjustments.edit', $record->id) }}">
-                                                                <span class="fa fa-pencil"></span> Edit
+                                        @foreach ($records as $record)
+                                            <tr class="@if ($record->status == 0) bg-warning @endif">
+                                                <td> {{ \Carbon\Carbon::parse($record->date)->toFormattedDateString() }}
+                                                </td>
+                                                <td> {{ $record->reference }} </td>
+                                                <td class="text-center">
+                                                    {!! $record->operation == 'in'
+                                                        ? '<span class="badge badge-success">In</span>'
+                                                        : '<span class="badge badge-danger">Out</span>' !!}
+                                                </td>
+                                                <td> {{ $record->description ?? null }} </td>
+                                                <td> {{ $record->createdBy->name ?? null }} </td>
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-default dropdown-toggle" type="button"
+                                                            id="dropdownMenuButton" data-toggle="dropdown"
+                                                            aria-haspopup="true" aria-expanded="false">
+                                                            Action
+                                                        </button>
+                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                            <a class="dropdown-item"
+                                                                href="{{ route('stock_adjustments.show', $record->id) }}">
+                                                                <span class="fa fa-eye"></span> View
                                                             </a>
-                                                            <form onsubmit="return confirm('Are you sure you want to cancel?')"
-                                                                  action="{{ route('stock_adjustments.delete', $record->id) }}"
-                                                                  method="post"
-                                                                  style="display: inline">
-                                                                {{ csrf_field() }}
-                                                                <button type="submit" class="dropdown-item">
-                                                                    <i class="text-danger fa fa-remove"></i> Delete
-                                                                </button>
-                                                            </form>
-
-                                                        @endif
+                                                            <a class="dropdown-item"
+                                                                href="{{ route('stock_adjustments.print', $record->id) }}"
+                                                                title="Print GRN" target="_BLANK">
+                                                                <span class="fa fa-print"></span> Print
+                                                            </a>
+                                                            @if ($record->status == 0)
+                                                                <form
+                                                                    action="{{ route('stock_adjustments.post', $record->id) }}"
+                                                                    method="post"
+                                                                    onsubmit="return confirm('Are you sure you want to post this order?')">
+                                                                    @csrf
+                                                                    <button type="submit" class="dropdown-item">
+                                                                        <i class="fa fa-check" aria-hidden="true"></i> Post
+                                                                    </button>
+                                                                </form>
+                                                                <a class="dropdown-item"
+                                                                    href="{{ route('stock_adjustments.edit', $record->id) }}">
+                                                                    <span class="fa fa-pencil"></span> Edit
+                                                                </a>
+                                                                <form
+                                                                    onsubmit="return confirm('Are you sure you want to cancel?')"
+                                                                    action="{{ route('stock_adjustments.delete', $record->id) }}"
+                                                                    method="post" style="display: inline">
+                                                                    {{ csrf_field() }}
+                                                                    <button type="submit" class="dropdown-item">
+                                                                        <i class="text-danger fa fa-remove"></i> Delete
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
+                                                </td>
+                                            </tr>
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>
@@ -114,7 +122,6 @@
 @endsection
 
 @push('js')
-
     <script type="text/javascript">
         $(function() {
             $("#record1").DataTable();

@@ -50,9 +50,7 @@
                                         <div class="form-group">
                                             <label for="date">Date</label>
                                             <input type="text" name="date" class="form-control date_ datepicker"
-                                                   value="{{ $order ? $order->order_date : date('Y-m-d') }}"
-                                                    required
-                                            />
+                                                value="{{ $order ? $order->order_date : date('Y-m-d') }}" required />
                                         </div>
 
                                     </div>
@@ -70,9 +68,11 @@
                                         <div class="form-group">
                                             <label>Customer</label>
                                             <div class="form-group">
-                                                <select name="customer_id" id="customer_record" class="form-control select2-single customer_id "></select>
+                                                <select name="customer_id" id="customer_record"
+                                                    class="form-control select2-multiple customer_id"></select>
                                                 <div class="form-group">
-                                                        <span class="text text-danger ion-android-alert" id="credit_balance"></span>
+                                                    <span class="text text-danger ion-android-alert"
+                                                        id="credit_balance"></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -90,13 +90,13 @@
                                 <input type="text" id="search" class="form-control" placeholder="Search">
                                 <table class="table" id="" style="font-size: 12px;">
                                     <thead>
-                                    <tr>
-                                        <th>Reference No</th>
-                                        <th>Date</th>
-                                    </tr>
+                                        <tr>
+                                            <th>Reference No</th>
+                                            <th>Date</th>
+                                        </tr>
                                     </thead>
                                     <tbody id="table-body" class="customer-orders">
-                                    {{--@foreach ($orders as $order)
+                                        {{-- @foreach ($orders as $order)
                                         <tr>
                                             <td>
                                                 <a href="javascript:void(0)" class="invoice" onclick="load()"
@@ -104,7 +104,7 @@
                                             </td>
                                             <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</td>
                                         </tr>
-                                    @endforeach--}}
+                                    @endforeach --}}
                                     </tbody>
                                 </table>
                             </div>
@@ -113,9 +113,9 @@
                     </div>
 
                     <div class="col-md-8" id="load">
-                        {{--@if (isset($order) && $order != null)
+                        {{-- @if (isset($order) && $order != null)
                             @include('pages.inventories.credit_notes.load_products')
-                        @endif--}}
+                        @endif --}}
                     </div>
 
                 </div>
@@ -135,9 +135,18 @@
 
     <!-- Sweet Alert Js -->
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
+    <script src="{{ asset('assets/backend/js/select2.full.js') }}"></script>
+    
     <script>
-
-
+        function Initialize()
+        {
+            if($('.customer_id').length) {
+                    $('.customer_id').select2({
+                        allowClear: true,
+                        width: '100%'
+                    });
+            }
+        } 
         $(function() {
             $("#example1,#store_data").DataTable();
             $('#example2').DataTable({
@@ -149,7 +158,8 @@
                 "autoWidth": false
             });
 
-            $('#account_type').on("change", function() {
+            $(document).on("change", '#account_type', function() {
+
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.customers') }}",
@@ -158,10 +168,12 @@
                     }
                 }).done(function(data) {
                     $("#customer_record").html(data);
+
                 });
             });
 
-            $('.customer_id').on('change',function() {
+            $(document).on('change', '.customer_id', function() {
+
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.customer-orders') }}",
@@ -169,7 +181,8 @@
                         customer_id: $(this).val()
                     }
                 }).done(function(data) {
-                    // console.log(data)
+                    console.log(data)
+                    Initialize();
                     $(".customer-orders").html(data);
                 });
             });
@@ -230,12 +243,14 @@
                 };
             })();*/
 
-            $(document).on('keyup','.quantity', function() {
+            $(document).on('keyup', '.quantity', function() {
                 let id = $(this).attr('data-value');
                 $("#valid_qty" + id.substr(1)).html("");
-                if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
-                    'max-qty'))) {
-                    $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $('#quantity' +
+                if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(
+                        1)).attr(
+                        'max-qty'))) {
+                    $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $(
+                        '#quantity' +
                         id.substr(1)).attr('max-qty') + ")");
                     $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
                     return false;
@@ -255,7 +270,8 @@
                         success: function(data) {
                             // console.log(data)
                             id = id.substr(1);
-                            subtotal = $('#price' + id).val() * $('#quantity' + id).val();
+                            subtotal = $('#price' + id).val() * $('#quantity' + id)
+                                .val();
                             $('.subtotal' + id).text(formatMoney(subtotal));
                             $('.total').text(formatMoney(data));
                         },
@@ -308,7 +324,7 @@
                             }
                         }).done(function(data) {
                             $('.total').text(formatMoney(data));
-                            $('.item'+id).remove();
+                            $('.item' + id).remove();
                         });
                         // return
                     } else if (

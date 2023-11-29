@@ -18,7 +18,8 @@ class Transaction
 {
 
 
-    public static function purchases($purchase_id, $date, $type = 'GRN'){
+    public static function purchases($purchase_id, $date, $type = 'GRN')
+    {
         /*
          * supplier payment
          * additional invoice payment
@@ -97,14 +98,15 @@ class Transaction
         ];
 
         $general_account_ledger = array_merge($asset_account, $cost_account, $supplier_ledger);
-        if(GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])){
-            return ['status'=>true, 'message'=>'success'];
+        if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
+            return ['status' => true, 'message' => 'success'];
         }
-        return ['status'=>false, 'message'=>'Something went wrong.'];
+        return ['status' => false, 'message' => 'Something went wrong.'];
 
     }
 
-    public static function intersite_post($intersite_id, $type = 'ITS'){
+    public static function intersite_post($intersite_id, $type = 'ITS')
+    {
         /*
          * supplier payment
          * additional invoice payment
@@ -171,27 +173,28 @@ class Transaction
         }
 
         $control_account_ledger[] = [
-                'model_id' => $control_account->general_account_id,
-                'model_name' => 'GeneralAccount',
-                'branch_id' => $branch->id,
-                'description' => $intersite->reference,
-                'reference' => $intersite->reference,
-                'credit' => 0,
-                'debit' => $amount,
-                'date' => $intersite->date,
-                'user_id' => auth()->id(),
-                'receipt_no' => 'S' . $intersite->reference
-            ];
+            'model_id' => $control_account->general_account_id,
+            'model_name' => 'GeneralAccount',
+            'branch_id' => $branch->id,
+            'description' => $intersite->reference,
+            'reference' => $intersite->reference,
+            'credit' => 0,
+            'debit' => $amount,
+            'date' => $intersite->date,
+            'user_id' => auth()->id(),
+            'receipt_no' => 'S' . $intersite->reference
+        ];
 
         $general_account_ledger = array_merge($asset_account, $cost_account, $control_account_ledger);
-        if(GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])){
-            return ['status'=>true, 'message'=>'success'];
+        if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
+            return ['status' => true, 'message' => 'success'];
         }
-        return ['status'=>false, 'message'=>'Something went wrong.'];
+        return ['status' => false, 'message' => 'Something went wrong.'];
 
     }
 
-    public static function intersite_receive($intersite_id, $type = 'ITS'){
+    public static function intersite_receive($intersite_id, $type = 'ITS')
+    {
         /*
          * supplier payment
          * additional invoice payment
@@ -247,13 +250,13 @@ class Transaction
                 'model_id' => $cat['asset_account_id'],
                 'model_name' => 'GeneralAccount',
                 'branch_id' => $branch->id,
-                'description' => 'R'.$intersite->reference,
-                'reference' => 'R'.$intersite->reference,
+                'description' => 'R' . $intersite->reference,
+                'reference' => 'R' . $intersite->reference,
                 'credit' => 0,
                 'debit' => $cat['amount'],
                 'date' => $intersite->date,
                 'user_id' => auth()->id(),
-                'receipt_no' => 'A' . 'R'.$intersite->reference
+                'receipt_no' => 'A' . 'R' . $intersite->reference
             ];
         }
 
@@ -261,24 +264,25 @@ class Transaction
             'model_id' => $control_account->general_account_id,
             'model_name' => 'GeneralAccount',
             'branch_id' => $branch->id,
-            'description' => 'R'.$intersite->reference,
-            'reference' => 'R'.$intersite->reference,
+            'description' => 'R' . $intersite->reference,
+            'reference' => 'R' . $intersite->reference,
             'credit' => $amount,
             'debit' => 0,
             'date' => $intersite->date,
             'user_id' => auth()->id(),
-            'receipt_no' => 'S' . 'R'.$intersite->reference
+            'receipt_no' => 'S' . 'R' . $intersite->reference
         ];
 
         $general_account_ledger = array_merge($asset_account, $cost_account, $control_account_ledger);
-        if(GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])){
-            return ['status'=>true, 'message'=>'success'];
+        if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
+            return ['status' => true, 'message' => 'success'];
         }
-        return ['status'=>false, 'message'=>'Something went wrong.'];
+        return ['status' => false, 'message' => 'Something went wrong.'];
 
     }
 
-    public static function stock_adjustment($stock_adjustment_id){
+    public static function stock_adjustment($stock_adjustment_id)
+    {
         /*
          * supplier payment
          * additional invoice payment
@@ -334,8 +338,8 @@ class Transaction
                 'branch_id' => $branch->id,
                 'description' => $stock->description,
                 'reference' => $stock->reference,
-                'credit' => ($stock->operation != 'in' ? $cat['amount'] : 0 ),// credit if out
-                'debit' => ($stock->operation == 'in'? $cat['amount'] : 0), // debit if in
+                'credit' => ($stock->operation != 'in' ? $cat['amount'] : 0), // credit if out
+                'debit' => ($stock->operation == 'in' ? $cat['amount'] : 0), // debit if in
                 'date' => $stock->date,
                 'user_id' => auth()->id(),
                 'receipt_no' => 'A' . $stock->reference
@@ -347,22 +351,23 @@ class Transaction
             'branch_id' => $branch->id,
             'description' => $stock->description,
             'reference' => $stock->reference,
-            'credit' => ($stock->operation == 'in' ? $amount : 0 ),// credit if in
-            'debit' => ($stock->operation != 'in' ? $amount : 0 ), // debit if out
+            'credit' => ($stock->operation == 'in' ? $amount : 0), // credit if in
+            'debit' => ($stock->operation != 'in' ? $amount : 0), // debit if out
             'date' => $stock->date,
             'user_id' => auth()->id(),
-            'receipt_no' => 'S' . ($stock->operation == 'in' ? "IN_" : "OUT_" ).$stock->reference
+            'receipt_no' => 'S' . ($stock->operation == 'in' ? "IN_" : "OUT_") . $stock->reference
         ];
 
         $general_account_ledger = array_merge($asset_account, $cost_account, $control_account_ledger);
-        if(GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])){
-            return ['status'=>true, 'message'=>'success'];
+        if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
+            return ['status' => true, 'message' => 'success'];
         }
-        return ['status'=>false, 'message'=>'Something went wrong.'];
+        return ['status' => false, 'message' => 'Something went wrong.'];
 
     }
 
-    public static function purchase_invoices($purchase_id, $invoice_id, $formula = 'A'){
+    public static function purchase_invoices($purchase_id, $invoice_id, $formula = 'A')
+    {
         /*
          * supplier payment
          * additional invoice payment
@@ -384,9 +389,9 @@ class Transaction
         $expenses = $purchase_grn->expenses;
 
         $amount = $expense_amount = 0;
-        $percentages = $expense_suppliers = $product_categories =  $product_amounts = $product_percentages = [];
+        $percentages = $expense_suppliers = $product_categories = $product_amounts = $product_percentages = [];
         $products = $categories = [];
-        foreach($items as $item){
+        foreach ($items as $item) {
             $product_categories[] = [
                 'id' => $item->product_id,
                 'category_id' => $item->product->category->id,
@@ -402,8 +407,8 @@ class Transaction
             $amount += ($item->unit_price * $item->quantity);
         }
 
-        foreach($product_categories as $key=>$value){
-            if(isset($categories[$value['category_id']])){
+        foreach ($product_categories as $key => $value) {
+            if (isset($categories[$value['category_id']])) {
                 $categories[$value['category_id']]['amount'] += $value['amount'];
                 continue;
             }
@@ -417,22 +422,22 @@ class Transaction
         }
 
 
-        foreach($categories as $key=>$value){
+        foreach ($categories as $key => $value) {
             $percent = ($value['amount'] / $total_grn) * 100;
-            $percentages[$key]=[
-                'category_id'=>$value['category_id'],
-                'category_name'=>$value['category_name'],
-                'asset_account_id'=>$value['asset_account_id'],
-                'cost_account_id'=>$value['cost_account_id'],
-                'amount'=>$value['amount'],
-                'invoice_amount'=>$invoice->amount,
-                'percentage'=>$percent,
+            $percentages[$key] = [
+                'category_id' => $value['category_id'],
+                'category_name' => $value['category_name'],
+                'asset_account_id' => $value['asset_account_id'],
+                'cost_account_id' => $value['cost_account_id'],
+                'amount' => $value['amount'],
+                'invoice_amount' => $invoice->amount,
+                'percentage' => $percent,
                 'total_amount' => ($value['amount'] / $total_grn) * $invoice->amount
             ];
         }
 
         $supplier_ledger = $asset_account = $cost_account = [];
-        foreach($percentages as $per){
+        foreach ($percentages as $per) {
             $asset_account[] = [
                 'model_id' => $per['asset_account_id'],
                 'model_name' => 'GeneralAccount',
@@ -443,7 +448,7 @@ class Transaction
                 'debit' => $per['total_amount'],
                 'date' => $invoice->date,
                 'user_id' => auth()->id(),
-                'receipt_no' => 'A'.$invoice->reference
+                'receipt_no' => 'A' . $invoice->reference
             ];
         }
         $supplier_ledger[] = [
@@ -456,17 +461,18 @@ class Transaction
             'debit' => 0,
             'date' => $invoice->date,
             'user_id' => auth()->id(),
-            'receipt_no' => 'S'.$invoice->reference
+            'receipt_no' => 'S' . $invoice->reference
         ];
 
         $general_account_ledger = array_merge($asset_account, $cost_account, $supplier_ledger);
-        if(GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])){
-            return ['status'=>true, 'message'=>'success'];
+        if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
+            return ['status' => true, 'message' => 'success'];
         }
 
     }
 
-    public static function sale(array $store_product, int $customer_id, string $reference, $date){
+    public static function sale(array $store_product, int $customer_id, string $reference, $date)
+    {
         /*
          *
          * $products = [
@@ -491,18 +497,19 @@ class Transaction
         //Customer (Debit) based on unit sale price
         //unit cost price
         //unit sale price
-        try{
-            $store_product_ids = $quantities = $sold_prices =  [];
-            foreach($store_product as $key=>$value){
-                $store_product_ids[] = $key;
-                $quantities[] = $value['quantity'];
-                $sold_prices[] = $value['sold_price'];
-                $cost_prices[] = $value['cost_price'];
-            }
+        //dd($store_product);
+        try {
+            $store_product_ids = $quantities = $sold_prices = [];
+            // foreach($store_product as $key=>$value){
+            //     $store_product_ids[] = $key;
+            //     $quantities[] = $value['quantity'];
+            //     $sold_prices[] = $value['sold_price'];
+            //     $cost_prices[] = $value['cost_price'];
+            // }
 //            return $sold_prices;
             $customer = Customer::find($customer_id);
             $records = StoreProduct::
-            whereIn('store_products.id',$store_product_ids)
+                whereIn('store_products.id', $store_product_ids)
                 ->join('stores', 'stores.id', 'store_products.store_id')
                 ->join('products', 'products.id', 'store_products.product_id')
                 ->join('categories', 'categories.id', 'products.category_id')
@@ -521,78 +528,79 @@ class Transaction
                 ")
                 ->groupBy('store_products.id')
                 ->get();
-//            return $records;
+            //            return $records;
             $asset_account = $cost_account = $revenue_account = $customer_ledger = [];
             $customer_value = $branch_id = 0;
-            foreach($records as $record){
+            foreach ($records as $record) {
                 // total value based on cost price
                 // total value based on sale price
                 $cost_value = ($store_product[$record->store_product_id]['cost_price'] * $store_product[$record->store_product_id]['quantity']);
                 $sell_value = ($store_product[$record->store_product_id]['sold_price'] * $store_product[$record->store_product_id]['quantity']);
-                $customer_value = ($customer_value+$sell_value);
+                $customer_value = ($customer_value + $sell_value);
                 $branch_id = $record->branch_id;
                 $asset_account[] = [
                     'model_id' => $record->asset_account_id,
                     'model_name' => 'GeneralAccount',
                     'branch_id' => $record->branch_id,
-                    'description' => 'Sale of '.$record->category_name,
+                    'description' => 'Sale of ' . $record->category_name,
                     'reference' => $reference,
                     'credit' => $cost_value,
                     'debit' => 0,
                     'date' => $date,
                     'user_id' => auth()->id(),
-                    'receipt_no' => 'A'.$reference
+                    'receipt_no' => 'A' . $reference
                 ];
                 $cost_account[] = [
                     'model_id' => $record->cost_account_id,
                     'model_name' => 'GeneralAccount',
                     'branch_id' => $record->branch_id,
-                    'description' => 'Sale of '.$record->category_name,
+                    'description' => 'Sale of ' . $record->category_name,
                     'reference' => $reference,
                     'credit' => 0,
                     'debit' => $cost_value,
                     'date' => $date,
                     'user_id' => auth()->id(),
-                    'receipt_no' => 'C'.$reference
+                    'receipt_no' => 'C' . $reference
                 ];
                 $revenue_account[] = [
                     'model_id' => $record->cost_account_id,
                     'model_name' => 'GeneralAccount',
                     'branch_id' => $record->branch_id,
-                    'description' => 'Sale of '.$record->category_name,
+                    'description' => 'Sale of ' . $record->category_name,
                     'reference' => $reference,
                     'credit' => $sell_value,
                     'debit' => 0,
                     'date' => $date,
                     'user_id' => auth()->id(),
-                    'receipt_no' => 'R'.$reference
+                    'receipt_no' => 'R' . $reference
                 ];
             }
             $customer_ledger[] = [
                 'model_id' => $customer->id,
                 'model_name' => 'Customer',
                 'branch_id' => $branch_id,
-                'description' => 'Sale Reference: '.$reference,
+                'description' => 'Sale Reference: ' . $reference,
                 'reference' => $reference,
                 'credit' => 0,
                 'debit' => $customer_value,
                 'date' => $date,
                 'user_id' => auth()->id(),
-                'receipt_no' => 'S'.$reference
+                'receipt_no' => 'S' . $reference
             ];
             $general_account_ledger = array_merge($asset_account, $cost_account, $revenue_account, $customer_ledger);
-//            return $general_account_ledger;
-            if(GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])){
-                return ['status'=>true, 'message'=>'success'];
+            //            return $general_account_ledger;
+            if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
+                return ['status' => true, 'message' => 'success'];
             }
-            return ['status'=>false, 'message'=>'Something went wrong.'];
-        }catch(\Exception $e){
-            return ['status'=>false, 'message'=>$e->getMessage()];
+            return ['status' => false, 'message' => 'Something went wrong.'];
+        } catch (\Exception $e) {
+            return ['status' => false, 'message' => $e->getMessage()];
         }
 
     }
 
-    public static function credit_note(array $store_product, int $customer_id, string $reference, $date){
+    public static function credit_note(array $store_product, int $customer_id, string $reference, $date)
+    {
         /*
          *
          * $products = [
@@ -617,18 +625,18 @@ class Transaction
         //Customer (Debit) based on unit sale price
         //unit cost price
         //unit sale price
-        try{
-            $store_product_ids = $quantities = $sold_prices =  [];
-            foreach($store_product as $key=>$value){
+        try {
+            $store_product_ids = $quantities = $sold_prices = [];
+            foreach ($store_product as $key => $value) {
                 $store_product_ids[] = $key;
                 $quantities[] = $value['quantity'];
                 $sold_prices[] = $value['sold_price'];
                 $cost_prices[] = $value['cost_price'];
             }
-//            return $sold_prices;
+            //            return $sold_prices;
             $customer = Customer::find($customer_id);
             $records = StoreProduct::
-            whereIn('store_products.id',$store_product_ids)
+                whereIn('store_products.id', $store_product_ids)
                 ->join('stores', 'stores.id', 'store_products.store_id')
                 ->join('products', 'products.id', 'store_products.product_id')
                 ->join('categories', 'categories.id', 'products.category_id')
@@ -647,131 +655,133 @@ class Transaction
                 ")
                 ->groupBy('store_products.id')
                 ->get();
-//            return $records;
+            //            return $records;
             $asset_account = $cost_account = $revenue_account = $customer_ledger = [];
             $customer_value = $branch_id = 0;
-            foreach($records as $record){
+            foreach ($records as $record) {
                 // total value based on cost price
                 // total value based on sale price
                 $cost_value = ($store_product[$record->store_product_id]['cost_price'] * $store_product[$record->store_product_id]['quantity']);
                 $sell_value = ($store_product[$record->store_product_id]['sold_price'] * $store_product[$record->store_product_id]['quantity']);
-                $customer_value = ($customer_value+$sell_value);
+                $customer_value = ($customer_value + $sell_value);
                 $branch_id = $record->branch_id;
                 $asset_account[] = [
                     'model_id' => $record->asset_account_id,
                     'model_name' => 'GeneralAccount',
                     'branch_id' => $record->branch_id,
-                    'description' => 'Sale of '.$record->category_name,
+                    'description' => 'Sale of ' . $record->category_name,
                     'reference' => $reference,
                     'credit' => 0,
                     'debit' => $cost_value,
                     'date' => $date,
                     'user_id' => auth()->id(),
-                    'receipt_no' => 'A'.$reference
+                    'receipt_no' => 'A' . $reference
                 ];
                 $cost_account[] = [
                     'model_id' => $record->cost_account_id,
                     'model_name' => 'GeneralAccount',
                     'branch_id' => $record->branch_id,
-                    'description' => 'Sale of '.$record->category_name,
+                    'description' => 'Sale of ' . $record->category_name,
                     'reference' => $reference,
                     'credit' => $cost_value,
                     'debit' => 0,
                     'date' => $date,
                     'user_id' => auth()->id(),
-                    'receipt_no' => 'C'.$reference
+                    'receipt_no' => 'C' . $reference
                 ];
                 $revenue_account[] = [
                     'model_id' => $record->cost_account_id,
                     'model_name' => 'GeneralAccount',
                     'branch_id' => $record->branch_id,
-                    'description' => 'Sale of '.$record->category_name,
+                    'description' => 'Sale of ' . $record->category_name,
                     'reference' => $reference,
                     'credit' => 0,
                     'debit' => $sell_value,
                     'date' => $date,
                     'user_id' => auth()->id(),
-                    'receipt_no' => 'R'.$reference
+                    'receipt_no' => 'R' . $reference
                 ];
             }
             $customer_ledger[] = [
                 'model_id' => $customer->id,
                 'model_name' => 'Customer',
                 'branch_id' => $branch_id,
-                'description' => 'Sale Reference: '.$reference,
+                'description' => 'Sale Reference: ' . $reference,
                 'reference' => $reference,
                 'credit' => $customer_value,
                 'debit' => 0,
                 'date' => $date,
                 'user_id' => auth()->id(),
-                'receipt_no' => 'S'.$reference
+                'receipt_no' => 'S' . $reference
             ];
             $general_account_ledger = array_merge($asset_account, $cost_account, $revenue_account, $customer_ledger);
-//            return $general_account_ledger;
-            if(GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])){
-                return ['status'=>true, 'message'=>'success'];
+            //            return $general_account_ledger;
+            if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
+                return ['status' => true, 'message' => 'success'];
             }
-            return ['status'=>false, 'message'=>'Something went wrong.'];
-        }catch(\Exception $e){
-            return ['status'=>false, 'message'=>$e->getMessage()];
+            return ['status' => false, 'message' => 'Something went wrong.'];
+        } catch (\Exception $e) {
+            return ['status' => false, 'message' => $e->getMessage()];
         }
 
     }
 
-    public static function transaction($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date, $type='TRN'){
+    public static function transaction($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date, $type = 'TRN')
+    {
         $user = auth()->user();
         $branch = $user->branch;
-        if(!$branch)
-            return ['status'=>false, 'message'=>'This user does not have a branch.'];
+        if (!$branch)
+            return ['status' => false, 'message' => 'This user does not have a branch.'];
         $source_name == 'Customer' ?
             $source_model = Customer::find($source_id) :
             ($source_name == 'Supplier' ?
                 $source_model = Supplier::find($source_id) :
-                    ($source_model = GeneralAccount::find($source_id) ));
+                ($source_model = GeneralAccount::find($source_id)));
         $destination_name == 'Customer' ?
             $destination_model = Customer::find($destination_id) :
             ($destination_name == 'Supplier' ?
                 $destination_model = Supplier::find($destination_id) :
-                ($destination_model = GeneralAccount::find($destination_id) ));
+                ($destination_model = GeneralAccount::find($destination_id)));
 
         $source_account[] = [
             'model_id' => $source_model->id,
             'model_name' => class_basename($source_model),
             'branch_id' => $branch->id,
-            'description' => 'Receipt on behalf of '.$reference,
+            'description' => 'Receipt on behalf of ' . $reference,
             'reference' => $reference,
             'credit' => 0,
             'debit' => $amount,
             'date' => $date,
             'user_id' => $user->id,
-            'receipt_no' => $type.$reference
+            'receipt_no' => $type . $reference
         ];
         $destination_account[] = [
             'model_id' => $destination_model->id,
             'model_name' => class_basename($destination_model),
             'branch_id' => $branch->id,
-            'description' => 'Receipt on behalf of '.$reference,
+            'description' => 'Receipt on behalf of ' . $reference,
             'reference' => $reference,
             'credit' => $amount,
             'debit' => 0,
             'date' => $date,
             'user_id' => $user->id,
-            'receipt_no' => $type.$reference
+            'receipt_no' => $type . $reference
         ];
 
         $general_account_ledger = array_merge($source_account, $destination_account);
-        if(GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])){
-            return ['status'=>true, 'message'=>'success'];
+        if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
+            return ['status' => true, 'message' => 'success'];
         }
-        return ['status'=>false, 'message'=>'Something went wrong.'];
+        return ['status' => false, 'message' => 'Something went wrong.'];
     }
 
-    public static function reversal($reference, $type = 'REVERSAL'){
-        if(is_null($reference))
-            return ['status'=>false, 'message'=>'$reference is null.'];
+    public static function reversal($reference, $type = 'REVERSAL')
+    {
+        if (is_null($reference))
+            return ['status' => false, 'message' => '$reference is null.'];
         $user = auth()->user();
         $general_ledgers = GeneralAccountLedger::forReference($reference)->get();
-        if(count($general_ledgers) > 0) {
+        if (count($general_ledgers) > 0) {
             $general_account_ledgers = [];
             foreach ($general_ledgers as $general_ledger) {
                 $general_account_ledgers[] = [
@@ -787,24 +797,27 @@ class Transaction
                     'receipt_no' => $type . '_' . $reference
                 ];
             }
-            if(GeneralAccountLedger::upsert($general_account_ledgers, ['model_id', 'model_name', 'branch_id', 'receipt_no'])){
-                return ['status'=>true, 'message'=>'success'];
+            if (GeneralAccountLedger::upsert($general_account_ledgers, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
+                return ['status' => true, 'message' => 'success'];
             }
-        }else{
-            return ['status'=>false, 'message'=>'No transaction found for .'.$reference];
+        } else {
+            return ['status' => false, 'message' => 'No transaction found for .' . $reference];
         }
-        return ['status'=>false, 'message'=>'Something went wrong.'];
+        return ['status' => false, 'message' => 'Something went wrong.'];
     }
 
-    public static function receipt($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date){
+    public static function receipt($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date)
+    {
         return self::transaction($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date, 'RCT');
     }
 
-    public static function payment($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date){
+    public static function payment($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date)
+    {
         return self::transaction($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date, 'PAY');
     }
 
-    public static function journal(array $accounts_details, $reference, $date, $type = 'JOURNAL' ){
+    public static function journal(array $accounts_details, $reference, $date, $type = 'JOURNAL')
+    {
         /*
          * source and destination account structure
          * [
@@ -816,7 +829,7 @@ class Transaction
         $user = auth()->user();
         $branch = $user->branch;
         $general_account_ledgers = [];
-        foreach($accounts_details as $account){
+        foreach ($accounts_details as $account) {
             $general_account_ledgers[] = [
                 'model_id' => $account['account_id'],
                 'model_name' => $account['account_type'],
@@ -830,31 +843,49 @@ class Transaction
                 'receipt_no' => $type . '_' . $reference
             ];
         }
-        if(GeneralAccountLedger::upsert($general_account_ledgers, ['model_id', 'model_name', 'branch_id', 'receipt_no'])){
-            return ['status'=>true, 'message'=>'success'];
-        }else{
-            return ['status'=>false, 'message'=>'Something went wrong'];
+        if (GeneralAccountLedger::upsert($general_account_ledgers, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
+            return ['status' => true, 'message' => 'success'];
+        } else {
+            return ['status' => false, 'message' => 'Something went wrong'];
         }
     }
 
 
-    public static function debit_note(){
+    public static function debit_note()
+    {
 
     }
 
-    public static function return_debit(){
+    public static function return_debit()
+    {
 
     }
 
-    public static function expense($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date){
+    public static function expense($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date)
+    {
         return self::transaction($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date, 'EXP');
     }
 
-    public static function interbank($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date){
+    public static function interbank($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date)
+    {
         return self::transaction($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date, 'ITB');
     }
 
-
+    public static function check_transaction_limit($customer_id, $total_sales)
+    {
+        $credit_limit = Customer::find($customer_id)->credit_limit;
+        $balance = Customer::find($customer_id)->runningBalance();
+        if ($balance <= 0 && $credit_limit == 0) {
+            return false;
+        }
+        if (($balance <= 0 && $credit_limit > 0 && (abs($balance + $total_sales)) > $credit_limit)) {
+            return false;
+        }
+        if ($balance > 0 && $credit_limit > 0 && (abs($balance + $total_sales) > $credit_limit)) {
+            return false;
+        }
+        return true;
+    }
 
 
 }

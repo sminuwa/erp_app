@@ -37,7 +37,7 @@ class PosController extends Controller
 
             })
 
-            //->where('stores.branch_id', 'LIKE', $user_branch)
+            ->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('branch_product_prices.status', 1);
 //            ->orderBy('products.code','asc')
             //->limit(100);

@@ -102,12 +102,21 @@
 @push('js')
     <script type="text/javascript">
         $(document).ready(function(e) {
-            initial = $('#code').val();
-            $(document).on('change', '.type', function(e) {
-                $('#code').val("");
-                code = $(this).val();
-                $('#code').val(code + initial);
-            })
+            $('.type').change(function() {
+                var prefix = $(this).val();
+                // Make an AJAX request to get the codes based on the selected prefix
+                $.ajax({
+                    url: "{{ route('suppliers.code', ':prefix') }}".replace(':prefix',
+                        prefix),
+                    type: 'GET',
+                    success: function(data) {
+                        // Populate the second select option with the retrieved codes
+                        $('#code').empty();
+                        $('#code').val(data);
+
+                    }
+                });
+            });
         });
     </script>
 @endpush

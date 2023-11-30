@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
+use App\Models\Proformer;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use App\Models\StoreProduct;
@@ -51,9 +52,10 @@ class PosController extends Controller
             $stores = $stores->where('store_products.store_id', 'LIKE', $store_id)
                 ->where('products.category_id', 'LIKE', $category_id);
         }
-        if (request()->routeIs('invoice.index')) {
+        if (request()->routeIs('pos.index')) {
             $stores = $stores->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('store_products.qty_available', '>', 0);
+            
         }
         $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name');
         $cart_products = \Cart::getContent();
@@ -63,7 +65,9 @@ class PosController extends Controller
         $receipt_no = ""; //$debtor->generateReceiptNo();
         if (request()->routeIs('proforma.index')) {
             $stores = $stores->get();
-            return view('pages.pos.proformer', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no'));
+            $model = new Proformer();
+            $type='create';
+            return view('pages.pos.proformer', compact('stores', 'model','customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no','type'));
         }
         if (request()->routeIs('order.invoice.index')) {
             $stores = $stores->get();

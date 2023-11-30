@@ -3,10 +3,10 @@
         <h3 class="card-title">
             <i class="fa fa-info"></i>
             Item Lists for Invoice
-            @if (isset($order))
-                {{ $order->invoice_no }}
+            @if (isset($purchase))
+                {{ $purchase->reference }}
             @elseif (Cart::getTotal() > 0)
-                {{ $invoice_no }}
+                {{ $reference }}
             @endif
 
         </h3>
@@ -36,16 +36,15 @@
                             <td>{{ $loop->iteration }}</td>
                             <td class="text-left">{{ $product->name }}</td>
 
-                            <form action="{{ route('return.debit.cart.update') }}" method="post" id="p{{ $product->id }}">
+                            <form action="{{ route('return.debit.cart.update') }}" method="post"
+                                id="p{{ $product->id }}">
                                 @csrf
                                 @method('PUT')
                                 <td>
-                                    <input type="text" name="sold_price" id="price{{ $product->id }}"
+                                    <input type="text" name="unit_price" id="price{{ $product->id }}"
                                         class="form-control price" style="min-width:65px;"
                                         onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
-                                        value="{{ $product->price }}"
-                                        data-val="{{ $product->attributes['cost_price'] }}"
-                                        data-value="p{{ $product->id }}">
+                                        value="{{ $product->price }}" data-value="p{{ $product->id }}">
                                     <span style="color: red;" id="valid_price{{ $product->id }}"></span>
                                 </td>
                                 <td>
@@ -58,10 +57,6 @@
                                         class="subtotal{{ $product->id }}">{{ number_format($product->price * $product->quantity, 2) }}</span>
                                 </td>
                                 <input type="hidden" name="id" class="form-control" value="{{ $product->id }}">
-                                <input type="hidden" name="selling_price" class="form-control"
-                                    value="{{ $product->attributes['selling_price'] }}">
-                                <input type="hidden" name="cost_price" class="form-control"
-                                    value="{{ $product->attributes['cost_price'] }}">
                                 {{-- <td>
                                 <button type="submit" class="btn btn-sm btn-success">
                                     <i class="fa fa-check-circle" aria-hidden="true"></i>
@@ -77,7 +72,7 @@
                                 <form id="delete-form-{{ $product->id }}"
                                     action="{{ route('return.debit.cart.remove', $product->id) }}" method="post"
                                     style="display:none;">
-                                    <input type="hidden" name="order" id="order" value="{{ $order->id }}" />
+                                    <input type="hidden" name="order" id="order" value="{{ $purchase->id }}" />
                                     @csrf
                                     @method('DELETE')
                                 </form>
@@ -92,7 +87,8 @@
         </div>
         <form action="{{ route('customers.return.debit.store') }}" method="POST">
             @csrf
-            <input type="hidden" name="order_id" id="order_id" value="{{ $order->id }}" />
+            <input type="hidden" name="purchase_id" id="purchase_id" value="{{ $purchase->id }}" />
+            <input type="date" class="form-control" name="date" id="date"/>
             <textarea name="comment" placeholder="Comment" rows="5" cols="100" class="form-control"></textarea>
             <div class="form-group text-right">
                 <input type="submit" name="Submit" class=" btn btn-primary" value="Submit" />

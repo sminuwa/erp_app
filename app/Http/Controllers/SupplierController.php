@@ -43,15 +43,16 @@ class SupplierController extends Controller
      */
     public function index(Index $request)
     {
-//        $user_branch = User::userBranchAction();
+
+        //        $user_branch = User::userBranchAction();
         return view('pages.suppliers.index', ['records' => Supplier::orderBy('name')->get()]);
     } /**
-  * Display the specified resource.
-  *
-  * @param  Show  $request
-  * @param  Supplier  $supplier
-  * @return \Illuminate\Http\Response
-  */
+      * Display the specified resource.
+      *
+      * @param  Show  $request
+      * @param  Supplier  $supplier
+      * @return \Illuminate\Http\Response
+      */
     public function show(Show $request, Supplier $supplier)
     {
         return view('pages.suppliers.show', [
@@ -59,26 +60,26 @@ class SupplierController extends Controller
         ]);
 
     } /**
-  * Show the form for creating a new resource.
-  *
-  * @param  Create  $request
-  * @return \Illuminate\Http\Response
-  */
+      * Show the form for creating a new resource.
+      *
+      * @param  Create  $request
+      * @return \Illuminate\Http\Response
+      */
     public function create(Create $request)
     {
 
         return view('pages.suppliers.create', [
             'model' => new Supplier,
             'banks' => Bank::all(['id', 'name']),
-            'code' => $this->supplierCode(),
+            'code' => $this->supplierCode('TS'),
 
         ]);
     } /**
-  * Store a newly created resource in storage.
-  *
-  * @param  Store  $request
-  * @return \Illuminate\Http\Response
-  */
+      * Store a newly created resource in storage.
+      *
+      * @param  Store  $request
+      * @return \Illuminate\Http\Response
+      */
     public function store(Store $request)
     {
         $model = new Supplier;
@@ -93,18 +94,17 @@ class SupplierController extends Controller
             if ($request->has('shortcut'))
                 return redirect()->back();
             return redirect()->route('suppliers.index');
-        }
-        else {
+        } else {
             session()->flash('app_message', 'Something is wrong while saving Supplier');
         }
         return redirect()->back();
     } /**
-  * Show the form for editing the specified resource.
-  *
-  * @param  Edit  $request
-  * @param  Supplier  $supplier
-  * @return \Illuminate\Http\Response
-  */
+      * Show the form for editing the specified resource.
+      *
+      * @param  Edit  $request
+      * @param  Supplier  $supplier
+      * @return \Illuminate\Http\Response
+      */
     public function edit(Edit $request, Supplier $supplier)
     {
 
@@ -113,12 +113,12 @@ class SupplierController extends Controller
             'banks' => Bank::all(['id', 'name']),
         ]);
     } /**
-  * Update a existing resource in storage.
-  *
-  * @param  Update  $request
-  * @param  Supplier  $supplier
-  * @return \Illuminate\Http\Response
-  */
+      * Update a existing resource in storage.
+      *
+      * @param  Update  $request
+      * @param  Supplier  $supplier
+      * @return \Illuminate\Http\Response
+      */
     public function update(Update $request, Supplier $supplier)
     {
         $supplier->fill($request->all());
@@ -128,19 +128,18 @@ class SupplierController extends Controller
             AuditLog::auditLog(Auth::id(), $action);
             session()->flash('app_message', 'Supplier successfully updated');
             return redirect()->route('suppliers.index');
-        }
-        else {
+        } else {
             session()->flash('app_error', 'Something is wrong while updating Supplier');
         }
         return redirect()->back();
     } /**
-  * Delete a  resource from  storage.
-  *
-  * @param  Destroy  $request
-  * @param  Supplier  $supplier
-  * @return \Illuminate\Http\Response
-  * @throws \Exception
-  */
+      * Delete a  resource from  storage.
+      *
+      * @param  Destroy  $request
+      * @param  Supplier  $supplier
+      * @return \Illuminate\Http\Response
+      * @throws \Exception
+      */
     public function destroy(Destroy $request, Supplier $supplier)
     {
         if ($supplier->supplierLedgers()->count() == 0) {
@@ -148,25 +147,26 @@ class SupplierController extends Controller
                 $action = "Deleted supplier " . $supplier->name;
                 AuditLog::auditLog(Auth::id(), $action);
                 session()->flash('app_message', 'Supplier successfully deleted');
-            }
-            else {
+            } else {
                 session()->flash('app_error', 'Error occurred while deleting Supplier');
             }
-        }
-        else {
+        } else {
             session()->flash('app_error', 'Error occurred while deleting Supplier');
         }
         return redirect()->back();
     }
-    public function supplierCode()
+    public function supplierCode($type)
     {
-        $no = DB::table('suppliers')->select('id')->orderBy('id', 'DESC')->first();
+        $no = DB::table('suppliers')
+            ->whereRaw("SUBSTRING(code, 1, 2) LIKE '$type'")
+            ->max(DB::raw("CAST(SUBSTRING(code, 3) AS UNSIGNED)"));
+
         if ($no == null)
             $no = 1;
         else {
-            $no = $no->id + 1;
+            $no = $no + 1;
         }
-        return str_pad($no, 3, "0", STR_PAD_LEFT);
+        return $type . str_pad($no, 5, "0", STR_PAD_LEFT);
     }
 
     public function runninigBalance($supplier_id)
@@ -217,7 +217,8 @@ class SupplierController extends Controller
 
             DB::table('bank_accounts')->where('id', $bank_account_id)->decrement('account_balance', $amount);
             //Bank Withdrawal
-            DB::table('bank_transactions')->insert(['bank_account_id' => $bank_account_id,
+            DB::table('bank_transactions')->insert([
+                'bank_account_id' => $bank_account_id,
                 'trans_date' => $request->payment_date,
                 'cr' => 0,
                 'dr' => $amount,
@@ -229,8 +230,7 @@ class SupplierController extends Controller
             AuditLog::auditLog(Auth::id(), $action);
             session()->flash('app_message', 'Payment captured successfully');
             DB::commit();
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
         }
@@ -256,7 +256,8 @@ class SupplierController extends Controller
             DB::table('bank_accounts')->where('id', $bank_account_id)->increment('account_balance', $ledger->dr);
             DB::table('bank_accounts')->where('id', $bank_account_id)->decrement('account_balance', $amount);
             //Bank Withdrawal
-            DB::table('bank_transactions')->where(['ref_no' => $ledger->teller_no, 'bank_account_id' => $ledger->bank_account_id])->update(['bank_account_id' => $bank_account_id,
+            DB::table('bank_transactions')->where(['ref_no' => $ledger->teller_no, 'bank_account_id' => $ledger->bank_account_id])->update([
+                'bank_account_id' => $bank_account_id,
                 'trans_date' => $request->payment_date,
                 'cr' => 0,
                 'dr' => $amount,
@@ -276,8 +277,7 @@ class SupplierController extends Controller
             AuditLog::auditLog(Auth::id(), $action);
             session()->flash('app_message', 'Payment updated successfully');
             DB::commit();
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('app_error', 'Payment failed');
             throw $e;
@@ -308,7 +308,7 @@ class SupplierController extends Controller
         $balance_b_d = $sum_cr_b_d - $sum_dr_b_d; //balance before date
         $ledgers = $query->orderBy('date')->get();
 
-        return view('pages.suppliers.load_ledger', compact('ledgers', 'supplier', 'from_date', 'to_date', 'balance_b_d','sum_cr_b_d','sum_dr_b_d'));
+        return view('pages.suppliers.load_ledger', compact('ledgers', 'supplier', 'from_date', 'to_date', 'balance_b_d', 'sum_cr_b_d', 'sum_dr_b_d'));
     }
     public function loadGeneralSupplierLedger(Request $request)
     {
@@ -333,7 +333,7 @@ class SupplierController extends Controller
         $sum_dr_b_d = SupplierLedger::where('supplier_id', $supplier_id)->where('payment_mode', '<>', 'Credit Note')->where('date', '<', $from_date)->sum('dr');
         $balance_b_d = $sum_cr_b_d - $sum_dr_b_d; //balance before date
         $ledgers = $query->orderBy('date')->get();
-        return view('pages.suppliers.load_general_ledger', compact('ledgers', 'from_date', 'to_date', 'balance_b_d', 'supplier','sum_cr_b_d','sum_dr_b_d'));
+        return view('pages.suppliers.load_general_ledger', compact('ledgers', 'from_date', 'to_date', 'balance_b_d', 'supplier', 'sum_cr_b_d', 'sum_dr_b_d'));
     }
     public function generateSupplierLedger()
     {
@@ -356,7 +356,7 @@ class SupplierController extends Controller
         $balance_b_d = $sum_cr_b_d - $sum_dr_b_d; //balance before date
         $ledgers = $query->orderBy('date')->get();
 
-        return view('pages.suppliers.print_ledger', compact('ledgers', 'supplier', 'from_date', 'to_date', 'balance_b_d','sum_cr_b_d','sum_dr_b_d'));
+        return view('pages.suppliers.print_ledger', compact('ledgers', 'supplier', 'from_date', 'to_date', 'balance_b_d', 'sum_cr_b_d', 'sum_dr_b_d'));
     }
     public function supplierPayments()
     {
@@ -408,8 +408,7 @@ class SupplierController extends Controller
             $action = "Deleted payment of  $ledger->teller_no for supplier: " . Supplier::find($supplier_id)->name;
             AuditLog::auditLog(Auth::id(), $action);
             DB::commit();
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('app_error', 'Payment cannot be deleted');
             throw $e;
@@ -463,7 +462,8 @@ class SupplierController extends Controller
             ]);
 
             //Bank Withdrawal
-            DB::table('bank_transactions')->insert(['bank_account_id' => $bank_account_id,
+            DB::table('bank_transactions')->insert([
+                'bank_account_id' => $bank_account_id,
                 'trans_date' => $request->payment_date,
                 'cr' => 0,
                 'dr' => $amount,
@@ -475,8 +475,7 @@ class SupplierController extends Controller
             $action = "Posted credit note $request->teller_no from supplier: " . Supplier::find($supplier_id)->name;
             AuditLog::auditLog(Auth::id(), $action);
             DB::commit();
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
         }
@@ -497,7 +496,8 @@ class SupplierController extends Controller
             DB::table('suppliers')->where(['id' => $supplier_id])->decrement('opening_balance', $amount);
 
             //Bank Withdrawal
-            DB::table('bank_transactions')->where(['ref_no' => $ledger->teller_no, 'bank_account_id' => $ledger->bank_account_id])->update(['bank_account_id' => $bank_account_id,
+            DB::table('bank_transactions')->where(['ref_no' => $ledger->teller_no, 'bank_account_id' => $ledger->bank_account_id])->update([
+                'bank_account_id' => $bank_account_id,
                 'trans_date' => $request->payment_date,
                 'cr' => 0,
                 'dr' => $amount,
@@ -516,8 +516,7 @@ class SupplierController extends Controller
             $action = "Updated credit note $request->teller_no from supplier: " . Supplier::find($supplier_id)->name;
             AuditLog::auditLog(Auth::id(), $action);
             DB::commit();
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('app_error', 'Credit note failed to update');
             throw $e;
@@ -540,8 +539,7 @@ class SupplierController extends Controller
             $action = "Deleted credit note $ledger->teller_no from supplier: " . Supplier::find($supplier_id)->name;
             AuditLog::auditLog(Auth::id(), $action);
             DB::commit();
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('app_error', 'Credit note cannot be deleted');
             throw $e;
@@ -568,7 +566,8 @@ class SupplierController extends Controller
         $suppliers = Supplier::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
         return view('pages.suppliers.create_opening_balance', [
             'suppliers' => $suppliers,
-            'model' => null]);
+            'model' => null
+        ]);
     }
     public function openingBalanceStore(Request $request)
     {

@@ -54,7 +54,7 @@
                                onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
                                @endif
                                value="{{ $product->price }}"
-                               data-val="{{ $product->attributes['selling_price'] }}"
+                               data-val="{{ $product->attributes['selling_price'] }}" min="1"
                                data-value="p{{ $product->id }}">
                         <span style="color: red;" id="valid_price{{ $product->id }}"></span>
                     </div>

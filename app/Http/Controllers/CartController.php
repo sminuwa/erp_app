@@ -217,7 +217,7 @@ class CartController extends Controller
             if ($request->cost_price != null) {
                 $cost_price = $request->cost_price;
             }
-           
+
             $add = \Cart::add([
                 'id' => generateRandomString(),
                 'name' => $product->name,
@@ -234,8 +234,27 @@ class CartController extends Controller
         }
         if ($type == 'order' || $type == 'proforma' || $type == 'invoice') {
             $customer = Customer::find($request->customer);
-            $store_product = StoreProduct::find($request->id);
-            $product_id = $store_product->product_id;
+            
+
+            if ($type == 'proforma' || $type == 'order') {
+                $product_id = $request->product_id;
+                $product = Product::find($product_id);
+                $name = $product->name ?? '';
+                $code = $product->code ?? '';
+                $qty_available = 0;
+                $id = $request->product_id;
+                $unit = $product->unit;
+                
+            } else {
+                $name = $request->name;
+                $code = $request->code;
+                $qty_available = $request->qty_available;
+                $id = $request->id;
+                $store_product = StoreProduct::find($request->id);
+                $product_id = $store_product->product_id;
+                $unit = $request->unit;
+                //$cost_price = str_replace(',', '', $request->cost_price);
+            }
             $prices = BranchProductPrice::where(['product_id' => $product_id, 'branch_id' => auth()->user()->branch->id])->first();
             $selling_price = 0;
             if ($prices) {
@@ -243,24 +262,25 @@ class CartController extends Controller
                     $selling_price = str_replace(',', '', $prices->retail_selling_price);
                 if ($customer->type == 'Wholesale')
                     $selling_price = str_replace(',', '', $prices->whole_selling_price);
+                $cost_price = str_replace(',', '', $prices->cost_price);
             }
             $qty = $request->qty;
-            $cost_price = str_replace(',', '', $request->cost_price);
-            $qty_available = $request->qty_available;
+            
+
             $store = $request->store;
             $add = \Cart::add([
-                'id' => $request->id,
-                'name' => $request->name,
+                'id' => $id,
+                'name' => $name,
                 'price' => $selling_price,
                 'quantity' => $qty == 0 ? 1 : $qty,
                 'attributes' => array(
                     'cost_price' => $cost_price,
-                    'code' => $request->code,
+                    'code' => $code,
                     'selling_price' => $selling_price,
                     'qty_available' => $qty_available,
                     'discount' => 0,
                     'store' => $store,
-                    'unit' => $request->unit ?? '',
+                    'unit' => $unit,
                 ),
             ]);
         }

@@ -194,6 +194,7 @@ class ReceiptController extends Controller
                 $receipt->receipt_no,
                 $receipt->date)
             ){
+                $ledger = new CustomerLedger();
                 $action = "Generated receipt of $receipt->amount for : " . $receipt->receipt_no;
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Receipt generated successfully');

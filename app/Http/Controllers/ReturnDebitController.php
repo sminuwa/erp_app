@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AuditLog;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\Purchase;
 use App\Models\ReturnDebit;
 use App\Models\Setting;
 use App\Models\StoreProduct;
@@ -25,10 +26,13 @@ class ReturnDebitController extends Controller
     public function createReturnDebit(Order $order = null)
     {
         $user_branch = User::userBranchAction();
-        $orders = Order::where('status', 1)
-            ->where('branch_id', 'LIKE', $user_branch)
-            ->whereNotIn('reference', DB::table('credit_notes')->select('reference')->pluck('reference')->toArray())
-            ->orderBy('order_date', 'DESC')->take(20)->get();
+        // $orders = Order::where('status', 1)
+        //     ->where('branch_id', 'LIKE', $user_branch)
+        //     ->whereNotIn('reference', DB::table('credit_notes')->select('reference')->pluck('reference')->toArray())
+        //     ->orderBy('order_date', 'DESC')->take(20)->get();
+       $purchases = Purchase::where('status',1)
+       ->where('branch_id', 'LIKE', $user_branch)
+       ->orderBy('purchase_date', 'DESC')->take(50)->get();
 
         $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price','retail_selling_price','whole_selling_price', 'cost_price', 'unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
@@ -48,7 +52,7 @@ class ReturnDebitController extends Controller
             \Cart::clear();
         $model = new Customer;
         $cart_products = \Cart::getContent();
-        return view('pages.inventories.return_debit.create_return_debit', compact('orders', 'model', 'cart_products', 'order', 'stores'));
+        return view('pages.inventories.return_debit.create_return_debit', compact('purchases', 'model', 'cart_products', 'order', 'stores'));
     }
     public function payReturnDebit(Request $request)
     {
@@ -134,22 +138,22 @@ class ReturnDebitController extends Controller
     }
     public function loadToCart(Request $request)
     {
-        $invoice_no = $request->invoice_no;
-        $order = Order::where('invoice_no', $invoice_no)->first();
+        $reference = $request->invoice_no;
+        $purchase = Purchase::where('reference', $reference)->first();
 
         \Cart::clear();
-        foreach ($order->order_items()->where('status', 1)->get() as $data) {
+        foreach ($purchase->purchasedProducts()->where('status', 1)->get() as $data) {
             $qty = $data->quantity == 0 ? 1 : $data->quantity;
             \Cart::add([
-                'id' => $data->store_product_id,
-                'name' => $data->storeProduct->product->name ?? 'No name found',
-                'price' => $data->sold_price,
+                'id' => $data->id,
+                'name' => $data->product->name ?? 'No name found',
+                'price' => $data->unit_price,
                 'quantity' => $qty,
-                'attributes' => array('cost_price' => $data->cost_price, 'selling_price' => $data->selling_price, 'discount' => 0),
+                'attributes' => array(),
             ]);
         }
         $cart_products = \Cart::getContent();
-        return view('pages.inventories.return_debit.load_products', ['cart_products' => $cart_products, 'invoice_no' => $invoice_no, 'order' => $order]);
+        return view('pages.inventories.return_debit.load_products', ['cart_products' => $cart_products, 'reference' => $reference, 'purchase' => $purchase]);
     }
     public function addToCart(Request $request)
     {

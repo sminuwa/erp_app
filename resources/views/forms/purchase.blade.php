@@ -1,4 +1,3 @@
-
 <div class="row">
     <div class="col-sm-12">
         <div class="card">
@@ -20,8 +19,9 @@
                                 <select
                                     class="form-control select2-single {{ $errors->has('supplier_id') ? ' is-invalid' : '' }}"
                                     name="supplier_id" id="supplier_id" required="required" autocomplete="off">
-                                    @if(isset($model->id))
-                                        <option value="{{ $model->supplier->id }}">{{ $model->supplier->code }} - {{ $model->supplier->name }}</option>
+                                    @if (isset($model->id))
+                                        <option value="{{ $model->supplier->id }}">{{ $model->supplier->code }} -
+                                            {{ $model->supplier->name }}</option>
                                     @endif
                                     <option value="">Select...</option>
                                     @if (isset($suppliers))
@@ -39,10 +39,10 @@
                                 <label for="purchase_date">Purchase Date</label>
                                 <div class="input-group">
                                     <input type="text"
-                                           class="form-control datepicker {{ $errors->has('purchase_date') ? ' is-invalid' : '' }}"
-                                           name="purchase_date" id="purchase_date"
-                                           value="{{ $model->purchase_date == null ? date('Y-m-d') : old('purchase_date', $model->purchase_date->format('Y-m-d')) }}"
-                                           placeholder="" required="required">
+                                        class="form-control datepicker {{ $errors->has('purchase_date') ? ' is-invalid' : '' }}"
+                                        name="purchase_date" id="purchase_date"
+                                        value="{{ $model->purchase_date == null ? date('Y-m-d') : old('purchase_date', $model->purchase_date->format('Y-m-d')) }}"
+                                        placeholder="" required="required">
                                     <?php date_default_timezone_set('Africa/Lagos'); ?>
                                     {{-- <input type="text"
                                         class="form-control datetimepicker input-sm {{ $errors->has('purchase_time') ? ' is-invalid' : '' }}"
@@ -64,7 +64,10 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="invoice">ATC/WayBill No</label>
-                                <input type="text" class="form-control {{ $errors->has('atc_no') ? ' is-invalid' : '' }}" name="atc_no" id="atc_no" value="{{ old('invoice', $model->atc_no) }}" placeholder="" maxlength="191" required="required">
+                                <input type="text"
+                                    class="form-control {{ $errors->has('atc_no') ? ' is-invalid' : '' }}"
+                                    name="atc_no" id="atc_no" value="{{ old('invoice', $model->atc_no) }}"
+                                    placeholder="" maxlength="191" required="required">
                                 @if ($errors->has('atc_no'))
                                     <div class="invalid-feedback">
                                         <strong>{{ $errors->first('atc_no') }}</strong>
@@ -76,10 +79,9 @@
                             <div class="form-group">
                                 <label for="vehicle_reg_no">Truck No</label>
                                 <input type="text"
-                                       class="form-control {{ $errors->has('truck_no') ? ' is-invalid' : '' }}"
-                                       name="truck_no" id="truck_no"
-                                       value="{{ old('truck_no', $model->truck_no) }}" placeholder=""
-                                       maxlength="191">
+                                    class="form-control {{ $errors->has('truck_no') ? ' is-invalid' : '' }}"
+                                    name="truck_no" id="truck_no" value="{{ old('truck_no', $model->truck_no) }}"
+                                    placeholder="" maxlength="191">
                                 @if ($errors->has('truck_no'))
                                     <div class="invalid-feedback">
                                         <strong>{{ $errors->first('truck_no') }}</strong>
@@ -104,10 +106,9 @@
             <div class="card-header">
                 <i class="ion-android-cart"></i> Supplier Cart: <small>Purchased Products</small>
                 <div class="float-right">
-                    <a href="javascript:void(0)" data-toggle="modal"
-                       data-target="#add_product_form"
-                       class="btn btn-sm btn-secondary float-md-right"
-                       style="margin-left: 2px;"><i class="fa fa-plus"></i> Add Product </a>
+                    <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
+                        class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
+                            class="fa fa-plus"></i> Add Product </a>
                 </div>
             </div>
             <div class="card-body table-responsive">
@@ -169,8 +170,8 @@
                     <div class="form-group">
                         <label for="qty_supplied">Quantity</label>
                         <input type="number"
-                               class="form-control {{ $errors->has('qty_supplied') ? ' is-invalid' : '' }}"
-                               name="qty_supplied" id="qty_supplied" placeholder="" required="required">
+                            class="form-control {{ $errors->has('qty_supplied') ? ' is-invalid' : '' }}"
+                            name="qty_supplied" id="qty_supplied" placeholder="" required="required">
                         @if ($errors->has('qty_supplied'))
                             <div class="invalid-feedback">
                                 <strong>{{ $errors->first('qty_supplied') }}</strong>
@@ -180,8 +181,8 @@
                     <div class="form-group">
                         <label for="unit_price">Cost Price</label>
                         <input type="text"
-                               class="form-control {{ $errors->has('unit_price') ? ' is-invalid' : '' }}"
-                               name="unit_price" id="unit_price" placeholder="" required="required">
+                            class="form-control {{ $errors->has('unit_price') ? ' is-invalid' : '' }}"
+                            name="unit_price" id="unit_price" placeholder="" required="required">
                         @if ($errors->has('unit_price'))
                             <div class="invalid-feedback">
                                 <strong>{{ $errors->first('unit_price') }}</strong>
@@ -212,4 +213,3 @@
         </div>
     </div>
 </div>
-

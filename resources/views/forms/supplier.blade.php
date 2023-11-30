@@ -26,10 +26,10 @@
     @if (!isset($model->code))
         <div class="form-group">
             <label for="code">Type</label>
-            <input type="radio" class="type" name="type" id="type" value="TS" required="required"
+            <input type="radio" class="type" name="type" class="type" value="TS" required="required"
                 {{ old('type', substr($model->code, 0, 2)) == 'TS' ? 'checked' : '' }} /> Transpoter
-            <input type="radio" class="type" name="type" id="type"
-                {{ old('type', substr($model->code, 0, 2)) == 'TS' ? 'checked' : '' }} value="MS"
+            <input type="radio" class="type" name="type" class="type"
+                {{ old('type', substr($model->code, 0, 2)) == 'MS' ? 'checked' : '' }} value="MS"
                 required="required" /> Supplier
             @if ($errors->has('code'))
                 <div class="invalid-feedback">
@@ -41,12 +41,8 @@
     @if (!isset($model->code))
         <div class="form-group">
             <label for="code">Supplier Code</label>
-            @php
-                $obj = new App\Http\Controllers\SupplierController();
-                $code = $obj->supplierCode();
-            @endphp
             <input type="text" class="form-control {{ $errors->has('code') ? ' is-invalid' : '' }}" name="code"
-                id="code" value="{{ $code }}" placeholder="" maxlength="4" required="required" readonly>
+                id="code" value="" placeholder="" maxlength="4" required="required" readonly>
             @if ($errors->has('code'))
                 <div class="invalid-feedback">
                     <strong>{{ $errors->first('code') }}</strong>

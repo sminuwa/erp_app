@@ -57,23 +57,23 @@
                                             <thead>
                                                 <tr>
                                                     <th>Reference No</th>
-                                                    <th>Customer</th>
+                                                    <th>Supplier</th>
                                                     <th>Date</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="table-body">
-                                                @foreach ($orders as $order)
+                                                @foreach ($purchases as $purchase)
                                                     <tr>
                                                         <td><a href="javascript:void(0)" class="invoice" onclick="load()"
-                                                                data-val="{{ $order->invoice_no }}">{{ $order->invoice_no }}</a>
+                                                                data-val="{{ $purchase->reference }}">{{ $purchase->reference }}</a>
                                                         </td>
-                                                        <td>{{ $order->customer->name }}</td>
-                                                        <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}
+                                                        <td>{{ $purchase->supplier->name }}</td>
+                                                        <td>{{ Carbon\Carbon::parse($purchase->purchase_date)->toFormattedDateString() }}
                                                         </td>
                                                         <td style="text-align: right"><a href="javascript:void(0)"
                                                                 onclick="load()" class="invoice"
-                                                                data-val="{{ $order->invoice_no }}"><span
+                                                                data-val="{{ $purchase->reference }}"><span
                                                                     class=""></span>Select</a></td>
                                                     </tr>
                                                 @endforeach
@@ -83,7 +83,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body table-responsive" id="load">
+                        {{-- <div class="card-body table-responsive" id="load">
                             <table id="store_data" class="table table-bordered table-striped text-left"
                                 style="font-size: 12px;">
                                 <thead>
@@ -93,7 +93,7 @@
                                         <th>Item</th>
                                         <th>Unit</th>
                                         <th>QTY</th>
-                                        {{-- <th>Price</th> --}}
+                                      
                                         <th>Add To Cart</th>
                                     </tr>
                                 </thead>
@@ -104,7 +104,7 @@
                                         <th>Name</th>
                                         <th>Unit</th>
                                         <th>QTY</th>
-                                        {{-- <th>Price</th> --}}
+                                       
                                         <th>Add To Cart</th>
                                     </tr>
                                 </tfoot>
@@ -133,9 +133,7 @@
                                                 <td>{{ $store->name }}</td>
                                                 <td>{{ $store->unit }}</td>
                                                 <td align="center">{{ $store->qty_available }}</td>
-                                                {{-- <td align="right">
-                                                    {{ number_format($store->selling_price, 2) }}
-                                                </td> --}}
+                                               
                                                 @if ($store->retail_selling_price > 0 || $store->whole_selling_price > 0)
                                                     <td align="center">
                                                         <button type="submit" class="btn btn-sm btn-success px-2">
@@ -155,7 +153,7 @@
 
                             </table>
 
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             </div><!-- /.container-fluid -->

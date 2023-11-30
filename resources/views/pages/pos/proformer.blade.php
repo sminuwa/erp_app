@@ -36,7 +36,7 @@
                     <div class="col-md-12">
                         <div class="card">
                             <form
-                                action="{{ isset($order) ? route('proformer.update',$order->id) : route('proformer.create') }}"
+                                action="{{ isset($order) ? route('proformer.update', $order->id) : route('proformer.create') }}"
                                 method="post">
                                 @csrf
                                 @isset($order)
@@ -51,20 +51,19 @@
                                 <div class="card-body">
 
                                     <input type="hidden" name="order_date" class="form-control datepicker"
-                                           value="{{ date('Y-m-d') }}" />
+                                        value="{{ date('Y-m-d') }}" />
 
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Customer Type</label>
-                                                <select
-                                                    name="account_type" id="account_type" class="form-control" required>
+                                                <select name="account_type" id="account_type" class="form-control" required>
                                                     <option value="" disabled selected>Select...</option>
                                                     <option value="Retail"
-                                                        {{ ((isset($order) && $order->customer->type=='Retail') || session()->has('customer') && session('customer')->type == 'Retail') ? 'selected' : '' }}>
+                                                        {{ (isset($order) && $order->customer->type == 'Retail') || (session()->has('customer') && session('customer')->type == 'Retail') ? 'selected' : '' }}>
                                                         Retail</option>
                                                     <option value="Wholesale"
-                                                        {{ ((isset($order) && $order->customer->type=='Wholesale') || session()->has('customer') && session('customer')->type == 'Wholesale') ? 'selected' : '' }}>
+                                                        {{ (isset($order) && $order->customer->type == 'Wholesale') || (session()->has('customer') && session('customer')->type == 'Wholesale') ? 'selected' : '' }}>
                                                         WholeSale</option>
                                                 </select>
                                             </div>
@@ -73,28 +72,32 @@
                                             <div class="form-group">
                                                 <label>Customer</label>
                                                 <div class="form-group">
-                                                    <select onchange="$('.customer').val($(this).val())"
-                                                            name="customer_id" id="customer_record"
-                                                            class="form-control select2-single">
-                                                        @if(session()->has('customer'))
-                                                            <option value="{{ session('customer')->id }}">{{ session('customer')->code }} - {{ session('customer')->name }}</option>
+                                                    <select onchange="$('.customer').val($(this).val())" name="customer_id"
+                                                        id="customer_record" class="form-control select2-single">
+                                                        @if (session()->has('customer'))
+                                                            <option value="{{ session('customer')->id }}">
+                                                                {{ session('customer')->code }} -
+                                                                {{ session('customer')->name }}</option>
                                                         @endif
                                                         @if (isset($order))
-                                                            <option value="{{ $order->customer->id }}" @if(session()->has('customer') && session('customer')->id == $order->customer?->id) selected @endif>
-                                                                {{ $order->customer->code }} - {{ $order->customer->name }}</option>
+                                                            <option value="{{ $order->customer->id }}"
+                                                                @if (session()->has('customer') && session('customer')->id == $order->customer?->id) selected @endif>
+                                                                {{ $order->customer->code }} -
+                                                                {{ $order->customer->name }}</option>
                                                         @endif
                                                     </select>
 
                                                     <div class="form-group">
                                                         <span class="text text-danger ion-android-alert"
-                                                              id="credit_balance"></span>
+                                                            id="credit_balance"></span>
                                                     </div>
                                                 </div>
                                                 {{-- <div class="form-group" style="border: 1px solid rgba(64, 44, 45, 0.4)">
                                                     <input type="text" class="form-control" name="reference" id="reference"
                                                         placeholder="Reference" />
                                                 </div> --}}
-                                                <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button>
+                                                <button type="submit" id="create_invoice"
+                                                    class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button>
                                             </div>
                                         </div>
                                     </div>
@@ -110,79 +113,177 @@
                                 <h3 class="card-title">Products</h3>
                                 @can('make.daily.sale')
                                     <input type="text" id="barcode" class="form-control" name="barcode"
-                                           placeholder="Scan barcode">
+                                        placeholder="Scan barcode">
                                 @endcannot
                             </div>
                             <!-- /.card-header -->
                             @can('view.sale.products')
-                                <div class="card-body table-responsive" id="load">
+                                {{-- <div class="card-body table-responsive" id="load">
                                     <table id="example1" class="table table-bordered table-striped text-left"
-                                           style="font-size: 12px;">
+                                        style="font-size: 12px;">
                                         <thead>
-                                        <tr>
-                                            <th>Store</th>
-                                            <th>Code</th>
-                                            <th>Item</th>
-                                            <th>Unit</th>
-                                            <th></th>
-                                        </tr>
+                                            <tr>
+                                                <th>Store</th>
+                                                <th>Code</th>
+                                                <th>Item</th>
+                                                <th>Unit</th>
+                                                <th></th>
+                                            </tr>
                                         </thead>
                                         <tfoot>
-                                        <tr>
-                                            <th>Store</th>
-                                            <th>Code</th>
-                                            <th>Name</th>
-                                            <th>Unit</th>
-                                            <th></th>
-                                        </tr>
+                                            <tr>
+                                                <th>Store</th>
+                                                <th>Code</th>
+                                                <th>Name</th>
+                                                <th>Unit</th>
+                                                <th></th>
+                                            </tr>
                                         </tfoot>
                                         <tbody>
-                                        @foreach ($stores as $key => $store)
-                                            <tr>
-                                                <form action="{{ route('ajax.cart.add') }}" method="POST" class="addCartItemForm">
-                                                    @csrf
-                                                    <input type="hidden" name="customer" class="customer" value="@if(session()->has('customer')) {{ session('customer')->id }} @endif">
-                                                    <input type="hidden" name="id" value="{{ $store->id }}">
-                                                    <input type="hidden" name="name" value="{{ $store->name }}">
-                                                    <input type="hidden" name="code" value="{{ $store->code }}">
-                                                    <input type="hidden" name="store" value="{{ $store->store }}">
-                                                    <input type="hidden" name="unit" value="{{ $store->unit }}">
-                                                    <input type="hidden" name="qty" value="1">
-                                                    <input type="hidden" name="selling_price"
-                                                           value="{{ $store->selling_price }}">
-                                                    <input type="hidden" name="qty_available"
-                                                           value="{{ $store->qty_available }}">
-                                                    <input type="hidden" name="sold_price"
-                                                           value="{{ $store->selling_price }}">
-                                                    <input type="hidden" name="cost_price"
-                                                           value="{{ $store->cost_price }}">
+                                            @foreach ($stores as $key => $store)
+                                                <tr>
+                                                    <form action="{{ route('ajax.cart.add') }}" method="POST"
+                                                        class="addCartItemForm">
+                                                        @csrf
+                                                        <input type="hidden" name="customer" class="customer"
+                                                            value="@if (session()->has('customer')) {{ session('customer')->id }} @endif">
+                                                        <input type="hidden" name="id" value="{{ $store->id }}">
+                                                        <input type="hidden" name="name" value="{{ $store->name }}">
+                                                        <input type="hidden" name="code" value="{{ $store->code }}">
+                                                        <input type="hidden" name="store" value="{{ $store->store }}">
+                                                        <input type="hidden" name="unit" value="{{ $store->unit }}">
+                                                        <input type="hidden" name="qty" value="1">
+                                                        <input type="hidden" name="selling_price"
+                                                            value="{{ $store->selling_price }}">
+                                                        <input type="hidden" name="qty_available"
+                                                            value="{{ $store->qty_available }}">
+                                                        <input type="hidden" name="sold_price"
+                                                            value="{{ $store->selling_price }}">
+                                                        <input type="hidden" name="cost_price"
+                                                            value="{{ $store->cost_price }}">
 
-                                                    <td>{{ ucwords($store->store) }}</td>
-                                                    <td>{{ $store->code }}</td>
-                                                    <td>{{ $store->name }}</td>
-                                                    <td>{{ $store->unit }}</td>
-                                                    {{--                                                        @if ($store->qty_available > 0 && $store->selling_price > 0)--}}
-                                                    <td align="center">
-                                                        <button type="submit" class="btn btn-sm btn-success px-2">
-                                                            <i class="fa fa-cart-plus" aria-hidden="true"></i>
-                                                        </button>
-                                                    </td>
-                                                    {{--@else
+                                                        <td>{{ ucwords($store->store) }}</td>
+                                                        <td>{{ $store->code }}</td>
+                                                        <td>{{ $store->name }}</td>
+                                                        <td>{{ $store->unit }}</td>
+                                                       
                                                         <td align="center">
-                                                            <span class="fa fa-crosshairs text text-danger"></span>
+                                                            <button type="submit" class="btn btn-sm btn-success px-2">
+                                                                <i class="fa fa-cart-plus" aria-hidden="true"></i>
+                                                            </button>
                                                         </td>
-                                                    @endif--}}
-                                                </form>
-                                            </tr>
-                                        @endforeach
+                                                        
+                                                    </form>
+                                                </tr>
+                                            @endforeach
 
                                         </tbody>
 
                                     </table>
 
+                                </div> --}}
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <i class="ion-android-cart"></i> Supplier Cart: <small>Purchased
+                                                    Products</small>
+                                                <div class="float-right">
+                                                    <a href="javascript:void(0)" data-toggle="modal"
+                                                        data-target="#add_product_form"
+                                                        class="btn btn-sm btn-secondary float-md-right"
+                                                        style="margin-left: 2px;"><i class="fa fa-plus"></i> Add Product </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                        @endcan
-                        <!-- /.card-body -->
+                                <div class="modal fade" id="add_product_form" style="display: none;" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Add product to cart</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form action="{{ route('ajax.cart.add') }}" method="POST"
+                                                    class="addCartItemForm">
+                                                    <input type="hidden" name="customer" class="customer"
+                                                            value="@if (session()->has('customer')) {{ session('customer')->id }} @endif">
+                                                    <input type="hidden" name="type" value="{{ 'proforma' }}" />
+                                                    @csrf
+                                                    
+                                                    <div class="form-group">
+                                                        <label for="product_id">Product Name</label>
+                                                        <select
+                                                            class="form-control select2-single ajax-products {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
+                                                            name="product_id" id="product_id" required="required">
+                                                            <option value="">Select...</option>
+                                                            @if (isset($products))
+                                                              
+                                                                @foreach ($products as $data)
+                                                                    <option value="{{ $data->id }}"
+                                                                        {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>
+                                                                        {{ $data->code }}-{{ $data->name }}</option>
+                                                                @endforeach
+                                                               
+                                                            @endif
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="qty">Quantity</label>
+                                                        <input type="number"
+                                                            class="form-control {{ $errors->has('qty') ? ' is-invalid' : '' }}"
+                                                            name="qty" id="qty" placeholder=""
+                                                            required="required">
+                                                        @if ($errors->has('qty'))
+                                                            <div class="invalid-feedback">
+                                                                <strong>{{ $errors->first('qty') }}</strong>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                    {{-- <div class="form-group">
+                                                        <label for="cost_price">Cost Price</label>
+                                                        <input type="text"
+                                                            class="form-control {{ $errors->has('cost_price') ? ' is-invalid' : '' }}"
+                                                            name="cost_price" id="cost_price" placeholder=""
+                                                            required="required">
+                                                        @if ($errors->has('cost_price'))
+                                                            <div class="invalid-feedback">
+                                                                <strong>{{ $errors->first('cost_price') }}</strong>
+                                                            </div>
+                                                        @endif
+                                                    </div> --}}
+                                                    <div class="form-group">
+                                                        <label for="store">Store</label>
+                                                        <select
+                                                            class="form-control select2-single {{ $errors->has('store') ? ' is-invalid' : '' }}"
+                                                            name="store" id="store" required="required">
+                                                            @if (isset($stores))
+                                                                <option value="">Select...</option>
+                                                                @foreach ($stores as $data)
+                                                                    <option value="{{ $data->code }}"
+                                                                        {{ $data->id == $model->source_store_id ? 'selected' : '' }}>
+                                                                        {{ $data->code }}-{{ $data->name }}</option>
+                                                                @endforeach
+                                                            @endif
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group text-right ">
+                                                        <button type="submit" class="btn btn-primary"><span
+                                                                class="ion-android-cart"> </span>Add to
+                                                            Cart</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endcan
+                            <!-- /.card-body -->
                         </div>
                         <!-- /.card -->
                     </div>
@@ -199,6 +300,7 @@
                             <div class="card-body cart-container">
 
                             </div>
+                            <span class="text text-danger error_price"></span>
                             <!-- /.card-body -->
                         </div>
 
@@ -231,23 +333,23 @@
                                 <div class="form-group">
                                     <label>Name</label>
                                     <input type="text" class="form-control" name="name"
-                                           value="{{ old('name') }}" placeholder="Enter Name">
+                                        value="{{ old('name') }}" placeholder="Enter Name">
                                 </div>
                                 <div class="form-group">
                                     <label>Phone</label>
                                     <input type="text" class="form-control" name="phone"
-                                           value="{{ old('phone') }}" placeholder="Enter Phone">
+                                        value="{{ old('phone') }}" placeholder="Enter Phone">
                                 </div>
                                 <div class="form-group">
                                     <label>Address</label>
                                     <input type="text" class="form-control" name="address"
-                                           value="{{ old('address') }}" placeholder="Enter Address">
+                                        value="{{ old('address') }}" placeholder="Enter Address">
                                 </div>
 
                                 <div class="form-group">
                                     <label>Credit Limit</label>
                                     <input type="text" class="form-control" name="credit_limit"
-                                           value="{{ old('credit_limit') }}" placeholder="Credit Limit">
+                                        value="{{ old('credit_limit') }}" placeholder="Credit Limit">
                                 </div>
                             </div>
                             <input type="hidden" name="modal" value="modal" />
@@ -283,15 +385,15 @@
                                 <div class="form-group">
                                     <label>Existing Amount</label>
                                     <input type="text" class="form-control" name="amount" value=""
-                                           id="existing_amount">
+                                        id="existing_amount">
                                 </div>
                                 <div class="form-group">
                                     <label>New Amount:</label>
                                     <input type="text" class="form-control" name="new_amount"
-                                           value="{{ old('new_amount') }}" placeholder="Enter the amount" required>
+                                        value="{{ old('new_amount') }}" placeholder="Enter the amount" required>
                                 </div>
                                 <input type="hidden" class="form-control" name="customer_id" id="credit_limit_customer"
-                                       value="">
+                                    value="">
                             </div>
                         </div>
                         <input type="hidden" name="modal" value="modal" />
@@ -320,17 +422,17 @@
                 </div>
                 <div class="modal-body">
                     <form method="get" action="{{ route('ajax.general.customer.ledger') }}" id="ledger_form"
-                          target="_BLANK">
+                        target="_BLANK">
                         @csrf
                         <div class="form-group">
                             <label for="from_date">From Date</label>
                             <input type="text" class="form-control datepicker" name="from_date" id="from_date"
-                                   placeholder="" autocomplete="off">
+                                placeholder="" autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label for="to_date">To Date</label>
                             <input type="text" class="form-control datepicker" name="to_date" id="to_date"
-                                   placeholder="" autocomplete="off">
+                                placeholder="" autocomplete="off">
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp;
@@ -371,9 +473,9 @@
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script>
         /*$('.cart-container').addClass('d-none')
-        $('select[name=account_type]').change( () => {
-            $('.cart-container').removeClass('d-none')
-        })*/
+                                                            $('select[name=account_type]').change( () => {
+                                                                $('.cart-container').removeClass('d-none')
+                                                            })*/
         $(function() {
             $("#example1").DataTable();
 
@@ -396,8 +498,8 @@
         function validate(selling_price, cost_price, tagg) {
             tagg_id = "valid_" + tagg;
             $("#" + tagg_id).html("");
-            if (parseFloat(selling_price.replace(/£/g, "")) < parseFloat(cost_price.replace(/£/g, ""))) {
-                $("#" + tagg_id).html("Selling price is less than the cost price");
+            if (parseFloat(selling_price.replace(/£/g, "")) <= 0) {
+                $("#" + tagg_id).html("Price cannot be less or equal to than zero");
             }
         }
 
@@ -469,40 +571,19 @@
         }
 
         $(function() {
-            $('#account_number,#account_name').hide();
-            $('#payment_mode').on("change", function() {
-                if ($(this).val() != "Cash") {
-                    $('#bank_account_id,#account_name').removeAttr('disabled');
-                    $('#account_number,#account_name').show();
-                    $("#bank_account_id").html(" < option value = '' > Loading... < /option>");
-                    $.ajax({
-                        url: "{{ route('ajax.loadBankAccounts') }}",
-                        type: 'GET',
-                        data: {
-                            payment_mode: $("#payment_mode").val()
-                        }
-                    }).done(function(msg) {
-                        $("#bank_account_id").html("<option value=''>--select--</option>" + msg);
-                    });
+
+            $('.price').on('input', function() {
+                // Get the value of the text field
+                var priceValue = parseFloat($(this).val());
+
+                // Hide or show the button based on the condition
+                if (priceValue <= 0 || $(this).val() == "") {
+                    $('#create_invoice').hide();
+                    $('.error_price').html("Price cannot be less or equal to than zero");
                 } else {
-                    $('#bank_account_id,#account_name').attr('disabled', 'disabled');
-                    $('#account_number,#account_name').hide();
+                    $('#create_invoice').show();
+                    $('.error_price').html("");
                 }
-
-            });
-
-
-            $('#bank_account_id').on("change", function() {
-                bank_account_id = $(this).val();
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route('ajax.load.account.name') }}",
-                    data: {
-                        bank_account_id: bank_account_id
-                    }
-                }).done(function(data) {
-                    $("#account_name").val(data);
-                });
             });
 
             function formatMoney(n, c, d, t) {
@@ -560,55 +641,6 @@
 
             }, 500);
         });
-        // detect when a barcode is scanned
-        // let code = "";
-        // let barcode ="";
-        // $(document).on('input', '#barcode', function(e) {
-        //     // var barcode = $(this).val();
-        //     // alert($('#barcode').val());
-        //     if (e.keyCode === 13) {
-        //         if (code.length >= 10) {
-        //             barcode = code;
-        //         }
-        //     } else {
-        //         code = code + e.key;
-        //     }
-
-        //     // send the barcode to the server to add the product to the cart
-        //     $.ajax({
-        //         url: "{{ route('barcode.search.product') }}",
-        //         type: 'GET',
-        //         data: {
-        //             barcode: barcode
-        //         },
-        //         dataType: 'html',
-        //         success: function(response) {
-        //             // update the cart items container with the new cart data
-        //             $('#load_cart').html(response);
-
-        //         },
-        //         error: function(xhr, status, error) {
-        //             // display an error message
-        //             alert('An error occurred while adding the product to cart.');
-        //         }
-        //     });
-        //     // clear the barcode input field
-        //     //$(this).val('');
-        // });
-
-        //     let UPC = '';
-        // document.addEventListener("keydown", function(e) {
-        //     const textInput = e.key || String.fromCharCode(e.keyCode);
-        //     const targetName = e.target.localName;
-        //     let newUPC = '';
-        //     if (textInput && textInput.length === 1 && targetName !== 'input'){
-        //         newUPC = UPC+textInput;
-
-        //       if (newUPC.length >= 6) {
-        //         console.log('barcode scanned:  ', newUPC);
-        //       }
-        //    }
-        // });
         let code = "";
         let reading = false;
 

@@ -518,7 +518,7 @@ Route::middleware('auth')->group(function () {
                     Route::delete('/delete/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
                     Route::get('/opening_balance', [SupplierController::class, 'createOpeningBalance'])->name('suppliers.create.opening_balance');
                     Route::post('/opening_balance/store', [SupplierController::class, 'openingBalanceStore'])->name('suppliers.opening_balance.store');
-
+                    Route::get('/get-codes/{type}', [SupplierController::class, 'supplierCode'])->name('suppliers.code');
                     //Import Suppliers
                     Route::get('/import/form', [SupplierController::class, 'importForm'])->name('suppliers.import.form');
                     Route::post('/import', [SupplierController::class, 'import'])->name('suppliers.import');

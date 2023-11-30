@@ -27,7 +27,7 @@ class Customer extends Model
     protected $dates = [];
     public function ledgers()
     {
-        return $this->hasMany(CustomerLedger::class, 'customer_id');
+        return $this->hasMany(GeneralAccountLedger::class, 'model_id');
     }
     public function amount()
     {
@@ -39,21 +39,22 @@ class Customer extends Model
     }
     public function runningBalance()
     {
-        return $this->ledgers()->sum('cr')-$this->ledgers()->sum('dr');
+        return $this->ledgers()->where('model_name', 'Customer')->sum('credit') - $this->ledgers()->sum('debit');
     }
     public function branch()
     {
         return $this->belongsTo(Branch::class, 'branch_id');
     }
 
-    public static function generateNewCode($branch_id, $category, $length = 6){
-        $prefix = Branch::find($branch_id)->code.$category;
-        $record = self::where('code', 'like', '%'.$prefix.'%')->orderBy('code', 'desc')->first();
-        if($record){
+    public static function generateNewCode($branch_id, $category, $length = 6)
+    {
+        $prefix = Branch::find($branch_id)->code . $category;
+        $record = self::where('code', 'like', '%' . $prefix . '%')->orderBy('code', 'desc')->first();
+        if ($record) {
             $code = $record->code;
-            $new = intval(substr($code,strlen($prefix)))+1;
-            return $prefix.str_pad($new, $length,0,STR_PAD_LEFT);
+            $new = intval(substr($code, strlen($prefix))) + 1;
+            return $prefix . str_pad($new, $length, 0, STR_PAD_LEFT);
         }
-        return $prefix.str_pad(1, $length,0,STR_PAD_LEFT);
+        return $prefix . str_pad(1, $length, 0, STR_PAD_LEFT);
     }
 }

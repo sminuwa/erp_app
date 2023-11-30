@@ -31,6 +31,7 @@ class ReturnDebit extends Model
         'invoice_no',
         'customer_id',
         'amount',
+        'date',
         'branch_id',
         'comment',
         'posted_by'

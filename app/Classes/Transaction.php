@@ -7,6 +7,7 @@ use App\Models\GeneralAccount;
 use App\Models\GeneralAccountControl;
 use App\Models\GeneralAccountLedger;
 use App\Models\IntersiteTransfer;
+use App\Models\Order;
 use App\Models\ProductUnitMeasure;
 use App\Models\Purchase;
 use App\Models\PurchaseExpense;
@@ -500,14 +501,14 @@ class Transaction
         //unit sale price
         //dd($store_product);
         try {
-            $store_product_ids = $quantities = $sold_prices = [];
-            // foreach($store_product as $key=>$value){
-            //     $store_product_ids[] = $key;
-            //     $quantities[] = $value['quantity'];
-            //     $sold_prices[] = $value['sold_price'];
-            //     $cost_prices[] = $value['cost_price'];
-            // }
-//            return $sold_prices;
+            $store_product_ids = $quantities = $sold_prices = $refund_account = $discount_account = [];
+            foreach ($store_product as $key => $value) {
+                $store_product_ids[] = $key;
+                $quantities[] = $value['quantity'];
+                $sold_prices[] = $value['sold_price'];
+                $cost_prices[] = $value['cost_price'];
+            }
+            //            return $sold_prices;
             $customer = Customer::find($customer_id);
             $records = StoreProduct::
                 whereIn('store_products.id', $store_product_ids)
@@ -576,6 +577,45 @@ class Transaction
                     'receipt_no' => 'R' . $reference
                 ];
             }
+
+            //Check if customer has discount or refund
+            $order = Order::where(['reference' => $reference, 'customer_id' => $customer->id])->first();
+            $discount = 0;
+            $refund = 0;
+            if ($order != null) {
+                if ($order->discount > 0) {
+                    $discount = $order->discount;
+                    $model = GeneralAccount::where('number', 'C610008')->first();
+                    $discount_account[] = [
+                        'model_id' => $model->id,
+                        'model_name' => 'GeneralAccount',
+                        'branch_id' => $branch_id,
+                        'description' => 'Discount for ' . $customer->name,
+                        'reference' => $reference,
+                        'credit' => 0,
+                        'debit' => $order->discount,
+                        'date' => $date,
+                        'user_id' => auth()->id(),
+                        'receipt_no' => 'R' . $reference
+                    ];
+                }
+                if ($order->refund > 0) {
+                    $refund = $order->refund;
+                    $model = GeneralAccount::where('number', 'C610006')->first();
+                    $refund_account[] = [
+                        'model_id' => $model->id,
+                        'model_name' => 'GeneralAccount',
+                        'branch_id' => $branch_id,
+                        'description' => 'Refund for customer ' . $customer->name,
+                        'reference' => $reference,
+                        'credit' => $order->refund,
+                        'debit' => 0,
+                        'date' => $date,
+                        'user_id' => auth()->id(),
+                        'receipt_no' => 'R' . $reference
+                    ];
+                }
+            }
             $customer_ledger[] = [
                 'model_id' => $customer->id,
                 'model_name' => 'Customer',
@@ -583,12 +623,12 @@ class Transaction
                 'description' => 'Sale Reference: ' . $reference,
                 'reference' => $reference,
                 'credit' => 0,
-                'debit' => $customer_value,
+                'debit' => $customer_value - $discount + $refund,
                 'date' => $date,
                 'user_id' => auth()->id(),
                 'receipt_no' => 'S' . $reference
             ];
-            $general_account_ledger = array_merge($asset_account, $cost_account, $revenue_account, $customer_ledger);
+            $general_account_ledger = array_merge($asset_account, $cost_account, $revenue_account, $customer_ledger, $discount_account, $refund_account);
             //            return $general_account_ledger;
             if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
                 return ['status' => true, 'message' => 'success'];

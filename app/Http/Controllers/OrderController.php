@@ -618,7 +618,7 @@ class OrderController extends Controller
 
                 $action = "Invoice of $invoice->total for : " . $invoice->reference;
                 AuditLog::auditLog(auth()->id(), $action);
-                session()->flash('app_message', 'Receipt generated successfully');
+                session()->flash('app_message', 'Sale posted successfully');
                 DB::commit();
             } else {
                 DB::rollBack();

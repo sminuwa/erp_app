@@ -124,6 +124,23 @@
                                                 @endisset
 
                                             </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <input type="number" class="form-control" name="discount"
+                                                placeholder="Discount" id="discount" />
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <input type="number" class="form-control" placeholder="Refund"
+                                                    name="refund" id="refund" />
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
                                             <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create
                                                 Invoice</button>
                                         </div>
@@ -235,7 +252,8 @@
                                                             </td>
                                                         @else
                                                             <td align="center">
-                                                                <span class="fa fa-crosshairs text text-danger" title="Selling price not set!"></span>
+                                                                <span class="fa fa-crosshairs text text-danger"
+                                                                    title="Selling price not set!"></span>
                                                             </td>
                                                         @endif
                                                     </form>
@@ -439,8 +457,8 @@
     <script>
         $(function() {
             $("#example1").DataTable({
-                    'iDisplayLength':100
-                });
+                'iDisplayLength': 100
+            });
 
             $('#account_type').on("change", function() {
                 $.ajax({

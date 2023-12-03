@@ -165,6 +165,12 @@ class InvoiceController extends Controller
         try {
             $payment_mode = 'Cash';
             $due_date = $request->input('due_date');
+            $discount = 0;
+            $refund = 0;
+            if ($request->has('discount') && str_replace(',', '', $request->discount) > 0)
+                $discount = $request->discount;
+            if ($request->has('refund') && str_replace(',', '', $request->refund) > 0)
+                $refund = $request->refund;
             $running_balance = $this->runninigBalance($customer_id);
             if ($running_balance < 0) { // in case the company owes a customer
 
@@ -182,6 +188,8 @@ class InvoiceController extends Controller
                 $invoice->branch_id = User::userBranchAction();
                 $invoice->order_status = 'approved';
                 $invoice->sold_by = Auth::id();
+                $invoice->discount = $discount;
+                $invoice->refund = $refund;
                 $invoice->customer_id = $customer_id;
                 $invoice->invoice_no = $reference;
             } else {
@@ -223,28 +231,10 @@ class InvoiceController extends Controller
                         'updated_at' => Carbon::now()
                     ]);
 
-                    /*DB::table('store_products')->where('id', $content->id)->update([
-                        'qty_available' => $qtyAval - $content->quantity,
-                        'updated_at' => Carbon::now()
-                    ]);
-
-                    DB::table('stock_cards')->insert([
-                        'store_id' => $store->store->id,
-                        'product_id' => $store->product->id,
-                        'cr' => 0,
-                        'dr' => $content->quantity,
-                        'refno' => $invoice,
-                        'type' => 'Sale',
-                        'date' => $request->order_date,
-                        'user_id' => Auth::id(),
-                        'priority' => 2,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now()
-                    ]);*/
                     $store_products[$content->id] = $content->quantity;
                 }
                 //Upate the Order table with the discount
-                DB::table('orders')->where('id', $invoice->id)->increment('discount', $total_discount);
+                //DB::table('orders')->where('id', $invoice->id)->increment('discount', $total_discount);
 
                 DB::table('order_invoices')->where('id', $request->order_invoice_id)->update([
                     'status' => 3,
@@ -436,12 +426,9 @@ class InvoiceController extends Controller
             $order_id = DB::table('order_invoices')->insertGetId([
                 'reference' => OrderInvoice::generateNewNumber(),
                 'customer_id' => $customer_id,
-                //                'payment_mode' => $payment_mode,
-//                'due_date' => $due_date,
                 'pay' => $payment_mode == "Credit" ? $amount_paid : $total,
                 'due' => $payment_mode == "Credit" ? ($total - $amount_paid) : 0,
                 'order_date' => $request->order_date,
-                //date('Y-m-d'),
                 'order_status' => 'approved',
                 'total_products' => \Cart::getTotalQuantity(),
                 'sub_total' => $sub_total,

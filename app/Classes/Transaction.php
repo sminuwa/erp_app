@@ -585,7 +585,7 @@ class Transaction
             if ($order != null) {
                 if ($order->discount > 0) {
                     $discount = $order->discount;
-                    $model = GeneralAccount::where('number', 'C610008')->first();
+                    $model = GeneralAccountControl::where('code', 'discount')->first();
                     $discount_account[] = [
                         'model_id' => $model->id,
                         'model_name' => 'GeneralAccount',
@@ -601,7 +601,7 @@ class Transaction
                 }
                 if ($order->refund > 0) {
                     $refund = $order->refund;
-                    $model = GeneralAccount::where('number', 'C610006')->first();
+                    $model = GeneralAccountControl::where('code', 'refund')->first();
                     $refund_account[] = [
                         'model_id' => $model->id,
                         'model_name' => 'GeneralAccount',

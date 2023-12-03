@@ -451,6 +451,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/print/receipt/pos/{payment}', [ReceiptController::class, 'printPoSPaymentReceipt'])->name('receipt.payment.print.pos');
             Route::get('/load/payers', [ReceiptController::class, 'loadPayers'])->name('ajax.load.payers');
             Route::get('/reverse/{receipt}', [ReceiptController::class, 'reverse'])->name('receipt.payment.reverse');
+            Route::get('/show/{receipt}', [ReceiptController::class, 'show'])->name('receipt.payment.show');
             Route::post('/post/{receipt}', [ReceiptController::class, 'post'])->name('receipt.payment.post');
             Route::post('/delete/{receipt}', [ReceiptController::class, 'delete'])->name('receipt.payment.delete');
         }
@@ -468,6 +469,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/print/interbank/{interbank}', [InterBankController::class, 'print'])->name('interbank.print');
             Route::get('/print/interbank/pos/{interbank}', [InterBankController::class, 'printPos'])->name('interbank.print.pos');
             Route::get('/reverse/{interbank}', [InterBankController::class, 'reverse'])->name('interbank.reverse');
+            Route::get('/show/{interbank}', [InterBankController::class, 'show'])->name('interbank.show');
             Route::post('/post/{interbank}', [InterBankController::class, 'post'])->name('interbank.post');
             Route::post('/delete/{interbank}', [InterBankController::class, 'delete'])->name('interbank.delete');
 
@@ -485,6 +487,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/print/payment/{payment}', [PaymentController::class, 'printPaymentReceipt'])->name('payment.print');
             Route::get('/print/payment/pos/{payment}', [PaymentController::class, 'printPoSPaymentReceipt'])->name('payment.print.pos');
             Route::get('/reverse/{payment}', [PaymentController::class, 'reverse'])->name('payment.reverse');
+            Route::get('/show/{payment}', [PaymentController::class, 'show'])->name('payment.show');
             Route::post('/post/{payment}', [PaymentController::class, 'post'])->name('payment.post');
             Route::post('/delete/{payment}', [PaymentController::class, 'deletePayment'])->name('payment.delete');
         }
@@ -1065,7 +1068,7 @@ Route::middleware('auth')->group(function () {
                                 Route::get('/load_invoices', [ReturnDebitController::class, 'loadInvoices'])->name('load.order.invoices');
                 Route::get('/load_cart', [ReturnDebitController::class, 'loadToCart'])->name('load.order.cart');
                 Route::post('/cart', [ReturnDebitController::class, 'addToCart'])->name('return.debit.cart.store');
-                Route::put('/update-cart', [ReturnDebitController::class, 'updateCart'])->name('return.debit.cart.update');
+                Route::get('/update-cart', [ReturnDebitController::class, 'updateCart'])->name('return.debit.cart.update');
                 Route::delete('/remove/{id}', [ReturnDebitController::class, 'removeCart'])->name('return.debit.cart.remove');
                 Route::get('/print/receipt/{returnDebit}', [ReturnDebitController::class, 'printReturnDebitReceipt'])->name('customers.return.debit.print');
             }

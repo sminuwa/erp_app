@@ -5,7 +5,8 @@
             <th>Branch</th>
             <th>Product</th>
             <th>Cost Price </th>
-            <th>Selling Price </th>
+            <th>Retail Price </th>
+            <th>Whole Price </th>
             <th>Status </th>
             <th>Updated By </th>
             <th>&nbsp;</th>
@@ -17,8 +18,13 @@
                 <td> {{ $record->branch?->code }} </td>
                 <td> {{ optional($record->branch)->name }} </td>
                 <td> {{ optional($record->product)->name }} </td>
-                <td style="text-align: right"> {{ number_format($record->cost_price, 2) }} </td>
-                <td style="text-align: right"> &#8358;{{ number_format($record->selling_price, 2) }} </td>
+                <td style="text-align: right"> {{ number_format(str_replace(',', '', $record->cost_price), 2) }} </td>
+                <td style="text-align: right">
+                    &#8358;{{ number_format(str_replace(',', '', $record->retail_selling_price), 2) }}
+                </td>
+                <td style="text-align: right">
+                    &#8358;{{ number_format(str_replace(',', '', $record->whole_selling_price), 2) }}
+                </td>
                 <td> {{ $record->status == 1 ? 'Active' : 'Inactive' }} </td>
                 <td> {{ $record->user->name }} </td>
                 <td>

@@ -14,7 +14,7 @@ class JournalController extends Controller
     //
     public function index()
     {
-        $journals = Journal::where('branch_id', User::userBranchAction())->orderBy('id', 'desc')->get();
+        $journals = Journal::where('branch_id', User::userBranchAction())->orderBy('status', 'ASC')->orderBy('date','DESC')->get();
         return view('pages.journals.index', compact('journals'));
     }
 

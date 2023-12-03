@@ -7,6 +7,7 @@ use App\Models\GeneralAccount;
 use App\Models\GeneralAccountControl;
 use App\Models\GeneralAccountLedger;
 use App\Models\IntersiteTransfer;
+use App\Models\ProductUnitMeasure;
 use App\Models\Purchase;
 use App\Models\PurchaseExpense;
 use App\Models\StockAdjustment;
@@ -886,6 +887,19 @@ class Transaction
         }
         return true;
     }
+    public static function quantity_sold($product_id, $quantity, $unit)
+    {
+        //determine the quantity sold based on unit of measure
+        $unit_of_measure = ProductUnitMeasure::where(['product_id' => $product_id, 'code' => $unit])->first();
 
+        if ($unit_of_measure == null)
+            return $quantity;
+
+        if ($unit_of_measure->type == 'division')
+            return ($quantity / $unit_of_measure->value);
+        if ($unit_of_measure->type == 'multiple')
+            return $quantity * $unit_of_measure->value;
+        return $quantity;
+    }
 
 }

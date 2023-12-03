@@ -234,7 +234,7 @@ class CartController extends Controller
         }
         if ($type == 'order' || $type == 'proforma' || $type == 'invoice') {
             $customer = Customer::find($request->customer);
-            
+            //return $request;
 
             if ($type == 'proforma' || $type == 'order') {
                 $product_id = $request->product_id;
@@ -244,6 +244,7 @@ class CartController extends Controller
                 $qty_available = 0;
                 $id = $request->product_id;
                 $unit = $product->unit;
+                $cost_price = str_replace(',', '', $request->cost_price);
                 
             } else {
                 $name = $request->name;
@@ -253,7 +254,7 @@ class CartController extends Controller
                 $store_product = StoreProduct::find($request->id);
                 $product_id = $store_product->product_id;
                 $unit = $request->unit;
-                //$cost_price = str_replace(',', '', $request->cost_price);
+                
             }
             $prices = BranchProductPrice::where(['product_id' => $product_id, 'branch_id' => auth()->user()->branch->id])->first();
             $selling_price = 0;
@@ -266,7 +267,7 @@ class CartController extends Controller
             }
             $qty = $request->qty;
             
-
+            
             $store = $request->store;
             $add = \Cart::add([
                 'id' => $id,

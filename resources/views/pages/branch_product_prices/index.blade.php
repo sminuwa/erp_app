@@ -57,14 +57,17 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         $(function() {
-            $("#record1").DataTable();
+            $("#record1").DataTable({
+                'iDisplayLength':100
+            });
             $('#record2').DataTable({
                 "paging": true,
-                "lengthChange": false,
+                "lengthChange": true,
                 "searching": true,
                 "ordering": true,
                 "info": true,
-                "autoWidth": false
+                "autoWidth": false,
+                'iDisplayLength':100
             });
         });
     </script>

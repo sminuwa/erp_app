@@ -17,10 +17,14 @@ class Product extends Model
     /**
      * Mass assignable columns
      */
-    protected $fillable = ['name', 'code',
-    'company_id',
+    protected $fillable = [
+        'name',
+        'code',
+        'company_id',
         'category_id',
-     'barcode','status'];
+        'barcode',
+        'status'
+    ];
 
     /**
      * Date time columns.
@@ -64,7 +68,8 @@ class Product extends Model
         return Product::where('code', $code);
     }
 
-    public static function createRecord($company_id,$category_id, $name, $barcode = null, $expiry_status = 0, $status = 1){
+    public static function createRecord($company_id, $category_id, $name, $barcode = null, $expiry_status = 0, $status = 1)
+    {
         $record = new self;
         $record->code = self::generateNewCode($category_id);
         $record->name = $name;
@@ -73,27 +78,33 @@ class Product extends Model
         $record->expiry_status = $expiry_status;
         $record->status = $status;
         $record->barcode = $barcode;
-        if(is_null($barcode))
+        if (is_null($barcode))
             $record->barcode = $record->code;
-        if($record->save())
+        if ($record->save())
             return $record;
         return false;
     }
 
-    public static function generateNewCode($category_id, $length = 4){
+    public static function generateNewCode($category_id, $length = 4)
+    {
         $prefix = Category::find($category_id)->code;
-        $record = self::where('code', 'like', '%'.$prefix.'%')->orderBy('code', 'desc')->first();
-        if($record){
+        $record = self::where('code', 'like', '%' . $prefix . '%')->orderBy('code', 'desc')->first();
+        if ($record) {
             $code = $record->code;
-            $new = intval(substr($code,strlen($prefix)))+1;
-            return $prefix.str_pad($new, $length,0,STR_PAD_LEFT);
+            $new = intval(substr($code, strlen($prefix))) + 1;
+            return $prefix . str_pad($new, $length, 0, STR_PAD_LEFT);
         }
-        return $prefix.str_pad(1, $length,0,STR_PAD_LEFT);
+        return $prefix . str_pad(1, $length, 0, STR_PAD_LEFT);
     }
 
-    public function scopeForCategory($query, int $category_id = null){
-        if(is_null($category_id))
+    public function scopeForCategory($query, int $category_id = null)
+    {
+        if (is_null($category_id))
             return $query;
         return $query->where('category_id', $category_id);
+    }
+    public function productUnitMeasure()
+    {
+        return $this->hasMany(ProductUnitMeasure::class, 'product_id');
     }
 }

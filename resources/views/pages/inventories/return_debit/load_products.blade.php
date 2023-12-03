@@ -22,7 +22,8 @@
                 <thead>
                     <tr>
                         <th>S.N</th>
-                        <th style="width:30%">Item</th>
+                        <th>Code</th>
+                        <th>Item</th>
                         <th>Price</th>
                         <th>Qty</th>
                         <th>Total</th>
@@ -34,12 +35,13 @@
                     @foreach ($cart_products as $product)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
+                            <td class="text-left">{{ $product->attributes['code'] }}</td>
                             <td class="text-left">{{ $product->name }}</td>
 
-                            <form action="{{ route('return.debit.cart.update') }}" method="post"
+                            <form action="{{ route('return.debit.cart.update') }}" method="get"
                                 id="p{{ $product->id }}">
                                 @csrf
-                                @method('PUT')
+                                
                                 <td>
                                     <input type="text" name="unit_price" id="price{{ $product->id }}"
                                         class="form-control price" style="min-width:65px;"

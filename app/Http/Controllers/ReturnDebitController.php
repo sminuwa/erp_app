@@ -142,6 +142,7 @@ class ReturnDebitController extends Controller
         $purchase = Purchase::where('reference', $reference)->first();
 
         \Cart::clear();
+        //dd($purchase->purchasedProducts()->where('status', 1)->get());
         foreach ($purchase->purchasedProducts()->where('status', 1)->get() as $data) {
             $qty = $data->quantity == 0 ? 1 : $data->quantity;
             \Cart::add([
@@ -149,10 +150,11 @@ class ReturnDebitController extends Controller
                 'name' => $data->product->name ?? 'No name found',
                 'price' => $data->unit_price,
                 'quantity' => $qty,
-                'attributes' => array(),
+                'attributes' => array('code' => $data->product->code),
             ]);
         }
         $cart_products = \Cart::getContent();
+        
         return view('pages.inventories.return_debit.load_products', ['cart_products' => $cart_products, 'reference' => $reference, 'purchase' => $purchase]);
     }
     public function addToCart(Request $request)
@@ -192,8 +194,8 @@ class ReturnDebitController extends Controller
     }
 
     public function updateCart(Request $request)
-    {
-        $sold_price = $request->sold_price;
+    { 
+        $sold_price = $request->unit_price;
 
         \Cart::update(
             $request->id,
@@ -203,7 +205,7 @@ class ReturnDebitController extends Controller
                     'value' => $request->quantity
                 ],
                 'price' => $sold_price,
-                'attributes' => array('cost_price' => $request->cost_price, 'selling_price' => $request->selling_price, 'code' => $request->code, 'discount' => $request->selling_price - $request->sold_price, 'qty_available' => $request->qty_available, 'store' => $request->store)
+                'attributes' => array('cost_price' => $request->unit_price,  'code' => $request->code, 'store' => $request->store)
             ]
         );
 

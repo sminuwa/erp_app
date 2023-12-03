@@ -121,6 +121,7 @@ class InvoiceController extends Controller
 
     public function final_invoice(Request $request)
     {
+        //dd(\Cart::getContent());
         $invoice_id = $request->invoice_id;
 
         $inputs = $request->except('_token');
@@ -216,6 +217,7 @@ class InvoiceController extends Controller
                         'cost_price' => $content->attributes['cost_price'],
                         'total' => $content->getPriceSum(),
                         'avail_qty_before_sale' => $qtyAval,
+                        'unit' => $content->attributes['unit'],
                         //get available product in stock before sale
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now()

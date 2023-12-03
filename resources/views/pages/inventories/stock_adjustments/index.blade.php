@@ -124,7 +124,9 @@
 @push('js')
     <script type="text/javascript">
         $(function() {
-            $("#record1").DataTable();
+             $("#record1").DataTable({
+                'iDisplayLength':100
+            });
             $('#record2').DataTable({
                 "paging": true,
                 "lengthChange": false,

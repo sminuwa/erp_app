@@ -236,7 +236,9 @@
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script type="text/javascript">
         $(function() {
-            $("#record1").DataTable();
+             $("#record1").DataTable({
+                'iDisplayLength':100
+            });
             $('body').on('submit', '.create-form', function(e) {
                 e.preventDefault();
                 $.ajax({

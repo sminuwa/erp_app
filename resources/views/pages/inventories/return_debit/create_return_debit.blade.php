@@ -284,6 +284,7 @@
                 };
             })();
             $(document).on('keyup', '.quantity,.price', function() {
+                
                 id = $(this).attr('data-value');
                 $("#valid_qty" + id.substr(1)).html("");
                 if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(
@@ -299,14 +300,14 @@
 
                     $.ajax({
                         url: $('#' + id).attr('action'),
-                        type: $('#' + id).attr('method'),
+                        type: 'GET',
                         header: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         data: $('#' + id).serialize(),
                         success: function(data) {
                             id = id.substr(1);
-
+alert(data);
                             subtotal = $('#price' + id).val() * $('#quantity' + id)
                                 .val();
                             $('.subtotal' + id).text(formatMoney(subtotal));

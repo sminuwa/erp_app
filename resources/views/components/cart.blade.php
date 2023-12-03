@@ -72,7 +72,8 @@
                         <span style="color: red;" id="valid_qty{{ $product->id }}"></span>
                     </div>
                     <div class="c-cell">
-                        <span class="subtotal{{ $product->id }}">{{ number_format($product->price * $product->quantity, 2) }}</span>
+                       
+                        <span class="subtotal{{ $product->id }}">{{ number_format(floatVal(str_replace(',','',$product->price)) * $product->quantity, 2) }}</span>
                     </div>
                     <div class="c-cell">
                         <a url="{{ route('ajax.cart.delete', $product->id) }}" class="btn btn-danger btn-sm deleteCartItem">

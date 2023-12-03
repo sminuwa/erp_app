@@ -116,174 +116,6 @@
                                         placeholder="Scan barcode">
                                 @endcannot
                             </div>
-                            <!-- /.card-header -->
-                            @can('view.sale.products')
-                                {{-- <div class="card-body table-responsive" id="load">
-                                    <table id="example1" class="table table-bordered table-striped text-left"
-                                        style="font-size: 12px;">
-                                        <thead>
-                                            <tr>
-                                                <th>Store</th>
-                                                <th>Code</th>
-                                                <th>Item</th>
-                                                <th>Unit</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tfoot>
-                                            <tr>
-                                                <th>Store</th>
-                                                <th>Code</th>
-                                                <th>Name</th>
-                                                <th>Unit</th>
-                                                <th></th>
-                                            </tr>
-                                        </tfoot>
-                                        <tbody>
-                                            @foreach ($stores as $key => $store)
-                                                <tr>
-                                                    <form action="{{ route('ajax.cart.add') }}" method="POST"
-                                                        class="addCartItemForm">
-                                                        @csrf
-                                                        <input type="hidden" name="customer" class="customer"
-                                                            value="@if (session()->has('customer')) {{ session('customer')->id }} @endif">
-                                                        <input type="hidden" name="id" value="{{ $store->id }}">
-                                                        <input type="hidden" name="name" value="{{ $store->name }}">
-                                                        <input type="hidden" name="code" value="{{ $store->code }}">
-                                                        <input type="hidden" name="store" value="{{ $store->store }}">
-                                                        <input type="hidden" name="unit" value="{{ $store->unit }}">
-                                                        <input type="hidden" name="qty" value="1">
-                                                        <input type="hidden" name="selling_price"
-                                                            value="{{ $store->selling_price }}">
-                                                        <input type="hidden" name="qty_available"
-                                                            value="{{ $store->qty_available }}">
-                                                        <input type="hidden" name="sold_price"
-                                                            value="{{ $store->selling_price }}">
-                                                        <input type="hidden" name="cost_price"
-                                                            value="{{ $store->cost_price }}">
-
-                                                        <td>{{ ucwords($store->store) }}</td>
-                                                        <td>{{ $store->code }}</td>
-                                                        <td>{{ $store->name }}</td>
-                                                        <td>{{ $store->unit }}</td>
-                                                       
-                                                        <td align="center">
-                                                            <button type="submit" class="btn btn-sm btn-success px-2">
-                                                                <i class="fa fa-cart-plus" aria-hidden="true"></i>
-                                                            </button>
-                                                        </td>
-                                                        
-                                                    </form>
-                                                </tr>
-                                            @endforeach
-
-                                        </tbody>
-
-                                    </table>
-
-                                </div> --}}
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <i class="ion-android-cart"></i> Supplier Cart: <small>Purchased
-                                                    Products</small>
-                                                <div class="float-right">
-                                                    <a href="javascript:void(0)" data-toggle="modal"
-                                                        data-target="#add_product_form"
-                                                        class="btn btn-sm btn-secondary float-md-right"
-                                                        style="margin-left: 2px;"><i class="fa fa-plus"></i> Add Product </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal fade" id="add_product_form" style="display: none;" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Add product to cart</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">×</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <form action="{{ route('ajax.cart.add') }}" method="POST"
-                                                    class="addCartItemForm">
-                                                    <input type="hidden" name="customer" class="customer"
-                                                            value="@if (session()->has('customer')) {{ session('customer')->id }} @endif">
-                                                    <input type="hidden" name="type" value="{{ 'proforma' }}" />
-                                                    @csrf
-                                                    
-                                                    <div class="form-group">
-                                                        <label for="product_id">Product Name</label>
-                                                        <select
-                                                            class="form-control select2-single ajax-products {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
-                                                            name="product_id" id="product_id" required="required">
-                                                            <option value="">Select...</option>
-                                                            @if (isset($products))
-                                                              
-                                                                @foreach ($products as $data)
-                                                                    <option value="{{ $data->id }}"
-                                                                        {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>
-                                                                        {{ $data->code }}-{{ $data->name }}</option>
-                                                                @endforeach
-                                                               
-                                                            @endif
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="qty">Quantity</label>
-                                                        <input type="number"
-                                                            class="form-control {{ $errors->has('qty') ? ' is-invalid' : '' }}"
-                                                            name="qty" id="qty" placeholder=""
-                                                            required="required">
-                                                        @if ($errors->has('qty'))
-                                                            <div class="invalid-feedback">
-                                                                <strong>{{ $errors->first('qty') }}</strong>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                    {{-- <div class="form-group">
-                                                        <label for="cost_price">Cost Price</label>
-                                                        <input type="text"
-                                                            class="form-control {{ $errors->has('cost_price') ? ' is-invalid' : '' }}"
-                                                            name="cost_price" id="cost_price" placeholder=""
-                                                            required="required">
-                                                        @if ($errors->has('cost_price'))
-                                                            <div class="invalid-feedback">
-                                                                <strong>{{ $errors->first('cost_price') }}</strong>
-                                                            </div>
-                                                        @endif
-                                                    </div> --}}
-                                                    <div class="form-group">
-                                                        <label for="store">Store</label>
-                                                        <select
-                                                            class="form-control select2-single {{ $errors->has('store') ? ' is-invalid' : '' }}"
-                                                            name="store" id="store" required="required">
-                                                            @if (isset($stores))
-                                                                <option value="">Select...</option>
-                                                                @foreach ($stores as $data)
-                                                                    <option value="{{ $data->code }}"
-                                                                        {{ $data->id == $model->source_store_id ? 'selected' : '' }}>
-                                                                        {{ $data->code }}-{{ $data->name }}</option>
-                                                                @endforeach
-                                                            @endif
-                                                        </select>
-                                                    </div>
-                                                    <div class="form-group text-right ">
-                                                        <button type="submit" class="btn btn-primary"><span
-                                                                class="ion-android-cart"> </span>Add to
-                                                            Cart</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endcan
-                            <!-- /.card-body -->
                         </div>
                         <!-- /.card -->
                     </div>
@@ -300,7 +132,9 @@
                             <div class="card-body cart-container">
 
                             </div>
-                            <span class="text text-danger error_price"></span>
+                            <div>
+                                <span class="text text-danger error_price"></span>
+                            </div>
                             <!-- /.card-body -->
                         </div>
 
@@ -316,153 +150,6 @@
     </div> <!-- Content Wrapper end -->
 
     <!--  modal create customer -->
-    <div class="modal fade" id="customermodal" style="display: none;" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add new Customer</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="post" action="{{ route('customers.store') }}">
-                        @csrf
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Name</label>
-                                    <input type="text" class="form-control" name="name"
-                                        value="{{ old('name') }}" placeholder="Enter Name">
-                                </div>
-                                <div class="form-group">
-                                    <label>Phone</label>
-                                    <input type="text" class="form-control" name="phone"
-                                        value="{{ old('phone') }}" placeholder="Enter Phone">
-                                </div>
-                                <div class="form-group">
-                                    <label>Address</label>
-                                    <input type="text" class="form-control" name="address"
-                                        value="{{ old('address') }}" placeholder="Enter Address">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Credit Limit</label>
-                                    <input type="text" class="form-control" name="credit_limit"
-                                        value="{{ old('credit_limit') }}" placeholder="Credit Limit">
-                                </div>
-                            </div>
-                            <input type="hidden" name="modal" value="modal" />
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-dark" data-dismiss="modal"><i class="fa fa-times"></i>
-                                Close
-                            </button>
-                            <button type="submit" class="btn btn-info px-3"><i class="icon-trash"></i> Save
-                            </button>
-                        </div>
-                        @method('post')
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div><!-- End modal delete -->
-    <!--  modal create customer -->
-    <div class="modal fade" id="credit_limitform" style="display: none;" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Increase Customer Credit Limit</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="post" action="{{ route('customers.update.credit_limit') }}">
-                        @csrf
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Existing Amount</label>
-                                    <input type="text" class="form-control" name="amount" value=""
-                                        id="existing_amount">
-                                </div>
-                                <div class="form-group">
-                                    <label>New Amount:</label>
-                                    <input type="text" class="form-control" name="new_amount"
-                                        value="{{ old('new_amount') }}" placeholder="Enter the amount" required>
-                                </div>
-                                <input type="hidden" class="form-control" name="customer_id" id="credit_limit_customer"
-                                    value="">
-                            </div>
-                        </div>
-                        <input type="hidden" name="modal" value="modal" />
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-dark" data-dismiss="modal"><i class="fa fa-times"></i>
-                        Close
-                    </button>
-                    <button type="submit" class="btn btn-info px-3"><i class="icon-trash"></i> Save
-                    </button>
-                </div>
-                @method('post')
-                </form>
-            </div>
-        </div>
-    </div>
-    </div><!-- End modal delete -->
-    <div class="modal fade" id="customer_ledgerform" style="display: none;" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Customer Ledger</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="get" action="{{ route('ajax.general.customer.ledger') }}" id="ledger_form"
-                        target="_BLANK">
-                        @csrf
-                        <div class="form-group">
-                            <label for="from_date">From Date</label>
-                            <input type="text" class="form-control datepicker" name="from_date" id="from_date"
-                                placeholder="" autocomplete="off">
-                        </div>
-                        <div class="form-group">
-                            <label for="to_date">To Date</label>
-                            <input type="text" class="form-control datepicker" name="to_date" id="to_date"
-                                placeholder="" autocomplete="off">
-                        </div>
-                        <div class="form-group">
-                            &nbsp;&nbsp;
-                            <label for="customer_id">Customer</label>
-                            <select class="form-control select2-single" name="customer_id" id="customer_id" required>
-                                @php
-                                    $customers = clone $customers;
-                                @endphp
-                                <option value="">Select...</option>
-                                @foreach ($customers as $data)
-                                    <option value="{{ $data->id }}">{{ $data->code }}-{{ $data->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <input type="hidden" name="print" value="print" />
-                        <input type="hidden" name="modal" value="modal" />
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-dark" data-dismiss="modal"><i class="fa fa-times"></i>
-                                Close
-                            </button>
-                            <button type="submit" class="btn btn-info px-3"><i class="icon-trash"></i> Generate
-                            </button>
-                        </div>
-                        @method('post')
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 
 
@@ -473,11 +160,13 @@
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script>
         /*$('.cart-container').addClass('d-none')
-                                                            $('select[name=account_type]').change( () => {
-                                                                $('.cart-container').removeClass('d-none')
-                                                            })*/
+                                                                        $('select[name=account_type]').change( () => {
+                                                                            $('.cart-container').removeClass('d-none')
+                                                                        })*/
         $(function() {
-            $("#example1").DataTable();
+            $("#example1").DataTable({
+                'iDisplayLength': 100
+            });
 
             $('#account_type').on("change", function() {
                 $.ajax({
@@ -572,10 +261,10 @@
 
         $(function() {
 
-            $('.price').on('input', function() {
+            $(document).on('input', '.price', function() {
                 // Get the value of the text field
                 var priceValue = parseFloat($(this).val());
-
+                //alert(priceValue)
                 // Hide or show the button based on the condition
                 if (priceValue <= 0 || $(this).val() == "") {
                     $('#create_invoice').hide();

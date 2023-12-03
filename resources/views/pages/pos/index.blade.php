@@ -438,7 +438,9 @@
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script>
         $(function() {
-            $("#example1").DataTable();
+            $("#example1").DataTable({
+                    'iDisplayLength':100
+                });
 
             $('#account_type').on("change", function() {
                 $.ajax({

@@ -18,12 +18,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Order Details</h1>
+                        <h1>Receipt</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Order Details</li>
+                            <li class="breadcrumb-item active">Receipt</li>
                         </ol>
                     </div>
                 </div>
@@ -41,49 +41,39 @@
                                 <a href="javascript:history.back()" class="btn btn-warning btn-sm">
                                     <i class="fa fa-arrow-left"></i> Back
                                 </a>
-                                <a href="{{ route('pos.index') }}" class="btn btn-secondary btn-sm ">
-                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> New Invoice
+                                <a href="{{ route('create.payment.reciept') }}" class="btn btn-secondary btn-sm ">
+                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> New Receipt
                                 </a>
 
-                                <a href="javascript:void(0)" data-toggle="modal"
-                                   data-target="#order_detail_form{{ $order->id }}"
-                                   data-val="{{ $order->id }}"
-                                   class="btn btn-success btn-sm  show">
-                                    <i class="fa fa-check" aria-hidden="true"></i> Confirm
-                                </a>
-                                <a href="{{ route('invoice.print', $order->id) }}"
-                                   target="_BLANK" class="btn btn-dark btn-sm ">
+                                <a href="{{ route('receipt.payment.print', $receipt->id) }}" target="_BLANK"
+                                    class="btn btn-dark btn-sm ">
                                     <i class="fa fa-print" aria-hidden="true"></i> Print
                                 </a>
-                                <a href="{{ route('pos.order_print', $order->id) }}"
-                                   target="_BLANK" class="btn btn-dark btn-sm ">
+                                <a href="{{ route('receipt.payment.print.pos', $receipt->id) }}" target="_BLANK"
+                                    class="btn btn-dark btn-sm ">
                                     <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
                                 </a>
-                                <a href="{{ route('waybill.order_print', $order->id) }}"
-                                   target="_BLANK" class="btn btn-primary btn-sm ">
-                                    <i class="fa fa-print" aria-hidden="true"></i> Waybill
-                                </a>
-
-                                @if ($order->status == 0)
-                                    <a href="{{ route('pos.edit', $order->id) }}"
-                                       class="btn btn-info btn-sm ">
+                                
+                                @if ($receipt->status == 0)
+                                    <a href="{{ route('create.payment.reciept', ['receipt_id'=>$receipt->id]) }}" class="btn btn-info btn-sm ">
                                         <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                     </a>
-                                    <form class="d-inline" action="{{ route('invoice.post', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to post this invoice?')">
+                                    <form class="d-inline" action="{{ route('receipt.payment.post', $receipt->id) }}" method="post"
+                                        onsubmit="return confirm('Are you sure you want to post this receipt?')">
                                         @csrf
-                                        <button type="submit"
-                                                class="btn btn-success btn-sm ">
+                                        <button type="submit" class="btn btn-success btn-sm ">
                                             <i class="fa fa-check" aria-hidden="true"></i> Post
                                         </button>
                                     </form>
 
-                                    <form class="d-inline" id="delete-form-{{ $order->id }}" action="{{ route('invoice.delete', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to close this invoice?')">
+                                    <form class="d-inline" id="delete-form-{{ $receipt->id }}"
+                                        action="{{ route('receipt.payment.delete', $receipt->id) }}" method="post"
+                                        onsubmit="return confirm('Are you sure you want to close this receipt?')">
                                         @csrf
                                         <button class="btn btn-danger btn-sm " type="submit">
                                             <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                         </button>
                                     </form>
-
                                 @endif
 
 
@@ -110,22 +100,38 @@
                                 <!-- /.col -->
                                 <div class="col-sm-4 invoice-col">
                                     To
+
                                     <address>
-                                        <strong>{{ $order->customer->code }} - {{ $order->customer->name }}</strong><br>
-                                        {{ $order->customer->address }}<br>
-                                        {{ $order->customer->city }}<br>
-                                        Phone: {{ $order->customer->phone }}<br>
-                                        Email: {{ $order->customer->email }}
+                                        @if ($receipt->mode_name == 'Customer')
+                                            <strong>{{ $receipt->customer->code }} -
+                                                {{ $receipt->customer->name }}</strong><br>
+                                            {{ $receipt->customer->address }}<br>
+                                            {{ $receipt->customer->city }}<br>
+                                            Phone: {{ $receipt->customer->phone }}<br>
+                                            Email: {{ $receipt->customer->email }}
+                                        @elseif ($receipt->mode_name == 'Supplier')
+                                            <strong>{{ $receipt->supplier->code }} -
+                                                {{ $receipt->supplier->name }}</strong><br>
+                                            {{ $receipt->supplier->address }}<br>
+                                            {{ $receipt->supplier->city }}<br>
+                                            Phone: {{ $receipt->supplier->phone }}<br>
+                                            Email: {{ $receipt->supplier->email }}
+                                        @else
+                                            <strong>{{ $receipt->payer()->number }}-{{ $receipt->payer()->description }}
+                                            </strong><br>
+                                        @endif
                                     </address>
+
                                 </div>
                                 <!-- /.col -->
                                 <div class="col-sm-4 invoice-col">
-                                    <b>Invoice No: {{ $order->reference }}</b><br><br>
+                                    <b>Invoice No: {{ $receipt->receipt_no }}</b><br><br>
                                     <b>Invoice Status:</b>
-                                    {!!
-                                        $order->status == 0 ? '<span class="badge badge-warning">Pending</span>':
-                                        ($order->status == 1 ? '<span class="badge badge-success">Posted</span>': '<span class="badge badge-success">Pending</span>' )
-                                    !!}
+                                    {!! $receipt->status == 0
+                                        ? '<span class="badge badge-warning">Pending</span>'
+                                        : ($receipt->status == 1
+                                            ? '<span class="badge badge-success">Posted</span>'
+                                            : '<span class="badge badge-success">Pending</span>') !!}
                                 </div>
                                 <!-- /.col -->
                             </div>
@@ -137,41 +143,36 @@
                                     <table class="table table-bordered text-left">
                                         <thead>
                                             <tr>
-                                                <th>S.N</th>
-                                                <th>Code</th>
-                                                <th>Product Name</th>
-                                                <th>Unit</th>
-                                                <th>Store Code</th>
-                                                <th>Quantity</th>
-                                                <th>Unit Cost</th>
-                                                <th>Subtotal</th>
+                                                <th>Account</th>
+                                                <th>Description</th>
+                                                <th>Amount</th>
+                                                <th>Date</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @php
-                                                $total = 0;
-                                                $total_discount = 0;
-                                            @endphp
-                                            @foreach ($order_details as $order_detail)
-                                                <tr>
-                                                    <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $order_detail->storeProduct->product->code }}</td>
-                                                    <td>{{ $order_detail->storeProduct->product->name }}</td>
-                                                    <td>{{ $order_detail->unit }}</td>
-                                                    <td>{{ $order_detail->storeProduct->store->code }}</td>
-                                                    <td align="center">{{ $order_detail->quantity }}</td>
-                                                    <td align="right">{{ number_format($order_detail->sold_price, 2) }}
-                                                    </td>
-                                                    <td align="right">
-                                                        {{ number_format($order_detail->sold_price * $order_detail->quantity, 2) }}
-                                                    </td>
-                                                </tr>
-                                                @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
-                                            @endforeach
+                                            
+                                            
                                             <tr>
-                                                <th colspan="7" align="right">Total</th>
-                                                <th style="text-align: right">{{ number_format($total, 2, '.', ',') }}</th>
-
+                                                <td>{{ $receipt->account()->code ?? $receipt->account()->number }} - {{ $receipt->account()->name ?? $receipt->account()->description }}</td>
+                                                <td>{{$receipt->description}}</td>
+                                                <th style="text-align: right">{{ number_format($receipt->amount, 2, '.', ',') }}</th>
+                                                <td>{{Carbon\Carbon::parse($receipt->date)->toFormattedDateString()}}</td>
+                                                
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left text-danger" colspan="2">
+                                                    <p>
+                                                        <strong>Amount in ward: </strong>
+                
+                                                        @php
+                                                            $obj = new App\Models\Utility();
+                                                            /*$a = new NumberFormatter("en", NumberFormatter::SPELLOUT);*/
+                                                        @endphp
+                                                        <strong><i class="fa fa-inr"></i>
+                                                            {{ $obj->convertNumberToWords($receipt->amount) }}</strong>
+                {{--                                            {{ $a->format($payment->amount/2.3) }}</strong>--}}
+                                                    </p>
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>

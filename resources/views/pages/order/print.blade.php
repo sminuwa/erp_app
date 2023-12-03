@@ -142,7 +142,7 @@
                                             <td>{{ $order_detail->storeProduct->product->code }}</td>
                                             <td>{{ $order_detail->storeProduct->product->name }}</td>
                                             <td align="center">{{ $order_detail->quantity }}</td>
-                                            <td align="center">{{ $order_detail->storeProduct->product->unit }}</td>
+                                            <td align="center">{{ $order_detail->unit }}</td>
                                             <td>{{ $order_detail->storeProduct->store->code }}</td>
 
                                             <td align="right">

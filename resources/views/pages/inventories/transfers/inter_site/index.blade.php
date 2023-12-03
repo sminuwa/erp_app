@@ -148,7 +148,9 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         $(function() {
-            $("#record1").DataTable();
+             $("#record1").DataTable({
+                'iDisplayLength':100
+            });
             $('#record2').DataTable({
                 "paging": true,
                 "lengthChange": false,

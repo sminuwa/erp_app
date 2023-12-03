@@ -1,0 +1,229 @@
+@extends('layouts.backend.app')
+
+@section('title', 'Order')
+
+@push('css')
+    <style>
+        .modal-lg {
+            max-width: 50% !important;
+        }
+    </style>
+@endpush
+
+@section('content')
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Interbank Transfer</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
+                            <li class="breadcrumb-item active">Interbank</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <!-- Main content -->
+                        <div class="row no-print">
+                            <div class="col-md-12 text-right">
+
+                                <a href="javascript:history.back()" class="btn btn-warning btn-sm">
+                                    <i class="fa fa-arrow-left"></i> Back
+                                </a>
+                                <a href="{{ route('create.interbank') }}" class="btn btn-secondary btn-sm ">
+                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> New Receipt
+                                </a>
+
+                                <a href="{{ route('interbank.print', $interbank->id) }}" target="_BLANK"
+                                    class="btn btn-dark btn-sm ">
+                                    <i class="fa fa-print" aria-hidden="true"></i> Print
+                                </a>
+                                <a href="{{ route('interbank.print.pos', $interbank->id) }}" target="_BLANK"
+                                    class="btn btn-dark btn-sm ">
+                                    <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
+                                </a>
+
+                                @if ($interbank->status == 0)
+                                    <a href="{{ route('create.interbank', ['interbank_id' => $interbank->id]) }}"
+                                        class="btn btn-info btn-sm ">
+                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                    </a>
+                                    <form class="d-inline" action="{{ route('interbank.post', $interbank->id) }}"
+                                        method="post"
+                                        onsubmit="return confirm('Are you sure you want to post this interbank?')">
+                                        @csrf
+                                        <button type="submit" class="btn btn-success btn-sm ">
+                                            <i class="fa fa-check" aria-hidden="true"></i> Post
+                                        </button>
+                                    </form>
+
+                                    <form class="d-inline" id="delete-form-{{ $interbank->id }}"
+                                        action="{{ route('interbank.delete', $interbank->id) }}" method="post"
+                                        onsubmit="return confirm('Are you sure you want to close this interbank?')">
+                                        @csrf
+                                        <button class="btn btn-danger btn-sm " type="submit">
+                                            <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                        </button>
+                                    </form>
+                                @endif
+
+
+                            </div>
+                        </div>
+                        <div class="invoice p-3 mt-3">
+                            <!-- title row -->
+
+                            <!-- info row -->
+                            <div class="row invoice-info">
+                                
+                                <!-- /.col -->
+                                <div class="col-sm-4 invoice-col">
+                                    <p><b>Refrence No: {{ $interbank->reference }}</b></p>
+                                    <p><b>Payment Date:
+                                            {{ \Carbon\Carbon::parse($interbank->date)->toFormattedDateString() }}</b></p>
+                                    <b>Transfer Status:</b>
+                                    {!! $interbank->status == 0
+                                        ? '<span class="badge badge-warning">Pending</span>'
+                                        : ($interbank->status == 1
+                                            ? '<span class="badge badge-success">Posted</span>'
+                                            : '<span class="badge badge-success">Pending</span>') !!}
+                                </div>
+                                <!-- /.col -->
+                            </div>
+                            <!-- /.row -->
+
+                            <!-- Table row -->
+                            <div class="row">
+                                <div class="col-12 table-responsive">
+                                    <table class="table table-bordered text-left">
+                                        <thead>
+                                            <tr>
+                                                <th width="40%">Source</th>
+                                                <th width="40%">Destination</th>
+                                                <th>Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+
+                                            <tr>
+                                                <td class="col-md-4">
+                                                    @if ($interbank->source_account() == null)
+                                                        Payment for
+                                                        {{ \Carbon\Carbon::parse($interbank->date)->toFormattedDateString() }}
+                                                    @else
+                                                        {{ $interbank->source_account()->number }} -
+                                                        {{ $interbank->source_account()->description }}
+                                                    @endif
+                                                </td>
+                                                <td class="col-md-4">
+                                                    @if ($interbank->destination_account() == null)
+                                                        Payment for
+                                                        {{ \Carbon\Carbon::parse($interbank->date)->toFormattedDateString() }}
+                                                    @else
+                                                        {{ $interbank->destination_account()->number }} -
+                                                        {{ $interbank->destination_account()->description }}
+                                                    @endif
+                                                </td>
+                                                <td class="col-md-3" align="right"><i class="fa fa-inr"></i>
+                                                    &#8358; {{ number_format($interbank->amount, 2) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left text-danger" colspan="2">
+                                                    <p>
+                                                        <strong>Amount in ward: </strong>
+
+                                                        @php
+                                                            $obj = new App\Models\Utility();
+                                                        @endphp
+                                                        <strong><i class="fa fa-inr"></i>
+                                                            {{ $obj->convertNumberToWords($interbank->amount) }}</strong>
+
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- /.col -->
+                            </div>
+                            <!-- /.row -->
+
+                            <!-- /.col -->
+                        </div>
+                        <!-- /.row -->
+
+                    </div>
+                    <!-- /.invoice -->
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+
+
+
+
+@endsection
+
+
+
+@push('js')
+    <!-- DataTables -->
+    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
+    <!-- SlimScroll -->
+    <script src="{{ asset('assets/backend/plugins/slimScroll/jquery.slimscroll.min.js') }}"></script>
+    <!-- FastClick -->
+    <script src="{{ asset('assets/backend/plugins/fastclick/fastclick.js') }}"></script>
+
+    <!-- Sweet Alert Js -->
+    <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
+
+    <script type="text/javascript">
+        function deleteItem(id) {
+            const swalWithBootstrapButtons = swal.mixin({
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+            })
+
+            swalWithBootstrapButtons({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    event.preventDefault();
+                    document.getElementById('delete-form-' + id).submit();
+                } else if (
+                    // Read more about handling dismissals
+                    result.dismiss === swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons(
+                        'Cancelled',
+                        'Your data is safe :)',
+                        'error'
+                    )
+                }
+            })
+        }
+    </script>
+@endpush

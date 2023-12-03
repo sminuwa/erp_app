@@ -95,11 +95,11 @@ class OrderController extends Controller
             ->where(
                 function ($query) use ($search_value) {
                     $query->where('reference', 'LIKE', "%$search_value%")
-                    ->orWhere(
-                        'invoice_no',
-                        'LIKE',
-                        "%$search_value%"
-                    )
+                        ->orWhere(
+                            'invoice_no',
+                            'LIKE',
+                            "%$search_value%"
+                        )
                         ->orWhere(
                             'customers.name',
                             'LIKE',
@@ -568,21 +568,24 @@ class OrderController extends Controller
         $orders = Order::with('customer')->where('branch_id', User::userBranchAction());
         if ($user->hasRole('Sales-Manager'))
             $orders = $orders->where('sold_by', Auth::id());
-        $orders = $orders->whereBetween('order_date', [date('Y-m-d',strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])
-            ->orderBy('id', 'desc')->get();
+        $orders = $orders->whereBetween('order_date', [date('Y-m-d', strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])
+            ->orderBy('posted_by', 'asc')->get();
         return view('pages.order.index', compact('orders'));
     }
-    public function post(Order $invoice) {
+    public function post(Order $invoice)
+    {
         $invoice->status = 1;
         $invoice->posted_by = auth()->id();
         $items = $invoice->order_items;
         DB::beginTransaction();
-        if($invoice->save()){
+        if ($invoice->save()) {
             $products = [];
             foreach ($items as $item) {
                 $store = StoreProduct::find($item->store_product_id);
+                //get unit of measure
+                $quantity_sold = Transaction::quantity_sold($store->product->id, $item->quantity, $item->unit);
                 DB::table('store_products')->where('id', $item->store_product_id)->update([
-                    'qty_available' => $store->qty_available - $item->quantity,
+                    'qty_available' => $store->qty_available - $quantity_sold,
                     'updated_at' => Carbon::now()
                 ]);
 
@@ -590,32 +593,34 @@ class OrderController extends Controller
                     'store_id' => $store->store->id,
                     'product_id' => $store->product->id,
                     'cr' => 0,
-                    'dr' => $item->quantity,
+                    'dr' => $quantity_sold,
                     'refno' => $invoice->reference,
                     'type' => 0,
                     'date' => $invoice->order_date,
                     'user_id' => auth()->id(),
                     'priority' => 2,
                 ]);
-                $products[$item->store_product_id] = ['quantity'=>$item->quantity, 'cost_price'=>$item->cost_price,  'sold_price'=>$item->sold_price];
+                $products[$item->store_product_id] = ['quantity' => $item->quantity, 'cost_price' => $item->cost_price, 'sold_price' => $item->sold_price];
             }
             /*return Transaction::sale(
                 $products,
                 $invoice->customer_id,
                 $invoice->reference,
                 $invoice->order_date);*/
-            if(Transaction::sale(
-                $products,
-                $invoice->customer_id,
-                $invoice->reference,
-                $invoice->order_date)['status']
-            ){
+            if (
+                Transaction::sale(
+                    $products,
+                    $invoice->customer_id,
+                    $invoice->reference,
+                    $invoice->order_date
+                )['status']
+            ) {
 
                 $action = "Invoice of $invoice->total for : " . $invoice->reference;
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Receipt generated successfully');
                 DB::commit();
-            }else {
+            } else {
                 DB::rollBack();
                 session()->flash('app_message', 'Something went wrong.');
             }
@@ -753,13 +758,13 @@ class OrderController extends Controller
     //order
     public function order_invoice_list()
     {
-//        return date('Y-m-d', strtotime(Carbon::now()->subDays(7)));
+        //        return date('Y-m-d', strtotime(Carbon::now()->subDays(7)));
         \Cart::clear();
         $user = Auth::user();
         $orders = OrderInvoice::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction());
         if ($user->hasRole('Sales-Manager'))
             $orders = $orders->where('sold_by', Auth::id());
-        $orders = $orders->whereBetween('order_date', [date('Y-m-d',strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])->get();
+        $orders = $orders->whereBetween('order_date', [date('Y-m-d', strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])->orderBy('status', 'asc')->get();
         return view('pages.order.order_invoices', compact('orders'));
     }
     public function order_invoice_show($id)
@@ -788,9 +793,10 @@ class OrderController extends Controller
         }
 
     }
-    public function orderInvoiceClose(Request $request, OrderInvoice $order){
+    public function orderInvoiceClose(Request $request, OrderInvoice $order)
+    {
         $order->status = 1;
-        if($order->save()){
+        if ($order->save()) {
             return back()->with('success', 'Order closed successfully');
         }
         return back()->with('error', 'Something went wrong.');
@@ -804,7 +810,7 @@ class OrderController extends Controller
         $orders = Proformer::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction());
         if ($user->hasRole('Sales-Manager'))
             $orders = $orders->where('sold_by', Auth::id());
-        $orders = $orders->whereBetween('order_date', [date('Y-m-d',strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])->get();
+        $orders = $orders->whereBetween('order_date', [date('Y-m-d', strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])->orderBy('status', 'asc')->get();
         return view('pages.order.proformers', compact('orders'));
     }
     public function proformer_show($id)

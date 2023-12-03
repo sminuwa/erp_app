@@ -19,14 +19,20 @@ class InterBankController extends Controller
         $user_branch = User::userBranchAction();
         $interbanks = InterBank::select('inter_banks.*')
             ->where('branch_id', 'LIKE', $user_branch)
-            ->orderBy('reference', 'DESC')->take(10)->get();
+            ->orderBy('status', 'ASC')->orderBy('id', 'DESC')
+            //->where('date', '>', Carbon::now()->subDays(7))
+            ->get();
         return view('pages.interbanks.list', ['interbanks' => $interbanks]);
     }
-
+    public function show(InterBank $interbank)
+    {
+        $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
+        return view('pages.interbanks.preview', compact('interbank', 'company'));
+    }
     public function create(Request $request)
     {
         $user_branch = User::userBranchAction();
-        $accounts = GeneralAccount::whereIn('class', ['A11','A12','A13'])->orderBy('number')->get();
+        $accounts = GeneralAccount::whereIn('class', ['A11', 'A12', 'A13'])->orderBy('number')->get();
         $model = new InterBank;
         return view('pages.interbanks.create', compact('accounts', 'model'));
     }
@@ -45,15 +51,15 @@ class InterBankController extends Controller
         $insert_id = 0;
         $ledger_id = 0;
         $interbank = InterBank::find($interbank_id);
-        if(!$interbank)
+        if (!$interbank)
 
-        DB::beginTransaction();
+            DB::beginTransaction();
         try {
-            if(!$interbank) {
+            if (!$interbank) {
                 $interbank = new InterBank();
                 $interbank->reference = $reference;
                 $interbank->created_by = auth()->id();
-            }else{
+            } else {
                 $interbank->updated_by = auth()->id();
             }
             $interbank->amount = $amount;
@@ -64,15 +70,12 @@ class InterBankController extends Controller
             $interbank->destination_account_id = $destination_account_id;
             $interbank->branch_id = $user_branch;
             $interbank->status = 0;
-            if($interbank->save()) {
-//                if(Transaction::interbank($source_account_id, 'GeneralAccount', $destination_account_id, 'GeneralAccount', $amount, $reference, $date)) {
-                    $action = "Posted payment of $amount for : " . $reference;
-                    AuditLog::auditLog(auth()->id(), $action);
-                    session()->flash('app_message', 'Transfered  successfully');
-                    DB::commit();
-//                } else {
-//                    DB::rollBack();
-//                }
+            if ($interbank->save()) {
+                $action = "Posted payment of $amount for : " . $reference;
+                AuditLog::auditLog(auth()->id(), $action);
+                session()->flash('app_message', 'Transfered  successfully');
+                DB::commit();
+
             }
 
         } catch (\Exception $e) {
@@ -81,20 +84,21 @@ class InterBankController extends Controller
             throw $e;
         }
 
-        return redirect()->back()->with(['prev_id' => $ledger_id]);
+        return redirect()->route('interbank.show', $interbank->id);
     }
 
-    public function post(InterBank $interbank) {
+    public function post(InterBank $interbank)
+    {
         $interbank->status = 1;
         $interbank->posted_by = auth()->id();
         DB::beginTransaction();
-        if($interbank->save()){
-            if(Transaction::interbank( $interbank->destination_account_id, 'GeneralAccount',$interbank->source_account_id, 'GeneralAccount', $interbank->amount, $interbank->reference, $interbank->date)){
+        if ($interbank->save()) {
+            if (Transaction::interbank($interbank->destination_account_id, 'GeneralAccount', $interbank->source_account_id, 'GeneralAccount', $interbank->amount, $interbank->reference, $interbank->date)) {
                 $action = "Made payment of $interbank->amount for : " . $interbank->receipt_no;
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Payment generated successfully');
                 DB::commit();
-            }else {
+            } else {
                 DB::rollBack();
                 session()->flash('app_message', 'Something went wrong');
             }
@@ -102,16 +106,18 @@ class InterBankController extends Controller
         return back();
     }
 
-    public function reverse(InterBank $interbank) {
+    public function reverse(InterBank $interbank)
+    {
         $interbank->status = 0;
         $interbank->updated_by = auth()->id();
-        if($interbank->save()){
+        if ($interbank->save()) {
             Transaction::reversal($interbank->reference);
         }
         return back();
     }
 
-    public function delete(InterBank $interbank){
+    public function delete(InterBank $interbank)
+    {
         $interbank->delete();
         return back();
     }
@@ -127,7 +133,7 @@ class InterBankController extends Controller
     public function edit(Request $request, InterBank $interbank)
     {
 
-        $accounts = GeneralAccount::orderBy('number', 'asc')->whereIn('class', ['A11','A12','A13'])->get();
+        $accounts = GeneralAccount::orderBy('number', 'asc')->whereIn('class', ['A11', 'A12', 'A13'])->get();
         return view('pages.interbanks.create', [
             'model' => $interbank,
             'accounts' => $accounts

@@ -294,7 +294,9 @@
     <script>
         $(function() {
 
-            $("#example1").DataTable();
+            $("#example1").DataTable({
+                    'iDisplayLength':100
+                });
             $('#example2').DataTable({
                 "paging": true,
                 "lengthChange": false,

@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+
 /**
    @property varchar $reference reference
 @property decimal $amount amount
@@ -14,48 +15,55 @@ class Journal extends Model
 {
 
     /**
-    * Database table name
-    */
+     * Database table name
+     */
     protected $table = 'journals';
 
     /**
-    * Mass assignable columns
-    */
-    protected $fillable=['reference',
-'amount',
-'created_by'];
+     * Mass assignable columns
+     */
+    protected $fillable = [
+        'reference',
+        'amount',
+        'created_by'
+    ];
 
     /**
-    * Date time columns.
-    */
-    protected $dates=[];
+     * Date time columns.
+     */
+    protected $dates = [];
 
 
-    public function createdBy(){
+    public function createdBy()
+    {
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function postedBy(){
+    public function postedBy()
+    {
         return $this->belongsTo(User::class, 'posted_by');
     }
 
-    public function updatedBy(){
+    public function updatedBy()
+    {
         return $this->belongsTo(User::class, 'updated_by');
     }
 
-    public function items(){
+    public function items()
+    {
         return $this->hasMany(JournalItem::class, 'journal_id');
     }
 
-    public static function generateNewNumber($prefix = 'JNL', $length = 4){
-        $prefix = $prefix.date('ym').auth()->user()->branch->code;
-        $record = self::where('reference', 'like', '%'.$prefix.'%')->orderBy('reference', 'desc')->first();
-        if($record){
+    public static function generateNewNumber($prefix = 'JNL', $length = 4, $date)
+    {
+        $prefix = $prefix . $date . auth()->user()->branch->code;
+        $record = self::where('reference', 'like', '%' . $prefix . '%')->orderBy('reference', 'desc')->first();
+        if ($record) {
             $number = $record->reference;
-            $new = intval(substr($number,strlen($prefix)))+1;
-            return $prefix.str_pad($new, $length,0,STR_PAD_LEFT);
+            $new = intval(substr($number, strlen($prefix))) + 1;
+            return $prefix . str_pad($new, $length, 0, STR_PAD_LEFT);
         }
-        return $prefix.str_pad(1, $length,0,STR_PAD_LEFT);
+        return $prefix . str_pad(1, $length, 0, STR_PAD_LEFT);
     }
 
 

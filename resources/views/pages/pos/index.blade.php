@@ -219,6 +219,7 @@
                                                     <form action="{{ route('ajax.cart.add') }}" method="POST"
                                                         class="addCartItemForm">
                                                         @csrf
+
                                                         <input type="hidden" name="customer" class="customer"
                                                             value="@if (session()->has('customer')) {{ session('customer')->id }} @endif">
                                                         <input type="hidden" name="id" value="{{ $store->id }}">
@@ -246,7 +247,8 @@
                                                         </td> --}}
                                                         @if ($store->qty_available > 0 && str_replace(',', '', $store->retail_selling_price) > 0)
                                                             <td align="center">
-                                                                <button type="submit" class="btn btn-sm btn-success px-2">
+                                                                <button type="submit"
+                                                                    class="btn btn-sm btn-success px-2 add">
                                                                     <i class="fa fa-cart-plus" aria-hidden="true"></i>
                                                                 </button>
                                                             </td>
@@ -457,8 +459,15 @@
     <script>
         $(function() {
             $("#example1").DataTable({
-                'iDisplayLength': 100
+                'iDisplayLength': 100,
+                
             });
+
+
+            $('body').on('click', '.add', function() {
+                var customer_id = $('#customer_record').val();
+                $('.customer').val(customer_id);
+            })
 
             $('#account_type').on("change", function() {
                 $.ajax({
@@ -493,7 +502,7 @@
         }
         $('#customer_record').on("change", function() {
             customer_id = $(this).val();
-
+            $('.customer').val(customer_id);
             $.ajax({
                 type: "GET",
                 url: "{{ route('ajax.load.customer.credit_limit') }}",

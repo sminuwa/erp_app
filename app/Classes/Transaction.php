@@ -587,7 +587,7 @@ class Transaction
                     $discount = $order->discount;
                     $model = GeneralAccountControl::where('code', 'discount')->first();
                     $discount_account[] = [
-                        'model_id' => $model->id,
+                        'model_id' => $model->general_account_id,
                         'model_name' => 'GeneralAccount',
                         'branch_id' => $branch_id,
                         'description' => 'Discount for ' . $customer->name,
@@ -603,7 +603,7 @@ class Transaction
                     $refund = $order->refund;
                     $model = GeneralAccountControl::where('code', 'refund')->first();
                     $refund_account[] = [
-                        'model_id' => $model->id,
+                        'model_id' => $model->general_account_id,
                         'model_name' => 'GeneralAccount',
                         'branch_id' => $branch_id,
                         'description' => 'Refund for customer ' . $customer->name,

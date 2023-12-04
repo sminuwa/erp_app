@@ -26,7 +26,7 @@
                     &#8358;{{ number_format(str_replace(',', '', $record->whole_selling_price), 2) }}
                 </td>
                 <td> {{ $record->status == 1 ? 'Active' : 'Inactive' }} </td>
-                <td> {{ $record->user->name }} </td>
+                <td> {{ $record->user->name ?? '' }} </td>
                 <td>
                     @can('set.product.price')
                         <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.edit', $record->id) }}">

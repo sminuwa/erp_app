@@ -54,8 +54,8 @@ class PosController extends Controller
         }
         if (request()->routeIs('pos.index')) {
             $stores = $stores->where('stores.branch_id', 'LIKE', $user_branch)
-            ->where('store_products.qty_available', '>', 0);
-            
+                ->where('store_products.qty_available', '>', 0);
+
         }
         $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name');
         $cart_products = \Cart::getContent();
@@ -66,14 +66,14 @@ class PosController extends Controller
         if (request()->routeIs('proforma.index')) {
             $stores = $stores->get();
             $model = new Proformer();
-            $type='create';
-            return view('pages.pos.proformer', compact('stores', 'model','customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no','type'));
+            $type = 'create';
+            return view('pages.pos.proformer', compact('stores', 'model', 'customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no', 'type'));
         }
         if (request()->routeIs('order.invoice.index')) {
             $stores = $stores->get();
             return view('pages.pos.order_invoice', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no'));
         }
-        
+
         $stores = $stores->orderBy('products.name')->orderBy('stores.name')->get();
         return view('pages.pos.index', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'category_id', 'store_id', 'receipt_no'));
     }
@@ -85,7 +85,7 @@ class PosController extends Controller
         $category_id = 0;
         $store_id = 0;
         $user_branch = User::userBranchAction();
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'cost_price', 'unit')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'retail_selling_price', 'cost_price', 'unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('products', 'products.id', 'store_products.product_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
@@ -112,7 +112,7 @@ class PosController extends Controller
             ->orderBy('products.name')->orderBy('stores.name')->get();
 
 
-        $customers = Customer::where('type', 'credit')->where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
+        $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name');
         if (\Cart::getContent()->isEmpty())
             $this->loadToCart($order);
         $cart_products = \Cart::getContent();

@@ -102,7 +102,8 @@
                                                     <select name="customer_id" id="customer_record"
                                                         class="form-control select2-single">
                                                         <option value="{{ $order->customer->id }}">
-                                                            {{ $order->customer->code }}-{{ $order->customer->name }}</option>
+                                                            {{ $order->customer->code }}-{{ $order->customer->name }}
+                                                        </option>
                                                     </select>
                                                     <div class="form-group">
                                                         <span class="text text-danger ion-android-alert"
@@ -113,7 +114,8 @@
                                                         <input type="text" class="form-control" name="reference" id="reference"
                                                             placeholder="Reference" />
                                                     </div> --}}
-                                                <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button>
+                                                <button type="submit"
+                                                    class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button>
                                             </div>
                                         </div>
                                     </div>
@@ -161,8 +163,11 @@
 
                                         @foreach ($stores as $key => $store)
                                             <tr>
-                                                <form action="{{ route('ajax.cart.add') }}" method="POST" class="addCartItemForm">
+                                                <form action="{{ route('ajax.cart.add') }}" method="POST"
+                                                    class="addCartItemForm">
                                                     @csrf
+                                                    <input type="hidden" name="customer" class="customer"
+                                                            value="@if (session()->has('customer')) {{ session('customer')->id }} @endif">
                                                     <input type="hidden" name="id" value="{{ $store->id }}">
                                                     <input type="hidden" name="name" value="{{ $store->name }}">
                                                     <input type="hidden" name="code" value="{{ $store->code }}">
@@ -186,15 +191,17 @@
                                                     {{-- <td align="right">
                                                         {{ number_format($store->selling_price, 2) }}
                                                     </td> --}}
-                                                    @if ($store->qty_available > 0 && $store->selling_price > 0)
+                                                    @if ($store->qty_available > 0 && str_replace(',', '', $store->retail_selling_price) > 0)
                                                         <td align="center">
-                                                            <button type="submit" class="btn btn-sm btn-success px-2">
+                                                            <button type="submit"
+                                                                class="btn btn-sm btn-success px-2 add">
                                                                 <i class="fa fa-cart-plus" aria-hidden="true"></i>
                                                             </button>
                                                         </td>
                                                     @else
                                                         <td align="center">
-                                                            <span class="fa fa-crosshairs text text-danger"></span>
+                                                            <span class="fa fa-crosshairs text text-danger"
+                                                                title="Selling price not set!"></span>
                                                         </td>
                                                     @endif
                                                 </form>
@@ -397,8 +404,16 @@
     <script>
         $(function() {
             $("#example1").DataTable({
-                    'iDisplayLength':100
-                });
+                'iDisplayLength': 100,
+                
+            });
+
+
+            $('body').on('click', '.add', function() {
+                var customer_id = $('#customer_record').val();
+                $('.customer').val(customer_id);
+            })
+            
             $('#account_type').on("change", function() {
                 $.ajax({
                     type: "GET",

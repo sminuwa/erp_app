@@ -158,7 +158,7 @@
                                         </tr>
                                         @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
                                     @endforeach
-                                    
+
                                 </tbody>
                             </table>
                             <table class="table table-bordered table-condensed">
@@ -171,26 +171,42 @@
                                             &#8358;{{ number_format($order->customer->amount()->sum('cr') - $order->customer->amount()->sum('dr'), 2) }}
                                         @endif
                                     </td>
-                                    <th style="text-align: right">Total Amount := </th>
+                                    <th style="text-align: right">Sub Total := </th>
                                     <th style="text-align: right;">
                                         &#8358;{{ number_format($total, 2, '.', ',') }}</th>
                                 </tr>
 
-                                {{-- @if ($order->discount != 0)
+                                @if ($order->discount != 0)
                                     <tr>
                                         <th style="text-align: right">Discount := </th>
                                         <th style="text-align: right;">
                                             &#8358;{{ number_format($order->discount, 2, '.', ',') }}
                                         </th>
                                     </tr>
-                                @endif --}}
+                                @endif
+                                @if ($order->refund != 0)
+                                    <tr>
+                                        <th style="text-align: right">Refund := </th>
+                                        <th style="text-align: right;">
+                                            &#8358;{{ number_format($order->refund, 2, '.', ',') }}
+                                        </th>
+                                    </tr>
+                                    @endif
+                                    @if ($order->discount != 0 || $order->refund != 0)
+                                        <tr>
+                                            <th style="text-align: right">Total Amount := </th>
+                                            <th style="text-align: right;">
+                                                &#8358;{{ number_format($total + $order->discount - $order->refund, 2, '.', ',') }}
+                                            </th>
+                                        </tr>
+                                    @endif
 
-                                <tr>
-                                    <td colspan="4">Amoun Paid in Words:
-                                        <span>{{ $utility->convertNumberToWords($total) }} Naira</span>
-                                    </td>
-                                </tr>
-                                </tbody>
+                                    <tr>
+                                        <td colspan="4">Amoun Paid in Words:
+                                            <span>{{ $utility->convertNumberToWords($total + $order->discount - $order->refund) }} Naira</span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
                             </table>
 
                             <table class="table table-condensed">

@@ -203,30 +203,26 @@
                 @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
             @endforeach
             <tr>
-                <td colspan="6" class="sum-up line">Total</td>
+                <td colspan="6" class="sum-up line">SubTotal: </td>
                 <td class="line price">{{ number_format($total, 2) }}</td>
             </tr>
-            {{--@if ($order->discount != 0)
+            @if ($order->discount != 0)
                 <tr>
-                    <td colspan="4" class="sum-up line">Discount</td>
+                    <td colspan="6" class="sum-up line">Discount: </td>
                     <td class="line price">{{ number_format($order->discount, 2) }}</td>
                 </tr>
-            @endif--}}
+            @endif
+            @if ($order->refund != 0)
+                <tr>
+                    <td colspan="6" class="sum-up line">Refund: </td>
+                    <td class="line price">{{ number_format($order->refund, 2) }}</td>
+                </tr>
+            @endif
             <tr>
-                <td colspan="6" class="sum-up line">Amount Paid</td>
-                <td class="line price">{{ number_format($order->pay, 2) }}</td>
+                <td colspan="6" class="sum-up line">Total Amount</td>
+                <td class="line price">{{ number_format($total+$order->discount-$order->refund, 2) }}</td>
             </tr>
-            <tr>
-                <td colspan="6" class="sum-up line">Amount Due</td>
-                <td class="line price">
-                    @if ($order->due < 0)
-                        &#8358;({{ number_format(abs($order->due), 2) }})
-                    @else
-                        &#8358;{{ number_format($order->due, 2) }}
-                    @endif
-                </td>
-            </tr>
-            <tr>
+            {{-- <tr>
                 <td colspan="6">Balance C/F =
                     @if ($order->customer->amount()->sum('cr') - $order->customer->amount()->sum('dr') < 0)
                         &#8358;({{ number_format(abs($order->customer->amount()->sum('cr') - $order->customer->amount()->sum('dr')), 2) }})
@@ -234,7 +230,7 @@
                         &#8358;{{ number_format($order->customer->amount()->sum('cr') - $order->customer->amount()->sum('dr'), 2) }}
                     @endif
                 </td>
-            </tr>
+            </tr> --}}
         </tbody>
     </table>
     <section>

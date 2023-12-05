@@ -114,9 +114,28 @@
                                                         <input type="text" class="form-control" name="reference" id="reference"
                                                             placeholder="Reference" />
                                                     </div> --}}
-                                                <button type="submit"
-                                                    class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button>
+                                                {{-- <button type="submit"
+                                                    class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button> --}}
                                             </div>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <input type="number" class="form-control" name="discount"
+                                                placeholder="Discount" id="discount" value="{{$order->discount}}" />
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <input type="number" class="form-control" placeholder="Refund"
+                                                    name="refund" id="refund" value="{{$order->refund}}" />
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create
+                                                Invoice</button>
                                         </div>
                                     </div>
                                 </div>
@@ -413,7 +432,7 @@
                 var customer_id = $('#customer_record').val();
                 $('.customer').val(customer_id);
             })
-            
+
             $('#account_type').on("change", function() {
                 $.ajax({
                     type: "GET",

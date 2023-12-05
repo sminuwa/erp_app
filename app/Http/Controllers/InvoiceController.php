@@ -120,7 +120,7 @@ class InvoiceController extends Controller
     }
 
     public function final_invoice(Request $request)
-    {
+    { 
         //dd(\Cart::getContent());
         $invoice_id = $request->invoice_id;
 
@@ -194,6 +194,8 @@ class InvoiceController extends Controller
                 $invoice->invoice_no = $reference;
             } else {
                 $invoice->order_invoice_id = $request->order_invoice_id ?? 0;
+                $invoice->discount = $discount;
+                $invoice->refund = $refund;
             }
             $invoice->pay = $payment_mode == "Credit" ? $amount_paid : $total;
             $invoice->due = $payment_mode == "Credit" ? ($total - $amount_paid) : 0;

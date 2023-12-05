@@ -15,9 +15,9 @@
     <tbody>
         @foreach ($records as $record)
             <tr>
-                <td> {{ $record->branch?->code }} </td>
-                <td> {{ optional($record->branch)->name }} </td>
-                <td> {{ optional($record->product)->name }} </td>
+                <td> {{ $record->branch_code }} </td>
+                <td> {{ $record->branch_name }} </td>
+                <td> {{ $record->product_name }} </td>
                 <td style="text-align: right"> {{ number_format(str_replace(',', '', $record->cost_price), 2) }} </td>
                 <td style="text-align: right">
                     &#8358;{{ number_format(str_replace(',', '', $record->retail_selling_price), 2) }}

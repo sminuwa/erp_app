@@ -42,11 +42,11 @@ class BranchProductPriceController extends Controller
     public function index(Index $request)
     {
         $user_branch = User::userBranchAction();
-        $records = BranchProductPrice::select('branch_product_prices.*', 'stores.name', 'products.name')
+        $records = BranchProductPrice::select('branch_product_prices.*', 'branches.name AS branch_name','branches.code AS branch_code', 'products.name AS product_name','products.code AS product_code')
             ->join('branches', 'branches.id', 'branch_product_prices.branch_id')
-            ->join('stores', 'stores.branch_id', 'branches.id')
             ->join('products', 'products.id', 'branch_product_prices.product_id')
             ->where('branch_product_prices.branch_id', 'LIKE', $user_branch)
+            //->where('branch_product_prices.retail_selling_price', '>', 0)
             ->latest('products.name')
             ->get();
         return view('pages.branch_product_prices.index', ['records' => $records]);
@@ -343,7 +343,9 @@ class BranchProductPriceController extends Controller
                         [
                             'branch_id' => $user_branch,
                             'product_id' => $product_id,
-                            'selling_price' => $row['selling_price'],
+                            'selling_price' => $row['retail_price'],
+                            'retail_selling_price' => $row['retail_price'],
+                            'whole_selling_price' => $row['whole_price'],
                             'cost_price' => $row['cost_price'],
                             'updated_by' => Auth::id(),
                             'updated_at' => Carbon::now(),

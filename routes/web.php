@@ -331,6 +331,8 @@ Route::middleware('auth')->group(function () {
             Route::post('/delete/{invoice}', [InvoiceController::class, 'delete'])->name('invoice.delete');
             Route::post('/post/{invoice}', [OrderController::class, 'post'])->name('invoice.post');
             Route::get('pos/edit/{order}', [PosController::class, 'edit'])->name('pos.edit');
+            Route::get('pos/get_available_product/{storeproduct}', [OrderController::class, 'getAvailableQuantity'])->name('update.available.quantity');
+            
         });
 
         //Proforma Invoice

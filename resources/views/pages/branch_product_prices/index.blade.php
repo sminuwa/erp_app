@@ -52,23 +52,5 @@
 @endsection
 
 @push('js')
-    <!-- DataTables -->
-    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-        $(function() {
-            $("#record1").DataTable({
-                'iDisplayLength':100
-            });
-            $('#record2').DataTable({
-                "paging": true,
-                "lengthChange": true,
-                "searching": true,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false,
-                'iDisplayLength':100
-            });
-        });
-    </script>
+   
 @endpush

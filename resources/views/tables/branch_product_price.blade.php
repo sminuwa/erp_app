@@ -4,11 +4,11 @@
             <th>Code</th>
             <th>Branch</th>
             <th>Product</th>
-            <th>Cost Price </th>
-            <th>Retail Price </th>
-            <th>Whole Price </th>
+            <th>C Price </th>
+            <th>R Price </th>
+            <th>W Price </th>
             <th>Status </th>
-            <th>Updated By </th>
+            <th>Modified</th>
             <th>&nbsp;</th>
         </tr>
     </thead>
@@ -28,22 +28,31 @@
                 <td> {{ $record->status == 1 ? 'Active' : 'Inactive' }} </td>
                 <td> {{ $record->user->name ?? '' }} </td>
                 <td>
-                    @can('set.product.price')
-                        <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.edit', $record->id) }}">
-                            <span class="fa fa-pencil"></span>
-                        </a>
-                    @endcan
-                    @can('delete.product.price')
-                        <form onsubmit="return confirm('Are you sure you want to delete?')"
-                            action="{{ route('branch_product_prices.destroy', $record->id) }}" method="post"
-                            style="display: inline">
-                            {{ csrf_field() }}
-                            {{ method_field('DELETE') }}
-                            <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
-                                <i class="text-danger fa fa-remove"></i>
-                            </button>
-                        </form>
-                    @endcan
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Action
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            @can('set.product.price')
+                                <a class="dropdown-item"
+                                    href="{{ route('branch_product_prices.edit', $record->id) }}">
+                                    <span class="fa fa-pencil"> Edit</span>
+                                </a>
+                            @endcan
+                            @can('delete.product.price')
+                                <form onsubmit="return confirm('Are you sure you want to delete?')"
+                                    action="{{ route('branch_product_prices.destroy', $record->id) }}" method="post"
+                                    style="display: inline">
+                                    {{ csrf_field() }}
+                                    {{ method_field('DELETE') }}
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="text-danger fa fa-remove"> Delete</i>
+                                    </button>
+                                </form>
+                            @endcan
+                        </div>
+                    </div>
                 </td>
             </tr>
         @endforeach

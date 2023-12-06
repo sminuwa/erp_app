@@ -460,7 +460,7 @@
         $(function() {
             $("#example1").DataTable({
                 'iDisplayLength': 100,
-                
+
             });
 
 
@@ -485,6 +485,26 @@
         });
     </script>
     <script type="text/javascript">
+        //To update available qty based on unit of measure
+        $(document).on('change', '.unit_measure', function() {
+            var formid = $(this).attr('data-value').substr(1);
+            unit = $(this).val();
+            $.ajax({
+                url: "{{ route('update.available.quantity', ['storeproduct' => ':formid']) }}".replace(
+                    ':formid',
+                    formid),
+                type: 'GET',
+                data: {
+                    unit: unit
+                }
+            }).done(function(value) {
+                //console.log(value)  
+                $('#quantity' + formid).attr(
+                    'max-qty', value)
+            })
+
+        });
+
         function validate(selling_price, cost_price, tagg) {
             tagg_id = "valid_" + tagg;
             $("#" + tagg_id).html("");

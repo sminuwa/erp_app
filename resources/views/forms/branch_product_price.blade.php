@@ -15,7 +15,7 @@
             </div>
         @endif
     </div>
-    <div class="form-group">
+    {{-- <div class="form-group">
         <label for="category_id">Category</label>
         <select class="form-control ajax-categories select2-single {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
                 name="category_id"
@@ -28,13 +28,13 @@
                 <strong>{{ $errors->first('category_id') }}</strong>
             </div>
         @endif
-    </div>
+    </div> --}}
     <div class="form-group">
         <label for="product_id">Product</label>
         <select class="form-control ajax-products select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
                 name="product_id"
                 id="product_id"
-                category_id=""
+                selected_item="{{ $model->product_id }}"
                 required="required">
         </select>
         @if ($errors->has('product_id'))

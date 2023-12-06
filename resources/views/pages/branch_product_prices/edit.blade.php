@@ -1,6 +1,6 @@
 @extends('layouts.backend.app')
 
-@section('title', 'Products')
+@section('title', 'Prices')
 
 @push('css')
 @endpush
@@ -41,7 +41,7 @@
                         <div class='card'>
 
                             <div class="card-body">
-                                @include('forms.store_product_price', [
+                                @include('forms.branch_product_price', [
                                     'route' => route('branch_product_prices.update', $model->id),
                                     'method' => 'PUT',
                                 ])
@@ -58,23 +58,6 @@
 @endsection
 
 @push('js')
-    <script script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}">
-    </script>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-        $(function() {
-            $(document).on("change", "#category_id", function(event) {
-                $("#product_id").html(" < option value = '' > Loading... < /option>");
-                $.ajax({
-                    url: "{{ route('ajax.loadproducts') }}",
-                    type: 'GET',
-                    data: {
-                        category_id: $("#category_id").val()
-                    }
-                }).done(function(msg) {
-                    $("#product_id").html("<option value=''>--select--</option>" + msg);
-                });
-            });
-        });
-    </script>
+   
+    
 @endpush

@@ -44,9 +44,9 @@
                                     <div class="form-group">
                                         <label for="type">Payee Category</label>
                                         <select
-                                            class="form-control select2-single {{ $errors->has('type') ? ' is-invalid' : '' }}"
+                                            class="form-control {{ $errors->has('type') ? ' is-invalid' : '' }}"
                                             name="type" id="type" required="required">
-                                            <option value="">Select...</option>
+                                            <option value="all">All</option>
                                             <option
                                                 value="Customer" {{ 'Customer' == $model->model_name ? 'selected' : '' }}>
                                                 Customer
@@ -79,7 +79,7 @@
                                         <select
                                             class="form-control select2-single {{ $errors->has('payer_id') ? ' is-invalid' : '' }}"
                                             name="payer_id" id="payer_id" required="required">
-                                            <option value="">Select...</option>
+                                            <option value="all">All</option>
                                             @if (isset($payers))
                                                 @foreach ($payers as $payer)
                                                     <option value="{{ $payer->id }}"
@@ -114,37 +114,8 @@
 
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="customer_category">Customer Category</label>
-                                        <select
-                                            class="form-control select2-single {{ $errors->has('customer_category') ? ' is-invalid' : '' }}"
-                                            name="customer_category" id="customer_category" required="required">
-                                            <option value="">Select...</option>
-                                            <option value="Credit">Credit</option>
-                                            <option value="Walked In">Walked In</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        &nbsp;&nbsp;
-                                        <label for="customer_id">Customer</label>
-                                        <select
-                                            class="form-control select2-single {{ $errors->has('customer_id') ? ' is-invalid' : '' }}"
-                                            name="customer_id" id="customer_id" required>
-                                            <option value="">Select...</option>
-                                            <option value="all">All</option>
-                                            @foreach ($customers as $data)
-                                                <option value="{{ $data->id }}">{{ $data->name }}-{{ $data->phone }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
+                            
+                            <div class="text-right form-group col-sm-12">
                                 <input type="button" class="btn btn-primary" id="generate" name="generate"
                                        value="Generate"/>
                             </div>
@@ -166,13 +137,8 @@
     <!-- DataTables -->
     <!-- DataTables -->
     <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
-    <!-- SlimScroll -->
-    <script src="{{ asset('assets/backend/plugins/slimScroll/jquery.slimscroll.min.js') }}"></script>
-    <!-- FastClick -->
-    <script src="{{ asset('assets/backend/plugins/fastclick/fastclick.js') }}"></script>
-
-    <!-- Sweet Alert Js -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>
+  
+    
     <script type="text/javascript">
         $(function () {
             function formatMoney(n, c, d, t) {
@@ -189,6 +155,7 @@
 
             $('#type').on("change", function () {
                 $("#payer_id").html(" < option value = '' > Loading... < /option>");
+               
                 $.ajax({
                     url: "{{ route('ajax.load.payers') }}",
                     type: 'GET',
@@ -196,32 +163,36 @@
                         type: $(this).val()
                     }
                 }).done(function (msg) {
+                   
                     $("#payer_id").html(msg);
+                    
                 });
             });
 
             $('#generate').on("click", function () {
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
-                customer_id = $('#customer_id').val();
-                type = $('#customer_category').val()     //  $('input[name="type"]:checked').val()
-
+                payer_id = $('#payer_id').val();
+                type = $('#type').val();
+                
+                
                 $.ajax({
                     type: "GET",
-                    url: "{{ route('ajax.general.customer.ledger') }}",
+                    url: "{{ route('ajax.load.account.balance.report') }}",
                     data: {
                         _token: "{{ csrf_token() }}",
                         from_date: from_date,
                         to_date: to_date,
-                        customer_id: customer_id,
+                        payer_id: payer_id,
                         type: type
                     }
                 }).done(function (data) {
-
+                   
                     $("#load").html(data);
                     $('#example1').DataTable({
                         lengthMenu: [25, 50, 75, 100],
-                        pageLength: 20
+                        pageLength: 20,
+                        
                     });
                 });
             });

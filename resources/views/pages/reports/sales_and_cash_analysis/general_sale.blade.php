@@ -36,24 +36,24 @@
         <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
-                <form method="POST" class="form-inline form-check-inline">
+                <form method="POST">
                     <div class="row">
-                        <div class="form-group  col-sm-2">
+                        <div class="col-sm-2">
                             <label for="from_date">From Date</label>
                             <input type="text" autocomplete="off"
                                 class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
                                 name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="">
                         </div>
-                        <div class="form-group  col-sm-2">
+                        <div class="col-sm-2">
                             <label for="to_date">To Date</label>
                             <input type="text" autocomplete="off"
                                 class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
                                 name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
                         </div>
-                        <div class="form-group  col-sm-2">
+                        <div class="col-sm-4">
                             &nbsp;&nbsp;
                             <label for="store_id">Store</label>
-                            <select class="form-control {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
+                            <select class="form-control select2-single {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
                                 name="store_id" id="store_id">
                                 <option value="all">All</option>
                                 @foreach ($stores as $data)
@@ -62,10 +62,11 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="form-group  col-sm-2">
+                        <div class="col-sm-4">
                             &nbsp;&nbsp;
                             <label for="category_id">Category</label>
-                            <select class="form-control {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
+                            <select
+                                class="form-control select2-single {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
                                 name="category_id" id="category_id">
                                 <option value="all">All</option>
                                 @foreach ($categories as $data)
@@ -74,7 +75,9 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="form-group  col-sm-2">
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
                             &nbsp;&nbsp;
                             <label for="product_id">Product</label>
                             <select
@@ -87,34 +90,24 @@
                                 @endforeach
                             </select>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group  col-sm-6">
-                            &nbsp;&nbsp; &nbsp;&nbsp;
-                            <input type="radio" name="credit_walkedin" value="all" class="form-control type" checked />
-                            &nbsp;&nbsp;All Customers &nbsp;&nbsp; &nbsp;&nbsp;
-                            <input type="radio" name="credit_walkedin" value="Credit" class="form-control type" />
-                            &nbsp;&nbsp;Credit Customer &nbsp;&nbsp; &nbsp;&nbsp;
-                            <input type="radio" name="credit_walkedin" value="Walked In" class="form-control type" />
-                            &nbsp;&nbsp;Walked In
+                        <div class="col-sm-4">
+                            <label for="type">Customer Type</label>
+                            <select class="form-control type" id="type" name="type">
+                                <option value="all">All</option>
+                                <option value="Retail">Retail</option>
+                                <option value="Wholesale">Wholesale</option>
+                            </select>
                         </div>
-                        <div class="form-group  col-sm-2">
+                        <div class="col-sm-4">
                             &nbsp;&nbsp;
                             <label for="customer_id">Customer</label>
                             <select class="form-control select2-single" name="customer_id" id="customer_id">
                                 <option value="all">All Customers</option>
                             </select>
                         </div>
-                        <div class="form-group  col-sm-4">
-                            &nbsp;&nbsp;
-                            <label for="payment_mode">Sale Mode</label>
-                            <select class="form-control select2-single" name="payment_mode" id="payment_mode">
-                                <option value="all">All</option>
-                                <option value="Cash">Cash Sales</option>
-                                <option value="Credit">Credit Sales</option>
-                            </select>
-                        </div>
-                        <div class="form-group text-right  col-sm-2">
+                    </div>
+                    <div class="row">
+                        <div class="text-right  col-sm-12">
                             <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />
                         </div>
                     </div>
@@ -148,13 +141,11 @@
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
 
-            $('#category_id,#store_id').on("change", function() {
+            $('#category_id').on("change", function() {
                 category_id = $('#category_id').val();
-                store_id = $('#store_id').val();
-
                 $.ajax({
                     type: "GET",
-                    url: "{{ route('ajax.load.store.products') }}",
+                    url: "{{ route('ajax.loadproducts') }}",
                     data: {
                         category_id: category_id,
                         store_id: store_id
@@ -184,8 +175,7 @@
                 store_id = $('#store_id').val();
                 category_id = $('#category_id').val();
                 customer_id = $('#customer_id').val();
-                payment_mode = $('#payment_mode').val();
-                credit_walkedin = $('input[name="credit_walkedin"]:checked').val()
+                type = $('#type').val();
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.general.sales.report') }}",
@@ -195,11 +185,9 @@
                         to_date: to_date,
                         product_id: product_id,
                         store_id: store_id,
-                        credit_walkedin: credit_walkedin,
                         category_id: category_id,
                         customer_id: customer_id,
-                        payment_mode: payment_mode,
-                        credit_walkedin:credit_walkedin
+                        type: type
                     }
                 }).done(function(data) {
                     $("#load").html(data);

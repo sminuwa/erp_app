@@ -194,13 +194,13 @@ class CustomerController extends Controller
         $customer_id = $request->customer_id;
         $type = $request->type;
 
-        if ($customer_id == 'all' && $type == 'Credit') {
+        if ($customer_id == 'all' && $type == 'Retail') {
             $customer_id = '%';
-            $type = "Credit";
+            $type = "Retail";
         }
-        if ($customer_id == 'all' && $type == 'Walked In') {
+        if ($customer_id == 'all' && $type == 'Wholesale') {
             $customer_id = '%';
-            $type = "Walked In";
+            $type = "Wholesale";
         }
         if ($customer_id == 'all' && $type == '') {
             $customer_id = '%';

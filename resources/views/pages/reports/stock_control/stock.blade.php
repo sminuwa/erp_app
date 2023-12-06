@@ -37,21 +37,32 @@
         <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <form method="POST" class="form-inline">
-                            <div class="form-group">
-                                &nbsp;&nbsp;
-                                <label for="category_id">Category</label>
-                                <select name="category_id" id="category_id" class="form-control">
-                                    <option value="all">All categories</option>
-                                    @foreach ($categories as $data)
-                                        <option value="{{ $data->id }}">
-                                            {{ $data->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            &nbsp;&nbsp;
+                            <label for="category_id">Category</label>
+                            <select name="category_id" id="category_id" class="form-control select2-single">
+                                <option value="all">All categories</option>
+                                @foreach ($categories as $data)
+                                    <option value="{{ $data->id }}">
+                                        {{ $data->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-sm-4">
+                            &nbsp;&nbsp;
+                            <label for="product_id">Product</label>
+                            <select name="product_id" id="product_id" class="form-control select2-single">
+                                <option value="all">All products</option>
+                            </select>
+                        </div>
+                        <div class="form-group text-right col-sm-4 ">
+                            <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />
+                        </div>
+                    </div>
+
+                    {{-- <div class="form-group">
                                 &nbsp;&nbsp;
                                 <label for="store_id">Store</label>
                                 <select name="store_id" id="store_id" class="form-control select2-single">
@@ -60,31 +71,22 @@
                                         </option>
                                     @endforeach
                                 </select>
-                            </div>
-                            <div class="form-group">
-                                &nbsp;&nbsp;
-                                <label for="product_id">Product</label>
-                                <select name="product_id" id="product_id" class="form-control select2-single">
-                                    <option value="all">All products</option>
-                                </select>
-                            </div>
+                            </div> --}}
 
-                            <div class="form-group text-right ">
-                                <input type="button" class="btn btn-primary" id="generate" name="generate"
-                                    value="Generate" />
-                            </div>
 
-                        </form>
-                    </div>
+
+
+                </form>
+
+            </div>
+            <div class="row">
+                <div class="col-sm-12 table-responsive" id="load">
+
                 </div>
-                <div class="row">
-                    <div class="col-sm-10 table-responsive" id="load">
-
-                    </div>
-                </div>
-            </div><!-- /.container-fluid -->
-        </section>
-        <!-- /.content -->
+            </div>
+    </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
 
@@ -93,15 +95,14 @@
 @push('js')
     <script type="text/javascript">
         $(function() {
-            $(document).on("change", "#category_id,#store_id", function(event) {
+            $(document).on("change", "#category_id", function(event) {
                 $("#product_id").html(" < option value = '' > Loading... < /option>");
 
                 $.ajax({
-                    url: "{{ route('ajax.load.store-products') }}",
+                    url: "{{ route('ajax.loadproducts') }}",
                     type: 'GET',
                     data: {
                         category_id: $("#category_id").val(),
-                        store_id: $("#store_id").val()
                     }
                 }).done(function(msg) {
                     $("#product_id").html("<option value='all'>All</option>" + msg);
@@ -120,7 +121,7 @@
             };
 
             $('#generate').on("click", function() {
-                store_id = $('#store_id').val();
+
                 category_id = $('#category_id').val();
                 product_id = $('#product_id').val();
                 $.ajax({
@@ -128,7 +129,7 @@
                     url: "{{ route('ajax.current.stock.report') }}",
                     data: {
                         _token: "{{ csrf_token() }}",
-                        store_id: store_id,
+                        // store_id: store_id,
                         category_id: category_id,
                         product_id: product_id
                     }
@@ -179,11 +180,11 @@
                                     i : 0;
                             };
 
-                            // Total over all pages
+                            // Total over all pages Total Cost price
 
-                            if (api.column(4).data().length) {
+                            if (api.column(6).data().length) {
                                 var total = api
-                                    .column(4)
+                                    .column(6)
                                     .data()
                                     .reduce(function(a, b) {
                                         return intVal(a) + intVal(b);
@@ -192,9 +193,9 @@
                                 total = 0
                             };
                             // Total over this page
-                            if (api.column(4).data().length) {
+                            if (api.column(6).data().length) {
                                 var pageTotal = api
-                                    .column(4, {
+                                    .column(6, {
                                         page: 'current'
                                     })
                                     .data()
@@ -204,16 +205,18 @@
                             } else {
                                 pageTotal = 0
                             };
+
                             // Update footer
-                            $(api.column(4).footer()).html(
+                            $(api.column(6).footer()).html(
                                 "Page Total: " + formatMoney(pageTotal) +
                                 "<br> (Grand Total: " +
                                 formatMoney(total) + ")"
                             );
-                            
-                            if (api.column(5).data().length) {
+                            // Total over all pages Total Retail price
+
+                            if (api.column(7).data().length) {
                                 var total = api
-                                    .column(5)
+                                    .column(7)
                                     .data()
                                     .reduce(function(a, b) {
                                         return intVal(a) + intVal(b);
@@ -221,9 +224,10 @@
                             } else {
                                 total = 0
                             };
-                            if (api.column(5).data().length) {
+                            // Total over this page
+                            if (api.column(7).data().length) {
                                 var pageTotal = api
-                                    .column(5, {
+                                    .column(7, {
                                         page: 'current'
                                     })
                                     .data()
@@ -234,13 +238,47 @@
                                 pageTotal = 0
                             };
 
-
                             // Update footer
-                            $(api.column(5).footer()).html(
+                            $(api.column(7).footer()).html(
                                 "Page Total: " + formatMoney(pageTotal) +
                                 "<br> (Grand Total: " +
                                 formatMoney(total) + ")"
                             );
+
+                            // Total over all pages Whole price
+
+                            if (api.column(8).data().length) {
+                                var total = api
+                                    .column(8)
+                                    .data()
+                                    .reduce(function(a, b) {
+                                        return intVal(a) + intVal(b);
+                                    })
+                            } else {
+                                total = 0
+                            };
+                            // Total over this page
+                            if (api.column(8).data().length) {
+                                var pageTotal = api
+                                    .column(8, {
+                                        page: 'current'
+                                    })
+                                    .data()
+                                    .reduce(function(a, b) {
+                                        return intVal(a) + intVal(b);
+                                    })
+                            } else {
+                                pageTotal = 0
+                            };
+
+                            // Update footer
+                            $(api.column(8).footer()).html(
+                                "Page Total: " + formatMoney(pageTotal) +
+                                "<br> (Grand Total: " +
+                                formatMoney(total) + ")"
+                            );
+
+
 
                         }
                     });

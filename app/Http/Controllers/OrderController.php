@@ -55,7 +55,7 @@ class OrderController extends Controller
             )
             ->where(
                 function ($query) use ($search_value) {
-                    $query->where('invoice_no', 'LIKE', "%$search_value%")
+                    $query->where('reference', 'LIKE', "%$search_value%")
                         ->orWhere(
                             'customers.name',
                             'LIKE',
@@ -70,7 +70,7 @@ class OrderController extends Controller
             )->get(
             );
 
-        return view('pages.order.approved_orders', compact('orders'));
+        return view('pages.order.index', compact('orders'));
     }
     public function proformer_search(Request $request)
     {

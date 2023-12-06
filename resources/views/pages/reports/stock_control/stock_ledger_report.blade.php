@@ -51,22 +51,11 @@
                                 <input type="text" class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}" autocomplete="off"
                                     name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
                             </div>
-                            <div class="form-group">
-                                &nbsp;&nbsp;
-                                <label for="store_id">Store</label>
-                                <select class="form-control {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
-                                    name="store_id" id="store_id">
-                                    <option value="">Select...</option>
-                                    @foreach ($stores as $data)
-                                        <option value="{{ $data->id }}">{{ $data->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            
                             <div class="form-group">
                                 &nbsp;&nbsp;
                                 <label for="category_id">Category</label>
-                                <select class="form-control {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
+                                <select class="form-control select2-single {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
                                     name="category_id" id="category_id">
                                     <option value="">Select...</option>
                                     @foreach ($categories as $data)

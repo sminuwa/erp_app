@@ -34,10 +34,11 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:50px;height:50px;"
-                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
+                                style="width:50px;height:50px;" alt="Albabello Logo" class="img-circle elevation-3"
+                                style="opacity: .8">
                             <h3>
-                                {{App\Models\User::UserBranchName()->long_name}}
+                                {{ App\Models\User::UserBranchName()->long_name }}
                             </h3>
                             <h5 style="text-align: center;">CURRENT STOCK REPORT
                             </h5>
@@ -48,58 +49,56 @@
 
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
-                            <table class="table table-bordered caption" id="example1" border="1" cellpadding="0"
-                                cellspacing="0">
+                            <table class="table table-bordered caption" id="example1">
+                               
                                 <thead>
                                     <tr>
                                         <th>ITEM</th>
-                                        <th>QTY</th>
-                                        <th>COST PRICE</th>
-                                        <th>SELLING PRICE</th>
-                                        <th>TOTAL COST</th>
-                                        <th>TOTAL SEELING</th>
                                         <th>STORE</th>
+                                        <th>QTY</th>
+                                        <th>COST PRICE (&#8358;)</th>
+                                        <th>R PRICE (&#8358;)</th>
+                                        <th>W PRICE (&#8358;)</th>
+                                        <th>TOTAL COST (&#8358;)</th>
+                                        <th>TOTAL R Price (&#8358;)</th>
+                                        <th>TOTAL W Price (&#8358;)</th>
                                     </tr>
                                 </thead>
-                                @php
-                                    $total_cost_price = 0;
-                                    $total_selling_price = 0;
-                                    $total_selling = 0;
-                                    $total_cost = 0;
-                                @endphp
                                 @foreach ($stores as $store)
                                     <tr>
                                         <td> {{ $store->name }} </td>
-                                        <td> {{ $store->qty_available }} </td>
-                                        @php
-                                            $total_cost_price += $store->cost_price;
-                                            $total_selling_price += $store->selling_price;
-                                            $total_selling += $store->qty_available * $store->selling_price;
-                                            $total_cost += $store->qty_available * $store->cost_price;
-                                        @endphp
-                                        <td style="text-align: right;"> &#8358;{{ number_format($store->cost_price,2,'.',',') }} </td>
-                                        <td style="text-align: right;"> &#8358;{{ number_format($store->selling_price,2,'.',',') }}
-                                        </td>
-                                        <td style="text-align: right;">
-                                            &#8358;{{ number_format($store->qty_available * $store->cost_price, 2, '.', ',') }}
-                                        </td>
-                                        <td style="text-align: right;">
-                                            &#8358;{{ number_format($store->qty_available * $store->selling_price, 2, '.', ',') }}
-                                        </td>
                                         <td>{{ $store->store }} </td>
+                                        <td> {{ $store->qty_available }} </td>
+                                        <td style="text-align: right;">
+                                            {{ number_format(str_replace(',', '', $store->cost_price), 2, '.', ',') }} </td>
+                                        <td style="text-align: right;">
+                                            {{ number_format(str_replace(',', '', $store->retail_selling_price), 2, '.', ',') }}
+                                        </td>
+                                        <td style="text-align: right;">
+                                            {{ number_format(str_replace(',', '', $store->whole_selling_price), 2, '.', ',') }}
+                                        </td>
+                                        <td style="text-align: right;">
+                                            {{ number_format(str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->cost_price), 2, '.', ',') }}
+                                        </td>
+                                        <td style="text-align: right;">
+                                            {{ number_format(str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->retail_selling_price), 2, '.', ',') }}
+                                        </td>
+                                        <td style="text-align: right;">
+                                            {{ number_format(str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->whole_selling_price), 2, '.', ',') }}
+                                        </td>
+
                                     </tr>
                                 @endforeach
-                                </tbody>
                                 <tfoot>
-                                    <tr>
-                                        <th></th>
-                                        <th></th>
-                                        <th style="text-align: right;">&#8358;{{number_format($total_cost_price,2,'.',',')}}</th>
-                                        <th style="text-align: right;">&#8358;{{number_format($total_selling_price,2,'.',',')}}</th>
-                                        <th style="text-align: right;">&#8358;{{number_format($total_cost,2,'.',',')}}</th>
-                                        <th style="text-align: right;">&#8358;{{number_format($total_selling,2,'.',',')}}</th>
-                                        <th></th>
-                                    </tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
                                 </tfoot>
                             </table>
                         </div>

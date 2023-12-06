@@ -39,12 +39,8 @@
                                         Daily Sales
                                     @endcannot
                                 </h3>
-                                <h3 class="card-title">
-                                    @can('verify.invoice')
-                                        Invoice Verification/Stock out
-                                    @endcan
-                                </h3>
                             </div>
+                            <br/>
                             <div class="row">
                                 <div class="col-sm-2">
                                     @can('view.daily.sale')
@@ -57,6 +53,7 @@
                                     @endcan
                                 </div>
                             </div>
+                            <br/>
                             <div class="row">
                                 <div class="col-md-6">
                                     <form action="{{ route('sales_products.search') }}" method="POST">

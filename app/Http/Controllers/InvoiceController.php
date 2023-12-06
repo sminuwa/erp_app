@@ -208,10 +208,12 @@ class InvoiceController extends Controller
             if ($invoice->save()) {
                 OrderDetail::where('order_id', $invoice->id)->delete();
                 $contents = \Cart::getContent();
+                
                 $products = [];
                 $total_discount = 0;
                 $store_products = [];
                 foreach ($contents as $content) {
+                    //dd($content->quantity);
                     $total_discount += $content->attributes['discount'] * $content->quantity;
                     $store = StoreProduct::find($content->id);
                     $qtyAval = $store->qty_available;

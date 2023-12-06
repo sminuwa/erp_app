@@ -46,44 +46,43 @@
                                 </a>
 
                                 <a href="javascript:void(0)" data-toggle="modal"
-                                   data-target="#order_detail_form{{ $order->id }}"
-                                   data-val="{{ $order->id }}"
-                                   class="btn btn-success btn-sm  show">
+                                    data-target="#order_detail_form{{ $order->id }}" data-val="{{ $order->id }}"
+                                    class="btn btn-success btn-sm  show">
                                     <i class="fa fa-check" aria-hidden="true"></i> Confirm
                                 </a>
-                                <a href="{{ route('invoice.print', $order->id) }}"
-                                   target="_BLANK" class="btn btn-dark btn-sm ">
+                                <a href="{{ route('invoice.print', $order->id) }}" target="_BLANK"
+                                    class="btn btn-dark btn-sm ">
                                     <i class="fa fa-print" aria-hidden="true"></i> Print
                                 </a>
-                                <a href="{{ route('pos.order_print', $order->id) }}"
-                                   target="_BLANK" class="btn btn-dark btn-sm ">
+                                <a href="{{ route('pos.order_print', $order->id) }}" target="_BLANK"
+                                    class="btn btn-dark btn-sm ">
                                     <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
                                 </a>
-                                <a href="{{ route('waybill.order_print', $order->id) }}"
-                                   target="_BLANK" class="btn btn-primary btn-sm ">
+                                <a href="{{ route('waybill.order_print', $order->id) }}" target="_BLANK"
+                                    class="btn btn-primary btn-sm ">
                                     <i class="fa fa-print" aria-hidden="true"></i> Waybill
                                 </a>
 
                                 @if ($order->status == 0)
-                                    <a href="{{ route('pos.edit', $order->id) }}"
-                                       class="btn btn-info btn-sm ">
+                                    <a href="{{ route('pos.edit', $order->id) }}" class="btn btn-info btn-sm ">
                                         <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                     </a>
-                                    <form class="d-inline" action="{{ route('invoice.post', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to post this invoice?')">
+                                    <form class="d-inline" action="{{ route('invoice.post', $order->id) }}" method="post"
+                                        onsubmit="return confirm('Are you sure you want to post this invoice?')">
                                         @csrf
-                                        <button type="submit"
-                                                class="btn btn-success btn-sm ">
+                                        <button type="submit" class="btn btn-success btn-sm ">
                                             <i class="fa fa-check" aria-hidden="true"></i> Post
                                         </button>
                                     </form>
 
-                                    <form class="d-inline" id="delete-form-{{ $order->id }}" action="{{ route('invoice.delete', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to close this invoice?')">
+                                    <form class="d-inline" id="delete-form-{{ $order->id }}"
+                                        action="{{ route('invoice.delete', $order->id) }}" method="post"
+                                        onsubmit="return confirm('Are you sure you want to close this invoice?')">
                                         @csrf
                                         <button class="btn btn-danger btn-sm " type="submit">
                                             <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                         </button>
                                     </form>
-
                                 @endif
 
 
@@ -122,10 +121,11 @@
                                 <div class="col-sm-4 invoice-col">
                                     <b>Invoice No: {{ $order->reference }}</b><br><br>
                                     <b>Invoice Status:</b>
-                                    {!!
-                                        $order->status == 0 ? '<span class="badge badge-warning">Pending</span>':
-                                        ($order->status == 1 ? '<span class="badge badge-success">Posted</span>': '<span class="badge badge-success">Pending</span>' )
-                                    !!}
+                                    {!! $order->status == 0
+                                        ? '<span class="badge badge-warning">Pending</span>'
+                                        : ($order->status == 1
+                                            ? '<span class="badge badge-success">Posted</span>'
+                                            : '<span class="badge badge-success">Pending</span>') !!}
                                 </div>
                                 <!-- /.col -->
                             </div>
@@ -169,10 +169,39 @@
                                                 @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
                                             @endforeach
                                             <tr>
-                                                <th colspan="7" align="right">Total</th>
+                                                <th colspan="7" style="text-align:right;">SubTotal :=</th>
                                                 <th style="text-align: right">{{ number_format($total, 2, '.', ',') }}</th>
 
                                             </tr>
+                                            @if ($order_detail->order->discount != 0)
+                                                <tr>
+                                                    <th style="text-align: right" colspan="7">Discount := </th>
+                                                    <th style="text-align: right;">
+                                                        &#8358;{{ number_format($order_detail->order->discount, 2, '.', ',') }}
+                                                    </th>
+                                                </tr>
+                                            @endif
+                                            @if ($order_detail->order->refund != 0)
+                                                <tr>
+                                                    <th style="text-align: right" colspan="7">Refund := </th>
+                                                    <th style="text-align: right;">
+                                                        &#8358;{{ number_format($order_detail->order->refund, 2, '.', ',') }}
+                                                    </th>
+                                                </tr>
+                                            @endif
+                                            @if ($order_detail->order->discount != 0 || $order_detail->order->refund != 0)
+                                                <tr>
+                                                    <th style="text-align: right"  colspan="7">Total Amount := </th>
+                                                    <th style="text-align: right;">
+                                                        &#8358;{{ number_format($total - $order_detail->order->discount + $order_detail->order->refund, 2, '.', ',') }}
+                                                    </th>
+                                                </tr>
+                                            @endif
+                                            {{-- <tr>
+                                                <th colspan="7" align="right">Total</th>
+                                                <th style="text-align: right">{{ number_format($total, 2, '.', ',') }}</th>
+
+                                            </tr> --}}
                                         </tbody>
                                     </table>
                                 </div>

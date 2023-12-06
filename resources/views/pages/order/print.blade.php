@@ -191,22 +191,23 @@
                                             &#8358;{{ number_format($order->refund, 2, '.', ',') }}
                                         </th>
                                     </tr>
-                                    @endif
-                                    @if ($order->discount != 0 || $order->refund != 0)
-                                        <tr>
-                                            <th style="text-align: right">Total Amount := </th>
-                                            <th style="text-align: right;">
-                                                &#8358;{{ number_format($total + $order->discount - $order->refund, 2, '.', ',') }}
-                                            </th>
-                                        </tr>
-                                    @endif
-
+                                @endif
+                                @if ($order->discount != 0 || $order->refund != 0)
                                     <tr>
-                                        <td colspan="4">Amoun Paid in Words:
-                                            <span>{{ $utility->convertNumberToWords($total + $order->discount - $order->refund) }} Naira</span>
-                                        </td>
+                                        <th style="text-align: right">Total Amount := </th>
+                                        <th style="text-align: right;">
+                                            &#8358;{{ number_format($total - $order->discount + $order->refund, 2, '.', ',') }}
+                                        </th>
                                     </tr>
-                                    </tbody>
+                                @endif
+
+                                <tr>
+                                    <td colspan="4">Amoun Paid in Words:
+                                        <span>{{ $utility->convertNumberToWords($total - $order->discount + $order->refund) }}
+                                            Naira</span>
+                                    </td>
+                                </tr>
+                                </tbody>
                             </table>
 
                             <table class="table table-condensed">

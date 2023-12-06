@@ -46,7 +46,7 @@ class BranchProductPriceController extends Controller
             ->join('branches', 'branches.id', 'branch_product_prices.branch_id')
             ->join('products', 'products.id', 'branch_product_prices.product_id')
             ->where('branch_product_prices.branch_id', 'LIKE', $user_branch)
-            //->where('branch_product_prices.retail_selling_price', '>', 0)
+            ->where('branch_product_prices.retail_selling_price', '>', 0)
             ->latest('products.name')
             ->get();
         return view('pages.branch_product_prices.index', ['records' => $records]);

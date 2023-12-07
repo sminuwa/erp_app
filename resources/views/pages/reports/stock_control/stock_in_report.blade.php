@@ -54,11 +54,11 @@
                             </div>
                             <div class="form-group">
                                 &nbsp;&nbsp;
-                                <label for="store_id">Store</label>
-                                <select class="form-control {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
-                                    name="store_id" id="store_id">
+                                <label for="branch_id">Branch</label>
+                                <select class="form-control {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
+                                    name="branch_id" id="branch_id">
                                     <option value="all">All</option>
-                                    @foreach ($stores as $data)
+                                    @foreach ($branches as $data)
                                         <option value="{{ $data->id }}">{{ $data->name }}
                                         </option>
                                     @endforeach
@@ -136,14 +136,14 @@
 
             $('#category_id,#store_id').on("change", function() {
                 category_id = $('#category_id').val();
-                store_id = $('#store_id').val();
+                branch_id = $('#branch_id').val();
 
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.store.products') }}",
                     data: {
                         category_id: category_id,
-                        store_id: store_id
+                        branch_id: branch_id
                     }
                 }).done(function(data) {
                     $("#product_id").html("<option value='all'>All</option>" + data);
@@ -154,7 +154,7 @@
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
                 product_id = $('#product_id').val();
-                store_id = $('#store_id').val();
+                branch_id = $('#branch_id').val();
                 category_id = $('#category_id').val();
                 $.ajax({
                     type: "GET",
@@ -164,7 +164,7 @@
                         from_date: from_date,
                         to_date: to_date,
                         product_id: product_id,
-                        store_id: store_id,
+                        branch_id: branch_id,
                         category_id: category_id
                     }
                 }).done(function(data) {

@@ -788,7 +788,7 @@ Route::middleware('auth')->group(function () {
             //Stock  In Report (Purchase)
             Route::get('/sc/stock/in', [ReportController::class, 'stockIn'])->name('stock.in.reports');
             Route::get('/sc/stock/in/load', [ReportController::class, 'loadStockInReport'])->name('ajax.load.stock.in.reports');
-            Route::get('/sc/stock/in/print/{from_date}/{to_date}/{store_id}/{category_id}/{product_id}/', [ReportController::class, 'printStockIn'])->name('ajax.print.stock.in.reports');
+            Route::get('/sc/stock/in/print/{from_date}/{to_date}/{branch_id}/{category_id}/{product_id}', [ReportController::class, 'printStockIn'])->name('ajax.print.stock.in.reports');
 
             //Store  Ledger
             Route::get('/sc/store-ledger/in', [ReportController::class, 'storeLedger'])->name('store.ledger.reports');

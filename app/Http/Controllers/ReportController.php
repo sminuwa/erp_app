@@ -36,6 +36,7 @@ use App\Models\AuditLog;
 use App\Models\LoanCollector;
 
 
+
 class ReportController extends Controller
 {
     public function stockTransfer()
@@ -134,7 +135,7 @@ class ReportController extends Controller
     public function stockIn()
     {
         return view('pages.reports.stock_control.stock_in_report', [
-            'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('id')->get(),
+            'branches' => Branch::orderBy('name')->get(),
             'products' => Product::orderBy('name')->get(),
             'categories' => Category::orderBy('name')->get(),
         ]);

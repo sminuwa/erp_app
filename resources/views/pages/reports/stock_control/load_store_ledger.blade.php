@@ -24,7 +24,7 @@
             <td> {{ $store->category }} </td>
             <td>{{ $store->store }} </td>
             <td> {{ $store->qty_available }} </td>
-            <td style="text-align: right;"> &#8358;{{ number_format($store->cost_price, 2, '.', ',') }} </td>
+            <td style="text-align: right;"> &#8358;{{ number_format(str_replace(',','',$store->cost_price), 2, '.', ',') }} </td>
         </tr>
     @endforeach
     <tfoot>

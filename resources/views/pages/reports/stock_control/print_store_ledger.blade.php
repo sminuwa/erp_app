@@ -34,10 +34,11 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:50px;height:50px;"
-                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
+                                style="width:50px;height:50px;" alt="Albabello Logo" class="img-circle elevation-3"
+                                style="opacity: .8">
                             <h3>
-                                {{App\Models\User::UserBranchName()->long_name}}
+                                {{ App\Models\User::UserBranchName()->long_name }}
                             </h3>
                             <h5 style="text-align: center;">STORE LEDGER REPORT
                             </h5>
@@ -68,7 +69,8 @@
                                         <td>{{ $store->store }} </td>
                                         <td> {{ $store->qty_available }} </td>
                                         <td style="text-align: right;">
-                                            &#8358;{{ number_format($store->cost_price, 2, '.', ',') }} </td>
+                                            &#8358;{{ number_format(str_replace(',', '', $store->cost_price), 2, '.', ',') }}
+                                        </td>
                                     </tr>
                                 @endforeach
                                 <tfoot>

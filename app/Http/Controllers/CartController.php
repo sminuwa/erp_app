@@ -245,7 +245,7 @@ class CartController extends Controller
                 $id = $request->product_id;
                 $unit = $product->unit;
                 $cost_price = str_replace(',', '', $request->cost_price);
-                
+
             } else {
                 $name = $request->name;
                 $code = $request->code;
@@ -254,7 +254,7 @@ class CartController extends Controller
                 $store_product = StoreProduct::find($request->id);
                 $product_id = $store_product->product_id;
                 $unit = $request->unit;
-                
+
             }
             $prices = BranchProductPrice::where(['product_id' => $product_id, 'branch_id' => auth()->user()->branch->id])->first();
             $selling_price = 0;
@@ -266,8 +266,8 @@ class CartController extends Controller
                 $cost_price = str_replace(',', '', $prices->cost_price);
             }
             $qty = $request->qty;
-            
-            
+
+
             $store = $request->store;
             $add = \Cart::add([
                 'id' => $id,
@@ -397,17 +397,23 @@ class CartController extends Controller
             $unit = $request->unit;
             $store_product_id = $request->id;
             $selling_price = str_replace(',', '', $request->selling_price);
+            $cost_price = str_replace(',', '', $request->cost_price);
             $sold_price = str_replace(',', '', $request->sold_price);
             $store_product = StoreProduct::find($store_product_id);
             $product_id = $store_product->product_id;
             $store_id = $store_product->store_id;
             $unit_measure = ProductUnitMeasure::where(['product_id' => $product_id, 'code' => $unit])->first();
             if ($unit_measure && $unit_measure->value > 1) {
-                if ($unit_measure->type == 'division')
+                if ($unit_measure->type == 'division') {
                     $sold_price = roundDown(($selling_price / ($unit_measure->value ?? 1)), 50);
-                if ($unit_measure->type == 'multiple')
+                    $cost_price = ($cost_price / ($unit_measure->value ?? 1));
+                }
+                if ($unit_measure->type == 'multiple') {
                     $sold_price = roundDown(($selling_price * ($unit_measure->value ?? 1)), 50);
+                    $cost_price = ($cost_price * ($unit_measure->value ?? 1));
+                }
             }
+
             // else {
             //     return $sold_price = $selling_price;
             // }
@@ -422,7 +428,7 @@ class CartController extends Controller
                     ],
                     'price' => $sold_price,
                     'attributes' => array(
-                        'cost_price' => str_replace(' ', '', $request->cost_price),
+                        'cost_price' => $cost_price,
                         'selling_price' => $selling_price,
                         'discount' => $discount > 0 ? $discount : 0,
                         'qty_available' => $request->qty_available,

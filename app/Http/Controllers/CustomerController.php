@@ -47,7 +47,7 @@ class CustomerController extends Controller
     public function index(Index $request)
     {
         $user_branch = User::userBranchAction();
-        return view('pages.customers.index', ['records' => Customer::where('branch_id', 'LIKE', $user_branch)->limit(10)->orderBy('created_at', 'desc')->get()]);
+        return view('pages.customers.index', ['records' => Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('created_at', 'desc')->get()]);
     } /**
       * Display the specified resource.
       *

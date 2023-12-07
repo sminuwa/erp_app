@@ -752,8 +752,8 @@ class OrderController extends Controller
         session()->flash('app_message', 'Invoice confirmed successfully');
         $action = "Issued order with invoice $invoice_no out of stock";
         AuditLog::auditLog(Auth::id(), $action);
-        $orders = Order::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('order_status', 'approved')->whereDate('order_date', date('Y-m-d'))->get();
-        return view('pages.order.approved_orders', compact('orders'));
+        $orders = Order::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('order_status', 'approved')->get();
+        return view('pages.order.index', compact('orders'));
     }
 
 

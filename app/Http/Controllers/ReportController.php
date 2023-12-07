@@ -146,7 +146,7 @@ class ReportController extends Controller
         $from_date = $request->from_date;
         $to_date = $request->to_date;
         $product_id = $request->product_id;
-        $store_id = $request->store_id;
+        $branch_id = $request->branch_id;
         $category_id = $request->category_id;
         if ($product_id == 'all') {
             $product_id = '%';
@@ -156,19 +156,18 @@ class ReportController extends Controller
             $category_id = '%';
 
         }
-        if ($store_id == 'all') {
-            $store_id = '%';
+        if ($branch_id == 'all') {
+            $branch_id = '%';
 
         }
 
-        $query = Purchase::select('purchase_date', 'source_store_id', 'qty_supplied', 'products.name', 'unit_price', 'stores.name AS store', 'branches.name AS branch', 'invoice')
+        $query = Purchase::select('purchase_date', 'branch_id', 'quantity', 'products.name', 'unit_price', 'branches.name AS branch', 'reference')
             ->where('purchase_products.product_id', 'LIKE', $product_id)
             ->where('products.category_id', 'LIKE', $category_id)
-            ->where('stores.branch_id', 'LIKE', User::userBranchAction())
+            ->where('purchases.branch_id', 'LIKE', $branch_id)
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('products', 'products.id', 'purchase_products.product_id')
-            ->join('stores', 'stores.id', 'source_store_id')
-            ->join('branches', 'branches.id', 'stores.branch_id')
+            ->join('branches', 'branches.id', 'purchases.branch_id')
             ->whereBetween('purchase_date', [$from_date, $to_date]);
         $purchases = $query->get();
         if ($product_id == '%') {
@@ -179,14 +178,14 @@ class ReportController extends Controller
             $category_id = 'all';
 
         }
-        if ($store_id == '%') {
-            $store_id = 'all';
+        if ($branch_id == '%') {
+            $branch_id = 'all';
 
         }
-        return view('pages.reports.stock_control.load_stock_in_report', compact('purchases', 'from_date', 'to_date', 'product_id', 'store_id', 'category_id'));
+        return view('pages.reports.stock_control.load_stock_in_report', compact('purchases', 'from_date', 'to_date', 'product_id', 'branch_id', 'category_id'));
     }
 
-    public function printStockIn($from_date, $to_date, $store_id, $category_id, $product_id)
+    public function printStockIn($from_date, $to_date, $branch_id, $category_id, $product_id)
     {
         if ($product_id == 'all') {
             $product_id = '%';
@@ -196,20 +195,19 @@ class ReportController extends Controller
             $category_id = '%';
 
         }
-        if ($store_id == 'all') {
-            $store_id = '%';
+        if ($branch_id == 'all') {
+            $branch_id = '%';
 
         }
 
-        $query = Purchase::select('purchase_date', 'source_store_id', 'qty_supplied', 'products.name', 'unit_price', 'stores.name AS store', 'branches.name AS branch', 'invoice')
-            ->where('purchase_products.product_id', 'LIKE', $product_id)
-            ->where('products.category_id', 'LIKE', $category_id)
-            ->where('stores.branch_id', 'LIKE', User::userBranchAction())
-            ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
-            ->join('products', 'products.id', 'purchase_products.product_id')
-            ->join('stores', 'stores.id', 'source_store_id')
-            ->join('branches', 'branches.id', 'stores.branch_id')
-            ->whereBetween('purchase_date', [$from_date, $to_date]);
+        $query = Purchase::select('purchase_date', 'branch_id', 'quantity', 'products.name', 'unit_price', 'branches.name AS branch', 'reference')
+        ->where('purchase_products.product_id', 'LIKE', $product_id)
+        ->where('products.category_id', 'LIKE', $category_id)
+        ->where('purchases.branch_id', 'LIKE', $branch_id)
+        ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
+        ->join('products', 'products.id', 'purchase_products.product_id')
+        ->join('branches', 'branches.id', 'purchases.branch_id')
+        ->whereBetween('purchase_date', [$from_date, $to_date]);
         $purchases = $query->get();
         return view('pages.reports.stock_control.print_stock_in', compact('purchases', 'from_date', 'to_date'));
     }
@@ -2902,12 +2900,6 @@ class ReportController extends Controller
         return view('pages.reports.ap_ar.statements.account_balances', compact('accounts', 'customers', 'model'));
     }
 
-    public function trialBalance()
-    {
-        $branches = Branch::select(['id', 'name', 'code'])->orderBy('name')->get();
-
-        return view('pages.reports.ap_ar.trial_balance.index', compact('branches'));
-    }
     public function loadAccountBalance(Request $request)
     {
         $type = $request->type;
@@ -2933,6 +2925,13 @@ class ReportController extends Controller
         $sum_dr_b_d = $this->generalAccountLedgerB4D($from_date, $branch_id)->sum('debit');
         
         return view('pages.reports.ap_ar.statements.load_account_balances', compact('ledgers', 'branch', 'from_date', 'to_date', 'balance', 'credit_sum', 'debit_sum','sum_cr_b_d','sum_dr_b_d'));
+    }
+    
+    public function trialBalance()
+    {
+        $branches = Branch::select(['id', 'name', 'code'])->orderBy('name')->get();
+
+        return view('pages.reports.ap_ar.trial_balance.index', compact('branches'));
     }
     public function loadTrialBalance(Request $request)
     {

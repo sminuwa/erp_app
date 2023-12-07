@@ -39,10 +39,10 @@
     @foreach ($purchases as $purchase)
         <tr>
             <td>{{ $purchase->purchase_date->toFormattedDateString() }}</td>
-            <td>{{ $purchase->invoice }}</td>
+            <td>{{ $purchase->reference }}</td>
             <td>{{ $purchase->name }}</td>
             <td style="text-align: right">{{ number_format($purchase->unit_price,2,'.',',') }}</td>
-            <td style="text-align: center">{{ $purchase->qty_supplied }}</td>
+            <td style="text-align: center">{{ $purchase->quantity }}</td>
             <td style="text-align: right">{{ number_format(($purchase->unit_price * $purchase->qty_supplied),2,'.',',') }}</td>
             <td>{{ $purchase->store }}</td>
             <td>{{ $purchase->branch }}</td>

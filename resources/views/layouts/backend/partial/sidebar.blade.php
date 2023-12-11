@@ -487,10 +487,10 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="{{ route('stock.in.reports') }}"
-                                                class="nav-link {{ Request::is('reports/sc/stock/in*') ? 'active' : '' }}">
+                                            <a href="{{ route('stock.history.reports') }}"
+                                                class="nav-link {{ Request::is('reports/sc/stock/history*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
-                                                <p>Stock In Reports</p>
+                                                <p>Stock History Report</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">

@@ -1,6 +1,6 @@
 @extends('layouts.backend.app')
 
-@section('title', 'Current Stock Report')
+@section('title', 'Report')
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
@@ -21,13 +21,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Current Stock Report</h4>
+                        <h4>Stock History Report</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
-                            <li class="breadcrumb-item active">Current Stock Report</li>
+                            <li class="breadcrumb-item active">Stock History Report</li>
                         </ol>
                     </div>
                 </div>
@@ -37,57 +36,85 @@
         <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
-                <form method="POST">
-                    <div class="row">
-                        <div class="form-group">
-                            <label for="branch_id">Branch</label>
-                            <select class="form-control select2-single ajax-branches"
-                                    name="branch_id"
-                                    id="branch_id">
-                            </select>
-                           
-                        </div>
-                        <div class="form-group">
-                            <label for="store_id">Store</label>
-                            <select class="form-control select2-single ajax-stores"
-                                    name="store_id"
-                                    id="store_id">
-                            </select>
-                           
-                        </div>
-                        <div class="form-group">
-                            <label for="category_id">Category</label>
-                            <select class="form-control select2-single ajax-categories"
-                                    name="category_id"
-                                    id="category_id">
-                            </select>
-                           
-                        </div>
-                       
-                        <div class="form-group">
-                            <label for="product_id">Product</label>
-                            <select class="form-control select2-single ajax-products"
-                                    name="product_id"
-                                    id="product_id">
-                            </select>
-                           
-                        </div>
-                        <div class="form-group text-right col-sm-4">
-                            <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />
-                        </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <form method="POST">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label for="from_date">From Date</label>
+                                    <input type="text" autocomplete="off"
+                                        class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
+                                        name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label for="to_date">To Date</label>
+                                    <input type="text" autocomplete="off"
+                                        class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
+                                        name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label for="type">Type</label>
+                                    <select class="form-control select2-single" name="type"
+                                        id="type">
+                                        <option value="">Select..</option>
+                                        {{-- <option value="0">Opening Balance</option> --}}
+                                        <option value="0">Sale</option>
+                                        <option value="1">Purchase GRN</option>
+                                        <option value="2">Intersite</option>
+                                        <option value="3">Interstore</option>
+                                        <option value="4">Stock Adjustment</option>
+                                        
+                                        <option value="6">Credit Note</option>    
+                                        <option value="7">Return & Debit</option>
+                                    </select>
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="branch_id">Branch</label>
+                                    <select class="form-control select2-single ajax-branches" name="branch_id"
+                                        id="branch_id">
+                                    </select>
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="store_id">Store</label>
+                                    <select class="form-control select2-single ajax-stores" name="store_id" id="store_id">
+                                    </select>
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="category_id">Category</label>
+                                    <select class="form-control select2-single ajax-categories" name="category_id"
+                                        id="category_id">
+                                    </select>
+
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="product_id">Product</label>
+                                    <select class="form-control select2-single ajax-products" name="product_id"
+                                        id="product_id">
+                                    </select>
+
+                                </div>
+                                <div class="form-group text-right col-sm-4">
+                                    <input type="button" class="btn btn-primary" id="generate" name="generate"
+                                        value="Generate" />
+                                </div>
+                            </div>
+
+                        </form>
                     </div>
-
-                </form>
-
-            </div>
-            <div class="row">
-                <div class="col-sm-12 table-responsive" id="load">
-                    <img src="{{ asset('assets/backend/img/loader.png') }}" style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
                 </div>
-            </div>
-    </div><!-- /.container-fluid -->
-    </section>
-    <!-- /.content -->
+                <div class="row">
+                    <div class="col-sm-12 table-responsive" id="load">
+                        <img src="{{ asset('assets/backend/img/loader.png') }}"
+                            style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
 
@@ -96,7 +123,7 @@
 @push('js')
     <script type="text/javascript">
         $(function() {
-            
+
             function formatMoney(n, c, d, t) {
                 var c = isNaN(c = Math.abs(c)) ? 2 : c,
                     d = d == undefined ? "." : d,
@@ -110,6 +137,9 @@
 
             $('#generate').on("click", function() {
 
+                type = $('#type').val();
+                from_date = $('#from_date').val();
+                to_date = $('#to_date').val();
                 branch_id = $('#branch_id').val();
                 store_id = $('#store_id').val();
                 category_id = $('#category_id').val();
@@ -117,9 +147,12 @@
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
-                    url: "{{ route('ajax.current.stock.report') }}",
+                    url: "{{ route('ajax.load.stock.history.reports') }}",
                     data: {
                         _token: "{{ csrf_token() }}",
+                        type: type,
+                        from_date: from_date,
+                        to_date: to_date,
                         branch_id: branch_id,
                         store_id: store_id,
                         category_id: category_id,
@@ -174,9 +207,9 @@
 
                             // Total over all pages Total Cost price
 
-                            if (api.column(7).data().length) {
+                            if (api.column(6).data().length) {
                                 var total = api
-                                    .column(7)
+                                    .column(6)
                                     .data()
                                     .reduce(function(a, b) {
                                         return intVal(a) + intVal(b);
@@ -185,9 +218,9 @@
                                 total = 0
                             };
                             // Total over this page
-                            if (api.column(7).data().length) {
+                            if (api.column(6).data().length) {
                                 var pageTotal = api
-                                    .column(7, {
+                                    .column(6, {
                                         page: 'current'
                                     })
                                     .data()
@@ -198,16 +231,16 @@
                                 pageTotal = 0
                             };
 
-                           
+
 
                             // Update footer
-                            $(api.column(7).footer()).html(
+                            $(api.column(6).footer()).html(
                                 "Page Total: " + formatMoney(pageTotal) +
                                 "<br> (Grand Total: " +
                                 formatMoney(total) + ")"
                             );
 
-                            
+
 
 
 

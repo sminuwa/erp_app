@@ -782,13 +782,13 @@ Route::middleware('auth')->group(function () {
             //Current Stock Report
             Route::get('/sc/current-stock', [ReportController::class, 'generateCurrentStock'])->name('current.stock.report');
             Route::get('/sc/current-stock/load', [ReportController::class, 'loadCurrentStock'])->name('ajax.current.stock.report');
-            Route::get('/sc/current-stock/print/{category_id}/{product_id}', [ReportController::class, 'printCurrentStock'])->name('ajax.current.stock.report.print');
+            Route::get('/sc/current-stock/print/{branch_id}/{store_id}/{category_id}/{product_id}', [ReportController::class, 'printCurrentStock'])->name('ajax.current.stock.report.print');
             Route::post('/available-stock', [ReportController::class, 'printAvailableStock'])->name('stock.available');
 
-            //Stock  In Report (Purchase)
-            Route::get('/sc/stock/in', [ReportController::class, 'stockIn'])->name('stock.in.reports');
-            Route::get('/sc/stock/in/load', [ReportController::class, 'loadStockInReport'])->name('ajax.load.stock.in.reports');
-            Route::get('/sc/stock/in/print/{from_date}/{to_date}/{branch_id}/{category_id}/{product_id}', [ReportController::class, 'printStockIn'])->name('ajax.print.stock.in.reports');
+            //Stock  History
+            Route::get('/sc/stock/history', [ReportController::class, 'stockHistory'])->name('stock.history.reports');
+            Route::get('/sc/stock/history/load', [ReportController::class, 'loadStockHistoryReport'])->name('ajax.load.stock.history.reports');
+            Route::get('/sc/stock/history/print/{from_date}/{to_date}/{type}/{branch_id}/{store_id}/{category_id}/{product_id}', [ReportController::class, 'printStockHistory'])->name('ajax.print.stock.history.reports');
 
             //Store  Ledger
             Route::get('/sc/store-ledger/in', [ReportController::class, 'storeLedger'])->name('store.ledger.reports');
@@ -808,7 +808,7 @@ Route::middleware('auth')->group(function () {
             //Stock Ledger Report
             Route::get('/sc/stock/ledger', [ReportController::class, 'stockLedger'])->name('stock.ledger.reports');
             Route::get('/sc/stock/ledger/load', [ReportController::class, 'loadStockLedger'])->name('ajax.load.stock.ledger.reports');
-            Route::get('/sc/stock/ledger/print/{from_date}/{to_date}/{category_id}/{product_id}/', [ReportController::class, 'printStockLedger'])->name('ajax.stock.ledger.report.print');
+            Route::get('/sc/stock/ledger/print/{from_date}/{to_date}/{branch_id}/{store_id}/{product_id}/', [ReportController::class, 'printStockLedger'])->name('ajax.stock.ledger.report.print');
 
             //General Sales Report
             Route::get('/sa/sales', [ReportController::class, 'generalSaleReport'])->name('general.sales.report');

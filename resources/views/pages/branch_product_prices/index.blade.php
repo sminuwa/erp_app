@@ -3,8 +3,8 @@
 @section('title', 'Prices')
 
 @push('css')
-<!-- DataTables -->
-<link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
 @endpush
 
 @section('content')
@@ -40,6 +40,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 table-responsive">
+                        <br/>
                         @include('tables.branch_product_price')
                     </div>
                 </div>
@@ -52,5 +53,61 @@
 @endsection
 
 @push('js')
-   
+    <!-- DataTables -->
+    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $("#record1").DataTable({
+                'iDisplayLength': 100
+            });
+            $('#record2').DataTable({
+                'iDisplayLength': 100,
+                "paging": true,
+                "lengthChange": false,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                dom: 'Bfrtip',
+                buttons: [{
+                        extend: 'copyHtml5',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        exportOptions: {
+                            columns: ':visible'
+                        },
+                        messageTop: 'Stock Price',
+                        orientation: 'landscape',
+                        pageSize: 'LEGAL'
+                    },
+                    {
+                        extend: 'colvis',
+                        columns: ':not(.noVis)',
+                        collectionLayout: 'fixed two-column',
+                        postfixButtons: [{
+                            extend: 'colvisGroup',
+                            text: 'Show all',
+                            show: ':hidden'
+                        }]
+                    }
+                ],
+                language: {
+                    buttons: {
+                        colvis: 'Show/Hide columns'
+                    }
+                },
+            });
+        });
+    </script>
 @endpush

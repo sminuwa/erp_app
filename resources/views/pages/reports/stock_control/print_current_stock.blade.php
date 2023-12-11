@@ -37,11 +37,11 @@
                             <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
                                 style="width:50px;height:50px;" alt="Albabello Logo" class="img-circle elevation-3"
                                 style="opacity: .8">
-                            <h3>
-                                {{ App\Models\User::UserBranchName()->long_name }}
-                            </h3>
-                            <h5 style="text-align: center;">CURRENT STOCK REPORT
-                            </h5>
+                            <caption style="caption-size:top">
+                                <h3 style="text-align: center;">
+                                    {{ $branch == null ? 'All Branches' : $branch->name."($branch->code)" }} </h3>
+                                <h5 style="text-align: center;">CURRENT STOCK REPORT </h5>
+                            </caption>
 
                         </div>
                         <!-- /.col -->
@@ -50,9 +50,10 @@
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
                             <table class="table table-bordered caption" id="example1">
-                               
+
                                 <thead>
                                     <tr>
+                                        <th>CODE</th>
                                         <th>ITEM</th>
                                         <th>STORE</th>
                                         <th>QTY</th>
@@ -60,17 +61,17 @@
                                         <th>R PRICE (&#8358;)</th>
                                         <th>W PRICE (&#8358;)</th>
                                         <th>TOTAL COST (&#8358;)</th>
-                                        <th>TOTAL R Price (&#8358;)</th>
-                                        <th>TOTAL W Price (&#8358;)</th>
                                     </tr>
                                 </thead>
                                 @foreach ($stores as $store)
                                     <tr>
+                                        <td> {{ $store->product_code }} </td>
                                         <td> {{ $store->name }} </td>
-                                        <td>{{ $store->store }} </td>
+                                        <td>{{ $store->store_code }} </td>
                                         <td> {{ $store->qty_available }} </td>
                                         <td style="text-align: right;">
-                                            {{ number_format(str_replace(',', '', $store->cost_price), 2, '.', ',') }} </td>
+                                            {{ number_format(str_replace(',', '', $store->cost_price), 2, '.', ',') }}
+                                        </td>
                                         <td style="text-align: right;">
                                             {{ number_format(str_replace(',', '', $store->retail_selling_price), 2, '.', ',') }}
                                         </td>
@@ -80,12 +81,12 @@
                                         <td style="text-align: right;">
                                             {{ number_format(str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->cost_price), 2, '.', ',') }}
                                         </td>
-                                        <td style="text-align: right;">
-                                            {{ number_format(str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->retail_selling_price), 2, '.', ',') }}
-                                        </td>
-                                        <td style="text-align: right;">
-                                            {{ number_format(str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->whole_selling_price), 2, '.', ',') }}
-                                        </td>
+                                        {{-- <td style="text-align: right;">
+                {{ number_format(str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->retail_selling_price), 2, '.', ',') }}
+            </td>
+            <td style="text-align: right;">
+                {{ number_format(str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->whole_selling_price), 2, '.', ',') }}
+            </td> --}}
 
                                     </tr>
                                 @endforeach
@@ -98,7 +99,7 @@
                                     <th></th>
                                     <th></th>
                                     <th></th>
-                                    <th></th>
+                                    {{-- <th></th> --}}
                                 </tfoot>
                             </table>
                         </div>

@@ -34,16 +34,16 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:50px;height:50px;"
-                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
+                                style="width:50px;height:50px;" alt="Albabello Logo" class="img-circle elevation-3"
+                                style="opacity: .8">
                             <h3>
-                                {{App\Models\User::UserBranchName()->long_name}}
+                                {{ App\Models\User::UserBranchName()->long_name }}
                             </h3>
-                            <h5 style="text-align: center;">STOCK TRANSFER REPORT
-                            </h5>
-                            <h5 style="text-align: center;">DATE BETWEEN
-                                {{ $from_date }} AND
-                                {{ $to_date }}
+                            <h5 style="text-align: center;">Stock History
+                                Between
+                                {{ Carbon\Carbon::parse($from_date)->toFormattedDateString() }} and
+                                {{ Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
                             </h5>
 
                         </div>
@@ -52,39 +52,59 @@
 
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
-                            <table class="table table-bordered caption" id="example1" border="1" cellpadding="0"
-                                cellspacing="0">
+                            <table class="table table-bordered caption" id="example1">
+                                <caption style="caption-size:top">
+                                    <h5 style="text-align: center;">Stock History
+                                        Between
+                                        {{ Carbon\Carbon::parse($from_date)->toFormattedDateString() }} and
+                                        {{ Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
+                                    </h5>
+                                </caption>
                                 <thead>
                                     <tr>
                                         <th>Date</th>
-                                        <th>Return No</th>
-                                        <th>Item Name</th>
-                                        <th>Rate</th>
+                                        <th>Reference</th>
+                                        <th>Code</th>
+                                        <th>Item</th>
                                         <th>QTY</th>
+                                        <th>Rate</th>
                                         <th>Total Amount</th>
+                                        <th>Store</th>
                                         <th>Branch</th>
                                     </tr>
                                 </thead>
                                 <tfoot>
                                     <tr>
                                         <th>Date</th>
-                                        <th>Return No</th>
-                                        <th>Item Name</th>
-                                        <th>Rate</th>
+                                        <th>Reference</th>
+                                        <th>Code</th>
+                                        <th>Item</th>
                                         <th>QTY</th>
+                                        <th>Rate</th>
                                         <th>Total Amount</th>
+                                        <th>Store</th>
                                         <th>Branch</th>
                                     </tr>
                                 </tfoot>
-                                @foreach ($purchases as $purchase)
+                                @foreach ($records as $record)
                                     <tr>
-                                        <td>{{ $purchase->purchase_date->toFormattedDateString() }}</td>
-                                        <td>{{ $purchase->reference }}</td>
-                                        <td>{{ $purchase->name }}</td>
-                                        <td style="text-align: right">{{ number_format($purchase->unit_price,2,'.',',') }}</td>
-                                        <td style="text-align: center">{{ $purchase->quantity }}</td>
-                                        <td style="text-align: right">{{ number_format(($purchase->unit_price * $purchase->quantity),2,'.',',') }}</td>
-                                        <td>{{ $purchase->branch }}</td>
+                                        <td>{{ Carbon\Carbon::parse($record->date)->toFormattedDateString() }}</td>
+                                        <td>{{ $record->refno }}</td>
+                                        <td>{{ $record->product_code }}</td>
+                                        <td>{{ $record->product_name }}</td>
+                                        <td>
+                                            @if ($record->cr > 0)
+                                                {{ $quantity = $record->cr }}
+                                            @else
+                                                -{{ $quantity = $record->dr }}
+                                            @endif
+                                        </td>
+                                        <td style="text-align: right">{{ number_format(0, 2, '.', ',') }}</td>
+                                        <td style="text-align: right">
+                                            {{ number_format(0 * $quantity, 2, '.', ',') }}
+                                        </td>
+                                        <td>{{ $record->store_code }}</td>
+                                        <td>{{ $record->branch_code }}</td>
                                     </tr>
                                 @endforeach
                             </table>

@@ -132,61 +132,60 @@ class ReportController extends Controller
     }
 
 
-    public function stockIn()
+    public function stockHistory()
     {
-        return view('pages.reports.stock_control.stock_in_report', [
-            'branches' => Branch::orderBy('name')->get(),
-            'products' => Product::orderBy('name')->get(),
-            'categories' => Category::orderBy('name')->get(),
-        ]);
+        return view('pages.reports.stock_control.stock_history_report');
     }
 
-    public function loadStockInReport(Request $request)
+    public function loadStockHistoryReport(Request $request)
     {
         //return $request->stock_in_out;
+        $type = $request->type;
         $from_date = $request->from_date;
         $to_date = $request->to_date;
-        $product_id = $request->product_id;
         $branch_id = $request->branch_id;
         $category_id = $request->category_id;
-        if ($product_id == 'all') {
-            $product_id = '%';
+        $product_id = $request->product_id;
+        $store_id = $request->store_id;
+        if ($type == "all" || $type == "")
+            $type = "%";
+        if ($branch_id == "all" || $branch_id == "")
+            $branch_id = "%";
+        if ($store_id == "all" || $store_id == "")
+            $store_id = "%";
+        if ($category_id == "all" || $category_id == "")
+            $category_id = "%";
+        if ($product_id == "all" || $product_id == "")
+            $product_id = "%";
 
-        }
-        if ($category_id == 'all') {
-            $category_id = '%';
-
-        }
-        if ($branch_id == 'all') {
-            $branch_id = '%';
-
-        }
-
-        $query = Purchase::select('purchase_date', 'branch_id', 'quantity', 'products.name', 'unit_price', 'branches.name AS branch', 'reference')
-            ->where('purchase_products.product_id', 'LIKE', $product_id)
+        $records = StockCard::select('date', 'branch_id', 'cr', 'dr', 'products.name AS product_name', 'products.code AS product_code', 'branches.code AS branch_code', 'refno', 'stores.code AS store_code')
+            ->join('products', 'products.id', 'stock_cards.product_id')
+            ->join('stores', 'stores.id', 'stock_cards.store_id')
+            ->join('branches', 'branches.id', 'stores.branch_id')
+            ->where('stock_cards.product_id', 'LIKE', $product_id)
             ->where('products.category_id', 'LIKE', $category_id)
-            ->where('purchases.branch_id', 'LIKE', $branch_id)
-            ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
-            ->join('products', 'products.id', 'purchase_products.product_id')
-            ->join('branches', 'branches.id', 'purchases.branch_id')
-            ->whereBetween('purchase_date', [$from_date, $to_date]);
-        $purchases = $query->get();
-        if ($product_id == '%') {
-            $product_id = 'all';
+            ->where('stores.branch_id', 'LIKE', $branch_id)
+            ->where('stock_cards.store_id', 'LIKE', $store_id)
+            ->where('stock_cards.type', 'LIKE', $type)
+            ->whereBetween('date', [$from_date, $to_date])->get();
 
-        }
-        if ($category_id == '%') {
-            $category_id = 'all';
-
-        }
-        if ($branch_id == '%') {
-            $branch_id = 'all';
-
-        }
-        return view('pages.reports.stock_control.load_stock_in_report', compact('purchases', 'from_date', 'to_date', 'product_id', 'branch_id', 'category_id'));
+        if ($type == "%" || $type == "")
+            $type = "all";
+        if ($branch_id == "%" || $branch_id == "")
+            $branch_id = "all";
+        if ($store_id == "%" || $store_id == "")
+            $store_id = "all";
+        if ($category_id == "%" || $category_id == "")
+            $category_id = "all";
+        if ($product_id == "%" || $product_id == "")
+            $product_id = "all";
+        $branch = null;
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.stock_control.load_stock_History_report', compact('records', 'from_date', 'to_date', 'store_id', 'product_id', 'branch_id', 'category_id', 'branch', 'type'));
     }
 
-    public function printStockIn($from_date, $to_date, $branch_id, $category_id, $product_id)
+    public function printStockHistory($from_date, $to_date, $type, $branch_id, $store_id, $category_id, $product_id)
     {
         if ($product_id == 'all') {
             $product_id = '%';
@@ -200,17 +199,27 @@ class ReportController extends Controller
             $branch_id = '%';
 
         }
+        if ($store_id == 'all') {
+            $store_id = '%';
 
-        $query = Purchase::select('purchase_date', 'branch_id', 'quantity', 'products.name', 'unit_price', 'branches.name AS branch', 'reference')
-        ->where('purchase_products.product_id', 'LIKE', $product_id)
-        ->where('products.category_id', 'LIKE', $category_id)
-        ->where('purchases.branch_id', 'LIKE', $branch_id)
-        ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
-        ->join('products', 'products.id', 'purchase_products.product_id')
-        ->join('branches', 'branches.id', 'purchases.branch_id')
-        ->whereBetween('purchase_date', [$from_date, $to_date]);
-        $purchases = $query->get();
-        return view('pages.reports.stock_control.print_stock_in', compact('purchases', 'from_date', 'to_date'));
+        }
+        if ($type == 'all') {
+            $type = '%';
+
+        }
+
+        $records = StockCard::select('date', 'branch_id', 'cr', 'dr', 'products.name AS product_name', 'products.code AS product_code', 'branches.code AS branch_code', 'refno', 'stores.code AS store_code')
+            ->join('products', 'products.id', 'stock_cards.product_id')
+            ->join('stores', 'stores.id', 'stock_cards.store_id')
+            ->join('branches', 'branches.id', 'stores.branch_id')
+            ->where('stock_cards.product_id', 'LIKE', $product_id)
+            ->where('products.category_id', 'LIKE', $category_id)
+            ->where('stores.branch_id', 'LIKE', $branch_id)
+            ->where('stock_cards.store_id', 'LIKE', $store_id)
+            ->where('stock_cards.type', 'LIKE', $type)
+            ->whereBetween('date', [$from_date, $to_date])->get();
+
+        return view('pages.reports.stock_control.print_stock_history', compact('records', 'from_date', 'to_date'));
     }
 
     public function generateBankLedger()
@@ -481,58 +490,74 @@ class ReportController extends Controller
 
     public function loadCurrentStock(Request $request)
     {
-        $categor_id = $request->category_id;
+        $branch_id = $request->branch_id;
+        $category_id = $request->category_id;
         $product_id = $request->product_id;
-        // $store_id = $request->store_id;
-        if ($categor_id == "all")
-            $categor_id = "%";
-        if ($product_id == "all")
+        $store_id = $request->store_id;
+        if ($branch_id == "all" || $branch_id == "")
+            $branch_id = "%";
+        if ($store_id == "all" || $store_id == "")
+            $store_id = "%";
+        if ($category_id == "all" || $category_id == "")
+            $category_id = "%";
+        if ($product_id == "all" || $product_id == "")
             $product_id = "%";
-        // if ($store_id == "all")
-        //     $store_id = "%";
+
         $stores = DB::table('store_products')
-            ->select('products.name', 'stores.name as store', 'store_products.qty_available', 'retail_selling_price', 'whole_selling_price', 'cost_price', 'store_products.id')
+            ->select('products.name', 'products.code AS product_code', 'stores.code as store_code', 'store_products.qty_available', 'retail_selling_price', 'whole_selling_price', 'cost_price', 'store_products.id')
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
             ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
             ->where('store_products.qty_available', '>', 0)
-            ->where('products.category_id', 'LIKE', $categor_id)
+            ->where('products.category_id', 'LIKE', $category_id)
             ->where('store_products.product_id', 'LIKE', $product_id)
-            // ->where('store_products.store_id', 'LIKE', $store_id)
+            ->where('store_products.store_id', 'LIKE', $store_id)
             ->where('branch_product_prices.product_id', 'LIKE', $product_id)
-            ->where('branch_product_prices.branch_id', 'LIKE', User::userBranchAction())
+            ->where('branch_product_prices.branch_id', 'LIKE', $branch_id)
             ->orderBy('products.name')
             ->get();
-        if ($categor_id == "%")
-            $categor_id = "all";
+        if ($branch_id == "%")
+            $branch_id = "all";
+        if ($category_id == "%")
+            $category_id = "all";
         if ($product_id == "%")
             $product_id = "all";
-        // if ($store_id == "%")
-        //     $store_id = "all";
-        return view('pages.reports.stock_control.load_stock', ['stores' => $stores, 'product_id' => $product_id, 'category_id' => $categor_id]);
+        if ($store_id == "%")
+            $store_id = "all";
+        $branch = null;
+        if ($branch_id != "all")
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.stock_control.load_stock', ['stores' => $stores, 'branch_id' => $branch_id, 'store_id' => $store_id, 'product_id' => $product_id, 'category_id' => $category_id, 'branch' => $branch]);
     }
 
-    public function printCurrentStock($categor_id, $product_id)
+    public function printCurrentStock($branch_id, $store_id, $category_id, $product_id)
     {
-        if ($categor_id == "all")
-            $categor_id = "%";
-        if ($product_id == "all")
+        if ($branch_id == "all" || $branch_id == "")
+            $branch_id = "%";
+        if ($store_id == "all" || $store_id == "")
+            $store_id = "%";
+        if ($category_id == "all" || $category_id == "")
+            $category_id = "%";
+        if ($product_id == "all" || $product_id == "")
             $product_id = "%";
 
         $stores = DB::table('store_products')
-            ->select('products.name', 'stores.name as store', 'store_products.qty_available', 'retail_selling_price', 'whole_selling_price', 'cost_price', 'store_products.id')
+            ->select('products.name', 'products.code AS product_code', 'stores.code as store_code', 'store_products.qty_available', 'retail_selling_price', 'whole_selling_price', 'cost_price', 'store_products.id')
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
             ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
             ->where('store_products.qty_available', '>', 0)
-            ->where('products.category_id', 'LIKE', $categor_id)
+            ->where('products.category_id', 'LIKE', $category_id)
             ->where('store_products.product_id', 'LIKE', $product_id)
-            // ->where('store_products.store_id', 'LIKE', $store_id)
+            ->where('store_products.store_id', 'LIKE', $store_id)
             ->where('branch_product_prices.product_id', 'LIKE', $product_id)
-            ->where('branch_product_prices.branch_id', 'LIKE', User::userBranchAction())
+            ->where('branch_product_prices.branch_id', 'LIKE', $branch_id)
             ->orderBy('products.name')
             ->get();
-        return view('pages.reports.stock_control.print_current_stock', ['stores' => $stores]);
+        $branch = null;
+        if ($branch_id != "all")
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.stock_control.print_current_stock', ['stores' => $stores, 'branch' => $branch]);
     }
 
     public function dailyReport()
@@ -1153,232 +1178,92 @@ class ReportController extends Controller
 
     public function stockLedger()
     {
-        return view('pages.reports.stock_control.stock_ledger_report', [
-            'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('id')->get(),
-            'products' => Product::orderBy('name')->get(),
-            'categories' => Category::orderBy('name')->get(),
-        ]);
+        return view('pages.reports.stock_control.stock_ledger_report');
     }
 
     public function loadStockLedger(Request $request)
     { //return $request;
-        $startDate = $request->from_date;
-        $endDate = $request->to_date;
-        $product_id = $request->product_id;
 
-        $category_id = $request->category_id;
-
-        $record = "";
-        $count = 0;
-        $qty_in_stock = 0;
-        $name = "";
-        //$cards = DB::table('stock_cards')->whereBetween(DB::raw('DATE(date)'), [$startDate, $endDate])->where(['store_id' => $store_id, 'product_id' => $product_id, 'status' => 1])->orderBy('date')->orderBy('priority')->get();
-        $cards = DB::table('stock_cards')->whereBetween(DB::raw('DATE(date)'), [$startDate, $endDate])->where(['product_id' => $product_id, 'status' => 1])->orderBy('date')->orderBy('priority')->get();
-        foreach ($cards as $card) {
-            $dd = new Carbon($card->date);
-            $date = $dd->toDateString();
-            if (substr($card->refno, 0, 3) == "INV") {
-
-                $data = Order::select('reference AS refno', 'customers.name', 'quantity')
-                    ->join('customers', 'customers.id', 'orders.customer_id')
-                    ->join('order_details', 'order_details.order_id', 'orders.id')
-                    ->join('store_products', 'store_products.id', 'order_details.store_product_id')
-                    ->where(DB::raw('DATE(order_date)'), $date)
-                    ->where('reference', $card->refno)
-                    ->where(['store_products.product_id' => $product_id, 'order_details.status' => 1])
-                    ->where('orders.branch_id', 'LIKE', User::userBranchAction())
-                    ->first();
-                $name = optional($data)->name;
-            }
-            if (substr($card->refno, 0, 3) == "GRN") {
-                $data = Purchase::select('reference AS refno', 'suppliers.name', 'qty_supplied')
-                    ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
-                    ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
-                    ->where(DB::raw('DATE(purchase_date)'), $date)
-                    ->where('reference', $card->refno)
-                    ->where(['purchase_products.product_id' => $product_id, 'purchase_products.status' => 1])
-                    ->where('suppliers.branch_id', 'LIKE', User::userBranchAction())
-                    ->first();
-                $name = optional($data)->name;
-            }
-            if (substr($card->refno, 0, 3) == "ITS") {
-                $data = TransferProduct::select('refno AS refno', 'stock_in_out')
-                    ->join('stores', 'stores.id', 'transfer_products.source_store_id')
-                    ->where(DB::raw('DATE(transfer_date)'), $date)
-                    ->where('refno', $card->refno)
-                    ->where('stores.branch_id', 'LIKE', User::userBranchAction())
-                    ->where(['product_id' => $product_id, 'transfer_products.status' => 'Completed'])
-                    ->first();
-                $name = optional($data)->stock_in_out == "in" ? "Recieved Item" : "Transfered Item";
-            }
-            if ($card->type == "Adjustment") {
-                $data = StockAdjustment::select('refno AS refno', 'adjusted_qty')
-                    ->join('stores', 'stores.id', 'stock_adjustments.store_id')
-                    ->where(DB::raw('DATE(date)'), $date)
-                    ->where('refno', $card->refno)
-                    ->where(['product_id' => $product_id])
-                    ->where('branch_id', 'LIKE', User::userBranchAction())
-                    ->first();
-                $name = "Adjusted Item";
-            }
-            if ($card->type == "Opening Balance") {
-                $name = "Opening Balance";
-            }
-
-            $qty_sold = StockCard::where(['status' => 1, 'type' => 'Sale'])->where('id', '=', $card->id)->first();
-            $qty_puchase = StockCard::where(['status' => 1, 'type' => 'Purchase'])->where('id', '=', $card->id)->first();
-            $qty_adjust = StockCard::where(['status' => 1, 'type' => 'Adjustment'])->where('id', '=', $card->id)->first();
-            $qty_tran_recv = StockCard::where(['status' => 1, 'type' => 'Transfer'])->where('id', '=', $card->id)->first();
-            $record .= "<tr><td>" . Carbon::parse($card->date)->toFormattedDateString() . "</td><td>" .
-                optional($card)->refno . "</td><td>" .
-                number_format($qty_in_stock, 0) . "</td><td>" .
-                number_format(optional($qty_sold)->dr, 0) . "</td><td>" .
-                number_format(optional($qty_puchase)->cr, 0) . "</td><td>" .
-                number_format((optional($qty_adjust)->cr - optional($qty_adjust)->dr), 0) . "</td><td>" .
-                number_format(optional($qty_tran_recv)->dr, 0) . "</td><td>" .
-                number_format(optional($qty_tran_recv)->cr, 0) . "</td><td>" .
-                $name . "</td><td>";
-
-            $balance = $qty_in_stock + optional($qty_puchase)->cr - optional($qty_sold)->dr + (optional($qty_adjust)->cr - optional($qty_adjust)->dr) + optional($qty_tran_recv)->cr - optional($qty_tran_recv)->dr;
-            /*if ($count == 0) {
-                $in_stock = StockCard::where(['store_id' => $store_id, 'product_id' => $product_id, 'status' => 1])->where(DB::raw('DATE(date)'), '<', $card->date)->sum('cr');
-                $out_stock = StockCard::where(['store_id' => $store_id, 'product_id' => $product_id, 'status' => 1])->where(DB::raw('DATE(date)'), '<', $card->date)->sum('dr');
-                $qty_in_stock = $in_stock - $out_stock;
-            }*/
-            $qty_in_stock = $balance;
-            if ($balance < 0)
-                $record .= "(" . number_format(abs($balance), 0) . ")";
-            else
-                $record .= "" . number_format($balance, 0);
-
-            $record . "</td></tr>";
-            $count++;
-        }
         $from_date = $request->from_date;
         $to_date = $request->to_date;
-        $product = Product::find($product_id);
-        $product = StoreProduct::select('store_products.qty_available', 'products.name AS item', 'stores.name AS store')
-            ->where(['product_id' => $product_id])
-            ->where('stores.branch_id', 'LIKE', User::userBranchAction())
-            ->join('products', 'products.id', 'store_products.product_id')
-            ->join('stores', 'stores.id', 'store_products.store_id')
-            ->first();
+        $branch_id = $request->branch_id;
+        $product_id = $request->product_id;
+        $store_id = $request->store_id;
+
+        if ($branch_id == "all" || $branch_id == "")
+            $branch_id = "%";
+        if ($store_id == "all" || $store_id == "")
+            $store_id = "%";
+
+        if ($product_id == "all" || $product_id == "")
+            $product_id = "%";
+
+        $records = StockCard::select('stock_cards.date', 'cr', 'dr', 'products.name AS product_name', 'products.code AS product_code', 'branches.code AS branch_code', 'refno', 'stores.code AS store_code', 'qty_before', 'qty_after','model_name','model_id')
+            ->join('products', 'products.id', 'stock_cards.product_id')
+            ->join('stores', 'stores.id', 'stock_cards.store_id')
+            ->join('branches', 'branches.id', 'stores.branch_id')
+            ->join('general_account_ledgers', 'general_account_ledgers.reference', 'stock_cards.refno')
+            ->where('stock_cards.product_id', 'LIKE', $product_id)
+            ->where('stores.branch_id', 'LIKE', $branch_id)
+            ->where('stock_cards.store_id', 'LIKE', $store_id)
+            ->where('general_account_ledgers.model_name','<>','GeneralAccount')
+            ->whereBetween('stock_cards.date', [$from_date, $to_date])->get();
+
+        if ($branch_id == "%" || $branch_id == "")
+            $branch_id = "all";
+        if ($store_id == "%" || $store_id == "")
+            $store_id = "all";
+        if ($product_id == "%" || $product_id == "")
+            $product_id = "all";
+        $branch = null;
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+
         return view('pages.reports.stock_control.load_stock_ledger_report', [
-            'result' => $record,
+            'records' => $records,
             'from_date' => $from_date,
             'to_date' => $to_date,
-            'category_id' => $category_id,
+            'branch_id' => $branch_id,
+            'store_id' => $store_id,
             'product_id' => $product_id,
-            'product' => $product
-            ,
-            'qty_in_stock' => $qty_in_stock
         ]);
     }
 
-    public function printStockLedger($from_date, $to_date, $category_id, $product_id)
+    public function printStockLedger($from_date, $to_date, $branch_id, $store_id, $product_id)
     {
-        $startDate = new Carbon($from_date);
-        $endDate = new Carbon($to_date);
-        $record = "";
-        $count = 0;
-        $qty_in_stock = 0;
-        $cards = DB::table('stock_cards')->whereBetween(DB::raw('DATE(date)'), [$startDate, $endDate])->where(['store_id' => $store_id, 'product_id' => $product_id, 'status' => 1])->orderBy('date')->orderBy('priority')->get();
-        foreach ($cards as $card) {
-            $dd = new Carbon($card->date);
-            $date = $dd->toDateString();
-            if ($card->type == "Sale") {
-                $data = Order::select('reference AS refno', 'customers.name', 'quantity')
-                    ->join('customers', 'customers.id', 'orders.customer_id')
-                    ->join('order_details', 'order_details.order_id', 'orders.id')
-                    ->join('store_products', 'store_products.id', 'order_details.store_product_id')
-                    ->where(DB::raw('DATE(order_date)'), $date)
-                    ->where('reference', $card->refno)
-                    ->where(['store_products.product_id' => $product_id, 'order_details.status' => 1])
-                    ->where('orders.branch_id', 'LIKE', User::userBranchAction())
-                    ->first();
-                $name = optional($data)->name;
-            }
-            if ($card->type == "Purchase") {
-                $data = Purchase::select('reference AS refno', 'suppliers.name', 'qty_supplied')
-                    ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
-                    ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
-                    ->where(DB::raw('DATE(purchase_date)'), $date)
-                    ->where('reference', $card->refno)
-                    ->where(['purchase_products.product_id' => $product_id, 'purchase_products.status' => 1])
-                    ->where('suppliers.branch_id', 'LIKE', User::userBranchAction())
-                    ->first();
-                $name = optional($data)->name;
-            }
-            if ($card->type == "Transfer") {
-                $data = TransferProduct::select('refno AS refno', 'stock_in_out')
-                    ->join('stores', 'stores.id', 'transfer_products.source_store_id')
-                    ->where(DB::raw('DATE(transfer_date)'), $date)
-                    ->where('refno', $card->refno)
-                    ->where('stores.branch_id', 'LIKE', User::userBranchAction())
-                    ->where(['product_id' => $product_id, 'transfer_products.status' => 'Completed'])
-                    ->first();
-                $name = optional($data)->stock_in_out == "in" ? "Recieved Item" : "Transfered Item";
-            }
-            if ($card->type == "Adjustment") {
-                $data = StockAdjustment::select('refno AS refno', 'adjusted_qty')
-                    ->join('stores', 'stores.id', 'stock_adjustments.store_id')
-                    ->where(DB::raw('DATE(date)'), $date)
-                    ->where('refno', $card->refno)
-                    ->where(['product_id' => $product_id])
-                    ->where('branch_id', 'LIKE', User::userBranchAction())
-                    ->first();
-                $name = "Adjusted Item";
-            }
-            if ($card->type == "Opening Balance") {
-                $name = "Opening Balance";
-            }
 
-            $qty_sold = StockCard::where(['status' => 1, 'type' => 'Sale'])->where('id', '=', $card->id)->first();
-            $qty_puchase = StockCard::where(['status' => 1, 'type' => 'Purchase'])->where('id', '=', $card->id)->first();
-            $qty_adjust = StockCard::where(['status' => 1, 'type' => 'Adjustment'])->where('id', '=', $card->id)->first();
-            $qty_tran_recv = StockCard::where(['status' => 1, 'type' => 'Transfer'])->where('id', '=', $card->id)->first();
-            $record .= "<tr><td>" . Carbon::parse($card->date)->toFormattedDateString() . "</td><td>" .
-                optional($card)->refno . "</td><td>" .
-                number_format($qty_in_stock, 0) . "</td><td>" .
-                number_format(optional($qty_sold)->dr, 0) . "</td><td>" .
-                number_format(optional($qty_puchase)->cr, 0) . "</td><td>" .
-                number_format((optional($qty_adjust)->cr - optional($qty_adjust)->dr), 0) . "</td><td>" .
-                number_format(optional($qty_tran_recv)->dr, 0) . "</td><td>" .
-                number_format(optional($qty_tran_recv)->cr, 0) . "</td><td>" .
-                $name . "</td><td>";
+        if ($branch_id == "all" || $branch_id == "")
+            $branch_id = "%";
+        if ($store_id == "all" || $store_id == "")
+            $store_id = "%";
 
-            $balance = $qty_in_stock + optional($qty_puchase)->cr - optional($qty_sold)->dr + (optional($qty_adjust)->cr - optional($qty_adjust)->dr) + optional($qty_tran_recv)->cr - optional($qty_tran_recv)->dr;
-            /*if ($count == 0) {
-                $in_stock = StockCard::where(['store_id' => $store_id, 'product_id' => $product_id, 'status' => 1])->where(DB::raw('DATE(date)'), '<', $card->date)->sum('cr');
-                $out_stock = StockCard::where(['store_id' => $store_id, 'product_id' => $product_id, 'status' => 1])->where(DB::raw('DATE(date)'), '<', $card->date)->sum('dr');
-                $qty_in_stock = $in_stock - $out_stock;
-            }*/
-            $qty_in_stock = $balance;
-            if ($balance < 0)
-                $record .= "(" . number_format(abs($balance), 0) . ")";
-            else
-                $record .= "" . number_format($balance, 0);
+        if ($product_id == "all" || $product_id == "")
+            $product_id = "%";
 
-            $record . "</td></tr>";
-            $count++;
-        }
+        $records = StockCard::select('date', 'branch_id', 'cr', 'dr', 'products.name AS product_name', 'products.name AS product_code', 'branches.code AS branch_code', 'refno', 'stores.code AS store_code', 'qty_before', 'qty_after')
+            ->join('products', 'products.id', 'stock_cards.product_id')
+            ->join('stores', 'stores.id', 'stock_cards.store_id')
+            ->join('branches', 'branches.id', 'stores.branch_id')
+            ->join('general_account_ledgers', 'general_account_ledgers.reference', 'stock_cards.refno')
+            ->where('stock_cards.product_id', 'LIKE', $product_id)
+            ->where('stores.branch_id', 'LIKE', $branch_id)
+            ->where('stock_cards.store_id', 'LIKE', $store_id)
+            ->whereBetween('date', [$from_date, $to_date])->get();
 
-        $product = Product::find($product_id);
-        $product = StoreProduct::select('store_products.qty_available', 'products.name AS item', 'stores.name AS store')
-            ->where(['product_id' => $product_id])
-            ->where('stores.branch_id', 'LIKE', User::userBranchAction())
-            ->join('products', 'products.id', 'store_products.product_id')
-            ->join('stores', 'stores.id', 'store_products.store_id')
-            ->first();
+        if ($branch_id == "%" || $branch_id == "")
+            $branch_id = "all";
+        if ($store_id == "%" || $store_id == "")
+            $store_id = "all";
+        if ($product_id == "%" || $product_id == "")
+            $product_id = "all";
+        $branch = null;
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+
         return view('pages.reports.stock_control.print_stock_ledger_report', [
-            'result' => $record,
+            'results' => $records,
             'from_date' => $from_date,
             'to_date' => $to_date,
-            'category_id' => $category_id,
-            'product_id' => $product_id,
-            'product' => $product
-            ,
-            'qty_in_stock' => $qty_in_stock
         ]);
     }
 
@@ -2924,10 +2809,10 @@ class ReportController extends Controller
         $branch = Branch::find($branch_id);
         $sum_cr_b_d = $this->generalAccountLedgerB4D($from_date, $branch_id)->sum('credit');
         $sum_dr_b_d = $this->generalAccountLedgerB4D($from_date, $branch_id)->sum('debit');
-        
-        return view('pages.reports.ap_ar.statements.load_account_balances', compact('ledgers', 'branch', 'from_date', 'to_date', 'balance', 'credit_sum', 'debit_sum','sum_cr_b_d','sum_dr_b_d'));
+
+        return view('pages.reports.ap_ar.statements.load_account_balances', compact('ledgers', 'branch', 'from_date', 'to_date', 'balance', 'credit_sum', 'debit_sum', 'sum_cr_b_d', 'sum_dr_b_d'));
     }
-    
+
     public function trialBalance()
     {
         $branches = Branch::select(['id', 'name', 'code'])->orderBy('name')->get();
@@ -2969,13 +2854,13 @@ class ReportController extends Controller
             ->where('general_account_ledgers.branch_id', 'like', $branch_id)
             ->whereBetween('date', [$from_date, $to_date]);
     }
-   
+
     private function generalAccountLedgerB4D($from_date, $branch_id)
     {
-         //To get account balance before start date 
+        //To get account balance before start date 
         return GeneralAccountLedger::join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
             ->where('general_account_ledgers.branch_id', 'like', $branch_id)
-            ->whereDate('date', '<',$from_date);
+            ->whereDate('date', '<', $from_date);
     }
 
 }

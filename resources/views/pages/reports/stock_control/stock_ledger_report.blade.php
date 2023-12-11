@@ -52,30 +52,30 @@
                                     name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
                             </div>
                             
+                           
                             <div class="form-group">
-                                &nbsp;&nbsp;
-                                <label for="category_id">Category</label>
-                                <select class="form-control select2-single {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
-                                    name="category_id" id="category_id">
-                                    <option value="">Select...</option>
-                                    @foreach ($categories as $data)
-                                        <option value="{{ $data->id }}">{{ $data->name }}
-                                        </option>
-                                    @endforeach
+                                <label for="branch_id">Branch</label>
+                                <select class="form-control select2-single ajax-branches"
+                                        name="branch_id"
+                                        id="branch_id">
                                 </select>
+                               
                             </div>
                             <div class="form-group">
-                                &nbsp;&nbsp;
-                                <label for="product_id">Product</label>
-                                <select
-                                    class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
-                                    name="product_id" id="product_id">
-                                    <option value="">Select...</option>
-                                    @foreach ($products as $data)
-                                        <option value="{{ $data->id }}">{{ $data->name }}
-                                        </option>
-                                    @endforeach
+                                <label for="store_id">Store</label>
+                                <select class="form-control select2-single ajax-stores"
+                                        name="store_id"
+                                        id="store_id">
                                 </select>
+                               
+                            </div>
+                            <div class="form-group">
+                                <label for="product_id">Product</label>
+                                <select class="form-control select2-single ajax-products"
+                                        name="product_id"
+                                        id="product_id">
+                                </select>
+                               
                             </div>
                             <div class="form-group text-right ">
                                 <input type="button" class="btn btn-primary" id="generate" name="generate"
@@ -99,16 +99,6 @@
 @endsection
 
 @push('js')
-    <!-- DataTables -->
-    <!-- DataTables -->
-    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
-    <!-- SlimScroll -->
-    <script src="{{ asset('assets/backend/plugins/slimScroll/jquery.slimscroll.min.js') }}"></script>
-    <!-- FastClick -->
-    <script src="{{ asset('assets/backend/plugins/fastclick/fastclick.js') }}"></script>
-
-    <!-- Sweet Alert Js -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>
     <script type="text/javascript">
         $(function() {
             function formatMoney(n, c, d, t) {
@@ -122,28 +112,13 @@
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
 
-            $('#category_id,#store_id').on("change", function() {
-                category_id = $('#category_id').val();
-                store_id = $('#store_id').val();
-
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route('ajax.load.store.products') }}",
-                    data: {
-                        category_id: category_id,
-                        store_id: store_id
-                    }
-                }).done(function(data) {
-                    $("#product_id").html("<option value='all'>All</option>" + data);
-                });
-            });
 
             $('#generate').on("click", function() {
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
-                product_id = $('#product_id').val();
+                branch_id = $('#branch_id').val();
                 store_id = $('#store_id').val();
-                category_id = $('#category_id').val();
+                product_id = $('#product_id').val();
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.stock.ledger.reports') }}",
@@ -151,9 +126,10 @@
                         _token: "{{ csrf_token() }}",
                         from_date:from_date,
                         to_date:to_date,
-                        product_id: product_id,
+                        branch_id: branch_id,
                         store_id: store_id,
-                        category_id: category_id
+                        product_id: product_id              
+                    
                     }
                 }).done(function(data) {
                     $("#load").html(data);

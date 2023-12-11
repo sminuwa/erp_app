@@ -3,7 +3,8 @@
         <tr>
             <th>Code</th>
             <th>Branch</th>
-            <th>Product</th>
+            <th>Item Code</th>
+            <th>Description</th>
             <th>C Price </th>
             <th>R Price </th>
             <th>W Price </th>
@@ -17,6 +18,7 @@
             <tr>
                 <td> {{ $record->branch_code }} </td>
                 <td> {{ $record->branch_name }} </td>
+                <td> {{ $record->product_code }} </td>
                 <td> {{ $record->product_name }} </td>
                 <td style="text-align: right"> {{ number_format(str_replace(',', '', $record->cost_price), 2) }} </td>
                 <td style="text-align: right">
@@ -26,7 +28,7 @@
                     &#8358;{{ number_format(str_replace(',', '', $record->whole_selling_price), 2) }}
                 </td>
                 <td> {{ $record->status == 1 ? 'Active' : 'Inactive' }} </td>
-                <td> {{ $record->user->name ?? '' }} </td>
+                <td> {{ ucfirst($record->user->name) ?? '' }} </td>
                 <td>
                     <div class="dropdown">
                         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton"

@@ -21,7 +21,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Sales Transactions</h4>
+                        <h4>Sales by Category</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -58,21 +58,10 @@
                                 </select>
 
                             </div>
-                            <div class="form-group">
-                                <label for="store_id">Store</label>
-                                <select class="form-control select2-single ajax-stores" name="store_id" id="store_id">
-                                </select>
-
-                            </div>
+                            
                             <div class="form-group">
                                 <label for="category_id">Category</label>
                                 <select class="form-control select2-single ajax-categories" name="category_id" id="category_id">
-                                </select>
-
-                            </div>
-                            <div class="form-group">
-                                <label for="product_id">Product</label>
-                                <select class="form-control select2-single ajax-products" name="product_id" id="product_id">
                                 </select>
 
                             </div>
@@ -146,22 +135,18 @@
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
                 branch_id = $('#branch_id').val();
-                product_id = $('#product_id').val();
-                store_id = $('#store_id').val();
                 category_id = $('#category_id').val();
                 customer_id = $('#customer_id').val();
                 type = $('#type').val();
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
-                    url: "{{ route('ajax.general.sales.report') }}",
+                    url: "{{ route('ajax.category.sales.report') }}",
                     data: {
                         _token: "{{ csrf_token() }}",
                         from_date: from_date,
                         to_date: to_date,
                         branch_id: branch_id,
-                        product_id: product_id,
-                        store_id: store_id,
                         category_id: category_id,
                         customer_id: customer_id,
                         type: type

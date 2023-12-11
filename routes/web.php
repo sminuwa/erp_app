@@ -813,8 +813,13 @@ Route::middleware('auth')->group(function () {
             //General Sales Report
             Route::get('/sa/sales', [ReportController::class, 'generalSaleReport'])->name('general.sales.report');
             Route::get('/sa/sales/load', [ReportController::class, 'loadGeneralSaleReport'])->name('ajax.general.sales.report');
-            Route::get('/sa/sales/print/{from_date}/{to_date}/{store_id}/{category_id}/{product_id}/{customer_id}/{type}', [ReportController::class, 'printGeneralSaleReport'])->name('ajax.general.sales.report.print');
+            Route::get('/sa/sales/print/{from_date}/{to_date}/{branch_id}/{store_id}/{category_id}/{product_id}/{customer_id}/{type}', [ReportController::class, 'printGeneralSaleReport'])->name('ajax.general.sales.report.print');
 
+             //Category Sales Report
+             Route::get('/sa/sales/category', [ReportController::class, 'categorySaleReport'])->name('sales.report.by.category');
+             Route::get('/sa/sales/category/load', [ReportController::class, 'loadCategorySaleReport'])->name('ajax.category.sales.report');
+             Route::get('/sa/sales/category/print/{from_date}/{to_date}/{branch_id}/{category_id}/{customer_id}/{type}', [ReportController::class, 'printCategorySaleReport'])->name('ajax.category.sales.report.print');
+            
             //Staff Sales Report
             Route::get('/sa/sales/staff', [ReportController::class, 'staffSaleReport'])->name('staff.sales.report');
             Route::get('/sa/sales/staff/load', [ReportController::class, 'loadStaffSaleReport'])->name('ajax.staff.sales.report');
@@ -947,8 +952,8 @@ Route::middleware('auth')->group(function () {
             Route::group(['prefix' => 'ap_ar'], function () {
                 Route::get('/account_balances', [ReportController::class, 'accountBalance'])->name('account.balance.report');
                 Route::get('/account_balances/load', [ReportController::class, 'loadAccountBalance'])->name('ajax.load.account.balance.report');
-                Route::get('/account_balances/print/{collector_id}', [ReportController::class, 'printAccountBalance'])->name('ajax.account.balance.report.print');
-
+                Route::get('/account_balances/print/{from_date}/{to_date}/{payer_id}/{branch_id}/{type}', [ReportController::class, 'printAccountBalance'])->name('ajax.account.balance.report.print');
+            
                 Route::get('/trial_balance', [ReportController::class, 'trialBalance'])->name('trial.balance.report');
                 Route::get('/trial_balance/load', [ReportController::class, 'loadTrialBalance'])->name('ajax.load.trial.balance.report');
                 Route::get('/trial_balance/print/{from}/{to}/{branch}', [ReportController::class, 'printTrialBalance'])->name('ajax.print.trial.balance.report');

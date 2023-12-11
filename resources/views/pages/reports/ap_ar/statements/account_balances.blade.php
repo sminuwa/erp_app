@@ -66,6 +66,13 @@
                                         @endif
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label for="branch_id">Branch</label>
+                                    <select class="form-control select2-single ajax-branches" name="branch_id"
+                                        id="branch_id">
+                                    </select>
+
+                                </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         @if (isset($model) && $model->model_name == 'Customer')
@@ -134,11 +141,8 @@
 @endsection
 
 @push('js')
-    <!-- DataTables -->
-    <!-- DataTables -->
-    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
-  
-    
+   
+
     <script type="text/javascript">
         $(function () {
             function formatMoney(n, c, d, t) {
@@ -173,6 +177,7 @@
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
                 payer_id = $('#payer_id').val();
+                branch_id = $('#branch_id').val();
                 type = $('#type').val();
                 
                 
@@ -184,6 +189,7 @@
                         from_date: from_date,
                         to_date: to_date,
                         payer_id: payer_id,
+                        branch_id: branch_id,
                         type: type
                     }
                 }).done(function (data) {

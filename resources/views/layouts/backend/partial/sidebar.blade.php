@@ -532,7 +532,14 @@
                                             <a href="{{ route('general.sales.report') }}"
                                                 class="nav-link {{ Request::is('reports//sa/sales/*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
-                                                <p>Sales Transaction Report</p>
+                                                <p>General Sales Report</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('sales.report.by.category') }}"
+                                                class="nav-link {{ Request::is('reports//sa/sales/*') ? 'active' : '' }}">
+                                                <i class="ion-code-working"></i>
+                                                <p>Sales by Category</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">

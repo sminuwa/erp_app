@@ -87,7 +87,7 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-12 table-responsive" id="load">
-
+                        <img src="{{ asset('assets/backend/img/loader.png') }}" style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
@@ -119,6 +119,7 @@
                 branch_id = $('#branch_id').val();
                 store_id = $('#store_id').val();
                 product_id = $('#product_id').val();
+                $('#img-loader').show();
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.stock.ledger.reports') }}",
@@ -132,6 +133,7 @@
                     
                     }
                 }).done(function(data) {
+                    $('#img-loader').hide();
                     $("#load").html(data);
                     $('#example1').DataTable({
                         dom: 'Bfrtip',

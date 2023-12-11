@@ -9,11 +9,16 @@
         <h5 style="text-align: center;">{{ strtoupper($branch->name) }} <br>
             GENERAL LEDGER BETWEEN {{ Carbon\carbon::parse($from_date)->toFormattedDateString() }} AND
             {{ Carbon\carbon::parse($to_date)->toFormattedDateString() }}
-            <br /> Runining Balance B/d Before this date {{ Carbon\carbon::parse($from_date)->toFormattedDateString() }} was = @if ($sum_dr_b_d - $sum_cr_b_d < 0)
-                &#8358;({{ number_format(abs($sum_dr_b_d - $sum_cr_b_d), 2) }})
+            <br /> B/F = @if ($balance_b_d < 0)
+                &#8358;({{ number_format(abs($balance_b_d), 2) }})
             @else
-                &#8358;{{ number_format($sum_dr_b_d - $sum_cr_b_d, 2) }}
+                &#8358;{{ number_format($balance_b_d, 2) }}
             @endif
+            <br /> B/C = @if ($balance < 0)
+            &#8358;({{ number_format(abs($balance), 2) }})
+        @else
+            &#8358;{{ number_format($balance, 2) }}
+        @endif
         </h5>
     </caption>
     <?php $sum_cr = $sum_cr_b_d;
@@ -57,7 +62,7 @@
             <td style="text-align: right">
                 <?php $sum_cr += $ledger->credit;
                 $sum_dr += $ledger->debit;
-                $dif = $sum_dr - $sum_cr;
+                $dif = $sum_cr - $sum_dr;
                 ?>
                 @if ($dif < 0)
                     &#8358;({{ number_format(abs($dif), 2) }})
@@ -68,9 +73,15 @@
         </tr>
     @endforeach
     <tr>
-        <th></th>
-        <th colspan="3">Total</th>
+        
+        <th colspan="4" style="text-align: right">Total</th>
         <th style="text-align: right;">&#8358;{{ number_format($credit_sum, 2) }}</th>
         <th style="text-align: right;">&#8358;{{ number_format($debit_sum, 2) }}</th>
+        <th></th>
+    </tr>
+    <tr>
+        <th colspan="4" style="text-align: right">Balance C/F</th>
+        <th colspan="3" style="text-align: right;">&#8358;{{ number_format($balance, 2) }}</th>
+       
     </tr>
 </table>

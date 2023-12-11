@@ -1,0 +1,72 @@
+<div class="row">
+    <div class="offset-10">
+        <a href="{{ route('ajax.category.sales.report.print', [$from_date, $to_date, $branch_id, $category_id, $customer_id, $type]) }}"
+            target="_BLANK" class="btn-success btn btn-sm">Print</a>
+    </div>
+</div>
+<table class="table table-bordered caption" id="example1" data-ordering="false">
+    <caption style="caption-size:top">
+        <h3 style="text-align: center;">{{ $branch == null ? 'All Branches' : $branch->name . "($branch->code)" }} </h3>
+        <h5 style="text-align: center;">{{ ucfirst($type) }} Sale Transactions
+            From
+            {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
+            AND
+            {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
+        </h5>
+    </caption>
+    <thead>
+        <tr>
+            <th>CATEGORY</th>
+            <th>QTY</th>
+            <th>AMOUNT(&#8358;)</th>
+            <th>COST(&#8358;)</th>
+            <th>MARGIN(&#8358;)</th>
+            <th>MARGIN (%)</th>
+        </tr>
+    </thead>
+    @php
+        $total_amount = 0;
+        $total_cost = 0;
+        $total_profit = 0;
+        $grand_total_profit = 0;
+    @endphp
+    @foreach ($sales as $sale)
+        <tr>
+            <td>{{ $sale->category }}</td>
+            <td>{{ $sale->quantity }}</td>
+            <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}</td>
+            <td style="text-align: right">{{ number_format($sale->cost, 2, '.', ',') }}</td>
+            <td style="text-align: right">
+                @php
+                    $total_profit = $sale->amount - $sale->cost;
+                    $grand_total_profit += $total_profit;
+                    $total_amount += $sale->amount;
+                    $total_cost += $sale->cost;
+                @endphp
+                @if ($total_profit < 0)
+                    ({{ number_format(abs($total_profit), 2, '.', ',') }})
+                @else
+                    {{ number_format($total_profit, 2) }}
+                @endif
+            </td>
+            <td style="text-align: right">{{ round(($total_profit / $sale->amount) * 100, 2) }}</td>
+        </tr>
+    @endforeach
+    <tfoot>
+        <tr>
+            <th colspan="2" style="text-align: right">TOTAL</th>
+            <th style="text-align: right">
+                &#8358;{{ number_format($total_amount, 2, '.', ',') }}</th>
+            <th style="text-align: right">
+                &#8358;{{ number_format($total_cost, 2, '.', ',') }}</th>
+            <th style="text-align: right">
+                @if ($grand_total_profit < 0)
+                    &#8358;({{ number_format(abs($grand_total_profit), 2, '.', ',') }})
+                @else
+                    &#8358;{{ number_format($grand_total_profit, 2) }}
+                @endif
+            </th>
+            <th></th>
+        </tr>
+    </tfoot>
+</table>

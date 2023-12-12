@@ -37,9 +37,8 @@
                             <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
                                 style="width:80px;height:80px;" alt="Albabello Logo" class="img-circle elevation-3"
                                 style="opacity: .8">
-                            <h3>
-                                {{ App\Models\User::UserBranchName()->long_name }}
-                            </h3>
+                            <h3 style="text-align: center;">
+                                {{ $branch == null ? 'All Branches' : $branch->name . "($branch->code)" }} </h3>
                             <h5 style="text-align: center;">{{ $type == '%' ? 'All' : $type }} SALES
                                 REPORT
                                 BETWEEN
@@ -82,15 +81,18 @@
                                 @endphp
                                 @foreach ($sales as $sale)
                                     <tr>
-                                        <td>{{ $sale->order_id }}-{{ \Carbon\Carbon::parse($sale->order_date)->toFormattedDateString() }}</td>
+                                        <td>{{ $sale->order_id }}-{{ \Carbon\Carbon::parse($sale->order_date)->toFormattedDateString() }}
+                                        </td>
                                         <td>{{ $sale->product_code }}</td>
                                         <td>{{ $sale->product_name }}</td>
                                         <td>{{ $sale->store_code }}</td>
                                         <td>{{ $sale->reference }}</td>
                                         <td>{{ $sale->customer }}</td>
                                         <td>{{ $sale->quantity }}</td>
-                                        <td style="text-align: right">{{ number_format($sale->cost_price, 2, '.', ',') }}</td>
-                                        <td style="text-align: right">{{ number_format($sale->sold_price, 2, '.', ',') }}</td>
+                                        <td style="text-align: right">
+                                            {{ number_format($sale->cost_price, 2, '.', ',') }}</td>
+                                        <td style="text-align: right">
+                                            {{ number_format($sale->sold_price, 2, '.', ',') }}</td>
                                         <td style="text-align: right">
                                             {{ number_format($sale->cost_price * $sale->quantity, 2, '.', ',') }}</td>
                                         <td style="text-align: right">
@@ -112,19 +114,24 @@
                                         @foreach ($credit_notes as $note)
                                             @foreach ($note->credit_note_items()->get() as $item)
                                                 <tr>
-                                                    <td>{{ \Carbon\Carbon::parse($note->date)->toFormattedDateString() }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($note->date)->toFormattedDateString() }}
+                                                    </td>
                                                     <td>{{ $item->storeProduct->product->code }}</td>
                                                     <td>{{ $item->storeProduct->product->name }}</td>
                                                     <td>{{ $item->storeProduct->store->code }}</td>
                                                     <td>{{ $note->reference }}</td>
                                                     <td>{{ $sale->customer }}</td>
                                                     <td>{{ $item->quantity }}</td>
-                                                    <td style="text-align: right">{{ number_format($item->cost_price, 2, '.', ',') }}</td>
-                                                    <td style="text-align: right">-{{ number_format($item->sold_price, 2, '.', ',') }}</td>
                                                     <td style="text-align: right">
-                                                        {{ number_format($item->cost_price * $item->quantity, 2, '.', ',') }}</td>
+                                                        {{ number_format($item->cost_price, 2, '.', ',') }}</td>
                                                     <td style="text-align: right">
-                                                        {{ number_format(-$item->sold_price * $item->quantity, 2, '.', ',') }}</td>
+                                                        -{{ number_format($item->sold_price, 2, '.', ',') }}</td>
+                                                    <td style="text-align: right">
+                                                        {{ number_format($item->cost_price * $item->quantity, 2, '.', ',') }}
+                                                    </td>
+                                                    <td style="text-align: right">
+                                                        {{ number_format(-$item->sold_price * $item->quantity, 2, '.', ',') }}
+                                                    </td>
                                                     <td style="text-align: right">
                                                         @php
                                                             $total_profit += -$item->sold_price * $item->quantity - $item->cost_price * $item->quantity;

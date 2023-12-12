@@ -19,7 +19,14 @@
         </tr>
     </thead>
     <tbody>
-        @php $qty_in_stock = 0; @endphp
+        @php
+            $qty_in_stock = 0;
+            $available_qty = 0;
+            $qty_before = $qty_available;
+            $qty_after = 0;
+            //$available_qty = $qty_available;
+        @endphp
+
         @foreach ($records as $record)
             <tr>
                 <td>{{ Carbon\Carbon::parse($record->date)->toFormattedDateString() }}</td>
@@ -29,30 +36,38 @@
                 <td>
                     @if ($record->cr > 0)
                         {{ $quantity = $record->cr }}
-                        @php $qty_in_stock +=$quantity; @endphp
+                        @php 
+                            $qty_after = $qty_before + $quantity;
+                        @endphp
                     @else
                         -{{ $quantity = $record->dr }}
-                        @php $qty_in_stock -=$quantity; @endphp
+                        @php
+                            $qty_after = $qty_before - $quantity;
+                        @endphp
                     @endif
                 </td>
                 <td>
                     @if ($record->model_name == 'Customer')
                         {{ App\Models\Customer::find($record->model_id)->code }}
-                    {{-- @elseif($record->model_name == 'GeneralAccount')
+                        {{-- @elseif($record->model_name == 'GeneralAccount')
                         {{ App\Models\GeneralAccount::find($record->model_id)->description }} --}}
                     @elseif($record->model_name == 'Supplier')
                         {{ App\Models\Supplier::find($record->model_id)->code }}
                     @endif
                 </td>
-                <td>{{ $record->qty_before }}</td>
-                <td>{{ $record->qty_before }}</td>
+
+                <td>{{ $qty_before }}</td>
+                <td>{{ $qty_after }}</td>
+                @php
+                    $qty_before = $qty_after;
+                @endphp
             </tr>
         @endforeach
     </tbody>
     <tfoot>
         <tr>
             <td colspan="7" align="right">Current Stock Balance B/F</td>
-            <td>{{ number_format($qty_in_stock, 0) }}</td>
+            <td>{{ number_format($qty_after, 0) }}</td>
         </tr>
     </tfoot>
 </table>

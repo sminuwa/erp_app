@@ -1,13 +1,13 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.category.sales.report.print', [$from_date, $to_date, $branch_id, $category_id, $customer_id, $type]) }}"
+        <a href="{{ route('ajax.category.sales.report.print', [$from_date, $to_date, $branch_id, $category_id1,$category_id2]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
 <table class="table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
         <h3 style="text-align: center;">{{ $branch == null ? 'All Branches' : $branch->name . "($branch->code)" }} </h3>
-        <h5 style="text-align: center;">{{ ucfirst($type) }} Sale Transactions
+        <h5 style="text-align: center;">Sale Transactions By Categoery
             From
             {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
             AND

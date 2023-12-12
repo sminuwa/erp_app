@@ -69,7 +69,7 @@
         @php $credit_notes = App\Models\Order::find($sale->order_id)->creditNotes @endphp
         @if ($credit_notes != null)
             @foreach ($credit_notes as $note)
-                @foreach ($note->credit_note_items()->get() as $item)
+                @foreach ($note->credit_note_items()->where('store_product_id',$sale->store_product_id)->get() as $item)
                     <tr>
                         <td>{{ \Carbon\Carbon::parse($note->date)->toFormattedDateString() }}</td>
                         <td>{{ $item->storeProduct->product->code }}</td>

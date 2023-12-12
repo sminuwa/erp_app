@@ -60,23 +60,16 @@
                             </div>
                             
                             <div class="form-group">
-                                <label for="category_id">Category</label>
-                                <select class="form-control select2-single ajax-categories" name="category_id" id="category_id">
+                                <label for="category_id1">From Category</label>
+                                <select class="form-control select2-single ajax-categories" name="category_id1" id="category_id1">
                                 </select>
 
                             </div>
                             <div class="form-group">
-                                <label for="type">Customer Type</label>
-                                <select class="form-control type" id="type" name="type">
-                                    <option value="all">Select...</option>
-                                    <option value="Retail">Retail</option>
-                                    <option value="Wholesale">Wholesale</option>
+                                <label for="category_id2">To Category</label>
+                                <select class="form-control select2-single ajax-categories" name="category_id2" id="category_id2">
                                 </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="customer_id">Customers</label>
-                                <select class="form-control select2-single ajax-customers" name="customer_id" id="customer_id">
-                                </select>
+
                             </div>
                             <div class="form-group text-right ">
                                 <input type="button" class="btn btn-primary" id="generate" name="generate"
@@ -135,9 +128,9 @@
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
                 branch_id = $('#branch_id').val();
-                category_id = $('#category_id').val();
-                customer_id = $('#customer_id').val();
-                type = $('#type').val();
+                category_id1 = $('#category_id1').val();
+                category_id2 = $('#category_id2').val();
+               
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
@@ -147,9 +140,8 @@
                         from_date: from_date,
                         to_date: to_date,
                         branch_id: branch_id,
-                        category_id: category_id,
-                        customer_id: customer_id,
-                        type: type
+                        category_id1: category_id1,
+                        category_id2: category_id2
                     }
                 }).done(function(data) {
                     $('#img-loader').hide();

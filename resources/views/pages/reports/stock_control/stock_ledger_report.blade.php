@@ -8,7 +8,6 @@
         caption {
             caption-side: top;
         }
-
     </style>
 @endpush
 
@@ -43,39 +42,36 @@
                             <div class="form-group">
                                 <label for="from_date">From Date</label>
                                 <input type="text"
-                                    class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}" autocomplete="off"
-                                    name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="">
+                                    class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
+                                    autocomplete="off" name="from_date" id="from_date" value="{{ old('from_date') }}"
+                                    placeholder="">
                             </div>
                             <div class="form-group">
                                 <label for="to_date">To Date</label>
-                                <input type="text" class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}" autocomplete="off"
-                                    name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
+                                <input type="text"
+                                    class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
+                                    autocomplete="off" name="to_date" id="to_date" value="{{ old('to_date') }}"
+                                    placeholder="">
                             </div>
-                            
-                           
+
+
                             <div class="form-group">
                                 <label for="branch_id">Branch</label>
-                                <select class="form-control select2-single ajax-branches"
-                                        name="branch_id"
-                                        id="branch_id">
+                                <select class="form-control select2-single ajax-branches" name="branch_id" id="branch_id">
                                 </select>
-                               
+
                             </div>
                             <div class="form-group">
                                 <label for="store_id">Store</label>
-                                <select class="form-control select2-single ajax-stores"
-                                        name="store_id"
-                                        id="store_id">
+                                <select class="form-control select2-single ajax-stores" name="store_id" id="store_id">
                                 </select>
-                               
+
                             </div>
                             <div class="form-group">
                                 <label for="product_id">Product</label>
-                                <select class="form-control select2-single ajax-products"
-                                        name="product_id"
-                                        id="product_id">
+                                <select class="form-control select2-single ajax-products" name="product_id" id="product_id">
                                 </select>
-                               
+
                             </div>
                             <div class="form-group text-right ">
                                 <input type="button" class="btn btn-primary" id="generate" name="generate"
@@ -87,7 +83,8 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-12 table-responsive" id="load">
-                        <img src="{{ asset('assets/backend/img/loader.png') }}" style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                        <img src="{{ asset('assets/backend/img/loader.png') }}"
+                            style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
@@ -119,18 +116,22 @@
                 branch_id = $('#branch_id').val();
                 store_id = $('#store_id').val();
                 product_id = $('#product_id').val();
+                if (!product_id > 0) {
+                    alert("Please select a product")
+                    return false;
+                }
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.stock.ledger.reports') }}",
                     data: {
                         _token: "{{ csrf_token() }}",
-                        from_date:from_date,
-                        to_date:to_date,
+                        from_date: from_date,
+                        to_date: to_date,
                         branch_id: branch_id,
                         store_id: store_id,
-                        product_id: product_id              
-                    
+                        product_id: product_id
+
                     }
                 }).done(function(data) {
                     $('#img-loader').hide();

@@ -1045,9 +1045,9 @@ class ReportController extends Controller
             ->where('order_details.status', 1)
             ->where(DB::raw("DATE(order_date)"), '>=', $from_date)
             ->where(DB::raw("DATE(order_date)"), '<=', $to_date);
-        if ($category_id2 == '' || $category_id2 == 'all') {
+        if ($category_id2 == '%' && $category_id1 != '%') {
             $sales = $sales->where('products.category_id', 'LIKE', $category_id1);
-        } elseif ($category_id2 != '' || $category_id2 != 'all') {
+        } elseif ($category_id2 != '%') {
             $sales = $sales->where('products.category_id', '>=', $category_id1)
                 ->where('products.category_id', '<=', $category_id2);
         }

@@ -68,6 +68,7 @@
                                         <tr>
                                             <th>Date</th>
                                             <th>Reference</th>
+                                            <th>Description</th>
                                             <th>Name</th>
                                             <th>Total</th>
                                             <th>Actions</th>
@@ -89,6 +90,7 @@
                                                 <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}
                                                 </td>
                                                 <td>{{ $order->reference }}</td>
+                                                <td>{{ $order->description }}</td>
                                                 <td>{{ $order->customer->name }}</td>
                                                 <td align="right">&#8358;{{ number_format($order->total, 2, '.', ',') }}
                                                 </td>

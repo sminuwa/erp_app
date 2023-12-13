@@ -92,10 +92,9 @@
                                                             id="credit_balance"></span>
                                                     </div>
                                                 </div>
-                                                {{-- <div class="form-group" style="border: 1px solid rgba(64, 44, 45, 0.4)">
-                                                    <input type="text" class="form-control" name="reference" id="reference"
-                                                        placeholder="Reference" />
-                                                </div> --}}
+                                                <div class="form-group">
+                                                    <textarea class="form-control" name="description" placeholder="Description" id="description"></textarea>
+                                                </div>
                                                 <button type="submit" id="create_invoice"
                                                     class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button>
                                             </div>
@@ -115,6 +114,11 @@
                                     <input type="text" id="barcode" class="form-control" name="barcode"
                                         placeholder="Scan barcode">
                                 @endcannot
+                            </div>
+                            <div class="float-right">
+                                <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
+                                    class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
+                                        class="fa fa-plus"></i> Add Product </a>
                             </div>
                         </div>
                         <!-- /.card -->
@@ -149,7 +153,83 @@
         <!-- /.content -->
     </div> <!-- Content Wrapper end -->
 
-    <!--  modal create customer -->
+    <div class="modal fade" id="add_product_form" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add product to cart</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('ajax.cart.add') }}" method="POST" class="addCartItemForm">
+                        <input type="hidden" name="customer" class="customer"
+                            value="@if (session()->has('customer')) {{ session('customer')->id }} @endif">
+                        <input type="hidden" name="type" value="{{ 'order' }}" />
+                        @csrf
+
+                        <div class="form-group">
+                            <label for="product_id">Product Name</label>
+                            <select
+                                class="form-control select2-single ajax-products {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
+                                name="product_id" id="product_id" required="required">
+                                <option value="">Select...</option>
+                                @if (isset($products))
+
+                                    @foreach ($products as $data)
+                                        <option value="{{ $data->id }}"
+                                            {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>
+                                            {{ $data->code }}-{{ $data->name }}</option>
+                                    @endforeach
+
+                                @endif
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="qty">Quantity</label>
+                            <input type="number" class="form-control {{ $errors->has('qty') ? ' is-invalid' : '' }}"
+                                name="qty" id="qty" placeholder="" required="required">
+                            @if ($errors->has('qty'))
+                                <div class="invalid-feedback">
+                                    <strong>{{ $errors->first('qty') }}</strong>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="form-group">
+                            <label for="cost_price">Cost Price</label>
+                            <input type="text"
+                                class="form-control {{ $errors->has('cost_price') ? ' is-invalid' : '' }}"
+                                name="cost_price" id="cost_price" placeholder="" required="required">
+                            @if ($errors->has('cost_price'))
+                                <div class="invalid-feedback">
+                                    <strong>{{ $errors->first('cost_price') }}</strong>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="form-group">
+                            <label for="store">Store</label>
+                            <select class="form-control select2-single {{ $errors->has('store') ? ' is-invalid' : '' }}"
+                                name="store" id="store" required="required">
+                                @if (isset($stores))
+                                    <option value="">Select...</option>
+                                    @foreach ($stores as $data)
+                                        <option value="{{ $data->code }}">
+                                            {{ $data->code }}-{{ $data->name }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                        <div class="form-group text-right ">
+                            <button type="submit" class="btn btn-primary"><span class="ion-android-cart"> </span>Add to
+                                Cart</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 
@@ -160,9 +240,9 @@
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script>
         /*$('.cart-container').addClass('d-none')
-                                                                        $('select[name=account_type]').change( () => {
-                                                                            $('.cart-container').removeClass('d-none')
-                                                                        })*/
+                                                                                                $('select[name=account_type]').change( () => {
+                                                                                                    $('.cart-container').removeClass('d-none')
+                                                                                                })*/
         $(function() {
             $("#example1").DataTable({
                 'iDisplayLength': 100

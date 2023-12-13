@@ -953,6 +953,11 @@ Route::middleware('auth')->group(function () {
                 Route::get('/account_balances', [ReportController::class, 'accountBalance'])->name('account.balance.report');
                 Route::get('/account_balances/load', [ReportController::class, 'loadAccountBalance'])->name('ajax.load.account.balance.report');
                 Route::get('/account_balances/print/{from_date}/{to_date}/{payer_id}/{branch_id}/{type}', [ReportController::class, 'printAccountBalance'])->name('ajax.account.balance.report.print');
+
+                //Income Statement
+                Route::get('/income_statement', [ReportController::class, 'incomeStatement'])->name('income.statement.report');
+                Route::get('/income_statement/load', [ReportController::class, 'loadIncomeStatement'])->name('ajax.load.income.statement.report');
+                Route::get('/income_statement/print/{from_month}/{to_month}/{income_year}/{branch_id}', [ReportController::class, 'printIncomeStatement'])->name('ajax.income.statement.report.print');
             
                 Route::get('/trial_balance', [ReportController::class, 'trialBalance'])->name('trial.balance.report');
                 Route::get('/trial_balance/load', [ReportController::class, 'loadTrialBalance'])->name('ajax.load.trial.balance.report');

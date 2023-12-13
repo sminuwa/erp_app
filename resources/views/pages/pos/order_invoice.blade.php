@@ -92,10 +92,10 @@
                                                             id="credit_balance"></span>
                                                     </div>
                                                 </div>
-                                                {{-- <div class="form-group" style="border: 1px solid rgba(64, 44, 45, 0.4)">
-                                                    <input type="text" class="form-control" name="reference" id="reference"
-                                                        placeholder="Reference" />
-                                                </div> --}}
+                                                <div class="form-group">
+                                                    <textarea class="form-control" name="description"
+                                                        placeholder="Description" id="description" ></textarea>
+                                                </div>
                                                 <button type="submit" id="create_invoice"
                                                     class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button>
                                             </div>

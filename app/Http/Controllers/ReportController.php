@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Branch;
+use App\Models\ChartOfAccount;
 use App\Models\GeneralAccount;
 use App\Models\GeneralAccountLedger;
 use Illuminate\Http\Request;
@@ -3020,6 +3021,127 @@ class ReportController extends Controller
         return GeneralAccountLedger::join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
             ->where('general_account_ledgers.branch_id', 'like', $branch_id)
             ->whereDate('date', '<', $from_date);
+    }
+    public function incomeStatement(Request $request)
+    {
+        return view('pages.reports.ap_ar.statements.income');
+    }
+    public function loadIncomeStatement(Request $request)
+    {
+        $branch_id = $request->branch_id;
+        $income_year = $request->income_year;
+        $from_month = $request->from_month;
+        $to_month = $request->to_month;
+        $revenue_class = ['R40'];
+        $cost_of_sale_class = ['C50'];
+        $expense_class = ['C51', 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C58', 'C59', 'C60', 'C61', 'C62', 'C63'];
+        $query = ChartOfAccount::whereYear('date', $income_year)
+            ->join('general_accounts', 'general_accounts.class', 'chart_of_accounts.class')
+            ->join('general_account_ledgers', 'model_id', 'general_accounts.id')
+            ->where('general_account_ledgers.branch_id', $branch_id);
+
+        if ($from_month == '' || $to_month == '') {
+            $query->whereMonth('date', '<=', 12);
+        }
+
+        if ($from_month != '') {
+            $query->whereMonth('date', '>=', $from_month);
+        }
+
+        if ($to_month != '') {
+            $query->whereMonth('date', '<=', $to_month);
+        }
+
+        $query->orderBy('number');
+
+        $expenses = clone $query;
+        $expenses = $expenses->whereIn('chart_of_accounts.class', $expense_class)->get();
+
+        $cost_of_sales = clone $query;
+        $cost_of_sales = $cost_of_sales->whereIn('chart_of_accounts.class', $cost_of_sale_class)->get();
+
+        $revenues = clone $query;
+        $revenues = $revenues->whereIn('chart_of_accounts.class', $revenue_class)->get();
+
+
+
+
+
+
+        $branch = null;
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        if ($from_month == '')
+            $from_month = 'all';
+
+        if ($to_month == '')
+            $to_month = 'all';
+        if ($branch_id == '')
+            $branch_id = 'all';
+        return view('pages.reports.ap_ar.statements.load_income_statement', [
+            'revenues' => $revenues,
+            'cost_of_sales' => $cost_of_sales,
+            'expenses' => $expenses,
+            'from_month' => $from_month,
+            'to_month' => $to_month,
+            'income_year' => $income_year,
+            'branch' => $branch,
+            'branch_id' => $branch_id,
+        ]);
+    }
+    public function printIncomeStatement($from_month, $to_month, $income_year, $branch_id)
+    {
+        $revenue_class = ['R40'];
+        $cost_of_sale_class = ['C50'];
+        $expense_class = ['C51', 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C58', 'C59', 'C60', 'C61', 'C62', 'C63'];
+        $query = ChartOfAccount::whereYear('date', $income_year)
+            ->join('general_accounts', 'general_accounts.class', 'chart_of_accounts.class')
+            ->join('general_account_ledgers', 'model_id', 'general_accounts.id')
+            ->where('general_account_ledgers.branch_id', $branch_id);
+
+        if ($from_month == '' || $to_month == '') {
+            $query->whereMonth('date', '<=', 12);
+        }
+
+        if ($from_month != '') {
+            $query->whereMonth('date', '>=', $from_month);
+        }
+
+        if ($to_month != '') {
+            $query->whereMonth('date', '<=', $to_month);
+        }
+
+        $query->orderBy('number');
+
+        $expenses = clone $query;
+        $expenses = $expenses->whereIn('chart_of_accounts.class', $expense_class)->get();
+
+        $cost_of_sales = clone $query;
+        $cost_of_sales = $cost_of_sales->whereIn('chart_of_accounts.class', $cost_of_sale_class)->get();
+
+        $revenues = clone $query;
+        $revenues = $revenues->whereIn('chart_of_accounts.class', $revenue_class)->get();
+
+        $branch = null;
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        if ($from_month == '')
+            $from_month = 'all';
+
+        if ($to_month == '')
+            $to_month = 'all';
+        if ($branch_id == '')
+            $branch_id = 'all';
+        return view('pages.reports.ap_ar.statements.print_income_statement', [
+            'revenues' => $revenues,
+            'cost_of_sales' => $cost_of_sales,
+            'expenses' => $expenses,
+            'from_month' => $from_month,
+            'to_month' => $to_month,
+            'income_year' => $income_year,
+            'branch' => $branch,
+            'branch_id' => $branch_id,
+        ]);
     }
 
 }

@@ -120,10 +120,10 @@ class InvoiceController extends Controller
     }
 
     public function final_invoice(Request $request)
-    { 
+    {
         //dd(\Cart::getContent());
         $invoice_id = $request->invoice_id;
-
+        $description = $request->description;
         $inputs = $request->except('_token');
         $rules = [];
         $rules = [
@@ -192,23 +192,25 @@ class InvoiceController extends Controller
                 $invoice->refund = $refund;
                 $invoice->customer_id = $customer_id;
                 $invoice->invoice_no = $reference;
+
             } else {
                 $invoice->order_invoice_id = $request->order_invoice_id ?? 0;
                 $invoice->discount = $discount;
                 $invoice->refund = $refund;
             }
-            $invoice->pay = $payment_mode == "Credit" ? $amount_paid : $total;
-            $invoice->due = $payment_mode == "Credit" ? ($total - $amount_paid) : 0;
+            $invoice->pay = $amount_paid;
+            $invoice->due = $total - $amount_paid;
             $invoice->order_date = $order_date;
             $invoice->total_products = \Cart::getTotalQuantity();
             $invoice->sub_total = $sub_total;
             $invoice->vat = $tax;
             $invoice->total = $total;
+            $invoice->description = $description;
             $invoice->status = 0;
             if ($invoice->save()) {
                 OrderDetail::where('order_id', $invoice->id)->delete();
                 $contents = \Cart::getContent();
-                
+
                 $products = [];
                 $total_discount = 0;
                 $store_products = [];
@@ -266,7 +268,7 @@ class InvoiceController extends Controller
     {
         $invoice = $this->generateProfomerInvoice('PFI');
         $inputs = $request->except('_token');
-
+        $description = $request->description;
 
         $rules = [];
 
@@ -300,7 +302,6 @@ class InvoiceController extends Controller
         //$customer_id = $request->input('customer_id');
         DB::beginTransaction();
         try {
-            $payment_mode = 'Cash';
             $due_date = $request->input('due_date');
             $running_balance = $this->runninigBalance($customer_id);
             if ($running_balance < 0) { // in case the company owes a customer
@@ -315,20 +316,14 @@ class InvoiceController extends Controller
             $order_id = DB::table('proformers')->insertGetId([
                 'reference' => Proformer::generateNewNumber(),
                 'customer_id' => $customer_id,
-                //                'payment_mode' => $payment_mode,
-//                'due_date' => $due_date,
-                'pay' => $payment_mode == "Credit" ? $amount_paid : $total,
-                'due' => $payment_mode == "Credit" ? ($total - $amount_paid) : 0,
                 'order_date' => $request->order_date,
-                //date('Y-m-d'),
                 'order_status' => 'approved',
                 'total_products' => \Cart::getTotalQuantity(),
-                'sub_total' => $sub_total,
-                'vat' => $tax,
                 'total' => $total,
                 'invoice_no' => $invoice,
                 'sold_by' => Auth::id(),
                 'status' => 1,
+                'description' => $description,
                 'branch_id' => User::userBranchAction(),
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
@@ -358,8 +353,6 @@ class InvoiceController extends Controller
                     'updated_at' => Carbon::now()
                 ]);
             }
-            //Upate the Order table with the discount
-            DB::table('proformers')->where('id', $order_id)->increment('discount', $total_discount);
 
             $action = "Issue proforma $invoice: $total";
             AuditLog::auditLog(Auth::id(), $action);
@@ -378,7 +371,7 @@ class InvoiceController extends Controller
     {
         $invoice = $this->generateProfomerInvoice('ODR');
         $inputs = $request->except('_token');
-
+        $description = $request->description;
         $rules = [];
 
         $rules = [
@@ -404,43 +397,29 @@ class InvoiceController extends Controller
         $items = $this->orderItems();
 
         $sub_total = str_replace(',', '', \Cart::getSubTotal());
-        $tax = 0;
         $total = str_replace(',', '', \Cart::getTotal());
 
 
         $pay = $request->input('pay');
-        //$due = $total - $pay;
         $order_id = 0;
-        $amount_paid = 0;
-        //$customer_id = $request->input('customer_id');
+
         DB::beginTransaction();
         try {
             $payment_mode = 'Cash';
             $due_date = $request->input('due_date');
-            $running_balance = $this->runninigBalance($customer_id);
-            if ($running_balance < 0) { // in case the company owes a customer
 
-                if ($running_balance <= $total)
-                    $amount_paid = abs($running_balance);
-                else
-                    $amount_paid = abs($running_balance) - $total;
-
-            }
 
             $order_id = DB::table('order_invoices')->insertGetId([
                 'reference' => OrderInvoice::generateNewNumber(),
                 'customer_id' => $customer_id,
-                'pay' => $payment_mode == "Credit" ? $amount_paid : $total,
-                'due' => $payment_mode == "Credit" ? ($total - $amount_paid) : 0,
                 'order_date' => $request->order_date,
                 'order_status' => 'approved',
                 'total_products' => \Cart::getTotalQuantity(),
-                'sub_total' => $sub_total,
-                'vat' => $tax,
                 'total' => $total,
                 'invoice_no' => $invoice,
                 'sold_by' => Auth::id(),
                 'status' => 0,
+                'description' => $description,
                 'branch_id' => User::userBranchAction(),
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
@@ -470,8 +449,6 @@ class InvoiceController extends Controller
                     'updated_at' => Carbon::now()
                 ]);
             }
-            //Upate the Order table with the discount
-            DB::table('order_invoices')->where('id', $order_id)->increment('discount', $total_discount);
 
             $action = "Issue order invoice $invoice: $total";
             AuditLog::auditLog(Auth::id(), $action);
@@ -923,7 +900,6 @@ class InvoiceController extends Controller
         $customer_id = $request->input('customer_id');
 
         $sub_total = str_replace(',', '', \Cart::getSubTotal());
-        $tax = 0;
         $total = str_replace(',', '', \Cart::getTotal());
 
         $pay = $request->input('pay');
@@ -937,14 +913,12 @@ class InvoiceController extends Controller
             $due_date = $request->input('due_date');
             DB::table('order_invoices')->where('id', $order->id)->update([
                 'customer_id' => $customer_id,
-                'due' => $total,
                 'order_date' => $request->order_date,
                 'order_status' => 'pending',
                 'total_products' => \Cart::getTotalQuantity(),
-                'sub_total' => $sub_total,
-                'vat' => $tax,
                 'total' => $total,
                 'invoice_no' => $invoice,
+                'description' => $request->description,
                 'modified_by' => Auth::id(),
             ]);
 
@@ -1117,17 +1091,14 @@ class InvoiceController extends Controller
             DB::table('proformers')->where('id', $order->id)->update([
                 'reference' => $reference,
                 'customer_id' => $customer_id,
-                'pay' => 0,
-                'due' => $total,
                 'order_date' => $request->order_date,
                 'order_status' => 'approved',
                 'total_products' => \Cart::getTotalQuantity(),
-                'sub_total' => $sub_total,
-                'vat' => $tax,
                 'total' => $total,
                 'invoice_no' => $invoice,
                 'sold_by' => Auth::id(),
                 'status' => 1,
+                'description' => $request->description,
                 'branch_id' => User::userBranchAction(),
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()

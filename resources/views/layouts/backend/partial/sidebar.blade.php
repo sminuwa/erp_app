@@ -807,8 +807,8 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="{{ route('user.loan.history.report') }}"
-                                                class="nav-link {{ Request::is('reports/pa/loan/history*') ? 'active' : '' }}">
+                                            <a href="{{ route('income.statement.report') }}"
+                                                class="nav-link {{ Request::is('reports/income_statement*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Income Statement</p>
                                             </a>

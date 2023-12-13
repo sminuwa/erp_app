@@ -533,6 +533,7 @@ class Transaction
             //            return $records;
             $asset_account = $cost_account = $revenue_account = $customer_ledger = [];
             $customer_value = $branch_id = 0;
+            $order = Order::where('reference', $reference)->first();
             foreach ($records as $record) {
                 // total value based on cost price
                 // total value based on sale price
@@ -544,7 +545,7 @@ class Transaction
                     'model_id' => $record->asset_account_id,
                     'model_name' => 'GeneralAccount',
                     'branch_id' => $record->branch_id,
-                    'description' => 'Sale of ' . $record->category_name,
+                    'description' => $order->description ?? 'Sale of ' . $record->category_name,
                     'reference' => $reference,
                     'credit' => $cost_value,
                     'debit' => 0,
@@ -556,7 +557,7 @@ class Transaction
                     'model_id' => $record->cost_account_id,
                     'model_name' => 'GeneralAccount',
                     'branch_id' => $record->branch_id,
-                    'description' => 'Sale of ' . $record->category_name,
+                    'description' => $order->description ?? 'Sale of ' . $record->category_name,
                     'reference' => $reference,
                     'credit' => 0,
                     'debit' => $cost_value,
@@ -568,7 +569,7 @@ class Transaction
                     'model_id' => $record->cost_account_id,
                     'model_name' => 'GeneralAccount',
                     'branch_id' => $record->branch_id,
-                    'description' => 'Sale of ' . $record->category_name,
+                    'description' => $order->description ?? 'Sale of ' . $record->category_name,
                     'reference' => $reference,
                     'credit' => $sell_value,
                     'debit' => 0,
@@ -620,7 +621,7 @@ class Transaction
                 'model_id' => $customer->id,
                 'model_name' => 'Customer',
                 'branch_id' => $branch_id,
-                'description' => 'Sale Reference: ' . $reference,
+                'description' => $order->description ?? 'Sale Reference: ' . $reference,
                 'reference' => $reference,
                 'credit' => 0,
                 'debit' => $customer_value - $discount + $refund,

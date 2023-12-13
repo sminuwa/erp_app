@@ -144,7 +144,7 @@ class InvoiceController extends Controller
 
         $total_sales = \Cart::getTotal();
         //Check to make sure that the amount has not exceeded the credit limit set for the customer.
-        if (Transaction::check_transaction_limit($customer_id, $total_sales) == false) {
+        if (Transaction::check_transaction_limit($customer_id, \Cart::getContent()) == false) {
             session()->flash('app_error', 'The amount has exceeded the customer credit limit');
             return redirect()->back();
         }

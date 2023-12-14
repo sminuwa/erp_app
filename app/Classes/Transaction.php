@@ -566,7 +566,7 @@ class Transaction
                     'receipt_no' => 'C' . $reference
                 ];
                 $revenue_account[] = [
-                    'model_id' => $record->cost_account_id,
+                    'model_id' => $record->revenue_account_id,
                     'model_name' => 'GeneralAccount',
                     'branch_id' => $record->branch_id,
                     'description' => $order->description ?? 'Sale of ' . $record->category_name,

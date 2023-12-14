@@ -143,7 +143,7 @@ class CreditNoteController extends Controller
                     $products,
                     $credit_note->customer_id,
                     $credit_note->reference,
-                    $credit_note->order_date
+                    $credit_note->date
                 )['status']
             ) {
 

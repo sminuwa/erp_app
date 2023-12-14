@@ -57,7 +57,8 @@
                     <?php
                     $credit_sum += $revenue->credit;
                     $debit_sum += $revenue->debit;
-                    $dif = $credit_sum - $debit_sum;
+                    //$dif = $credit_sum - $debit_sum;
+                    $dif = $revenue->credit - $revenue->debit;
                     ?>
                     @if ($dif < 0)
                         &#8358;({{ number_format(abs($dif), 2) }})
@@ -104,7 +105,8 @@
                     <?php
                     $credit_sum += $sale->credit;
                     $debit_sum += $sale->debit;
-                    $dif = $credit_sum - $debit_sum;
+                     //$dif = $credit_sum - $debit_sum;
+                     $dif = $sale->credit - $sale->debit;
                     ?>
                     @if ($dif < 0)
                         &#8358;({{ number_format(abs($dif), 2) }})
@@ -157,7 +159,8 @@
                     <?php
                     $credit_sum += $expense->credit;
                     $debit_sum += $expense->debit;
-                    $dif = $credit_sum - $debit_sum;
+                     //$dif = $credit_sum - $debit_sum;
+                     $dif = $expense->credit - $expense->debit;
                     ?>
                     @if ($dif < 0)
                         &#8358;({{ number_format(abs($dif), 2) }})

@@ -1,6 +1,6 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.category.sales.report.print', [$from_date, $to_date, $branch_id, $category_id1,$category_id2]) }}"
+        <a href="{{ route('ajax.category.sales.report.print', [$from_date, $to_date, $branch_id, $category_id1, $category_id2]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
@@ -66,7 +66,7 @@
                     &#8358;{{ number_format($grand_total_profit, 2) }}
                 @endif
             </th>
-            <th></th>
+            <th style="text-align:right">{{ number_format(($grand_total_profit / $total_amount) * 100, 2) }}</th>
         </tr>
     </tfoot>
 </table>

@@ -1396,7 +1396,20 @@ class ReportController extends Controller
         if ($product_id == "all" || $product_id == "")
             $product_id = "%";
 
-        $records = StockCard::select('date', 'branch_id', 'cr', 'dr', 'products.name AS product_name', 'products.name AS product_code', 'branches.code AS branch_code', 'refno', 'stores.code AS store_code', 'qty_before', 'qty_after')
+        $records = StockCard::select(
+            'stock_cards.date',
+            'cr',
+            'dr',
+            'products.name AS product_name',
+            'products.code AS product_code',
+            'branches.code AS branch_code',
+            'refno',
+            'stores.code AS store_code',
+            'qty_before',
+            'qty_after',
+            'model_name',
+            'model_id'
+        )
             ->join('products', 'products.id', 'stock_cards.product_id')
             ->join('stores', 'stores.id', 'stock_cards.store_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
@@ -1404,7 +1417,15 @@ class ReportController extends Controller
             ->where('stock_cards.product_id', 'LIKE', $product_id)
             ->where('stores.branch_id', 'LIKE', $branch_id)
             ->where('stock_cards.store_id', 'LIKE', $store_id)
-            ->whereBetween('date', [$from_date, $to_date])->get();
+            ->where('general_account_ledgers.model_name', '<>', 'GeneralAccount')
+            ->whereBetween('stock_cards.date', [$from_date, $to_date])
+            ->orderBy('date', 'DESC')
+            ->get();
+        $qty_available = 0;
+        if ($store_id > 0)
+            $qty_available = DB::table('store_products')->WHERE('store_id', $store_id)->where('product_id', $product_id)->sum('qty_available');
+        else
+            $qty_available = DB::table('store_products')->where('product_id', $product_id)->groupBy('store_id')->sum('qty_available');
 
         if ($branch_id == "%" || $branch_id == "")
             $branch_id = "all";
@@ -1417,9 +1438,14 @@ class ReportController extends Controller
             $branch = Branch::find($branch_id);
 
         return view('pages.reports.stock_control.print_stock_ledger_report', [
-            'results' => $records,
+            'records' => $records,
             'from_date' => $from_date,
             'to_date' => $to_date,
+            'branch_id' => $branch_id,
+            'store_id' => $store_id,
+            'product_id' => $product_id,
+            'qty_available' => $qty_available,
+            'branch' => $branch,
         ]);
     }
 
@@ -3035,10 +3061,13 @@ class ReportController extends Controller
         $revenue_class = ['R40'];
         $cost_of_sale_class = ['C50'];
         $expense_class = ['C51', 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C58', 'C59', 'C60', 'C61', 'C62', 'C63'];
-        $query = ChartOfAccount::whereYear('date', $income_year)
+        $query = ChartOfAccount::select(DB::raw('SUM(credit) AS credit'), DB::raw('SUM(debit) AS debit'), 'number', 'general_accounts.description')
+            ->whereYear('date', $income_year)
             ->join('general_accounts', 'general_accounts.class', 'chart_of_accounts.class')
             ->join('general_account_ledgers', 'model_id', 'general_accounts.id')
-            ->where('general_account_ledgers.branch_id', $branch_id);
+            ->where('general_account_ledgers.branch_id', $branch_id)
+            ->where('model_name','GeneralAccount')
+            ->groupBy('number');
 
         if ($from_month == '' || $to_month == '') {
             $query->whereMonth('date', '<=', 12);
@@ -3062,11 +3091,6 @@ class ReportController extends Controller
 
         $revenues = clone $query;
         $revenues = $revenues->whereIn('chart_of_accounts.class', $revenue_class)->get();
-
-
-
-
-
 
         $branch = null;
         if ($branch_id != 'all')
@@ -3094,10 +3118,12 @@ class ReportController extends Controller
         $revenue_class = ['R40'];
         $cost_of_sale_class = ['C50'];
         $expense_class = ['C51', 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C58', 'C59', 'C60', 'C61', 'C62', 'C63'];
-        $query = ChartOfAccount::whereYear('date', $income_year)
+        $query = ChartOfAccount::select(DB::raw('SUM(credit) AS credit'), DB::raw('SUM(debit) AS debit'), 'number', 'general_accounts.description')
+            ->whereYear('date', $income_year)
             ->join('general_accounts', 'general_accounts.class', 'chart_of_accounts.class')
             ->join('general_account_ledgers', 'model_id', 'general_accounts.id')
-            ->where('general_account_ledgers.branch_id', $branch_id);
+            ->where('general_account_ledgers.branch_id', $branch_id)
+            ->groupBy('number');
 
         if ($from_month == '' || $to_month == '') {
             $query->whereMonth('date', '<=', 12);

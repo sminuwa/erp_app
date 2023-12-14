@@ -22,8 +22,7 @@
         @php
             $qty_in_stock = 0;
             $available_qty = 0;
-            $qty_before = $qty_available;
-            $qty_after = 0;
+            $qty_after = $qty_before = $qty_available;
             //$available_qty = $qty_available;
         @endphp
 
@@ -34,18 +33,23 @@
                 <td>{{ $record->store_code }}</td>
                 <td>{{ $record->branch_code }}</td>
                 <td>
+                    @php
+                        $qty_after = $qty_before;
+                    @endphp
                     @if ($record->cr > 0)
                         {{ $quantity = $record->cr }}
-                        @php 
-                            $qty_after = $qty_before + $quantity;
+                        @php
+                            $qty_before = $qty_after - $quantity;
                         @endphp
                     @else
                         -{{ $quantity = $record->dr }}
                         @php
-                            $qty_after = $qty_before - $quantity;
+                            $qty_before = $qty_after + $quantity;
                         @endphp
                     @endif
                 </td>
+
+
                 <td>
                     @if ($record->model_name == 'Customer')
                         {{ App\Models\Customer::find($record->model_id)->code }}
@@ -58,9 +62,6 @@
 
                 <td>{{ $qty_before }}</td>
                 <td>{{ $qty_after }}</td>
-                @php
-                    $qty_before = $qty_after;
-                @endphp
             </tr>
         @endforeach
     </tbody>

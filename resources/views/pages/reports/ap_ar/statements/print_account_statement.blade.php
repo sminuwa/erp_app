@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Account Balances - {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Account Statements - {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -39,8 +39,10 @@
                             <h3>
                                 {{App\Models\User::UserBranchName()->long_name}}
                             </h3>
-                            <h5 style="text-align: center;">{{ strtoupper($customer->name) }} ACOOUNT BALANCES AS AT
+                            <h5 style="text-align: center;">{{ strtoupper($customer->name) }} LEDGER LISTING BETWEEN
                                 {{ $from_date }}
+                                AND
+                                {{ $to_date }}<br /> Runining Balance B/d Before this date {{ $from_date }}
                                 was = @if ($balance_b_d < 0)
                                     &#8358;({{ number_format(abs($balance_b_d), 2) }})
                                 @else

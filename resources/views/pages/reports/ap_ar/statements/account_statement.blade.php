@@ -21,12 +21,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Account Balances/Statements</h4>
+                        <h4>Account Statements</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Account Balances/Statements</li>
+                            <li class="breadcrumb-item active">Account Statements</li>
                         </ol>
                     </div>
                 </div>
@@ -43,20 +43,15 @@
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="type">Payee Category</label>
-                                        <select
-                                            class="form-control {{ $errors->has('type') ? ' is-invalid' : '' }}"
+                                        <select class="form-control {{ $errors->has('type') ? ' is-invalid' : '' }}"
                                             name="type" id="type" required="required">
                                             <option value="all">All</option>
-                                            <option
-                                                value="Customer" {{ 'Customer' == $model->model_name ? 'selected' : '' }}>
+                                            <option value="Customer">
                                                 Customer
                                             </option>
-                                            <option
-                                                value="Supplier" {{ 'Supplier' == $model->model_name ? 'selected' : '' }}>
+                                            <option value="Supplier">
                                                 Supplier
-                                            <option value="GeneralAccount"
-                                                {{ 'GeneralAccount' == $model->model_name ? 'selected' : '' }}>General
-                                                Accounts
+                                            <option value="GeneralAccount">General Accounts
                                             </option>
                                         </select>
                                         @if ($errors->has('type'))
@@ -75,26 +70,11 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        @if (isset($model) && $model->model_name == 'Customer')
-                                                <?php $payers = \App\Models\Customer::orderBy('code', 'asc')->get(); ?>
-                                        @elseif(isset($model) && $model->model_name == 'Supplier')
-                                                <?php $payers = \App\Models\Supplier::orderBy('code', 'asc')->get(); ?>
-                                        @else
-                                                <?php $payers = \App\Models\GeneralAccount::orderBy('number', 'asc')->get(); ?>
-                                        @endif
                                         <label for="payer_id">Payee</label>
                                         <select
-                                            class="form-control select2-single {{ $errors->has('payer_id') ? ' is-invalid' : '' }}"
+                                            class="form-control select2-single ajax-payee {{ $errors->has('payer_id') ? ' is-invalid' : '' }}"
                                             name="payer_id" id="payer_id" required="required">
                                             <option value="all">All</option>
-                                            @if (isset($payers))
-                                                @foreach ($payers as $payer)
-                                                    <option value="{{ $payer->id }}"
-                                                        {{ $payer->id == $model->model_id ? 'selected' : '' }}>
-                                                        {{ $payer->code ?? $payer->number }} -
-                                                        {{ $payer->name ?? $payer->description }}</option>
-                                                @endforeach
-                                            @endif
                                         </select>
                                         @if ($errors->has('payer_id'))
                                             <div class="invalid-feedback">
@@ -107,24 +87,25 @@
                                     <div class="form-group">
                                         <label for="from_date">From Date</label>
                                         <input type="text" autocomplete="off" name="from_date" id="from_date"
-                                               class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
-                                               value="{{ old('from_date') }}" placeholder="" required>
+                                            class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
+                                            value="{{ old('from_date') }}" placeholder="" required>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="to_date">To Date</label>
-                                        <input type="text" autocomplete="off" name="to_date" id="to_date" placeholder=""
-                                               class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
-                                               value="{{ old('to_date') }}" required/>
+                                        <input type="text" autocomplete="off" name="to_date" id="to_date"
+                                            placeholder=""
+                                            class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
+                                            value="{{ old('to_date') }}" required />
                                     </div>
 
                                 </div>
                             </div>
-                            
+
                             <div class="text-right form-group col-sm-12">
                                 <input type="button" class="btn btn-primary" id="generate" name="generate"
-                                       value="Generate"/>
+                                    value="Generate" />
                             </div>
                         </form>
                     </div>
@@ -141,10 +122,8 @@
 @endsection
 
 @push('js')
-   
-
     <script type="text/javascript">
-        $(function () {
+        $(function() {
             function formatMoney(n, c, d, t) {
                 var c = isNaN(c = Math.abs(c)) ? 2 : c,
                     d = d == undefined ? "." : d,
@@ -157,33 +136,33 @@
             };
 
 
-            $('#type').on("change", function () {
+            $('#type').on("change", function() {
                 $("#payer_id").html(" < option value = '' > Loading... < /option>");
-               
+
                 $.ajax({
                     url: "{{ route('ajax.load.payers') }}",
                     type: 'GET',
                     data: {
                         type: $(this).val()
                     }
-                }).done(function (msg) {
-                   
-                    $("#payer_id").html(msg);
+                }).done(function(msg) {
                     
+                    $("#payer_id").html(msg);
+
                 });
             });
 
-            $('#generate').on("click", function () {
+            $('#generate').on("click", function() {
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
                 payer_id = $('#payer_id').val();
                 branch_id = $('#branch_id').val();
                 type = $('#type').val();
-                
-                
+
+
                 $.ajax({
                     type: "GET",
-                    url: "{{ route('ajax.load.account.balance.report') }}",
+                    url: "{{ route('ajax.load.account.statement.report') }}",
                     data: {
                         _token: "{{ csrf_token() }}",
                         from_date: from_date,
@@ -192,13 +171,63 @@
                         branch_id: branch_id,
                         type: type
                     }
-                }).done(function (data) {
-                   
+                }).done(function(data) {
+
                     $("#load").html(data);
                     $('#example1').DataTable({
+                        dom: 'Bfrtip',
                         lengthMenu: [25, 50, 75, 100],
-                        pageLength: 20,
-                        
+                        pageLength: 100,
+                        buttons: [{
+                                extend: 'copyHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },
+                            {
+                                extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },
+                            {
+                                extend: 'print',
+                                exportOptions: {
+                                    columns: ':visible'
+                                },
+                                messageTop: 'Sales Report',
+                                orientation: 'landscape',
+                                pageSize: 'LEGAL'
+                            },
+                            {
+                                extend: 'colvis',
+                                columns: ':not(.noVis)',
+                                collectionLayout: 'fixed two-column',
+                                postfixButtons: [{
+                                    extend: 'colvisGroup',
+                                    text: 'Show all',
+                                    show: ':hidden'
+                                }]
+                            }
+                        ],
+                        language: {
+                            buttons: {
+                                colvis: 'Show/Hide columns'
+                            }
+                        },
+                        //buttons: ['excel', 'pdf', 'print'],
+                        "footerCallback": function(row, data, start, end, display) {
+                            var api = this.api();
+                            var json = api.ajax.json();
+                            // Remove the formatting to get integer data for summation
+                            var intVal = function(i) {
+                                return typeof i === 'string' ?
+                                    i.replace(/[\$,]/g, '') * 1 :
+                                    typeof i === 'number' ?
+                                    i : 0;
+                            };
+
+                        }
                     });
                 });
             });

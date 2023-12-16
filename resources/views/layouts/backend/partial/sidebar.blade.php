@@ -793,15 +793,22 @@
                                     </a>
                                     <ul class="nav nav-treeview">
                                         <li class="nav-item">
-                                            <a href="{{ route('account.balance.report') }}"
-                                                class="nav-link {{ Request::is('reports/us/user/ledger*') ? 'active' : '' }}">
+                                            <a href="{{ route('account.statement.report') }}"
+                                                class="nav-link {{ Request::is('reports/ap_ar/account_statement*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
-                                                <p>Account Balances/Statements</p>
+                                                <p>Account Statements</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('account.balance.report') }}"
+                                                class="nav-link {{ Request::is('reports/ap_ar/account_balances*') ? 'active' : '' }}">
+                                                <i class="ion-cash"></i>
+                                                <p>Account Balances</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="{{ route('trial.balance.report') }}"
-                                                class="nav-link {{ Request::is('reports/us/loan/balance*') ? 'active' : '' }}">
+                                                class="nav-link {{ Request::is('reports/ap_ar/trial_balance*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Trial Balance</p>
                                             </a>

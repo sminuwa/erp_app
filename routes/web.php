@@ -950,9 +950,15 @@ Route::middleware('auth')->group(function () {
             //Account Balances and Statements
             //Loan History
             Route::group(['prefix' => 'ap_ar'], function () {
+                //Account balances
                 Route::get('/account_balances', [ReportController::class, 'accountBalance'])->name('account.balance.report');
                 Route::get('/account_balances/load', [ReportController::class, 'loadAccountBalance'])->name('ajax.load.account.balance.report');
-                Route::get('/account_balances/print/{from_date}/{to_date}/{payer_id}/{branch_id}/{type}', [ReportController::class, 'printAccountBalance'])->name('ajax.account.balance.report.print');
+                Route::get('/account_balances/print/{date}//{account_type}/{branch_id}', [ReportController::class, 'printAccountBalance'])->name('ajax.account.balance.report.print');
+
+                //Account Statement
+                Route::get('/account_statement', [ReportController::class, 'accountStatement'])->name('account.statement.report');
+                Route::get('/account_statement/load', [ReportController::class, 'loadAccountStatement'])->name('ajax.load.account.statement.report');
+                Route::get('/account_statement/print/{from_date}/{to_date}/{payer_id}/{branch_id}/{type}', [ReportController::class, 'printAccountStatement'])->name('ajax.account.statement.report.print');
 
                 //Income Statement
                 Route::get('/income_statement', [ReportController::class, 'incomeStatement'])->name('income.statement.report');

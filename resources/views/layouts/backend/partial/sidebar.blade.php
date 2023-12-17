@@ -815,7 +815,7 @@
                                         </li>
                                         <li class="nav-item">
                                             <a href="{{ route('income.statement.report') }}"
-                                                class="nav-link {{ Request::is('reports/income_statement*') ? 'active' : '' }}">
+                                                class="nav-link {{ Request::is('reports/ap_ar/income_statement*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Income Statement</p>
                                             </a>
@@ -842,15 +842,15 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="{{ route('user.loan.history.report') }}"
-                                                class="nav-link {{ Request::is('reports/pa/loan/history*') ? 'active' : '' }}">
+                                            <a href="{{ route('remittance.report') }}"
+                                                class="nav-link {{ Request::is('reports/ap_ar/remittance*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>User Daily Remittance</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="{{ route('user.loan.history.report') }}"
-                                                class="nav-link {{ Request::is('reports/pa/loan/history*') ? 'active' : '' }}">
+                                            <a href="{{ route('document.status.report') }}"
+                                                class="nav-link {{ Request::is('reports/ap_ar/document_status*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Receipt/Payment/Interbank & Journal list</p>
                                             </a>

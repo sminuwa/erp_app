@@ -964,10 +964,21 @@ Route::middleware('auth')->group(function () {
                 Route::get('/income_statement', [ReportController::class, 'incomeStatement'])->name('income.statement.report');
                 Route::get('/income_statement/load', [ReportController::class, 'loadIncomeStatement'])->name('ajax.load.income.statement.report');
                 Route::get('/income_statement/print/{from_month}/{to_month}/{income_year}/{branch_id}', [ReportController::class, 'printIncomeStatement'])->name('ajax.income.statement.report.print');
-            
+               
+                //Trial Balance
                 Route::get('/trial_balance', [ReportController::class, 'trialBalance'])->name('trial.balance.report');
                 Route::get('/trial_balance/load', [ReportController::class, 'loadTrialBalance'])->name('ajax.load.trial.balance.report');
                 Route::get('/trial_balance/print/{from}/{to}/{branch}', [ReportController::class, 'printTrialBalance'])->name('ajax.print.trial.balance.report');
+
+                //Daily Remittance
+                Route::get('/remittance', [ReportController::class, 'remittance'])->name('remittance.report');
+                Route::get('/remittance/load', [ReportController::class, 'loadRemittance'])->name('ajax.load.remittance.report');
+                Route::get('/remittance/print/{from}/{to}/{branch_id}/{payee_id}/{user_id}', [ReportController::class, 'printRemittance'])->name('ajax.print.remittance.report');
+
+                //Document Status
+                Route::get('/document_status', [ReportController::class, 'documentStatus'])->name('document.status.report');
+                Route::get('/document_status/load', [ReportController::class, 'loadDocumentStatus'])->name('ajax.load.document.status.report');
+                Route::get('/document_status/print/{from}/{to}/{branch_id}/{status}/{type}', [ReportController::class, 'printdocumentStatus'])->name('ajax.print.document.status.report');
                 
             });
 

@@ -35,6 +35,12 @@ use App\Models\Customer;
 use App\Models\Supplier;
 use App\Models\AuditLog;
 use App\Models\LoanCollector;
+use App\Models\Payment;
+use App\Models\Receipt;
+use App\Models\InterBank;
+use App\Models\Journal;
+
+
 
 
 
@@ -3125,6 +3131,8 @@ class ReportController extends Controller
 
     private function generalAccountLedgerBy($from_date, $to_date, $branch_id)
     {
+        if ($branch_id == 'all' || $branch_id == '')
+            $branch_id = '%';
         return GeneralAccountLedger::join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
             ->where('general_account_ledgers.branch_id', 'like', $branch_id)
             ->whereDate('date', '>=', $from_date)
@@ -3258,6 +3266,124 @@ class ReportController extends Controller
             'branch' => $branch,
             'branch_id' => $branch_id,
         ]);
+    }
+    public function remittance()
+    {
+        $users = User::orderBy('user_code')->get();
+        return view('pages.reports.ap_ar.remittance.index', compact('users'));
+    }
+    public function loadRemittance(Request $request)
+    {
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
+        $branch_id = $request->branch_id;
+        $payee_id = $request->payee_id;
+        $user_id = $request->user_id;
+        if ($user_id == 'all' || $user_id == '')
+            $user_id = '%';
+        if ($payee_id == 'all' || $payee_id == '')
+            $payee_id = '%';
+        $query = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id);
+        $ledgers = $query->select(
+            DB::raw('SUM(credit) AS credit'),
+            DB::raw('SUM(debit) AS debit'),
+            'number',
+            'general_accounts.description',
+            'general_account_ledgers.id',
+            'users.name'
+        )->join('users', 'users.id', 'general_account_ledgers.user_id')
+            ->where('model_id', 'LIKE', $payee_id)
+            ->where('user_id', 'LIKE', $user_id)
+            ->orderBy('number')
+            ->groupBy('user_id')
+            ->groupBy('number')
+            ->get();
+
+
+        $credit_sum = $query->sum('credit');
+        $debit_sum = $query->sum('debit');
+        $balance = $credit_sum - $debit_sum;
+        $branch = Branch::find($branch_id);
+        if ($user_id == '%')
+            $user_id = 'all';
+        if ($payee_id == '%')
+            $payee_id = 'all';
+        $branch = null;
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.ap_ar.remittance.load', compact('ledgers', 'branch', 'from_date', 'to_date', 'balance', 'branch_id', 'payee_id', 'user_id', 'credit_sum', 'debit_sum'));
+    }
+
+    public function printRemittance($from, $to, $branch_id, $payee_id, $user_id)
+    {
+        if ($user_id == 'all' || $user_id == '')
+            $user_id = '%';
+        if ($branch_id == 'all' || $branch_id == '')
+            $branch_id = '%';
+        if ($payee_id == 'all' || $payee_id == '')
+            $payee_id = '%';
+        $query = $this->generalAccountLedgerBy($from, $to, $branch_id);
+        $ledgers = $query->select(
+            DB::raw('SUM(credit) AS credit'),
+            DB::raw('SUM(debit) AS debit'),
+            'number',
+            'general_accounts.description',
+            'general_account_ledgers.id',
+            'users.name'
+        )->join('users', 'users.id', 'general_account_ledgers.user_id')
+            ->where('model_id', 'LIKE', $payee_id)
+            ->where('user_id', 'LIKE', $user_id)
+            ->orderBy('number')
+            ->groupBy('user_id')
+            ->groupBy('number')
+            ->get();
+
+        $credit_sum = $query->sum('credit');
+        $debit_sum = $query->sum('debit');
+        $balance = $credit_sum - $debit_sum;
+        $balance = $credit_sum - $debit_sum;
+        if ($branch_id != '%')
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.ap_ar.remittance.print', compact('ledgers', 'branch', 'from', 'to', 'balance', 'credit_sum', 'debit_sum'));
+    }
+    public function documentStatus()
+    {
+        return view('pages.reports.ap_ar.document_status.index');
+    }
+    public function loadDocumentStatus(Request $request)
+    {
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
+        $branch_id = $request->branch_id;
+        $type = $request->type;
+        $status = $request->status;
+        if ($status == 'all' || $status == '')
+            $status = '%';
+        if ($branch_id == 'all' || $branch_id == '')
+            $branch_id = '%';
+
+        $query = null;
+        if ($type == "Payment")
+            $query = Payment::where('branch_id', 'LIKE', $branch_id)
+                ->where('status', 'LIKE', $status)->orderBy('date', "DESC");
+        if ($type == "Receipt")
+            $query = Receipt::where('branch_id', 'LIKE', $branch_id)
+                ->where('status', 'LIKE', $status)->orderBy('date', "DESC");
+        if ($type == "Journal")
+            $query = Journal::where('branch_id', 'LIKE', $branch_id)
+                ->where('status', 'LIKE', $status)->orderBy('date', "DESC");
+        if ($type == "Interbank")
+            $query = InterBank::where('branch_id', 'LIKE', $branch_id)
+                ->where('status', 'LIKE', $status)->orderBy('date', "DESC");
+
+        $payments = $query->get();
+
+        if ($status == '%')
+            $status = 'all';
+        $branch = null;
+        if ($branch_id != 'all' || $status != '%')
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.ap_ar.document_status.load', compact('payments', 'branch', 'from_date', 'to_date', 'branch_id', 'type','status'));
     }
 
 }

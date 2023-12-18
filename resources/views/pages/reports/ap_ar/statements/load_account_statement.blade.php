@@ -1,12 +1,12 @@
 <div class="row">
-    <div class="offset-10">
-        <a href="{{ route('ajax.print.trial.balance.report', [$from_date, $to_date, $branch->id]) }}" target="_BLANK"
+    {{-- <div class="offset-10">
+        <a href="{{ route('ajax.account.statement.report.print', [$from_date, $to_date, $branch_id,$payer_id, $type]) }}" target="_BLANK"
             class="btn-success btn btn-sm">Print</a>
-    </div>
+    </div> --}}
 </div>
 <table class="table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
-        <h5 style="text-align: center;">{{ strtoupper($branch->name) }} <br>
+        <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
             ACCOUNT STATEMENTS BETWEEN {{ Carbon\carbon::parse($from_date)->toFormattedDateString() }} AND
             {{ Carbon\carbon::parse($to_date)->toFormattedDateString() }}
             <br /> B/F = @if ($balance_b_d < 0)

@@ -1,14 +1,14 @@
-<div class="row">
+{{-- <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.print.remittance.report', [$from_date, $to_date, $branch->id, $status, $type]) }}"
+        <a href="{{ route('ajax.print.remittance.report', [$from_date, $to_date, $branch_id, $status, $type]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
-</div>
+</div> --}}
 
 @if ($type == 'Payment' || $type == 'Receipt')
     <table id="example1" class="table table-bordered table-striped text-left table-responsive-xl">
         <caption style="caption-size:top">
-            <h5 style="text-align: center;">{{ strtoupper($branch->name) }} <br>
+            <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
                 AP-AR STATUS BETWEEN {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                 AND
                 {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
@@ -26,18 +26,7 @@
                 <th>Status</th>
             </tr>
         </thead>
-        <tfoot>
-            <tr>
-                <th>Date</th>
-                <th>Payment No</th>
-                <th>Payee</th>
-                <th>Account</th>
-                <th>Amount</th>
-                <th>Description</th>
-                <th>Created By</th>
-                <th>Status</th>
-            </tr>
-        </tfoot>
+       
         <tbody>
             @foreach ($payments as $payment)
                 <tr>
@@ -65,7 +54,7 @@
 @if ($type == 'Interbank')
     <table id="example1" class="table table-bordered table-striped text-left table-responsive-xl">
         <caption style="caption-size:top">
-            <h5 style="text-align: center;">{{ strtoupper($branch->name) }} <br>
+            <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
                 AP-AR STATUS BETWEEN {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                 AND
                 {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
@@ -83,18 +72,7 @@
                 <th>Actions</th>
             </tr>
         </thead>
-        <tfoot>
-            <tr>
-                <th>Date</th>
-                <th>Receipt No</th>
-                <th>Amount</th>
-                <th>Description</th>
-                <th>Source</th>
-                <th>Destination</th>
-                <th>Created By</th>
-                <th>Status</th>
-            </tr>
-        </tfoot>
+       
         <tbody>
             @foreach ($payments as $interbank)
                 <tr class="@if ($interbank->status == 0) bg-warning @endif">
@@ -125,15 +103,6 @@
                 <th>Status</th>
             </tr>
         </thead>
-        <tfoot>
-            <tr>
-                <th>Date</th>
-                <th>Reference</th>
-                <th>Description</th>
-                <th>Created By</th>
-                <th>Status</th>
-            </tr>
-        </tfoot>
         <tbody>
             @foreach ($payments as $record)
                 <tr>
@@ -147,5 +116,61 @@
             @endforeach
         </tbody>
 
+    </table>
+@endif
+@if ($type == 'Invoice')
+    <table id="example1" class="table table-bordered table-striped text-left table-responsive-xl"
+        data-ordering="false">
+        <caption style="caption-size:top">
+            <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
+                AP-AR STATUS BETWEEN {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
+                AND
+                {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
+            </h5>
+        </caption>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Invoice No</th>
+                <th>Total</th>
+                <th>Amount Paid</th>
+                <th>Amount Due</th>
+                <th>Due Date</th>
+                <th>Payment Mode</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $total = 0;
+                $total_pay = 0;
+                $total_due = 0;
+            @endphp
+            @foreach ($payments as $order)
+                @php
+                    $total = $total + $order->total;
+                    $total_pay = $total_pay + $order->pay;
+                    $total_due = $total_due + $order->due;
+                @endphp
+                <tr class="@if ($order->status == 0) bg-warning @endif">
+                    <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}
+                    </td>
+                    <td>{{ $order->customer->name }}</td>
+                    <td>{{ $order->reference }}</td>
+                    <td align="right">&#8358;{{ number_format($order->total, 2, '.', ',') }}
+                    </td>
+                    <td align="right">&#8358;{{ number_format($order->pay, 2, '.', ',') }}</td>
+                    <td align="right">&#8358;{{ number_format($order->due, 2, '.', ',') }}
+                    </td>
+                    <td>{{ Carbon\Carbon::parse($order->due_date)->toFormattedDateString() }}
+                    </td>
+                    <td>{{ $order->payment_mode }}</td>
+                    <td>
+                        {{ $order->status == 1 ? 'Posted' : 'Pending' }}</td>
+
+                </tr>
+            @endforeach
+        </tbody>
     </table>
 @endif

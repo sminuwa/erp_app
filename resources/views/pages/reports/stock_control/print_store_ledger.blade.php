@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Stock - {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Store Ledger - {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -38,7 +38,7 @@
                                 style="width:50px;height:50px;" alt="Albabello Logo" class="img-circle elevation-3"
                                 style="opacity: .8">
                             <h3>
-                                {{ App\Models\User::UserBranchName()->long_name }}
+                                {{ $branch->name ?? 'All Branches' }}
                             </h3>
                             <h5 style="text-align: center;">STORE LEDGER REPORT
                             </h5>
@@ -54,26 +54,28 @@
                                 cellspacing="0">
                                 <thead>
                                     <tr>
+                                        <th>CODE</th>
                                         <th>ITEM NAME</th>
                                         <th>GROUP NAME</th>
                                         <th>STORE</th>
                                         <th>QUANTITY</th>
-                                        <th>COST PRICE</th>
-
+                                        <th>COST PRICE (&#8358;)</th>
+                            
                                     </tr>
                                 </thead>
                                 @foreach ($stores as $store)
                                     <tr>
+                                        <td> {{ $store->code }} </td>
                                         <td> {{ $store->name }} </td>
                                         <td> {{ $store->category }} </td>
                                         <td>{{ $store->store }} </td>
                                         <td> {{ $store->qty_available }} </td>
                                         <td style="text-align: right;">
-                                            &#8358;{{ number_format(str_replace(',', '', $store->cost_price), 2, '.', ',') }}
-                                        </td>
+                                            {{ number_format(str_replace(',', '', $store->cost_price), 2, '.', ',') }} </td>
                                     </tr>
                                 @endforeach
                                 <tfoot>
+                                    <th></th>
                                     <th></th>
                                     <th></th>
                                     <th></th>

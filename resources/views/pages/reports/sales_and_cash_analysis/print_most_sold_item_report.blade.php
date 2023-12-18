@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Debtor Balance Report - {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Most Sold Items Report - {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -34,13 +34,13 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:80px;height:80px;"
-                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
-                            <h3>
-                                {{App\Models\User::UserBranchName()->long_name}}
-                            </h3>
-                            <h5 style="text-align: center;">{{ $number_limit }} MOST SOLD ITEMS
-                                BETWEEN
+                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
+                                style="width:80px;height:80px;" alt="Albabello Logo" class="img-circle elevation-3"
+                                style="opacity: .8">
+                            <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>
+                            <h5 style="text-align: center;">{{ $number_limit }} Most Sold Items Report by
+                                {{ $type == 'qty' ? 'Amount' : 'Quantity' }}
+                                Between
                                 {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                                 AND
                                 {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
@@ -56,6 +56,7 @@
                                 cellspacing="0" data-ordering="false">
                                 <thead>
                                     <tr>
+                                        <th>CODE</th>
                                         <th>ITEM</th>
                                         <th>QUANTITY</th>
                                         <th>TOTAL AMOUNT</th>
@@ -67,19 +68,21 @@
                                 @endphp
                                 @foreach ($sales as $sale)
                                     <tr>
+                                        <td>{{ $sale->code }}</td>
                                         <td>{{ $sale->item }}</td>
                                         <td>{{ $sale->quantity }}</td>
-                                        <td style="text-align: right">&#8358;{{ number_format($sale->total, 2, '.', ',') }}</td>
+                                        <td style="text-align: right">
+                                            &#8358;{{ number_format($sale->total, 2, '.', ',') }}</td>
                                     </tr>
                                     @php
                                         $total_quantity += $sale->quantity;
                                         $total_amount += $sale->total;
-                                        
+
                                     @endphp
                                 @endforeach
                                 <tfoot>
                                     <tr>
-                                        <th style="text-align: right">TOTAL</th>
+                                        <th style="text-align: right" colspan="2">TOTAL</th>
                                         <th style="text-align: right">
                                             {{ number_format($total_quantity, 0, '.', ',') }}</th>
                                         <th style="text-align: right">

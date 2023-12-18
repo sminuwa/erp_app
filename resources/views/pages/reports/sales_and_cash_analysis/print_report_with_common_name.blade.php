@@ -34,10 +34,11 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:80px;height:80px;"
-                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
+                                style="width:80px;height:80px;" alt="Albabello Logo" class="img-circle elevation-3"
+                                style="opacity: .8">
                             <h3>
-                                {{App\Models\User::UserBranchName()->long_name}}
+                                {{ $branch->name ?? 'All Branches' }}
                             </h3>
                             <h5 style="text-align: center;">CUSTOMER SALES WITH COMMON NAMES
                                 REPORT
@@ -46,12 +47,11 @@
                                 AND
                                 {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
                             </h5>
+
                             <h5 style="font-weight: 900;">
                                 Keyword Search: {{ $customer }}<br>
                                 Store/Product:
                                 {{ $store_id == 'all' ? 'All stores' : \App\Models\Store::find($store_id)->name }}/{{ $product_id == 'all' ? 'All products' : \App\Models\Product::find($product_id)->name }}<br />
-                                Payment Mode/Customer Type:
-                                {{ $payment_mode == 'all' ? 'Cash and Credit' : $payment_mode }}/{{ $credit_walkedin == 'all' ? 'All customers' : $credit_walkedin }}
                             </h5>
                         </div>
                         <!-- /.col -->
@@ -63,6 +63,7 @@
                                 cellspacing="0" data-ordering="false">
                                 <thead>
                                     <tr>
+                                        <th>CODE</th>
                                         <th>CUSTOMER NAMES</th>
                                         <th>TOTAL SALES</th>
                                     </tr>
@@ -72,6 +73,7 @@
                                 @endphp
                                 @foreach ($sales as $sale)
                                     <tr>
+                                        <td>{{ $sale->code }}</td>
                                         <td>{{ $sale->customer }}</td>
                                         <td style="text-align: right">
                                             &#8358;{{ number_format($sale->total, 2, '.', ',') }}</td>
@@ -82,7 +84,7 @@
                                 @endforeach
                                 <tfoot>
                                     <tr>
-                                        <th style="text-align: right">TOTAL</th>
+                                        <th style="text-align: right" colspan="2">TOTAL</th>
                                         <th style="text-align: right">
                                             &#8358;{{ number_format($total_sold, 2, '.', ',') }}</th>
                                     </tr>

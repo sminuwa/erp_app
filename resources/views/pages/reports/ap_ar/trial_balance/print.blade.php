@@ -38,7 +38,7 @@
                              style="width:50px;height:50px;" alt="Albabello Logo" class="img-circle elevation-3"
                              style="opacity: .8">
                         <h3>
-                            {{$branch->name }}
+                            <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
                         </h3>
                         <h5 style="text-align: center;">TRIAL BALANCE BETWEEN {{ Carbon\Carbon::parse($from)->toFormattedDateString() }} AND {{ Carbon\Carbon::parse($to)->toFormattedDateString() }}</h5>
 

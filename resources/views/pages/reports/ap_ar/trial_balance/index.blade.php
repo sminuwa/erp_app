@@ -45,7 +45,7 @@
                                         <label for="branch_id">Branch</label>
                                         <select
                                             class="form-control select2-single {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
-                                            name="branch_id" id="branch_id" required>
+                                            name="branch_id" id="branch_id">
                                             <option value="">Select...</option>
 {{--                                            <option value="all">All</option>--}}
                                             @foreach ($branches as $data)

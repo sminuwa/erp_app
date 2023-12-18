@@ -1,6 +1,6 @@
 <div class="row">
-    <div class="offset-10">
-        <a href="{{ route('ajax.customer.sale.report.print', [$from_date, $to_date, $store_id, $category_id, $product_id, $payment_mode, $customer, $credit_walkedin, $matching]) }}"
+    <div class="col-sm-12">
+        <a href="{{ route('ajax.customer.sale.report.print', [$from_date, $to_date, $branch_id,$store_id, $category_id, $product_id, $customer,$matching]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
@@ -16,13 +16,12 @@
             Keyword Search: {{ $customer }}<br>
             Store/Product:
             {{ $store_id == 'all' ? 'All stores' : \App\Models\Store::find($store_id)->name }}/{{ $product_id == 'all' ? 'All products' : \App\Models\Product::find($product_id)->name }}<br />
-            Payment Mode/Customer Type:
-            {{ $payment_mode == 'all' ? 'Cash and Credit' : $payment_mode }}/{{ $credit_walkedin == 'all' ? 'All customers' : $credit_walkedin }}
         </h5>
     </caption>
 
     <thead>
         <tr>
+            <th>CODE</th>
             <th>CUSTOMER NAMES</th>
             <th>TOTAL SALES</th>
         </tr>
@@ -32,6 +31,7 @@
     @endphp
     @foreach ($sales as $sale)
         <tr>
+            <td>{{ $sale->code }}</td>
             <td>{{ $sale->customer }}</td>
             <td style="text-align: right">
                 &#8358;{{ number_format($sale->total, 2, '.', ',') }}</td>
@@ -42,7 +42,7 @@
     @endforeach
     <tfoot>
         <tr>
-            <th style="text-align: right">TOTAL</th>
+            <th style="text-align: right" colspan="2">TOTAL</th>
             <th style="text-align: right">
                 &#8358;{{ number_format($total_sold, 2, '.', ',') }}</th>
         </tr>

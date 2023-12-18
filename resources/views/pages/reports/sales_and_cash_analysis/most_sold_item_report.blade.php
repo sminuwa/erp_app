@@ -38,34 +38,53 @@
             <div class="container-fluid">
                 <form method="POST" class="form-inline form-check-inline">
                     <div class="row">
-                        <div class="form-group  col-sm-4">
+                        <div class="form-group">
                             <label for="from_date">From Date</label>
                             <input type="text" autocomplete="off"
                                 class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
                                 name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="">
                         </div>
-                        <div class="form-group  col-sm-4">
+                        <div class="form-group">
                             <label for="to_date">To Date</label>
                             <input type="text" autocomplete="off"
                                 class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
                                 name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
                         </div>
-                        <div class="form-group  col-sm-4">
+                        <div class="form-group">
+                            &nbsp;&nbsp;
+                            <label for="branch_id">Branch</label>
+                            <select
+                                class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
+                                name="branch_id" id="branch_id" required>
+
+                            </select>
+                        </div>
+                        <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="number">Number</label>
-                            <input type="number" name="number_limit" id="number_limit" class="form-control" placeholder="Enter the number record to display" min="1" />
+                            <input type="number" name="number_limit" id="number_limit" class="form-control"
+                                placeholder="Enter the number record to display" min="1" />
                         </div>
-                        <div class="form-group text-right  col-sm-2">
+                        
+                        <div class="form-group">
+                            By  &nbsp;&nbsp; &nbsp;
+                            <input type="radio" name="type" value="qty" class="form-control" />
+                            &nbsp;&nbsp; &nbsp;Quantity &nbsp; &nbsp;&nbsp;
+                            <input type="radio" name="type" value="amt" class="form-control" checked />
+                            &nbsp;&nbsp;Amount
+                        </div>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <div class="form-group text-right">
                             <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />
                         </div>
                     </div>
                 </form>
                 <div class="row">
                     <div class="col-sm-12 table-responsive" id="load">
-                        <img src="{{ asset('assets/backend/img/loader.png') }}" style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                        <img src="{{ asset('assets/backend/img/loader.png') }}"
+                            style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
                     </div>
                 </div>
-                
+
             </div><!-- /.container-fluid -->
         </section>
         <!-- /.content -->
@@ -94,6 +113,8 @@
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
                 number_limit = $('#number_limit').val();
+                type = $('input[name="type"]:checked').val();
+                branch_id = $('#branch_id').val();
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
@@ -102,7 +123,8 @@
                         _token: "{{ csrf_token() }}",
                         from_date: from_date,
                         to_date: to_date,
-                        number_limit: number_limit
+                        number_limit: number_limit,
+                        type: type
                     }
                 }).done(function(data) {
                     $("#load").html(data);

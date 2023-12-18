@@ -9,13 +9,16 @@ $(document).ready(function(){
     ajerks('GET','/misc/ajax/chart-of-accounts','ajax-chart-of-accounts')
     ajerks('GET','/misc/ajax/general-accounts','ajax-general-accounts')
     ajerks('GET','/misc/ajax/companies','ajax-companies')
+    ajerks('GET','/misc/ajax/users','ajax-users')
 })
 
 let bodi = $('body');
 
 bodi.on('change', '.ajax-branches',function(){
     $('.ajax-stores').attr('branch_id', $(this).val())
+    $('.ajax-users').attr('branch_id', $(this).val())
     ajerks('GET','/misc/ajax/stores','ajax-stores')
+    ajerks('GET','/misc/ajax/users','ajax-users')
 })
 
 bodi.on('change', '.ajax-categories',function(){

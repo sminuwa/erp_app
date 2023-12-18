@@ -1,28 +1,31 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.print.trial.balance.report', [$from_date, $to_date, $branch->id]) }}" target="_BLANK"
-            class="btn-success btn btn-sm">Print</a>
+        <a href="{{ route('ajax.print.remittance.report', [$from_date, $to_date, $branch->id, $payee_id, $user_id]) }}"
+            target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
 <table class="table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">{{ strtoupper($branch->name) }} <br>
-            TRIAL BALANCE BETWEEN {{ $from_date }} AND {{ $to_date }}
+            DAILY REMITTANCE BETWEEN  {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
+            AND
+            {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
         </h5>
     </caption>
     <thead>
         <tr>
             <th>Account No</th>
             <th>Description</th>
-            <th style="text-align: center; align-content: center">Total (Cr.)</th>
-            <th style="text-align: center; align-content: center">Total (Dr.)</th>
-            <th style="text-align: center; align-content: center">Balance</th>
+            <th>User</th>
+            {{-- <th style="text-align: center; align-content: center">Total (Cr.)</th>
+            <th style="text-align: center; align-content: center">Total (Dr.)</th> --}}
+            <th style="text-align: center; align-content: center">Total</th>
         </tr>
 
     </thead>
     <tbody>
         @php
-            $total_credit = $total_debit = 0;
+            $total_credit = $total_debit = $diff = 0;
         @endphp
         @foreach ($ledgers as $ledger)
             @php
@@ -32,7 +35,8 @@
             <tr>
                 <td>{{ $ledger->number }}</td>
                 <td>{{ $ledger->description }}</td>
-                <td style="text-align: right">
+                <td>{{ $ledger->name ?? '' }}</td>
+                {{-- <td style="text-align: right">
                     @if ($credit > 0.0)
                         &#8358; {{ $credit }}
                     @endif
@@ -41,7 +45,7 @@
                     @if ($debit > 0.0)
                         &#8358; {{ $debit }}
                     @endif
-                </td>
+                </td> --}}
                 @php
                     $total_credit += $ledger->credit;
                     $total_debit += $ledger->debit;
@@ -54,13 +58,13 @@
                 @endif
             </tr>
         @endforeach
-        <tfoot>
-            <tr>
-                <th colspan="2" style="text-align: right;">Total</th>
-                <th style="text-align: right;">&#8358;{{ number_format($total_credit, 2) }}</th>
-                <th style="text-align: right;">&#8358;{{ number_format($total_debit, 2) }}</th>
-                <th style="text-align: right;">&#8358;{{ number_format($diff, 2) }}</th>
-            </tr>
-        </tfoot>
+    <tfoot>
+        <tr>
+            <th colspan="3" style="text-align: right;">Total</th>
+            {{-- <th style="text-align: right;">&#8358;{{ number_format($total_credit, 2) }}</th>
+            <th style="text-align: right;">&#8358;{{ number_format($total_debit, 2) }}</th> --}}
+            <th style="text-align: right;">&#8358;{{ number_format($diff, 2) }}</th>
+        </tr>
+    </tfoot>
     </tbody>
 </table>

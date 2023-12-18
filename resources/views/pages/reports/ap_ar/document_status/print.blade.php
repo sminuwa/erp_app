@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Ledger - {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Daily Remittance - {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -38,9 +38,9 @@
                              style="width:50px;height:50px;" alt="Albabello Logo" class="img-circle elevation-3"
                              style="opacity: .8">
                         <h3>
-                            {{$branch->name }}
+                            {{$branch->name ?? 'All Branches'}}
                         </h3>
-                        <h5 style="text-align: center;">TRIAL BALANCE BETWEEN {{ Carbon\Carbon::parse($from)->toFormattedDateString() }} AND {{ Carbon\Carbon::parse($to)->toFormattedDateString() }}</h5>
+                        <h5 style="text-align: center;">DAILY REMITTANCE BETWEEN {{ Carbon\Carbon::parse($from)->toFormattedDateString() }} AND {{ Carbon\Carbon::parse($to)->toFormattedDateString() }}</h5>
 
                     </div>
                     <!-- /.col -->
@@ -49,14 +49,15 @@
                 <div class="row" style="line-height: 0.4">
                     <div class="col-12 table-responsive">
                         <table class="table table-bordered caption" id="example1" data-ordering="false">
-
+                        
                             <thead>
                                 <tr>
                                     <th>Account No</th>
                                     <th>Description</th>
-                                    <th style="text-align: center; align-content: center">Total (Cr.)</th>
-                                    <th style="text-align: center; align-content: center">Total (Dr.)</th>
-                                    <th style="text-align: center; align-content: center">Balance</th>
+                                    <th>User</th>
+                                    {{-- <th style="text-align: center; align-content: center">Total (Cr.)</th>
+                                    <th style="text-align: center; align-content: center">Total (Dr.)</th> --}}
+                                    <th style="text-align: center; align-content: center">Total</th>
                                 </tr>
                         
                             </thead>
@@ -72,7 +73,8 @@
                                     <tr>
                                         <td>{{ $ledger->number }}</td>
                                         <td>{{ $ledger->description }}</td>
-                                        <td style="text-align: right">
+                                        <td>{{ $ledger->name ?? '' }}</td>
+                                        {{-- <td style="text-align: right">
                                             @if ($credit > 0.0)
                                                 &#8358; {{ $credit }}
                                             @endif
@@ -81,7 +83,7 @@
                                             @if ($debit > 0.0)
                                                 &#8358; {{ $debit }}
                                             @endif
-                                        </td>
+                                        </td> --}}
                                         @php
                                             $total_credit += $ledger->credit;
                                             $total_debit += $ledger->debit;
@@ -94,14 +96,14 @@
                                         @endif
                                     </tr>
                                 @endforeach
-                                <tfoot>
-                                    <tr>
-                                        <th colspan="2" style="text-align: right;">Total</th>
-                                        <th style="text-align: right;">&#8358;{{ number_format($total_credit, 2) }}</th>
-                                        <th style="text-align: right;">&#8358;{{ number_format($total_debit, 2) }}</th>
-                                        <th style="text-align: right;">&#8358;{{ number_format($diff, 2) }}</th>
-                                    </tr>
-                                </tfoot>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="3" style="text-align: right;">Total</th>
+                                    {{-- <th style="text-align: right;">&#8358;{{ number_format($total_credit, 2) }}</th>
+                                    <th style="text-align: right;">&#8358;{{ number_format($total_debit, 2) }}</th> --}}
+                                    <th style="text-align: right;">&#8358;{{ number_format($diff, 2) }}</th>
+                                </tr>
+                            </tfoot>
                             </tbody>
                         </table>
                     </div>

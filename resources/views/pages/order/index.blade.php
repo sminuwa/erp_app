@@ -81,7 +81,6 @@
                                             <th>Amount Paid</th>
                                             <th>Amount Due</th>
                                             <th>Due Date</th>
-                                            <th>Payment Mode</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -109,7 +108,6 @@
                                                 </td>
                                                 <td>{{ Carbon\Carbon::parse($order->due_date)->toFormattedDateString() }}
                                                 </td>
-                                                <td>{{ $order->payment_mode }}</td>
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button"
@@ -191,25 +189,10 @@
                                             <th style="text-align:right">
                                                 &#8358;{{ number_format($total_due, 2, '.', ',') }}</th>
                                             <th>Due Date</th>
-                                            <th>Payment Mode</th>
                                             <th>Actions</th>
                                         </tr>
                                     </tfoot>
                                 </table>
-                                <div class="row">
-                                    <div class="col-sm-2">
-                                        @can('view.customer.ledger')
-                                            <a href="javascript:void(0)" data-toggle="modal"
-                                                data-target="#customer_ledgerform" class="btn btn-sm btn-secondary"
-                                                style="margin-left: 2px;">Customer Ledger </a>
-                                        @endcan
-
-                                    </div>
-                                    <div class="col-sm-6 text-danger">
-                                        <strong>Total Record is of
-                                            {{ number_format(App\Models\Order::count('*'), 0, ',', '') }}</strong>
-                                    </div>
-                                </div>
                             </div>
                             <!-- /.card-body -->
 

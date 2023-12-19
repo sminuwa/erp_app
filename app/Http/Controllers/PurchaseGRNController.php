@@ -56,12 +56,13 @@ class PurchaseGRNController extends Controller
     {
         \Cart::clear();
         $search_value = $request->refno;
-        $records = Purchase::select('purchases.*')->where('invoice', 'LIKE', "%$search_value%")
+        $records = Purchase::select('purchases.*')->where('reference', 'LIKE', "%$search_value%")
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
-            ->where('branch_id', 'LIKE', User::userBranchAction())
+            ->where('purchases.branch_id', 'LIKE', User::userBranchAction())
             ->orderBy('purchase_date', 'DESC')->take(10)->get();
         return view('pages.inventories.purchases.grn.index', [
-            'records' => $records
+            'records' => $records,
+            'suppliers' => Supplier::where('code', 'like', 'TS%')->orderBy('name')->get(),
         ]);
     }
 

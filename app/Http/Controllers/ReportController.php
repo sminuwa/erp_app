@@ -189,7 +189,7 @@ class ReportController extends Controller
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.stock_control.load_stock_History_report', compact('records', 'from_date', 'to_date', 'store_id', 'product_id', 'branch_id', 'category_id', 'branch', 'type'));
+        return view('pages.reports.stock_control.load_stock_history_report', compact('records', 'from_date', 'to_date', 'store_id', 'product_id', 'branch_id', 'category_id', 'branch', 'type'));
     }
 
     public function printStockHistory($from_date, $to_date, $type, $branch_id, $store_id, $category_id, $product_id)

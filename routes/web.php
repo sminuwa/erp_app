@@ -735,45 +735,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/stock/transfer/load', [ReportController::class, 'loadStockTransferReport'])->name('ajax.load.stock.transfer.reports');
             Route::get('/stock/transfer/print/{from_date}/{to_date}/{store_id}/{category_id}/{product_id}/{from_to}', [ReportController::class, 'printStockTransfer'])->name('ajax.print.stock.transfer.reports');
 
-            //Bank Ledger Report
-            Route::get('/be/bank-ledger', [ReportController::class, 'generateBankLedger'])->name('bank.ledger');
-            Route::get('/be/bank-ledger/load', [ReportController::class, 'loadBankLedger'])->name('ajax.bank.ledger');
-            Route::get('/be/bank-ledger/print/{from_date}/{to_date}/{bank_id}', [ReportController::class, 'printBankLedger'])->name('ajax.bank.print.ledger');
-
-            //Bank Deposit Report
-            Route::get('/be/bank-deposit', [ReportController::class, 'generateBankDeposit'])->name('bank.deposit.report');
-            Route::get('/be/bank-desposit/load', [ReportController::class, 'loadBankDeposit'])->name('ajax.bank.deposit.report');
-            Route::get('/be/bank-deposit/print/{from_date}/{to_date}', [ReportController::class, 'printBankDeposit'])->name('ajax.bank.deposit.report.print');
-
-            //Bank Withdaw Report
-            Route::get('/be/bank-withdraw', [ReportController::class, 'generateBankWithdraw'])->name('bank.withdraw.report');
-            Route::get('/be/bank-withdraw/load', [ReportController::class, 'loadBankWithdraw'])->name('ajax.bank.withdraw.report');
-            Route::get('/be/bank-withdraw/print/{from_date}/{to_date}', [ReportController::class, 'printBankWithdraw'])->name('ajax.bank.withdraw.report.print');
-
-            //Bank Withdaw Report
-            Route::get('/be/cash-transfer', [ReportController::class, 'generateCashTransfer'])->name('cash.transfer.report');
-            Route::get('/be/cash-transfer/load', [ReportController::class, 'loadCashTransfer'])->name('ajax.cash.transfer.report');
-            Route::get('/be/cash-transfer/print/{from_date}/{to_date}/{user_id}', [ReportController::class, 'printCashTransfer'])->name('ajax.cash.trasnfer.report.print');
-
-            //Bank Withdaw Report
-            Route::get('/be/bank-balance', [ReportController::class, 'generateBankBalance'])->name('bank.balance.report');
-            Route::get('/be/bank-balance/print', [ReportController::class, 'printBankBalance'])->name('bank.balance.report.print');
-
-            //Cheque Collected Report
-            Route::get('/be/cheque-collected', [ReportController::class, 'generateChequeCollected'])->name('cheque.collected.report');
-            Route::get('/cheque-collected/load', [ReportController::class, 'loadChequeCollected'])->name('ajax.cheque.collected.report');
-            Route::get('/cheque-collected/print/{from_date}/{to_date}', [ReportController::class, 'printChequeCollected'])->name('ajax.cheque.collected.report.print');
-
-            //Consolidated Expense Report
-            Route::get('/consolidated-expense', [ReportController::class, 'generateConsolidatedExpense'])->name('consolidated.expense.report');
-            Route::get('/be/consolidated-expense/load', [ReportController::class, 'loadConsolidatedExpense'])->name('ajax.consolidated.expense.report');
-            Route::get('/be/consolidated-expense/print/{from_date}/{to_date}/{item_id}', [ReportController::class, 'printConsolidatedExpense'])->name('ajax.consolidated.expense.report.print');
-
-            //Expense Item Report
-            Route::get('/be/expense-item', [ReportController::class, 'generateExpenseItem'])->name('expense.item.report');
-            Route::get('/be/expense-item/load', [ReportController::class, 'loadExpenseItem'])->name('ajax.expense.item.report');
-            Route::get('/be/expense-item/print/{from_date}/{to_date}/{item_id}', [ReportController::class, 'printExpenseItem'])->name('ajax.expense.item.report.print');
-
             //Daily Report
             Route::get('/be/daily-report', [ReportController::class, 'dailyReport'])->name('daily.report');
             Route::get('/be/daily-report/load', [ReportController::class, 'loadDailyReport'])->name('ajax.load.daily.report');
@@ -793,12 +754,12 @@ Route::middleware('auth')->group(function () {
             //Store  Ledger
             Route::get('/sc/store-ledger/in', [ReportController::class, 'storeLedger'])->name('store.ledger.reports');
             Route::get('/sc/store-ledger/load', [ReportController::class, 'loadStoreLedger'])->name('ajax.load.store.ledger.reports');
-            Route::get('/sc/stock-ledger/print/{store_id}/{category_id}/{product_id}', [ReportController::class, 'printstoreLedger'])->name('ajax.print.store.ledger.reports');
+            Route::get('/sc/stock-ledger/print/{branch_id}/{store_id}/{category_id}/{product_id}', [ReportController::class, 'printstoreLedger'])->name('ajax.print.store.ledger.reports');
 
             //Stock  Adjustment
             Route::get('/sc/stock-adjustment/in', [ReportController::class, 'stockAdjustment'])->name('stock.adjustment.reports');
             Route::get('/sc/stock-adjustment/load', [ReportController::class, 'loadStockAdjustment'])->name('ajax.load.stock.adjustment.reports');
-            Route::get('/sc/stock-adjustment/print/{from_date}/{to_date}/{store_id}/{category_id}/{product_id}', [ReportController::class, 'printStockAdjustment'])->name('ajax.print.stock.adjustment.reports');
+            Route::get('/sc/stock-adjustment/print/{from_date}/{to_date}/{branch_id}/{store_id}/{category_id}/{product_id}', [ReportController::class, 'printStockAdjustment'])->name('ajax.print.stock.adjustment.reports');
 
             //Previous Stock Balances Report
             Route::get('/sc/stock/balances', [ReportController::class, 'previousStockBalance'])->name('stock.balances.report');
@@ -828,23 +789,19 @@ Route::middleware('auth')->group(function () {
             //CUstoomer Sale with common names Report
             Route::get('/sa/customer/sale/common-name', [ReportController::class, 'customerSaleReport'])->name('customer.sale.reports');
             Route::get('/sa/customer/sale/common-name/load', [ReportController::class, 'loadCustomerSaleReport'])->name('ajax.load.customer.sale.reports');
-            Route::get('/sa/customer/sale/common-name/print/{from_date}/{to_date}/{store_id}/{category_id}/{product_id}/{payment_mode}/{customer}/{credit_walkedin}/{matching}/', [ReportController::class, 'printCustomerSaleReport'])->name('ajax.customer.sale.report.print');
+            Route::get('/sa/customer/sale/common-name/print/{from_date}/{to_date}/{branch_id}/{store_id}/{category_id}/{product_id}/{customer}/{matching}', [ReportController::class, 'printCustomerSaleReport'])->name('ajax.customer.sale.report.print');
 
             //Debtpr Balance Report
             Route::get('/sa/debtor/balance', [ReportController::class, 'debtorBalanceReport'])->name('debtor.balance.reports');
             Route::get('/sa/debtor/balance/load', [ReportController::class, 'loadDebtorBalanceReport'])->name('ajax.load.debtor.balance.reports');
             Route::get('/sa/debtor/balance/print/{from_date}/{to_date}/{customer}/', [ReportController::class, 'printDebtorBalanceReport'])->name('ajax.debtor.balance.report.print');
 
-            //Most Sold Item by Amount Report
+            //Most Sold Item by Amount and by Quantity Report
             Route::get('/sa/most/sold-item', [ReportController::class, 'mostSoldItemReport'])->name('most.sold.item.reports');
             Route::get('/sa/most/sold-item/load', [ReportController::class, 'loadMostSoldItemReport'])->name('ajax.load.most.sold.item.reports');
-            Route::get('/sa/most/sold-item/print/{from_date}/{to_date}/{number_limit}/', [ReportController::class, 'printMostSoldItemReport'])->name('ajax.most.sold.item.print');
+            Route::get('/sa/most/sold-item/print/{from_date}/{to_date}/{branch_id}/{type}/{number_limit}/', [ReportController::class, 'printMostSoldItemReport'])->name('ajax.most.sold.item.print');
 
-            //Most Sold Item by Quantity Report
-            Route::get('/sa/most/sold-item/qty', [ReportController::class, 'mostSoldItemQuantityReport'])->name('most.sold.item.quantity.reports');
-            Route::get('/sa/most/sold-item/qty/load', [ReportController::class, 'loadSoldItemQuantityReport'])->name('ajax.load.most.sold.item.quantity.reports');
-            Route::get('/sa/most/sold-item/qty/print/{from_date}/{to_date}/{number_limit}/', [ReportController::class, 'printSoldItemQuantityReport'])->name('ajax.most.sold.item.quantity.print');
-
+        
             //Total Items Sold to Customer
             Route::get('/sa/total-item', [ReportController::class, 'totalItemSoldReport'])->name('total.item.sold.report');
             Route::get('/sa/total-item/load', [ReportController::class, 'loadItemSoldReport'])->name('ajax.total.item.sold.report');
@@ -862,58 +819,23 @@ Route::middleware('auth')->group(function () {
             Route::get('/ca/customer/debt/load', [ReportController::class, 'loadCustomerDebtReport'])->name('ajax.load.customer.total.debt.reports');
             Route::get('/ca/customer/debt/print/{from_date}/{to_date}/{customer}/', [ReportController::class, 'printCustomerDebtReport'])->name('ajax.customer.total.debt.report.print');
 
-            //Customer Balance Detail Report
-            Route::get('/ca/customer/balance-details', [ReportController::class, 'customerBalanceDetailReport'])->name('customer.balance.details.reports');
-            Route::get('/ca/customer/balance-details/load', [ReportController::class, 'loadCustomerBalanceDetailReport'])->name('ajax.load.customer.balance.details.reports');
-            Route::get('/ca/customer/balance-details/print/{from_date}/{to_date}/{customer}/', [ReportController::class, 'printCustomerBalanceDetailReport'])->name('ajax.customer.balance.details.report.print');
-
             //Customer Last Transaction Report
             Route::get('/ca/customer/last-transaction', [ReportController::class, 'lastTransaction'])->name('customer.last.transaction.reports');
             Route::get('/ca/customer/last-transaction/load', [ReportController::class, 'loadLastTransaction'])->name('ajax.load.customer.last.transaction.reports');
             Route::get('/ca/customer/last-transaction/print/{from_date}/{to_date}/{customer}/', [ReportController::class, 'printLastTransaction'])->name('ajax.customer.last.transaction.report.print');
 
-            //Customer Payment Report
-            Route::get('/ca/customer/payment', [ReportController::class, 'customerPaymentReport'])->name('customer.payment.reports');
-            Route::get('/ca/customer/payment/load', [ReportController::class, 'loadCustomerPaymentReport'])->name('ajax.load.customer.payment.reports');
-            Route::get('/ca/customer/payment/print/{from_date}/{to_date}/{customer}/', [ReportController::class, 'printCustomerPaymentReport'])->name('ajax.customer.payment.report.print');
-
-            //Debtor Payment Overdue Report
-            Route::get('/ca/debtor/payment-overdue', [ReportController::class, 'debtorPaymentOverDueReport'])->name('customer.payment.overdue.reports');
-            Route::get('/ca/debtor/payment-overdue/load', [ReportController::class, 'loadDebtorPaymentOverDueReport'])->name('ajax.load.customer.payment.overdue.reports');
-            Route::get('/ca/debtor/payment-overdue/print/{from_date}/{to_date}/{customer}/', [ReportController::class, 'printDebtorPaymentOverDueReport'])->name('ajax.customer.payment.overdue.report.print');
-
-            //Deleted Sales Report
-            Route::get('/be/deleted-sales', [ReportController::class, 'deletedSaleReport'])->name('deleted.sales.reports');
-            Route::get('/be/deleted-sales/load', [ReportController::class, 'loadDeletedSaleReport'])->name('ajax.load.deleted.sales.reports');
-            Route::get('/be/deleted-sales/print/{from_date}/{to_date}/{customer}/', [ReportController::class, 'printDeletedSaleReport'])->name('ajax.deleted.sales.report.print');
-
+          
             //Customer Balance Detail Report
             Route::get('/ca/customer/ageing-report', [ReportController::class, 'ageingReport'])->name('customer.ageing.reports');
             Route::get('/ca/customer/ageing-report/load', [ReportController::class, 'loadAgeingReport'])->name('ajax.load.customer.ageing.reports');
             Route::get('/ca/customer/ageing-report/print/{from_date}/{to_date}/{customer_id}/', [ReportController::class, 'printAgeingReport'])->name('ajax.customer.ageing.report.print');
-
-            //Begin Supplier Ledger Analysis
-            //Supplier Balance Detail Report
-            Route::get('/sp/supplier/running-balance', [ReportController::class, 'supplierBalanceReport'])->name('supplier.balance.reports');
-            Route::get('/sp/supplier/running-balance/load', [ReportController::class, 'loadSupplierBalanceReport'])->name('ajax.load.supplier.balance.reports');
-            Route::get('/sp/supplier/running-balance/print/{from_date}/{to_date}/{supplier_id}/', [ReportController::class, 'printSupplierBalanceReport'])->name('ajax.supplier.balance.report.print');
-
-            //Supplier Debt Report
-            Route::get('/ca/supplier/debt', [ReportController::class, 'supplierDebtReport'])->name('supplier.total.debt.reports');
-            Route::get('/ca/supplier/debt/load', [ReportController::class, 'loadSupplierDebtReport'])->name('ajax.load.supplier.total.debt.reports');
-            Route::get('/ca/supplier/debt/print/{from_date}/{to_date}/{supplier_id}/', [ReportController::class, 'printSupplierDebtReport'])->name('ajax.supplier.total.debt.report.print');
 
             //Credit Note Report
             Route::get('/ca/credit/note', [ReportController::class, 'creditNoteReport'])->name('credit.note.reports');
             Route::get('/ca/credit/note/load', [ReportController::class, 'loadCreditNoteReport'])->name('ajax.load.credit.note.reports');
             Route::get('/ca/credit/note/print/{from_date}/{to_date}/{supplier_id}/', [ReportController::class, 'printCreditNoteReport'])->name('ajax.credit.note.report.print');
 
-            //Begin Purchase Anaysis
-            //Customer Payment Report
-            Route::get('/pa/supplier/payment', [ReportController::class, 'supplierPaymentReport'])->name('supplier.payment.reports');
-            Route::get('/pa/supplier/payment/load', [ReportController::class, 'loadSupplierPaymentReport'])->name('ajax.load.supplier.payment.reports');
-            Route::get('/pa/supplier/payment/print/{from_date}/{to_date}/{supplier_id}/', [ReportController::class, 'printSupplierPaymentReport'])->name('ajax.supplier.payment.report.print');
-
+           
             //Purchases  Report
             Route::get('/pa/puchases/transaction', [ReportController::class, 'purchasesReport'])->name('supplier.transaction.report');
             Route::get('/pa/puchases/transaction/load', [ReportController::class, 'loadPurchasesReport'])->name('ajax.supplier.transaction.report');
@@ -958,7 +880,7 @@ Route::middleware('auth')->group(function () {
                 //Account Statement
                 Route::get('/account_statement', [ReportController::class, 'accountStatement'])->name('account.statement.report');
                 Route::get('/account_statement/load', [ReportController::class, 'loadAccountStatement'])->name('ajax.load.account.statement.report');
-                Route::get('/account_statement/print/{from_date}/{to_date}/{payer_id}/{branch_id}/{type}', [ReportController::class, 'printAccountStatement'])->name('ajax.account.statement.report.print');
+                Route::get('/account_statement/print/{from_date}/{to_date}/{branch_id}/{payer_id}/{type}', [ReportController::class, 'printAccountStatement'])->name('ajax.account.statement.report.print');
 
                 //Income Statement
                 Route::get('/income_statement', [ReportController::class, 'incomeStatement'])->name('income.statement.report');
@@ -968,7 +890,7 @@ Route::middleware('auth')->group(function () {
                 //Trial Balance
                 Route::get('/trial_balance', [ReportController::class, 'trialBalance'])->name('trial.balance.report');
                 Route::get('/trial_balance/load', [ReportController::class, 'loadTrialBalance'])->name('ajax.load.trial.balance.report');
-                Route::get('/trial_balance/print/{from}/{to}/{branch}', [ReportController::class, 'printTrialBalance'])->name('ajax.print.trial.balance.report');
+                Route::get('/trial_balance/print/{from}/{to}/{branch_id}', [ReportController::class, 'printTrialBalance'])->name('ajax.print.trial.balance.report');
 
                 //Daily Remittance
                 Route::get('/remittance', [ReportController::class, 'remittance'])->name('remittance.report');

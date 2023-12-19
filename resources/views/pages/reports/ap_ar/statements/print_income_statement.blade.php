@@ -39,7 +39,7 @@
                             <h3>
                                 {{$branch->name}}
                             </h3>
-                            <h5 style="text-align: center;">{{ strtoupper($branch->name) }} <br>
+                            <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
                                 INCOME STATEMENT FROM {{ $from_month=='all'?'January':monthName($from_month) }} AND
                                 {{ $to_month=='all'?'December':monthName($to_month) }}
                             </h5>
@@ -164,7 +164,11 @@
                                         @php $gross_profit_loss = $total_revenue - $total_cost  @endphp
                                         <th colspan="3" style="text-align: right;">&#8358;{{ number_format($gross_profit_loss, 2) }}</th>
                                     </tr>
-                                     
+                                    <tr>
+                                        <th colspan="6">
+                                            <h3>OTHER INCOMES</h3>
+                                        </th>
+                                    </tr>
                                     <tr>
                                         <th colspan="6">
                                             <h3>EXPENSES</h3>
@@ -212,6 +216,11 @@
                                         @php $total_expense = $credit_sum - $debit_sum  @endphp
                                         <th colspan="3" style="text-align: right;">&#8358;{{ number_format($total_expense, 2) }}</th>
                                     </tr>
+                                    <tr>
+                                        <th colspan="4" style="text-align: right">TAX DIVIDEND</th>
+                                        <th colspan="3" style="text-align: right;">&#8358;{{ number_format(0, 2) }}</th>
+                                    </tr>
+                                    
                                     <tr>
                                         <th colspan="4" style="text-align: right">NET PROFIT /LOSS</th>
                                         @php $net_profit_loss = $gross_profit_loss - $total_expense+ $other_income  @endphp

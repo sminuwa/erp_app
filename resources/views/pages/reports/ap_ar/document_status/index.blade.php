@@ -20,12 +20,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Receipt/Payment/Interbank & Journal list</h4>
+                        <h4>Invoice/Receipt/Payment/Interbank & Journal list</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Receipt/Payment/Interbank & Journal list</li>
+                            <li class="breadcrumb-item active">Status</li>
                         </ol>
                     </div>
                 </div>
@@ -69,6 +69,9 @@
                                         <select class="form-control {{ $errors->has('type') ? ' is-invalid' : '' }}"
                                             name="type" id="type" required="required">
                                             <option value="">Select</option>
+                                            <option value="Invoice">
+                                                Invoice
+                                            </option>
                                             <option value="Payment">
                                                 Payment
                                             </option>

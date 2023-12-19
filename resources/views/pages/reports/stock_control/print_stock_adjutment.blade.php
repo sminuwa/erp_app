@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Stock - {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Stock Adjustment- {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -34,15 +34,16 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:80px;height:80px;"
-                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
+                                style="width:80px;height:80px;" alt="Albabello Logo" class="img-circle elevation-3"
+                                style="opacity: .8">
                             <h3>
-                                {{App\Models\User::UserBranchName()->long_name}}
+                                {{ $branch->name ?? 'All Branches' }}
                             </h3>
                             <h5 style="text-align: center;">STOCK ADJUSTMENT REPORT
                             </h5>
                             <h5 style="text-align: center;">DATE BETWEEN
-                                {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}  AND
+                                {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }} AND
                                 {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
                             </h5>
 
@@ -57,20 +58,22 @@
                                 <thead>
                                     <tr>
                                         <th>DATE</th>
+                                        <th>ITEM CODE</th>
                                         <th>ITEM NAME</th>
                                         <th>QUANTITY</th>
                                         <th>STORE</th>
                                         <th>ADJUSTMENT NO</th>
-                            
+
                                     </tr>
                                 </thead>
                                 @foreach ($stores as $store)
                                     <tr>
                                         <td> {{ \Carbon\Carbon::parse($store->date)->toFormattedDateString() }} </td>
+                                        <td> {{ $store->code }} </td>
                                         <td> {{ $store->name }} </td>
-                                        <td> {{ $store->adjusted_qty }} </td>
+                                        <td> {{ $store->quantity }} </td>
                                         <td>{{ $store->store }} </td>
-                                        <td> {{ $store->refno }} </td>
+                                        <td> {{ $store->reference }} </td>
                                     </tr>
                                 @endforeach
                             </table>

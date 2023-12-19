@@ -1,12 +1,12 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.print.trial.balance.report', [$from_date, $to_date, $branch->id]) }}" target="_BLANK"
+        <a href="{{ route('ajax.print.trial.balance.report', [$from_date, $to_date, $branch_id]) }}" target="_BLANK"
             class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
 <table class="table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
-        <h5 style="text-align: center;">{{ strtoupper($branch->name) }} <br>
+        <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
             TRIAL BALANCE BETWEEN {{ $from_date }} AND {{ $to_date }}
         </h5>
     </caption>

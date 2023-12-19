@@ -1,12 +1,12 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.print.remittance.report', [$from_date, $to_date, $branch->id, $payee_id, $user_id]) }}"
+        <a href="{{ route('ajax.print.remittance.report', [$from_date, $to_date, $branch_id, $payee_id, $user_id]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
 <table class="table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
-        <h5 style="text-align: center;">{{ strtoupper($branch->name) }} <br>
+        <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
             DAILY REMITTANCE BETWEEN  {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
             AND
             {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}

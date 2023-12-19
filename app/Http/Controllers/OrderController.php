@@ -567,8 +567,8 @@ class OrderController extends Controller
         $user = Auth::user();
         $orders = Order::with('customer')->where('branch_id', User::userBranchAction());
         if ($user->hasRole('Sales-Manager'))
-            $orders = $orders->where('sold_by', Auth::id());
-        $orders = $orders->whereBetween('order_date', [date('Y-m-d', strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])
+            $orders = $orders->where('sold_by', Auth::id())->take(300);
+        //$orders = $orders->whereBetween('order_date', [date('Y-m-d', strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])
             ->orderBy('posted_by', 'asc')->get();
         return view('pages.order.index', compact('orders'));
     }

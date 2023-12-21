@@ -37,7 +37,7 @@ class CreditNoteController extends Controller
             ->whereNotIn('invoice_no', DB::table('credit_notes')->select('invoice_no')->pluck('invoice_no')->toArray())
             ->orderBy('order_date', 'DESC')->take(20)->get();
 
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price','retail_selling_price','whole_selling_price', 'cost_price', 'unit')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'retail_selling_price', 'whole_selling_price', 'cost_price', 'unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
             ->join('products', 'products.id', 'store_products.product_id')
@@ -269,7 +269,8 @@ class CreditNoteController extends Controller
                     'selling_price' => $data->selling_price,
                     'sold_price' => $data->sold_price,
                     'discount' => 0,
-                    'unit' => $data->storeProduct->product->unit
+                    'code' => $data->storeProduct->product->code ?? '',
+                    'unit' => $data->unit
                 ),
             ]);
         }

@@ -37,7 +37,7 @@
                     @foreach ($cart_products as $product)
                         <tr class="item{{ $product->id }}">
                             <td>{{ $loop->iteration }}</td>
-                            <td class="text-left">{{ $product->code }}</td>
+                            <td class="text-left">{{ $product->attributes['code'] }}</td>
                             <td class="text-left">{{ $product->name }}</td>
                             <td class="text-left">{{ $product->attributes['unit'] }}</td>
                             <td class="text-left">{{ $product->attributes['sold_price'] }}</td>

@@ -17,7 +17,9 @@ let bodi = $('body');
 bodi.on('change', '.ajax-branches',function(){
     $('.ajax-stores').attr('branch_id', $(this).val())
     $('.ajax-users').attr('branch_id', $(this).val())
+    $('.ajax-customers').attr('branch_id', $(this).val())
     ajerks('GET','/misc/ajax/stores','ajax-stores')
+    ajerks('GET','/misc/ajax/customers','ajax-customers')
     ajerks('GET','/misc/ajax/users','ajax-users')
 })
 
@@ -31,6 +33,10 @@ function ajerks(method, url, cssClass){
     let element = $('.'+cssClass);
     let data;
     if(element.attr('branch_id') && element.attr('name')==='store_id'){
+        let branch_id = element.attr('branch_id')
+        data = { branch_id : branch_id }
+    }
+    if(element.attr('branch_id') && element.attr('name')==='customer_id'){
         let branch_id = element.attr('branch_id')
         data = { branch_id : branch_id }
     }

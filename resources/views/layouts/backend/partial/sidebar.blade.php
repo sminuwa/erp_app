@@ -174,16 +174,7 @@
 
                     </ul>
                 </li>
-                <!--
-                @can('view.daily.sale.report')
-    <li class="nav-item">
-                            <a href="{{ route('daily.report') }}"
-                                class="nav-link {{ Request::is('*/daily-report*') ? 'active' : '' }}">
-                                <i class="ion-code-working"></i>
-                                <p>Daily Report</p>
-                            </a>
-                        </li>
-@endcan-->
+               
 
                 @can('menu.setting')
                     <li class="nav-item has-treeview {{ Request::is('settings/*') ? 'menu-open' : '' }}">
@@ -509,6 +500,20 @@
                                                 <p>Ageing Report</p>
                                             </a>
                                         </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('customer.credit_limit.reports') }}"
+                                                class="nav-link {{ Request::is('reports/ca/customer/credit_limit*') ? 'active' : '' }}">
+                                                <i class="ion-cash"></i>
+                                                <p>Customers With Credit Limit</p>
+                                            </a>
+                                        </li> 
+                                        <li class="nav-item">
+                                            <a href="{{ route('customer.list.reports') }}"
+                                                class="nav-link {{ Request::is('reports/ca/customer/list*') ? 'active' : '' }}">
+                                                <i class="ion-cash"></i>
+                                                <p>Customer List</p>
+                                            </a>
+                                        </li> 
                                     </ul>
                                 </li>
                             @endcan

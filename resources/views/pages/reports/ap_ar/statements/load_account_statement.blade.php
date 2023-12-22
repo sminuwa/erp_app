@@ -84,7 +84,7 @@
         </tr>
         <tr>
             <th colspan="4" style="text-align: right">Balance C/F</th>
-            <th colspan="3" style="text-align: right;">&#8358;{{ number_format($balance, 2) }}</th>
+            <th colspan="3" style="text-align: right;">&#8358;{{ number_format($dif, 2) }}</th>
 
         </tr>
     </tfoot>

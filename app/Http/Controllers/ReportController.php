@@ -2386,19 +2386,29 @@ class ReportController extends Controller
         if ($branch_id == 'all')
             $branch_id = '%';
 
-        $query = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id);
-        $ledgers = $query->orderBy('date')->orderBy('general_account_ledgers.id')->get();
-        $ledgers = $query->where('model_name', 'LIKE', $type)
-            ->where('model_id', 'LIKE', $payer_id)->get();
-
-        $credit_sum = $query->sum('credit');
-        $debit_sum = $query->sum('debit');
+        $query = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, $type)
+            ->where('model_id', 'LIKE', $payer_id)
+            ->orderBy('date')->orderBy('general_account_ledgers.id');
+        $ledgers = $query->get();
 
 
-        $sum_cr_b_d = $this->generalAccountLedgerB4D($from_date, $branch_id)->sum('credit');
-        $sum_dr_b_d = $this->generalAccountLedgerB4D($from_date, $branch_id)->sum('debit');
-        $balance = $credit_sum - $debit_sum;
+        // $credit_sum = $query->sum('credit');
+        // $debit_sum = $query->sum('debit');
+        $credit_sum = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, $type)
+            ->where('model_id', 'LIKE', $payer_id)->sum('credit');
+        $debit_sum = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, $type)
+            ->where('model_id', 'LIKE', $payer_id)->sum('debit');
+
+
+        $sum_cr_b_d = $this->generalAccountLedgerB4D($from_date, $branch_id, $type)
+            ->where('model_id', 'LIKE', $payer_id)
+            ->where('model_name', 'LIKE', $type)->sum('credit');
+        $sum_dr_b_d = $this->generalAccountLedgerB4D($from_date, $branch_id, $type)
+            ->where('model_id', 'LIKE', $payer_id)
+            ->where('model_name', 'LIKE', $type)->sum('debit');
         $balance_b_d = $sum_cr_b_d - $sum_dr_b_d;
+        $balance = $credit_sum - $debit_sum + $balance_b_d;
+
         if ($branch_id == '%')
             $branch_id = 'all';
         if ($payer_id == '%')
@@ -2408,7 +2418,7 @@ class ReportController extends Controller
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.ap_ar.statements.load_account_statement', compact('ledgers', 'branch', 'from_date', 'to_date', 'balance', 'branch_id', 'payer_id','type','credit_sum', 'debit_sum', 'sum_cr_b_d', 'sum_dr_b_d', 'balance_b_d'));
+        return view('pages.reports.ap_ar.statements.load_account_statement', compact('ledgers', 'branch', 'from_date', 'to_date', 'balance', 'branch_id', 'payer_id', 'type', 'credit_sum', 'debit_sum', 'sum_cr_b_d', 'sum_dr_b_d', 'balance_b_d'));
     }
     public function accountBalance(Request $request)
     {
@@ -2534,21 +2544,62 @@ class ReportController extends Controller
         return view('pages.reports.ap_ar.trial_balance.print', compact('ledgers', 'branch', 'from', 'to', 'balance', 'credit_sum', 'debit_sum'));
     }
 
-    private function generalAccountLedgerBy($from_date, $to_date, $branch_id)
+    private function generalAccountLedgerBy($from_date, $to_date, $branch_id, $type = null)
     {
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
+        if ($type != null && $type == "Customer") {
+            return GeneralAccountLedger::join('customers', 'customers.id', '=', 'general_account_ledgers.model_id')
+                ->where('general_account_ledgers.branch_id', 'like', $branch_id)
+                ->whereDate('date', '>=', $from_date)
+                ->whereDate('date', '<=', $to_date)
+                ->where('model_name', 'Customer');
+        }
+        if ($type != null && $type == "Supplier") {
+            return GeneralAccountLedger::join('suppliers', 'suppliers.id', '=', 'general_account_ledgers.model_id')
+                ->where('general_account_ledgers.branch_id', 'like', $branch_id)
+                ->whereDate('date', '>=', $from_date)
+                ->whereDate('date', '<=', $to_date)
+                ->where('model_name', 'Supplier');
+        }
+        if ($type != null && $type == "GeneralAccount") {
+            return GeneralAccountLedger::join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+                ->where('general_account_ledgers.branch_id', 'like', $branch_id)
+                ->whereDate('date', '>=', $from_date)
+                ->whereDate('date', '<=', $to_date)
+                ->where('model_name', 'GeneralAccount');
+        }
         return GeneralAccountLedger::join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
             ->where('general_account_ledgers.branch_id', 'like', $branch_id)
             ->whereDate('date', '>=', $from_date)
             ->whereDate('date', '<=', $to_date);
+
     }
 
-    private function generalAccountLedgerB4D($from_date, $branch_id)
+    private function generalAccountLedgerB4D($from_date, $branch_id, $type = null)
     {
         //To get account balance before start date 
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
+        if ($type != null && $type == "Customer") {
+            return GeneralAccountLedger::join('customers', 'customers.id', '=', 'general_account_ledgers.model_id')
+                ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+                ->whereDate('date', '<', $from_date)
+                ->where('model_name', 'Customer');
+        }
+        if ($type != null && $type == "Supplier") {
+            return GeneralAccountLedger::join('suppliers', 'suppliers.id', '=', 'general_account_ledgers.model_id')
+                ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+                ->whereDate('date', '<', $from_date)
+                ->where('model_name', 'Supplier');
+        }
+        if ($type != null && $type == "GeneralAccount") {
+            return GeneralAccountLedger::join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+                ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+                ->whereDate('date', '<', $from_date)
+                ->where('model_name', 'GeneralAccount');
+        }
+
         return GeneralAccountLedger::join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
             ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
             ->whereDate('date', '<', $from_date);

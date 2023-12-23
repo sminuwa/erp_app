@@ -45,11 +45,7 @@
                                     <i class="fa fa-plus-circle" aria-hidden="true"></i> New Invoice
                                 </a>
 
-                                <a href="javascript:void(0)" data-toggle="modal"
-                                    data-target="#order_detail_form{{ $order->id }}" data-val="{{ $order->id }}"
-                                    class="btn btn-success btn-sm  show">
-                                    <i class="fa fa-check" aria-hidden="true"></i> Confirm
-                                </a>
+
 
                                 <a href="{{ route('waybill.order_print', $order->id) }}" target="_BLANK"
                                     class="btn btn-primary btn-sm ">
@@ -57,6 +53,11 @@
                                 </a>
 
                                 @if ($order->status == 1)
+                                    <a href="javascript:void(0)" data-toggle="modal"
+                                       data-target="#order_detail_form{{ $order->id }}" data-val="{{ $order->id }}"
+                                       class="btn btn-success btn-sm  show">
+                                        <i class="fa fa-check" aria-hidden="true"></i> Confirm
+                                    </a>
                                     <a href="{{ route('invoice.print', $order->id) }}" target="_BLANK"
                                        class="btn btn-dark btn-sm ">
                                         <i class="fa fa-print" aria-hidden="true"></i> Print

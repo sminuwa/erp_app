@@ -127,14 +127,7 @@
                                                                class="dropdown-item show">
                                                                 <i class="fa fa-check" aria-hidden="true"></i> Confirm
                                                             </a>
-                                                            <a href="{{ route('invoice.print', $order->id) }}"
-                                                               target="_BLANK" class="dropdown-item">
-                                                                <i class="fa fa-print" aria-hidden="true"></i> Print
-                                                            </a>
-                                                            <a href="{{ route('pos.order_print', $order->id) }}"
-                                                               target="_BLANK" class="dropdown-item">
-                                                                <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
-                                                            </a>
+
                                                             <a href="{{ route('waybill.order_print', $order->id) }}"
                                                                target="_BLANK" class="dropdown-item">
                                                                 <i class="fa fa-print" aria-hidden="true"></i> Waybill
@@ -159,7 +152,15 @@
                                                                         <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                                                     </button>
                                                                 </form>
-
+                                                            @else
+                                                                <a href="{{ route('invoice.print', $order->id) }}"
+                                                                   target="_BLANK" class="dropdown-item">
+                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                </a>
+                                                                <a href="{{ route('pos.order_print', $order->id) }}"
+                                                                   target="_BLANK" class="dropdown-item">
+                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
+                                                                </a>
                                                             @endif
 
                                                         </div>

@@ -96,7 +96,7 @@
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <label for="payment_date">Tranfer Date</label>
+                                                <label for="payment_date">Transfer Date</label>
                                                 <input type="text"
                                                        class="form-control datepicker {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
                                                        name="payment_date" id="payment_date"

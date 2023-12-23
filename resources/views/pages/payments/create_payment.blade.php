@@ -54,7 +54,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="type">Payee Category</label>
+                                        <label for="type">Category</label>
                                         <select class="form-control select2-single {{ $errors->has('type') ? ' is-invalid' : '' }}"
                                                 name="type" id="type" required="required">
                                             <option value="">Select...</option>
@@ -79,7 +79,7 @@
                                         @else
                                             <?php $payers = \App\Models\GeneralAccount::orderBy('number','asc')->get(); ?>
                                         @endif
-                                        <label for="payer_id">Payee</label>
+                                        <label for="payer_id">Payable</label>
                                         <select class="form-control select2-single {{ $errors->has('payer_id') ? ' is-invalid' : '' }}"
                                                 name="payer_id" id="payer_id" required="required">
                                             <option value="">Select...</option>

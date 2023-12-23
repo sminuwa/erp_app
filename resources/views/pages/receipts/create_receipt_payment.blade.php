@@ -58,7 +58,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="type">Payer Category</label>
+                                        <label for="type">Category</label>
                                         <select class="form-control select2-single {{ $errors->has('type') ? ' is-invalid' : '' }}"
                                                 name="type" id="type" required="required">
                                             <option value="">Select...</option>
@@ -76,7 +76,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="payer_id">Payer</label>
+                                        <label for="payer_id">Receiver</label>
                                         @if(isset($model) && $model->model_name == 'Customer')
                                             <?php $payers = \App\Models\Customer::orderBy('code','asc')->get(); ?>
                                         @elseif(isset($model) && $model->model_name == 'Supplier')
@@ -104,7 +104,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="payment_date">Payment Date</label>
+                                        <label for="payment_date">Receipt Date</label>
                                         <input type="text"
                                                class="form-control datepicker {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
                                                name="payment_date" id="payment_date"

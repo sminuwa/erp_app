@@ -45,15 +45,8 @@
                                     <i class="fa fa-plus-circle" aria-hidden="true"></i> New Receipt
                                 </a>
 
-                                <a href="{{ route('receipt.payment.print', $receipt->id) }}" target="_BLANK"
-                                    class="btn btn-dark btn-sm ">
-                                    <i class="fa fa-print" aria-hidden="true"></i> Print
-                                </a>
-                                <a href="{{ route('receipt.payment.print.pos', $receipt->id) }}" target="_BLANK"
-                                    class="btn btn-dark btn-sm ">
-                                    <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
-                                </a>
-                                
+
+
                                 @if ($receipt->status == 0)
                                     <a href="{{ route('create.payment.reciept', ['receipt_id'=>$receipt->id]) }}" class="btn btn-info btn-sm ">
                                         <i class="fa fa-edit" aria-hidden="true"></i> Edit
@@ -74,6 +67,16 @@
                                             <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                         </button>
                                     </form>
+
+                                @else
+                                    <a href="{{ route('receipt.payment.print', $receipt->id) }}" target="_BLANK"
+                                       class="btn btn-dark btn-sm ">
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                    </a>
+                                    <a href="{{ route('receipt.payment.print.pos', $receipt->id) }}" target="_BLANK"
+                                       class="btn btn-dark btn-sm ">
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
+                                    </a>
                                 @endif
 
 
@@ -150,20 +153,20 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            
-                                            
+
+
                                             <tr>
                                                 <td>{{ $receipt->account()->code ?? $receipt->account()->number }} - {{ $receipt->account()->name ?? $receipt->account()->description }}</td>
                                                 <td>{{$receipt->description}}</td>
                                                 <th style="text-align: right">{{ number_format($receipt->amount, 2, '.', ',') }}</th>
                                                 <td>{{Carbon\Carbon::parse($receipt->date)->toFormattedDateString()}}</td>
-                                                
+
                                             </tr>
                                             <tr>
                                                 <td class="text-left text-danger" colspan="2">
                                                     <p>
                                                         <strong>Amount in ward: </strong>
-                
+
                                                         @php
                                                             $obj = new App\Models\Utility();
                                                             /*$a = new NumberFormatter("en", NumberFormatter::SPELLOUT);*/

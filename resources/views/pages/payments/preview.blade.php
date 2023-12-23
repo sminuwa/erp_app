@@ -45,16 +45,8 @@
                                     <i class="fa fa-plus-circle" aria-hidden="true"></i> New Receipt
                                 </a>
 
-                                <a href="{{ route('payment.print', $payment->id) }}" target="_BLANK"
-                                    class="btn btn-dark btn-sm ">
-                                    <i class="fa fa-print" aria-hidden="true"></i> Print
-                                </a>
-                                <a href="{{ route('payment.print.pos', $payment->id) }}" target="_BLANK"
-                                    class="btn btn-dark btn-sm ">
-                                    <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
-                                </a>
-
                                 @if ($payment->status == 0)
+
                                     <a href="{{ route('create.payment', ['payment_id' => $payment->id]) }}"
                                         class="btn btn-info btn-sm ">
                                         <i class="fa fa-edit" aria-hidden="true"></i> Edit
@@ -76,6 +68,16 @@
                                             <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                         </button>
                                     </form>
+
+                                @else
+                                    <a href="{{ route('payment.print', $payment->id) }}" target="_BLANK"
+                                       class="btn btn-dark btn-sm ">
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                    </a>
+                                    <a href="{{ route('payment.print.pos', $payment->id) }}" target="_BLANK"
+                                       class="btn btn-dark btn-sm ">
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
+                                    </a>
                                 @endif
 
 

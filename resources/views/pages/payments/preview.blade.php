@@ -167,7 +167,7 @@
 
                                             </tr>
                                             <tr>
-                                                <td class="text-left text-danger" colspan="2">
+                                                <td class="text-left text-danger" colspan="4">
                                                     <p>
                                                         <strong>Amount in ward: </strong>
 
@@ -175,8 +175,8 @@
                                                             $obj = new App\Models\Utility();
                                                             /*$a = new NumberFormatter("en", NumberFormatter::SPELLOUT);*/
                                                         @endphp
-                                                        <strong><i class="fa fa-inr"></i>
-                                                            {{ $obj->convertNumberToWords($payment->amount) }}</strong>
+                                                        <strong>
+                                                            {{ convertNumberToWords($payment->amount) }}</strong>
                                                         {{--                                            {{ $a->format($payment->amount/2.3) }}</strong> --}}
                                                     </p>
                                                 </td>

@@ -38,32 +38,35 @@
             <div class="container-fluid">
                 <form method="POST" >
                     <div class="row">
-                        <div class="form-group  col-sm-2">
+                        <div class="form-group">
                             <label for="from_date">From Date</label>
                             <input type="text" autocomplete="off"
                                 class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
                                 name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="">
                         </div>
-                        <div class="form-group  col-sm-2">
+                        <div class="form-group">
                             <label for="to_date">To Date</label>
                             <input type="text" autocomplete="off"
                                 class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
                                 name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
                         </div>
-                        <div class="form-group  col-sm-2">
+                        <div class="form-group">
+                            &nbsp;&nbsp;
+                            <label for="branch_id">Branch</label>
+                            <select class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
+                                name="branch_id" id="branch_id">
+                                
+                            </select>
+                        </div>
+                        <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="customer_id">Customer</label>
                             <select
-                                class="form-control select2-single {{ $errors->has('customer_id') ? ' is-invalid' : '' }}"
+                                class="form-control select2-single ajax-customers {{ $errors->has('customer_id') ? ' is-invalid' : '' }}"
                                 name="customer_id" id="customer_id">
-                                <option value="all">All</option>
-                                @foreach ($customers as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name }}
-                                    </option>
-                                @endforeach
                             </select>
                         </div>
-                        <div class="form-group text-right  col-sm-2">
+                        <div class="form-group text-right">
                             <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />
                         </div>
                     </div>
@@ -83,8 +86,6 @@
 @endsection
 
 @push('js')
-    <!-- Sweet Alert Js -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>
     <script type="text/javascript">
         $(function() {
             function formatMoney(n, c, d, t) {
@@ -99,8 +100,10 @@
             };
 
             $('#generate').on("click", function() {
+                
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
+                branch_id = $('#branch_id').val();
                 customer_id = $('#customer_id').val();
                 $('#img-loader').show();
                 $.ajax({
@@ -110,6 +113,7 @@
                         _token: "{{ csrf_token() }}",
                         from_date: from_date,
                         to_date: to_date,
+                        branch_id: branch_id,
                         customer_id: customer_id
                     }
                 }).done(function(data) {

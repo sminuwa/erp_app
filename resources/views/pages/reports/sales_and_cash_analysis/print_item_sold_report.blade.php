@@ -34,11 +34,10 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:80px;height:80px;"
-                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
-                            <h3>
-                                {{App\Models\User::UserBranchName()->long_name}}
-                            </h3>
+                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
+                                style="width:80px;height:80px;" alt="Albabello Logo" class="img-circle elevation-3"
+                                style="opacity: .8">
+                            <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>
                             <h5 style="text-align: center;">TOTAL ITEMS SOLD TO CUSTOMERS
                                 FROM
                                 {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
@@ -59,18 +58,22 @@
                                 cellspacing="0" data-ordering="false">
                                 <thead>
                                     <tr>
+                                        <th>CODE</th>
                                         <th>ITEM</th>
+                                        <th>STORE</th>
                                         <th>QUANTITY</th>
                                         <th>CUSTOMER</th>
                                     </tr>
                                 </thead>
                                 @php
-                                    
+
                                     $total_qty = 0;
                                 @endphp
                                 @foreach ($sales as $sale)
                                     <tr>
+                                        <td>{{ $sale->code }}</td>
                                         <td>{{ $sale->product }}</td>
+                                        <td>{{ $sale->store }}</td>
                                         <td style="text-align: center">{{ $sale->quantity }}</td>
                                         <td>{{ $sale->customer }}</td>
                                     </tr>
@@ -80,7 +83,7 @@
                                 @endforeach
                                 <tfoot>
                                     <tr>
-                                        <th style="text-align: right">TOTAL</th>
+                                        <th style="text-align: right" colspan="3">TOTAL</th>
                                         <th style="text-align: center">
                                             {{ number_format($total_qty, 0) }}</th>
                                         <th style="text-align: right">

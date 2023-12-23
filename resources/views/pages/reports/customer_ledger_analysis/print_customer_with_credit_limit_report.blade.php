@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Customer Total Debt Report - {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Customer with Credit Limit Report - {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -37,69 +37,33 @@
                             <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
                                 style="width:80px;height:80px;" alt="Albabello Logo" class="img-circle elevation-3"
                                 style="opacity: .8">
-                            <h3 style="text-align: center">
-                                {{ $branch->name ?? 'All Branches' }}
-                            </h3>
-                            <caption style="caption-size:top">
-                                <h5 style="text-align: center;">Last Transaction of Customers with their Current
-                                    Balances
-                                </h5>
-
-                            </caption>
+                            <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>
+                            <h5 style="text-align: center;">List of Customers with Credit Limit</h5>
                         </div>
                         <!-- /.col -->
                     </div>
 
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
-                            <table class="table table-bordered caption" id="example1" border="1" cellpadding="0"
-                                cellspacing="0" data-ordering="false">
+                            <table class="table table-bordered caption" id="example1" data-ordering="false">
                                 <thead>
                                     <tr>
-                            
                                         <th>ACCOUNT NO</th>
-                                        <th>CUSTOMER NAMES</th>
-                                        <th>LAST INVOICE</th>
-                                        <th>LAST DATE</th>
-                                        <th>BALANCE</th>
+                                        <th>NAME</th>
+                                        <th>TYPE</th>
+                                        <th>CREDIT LIMIT</th>
+                                        <th>BRANCH</th>
                                     </tr>
                                 </thead>
-                                @php
-                                    $total_balance = 0;
-                                @endphp
-                                @foreach ($sales as $sale)
-                                    @php
-                            
-                                        $running_balance = $sale->balance;
-                                        $total_balance += $running_balance;
-                                    @endphp
+                                @foreach ($customers as $customer)
                                     <tr>
-                                        <td>{{ $sale->code }}</td>
-                                        <td>{{ $sale->customer }}</td>
-                                        <td>{{ $sale->reference }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($sale->last_date)->toFormattedDateString() }}</td>
-                                        <td style="text-align: right">
-                                            @if ($running_balance < 0)
-                                                &#8358;({{ number_format(abs($running_balance), 2) }})
-                                            @else
-                                                &#8358;{{ number_format($running_balance, 2) }}
-                                            @endif
-                                        </td>
-                            
+                                        <td>{{ $customer->code }}</td>
+                                        <td>{{ strtoupper($customer->name) }}</td>
+                                        <td>{{ $customer->type }}</td>
+                                        <td style="text-align: right">{{ number_format($customer->credit_limit, 2) }}</td>
+                                        <td>{{ $customer->branch->name ?? '' }}</td>
                                     </tr>
                                 @endforeach
-                                <tfoot>
-                                    <tr>
-                                        <th style="text-align: right" colspan="4">TOTAL</th>
-                                        <th style="text-align: right">
-                                            @if ($total_balance < 0)
-                                                &#8358;({{ number_format(abs($total_balance), 2) }})
-                                            @else
-                                                &#8358;{{ number_format($total_balance, 2) }}
-                                            @endif
-                                        </th>
-                                    </tr>
-                                </tfoot>
                             </table>
                         </div>
                         <!-- /.col -->

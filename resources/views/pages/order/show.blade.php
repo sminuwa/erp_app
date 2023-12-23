@@ -56,6 +56,16 @@
                                     <i class="fa fa-print" aria-hidden="true"></i> Waybill
                                 </a>
 
+                                @if ($order->status == 1)
+                                    <a href="{{ route('invoice.print', $order->id) }}" target="_BLANK"
+                                       class="btn btn-dark btn-sm ">
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                    </a>
+                                    <a href="{{ route('pos.order_print', $order->id) }}" target="_BLANK"
+                                       class="btn btn-dark btn-sm ">
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
+                                    </a>
+                                @endif
                                 @if ($order->status == 0)
                                     <a href="{{ route('pos.edit', $order->id) }}" class="btn btn-info btn-sm ">
                                         <i class="fa fa-edit" aria-hidden="true"></i> Edit
@@ -77,15 +87,6 @@
                                         </button>
                                     </form>
 
-                                @else
-                                    <a href="{{ route('invoice.print', $order->id) }}" target="_BLANK"
-                                       class="btn btn-dark btn-sm ">
-                                        <i class="fa fa-print" aria-hidden="true"></i> Print
-                                    </a>
-                                    <a href="{{ route('pos.order_print', $order->id) }}" target="_BLANK"
-                                       class="btn btn-dark btn-sm ">
-                                        <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
-                                    </a>
                                 @endif
 
 

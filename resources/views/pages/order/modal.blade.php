@@ -18,7 +18,7 @@
 
                     </div>
                     <div class="form-row">
-                        <textarea name="comment" class="form-control"  placeholder="If you are in doubt of the invoice,  type your comment here">{{$order?->comment}}</textarea>
+                        <textarea required name="comment" class="form-control"  placeholder="If you are in doubt of the invoice,  type your comment here">{{$order?->comment}}</textarea>
                     </div>
                     <input type="hidden" name="print" value="print" />
                     <input type="hidden" name="modal" value="modal" />

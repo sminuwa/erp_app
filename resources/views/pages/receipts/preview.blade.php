@@ -158,7 +158,7 @@
                                             <tr>
                                                 <td>{{ $receipt->account()->code ?? $receipt->account()->number }} - {{ $receipt->account()->name ?? $receipt->account()->description }}</td>
                                                 <td>{{$receipt->description}}</td>
-                                                <th style="text-align: right">{{ number_format($receipt->amount, 2, '.', ',') }}</th>
+                                                <th style="text-align: right">{{ currency_sign().number_format($receipt->amount, 2, '.', ',') }}</th>
                                                 <td>{{Carbon\Carbon::parse($receipt->date)->toFormattedDateString()}}</td>
 
                                             </tr>

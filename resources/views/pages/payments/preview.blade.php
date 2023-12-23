@@ -161,7 +161,7 @@
                                                 </td>
                                                 <td>{{ $payment->description }}</td>
                                                 <th style="text-align: right">
-                                                    {{ number_format($payment->amount, 2, '.', ',') }}</th>
+                                                    {{ currency_sign().number_format($payment->amount, 2, '.', ',') }}</th>
                                                 <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                                                 </td>
 

@@ -86,7 +86,7 @@
 
                             <!-- info row -->
                             <div class="row invoice-info">
-                                
+
                                 <!-- /.col -->
                                 <div class="col-sm-4 invoice-col">
                                     <p><b>Refrence No: {{ $interbank->reference }}</b></p>
@@ -136,8 +136,8 @@
                                                         {{ $interbank->destination_account()->description }}
                                                     @endif
                                                 </td>
-                                                <td class="col-md-3" align="right"><i class="fa fa-inr"></i>
-                                                    &#8358; {{ number_format($interbank->amount, 2) }}</td>
+                                                <td class="col-md-3" align="right">
+                                                    &#8358; {{ currency_sign().number_format($interbank->amount, 2) }}</td>
                                             </tr>
                                             <tr>
                                                 <td class="text-left text-danger" colspan="2">
@@ -147,7 +147,7 @@
                                                         @php
                                                             $obj = new App\Models\Utility();
                                                         @endphp
-                                                        <strong><i class="fa fa-inr"></i>
+                                                        <strong>
                                                             {{ $obj->convertNumberToWords($interbank->amount) }}</strong>
 
                                                     </p>

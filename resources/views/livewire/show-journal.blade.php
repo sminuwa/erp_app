@@ -50,8 +50,8 @@
                                             {{ $journal_item->account()->code ?? $journal_item->account()->number }} -
                                             {{ $journal_item->account()->name ?? $journal_item->account()->description }}
                                         </td>
-                                        <td>{{ $journal_item->debit }}</td>
-                                        <td>{{ $journal_item->credit }}</td>
+                                        <td>{{ currency_sign().$journal_item->debit }}</td>
+                                        <td>{{ currency_sign().$journal_item->credit }}</td>
                                         <td>{{ $journal_item->description }}</td>
                                         <td>{!!  $journal->status == 0 ? '<span class="badge badge-danger">pending</span>' : '<span class="badge badge-success">posted</span>' !!}</td>
                                     </tr>
@@ -61,9 +61,9 @@
                         </div>
                         <div class="col-md-12 mt-3">
                             <h4>
-                                <small>Total Credit:</small> N{{ $total_credit }} <br>
-                                <small>Total Debit:</small> N{{ $total_debit }} <br>
-                                <small>Balance:</small> N{{ $total_credit-$total_debit }}
+                                <small>Total Credit:</small> {{ currency_sign().$total_credit }} <br>
+                                <small>Total Debit:</small> {{ currency_sign().$total_debit }} <br>
+                                <small>Balance:</small> {{ currency_sign().$total_credit-$total_debit }}
                             </h4>
                         </div>
                         <div class="col-md-12 mt-3">

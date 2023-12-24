@@ -416,35 +416,35 @@
                                     <ul class="nav nav-treeview">
                                         <li class="nav-item">
                                             <a href="{{ route('general.sales.report') }}"
-                                                class="nav-link {{ Request::is('reports//sa/sales/*') ? 'active' : '' }}">
+                                                class="nav-link {{ Request::is('reports/sa/sales/*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
                                                 <p>General Sales Report</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="{{ route('sales.report.by.category') }}"
-                                                class="nav-link {{ Request::is('reports//sa/sales/*') ? 'active' : '' }}">
+                                                class="nav-link {{ Request::is('reports/sa/sales/*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
                                                 <p>Sales by Category</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="{{ route('customer.sale.reports') }}"
-                                                class="nav-link {{ Request::is('reports//sa/sales/*') ? 'active' : '' }}">
+                                                class="nav-link {{ Request::is('reports/sa/sales/*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
                                                 <p>Customer Sales With Common Name</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="{{ route('debtor.balance.reports') }}"
-                                                class="nav-link {{ Request::is('reports//sa/debtor/balance*') ? 'active' : '' }}">
+                                                class="nav-link {{ Request::is('reports/sa/debtor/balance*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
                                                 <p>Debtor Balance Report</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="{{ route('most.sold.item.reports') }}"
-                                                class="nav-link {{ Request::is('reports//sa/most/sold-item*') ? 'active' : '' }}">
+                                                class="nav-link {{ Request::is('reports/sa/most/sold-item*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
                                                 <p>Most Sold Item</p>
                                             </a>
@@ -452,16 +452,30 @@
                                         
                                         <li class="nav-item">
                                             <a href="{{ route('staff.sales.report') }}"
-                                                class="nav-link {{ Request::is('reports//sa/sales/staff*') ? 'active' : '' }}">
+                                                class="nav-link {{ Request::is('reports/sa/sales/staff*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
                                                 <p>Staff Sales Report</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="{{ route('total.item.sold.report') }}"
-                                                class="nav-link {{ Request::is('reports//sa/sales/staff*') ? 'active' : '' }}">
+                                                class="nav-link {{ Request::is('reports/sa/sales/staff*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
                                                 <p>Total Items Sold to Customers</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('credit.note.reports') }}"
+                                                class="nav-link {{ Request::is('reports/sa/sales/staff*') ? 'active' : '' }}">
+                                                <i class="ion-code-working"></i>
+                                                <p>Credit Notes</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('invoice.list.reports') }}"
+                                                class="nav-link {{ Request::is('reports/sa/sales/invoice*') ? 'active' : '' }}">
+                                                <i class="ion-code-working"></i>
+                                                <p>Invoices List</p>
                                             </a>
                                         </li>
                                         {{-- <li class="nav-item">
@@ -505,6 +519,13 @@
                                                 class="nav-link {{ Request::is('reports/ca/customer/credit_limit*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Customers With Credit Limit</p>
+                                            </a>
+                                        </li> 
+                                        <li class="nav-item">
+                                            <a href="{{ route('customer.exceeded_credit_limit.reports') }}"
+                                                class="nav-link {{ Request::is('reports/ca/customer/exceeded_credit_limit*') ? 'active' : '' }}">
+                                                <i class="ion-cash"></i>
+                                                <p>Customers Exceeded Credit Limit</p>
                                             </a>
                                         </li> 
                                         <li class="nav-item">

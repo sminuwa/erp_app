@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Stock Adjustment- {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Customer Exceeded Credit Limit Report - {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -37,44 +37,36 @@
                             <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
                                 style="width:80px;height:80px;" alt="Albabello Logo" class="img-circle elevation-3"
                                 style="opacity: .8">
-                            <h3>
-                                {{ $branch->name ?? 'All Branches' }}
-                            </h3>
-                            <h5 style="text-align: center;">STOCK ADJUSTMENT REPORT
-                            </h5>
-                            <h5 style="text-align: center;">DATE BETWEEN
-                                {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }} AND
-                                {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
-                            </h5>
-
+                            <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>
+                            <h5 style="text-align: center;">List of Customers Exceeded Credit Limit</h5>
                         </div>
                         <!-- /.col -->
                     </div>
 
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
-                            <table class="table table-bordered caption" id="example1" border="1" cellpadding="0"
-                                cellspacing="0">
+                            <table class="table table-bordered caption" id="example1" data-ordering="false">
                                 <thead>
                                     <tr>
-                                        <th>DATE</th>
-                                        <th>ITEM CODE</th>
-                                        <th>ITEM NAME</th>
-                                        <th>QUANTITY</th>
-                                        <th>STORE</th>
-                                        <th>ADJUSTMENT NO</th>
-
+                                        <th>ACCOUNT NO</th>
+                                        <th>NAME</th>
+                                        <th>TYPE</th>
+                                        <th>BRANCH</th>
+                                        <th>CREDIT LIMIT</th>
+                                        <th>BALANCE</th>
+                                        <th>MARGIN</th>
+                                        
                                     </tr>
                                 </thead>
-                                @foreach ($stores as $store)
+                                @foreach ($customers as $customer)
                                     <tr>
-                                        <td> {{ \Carbon\Carbon::parse($store->date)->toFormattedDateString() }} </td>
-                                        <td> {{ $store->code }} </td>
-                                        <td> {{ $store->name }} </td>
-                                        <td> {{ $store->quantity }} </td>
-                                        <td> {{ $store->operation }} </td>
-                                        <td>{{ $store->store }} </td>
-                                        <td> {{ $store->reference }} </td>
+                                        <td>{{ $customer->code }}</td>
+                                        <td>{{ strtoupper($customer->name) }}</td>
+                                        <td>{{ $customer->type }}</td>
+                                        <td>{{ $customer->branch->name  }}</td>
+                                        <td style="text-align: right">{{ number_format($customer->credit_limit, 2) }}</td>
+                                        <td style="text-align: right">{{ number_format($customer->balance, 2) }}</td>
+                                        <td style="text-align: right">{{ number_format($customer->balance-$customer->credit_limit, 2) }}</td>
                                     </tr>
                                 @endforeach
                             </table>

@@ -42,18 +42,19 @@ class CreditNote extends Model
         return $this->belongsTo(Branch::class);
     }
 
-    public function credit_note_items(){
-        return $this->hasMany(CreditNoteDetail::class,'credit_note_id');
+    public function credit_note_items()
+    {
+        return $this->hasMany(CreditNoteDetail::class, 'credit_note_id');
     }
 
     public function createdBy()
     {
-        return $this->belongsTo(User::class,'created_by');
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function postedBy()
     {
-        return $this->belongsTo(User::class,'posted_by');
+        return $this->belongsTo(User::class, 'posted_by');
     }
 
     public static function generateNewNumber($prefix = 'CRN', $length = 4)
@@ -66,6 +67,10 @@ class CreditNote extends Model
             return $prefix . str_pad($new, $length, 0, STR_PAD_LEFT);
         }
         return $prefix . str_pad(1, $length, 0, STR_PAD_LEFT);
+    }
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id');
     }
 
 }

@@ -478,6 +478,13 @@
                                                 <p>Invoices List</p>
                                             </a>
                                         </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('order.list.reports') }}"
+                                                class="nav-link {{ Request::is('reports/sa/sales/order*') ? 'active' : '' }}">
+                                                <i class="ion-code-working"></i>
+                                                <p>Orders List</p>
+                                            </a>
+                                        </li>
                                         {{-- <li class="nav-item">
                                             <a href="{{ route('discount.granted.reports') }}"
                                                 class="nav-link {{ Request::is('reports//sa/discount-granted*') ? 'active' : '' }}">

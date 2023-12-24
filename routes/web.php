@@ -816,7 +816,12 @@ Route::middleware('auth')->group(function () {
              //List of Invoices Report
              Route::get('/sa/sales/list/invoices', [ReportController::class, 'invoiceReport'])->name('invoice.list.reports');
              Route::get('/sa/sales/list/invoices/load', [ReportController::class, 'loadInvoiceReport'])->name('ajax.load.invoice.list.reports');
-             Route::get('/sa/sales/list/note/invoices/{from_date}/{to_date}/{branch_id}/{status}', [ReportController::class, 'printInvoiceReport'])->name('ajax.invoice.list.report.print');
+             Route::get('/sa/sales/list/invoices/print/{from_date}/{to_date}/{branch_id}/{status}', [ReportController::class, 'printInvoiceReport'])->name('ajax.invoice.list.report.print');
+
+              //List of Orders Report
+              Route::get('/sa/sales/list/orders', [ReportController::class, 'orderReport'])->name('order.list.reports');
+              Route::get('/sa/sales/list/orders/load', [ReportController::class, 'loadOrderReport'])->name('ajax.load.order.list.reports');
+              Route::get('/sa/sales/list/orders/print/{from_date}/{to_date}/{branch_id}/{status}', [ReportController::class, 'printOrderReport'])->name('ajax.order.list.report.print');
  
 
             //Begin Customer Sales Analysis Report

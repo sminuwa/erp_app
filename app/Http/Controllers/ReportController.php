@@ -7,6 +7,7 @@ use App\Models\ChartOfAccount;
 use App\Models\CreditNote;
 use App\Models\GeneralAccount;
 use App\Models\GeneralAccountLedger;
+use App\Models\OrderInvoice;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Store;
@@ -1858,7 +1859,40 @@ class ReportController extends Controller
         return view('pages.reports.sales_and_cash_analysis.load_list_of_invoices_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'status', 'branch'));
     }
 
-    public function printInvoiceReport($from_date, $to_date, $branch_id, $status)
+    public function orderReport()
+    {
+        return view('pages.reports.sales_and_cash_analysis.orders_report');
+    }
+
+    public function loadOrderReport(Request $request)
+    {
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
+        $branch_id = $request->branch_id;
+        $status = $request->status;
+
+        if ($branch_id == 'all' || $branch_id == '') {
+            $branch_id = '%';
+        }
+        if ($status == 'all' || $status == '') {
+            $status = '%';
+        }
+        $sales = OrderInvoice::where('branch_id', 'LIKE', $branch_id)
+            ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
+            ->where('status', 'LIKE', $status)
+            ->orderBy('order_date', 'DESC')
+            ->get();
+        if ($branch_id == "%")
+            $branch_id = "all";
+        if ($status == "%")
+            $status = "all";
+        $branch = null;
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.sales_and_cash_analysis.load_orders_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'status', 'branch'));
+    }
+
+    public function printOrderReport($from_date, $to_date, $branch_id, $status)
     {
 
         if ($branch_id == 'all' || $branch_id == '') {
@@ -1867,7 +1901,7 @@ class ReportController extends Controller
         if ($status == 'all' || $status == '') {
             $status = '%';
         }
-        $sales = Order::where('branch_id', 'LIKE', $branch_id)
+        $sales = OrderInvoice::where('branch_id', 'LIKE', $branch_id)
             ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
             ->where('status', 'LIKE', $status)
             ->orderBy('order_date', 'DESC')
@@ -1877,7 +1911,7 @@ class ReportController extends Controller
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.sales_and_cash_analysis.print_list_of_invoices_report', compact('sales', 'from_date', 'to_date', 'branch'));
+        return view('pages.reports.sales_and_cash_analysis.print_orders_report', compact('sales', 'from_date', 'to_date', 'branch'));
     }
 
     public function supplierPaymentReport()

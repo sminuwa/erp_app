@@ -54,6 +54,7 @@
                             <table class="table table-bordered caption" id="example1" data-ordering="false">
                                 <thead>
                                     <tr>
+                                        <th>CODE</th>
                                         <th>CATEGORY</th>
                                         <th>QTY</th>
                                         <th>AMOUNT(&#8358;)</th>
@@ -70,6 +71,7 @@
                                 @endphp
                                 @foreach ($sales as $sale)
                                     <tr>
+                                        <td>{{ $sale->code }}</td>
                                         <td>{{ $sale->category }}</td>
                                         <td>{{ $sale->quantity }}</td>
                                         <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}
@@ -95,7 +97,7 @@
                                 @endforeach
                                 <tfoot>
                                     <tr>
-                                        <th colspan="2" style="text-align: right">TOTAL</th>
+                                        <th colspan="3" style="text-align: right">TOTAL</th>
                                         <th style="text-align: right">
                                             &#8358;{{ number_format($total_amount, 2, '.', ',') }}</th>
                                         <th style="text-align: right">

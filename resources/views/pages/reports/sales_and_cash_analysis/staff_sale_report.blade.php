@@ -50,73 +50,46 @@
                                 class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
                                 name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
                         </div>
-                        <div class="form-group  col-sm-2">
-                            &nbsp;&nbsp;
+                        <div class="form-group">
+                            <label for="branch_id">Branch</label>
+                            <select class="form-control select2-single ajax-branches" name="branch_id" id="branch_id">
+                            </select>
+
+                        </div>
+                        <div class="form-group">
                             <label for="store_id">Store</label>
-                            <select class="form-control {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
-                                name="store_id" id="store_id">
-                                <option value="all">All</option>
-                                @foreach ($stores as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name }}
-                                    </option>
-                                @endforeach
+                            <select class="form-control select2-single ajax-stores" name="store_id" id="store_id">
                             </select>
+
                         </div>
-                        <div class="form-group  col-sm-2">
-                            &nbsp;&nbsp;
+                        <div class="form-group">
                             <label for="category_id">Category</label>
-                            <select class="form-control {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
-                                name="category_id" id="category_id">
-                                <option value="all">All</option>
-                                @foreach ($categories as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name }}
-                                    </option>
-                                @endforeach
+                            <select class="form-control select2-single ajax-categories" name="category_id" id="category_id">
                             </select>
+
                         </div>
-                        <div class="form-group  col-sm-2">
-                            &nbsp;&nbsp;
+                        <div class="form-group">
                             <label for="product_id">Product</label>
-                            <select
-                                class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
-                                name="product_id" id="product_id">
-                                <option value="all">All</option>
-                                @foreach ($products as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name }}
-                                    </option>
-                                @endforeach
+                            <select class="form-control select2-single ajax-products" name="product_id" id="product_id">
                             </select>
+
                         </div>
-                        <div class="form-group  col-sm-2">
-                            &nbsp;&nbsp;
-                            <label for="payment_mode">Sales Mode</label>
-                            <select class="form-control select2-single" name="payment_mode" id="payment_mode">
-                                <option value="all">All</option>
-                                <option value="Cash">Cash Sales</option>
-                                <option value="Credit">Credit Sales</option>
-                            </select>
-                        </div>
-                        <div class="form-group  col-sm-2">
+                        <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="user_id">Users</label>
-                            <select
-                                class="form-control select2-single {{ $errors->has('user_id') ? ' is-invalid' : '' }}"
-                                name="user_id" id="user_id" required>
-                                <option value="">Select...</option>
-                                @foreach ($users as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name }}
-                                    </option>
-                                @endforeach
+                            <select class="form-control select2-single ajax-users" name="user_id" id="user_id" required>
+
                             </select>
                         </div>
-                        <div class="form-group text-right  col-sm-2">
+                        <div class="form-group text-right">
                             <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />
                         </div>
                     </div>
                 </form>
                 <div class="row">
                     <div class="col-sm-12 table-responsive" id="load">
-
+                        <img src="{{ asset('assets/backend/img/loader.png') }}"
+                            style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
@@ -143,30 +116,17 @@
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
 
-            $('#category_id,#store_id').on("change", function() {
-                category_id = $('#category_id').val();
-                store_id = $('#store_id').val();
 
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route('ajax.load.store.products') }}",
-                    data: {
-                        category_id: category_id,
-                        store_id: store_id
-                    }
-                }).done(function(data) {
-                    $("#product_id").html("<option value='all'>All</option>" + data);
-                });
-            });
 
             $('#generate').on("click", function() {
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
+                branch_id = $('#branch_id').val();
                 product_id = $('#product_id').val();
                 store_id = $('#store_id').val();
                 category_id = $('#category_id').val();
-                payment_mode = $('#payment_mode').val();
                 user_id = $('#user_id').val();
+                $('#img-loader').show();
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.staff.sales.report') }}",
@@ -174,13 +134,14 @@
                         _token: "{{ csrf_token() }}",
                         from_date: from_date,
                         to_date: to_date,
+                        branch_id: branch_id,
                         product_id: product_id,
                         store_id: store_id,
                         category_id: category_id,
-                        staff_id: user_id,
-                        payment_mode: payment_mode
+                        staff_id: user_id
                     }
                 }).done(function(data) {
+                    $('#img-loader').hide();
                     $("#load").html(data);
                     $('#example1').DataTable({
                         dom: 'Bfrtip',

@@ -58,14 +58,7 @@
                                 
                             </select>
                         </div>
-                        <div class="form-group">
-                            &nbsp;&nbsp;
-                            <label for="store_id">Store</label>
-                            <select class="form-control select2-single ajax-stores {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
-                                name="store_id" id="store_id">
-                                
-                            </select>
-                        </div>
+                        
                         <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="category_id">Category</label>
@@ -130,7 +123,6 @@
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
                 product_id = $('#product_id').val();
-                store_id = $('#store_id').val();
                 category_id = $('#category_id').val();
                 branch_id = $('#branch_id').val();
                 customer_id = $('#customer_id').val();
@@ -143,7 +135,6 @@
                         from_date: from_date,
                         to_date: to_date,
                         product_id: product_id,
-                        store_id: store_id,
                         category_id: category_id,
                         customer_id: customer_id,
                         branch_id:branch_id

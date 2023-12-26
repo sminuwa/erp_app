@@ -780,7 +780,7 @@ Route::middleware('auth')->group(function () {
             //Staff Sales Report
             Route::get('/sa/sales/staff', [ReportController::class, 'staffSaleReport'])->name('staff.sales.report');
             Route::get('/sa/sales/staff/load', [ReportController::class, 'loadStaffSaleReport'])->name('ajax.staff.sales.report');
-            Route::get('/sa/sales/staff/print/{from_date}/{to_date}/{store_id}/{category_id}/{product_id}/{staff_id}/{payment_mode}/', [ReportController::class, 'printStaffSaleReport'])->name('ajax.staff.sales.report.print');
+            Route::get('/sa/sales/staff/print/{from_date}/{to_date}/{branch_id}/{store_id}/{category_id}/{product_id}/{staff_id}', [ReportController::class, 'printStaffSaleReport'])->name('ajax.staff.sales.report.print');
 
             //CUstoomer Sale with common names Report
             Route::get('/sa/sales/customer/sale/common-name', [ReportController::class, 'customerSaleReport'])->name('customer.sale.reports');
@@ -801,7 +801,7 @@ Route::middleware('auth')->group(function () {
             //Total Items Sold to Customer
             Route::get('/sa/sales/total-item', [ReportController::class, 'totalItemSoldReport'])->name('total.item.sold.report');
             Route::get('/sa/sales/total-item/load', [ReportController::class, 'loadItemSoldReport'])->name('ajax.total.item.sold.report');
-            Route::get('/sa/sales/total-item/print/{branch_id}/{from_date}/{to_date}/{store_id}/{category_id}/{product_id}/{customer_id}', [ReportController::class, 'printItemSoldReport'])->name('ajax.total.item.sold.report.print');
+            Route::get('/sa/sales/total-item/print/{branch_id}/{from_date}/{to_date}/{category_id}/{product_id}/{customer_id}', [ReportController::class, 'printItemSoldReport'])->name('ajax.total.item.sold.report.print');
 
             //Discount Granted Report
             Route::get('/sa/sales/discount-granted', [ReportController::class, 'trackDiscount'])->name('discount.granted.reports');
@@ -1120,9 +1120,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/show/{intersiteTransfer}', [InterSiteTransferController::class, 'show'])->name('intersite.show');
             Route::post('/store', [InterSiteTransferController::class, 'store'])->name('intersite.store');
             Route::get('/edit/{intersite}', [InterSiteTransferController::class, 'edit'])->name('intersite.edit');
-            Route::put('/update/{intersiteTransfer}', [InterSiteTransferController::class, 'update'])->name('intersite.update');
-            Route::put('/approve/{intersiteTransfer}', [InterSiteTransferController::class, 'approve'])->name('intersite.approve');
-            Route::delete('/delete/{intersiteTransfer}', [InterSiteTransferController::class, 'destroy'])->name('intersite.destroy');
+           
             Route::post('/cart', [InterSiteTransferController::class, 'addToCart'])->name('intersite.cart');
             Route::delete('/remove/{id}', [InterSiteTransferController::class, 'removeCart'])->name('intersite.cart.remove');
             Route::post('/clear', [InterSiteTransferController::class, 'clearAllCart'])->name('intersite.cart.clear');

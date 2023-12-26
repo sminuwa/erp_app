@@ -161,7 +161,7 @@
                                                                class="btn btn-sm btn-success add-product"
                                                                data-product-id="{{ $product->product_id }}"
                                                                data-store-id="{{ $product->store_id }}"
-                                                               data-quantity="{{ $product->quantity }}"
+                                                               data-quantity="{{ $product->quantity-$product->totalReceive() }}"
                                                                data-cost="{{ $product->cost_price }}"
                                                                ><i class="fa fa-plus"></i> Add Product </a>
                                                         @endif
@@ -304,7 +304,7 @@
             product_id.val(p_id)
             total_quantity.val(qty)
             cost_price.val(cost)
-            quantity.attr('maxlength',total_quantity)
+            quantity.attr('max',item.attr('data-quantity'))
             quantity.val(qty)
         })
 

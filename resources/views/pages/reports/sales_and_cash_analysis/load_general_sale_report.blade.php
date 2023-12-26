@@ -51,13 +51,18 @@
             <td style="text-align: right">{{ number_format($sale->cost_price, 2, '.', ',') }}</td>
             <td style="text-align: right">{{ number_format($sale->sold_price, 2, '.', ',') }}</td>
             <td style="text-align: right">
-                {{ number_format($sale->cost_price * $sale->quantity, 2, '.', ',') }}</td>
+                {{ number_format(str_replace(',', '', $sale->cost_price) * $sale->quantity, 2, '.', ',') }}</td>
             <td style="text-align: right">
-                {{ number_format($sale->sold_price * $sale->quantity, 2, '.', ',') }}</td>
+                {{ number_format(str_replace(',', '', $sale->sold_price) * $sale->quantity, 2, '.', ',') }}</td>
             <td style="text-align: right">
                 @php
-                    $total_profit = $sale->sold_price * $sale->quantity - $sale->cost_price * $sale->quantity;
+                    $total_profit = str_replace(',', '', $sale->sold_price) * $sale->quantity - str_replace(',', '', $sale->cost_price) * $sale->quantity;
                     $grand_total_profit += $total_profit;
+
+                    $total_cost_price += str_replace(',', '', $sale->cost_price);
+                    $total_sold_price += str_replace(',', '', $sale->sold_price);
+                    $total_cost += str_replace(',', '', $sale->cost_price) * $sale->quantity;
+                    $total_sold += str_replace(',', '', $sale->sold_price) * $sale->quantity;
                 @endphp
                 @if ($total_profit < 0)
                     ({{ number_format(abs($total_profit), 2, '.', ',') }})
@@ -68,8 +73,9 @@
         </tr>
         @php $credit_notes = App\Models\Order::find($sale->order_id)->creditNotes @endphp
         @if ($credit_notes != null)
+            @php  $total_profit_note = 0; @endphp
             @foreach ($credit_notes as $note)
-                @foreach ($note->credit_note_items()->where('store_product_id',$sale->store_product_id)->get() as $item)
+                @foreach ($note->credit_note_items()->where('store_product_id', $sale->store_product_id)->get() as $item)
                     <tr>
                         <td>{{ \Carbon\Carbon::parse($note->date)->toFormattedDateString() }}</td>
                         <td>{{ $item->storeProduct->product->code }}</td>
@@ -81,35 +87,36 @@
                         <td style="text-align: right">{{ number_format($item->cost_price, 2, '.', ',') }}</td>
                         <td style="text-align: right">-{{ number_format($item->sold_price, 2, '.', ',') }}</td>
                         <td style="text-align: right">
-                            {{ number_format($item->cost_price * $item->quantity, 2, '.', ',') }}</td>
+                            {{ number_format(str_replace(',', '', $item->cost_price) * $item->quantity, 2, '.', ',') }}
+                        </td>
                         <td style="text-align: right">
-                            {{ number_format(-$item->sold_price * $item->quantity, 2, '.', ',') }}</td>
+                            {{ number_format(str_replace(',', '', $item->sold_price) * $item->quantity, 2, '.', ',') }}
+                        </td>
                         <td style="text-align: right">
                             @php
-                                $total_profit += -$item->sold_price * $item->quantity - $item->cost_price * $item->quantity;
-                                $grand_total_profit += $total_profit;
+                                $total_profit_note = str_replace(',', '', $item->sold_price) * $item->quantity - str_replace(',', '', $item->cost_price) * $item->quantity;
+                                $grand_total_profit += $total_profit_note;
                             @endphp
                             @if ($total_profit < 0)
-                                ({{ number_format(abs($total_profit), 2, '.', ',') }})
+                                ({{ number_format(abs($total_profit_note), 2, '.', ',') }})
                             @else
-                                {{ number_format($total_profit, 2) }}
+                                {{ number_format($total_profit_note, 2) }}
                             @endif
                         </td>
                     </tr>
+                    @php
+                        $total_cost_price += str_replace(',', '', $item->cost_price);
+                        $total_sold_price += str_replace(',', '', $item->sold_price);
+                        $total_cost += str_replace(',', '', $item->cost_price) * $item->quantity;
+                        $total_sold += str_replace(',', '', $item->sold_price) * $item->quantity;
+                    @endphp
                 @endforeach
             @endforeach
         @endif
-        @php
-            $total_cost_price += $sale->cost_price;
-            $total_sold_price += $sale->sold_price;
-            $total_cost += $sale->cost_price * $sale->quantity;
-            $total_sold += $sale->sold_price * $sale->quantity;
-            $last_order_date = $sale->order_date;
-        @endphp
     @endforeach
     <tfoot>
         <tr>
-            <th colspan="7" style="text-align: right">TOTAL</th>
+            <th colspan="7" style="text-align: right">TOTALL</th>
             <th style="text-align: right">
                 &#8358;{{ number_format($total_cost_price, 2, '.', ',') }}</th>
             <th style="text-align: right">

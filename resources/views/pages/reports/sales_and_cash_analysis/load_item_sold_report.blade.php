@@ -1,6 +1,6 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.total.item.sold.report.print', [$from_date, $to_date, $branch_id, $store_id, $category_id, $product_id, $customer_id]) }}"
+        <a href="{{ route('ajax.total.item.sold.report.print', [$from_date, $to_date, $branch_id, $category_id, $product_id, $customer_id]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
@@ -22,7 +22,6 @@
         <tr>
             <th>CODE</th>
             <th>ITEM</th>
-            <th>STORE</th>
             <th>QUANTITY</th>
             <th>CUSTOMER</th>
         </tr>
@@ -35,7 +34,6 @@
         <tr>
             <td>{{ $sale->code }}</td>
             <td>{{ $sale->product }}</td>
-            <td>{{ $sale->store }}</td>
             <td style="text-align: center">{{ $sale->quantity }}</td>
             <td>{{ $sale->customer }}</td>
         </tr>
@@ -45,7 +43,7 @@
     @endforeach
     <tfoot>
         <tr>
-            <th style="text-align: right" colspan="3">TOTAL</th>
+            <th style="text-align: right" colspan="2">TOTAL</th>
             <th style="text-align: center">
                 {{ number_format($total_qty, 0) }}</th>
             <th style="text-align: right">

@@ -25,7 +25,7 @@
             <td> {{ \Carbon\Carbon::parse($store->date)->toFormattedDateString() }} </td>
             <td> {{ $store->code }} </td>
             <td> {{ $store->name }} </td>
-            <td> {{ $store->quantity }} </td>
+            <td> {{ $store->operation == 'in'? $store->quantity:(-$store->quantity) }} </td>
             <td> {{ $store->operation }} </td>
             <td>{{ $store->store }} </td>
             <td> {{ $store->reference }} </td>

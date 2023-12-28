@@ -573,7 +573,7 @@ class OrderController extends Controller
         return view('pages.order.index', compact('orders'));
     }
     public function post(Order $invoice)
-    {
+    { 
         $invoice->status = 1;
         $invoice->posted_by = auth()->id();
         $items = $invoice->order_items;
@@ -585,7 +585,7 @@ class OrderController extends Controller
                 $store = StoreProduct::find($item->store_product_id);
                 //get unit of measure
                 $quantity_sold = Transaction::quantity_sold($store->product->id, $item->quantity, $item->unit);
-               
+
                 DB::table('store_products')->where('id', $item->store_product_id)->update([
                     'qty_available' => str_replace(',', '', $store->qty_available) - $quantity_sold,
                     'updated_at' => Carbon::now()
@@ -599,6 +599,7 @@ class OrderController extends Controller
                     'refno' => $invoice->reference,
                     'type' => 0,
                     'date' => $invoice->order_date,
+                    'charged_account' => $invoice->customer->code ?? '',
                     'user_id' => auth()->id(),
                     'priority' => 2,
                 ]);

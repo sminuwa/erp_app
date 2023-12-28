@@ -64,4 +64,8 @@ class AjaxController extends Controller
         $records = Company::orderBy('name','asc')->get();
         return view('misc.ajax.companies', compact('records'));
     }
+    public function users(){
+        $records = User::orderBy('user_code','asc')->get();
+        return view('misc.ajax.users', compact('records'));
+    }
 }

@@ -51,13 +51,14 @@
 
 
                 <td>
-                    @if ($record->model_name == 'Customer')
+                    {{-- @if ($record->model_name == 'Customer')
                         {{ App\Models\Customer::find($record->model_id)->code }}
-                        {{-- @elseif($record->model_name == 'GeneralAccount')
-                        {{ App\Models\GeneralAccount::find($record->model_id)->description }} --}}
+                        @elseif($record->model_name == 'GeneralAccount')
+                        {{ App\Models\GeneralAccount::find($record->model_id)->description }}
                     @elseif($record->model_name == 'Supplier')
                         {{ App\Models\Supplier::find($record->model_id)->code }}
-                    @endif
+                    @endif --}}
+                    {{$record->charged_account}}
                 </td>
 
                 <td>{{ $qty_before }}</td>

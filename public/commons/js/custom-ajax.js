@@ -36,6 +36,10 @@ function ajerks(method, url, cssClass){
         let branch_id = element.attr('branch_id')
         data = { branch_id : branch_id }
     }
+    if(element.attr('branch_id') && element.attr('name')==='user_id'){
+        let branch_id = element.attr('branch_id')
+        data = { branch_id : branch_id }
+    }
     if(element.attr('branch_id') && element.attr('name')==='customer_id'){
         let branch_id = element.attr('branch_id')
         data = { branch_id : branch_id }

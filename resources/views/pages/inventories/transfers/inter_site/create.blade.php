@@ -48,7 +48,7 @@
                                 <form action="{{ route('intersite.store') }}" method="POST">
                                     {{ csrf_field() }}
                                     <input type="hidden" name="intersite_id"
-                                        value="{{ isset($instersite) ? $intersite->id : '' }}" />
+                                        value="{{ isset($intersite) ? $intersite->id : '' }}" />
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group">
@@ -195,7 +195,8 @@
                         </div>
                         <input type="hidden" value="0" name="cost_price" id="cost_price" />
                         <div class="form-group text-right ">
-                            <button type="submit" class="btn btn-primary" onclick="validateQuantity()"><span class="ion-ios-cart-outline"></span> Add
+                            <button type="submit" class="btn btn-primary" onclick="validateQuantity()"><span
+                                    class="ion-ios-cart-outline"></span> Add
                                 to Cart</button>
                         </div>
                     </form>

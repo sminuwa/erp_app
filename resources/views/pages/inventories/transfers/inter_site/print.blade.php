@@ -34,10 +34,11 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:30px;height:30px;"
-                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
+                                style="width:30px;height:30px;" alt="Albabello Logo" class="img-circle elevation-3"
+                                style="opacity: .8">
                             <h3>
-                                {{App\Models\User::UserBranchName()->long_name}}
+                                {{ App\Models\User::UserBranchName()->long_name }}
                             </h3>
                             <h4>INTERSITE STOCK TRANSFER REPORT</h4>
                             <small class="float-right">View Date: {{ date('l, d-M-Y h:i:s A') }}</small>
@@ -54,14 +55,15 @@
                                         <th style="width:250px;">Item Name</th>
                                         <th>From Store</th>
                                         <th>To Store</th>
-                                        <th>QTY BF/T<br/><br/>Transfer</th>
-                                        <th>QTY <br/><br/>AF/T</th>
+                                        <th>QTY BF/T<br /><br />Transfer</th>
+                                        <th>QTY <br /><br />AF/T</th>
                                         <th>TRF No</th>
-                                        <th>Date <br/><br/>Transfer</th>
+                                        <th>Date <br /><br />Transfer</th>
                                         <th>Vehicle No</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @php $transfer_by = null; @endphp
                                     @foreach ($transfers as $transfer)
                                         <tr>
                                             <td>{{ $transfer->product->name }}</td>
@@ -73,9 +75,11 @@
                                             <td>{{ $transfer->created_at->toFormattedDateString() }}</td>
                                             <td>{{ $transfer->vehicle_no }}</td>
                                         </tr>
+                                        @php $transfer_by = $transfer @endphp
                                     @endforeach
                                     <tr>
-                                        <th colspan="8" style="text-align: center">TRANSFER BY: {{ucfirst($transfer->user->name)}}</th>
+                                        <th colspan="8" style="text-align: center">TRANSFER BY:
+                                            {{ ucfirst($transfer->user->name ?? '') }}</th>
                                     </tr>
                                 </tbody>
                             </table>

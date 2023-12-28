@@ -1,12 +1,13 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.staff.sales.report.print', [$from_date, $to_date, $store_id, $category_id, $product_id, $staff_id, $payment_mode]) }}"
+        <a href="{{ route('ajax.staff.sales.report.print', [$from_date, $to_date, $branch_id, $store_id, $category_id, $product_id, $staff_id]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
 <table class="table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
-        <h5 style="text-align: center;">{{ ucfirst($user->name) }} Sales Transactions
+        <h3 style="text-align: center">{{ $branch->name ?? 'All Branches' }}</h3>
+        <h5 style="text-align: center;">{{ ucfirst($user->name ?? 'All Users') }} <br/>Sales
             From
             {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
             AND
@@ -16,30 +17,17 @@
 
     <thead>
         <tr>
-            <th colspan="4" style="text-align: right">TOTAL CASH SALES: </th>
+            <th colspan="4" style="text-align: right">TOTAL RECEIPTS: </th>
             <th style="text-align: right">&#8358;{{ number_format($total_cash, 2, '.', ',') }}</th>
             <th></th>
             <th></th>
             <th></th>
         </tr>
-        <tr>
-            <th colspan="4" style="text-align: right">TOTAL DEBTOR PAYMENT: </th>
-            <th style="text-align: right">&#8358;{{ number_format($total_debtors, 2, '.', ',') }}</th>
-            <th></th>
-            <th></th>
-            <th></th>
-        </tr>
-        <tr>
-            <th colspan="4" style="text-align: right">TOTAL CASH: </th>
-            <th style="text-align: right">&#8358;{{ number_format($total_debtors + $total_cash, 2, '.', ',') }}</th>
-            <th></th>
-            <th></th>
-            <th></th>
-        </tr>
+        
         <tr>
             <th>DATE</th>
             <th>INVOICE</th>
-            <th>CUST NAME</th>
+            <th>CUST ACCOUNT</th>
             <th>ITEM</th>
             <th>STORE</th>
             <th>QTY</th>
@@ -55,7 +43,7 @@
     @foreach ($sales as $sale)
         <tr>
             <td>{{ \Carbon\Carbon::parse($sale->order_date)->toFormattedDateString() }}</td>
-            <td>{{ $sale->invoice_no }}</td>
+            <td>{{ $sale->reference }}</td>
             <td>{{ $sale->customer }}</td>
             <td>{{ $sale->product }}</td>
             <td>{{ $sale->store }}</td>

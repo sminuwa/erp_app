@@ -573,19 +573,25 @@ class OrderController extends Controller
         return view('pages.order.index', compact('orders'));
     }
     public function post(Order $invoice)
-    { 
+    {
         $invoice->status = 1;
         $invoice->posted_by = auth()->id();
         $items = $invoice->order_items;
+        $is_out_of_stock = false;
+        $out_of_stock_products = "";
         DB::beginTransaction();
         if ($invoice->save()) {
             $products = [];
             foreach ($items as $item) {
 
                 $store = StoreProduct::find($item->store_product_id);
+
                 //get unit of measure
                 $quantity_sold = Transaction::quantity_sold($store->product->id, $item->quantity, $item->unit);
-
+                if ($quantity_sold > $store->qty_available) {
+                    $is_out_of_stock = true;
+                    $out_of_stock_products .= $store->product->code . ",";
+                }
                 DB::table('store_products')->where('id', $item->store_product_id)->update([
                     'qty_available' => str_replace(',', '', $store->qty_available) - $quantity_sold,
                     'updated_at' => Carbon::now()
@@ -604,6 +610,11 @@ class OrderController extends Controller
                     'priority' => 2,
                 ]);
                 $products[$item->store_product_id] = ['quantity' => $item->quantity, 'cost_price' => $item->cost_price, 'sold_price' => $item->sold_price];
+            }
+            if ($is_out_of_stock == true) {
+                session()->flash('app_error', 'Please check, the following products are out of stock\n' . $out_of_stock_products);
+                DB::rollBack();
+                return redirect()->back()->withInput();
             }
             /*return Transaction::sale(
                 $products,

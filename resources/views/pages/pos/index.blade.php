@@ -83,13 +83,14 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Customer Type</label>
-                                                <select name="account_type" id="account_type" class="form-control" required>
+                                                <select name="account_type" id="account_type" class="form-control"
+                                                    {{ !empty(old('account_type')) ? 'disabled' : '' }} required>
                                                     <option value="" disabled selected>Select...</option>
                                                     <option value="Retail"
-                                                        {{ (isset($order) && $order->customer->type == 'Retail') || (session()->has('customer') && session('customer')->type == 'Retail') ? 'selected' : '' }}>
+                                                        {{ (isset($order) && $order->customer->type) || old('account_type') == 'Retail' || (session()->has('customer') && session('customer')->type == 'Retail') ? 'selected' : '' }}>
                                                         Retail</option>
                                                     <option value="Wholesale"
-                                                        {{ (isset($order) && $order->customer->type == 'Wholesale') || (session()->has('customer') && session('customer')->type == 'Wholesale') ? 'selected' : '' }}>
+                                                        {{ (isset($order) && $order->customer->type) || old('account_type') == 'Wholesale' || (session()->has('customer') && session('customer')->type == 'Wholesale') ? 'selected' : '' }}>
                                                         WholeSale</option>
                                                 </select>
                                             </div>
@@ -98,8 +99,11 @@
                                             <div class="form-group">
                                                 <label>Customer</label>
                                                 <div class="form-group">
+                                                    <input type="hidden" class="form-control" name="customer_id"
+                                                        id="customer_val_id" value="">
                                                     <select onchange="$('.customer').val($(this).val())" name="customer_id"
-                                                        id="customer_record" class="form-control select2-single">
+                                                        {{ old('customer_id') > 0 ? 'disabled' : '' }} id="customer_record"
+                                                        class="form-control select2-single">
                                                         @if (session()->has('customer'))
                                                             <option value="{{ session('customer')->id }}">
                                                                 {{ session('customer')->code }} -
@@ -107,9 +111,16 @@
                                                         @endif
                                                         @if (isset($order))
                                                             <option value="{{ $order->customer->id }}"
-                                                                @if (session()->has('customer') && session('customer')->id == $order->customer?->id) selected @endif>
+                                                                @if ((session()->has('customer') && session('customer')->id) == $order->customer?->id) selected @endif>
                                                                 {{ $order->customer->code }} -
                                                                 {{ $order->customer->name }}</option>
+                                                        @endif
+                                                        @if (old('customer_id') > 0)
+                                                            <option value="{{ old('customer_id') }}"
+                                                                @if ((session()->has('customer') && session('customer')->id) == old('customer_id')) selected @endif>
+                                                                {{ App\Models\Customer::find(old('customer_id'))->code }} -
+                                                                {{ App\Models\Customer::find(old('customer_id'))->name }}
+                                                            </option>
                                                         @endif
                                                     </select>
 
@@ -129,8 +140,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-4">
-                                            <textarea class="form-control" name="description"
-                                                placeholder="Description" id="description" ></textarea>
+                                            <textarea class="form-control" name="description" placeholder="Description" id="description"></textarea>
                                         </div>
                                         <div class="col-md-4">
                                             <input type="number" class="form-control" name="discount"
@@ -286,7 +296,7 @@
                                 </h3>
                             </div>
                             <!-- /.card-header -->
-                            <div class="card-body cart-container">
+                            <div class="card-body cart-container table-responsive">
 
                             </div>
                             <!-- /.card-body -->
@@ -585,41 +595,6 @@
         }
 
         $(function() {
-            $('#account_number,#account_name').hide();
-            $('#payment_mode').on("change", function() {
-                if ($(this).val() != "Cash") {
-                    $('#bank_account_id,#account_name').removeAttr('disabled');
-                    $('#account_number,#account_name').show();
-                    $("#bank_account_id").html(" < option value = '' > Loading... < /option>");
-                    $.ajax({
-                        url: "{{ route('ajax.loadBankAccounts') }}",
-                        type: 'GET',
-                        data: {
-                            payment_mode: $("#payment_mode").val()
-                        }
-                    }).done(function(msg) {
-                        $("#bank_account_id").html("<option value=''>--select--</option>" + msg);
-                    });
-                } else {
-                    $('#bank_account_id,#account_name').attr('disabled', 'disabled');
-                    $('#account_number,#account_name').hide();
-                }
-
-            });
-
-            $('#bank_account_id').on("change", function() {
-                bank_account_id = $(this).val();
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route('ajax.load.account.name') }}",
-                    data: {
-                        bank_account_id: bank_account_id
-                    }
-                }).done(function(data) {
-                    $("#account_name").val(data);
-                });
-            });
-
             function formatMoney(n, c, d, t) {
                 var c = isNaN(c = Math.abs(c)) ? 2 : c,
                     d = d == undefined ? "." : d,

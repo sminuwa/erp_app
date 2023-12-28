@@ -69,6 +69,8 @@
                                             </div>
                                         </div>
                                         <div class="col-md-6">
+                                            <input type="hidden" class="form-control" name="customer_id"
+                                            id="customer_val_id" value="">
                                             <div class="form-group">
                                                 <label>Customer</label>
                                                 <div class="form-group">

@@ -146,7 +146,7 @@ class InvoiceController extends Controller
         //Check to make sure that the amount has not exceeded the credit limit set for the customer.
         if (Transaction::check_transaction_limit($customer_id, \Cart::getContent()) == false) {
             session()->flash('app_error', 'The amount has exceeded the customer credit limit');
-            return redirect()->back();
+            return redirect()->back()->withInput();
         }
 
         $sub_total = str_replace(',', '', \Cart::getSubTotal());
@@ -161,6 +161,8 @@ class InvoiceController extends Controller
         $reference = Order::generateNewNumber();
         $order_date = $request->order_date;
         //$customer_id = $request->input('customer_id');
+        $is_out_of_stock = false;
+        $out_of_stock_products = "";
         DB::beginTransaction();
         try {
             $payment_mode = 'Cash';
@@ -220,6 +222,10 @@ class InvoiceController extends Controller
                     $store = StoreProduct::find($content->id);
                     $qtyAval = $store->qty_available;
                     //$store->qty_available = $qtyAval - $content->quantity;
+                    if ($content->quantity > $qtyAval) {
+                        $is_out_of_stock = true;
+                        $out_of_stock_products .= $store->product->code . ",";
+                    }
                     $order_detail = new OrderDetail();
                     DB::table('order_details')->insert([
                         'order_id' => $invoice->id,
@@ -238,6 +244,11 @@ class InvoiceController extends Controller
                     ]);
 
                     $store_products[$content->id] = $content->quantity;
+                }
+                if ($is_out_of_stock == true) {
+                    session()->flash('app_error', 'Please check, the following products are out of stock\n' . $out_of_stock_products);
+                    DB::rollBack();
+                    return redirect()->back()->withInput();
                 }
                 //Upate the Order table with the discount
                 //DB::table('orders')->where('id', $invoice->id)->increment('discount', $total_discount);

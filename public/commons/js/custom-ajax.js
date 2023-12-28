@@ -1,65 +1,65 @@
 let body = $('body');
-$(document).ready(function(){
-    ajerks('GET','/misc/ajax/categories','ajax-categories')
-    ajerks('GET','/misc/ajax/customers','ajax-customers')
-    ajerks('GET','/misc/ajax/suppliers','ajax-suppliers')
-    ajerks('GET','/misc/ajax/products','ajax-products')
-    ajerks('GET','/misc/ajax/stores','ajax-stores')
-    ajerks('GET','/misc/ajax/branches','ajax-branches')
-    ajerks('GET','/misc/ajax/chart-of-accounts','ajax-chart-of-accounts')
-    ajerks('GET','/misc/ajax/general-accounts','ajax-general-accounts')
-    ajerks('GET','/misc/ajax/companies','ajax-companies')
-    ajerks('GET','/misc/ajax/users','ajax-users')
+$(document).ready(function () {
+    ajerks('GET', '/misc/ajax/categories', 'ajax-categories')
+    ajerks('GET', '/misc/ajax/customers', 'ajax-customers')
+    ajerks('GET', '/misc/ajax/suppliers', 'ajax-suppliers')
+    ajerks('GET', '/misc/ajax/products', 'ajax-products')
+    ajerks('GET', '/misc/ajax/stores', 'ajax-stores')
+    ajerks('GET', '/misc/ajax/branches', 'ajax-branches')
+    ajerks('GET', '/misc/ajax/chart-of-accounts', 'ajax-chart-of-accounts')
+    ajerks('GET', '/misc/ajax/general-accounts', 'ajax-general-accounts')
+    ajerks('GET', '/misc/ajax/companies', 'ajax-companies')
+    ajerks('GET', '/misc/ajax/users', 'ajax-users')
 })
 
 let bodi = $('body');
 
-bodi.on('change', '.ajax-branches',function(){
+bodi.on('change', '.ajax-branches', function () {
     $('.ajax-stores').attr('branch_id', $(this).val())
     $('.ajax-users').attr('branch_id', $(this).val())
     $('.ajax-customers').attr('branch_id', $(this).val())
-    ajerks('GET','/misc/ajax/stores','ajax-stores')
-    ajerks('GET','/misc/ajax/customers','ajax-customers')
-    ajerks('GET','/misc/ajax/users','ajax-users')
+    ajerks('GET', '/misc/ajax/stores', 'ajax-stores')
+    ajerks('GET', '/misc/ajax/customers', 'ajax-customers')
+    ajerks('GET', '/misc/ajax/users', 'ajax-users')
 })
 
-bodi.on('change', '.ajax-categories',function(){
+bodi.on('change', '.ajax-categories', function () {
     $('.ajax-products').attr('category_id', $(this).val())
-    ajerks('GET','/misc/ajax/products','ajax-products')
+    ajerks('GET', '/misc/ajax/products', 'ajax-products')
 })
 
 
-function ajerks(method, url, cssClass){
-    let element = $('.'+cssClass);
+function ajerks(method, url, cssClass) {
+    let element = $('.' + cssClass);
     let data;
-    if(element.attr('branch_id') && element.attr('name')==='store_id'){
+    if (element.attr('branch_id') && element.attr('name') === 'store_id') {
         let branch_id = element.attr('branch_id')
-        data = { branch_id : branch_id }
+        data = { branch_id: branch_id }
     }
-    if(element.attr('branch_id') && element.attr('name')==='user_id'){
+    if (element.attr('branch_id') && element.attr('name') === 'user_id') {
         let branch_id = element.attr('branch_id')
-        data = { branch_id : branch_id }
+        data = { branch_id: branch_id }
     }
-    if(element.attr('branch_id') && element.attr('name')==='customer_id'){
+    if (element.attr('branch_id') && element.attr('name') === 'customer_id') {
         let branch_id = element.attr('branch_id')
-        data = { branch_id : branch_id }
+        data = { branch_id: branch_id }
     }
-    if(element.attr('category_id') && element.attr('name')==='product_id'){
+    if (element.attr('category_id') && element.attr('name') === 'product_id') {
         let category_id = element.attr('category_id')
-        data = { category_id : category_id }
+        data = { category_id: category_id }
     }
 
     $.ajax({
         url: url,
         type: method,
         data,
-        success:function(response){
+        success: function (response) {
             element.html(response)
             mySelect2()
             // select default item
-            if(element.attr('selected_item')){
+            if (element.attr('selected_item')) {
                 let selected_item = element.attr('selected_item')
-                element.find("[value='"+selected_item+"']").attr('selected', 'selected')
+                element.find("[value='" + selected_item + "']").attr('selected', 'selected')
             }
 
         }
@@ -67,7 +67,7 @@ function ajerks(method, url, cssClass){
 
 }
 
-function mySelect2(){
+function mySelect2() {
 
     $(".select2-single, .select2-multiple, .select2").select2({
         theme: "bootstrap",
@@ -86,9 +86,9 @@ $.ajax({
     url: "/ajax/cart/load",
     type: 'GET',
     data: {
-        type : type
+        type: type
     }
-}).done(function(component){
+}).done(function (component) {
     // console.log(component)
     cart_container.html(component)
 })
@@ -96,16 +96,19 @@ $.ajax({
 
 
 //add cart item
-$(document).on('submit','.addCartItemForm', function(e){
+$(document).on('submit', '.addCartItemForm', function (e) {
     e.preventDefault()
-    if(type === 'order' || type === 'proforma' || type === 'invoice') {
+    if (type === 'order' || type === 'proforma' || type === 'invoice') {
         if ($('input[name=customer]').val() == '') {
             alert("Please select customer")
             return;
         }
+        $('#customer_record').attr('disabled', true);
+        $('#customer_val_id').val($('input[name=customer]').val());
+        $('#account_type').attr('disabled', true);
     }
 
-    if(type === 'adjustment') {
+    if (type === 'adjustment') {
         if ($('select[name=operation]').val() == '') {
             alert("Please select operation")
             return;
@@ -115,10 +118,10 @@ $(document).on('submit','.addCartItemForm', function(e){
     $.ajax({
         url: $(this).attr('action'),
         type: 'GET',
-        data: $(this).serialize()+'&type='+type,
-    }).done(function(component){
+        data: $(this).serialize() + '&type=' + type,
+    }).done(function (component) {
         //reset input only
-        if(type !== 'order' && type !== 'proforma' && type !== 'invoice') {
+        if (type !== 'order' && type !== 'proforma' && type !== 'invoice') {
             $('.addCartItemForm')[0].reset();
             $('.select2-single').val(null).trigger('change');
         }
@@ -128,10 +131,10 @@ $(document).on('submit','.addCartItemForm', function(e){
 })
 
 //update to card
-$(document).on('keyup','.quantity, .price', function(){
+$(document).on('keyup', '.quantity, .price', function () {
     let id = $(this).attr('data-value');
-    
-    if(type == 'invoice'){
+
+    if (type == 'invoice') {
         $("#valid_qty" + id.substr(1)).html("");
         if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
             'max-qty'))) {
@@ -145,14 +148,14 @@ $(document).on('keyup','.quantity, .price', function(){
 
 })
 
-function updateCart(formId, formData = ''){
+function updateCart(formId, formData = '') {
     let form = $('#' + formId);
-   
+
     $.ajax({
         url: form.attr('action'),
         type: 'GET',
-        data: form.serialize()+'&type='+type,
-    }).done(function(component){
+        data: form.serialize() + '&type=' + type,
+    }).done(function (component) {
         console.log(component)
         formId = formId.substr(1);
         subtotal = $('#price' + formId).val() * $('#quantity' + formId).val();
@@ -162,30 +165,38 @@ function updateCart(formId, formData = ''){
 }
 
 //delete card
-$(document).on('click','.deleteCartItem', function(e){
+$(document).on('click', '.deleteCartItem', function (e) {
     e.preventDefault()
     $.ajax({
         url: $(this).attr('url'),
         type: 'GET',
         data: {
-            type : type
+            type: type
         }
-    }).done(function(component){
-        // console.log(component)
+    }).done(function (component) {
+        var numberOfForms = 0;
+        $(component).find('form').each(function () {
+            numberOfForms++;
+        });
+
+        if (numberOfForms == 0) {
+            $('#customer_record').attr('disabled', false);
+            $('#account_type').attr('disabled', false);
+        }
         cart_container.html(component)
     })
 })
 
 
 //change store from card
-$(document).on('change','.store_code', function(){
+$(document).on('change', '.store_code', function () {
     let id = $(this).attr('data-value');
     updateCart(id)
 
 })
 
 //change unit measure
-$(document).on('change','.unit_measure', function(){
+$(document).on('change', '.unit_measure', function () {
     let id = $(this).attr('data-value');
     updateCart(id)
 })

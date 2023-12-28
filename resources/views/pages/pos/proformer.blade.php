@@ -54,6 +54,8 @@
                                         value="{{ date('Y-m-d') }}" />
 
                                     <div class="row">
+                                        <input type="hidden" class="form-control" name="customer_id"
+                                        id="customer_val_id" value="">
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Customer Type</label>

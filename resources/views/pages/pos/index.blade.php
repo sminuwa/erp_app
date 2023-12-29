@@ -59,6 +59,11 @@
                                                 <a href="javascript:void(0)" data-toggle="modal" data-target="#customermodal"
                                                     class="btn btn-sm btn-primary float-md-right">Add New</a>
                                             @endcan
+
+                                            <a href="javascript:void(0)" data-toggle="modal" data-target="#receipt"
+                                                class="btn btn-sm btn-secondary float-md-right"
+                                                onclick="checkCustomerSelection()" style="margin-left: 2px;">Receipt
+                                            </a>&nbsp;
                                             <span class="text text-danger fa fa-mobile">Send SMS: </span> <input
                                                 type="checkbox" name="sms" id="sms" />
                                         </span>
@@ -169,31 +174,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">POS</h3>
-                                {{-- @can('view.sale.products')
-                                    <form action="{{ route('pos.index') }}" method="get">
-                                        @csrf
-                                        Product Category
-                                        <select name="category_id" id="category_id" class="form-control select2-single">
-                                            <option value="all">All categories</option>
-                                            @foreach ($categories as $data)
-                                                <option value="{{ $data->id }}"
-                                                    {{ $data->id == $category_id ? 'selected' : '' }}>
-                                                    {{ $data->code }}-{{ $data->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        Store
-                                        <select name="store_id" id="store_id" class="form-control select2-single">
-                                            <option value="all">All stores</option>
-                                            @foreach ($store as $data)
-                                                <option value="{{ $data->id }}"
-                                                    {{ $data->id == $store_id ? 'selected' : '' }}>{{ $data->code }}-{{ $data->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <input type="submit" name="btnLoad" id="btnLoad" value="Load"
-                                            class="btn btn-sm btn-secondary" />
-                                    </form>
-                                @endcan --}}
+
                                 @can('make.daily.sale')
                                     <input type="text" id="barcode" class="form-control" name="barcode"
                                         placeholder="Scan barcode">
@@ -366,6 +347,89 @@
             </div>
         </div>
     </div><!-- End modal delete -->
+    <div class="modal fade" id="receipt" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Receipt</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <form action="{{ isset($route) ? $route : route('receipt.payment.store') }}" method="POST">
+                    <div class="modal-body">
+                        {{ csrf_field() }}
+                        <input type="hidden" name="payer_id" id="payer_id" value="" required />
+                        <input type="hidden" name="type" value="Customer" required />
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="payment_date">Payment Date</label>
+                                <input type="text"
+                                    class="form-control datepicker {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
+                                    name="payment_date" id="payment_date"
+                                    value="{{ old('payment_date') == '' ? date('Y-m-d') : old('payment_date') }}"
+                                    required="required">
+                                @if ($errors->has('payment_date'))
+                                    <div class="invalid-feedback">
+                                        <strong>{{ $errors->first('payment_date') }}</strong>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="account_id">Account</label>
+                                <select
+                                    class="form-control select2-single ajax-general-accounts {{ $errors->has('account_id') ? ' is-invalid' : '' }}"
+                                    name="account_id" id="account_id" required="required">
+                                    <option value="">Select...</option>
+
+                                </select>
+                                @if ($errors->has('payer_id'))
+                                    <div class="invalid-feedback">
+                                        <strong>{{ $errors->first('payer_id') }}</strong>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="amount_paid">Amount</label>
+                                <input type="number"
+                                    class="form-control {{ $errors->has('amount_paid') ? ' is-invalid' : '' }}"
+                                    name="amount_paid" id="amount_paid" value="{{ old('amount_paid') }}" required>
+                                @if ($errors->has('amount_paid'))
+                                    <div class="invalid-feedback">
+                                        <strong>{{ $errors->first('amount_paid') }}</strong>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="payment_ref">Description</label>
+                                <textarea type="text" class="form-control" name="payment_ref" id="payment_ref"></textarea>
+                                @if ($errors->has('payment_ref'))
+                                    <div class="invalid-feedback">
+                                        <strong>{{ $errors->first('payment_ref') }}</strong>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-dark" data-dismiss="modal" id="close"><i
+                                class="fa fa-times"></i>
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-info px-3"><i class="icon-trash"></i> Save
+                        </button>
+                    </div>
+                    @method('post')
+                </form>
+            </div>
+        </div>
+    </div>
     <!--  modal create customer -->
     <div class="modal fade" id="credit_limitform" style="display: none;" aria-hidden="true">
         <div class="modal-dialog">
@@ -537,6 +601,7 @@
         $('#customer_record').on("change", function() {
             customer_id = $(this).val();
             $('.customer').val(customer_id);
+            $('#payer_id').val(customer_id);
             $.ajax({
                 type: "GET",
                 url: "{{ route('ajax.load.customer.credit_limit') }}",
@@ -691,5 +756,15 @@
                 }, 200); //200 works fine for me but you can adjust it
             }
         });
+
+        function checkCustomerSelection() {
+            var selectedCustomerId = $('#customer_record').val();
+
+            if (!selectedCustomerId) {
+                alert('Please select a customer below.');
+
+                return false;
+            }
+        }
     </script>
 @endpush

@@ -416,21 +416,21 @@
                                     <ul class="nav nav-treeview">
                                         <li class="nav-item">
                                             <a href="{{ route('general.sales.report') }}"
-                                                class="nav-link {{ Request::is('reports/sa/sales/*') ? 'active' : '' }}">
+                                                class="nav-link {{ Request::is('reports/sa/sales/general*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
                                                 <p>General Sales Report</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="{{ route('sales.report.by.category') }}"
-                                                class="nav-link {{ Request::is('reports/sa/sales/*') ? 'active' : '' }}">
+                                                class="nav-link {{ Request::is('reports/sa/sales/category*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
                                                 <p>Sales by Category</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="{{ route('customer.sale.reports') }}"
-                                                class="nav-link {{ Request::is('reports/sa/sales/*') ? 'active' : '' }}">
+                                                class="nav-link {{ Request::is('reports/sa/sales/customer/sale/common-name*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
                                                 <p>Customer Sales With Common Name</p>
                                             </a>
@@ -479,10 +479,24 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
+                                            <a href="{{ route('invoice.lines.reports') }}"
+                                                class="nav-link {{ Request::is('reports/sa/sales/invoice/lines*') ? 'active' : '' }}">
+                                                <i class="ion-code-working"></i>
+                                                <p>Invoices Lines</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
                                             <a href="{{ route('order.list.reports') }}"
                                                 class="nav-link {{ Request::is('reports/sa/sales/order*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
                                                 <p>Orders List</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('order.lines.reports') }}"
+                                                class="nav-link {{ Request::is('reports/sa/sales/order/lines*') ? 'active' : '' }}">
+                                                <i class="ion-code-working"></i>
+                                                <p>Orders Lines</p>
                                             </a>
                                         </li>
                                         {{-- <li class="nav-item">
@@ -496,9 +510,9 @@
                                 </li>
                             @endcan
                             @can('customer.ledger.analysis.report')
-                                <li class="nav-item has-treeview {{ Request::is('reports/sa/sales*') ? 'menu-open' : '' }}">
+                                <li class="nav-item has-treeview {{ Request::is('reports/ca/customer*') ? 'menu-open' : '' }}">
                                     <a href="#"
-                                        class="nav-link {{ Request::is('reports/sa/sales*') ? 'active' : '' }}">
+                                        class="nav-link {{ Request::is('reports/ca/customer*') ? 'active' : '' }}">
                                         <i class="ion-ios-time"></i>
                                         <p>
                                             Customer Ledger Analysis

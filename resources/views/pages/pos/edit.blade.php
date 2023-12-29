@@ -97,6 +97,8 @@
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
+                                                <input type="hidden" class="form-control" name="customer_id"
+                                                        id="customer_val_id" value="">
                                                 <label>Customer</label>
                                                 <div class="form-group">
                                                     <select name="customer_id" id="customer_record"

@@ -2717,7 +2717,7 @@ class ReportController extends Controller
         }
         if ($type != null && $type == "Supplier") {
             return GeneralAccountLedger::join('suppliers', 'suppliers.id', '=', 'general_account_ledgers.model_id')
-                ->where('suppliers.branch_id', 'like', $branch_id)
+                ->where('general_account_ledgers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '>=', $from_date)
                 ->whereDate('date', '<=', $to_date)
                 ->where('model_name', 'Supplier');

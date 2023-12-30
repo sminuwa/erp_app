@@ -39,7 +39,7 @@ class Customer extends Model
     }
     public function runningBalance()
     {
-        return $this->ledgers()->where('model_name', 'Customer')->sum('credit') - $this->ledgers()->sum('debit');
+        return $this->ledgers()->where('model_name', 'Customer')->sum('credit') - $this->ledgers()->where('model_name', 'Customer')->sum('debit');
     }
     public function branch()
     {

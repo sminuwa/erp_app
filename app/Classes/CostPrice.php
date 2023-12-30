@@ -607,8 +607,6 @@ class CostPrice
             ];
         }
 
-        return $records;
-
         $store_products = $product_costs = $batch = $stock_card_param = [];
         if ($operation == 'in') {
             foreach ($records as $key => $record) {
@@ -642,6 +640,7 @@ class CostPrice
                     'expiry_date' => $record['expiry_date'],
                 ];
             }
+            return $product_costs;
             DB::beginTransaction();
             if (
                 StockCard::createBatchRecord($stock_card_param, $batch_no, $date, $type)

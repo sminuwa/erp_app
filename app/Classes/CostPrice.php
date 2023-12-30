@@ -579,9 +579,9 @@ class CostPrice
                 ->where(['store_products.product_id' => $key, 'store_products.store_id' => $store_id])->first();
             $prices[$details->product_id] = [
                 'product_id' => $details->product_id,
-                'cost_price' => $details->cost_price,
+                'cost_price' => $details->cost_price ?? 0,
                 'qty_available' => $details->qty_available,
-                'total_quantity' => $details->quantity,
+                'total_quantity' => $details->quantity ?? 0,
                 'total_existing_cost' => $details->total_existing_cost,
             ];
         }

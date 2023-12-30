@@ -42,7 +42,7 @@
                                     <i class="fa fa-arrow-left"></i> Back
                                 </a>
                                 <a href="{{ route('create.interbank') }}" class="btn btn-secondary btn-sm ">
-                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> New Receipt
+                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> New Transfer
                                 </a>
 
                                 <a href="{{ route('interbank.print', $interbank->id) }}" target="_BLANK"

@@ -285,6 +285,7 @@ class ReportController extends Controller
 
     public function printCurrentStock($branch_id, $store_id, $category_id, $product_id)
     {
+        return $branch_id;
         if ($branch_id == "all" || $branch_id == "")
             $branch_id = "%";
         if ($store_id == "all" || $store_id == "")

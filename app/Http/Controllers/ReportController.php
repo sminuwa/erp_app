@@ -2699,14 +2699,14 @@ class ReportController extends Controller
             $branch_id = '%';
         if ($type != null && $type == "Customer") {
             return GeneralAccountLedger::join('customers', 'customers.id', '=', 'general_account_ledgers.model_id')
-                ->where('general_account_ledgers.branch_id', 'like', $branch_id)
+                ->where('customers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '>=', $from_date)
                 ->whereDate('date', '<=', $to_date)
                 ->where('model_name', 'Customer');
         }
         if ($type != null && $type == "Supplier") {
             return GeneralAccountLedger::join('suppliers', 'suppliers.id', '=', 'general_account_ledgers.model_id')
-                ->where('general_account_ledgers.branch_id', 'like', $branch_id)
+                ->where('suppliers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '>=', $from_date)
                 ->whereDate('date', '<=', $to_date)
                 ->where('model_name', 'Supplier');
@@ -2716,7 +2716,7 @@ class ReportController extends Controller
                 ->where('general_account_ledgers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '>=', $from_date)
                 ->whereDate('date', '<=', $to_date)
-                ->where('model_name', 'GeneralAccount');
+                ->where('model_nam', 'GeneralAccount');
         }
         return GeneralAccountLedger::join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
             ->where('general_account_ledgers.branch_id', 'like', $branch_id)

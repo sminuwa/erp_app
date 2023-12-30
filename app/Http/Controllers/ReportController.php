@@ -266,7 +266,7 @@ class ReportController extends Controller
             ->where('store_products.product_id', 'LIKE', $product_id)
             ->where('store_products.store_id', 'LIKE', $store_id)
             ->where('branch_product_prices.product_id', 'LIKE', $product_id)
-            ->where('stores.branch_id', 'LIKE', $branch_id)
+            ->where('stores.branch_id', $branch_id)
             ->orderBy('products.name')
             ->get();
         if ($branch_id == "%")
@@ -300,11 +300,11 @@ class ReportController extends Controller
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
             ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
             ->where('store_products.qty_available', '>', 0)
-            ->where('products.category_id', 'LIKE', $category_id)
-            ->where('store_products.product_id', 'LIKE', $product_id)
-            ->where('store_products.store_id', 'LIKE', $store_id)
-            ->where('branch_product_prices.product_id', 'LIKE', $product_id)
-            ->where('stores.branch_id', 'LIKE', $branch_id)
+            ->where('products.category_id', $category_id)
+            ->where('store_products.product_id', $product_id)
+            ->where('store_products.store_id', $store_id)
+            ->where('branch_product_prices.product_id', $product_id)
+            ->where('stores.branch_id', $branch_id)
             ->orderBy('products.name')
             ->get();
         $branch = null;
@@ -2727,7 +2727,7 @@ class ReportController extends Controller
 
     private function generalAccountLedgerB4D($from_date, $branch_id, $type = null)
     {
-        //To get account balance before start date 
+        //To get account balance before start date
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
         if ($type != null && $type == "Customer") {

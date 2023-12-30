@@ -163,14 +163,15 @@ class CostPrice
 
         foreach ($products as $key => $p) {
             $product_ids[] = $key;
+            $store_id = $p['store_id'];
             $total_new_cost[$key] = intval($p['quantity']) * intval($p['price']);
             $details = StoreProduct::selectRaw("
                 store_products.product_id,
                 qty_available,
-                (SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) as cost_price,
-                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key) as quantity,
-                ((SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) *
-                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key)) as total_existing_cost
+                (SELECT cost_price FROM branch_product_prices WHERE product_id = $key AND branch_id=$purchase_grn->branch_id limit 1) as cost_price,
+                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key AND store_id=$store_id) as quantity,
+                ((SELECT cost_price FROM branch_product_prices WHERE product_id = $key AND branch_id=$purchase_grn->branch_id limit 1) *
+                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key AND store_id=$store_id)) as total_existing_cost
                 ")
                 ->where('store_products.product_id', $key)->first();
             if ($details != null) {
@@ -274,14 +275,15 @@ class CostPrice
 
         foreach ($products as $key => $p) {
             $product_ids[] = $key;
+            $store_id = $p['store_id'];
             $total_new_cost[$key] = intval($p['quantity']) * intval($p['price']);
             $details = StoreProduct::selectRaw("
                 store_products.product_id,
                 qty_available,
-                (SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) as cost_price,
-                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key) as quantity,
-                ((SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) *
-                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key)) as total_existing_cost
+                (SELECT cost_price FROM branch_product_prices WHERE product_id = $key AND branch_id = $purchase_grn->branch_id limit 1) as cost_price,
+                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key AND store_id=$store_id) as quantity,
+                ((SELECT cost_price FROM branch_product_prices WHERE product_id = $key AND branch_id = $purchase_grn->branch_id limit 1) *
+                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key AND store_id=$store_id)) as total_existing_cost
                 ")
                 ->where('store_products.product_id', $key)->first();
             $prices[$details->product_id] = [
@@ -390,19 +392,19 @@ class CostPrice
             $source_details = StoreProduct::selectRaw("
                 store_products.product_id,
                 qty_available,
-                (SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) as cost_price,
-                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key) as quantity,
-                ((SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) *
-                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key)) as total_existing_cost
+                (SELECT cost_price FROM branch_product_prices WHERE product_id = $key AND branch_id = $branch_id limit 1) as cost_price,
+                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key AND store_id=$source_store_id) as quantity,
+                ((SELECT cost_price FROM branch_product_prices WHERE product_id = $key AND branch_id = $branch_id limit 1) *
+                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key AND store_id=$source_store_id)) as total_existing_cost
                 ")
                 ->where(['store_products.product_id' => $key, 'store_products.store_id' => $source_store_id])->first();
             $destination_details = StoreProduct::selectRaw("
                 store_products.product_id,
                 qty_available,
-                (SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) as cost_price,
-                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key) as quantity,
-                ((SELECT cost_price FROM branch_product_prices WHERE product_id = $key limit 1) *
-                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key)) as total_existing_cost
+                (SELECT cost_price FROM branch_product_prices WHERE product_id = $key AND branch_id = $branch_id limit 1) as cost_price,
+                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key AND store_id=$destination_store_id) as quantity,
+                ((SELECT cost_price FROM branch_product_prices WHERE product_id = $key AND branch_id = $branch_id limit 1) *
+                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key AND store_id=$destination_store_id)) as total_existing_cost
                 ")
                 ->where(['store_products.product_id' => $key, 'store_products.store_id' => $destination_store_id])->first();
             $prices[$s][$source_details->product_id] = [

@@ -575,9 +575,9 @@ class CostPrice
                 store_products.product_id,
                 qty_available,
                 (SELECT cost_price FROM branch_product_prices WHERE product_id = $key AND branch_id = $branch_id limit 1) as cost_price,
-                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key AND store_id in ($store_ids)) as quantity,
+                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key AND store_id in (SELECT id FROM stores WHERE branch_id =$branch_id)) as quantity,
                 ((SELECT cost_price FROM branch_product_prices WHERE product_id = $key AND branch_id = $branch_id limit 1) *
-                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key AND store_id in ($store_ids) )) as total_existing_cost
+                (SELECT sum(qty_available) as quantity FROM store_products WHERE product_id = $key AND store_id in (SELECT id FROM stores WHERE branch_id =$branch_id) )) as total_existing_cost
                 ")
                 ->where(['store_products.product_id' => $key, 'store_products.store_id' => $store_id])->first();
             $prices[$details->product_id] = [

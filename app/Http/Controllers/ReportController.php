@@ -300,11 +300,11 @@ class ReportController extends Controller
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
             ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
             ->where('store_products.qty_available', '>', 0)
-            ->where('products.category_id', $category_id)
-            ->where('store_products.product_id', $product_id)
-            ->where('store_products.store_id', $store_id)
-            ->where('branch_product_prices.product_id', $product_id)
-            ->where('stores.branch_id', $branch_id)
+            ->where('products.category_id', 'LIKE', $category_id)
+            ->where('store_products.product_id', 'LIKE', $product_id)
+            ->where('store_products.store_id', 'LIKE', $store_id)
+            ->where('branch_product_prices.product_id', 'LIKE', $product_id)
+            ->where('stores.branch_id', 'LIKE', $branch_id)
             ->orderBy('products.name')
             ->get();
         $branch = null;

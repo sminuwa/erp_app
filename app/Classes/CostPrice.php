@@ -586,7 +586,7 @@ class CostPrice
             ];
         }
 
-        return $details;
+        return $prices;
 
         foreach ($prices as $price) {
             $existing_cost[$price['product_id']] = ['cost_price' => $price['cost_price'], 'quantity' => $price['total_quantity'], 'total_existing_cost' => $price['total_existing_cost']];

@@ -257,7 +257,16 @@ class ReportController extends Controller
             $product_id = "%";
 
         $stores = DB::table('store_products')
-            ->select('products.name', 'products.code AS product_code', 'stores.code as store_code', 'store_products.qty_available', 'retail_selling_price', 'whole_selling_price', 'cost_price', 'store_products.id')
+            ->selectRaw(
+                "products.name,
+                products.code AS product_code,
+                stores.code as store_code,
+                store_products.qty_available,
+                branch_product_prices.retail_selling_price,
+                branch_product_prices.whole_selling_price,
+
+                branch_product_prices.cost_price,
+                store_products.id")
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
             ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
@@ -266,7 +275,8 @@ class ReportController extends Controller
             ->where('store_products.product_id', 'LIKE', $product_id)
             ->where('store_products.store_id', 'LIKE', $store_id)
             ->where('branch_product_prices.product_id', 'LIKE', $product_id)
-            ->where('stores.branch_id', 'LIKE', $branch_id)
+            ->where('stores.branch_id', $branch_id)
+            ->where('branch_product_prices.branch_id', $branch_id)
             ->orderBy('products.name')
             ->get();
         if ($branch_id == "%")
@@ -304,7 +314,8 @@ class ReportController extends Controller
             ->where('store_products.product_id', 'LIKE', $product_id)
             ->where('store_products.store_id', 'LIKE', $store_id)
             ->where('branch_product_prices.product_id', 'LIKE', $product_id)
-            ->where('stores.branch_id', 'LIKE', $branch_id)
+            ->where('stores.branch_id', $branch_id)
+            ->where('branch_product_prices.branch_id', $branch_id)
             ->orderBy('products.name')
             ->get();
         $branch = null;
@@ -2727,7 +2738,7 @@ class ReportController extends Controller
 
     private function generalAccountLedgerB4D($from_date, $branch_id, $type = null)
     {
-        //To get account balance before start date 
+        //To get account balance before start date
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
         if ($type != null && $type == "Customer") {

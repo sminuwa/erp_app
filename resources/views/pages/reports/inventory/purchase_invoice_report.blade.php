@@ -21,7 +21,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Supplier Transactions</h4>
+                        <h4>Purchase Invoices</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -38,86 +38,56 @@
             <div class="container-fluid">
                 <form method="POST">
                     <div class="row">
-                        <div class="form-group  col-sm-2">
+                        <div class="form-group">
                             <label for="from_date">From Date</label>
                             <input type="text" autocomplete="off"
                                 class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
                                 name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="">
                         </div>
-                        <div class="form-group  col-sm-2">
+                        <div class="form-group">
                             <label for="to_date">To Date</label>
                             <input type="text" autocomplete="off"
                                 class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
                                 name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
                         </div>
-                        <div class="form-group  col-sm-2">
+                        <div class="form-group">
                             &nbsp;&nbsp;
-                            <label for="store_id">Store</label>
-                            <select class="form-control {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
-                                name="store_id" id="store_id">
-                                <option value="all">All</option>
-                                @foreach ($stores as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="form-group  col-sm-2">
-                            &nbsp;&nbsp;
-                            <label for="category_id">Category</label>
-                            <select class="form-control {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
-                                name="category_id" id="category_id">
-                                <option value="all">All</option>
-                                @foreach ($categories as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="form-group  col-sm-2">
-                            &nbsp;&nbsp;
-                            <label for="product_id">Product</label>
+                            <label for="branch_id">Branch</label>
                             <select
-                                class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
-                                name="product_id" id="product_id">
-                                <option value="all">All</option>
-                                @foreach ($products as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name }}
-                                    </option>
-                                @endforeach
+                                class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
+                                name="branch_id" id="branch_id">
+
                             </select>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group  col-sm-2">
+                        <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="supplier_id">Supplier</label>
-                            <select class="form-control {{ $errors->has('supplier_id') ? ' is-invalid' : '' }}"
+                            <select
+                                class="form-control select2-single ajax-suppliers {{ $errors->has('supplier_id') ? ' is-invalid' : '' }}"
                                 name="supplier_id" id="supplier_id">
-                                <option value="all">All</option>
-                                @foreach ($suppliers as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name }}
-                                    </option>
-                                @endforeach
+
                             </select>
                         </div>
-                        <div class="form-group  col-sm-4">
+                        <div class="form-group">
                             &nbsp;&nbsp;
-                            <label for="purchase_mode">Purchase Mode</label>
-                            <select class="form-control select2-single" name="purchase_mode" id="purchase_mode">
-                                <option value="all">All</option>
-                                <option value="Cash">Cash</option>
-                                <option value="Credit">Credit</option>
+                            <label for="status">Status</label>
+                            <select class="form-control {{ $errors->has('status') ? ' is-invalid' : '' }}" name="status"
+                                id="status">
+                                <option value="">Select...</option>
+                                <option value="0">Pending</option>
+                                <option value="1">Completed</option>
                             </select>
                         </div>
-                        <div class="form-group text-right  col-sm-2">
+                        <div class="form-group text-right">
                             <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />
                         </div>
                     </div>
+
                 </form>
                 <div class="row">
                     <div class="col-sm-12 table-responsive" id="load">
-                        <img src="{{ asset('assets/backend/img/loader.png') }}" style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                        <img src="{{ asset('assets/backend/img/loader.png') }}"
+                            style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
@@ -144,56 +114,26 @@
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
 
-            $('#category_id,#store_id').on("change", function() {
-                category_id = $('#category_id').val();
-                store_id = $('#store_id').val();
 
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route('ajax.load.store.products') }}",
-                    data: {
-                        category_id: category_id,
-                        store_id: store_id
-                    }
-                }).done(function(data) {
-                    $("#product_id").html("<option value='all'>All</option>" + data);
-                });
-            });
 
-            $('.type').on("change", function() {
-                type = $(this).val();
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route('ajax.load.customers') }}",
-                    data: {
-                        type: type
-                    }
-                }).done(function(data) {
-                    $("#customer_id").html("<option value='all'>All</option>" + data);
-                });
-            });
 
             $('#generate').on("click", function() {
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
-                product_id = $('#product_id').val();
-                store_id = $('#store_id').val();
-                category_id = $('#category_id').val();
                 supplier_id = $('#supplier_id').val();
-                purchase_mode = $('#purchase_mode').val();
+                branch_id = $('#branch_id').val();
+                status = $('#status').val();
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
-                    url: "{{ route('ajax.supplier.transaction.report') }}",
+                    url: "{{ route('ajax.purchase.invoice.report') }}",
                     data: {
                         _token: "{{ csrf_token() }}",
                         from_date: from_date,
                         to_date: to_date,
-                        product_id: product_id,
-                        store_id: store_id,
-                        category_id: category_id,
                         supplier_id: supplier_id,
-                        purchase_mode: purchase_mode
+                        branch_id: branch_id,
+                        status: status
                     }
                 }).done(function(data) {
                     $('#img-loader').hide();
@@ -219,7 +159,7 @@
                                 exportOptions: {
                                     columns: ':visible'
                                 },
-                                messageTop: 'Supplier Transaction (Purchases)',
+                                messageTop: 'Purchase Invoice',
                                 orientation: 'landscape',
                                 pageSize: 'LEGAL'
                             },

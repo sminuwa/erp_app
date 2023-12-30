@@ -266,7 +266,7 @@ class ReportController extends Controller
             ->where('store_products.product_id', 'LIKE', $product_id)
             ->where('store_products.store_id', 'LIKE', $store_id)
             ->where('branch_product_prices.product_id', 'LIKE', $product_id)
-            ->where('branch_product_prices.branch_id', 'LIKE', $branch_id)
+            ->where('stores.branch_id', 'LIKE', $branch_id)
             ->orderBy('products.name')
             ->get();
         if ($branch_id == "%")
@@ -304,7 +304,7 @@ class ReportController extends Controller
             ->where('store_products.product_id', 'LIKE', $product_id)
             ->where('store_products.store_id', 'LIKE', $store_id)
             ->where('branch_product_prices.product_id', 'LIKE', $product_id)
-            ->where('branch_product_prices.branch_id', 'LIKE', $branch_id)
+            ->where('stores.branch_id', 'LIKE', $branch_id)
             ->orderBy('products.name')
             ->get();
         $branch = null;
@@ -2006,69 +2006,12 @@ class ReportController extends Controller
         return view('pages.reports.sales_and_cash_analysis.print_order_lines_report', compact('sales', 'from_date', 'to_date', 'branch'));
     }
 
-    public function supplierPaymentReport()
+    public function purchaseInvoiceLinesReport()
     {
-        return view('pages.reports.purchase_analysis.supplier_payment_report', [
-            'suppliers' => Supplier::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('name')->get(),
-        ]);
+        return view('pages.reports.inventory.purchase_invoice_lines_report');
     }
 
-    public function loadSupplierPaymentReport(Request $request)
-    {
-        $from_date = $request->from_date;
-        $to_date = $request->to_date;
-        $supplier_id = $request->supplier_id;
-
-        if ($supplier_id == 'all') {
-            $supplier_id = '%';
-        }
-        $sales = DB::table('suppliers')
-            ->select('suppliers.name AS supplier', 'suppliers.id AS supplier_id', 'supplier_ledgers.id', 'supplier_ledgers.dr', 'supplier_ledgers.cr', 'teller_no', 'cr', 'account_name', 'date', 'payment_mode', 'supplier_ledgers.created_at')
-            ->join('supplier_ledgers', 'suppliers.id', 'supplier_ledgers.supplier_id')
-            ->join('bank_accounts', 'bank_accounts.id', 'supplier_ledgers.bank_account_id')
-            ->where('supplier_ledgers.supplier_id', 'LIKE', $supplier_id)
-            ->where('payment_mode', '<>', 'Credit')
-            ->where('suppliers.branch_id', 'LIKE', User::userBranchAction())
-            ->whereBetween(DB::raw("DATE(supplier_ledgers.date)"), [$from_date, $to_date])
-            ->orderBy('supplier_ledgers.date')
-            ->get();
-        if ($supplier_id == "%")
-            $supplier_id = "all";
-        return view('pages.reports.purchase_analysis.load_supplier_payment_report', compact('sales', 'from_date', 'to_date', 'supplier_id'));
-    }
-
-    public function printSupplierPaymentReport($from_date, $to_date, $supplier_id)
-    {
-
-        if ($supplier_id == 'all') {
-            $supplier_id = '%';
-        }
-        $sales = DB::table('suppliers')
-            ->select('suppliers.name AS supplier', 'suppliers.id AS supplier_id', 'supplier_ledgers.id', 'supplier_ledgers.dr', 'supplier_ledgers.cr', 'teller_no', 'cr', 'account_name', 'date', 'payment_mode', 'supplier_ledgers.created_at')
-            ->join('supplier_ledgers', 'suppliers.id', 'supplier_ledgers.supplier_id')
-            ->join('bank_accounts', 'bank_accounts.id', 'supplier_ledgers.bank_account_id')
-            ->where('supplier_ledgers.supplier_id', 'LIKE', $supplier_id)
-            ->where('payment_mode', '<>', 'Credit')
-            ->where('suppliers.branch_id', 'LIKE', User::userBranchAction())
-            ->whereBetween(DB::raw("DATE(supplier_ledgers.date)"), [$from_date, $to_date])
-            ->orderBy('supplier_ledgers.date')
-            ->get();
-        if ($supplier_id == "%")
-            $supplier_id = "all";
-        return view('pages.reports.purchase_analysis.print_supplier_payment_report', compact('sales', 'from_date', 'to_date', 'supplier_id'));
-    }
-
-    public function purchasesReport()
-    {
-        return view('pages.reports.purchase_analysis.supplier_transaction', [
-            'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('id')->get(),
-            'products' => Product::orderBy('name')->get(),
-            'categories' => Category::orderBy('name')->get(),
-            'suppliers' => Supplier::where('branch_id', 'LIKE', User::userBranchAction())->get(),
-        ]);
-    }
-
-    public function loadPurchasesReport(Request $request)
+    public function loadPurchaseInvoiceLinesReport(Request $request)
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
@@ -2076,57 +2019,65 @@ class ReportController extends Controller
         $store_id = $request->store_id;
         $category_id = $request->category_id;
         $supplier_id = $request->supplier_id;
-        $purchase_mode = $request->purchase_mode;
+        $branch_id = $request->branch_id;
+        $status = $request->status;
 
-        if ($product_id == 'all') {
+        if ($product_id == 'all' || $product_id == '') {
             $product_id = '%';
         }
-        if ($category_id == 'all') {
+        if ($category_id == 'all' || $category_id == '') {
             $category_id = '%';
         }
-        if ($store_id == 'all') {
+        if ($store_id == 'all' || $store_id == '') {
             $store_id = '%';
         }
-        if ($supplier_id == 'all') {
+        if ($supplier_id == 'all' || $supplier_id == '') {
             $supplier_id = '%';
         }
-        if ($purchase_mode == 'all') {
-            $purchase_mode = '%';
+        if ($branch_id == 'all' || $branch_id == '') {
+            $branch_id = '%';
+        }
+        if ($status == 'all' || $status == '') {
+            $status = '%';
         }
 
+
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'invoice', 'products.name AS product', 'stores.name AS store', 'purchase_products.qty_supplied AS quantity', 'unit_price', 'purchase_products.updated_at', 'purchases.purchase_date', 'purchase_mode')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
-            ->join('stores', 'stores.id', 'purchases.source_store_id')
+            ->join('stores', 'stores.id', 'purchase_products.store_id')
             ->join('products', 'products.id', 'purchase_products.product_id')
             ->where('products.category_id', 'LIKE', $category_id)
             ->where('purchase_products.product_id', 'LIKE', $product_id)
-            ->where('purchases.source_store_id', 'LIKE', $store_id)
+            ->where('purchase_products.store_id', 'LIKE', $store_id)
             ->where('purchases.supplier_id', 'LIKE', $supplier_id)
-            ->where('purchases.purchase_mode', 'LIKE', $purchase_mode)
-            ->where('purchase_products.status', 1)
-            ->where('stores.branch_id', 'LIKE', User::userBranchAction())
+            ->where('purchases.status', 'LIKE', $status)
+            ->where('stores.branch_id', 'LIKE', $branch_id)
             ->where(DB::raw("DATE(purchase_date)"), '>=', $from_date)
             ->where(DB::raw("DATE(purchase_date)"), '<=', $to_date)
             ->orderBy('purchase_date')
             ->get();
         if ($category_id == "%")
             $category_id = "all";
+        if ($status == "%")
+            $status = "all";
         if ($product_id == "%")
             $product_id = "all";
         if ($store_id == "%")
             $store_id = "all";
         if ($supplier_id == "%")
             $supplier_id = "all";
-        if ($purchase_mode == "%")
-            $purchase_mode = "all";
+        if ($branch_id == "%")
+            $branch_id = "all";
+        $branch = null;
+        if ($branch_id != "all")
+            $branch = Branch::find($branch_id);
 
-
-        return view('pages.reports.purchase_analysis.load_supplier_transaction_report', compact('sales', 'from_date', 'to_date', 'product_id', 'store_id', 'category_id', 'supplier_id', 'purchase_mode'));
+        return view('pages.reports.inventory.load_purchase_invoice_lines_report', compact('sales', 'from_date', 'to_date', 'product_id', 'store_id', 'category_id', 'supplier_id', 'branch_id', 'branch', 'status'));
     }
 
-    public function printPurchasesReport($from_date, $to_date, $store_id, $category_id, $product_id, $supplier_id, $purchase_mode)
+    public function printPurchaseInvoiceLinesReport($from_date, $to_date, $branch_id, $store_id, $category_id, $product_id, $supplier_id, $status)
     {
         if ($product_id == 'all') {
             $product_id = '%';
@@ -2140,28 +2091,119 @@ class ReportController extends Controller
         if ($supplier_id == 'all') {
             $supplier_id = '%';
         }
-        if ($purchase_mode == 'all') {
-            $purchase_mode = '%';
+        if ($branch_id == 'all') {
+            $branch_id = '%';
         }
-
+        if ($status == 'all') {
+            $status = '%';
+        }
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'invoice', 'products.name AS product', 'stores.name AS store', 'purchase_products.qty_supplied AS quantity', 'unit_price', 'purchase_products.updated_at', 'purchases.purchase_date', 'purchase_mode')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
-            ->join('stores', 'stores.id', 'purchases.source_store_id')
+            ->join('stores', 'stores.id', 'purchase_products.store_id')
             ->join('products', 'products.id', 'purchase_products.product_id')
             ->where('products.category_id', 'LIKE', $category_id)
             ->where('purchase_products.product_id', 'LIKE', $product_id)
-            ->where('purchases.source_store_id', 'LIKE', $store_id)
+            ->where('purchase_products.store_id', 'LIKE', $store_id)
             ->where('purchases.supplier_id', 'LIKE', $supplier_id)
-            ->where('purchases.purchase_mode', 'LIKE', $purchase_mode)
-            ->where('purchase_products.status', 1)
-            ->where('stores.branch_id', 'LIKE', User::userBranchAction())
+            ->where('purchases.status', 'LIKE', $status)
+            ->where('stores.branch_id', 'LIKE', $branch_id)
             ->where(DB::raw("DATE(purchase_date)"), '>=', $from_date)
             ->where(DB::raw("DATE(purchase_date)"), '<=', $to_date)
             ->orderBy('purchase_date')
             ->get();
-        return view('pages.reports.purchase_analysis.print_supplier_transaction_report', compact('sales', 'from_date', 'to_date', 'purchase_mode'));
+        $branch = null;
+        if ($branch_id != "all")
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.inventory.print_purchase_invoice_lines_report', compact('sales', 'from_date', 'to_date', 'branch'));
+    }
+
+    public function purchaseInvoiceReport()
+    {
+        return view('pages.reports.inventory.purchase_invoice_report');
+    }
+
+    public function loadPurchaseInvoiceReport(Request $request)
+    {
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
+        $supplier_id = $request->supplier_id;
+        $branch_id = $request->branch_id;
+        $status = $request->status;
+
+
+        if ($supplier_id == 'all' || $supplier_id == '') {
+            $supplier_id = '%';
+        }
+        if ($branch_id == 'all' || $branch_id == '') {
+            $branch_id = '%';
+        }
+        if ($status == 'all' || $status == '') {
+            $status = '%';
+        }
+
+
+        $sales = DB::table('purchases')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno', DB::raw('SUM(quantity * unit_price) AS total'),'purchases.status')
+            ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
+            ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
+            ->join('stores', 'stores.id', 'purchase_products.store_id')
+            ->join('products', 'products.id', 'purchase_products.product_id')
+            ->where('purchases.supplier_id', 'LIKE', $supplier_id)
+            ->where('purchases.status', 'LIKE',$status)
+            ->where('stores.branch_id', 'LIKE', $branch_id)
+            ->where(DB::raw("DATE(purchase_date)"), '>=', $from_date)
+            ->where(DB::raw("DATE(purchase_date)"), '<=', $to_date)
+            ->orderBy('purchase_date')
+            ->groupBy('purchase_products.purchase_id')
+            ->get();
+
+
+        if ($status == "%")
+            $status = "all";
+        if ($supplier_id == "%")
+            $supplier_id = "all";
+        if ($branch_id == "%")
+            $branch_id = "all";
+        $branch = null;
+        if ($branch_id != "all")
+            $branch = Branch::find($branch_id);
+
+        return view('pages.reports.inventory.load_purchase_invoice_report', compact('sales', 'from_date', 'to_date', 'supplier_id', 'branch_id', 'branch', 'status'));
+    }
+
+    public function printPurchaseInvoiceReport($from_date, $to_date, $branch_id, $supplier_id, $status)
+    {
+
+        if ($supplier_id == 'all') {
+            $supplier_id = '%';
+        }
+        if ($branch_id == 'all') {
+            $branch_id = '%';
+        }
+        if ($status == 'all') {
+            $status = '%';
+        }
+        $sales = DB::table('purchases')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno', DB::raw('SUM(quantity * unit_price) AS total'),'purchases.status')
+            ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
+            ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
+            ->join('stores', 'stores.id', 'purchase_products.store_id')
+            ->join('products', 'products.id', 'purchase_products.product_id')
+            ->where('purchases.supplier_id', 'LIKE', $supplier_id)
+            ->where('purchases.status', 'LIKE',$status)
+            ->where('stores.branch_id', 'LIKE', $branch_id)
+            ->where(DB::raw("DATE(purchase_date)"), '>=', $from_date)
+            ->where(DB::raw("DATE(purchase_date)"), '<=', $to_date)
+            ->orderBy('purchase_date')
+            ->groupBy('purchase_products.purchase_id')
+            ->get();
+
+        $branch = null;
+        if ($branch_id != "all")
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.inventory.print_purchase_invoice_report', compact('sales', 'from_date', 'to_date', 'branch'));
     }
 
     public function purchaseCheckReport()

@@ -869,12 +869,16 @@ Route::middleware('auth')->group(function () {
             Route::get('/ca/customer/exceeded/credit_limit/load/print/{branch_id}', [ReportController::class, 'printCustomerExceededCreditLimitReport'])->name('ajax.customer.exceeded_credit_limit.report.print');
 
 
-
-
             //Purchases  Report
-            Route::get('/pa/puchases/transaction', [ReportController::class, 'purchasesReport'])->name('supplier.transaction.report');
-            Route::get('/pa/puchases/transaction/load', [ReportController::class, 'loadPurchasesReport'])->name('ajax.supplier.transaction.report');
-            Route::get('/pa/puchases/transaction/print/{from_date}/{to_date}/{store_id}/{category_id}/{product_id}/{supplier_id}/{purchase_mode}', [ReportController::class, 'printPurchasesReport'])->name('ajax.supplier.transaction.report.print');
+            Route::get('/pa/puchases/invoice', [ReportController::class, 'purchaseInvoiceReport'])->name('purchase.invoice.report');
+            Route::get('/pa/puchases/invoice/load', [ReportController::class, 'loadPurchaseInvoiceReport'])->name('ajax.purchase.invoice.report');
+            Route::get('/pa/puchases/invoice/print/lines/{from_date}/{to_date}/{branch_id}/{supplier_id}/{status}', [ReportController::class, 'printPurchaseInvoiceReport'])->name('ajax.purchase.invoice.report.print');
+
+
+            //Purchases  Lines Report
+            Route::get('/pa/puchases/invoice/lines', [ReportController::class, 'purchaseInvoiceLinesReport'])->name('purchase.invoice.lines.report');
+            Route::get('/pa/puchases/invoice/lines/load', [ReportController::class, 'loadPurchaseInvoiceLinesReport'])->name('ajax.purchase.invoice.lines.report');
+            Route::get('/pa/puchases/invoice/lines/print/lines/{from_date}/{to_date}/{branch_id}/{store_id}/{category_id}/{product_id}/{supplier_id}/{status}', [ReportController::class, 'printPurchaseInvoiceLinesReport'])->name('ajax.purchase.invoice.lines.report.print');
 
             //Purchase Check Report
             Route::get('/pa/puchases/transaction/check', [ReportController::class, 'purchaseCheckReport'])->name('purchase.transaction.check.report');

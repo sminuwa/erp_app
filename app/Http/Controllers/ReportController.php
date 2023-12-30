@@ -265,7 +265,7 @@ class ReportController extends Controller
             ->where('products.category_id', 'LIKE', $category_id)
             ->where('store_products.product_id', 'LIKE', $product_id)
             ->where('store_products.store_id', 'LIKE', $store_id)
-            ->where('branch_product_prices.product_id', $product_id)
+//            ->where('branch_product_prices.product_id', 'LIKE', $product_id)
             ->where('stores.branch_id', $branch_id)
             ->where('branch_product_prices.branch_id', $branch_id)
             ->orderBy('products.name')

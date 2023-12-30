@@ -70,7 +70,7 @@ class StockAdjustmentController extends Controller
 
     public function store(Request $request)
     {
-        
+
         $user = auth()->user();
         $branch = $user->branch;
         $stock_adjustment_id = $request->stock_adjustment_id;
@@ -79,7 +79,7 @@ class StockAdjustmentController extends Controller
         $description = $request->description;
         $stock = StockAdjustment::find($stock_adjustment_id);
         $items = \Cart::getContent();
-        
+
         DB::beginTransaction();
         try {
             if(!$stock){
@@ -168,6 +168,7 @@ class StockAdjustmentController extends Controller
             DB::beginTransaction();
 //            return $stockAdjustment;
             if($stockAdjustment->save()){
+
                 $new_cost_price = [];
                 foreach ($items as $item) {
                     $new_cost_price[$item->product_id] = [
@@ -177,6 +178,16 @@ class StockAdjustmentController extends Controller
                         'expiry_date' => $item->expire_date,
                     ];
                 }
+
+                return
+                    CostPrice::newCostPrice(
+                        $new_cost_price,
+                        $stockAdjustment->reference,
+                        $stockAdjustment->branch_id,
+                        $stockAdjustment->date,
+                        TRANSACTION_TYPE_ADJUSTMENT,
+                        $stockAdjustment->operation
+                    );
 
                 if (
                     Transaction::stock_adjustment($stockAdjustment->id)['status']

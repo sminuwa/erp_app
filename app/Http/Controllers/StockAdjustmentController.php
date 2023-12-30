@@ -179,7 +179,7 @@ class StockAdjustmentController extends Controller
                     ];
                 }
 
-                return
+                /*return
                     CostPrice::newCostPrice(
                         $new_cost_price,
                         $stockAdjustment->reference,
@@ -187,7 +187,7 @@ class StockAdjustmentController extends Controller
                         $stockAdjustment->date,
                         TRANSACTION_TYPE_ADJUSTMENT,
                         $stockAdjustment->operation
-                    );
+                    );*/
 
                 if (
                     Transaction::stock_adjustment($stockAdjustment->id)['status']

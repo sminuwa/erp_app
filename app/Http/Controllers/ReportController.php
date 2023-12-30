@@ -257,7 +257,16 @@ class ReportController extends Controller
             $product_id = "%";
 
         $stores = DB::table('store_products')
-            ->select('products.name', 'products.code AS product_code', 'stores.code as store_code', 'store_products.qty_available', 'branch_product_prices.retail_selling_price', 'branch_product_prices.whole_selling_price', 'branch_product_prices.cost_price', 'store_products.id')
+            ->selectRaw(
+                "products.name,
+                products.code AS product_code,
+                stores.code as store_code,
+                store_products.qty_available,
+                branch_product_prices.retail_selling_price,
+                branch_product_prices.whole_selling_price,
+
+                branch_product_prices.cost_price,
+                store_products.id")
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
             ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')

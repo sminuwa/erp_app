@@ -187,7 +187,7 @@ class StockAdjustmentController extends Controller
                         $stockAdjustment->date,
                         TRANSACTION_TYPE_ADJUSTMENT,
                         $stockAdjustment->operation
-                    )['status'];
+                    );
 
                 if (
                     Transaction::stock_adjustment($stockAdjustment->id)['status']

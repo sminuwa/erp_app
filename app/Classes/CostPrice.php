@@ -640,7 +640,7 @@ class CostPrice
                     'expiry_date' => $record['expiry_date'],
                 ];
             }
-            return $product_costs;
+            /*return $product_costs;*/
             DB::beginTransaction();
             if (
                 StockCard::createBatchRecord($stock_card_param, $batch_no, $date, $type)

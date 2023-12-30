@@ -570,7 +570,7 @@ class CostPrice
             $product_ids[] = $key;
             $store_id = $p['store_id'];
             $total_new_cost[$key] = intval($p['quantity']) * intval($p['price']);
-            $store_ids = implode(',', Store::where('branch_id',$branch_id)->pluck('id'));
+            $store_ids = implode(',', Store::where('branch_id',$branch_id)->pluck('id')->toArray());
             $details = StoreProduct::selectRaw("
                 store_products.product_id,
                 qty_available,

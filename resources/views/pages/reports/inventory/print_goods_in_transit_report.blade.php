@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Purchase Invoice Lines - {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Goods in Transit Report - {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -40,7 +40,7 @@
                             <h3 style="text-align: center;">
                                 {{ $branch->name ?? 'All Branches' }}
                             </h3>
-                            <h5 style="text-align: center;">Purchase Invoice Lines Report
+                            <h5 style="text-align: center;">Goods in Transit Report
                                 From
                                 {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                                 AND
@@ -58,14 +58,16 @@
                                 <thead>
                                     <tr>
                                         <th>DATE</th>
-                                        <th>INVOICE</th>
+                                        <th>REFERENCE</th>
+                                        <th>SOURCE</th>
+                                        <th>DESTINATION</th>
+                                        <th>CODE</th>
                                         <th>ITEM</th>
-                                        <th>ITEM PRICE</th>
                                         <th>QTY</th>
+                                        <th>COST PRICE</th>
                                         <th>TOTAL COST</th>
-                                        <th>STORE</th>
-                                        <th>WAYBILL</th>
-                                        <th>SUPP NAME</th>
+                                        <th>VEHICLE NO</th>
+                                        <th>STATUS</th>
                                     </tr>
                                 </thead>
                                 @php
@@ -73,29 +75,31 @@
                                 @endphp
                                 @foreach ($sales as $sale)
                                     <tr>
-                                        <td>{{ \Carbon\Carbon::parse($sale->purchase_date)->toFormattedDateString() }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}</td>
                                         <td>{{ $sale->reference }}</td>
+                                        <td>{{ $sale->source }}</td>
+                                        <td>{{ $sale->destination }}</td>
+                                        <td>{{ $sale->code }}</td>
                                         <td>{{ $sale->product }}</td>
-                                        <td>{{ $sale->unit_price }}</td>
                                         <td>{{ $sale->quantity }}</td>
+                                        <td style="text-align: right">{{ number_format($sale->cost_price, 2) }}</td>
                                         <td style="text-align: right">
-                                            &#8358;{{ number_format($sale->unit_price * $sale->quantity, 2, '.', ',') }}</td>
-                                        <td>{{ $sale->store }}</td>
-                                        <td>{{ $sale->wbno }}</td>
-                                        <td>{{ $sale->supplier }}</td>
-                            
+                                            {{ number_format($sale->cost_price * $sale->quantity, 2, '.', ',') }}</td>
+                                        <td>{{ $sale->vehicle_no }}</td>
+                                        <td>{{ $sale->status == 0 ? 'Pending' : ($sale->status == 1 ? 'In-Transit' : 'Recieved') }}
+                                        </td>
+
                                     </tr>
                                     @php
-                                        $total_cost += $sale->unit_price * $sale->quantity;
+                                        $total_cost += $sale->cost_price * $sale->quantity;
                                     @endphp
                                 @endforeach
                                 <tfoot>
                                     <tr>
-                                        <th colspan="5" style="text-align: right">TOTAL</th>
+                                        <th colspan="8" style="text-align: right">TOTAL</th>
                                         <th style="text-align: right">
                                             &#8358;{{ number_format($total_cost, 2, '.', ',') }}
                                         </th>
-                                        <th></th>
                                         <th></th>
                                         <th></th>
                                     </tr>

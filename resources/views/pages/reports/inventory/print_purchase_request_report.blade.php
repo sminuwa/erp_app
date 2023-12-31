@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Purchase Invoice Lines - {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Purchase Request Report - {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -40,7 +40,7 @@
                             <h3 style="text-align: center;">
                                 {{ $branch->name ?? 'All Branches' }}
                             </h3>
-                            <h5 style="text-align: center;">Purchase Invoice Lines Report
+                            <h5 style="text-align: center;">Purchase Request Report
                                 From
                                 {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                                 AND
@@ -63,9 +63,9 @@
                                         <th>ITEM PRICE</th>
                                         <th>QTY</th>
                                         <th>TOTAL COST</th>
-                                        <th>STORE</th>
                                         <th>WAYBILL</th>
                                         <th>SUPP NAME</th>
+                                        <th>STATUS</th>
                                     </tr>
                                 </thead>
                                 @php
@@ -76,13 +76,13 @@
                                         <td>{{ \Carbon\Carbon::parse($sale->purchase_date)->toFormattedDateString() }}</td>
                                         <td>{{ $sale->reference }}</td>
                                         <td>{{ $sale->product }}</td>
-                                        <td>{{ $sale->unit_price }}</td>
+                                        <td style="text-align: right">{{ number_format($sale->unit_price, 2) }}</td>
                                         <td>{{ $sale->quantity }}</td>
                                         <td style="text-align: right">
-                                            &#8358;{{ number_format($sale->unit_price * $sale->quantity, 2, '.', ',') }}</td>
-                                        <td>{{ $sale->store }}</td>
+                                            {{ number_format($sale->unit_price * $sale->quantity, 2, '.', ',') }}</td>
                                         <td>{{ $sale->wbno }}</td>
                                         <td>{{ $sale->supplier }}</td>
+                                        <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
                             
                                     </tr>
                                     @php

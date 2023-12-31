@@ -214,9 +214,9 @@
                             <label for="store">Store</label>
                             <select class="form-control select2-single {{ $errors->has('store') ? ' is-invalid' : '' }}"
                                 name="store" id="store" required="required">
-                                @if (isset($stores))
+                                @if (isset($store))
                                     <option value="">Select...</option>
-                                    @foreach ($stores as $data)
+                                    @foreach ($store as $data)
                                         <option value="{{ $data->code }}">
                                             {{ $data->code }}-{{ $data->name }}</option>
                                     @endforeach

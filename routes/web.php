@@ -820,8 +820,8 @@ Route::middleware('auth')->group(function () {
 
             //List of Invoice Lines Report
             Route::get('/sa/sales/list/invoices/lines', [ReportController::class, 'invoiceLinesReport'])->name('invoice.lines.reports');
-            Route::get('/sa/sales/list/invoices/lines/load', [ReportController::class, 'loadInvoiceLinesReport'])->name('ajax.load.invoice.list.reports');
-            Route::get('/sa/sales/list/invoices/lines/print/{from_date}/{to_date}/{branch_id}/{status}', [ReportController::class, 'printInvoiceLinesReport'])->name('ajax.invoice.list.report.print');
+            Route::get('/sa/sales/list/invoices/lines/load', [ReportController::class, 'loadInvoiceLinesReport'])->name('ajax.load.invoice.lines.reports');
+            Route::get('/sa/sales/list/invoices/lines/print/{from_date}/{to_date}/{branch_id}/{status}', [ReportController::class, 'printInvoiceLinesReport'])->name('ajax.invoice.lines.report.print');
 
 
             //List of Orders Report

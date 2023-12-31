@@ -78,43 +78,48 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
+                <li class="nav-item has-treeview {{ Request::is('sales/*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ Request::is('sales/*') ? 'active' : '' }}">
                         <i class="ion-android-list"></i>
                         <p>
                             Sales
                             <i class="right fa fa-angle-left"></i>
                         </p>
                     </a>
+
                     <ul class="nav nav-treeview">
+
                         <li class="nav-item">
                             <a href="{{ route('order.invoice.list') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Orders</p>
                             </a>
                         </li>
-                        @can('make.daily.sale')
-                            <li class="nav-item">
-                                <a href="{{ route('invoice.index') }}" class="nav-link ">
-                                    <i class="ion-card"></i>
-                                    <p>Invoice (POS)</p>
-                                </a>
-                            </li>
-                        @endcan
+
+                        <li class="nav-item">
+                            <a href="{{ route('invoice.index') }}" class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>Invoice (POS)</p>
+                            </a>
+                        </li>
+
                         <li class="nav-item">
                             <a href="{{ route('proformer.list') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Proforma Invoice</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
                             <a href="{{ route('customers.credit.note') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Credit Note</p>
                             </a>
                         </li>
+
                     </ul>
                 </li>
+
                 <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
                         <i class="ion-android-list"></i>
@@ -254,12 +259,12 @@
                                     </a>
                                 </li>
                                 <!--                                <li class="nav-item">
-                                                    <a href="{{ route('product_expire_settings.index') }}"
-                                                        class="nav-link {{ Request::is('settings/products/manage/expiration*') ? 'active' : '' }}">
-                                                        <i class="ion-ios-cart-outline"></i>
-                                                        <p>Product Expire Settings</p>
-                                                    </a>
-                                                </li>-->
+                                                                                                                    <a href="{{ route('product_expire_settings.index') }}"
+                                                                                                                        class="nav-link {{ Request::is('settings/products/manage/expiration*') ? 'active' : '' }}">
+                                                                                                                        <i class="ion-ios-cart-outline"></i>
+                                                                                                                        <p>Product Expire Settings</p>
+                                                                                                                    </a>
+                                                                                                                </li>-->
                             @endcan
 
                             {{-- @can('view.bank')
@@ -615,7 +620,7 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="{{route('purchase.invoice.lines.report')}}"
+                                            <a href="{{ route('purchase.invoice.lines.report') }}"
                                                 class="nav-link {{ Request::is('reports/pa/purchase/transaction/check*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Purchase Invoices Lines</p>

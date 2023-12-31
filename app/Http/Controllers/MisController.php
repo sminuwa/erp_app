@@ -130,39 +130,33 @@ class MisController extends Controller
 
     }
     public function loadCustomers(Request $request)
-    { //return $request->type;
+    { 
         $types = DB::table('customers')
             ->select('customers.id', 'customers.name', 'customers.code')
             ->where('type', '=', $request->type)
             ->where('branch_id', 'LIKE', User::userBranchAction())
             ->orderBy('name', 'asc')
             ->get();
-        $result = "";
-        if ($types->count() > 1)
-            $result .= "<option value=''>Select....</option>";
-        foreach ($types as $type) {
-            $result .= "<option value='" . $type->id . "'>" . $type->code.'-'.$type->name;
-            $request .= "</option>";
-        }
-        return $result;
+        return view('misc.ajax.customers', ['records' => $types]);
+
     }
 
     public function loadCustomerOrders(Request $request)
     {   //return $request->type;
         $customer = Customer::find($request->customer_id);
         $credit_notes = CreditNote::where('customer_id', $customer->id)->pluck('order_id')->toArray();
-        $orders = Order::where(['customer_id' => $customer->id, 'status'=>1])
+        $orders = Order::where(['customer_id' => $customer->id, 'status' => 1])
             ->whereNotIn('id', $credit_notes)
-            ->orderBy('id','desc')->get();
-//        if (count($orders) > 1)
+            ->orderBy('id', 'desc')->get();
+        //        if (count($orders) > 1)
         $result = "<tr>";
         foreach ($orders as $order) {
             $result .= '<tr>
                         <td>
                             <a href="javascript:void(0)" class="invoice" onclick="load()"
-                               data-val="'.$order->reference .'">'.$order->reference .'</a>
+                               data-val="' . $order->reference . '">' . $order->reference . '</a>
                         </td>
-                        <td>'. \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() .'</td>
+                        <td>' . \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() . '</td>
                     </tr>';
         }
         $result .= "</tr>";

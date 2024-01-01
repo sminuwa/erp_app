@@ -43,6 +43,7 @@
                         </p>
                     </a>
                 </li>
+                @can('menu.accounting')
                 <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
                         <i class="ion-android-list"></i>
@@ -78,6 +79,8 @@
                         </li>
                     </ul>
                 </li>
+                @endcan
+                @can('menu.sale')
                 <li class="nav-item has-treeview {{ Request::is('sales/*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ Request::is('sales/*') ? 'active' : '' }}">
                         <i class="ion-android-list"></i>
@@ -119,7 +122,8 @@
 
                     </ul>
                 </li>
-
+                @endcan
+                @can('menu.purchase')
                 <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
                         <i class="ion-android-list"></i>
@@ -179,7 +183,7 @@
 
                     </ul>
                 </li>
-
+                @endcan
 
                 @can('menu.setting')
                     <li class="nav-item has-treeview {{ Request::is('settings/*') ? 'menu-open' : '' }}">
@@ -335,7 +339,7 @@
                         </ul>
                     </li>
                 @endcan
-                @can('view.report')
+                @can('menu.report')
                     <li class="nav-item has-treeview {{ Request::is('reports/*') ? 'menu-open' : '' }}">
                         <a href="#" class="nav-link {{ Request::is('reports/*') ? 'active' : '' }}">
                             <i class="ion-ios-timer-outline"></i>
@@ -345,7 +349,7 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                            @can('stock.control.report')
+                            @can('submenu.stock.control')
                                 <li class="nav-item has-treeview {{ Request::is('reports/sc/stock*') ? 'menu-open' : '' }}">
                                     <a href="#"
                                         class="nav-link {{ Request::is('reports/sc/stock*') ? 'active' : '' }}">
@@ -408,7 +412,7 @@
                                     </ul>
                                 </li>
                             @endcan
-                            @can('sale.cash.analysis.report')
+                            @can('submenu.sale.report')
                                 <li class="nav-item has-treeview {{ Request::is('reports/sa/sales*') ? 'menu-open' : '' }}">
                                     <a href="#"
                                         class="nav-link {{ Request::is('reports/sa/sales*') ? 'active' : '' }}">
@@ -514,7 +518,7 @@
                                     </ul>
                                 </li>
                             @endcan
-                            @can('customer.ledger.analysis.report')
+                            @can('submenu.customer.report')
                                 <li
                                     class="nav-item has-treeview {{ Request::is('reports/ca/customer*') ? 'menu-open' : '' }}">
                                     <a href="#"
@@ -566,7 +570,7 @@
                                 </li>
                             @endcan
 
-                            @can('purchase.analysis.report')
+                            @can('submenu.inventory.report')
                                 <li
                                     class="nav-item has-treeview {{ Request::is('reports/inventory*') ? 'menu-open' : '' }}">
                                     <a href="#" class="nav-link {{ Request::is('reports/pa/*') ? 'active' : '' }}">
@@ -640,11 +644,11 @@
                                                 <p>Additional Invoices</p>
                                             </a>
                                         </li>
-                                        
+
                                     </ul>
                                 </li>
                             @endcan
-                            @can('user.ledger.and.loan')
+                            @can('submenu.user.ledger.and.loan')
                                 <li class="nav-item has-treeview {{ Request::is('reports/us/user*') ? 'menu-open' : '' }}">
                                     <a href="#" class="nav-link {{ Request::is('reports/us/*') ? 'active' : '' }}">
                                         <i class="ion-ios-time"></i>
@@ -678,7 +682,7 @@
                                     </ul>
                                 </li>
                             @endcan
-                            @can('user.ledger.and.loan')
+                            @can('submenu.accounting.report')
                                 <li class="nav-item has-treeview {{ Request::is('reports/ap_ar*') ? 'menu-open' : '' }}">
                                     <a href="#" class="nav-link {{ Request::is('reports/ap_ar*') ? 'active' : '' }}">
                                         <i class="ion-ios-time"></i>

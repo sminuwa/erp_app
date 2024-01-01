@@ -836,7 +836,7 @@ Route::middleware('auth')->group(function () {
 
 
             //Begin Customer Sales Analysis Report
-    
+
             //Customer Debt Report
             Route::get('/ca/customer/debt', [ReportController::class, 'customerDebtReport'])->name('customer.total.debt.reports');
             Route::get('/ca/customer/debt/load', [ReportController::class, 'loadCustomerDebtReport'])->name('ajax.load.customer.total.debt.reports');
@@ -911,7 +911,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/activity/load/logs/print/{from_date}/{to_date}/{user_id}', [ReportController::class, 'printLogs'])->name('user.activity.logs.print');
 
             //User Ledger and Loans
-    
+
             //Loan Balances
             Route::get('/us/user/balance', [ReportController::class, 'loanBalance'])->name('user.loan.balance.report');
             Route::get('/us/user/balance/load', [ReportController::class, 'loadLoanBalance'])->name('ajax.load.user.loan.balance.report');
@@ -1042,26 +1042,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/print/receipt/{debit_note}', [DebitNoteController::class, 'printDebitNoteReceipt'])->name('suppliers.debit.note.print');
             Route::post('/expense', [DebitNoteController::class, 'expense'])->name('update.purchases.expense.ajax.create');
         });
-
-        /*Route::group(
-            ['prefix' => 'debit-note'],
-            function () {
-                Route::get('/', [DebitNoteController::class, 'supplierDebitNote'])->name('suppliers.debit.note');
-                Route::get('/create/{purchase?}', [DebitNoteController::class, 'createDebitNote'])->name('suppliers.debit.note.create');
-                Route::post('/store', [DebitNoteController::class, 'payDebitNote'])->name('suppliers.debit.note.store');
-                Route::put('/update/{ledger}', [DebitNoteController::class, 'updateDebitNote'])->name('suppliers.debit.note.update');
-                Route::delete('/delete/{ledger}', [DebitNoteController::class, 'deleteDebitNote'])->name('suppliers.debit.note.destroy');
-                Route::post('/search', [DebitNoteController::class, 'searchDebitNote'])->name('suppliers.debit.note.search');
-                Route::get('/load-invoices', [DebitNoteController::class, 'loadInvoices'])->name('suppliers.load.order.invoices');
-                Route::get('/load_cart', [DebitNoteController::class, 'loadToCart'])->name('suppliers.load.order.cart');
-                Route::post('/cart', [DebitNoteController::class, 'addToCart'])->name('debit.note.cart.store');
-                Route::put('/update-cart', [DebitNoteController::class, 'updateCart'])->name('debit.note.cart.update');
-                Route::delete('/remove/{id}', [DebitNoteController::class, 'removeCart'])->name('debit.note.cart.remove');
-                Route::get('/print/receipt/{debit_note}', [DebitNoteController::class, 'printDebitNoteReceipt'])->name('suppliers.debit.note.print');
-                Route::post('/expense', [DebitNoteController::class, 'expense'])->name('update.purchases.expense.ajax.create');
-            }
-        );*/
-
 
         //Return and Debit
         Route::group(

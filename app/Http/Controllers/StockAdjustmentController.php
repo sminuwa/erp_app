@@ -38,7 +38,7 @@ class StockAdjustmentController extends Controller
 
     public function index(Index $request)
     {
-        $this->authorize('stock_adjustments.index1');
+        $this->authorize('stock_adjustments.index');
         \Cart::clear();
         $user = auth()->user();
         $branch = $user->branch;

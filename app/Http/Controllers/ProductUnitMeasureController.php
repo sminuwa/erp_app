@@ -50,6 +50,7 @@ class ProductUnitMeasureController extends Controller
       */
     public function create(Request $request)
     {
+        $this->authorize('product_unit_measures.create');
         $products = Product::all(['id', 'name', 'code']);
 
         return view('pages.product_unit_measures.create', [
@@ -65,6 +66,7 @@ class ProductUnitMeasureController extends Controller
       */
     public function store(Request $request)
     {
+        $this->authorize('product_unit_measures.create');
         $model = new ProductUnitMeasure;
         $model->fill($request->all());
 
@@ -85,6 +87,7 @@ class ProductUnitMeasureController extends Controller
       */
     public function edit(Request $request, ProductUnitMeasure $productunitmeasure)
     {
+        $this->authorize('product_unit_measures.edit');
         $products = Product::all(['id', 'name', 'code']);
 
         return view('pages.product_unit_measures.edit', [
@@ -101,6 +104,7 @@ class ProductUnitMeasureController extends Controller
       */
     public function update(Request $request, ProductUnitMeasure $productunitmeasure)
     {
+        $this->authorize('product_unit_measures.edit');
         $productunitmeasure->fill($request->all());
 
         if ($productunitmeasure->save()) {
@@ -121,6 +125,7 @@ class ProductUnitMeasureController extends Controller
       */
     public function destroy(Request $request, ProductUnitMeasure $productunitmeasure)
     {
+        $this->authorize('product_unit_measures.destroy');
         if ($productunitmeasure->delete()) {
             session()->flash('app_message', 'Produc uUnit measure successfully deleted');
         } else {
@@ -131,10 +136,12 @@ class ProductUnitMeasureController extends Controller
     }
     public function importForm()
     {
+        $this->authorize('product_unit_measures.import.form');
         return view('pages.product_unit_measures.import');
     }
     public function import(Request $request)
     {
+        $this->authorize('product_unit_measures.import');
         $request->validate([
             'file' => 'required|file|mimes:xlsx',
         ]);

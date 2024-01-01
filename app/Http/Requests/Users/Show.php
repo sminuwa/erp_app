@@ -5,7 +5,7 @@ namespace App\Http\Requests\Users;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\User;
 
-class Show extends FormRequest 
+class Show extends FormRequest
 {
 
     /**
@@ -13,9 +13,9 @@ class Show extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('assign.user.role', User::class);
+        return $this->user()->can('users.show', User::class);
     }
 
     /**
@@ -23,7 +23,7 @@ class Show extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 
@@ -38,7 +38,7 @@ class Show extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

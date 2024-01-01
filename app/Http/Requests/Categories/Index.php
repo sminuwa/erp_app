@@ -4,7 +4,7 @@ namespace App\Http\Requests\Categories;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Category;
-class Index extends FormRequest 
+class Index extends FormRequest
 {
 
     /**
@@ -12,9 +12,9 @@ class Index extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('view.product.group', Category::class);
+        return $this->user()->can('categories.index', Category::class);
     }
 
     /**
@@ -22,7 +22,7 @@ class Index extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 
@@ -37,7 +37,7 @@ class Index extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

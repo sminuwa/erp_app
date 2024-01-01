@@ -4,7 +4,7 @@ namespace App\Http\Requests\Banks;
 
 use Illuminate\Foundation\Http\FormRequest;
 use app\Models\Bank;
-class Update extends FormRequest 
+class Update extends FormRequest
 {
 
     /**
@@ -12,9 +12,9 @@ class Update extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('edit.bank', Bank::class);
+        return $this->user()->can('banks.edit', Bank::class);
     }
 
     /**
@@ -22,7 +22,7 @@ class Update extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 			'name' => 'required|unique:banks,name|max:100',
@@ -38,7 +38,7 @@ class Update extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

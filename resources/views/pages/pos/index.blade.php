@@ -44,26 +44,28 @@
                                         Customer
                                         <span>
                                             &nbsp
-                                            @can('view.customer.ledger')
+                                            @can('customer.ledger')
                                                 <a href="javascript:void(0)" data-toggle="modal"
                                                     data-target="#customer_ledgerform"
                                                     class="btn btn-sm btn-secondary float-md-right"
                                                     style="margin-left: 2px;">Customer Ledger </a>
                                             @endcan
-                                            @can('increase.customer.credit.limit')
+                                            @can('credit_limits.create')
                                                 <a href="javascript:void(0)" data-toggle="modal" data-target="#credit_limitform"
                                                     class="btn btn-sm btn-success float-md-right"
                                                     style="margin-left: 2px;">Increase Limit </a>
                                             @endcan
-                                            @can('add.customer')
+                                            @can('customers.create')
                                                 <a href="javascript:void(0)" data-toggle="modal" data-target="#customermodal"
                                                     class="btn btn-sm btn-primary float-md-right">Add New</a>
                                             @endcan
-
-                                            <a href="javascript:void(0)" data-toggle="modal" data-target="#receipt"
-                                                class="btn btn-sm btn-secondary float-md-right"
-                                                onclick="checkCustomerSelection()" style="margin-left: 2px;">Receipt
-                                            </a>&nbsp;
+                                            @can('receipt.payment.store')
+                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#receipt"
+                                                    class="btn btn-sm btn-secondary float-md-right"
+                                                    onclick="checkCustomerSelection()" style="margin-left: 2px;">Receipt
+                                                </a>
+                                            @endcan
+                                            &nbsp;
                                             <span class="text text-danger fa fa-mobile">Send SMS: </span> <input
                                                 type="checkbox" name="sms" id="sms" />
                                         </span>

@@ -19,7 +19,6 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
                             <li class="breadcrumb-item active">Stock Transfer</li>
                         </ol>
                     </div>
@@ -39,9 +38,11 @@
                             <div class="card-header">
                                 <i class="ion-android-cart"></i> Transfer Product Cart
                                 <div class="float-right">
-                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
-                                        class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
-                                            class="fa fa-plus"></i> Add Product </a>
+                                    @can('ajax.cart.add')
+                                        <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
+                                            class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
+                                                class="fa fa-plus"></i> Add Product </a>
+                                    @endcan
                                 </div>
                             </div>
                             <div class="card-body">
@@ -97,11 +98,13 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group text-right ">
-                                        <button type="submit" class="btn btn-success">
-                                            <span class="ion-forward">Transfer</span>
-                                        </button>
-                                    </div>
+                                    @can('intersite.store')
+                                        <div class="form-group text-right">
+                                            <button type="submit" class="btn btn-success">
+                                                <span class="ion-forward">Transfer</span>
+                                            </button>
+                                        </div>
+                                    @endcan
                                 </form>
 
                                 <div class="cart-container"></div>

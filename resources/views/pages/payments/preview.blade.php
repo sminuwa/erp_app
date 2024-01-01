@@ -41,43 +41,50 @@
                                 <a href="javascript:history.back()" class="btn btn-warning btn-sm">
                                     <i class="fa fa-arrow-left"></i> Back
                                 </a>
-                                <a href="{{ route('create.payment') }}" class="btn btn-secondary btn-sm ">
-                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> New Payment
-                                </a>
-
+                                @can('create.payment')
+                                    <a href="{{ route('create.payment') }}" class="btn btn-secondary btn-sm ">
+                                        <i class="fa fa-plus-circle" aria-hidden="true"></i> New Payment
+                                    </a>
+                                @endcan
                                 @if ($payment->status == 0)
-
-                                    <a href="{{ route('create.payment', ['payment_id' => $payment->id]) }}"
-                                        class="btn btn-info btn-sm ">
-                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                    </a>
-                                    <form class="d-inline" action="{{ route('payment.post', $payment->id) }}"
-                                        method="post"
-                                        onsubmit="return confirm('Are you sure you want to post this payment?')">
-                                        @csrf
-                                        <button type="submit" class="btn btn-success btn-sm ">
-                                            <i class="fa fa-check" aria-hidden="true"></i> Post
-                                        </button>
-                                    </form>
-
-                                    <form class="d-inline" id="delete-form-{{ $payment->id }}"
-                                        action="{{ route('payment.delete', $payment->id) }}" method="post"
-                                        onsubmit="return confirm('Are you sure you want to close this payment?')">
-                                        @csrf
-                                        <button class="btn btn-danger btn-sm " type="submit">
-                                            <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                        </button>
-                                    </form>
-
+                                    @can('create.payment')
+                                        <a href="{{ route('create.payment', ['payment_id' => $payment->id]) }}"
+                                            class="btn btn-info btn-sm ">
+                                            <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                        </a>
+                                    @endcan
+                                    @can('payment.post')
+                                        <form class="d-inline" action="{{ route('payment.post', $payment->id) }}" method="post"
+                                            onsubmit="return confirm('Are you sure you want to post this payment?')">
+                                            @csrf
+                                            <button type="submit" class="btn btn-success btn-sm ">
+                                                <i class="fa fa-check" aria-hidden="true"></i> Post
+                                            </button>
+                                        </form>
+                                    @endcan
+                                    @can('payment.delete')
+                                        <form class="d-inline" id="delete-form-{{ $payment->id }}"
+                                            action="{{ route('payment.delete', $payment->id) }}" method="post"
+                                            onsubmit="return confirm('Are you sure you want to close this payment?')">
+                                            @csrf
+                                            <button class="btn btn-danger btn-sm " type="submit">
+                                                <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                            </button>
+                                        </form>
+                                    @endcan
                                 @else
-                                    <a href="{{ route('payment.print', $payment->id) }}" target="_BLANK"
-                                       class="btn btn-dark btn-sm ">
-                                        <i class="fa fa-print" aria-hidden="true"></i> Print
-                                    </a>
-                                    <a href="{{ route('payment.print.pos', $payment->id) }}" target="_BLANK"
-                                       class="btn btn-dark btn-sm ">
-                                        <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
-                                    </a>
+                                    @can('payment.print')
+                                        <a href="{{ route('payment.print', $payment->id) }}" target="_BLANK"
+                                            class="btn btn-dark btn-sm ">
+                                            <i class="fa fa-print" aria-hidden="true"></i> Print
+                                        </a>
+                                    @endcan
+                                    @can('payment.print.pos')
+                                        <a href="{{ route('payment.print.pos', $payment->id) }}" target="_BLANK"
+                                            class="btn btn-dark btn-sm ">
+                                            <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
+                                        </a>
+                                    @endcan
                                 @endif
 
 
@@ -161,7 +168,8 @@
                                                 </td>
                                                 <td>{{ $payment->description }}</td>
                                                 <th style="text-align: right">
-                                                    {{ currency_sign().number_format($payment->amount, 2, '.', ',') }}</th>
+                                                    {{ currency_sign() . number_format($payment->amount, 2, '.', ',') }}
+                                                </th>
                                                 <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                                                 </td>
 

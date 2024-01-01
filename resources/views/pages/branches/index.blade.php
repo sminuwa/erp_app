@@ -3,8 +3,8 @@
 @section('title', 'Branch')
 
 @push('css')
- <!-- DataTables -->
- <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
 @endpush
 
 @section('content')
@@ -31,12 +31,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('branches.create') }}">
-                <span class="fa fa-plus-circle"> New Branch</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('branches.import.form') }}">
-                <span class="fa fa-upload"> Upload Prices</span>
-            </a>
+            @can('branches.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('branches.create') }}">
+                    <span class="fa fa-plus-circle"> New Branch</span>
+                </a>
+            @endcan
+            @can('branches.import.form')
+                <a class="btn btn-secondary btn-sm" href="{{ route('branches.import.form') }}">
+                    <span class="fa fa-upload"> Upload Prices</span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 table-responsive">
@@ -53,12 +57,12 @@
 @endsection
 
 @push('js')
-<script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
+    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         $(function() {
-             $("#record1").DataTable({
-                'iDisplayLength':100
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
             $('#record2').DataTable({
                 "paging": true,

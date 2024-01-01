@@ -3,8 +3,8 @@
 @section('title', 'Stores')
 
 @push('css')
- <!-- DataTables -->
- <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
 @endpush
 
 @section('content')
@@ -31,12 +31,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('stores.create') }}">
-                <span class="fa fa-plus-circle"> New Store</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('stores.import.form') }}">
-                <span class="fa fa-upload"> Upload Users</span>
-            </a>
+            @can('stores.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('stores.create') }}">
+                    <span class="fa fa-plus-circle"> New Store</span>
+                </a>
+            @endcan
+            @can('stores.import.form')
+                <a class="btn btn-secondary btn-sm" href="{{ route('stores.import.form') }}">
+                    <span class="fa fa-upload"> Upload Stores</span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 table-responsive">
@@ -57,8 +61,8 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         $(function() {
-             $("#record1").DataTable({
-                'iDisplayLength':100
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
             $('#record2').DataTable({
                 "paging": true,

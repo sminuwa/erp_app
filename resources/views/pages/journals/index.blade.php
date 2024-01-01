@@ -32,16 +32,16 @@
                     <!-- left column -->
                     <div class="col-12">
                         <div class="col-12">
-                            @if(session()->has('message'))
+                            @if (session()->has('message'))
                                 <div class="alert alert-success">{{ session('message') }}</div>
                             @endif
-                            @if(session()->has('error'))
+                            @if (session()->has('error'))
                                 <div class="alert alert-danger">{{ session('error') }}</div>
                             @endif
                         </div>
-                        {{--@if(session()->has('message'))
+                        {{-- @if (session()->has('message'))
                             <div class="alert alert-success">{{ session('message') }}</div>
-                        @endif--}}
+                        @endif --}}
                     </div>
                     <div class="col-md-12">
                         <!-- general form elements -->
@@ -51,11 +51,15 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <a href="{{ route('journal.index') }}" class="btn btn-sm btn-secondary"
-                                       style="margin-left: 2px;"><span class="fa fa-list"> </span> List</a>
-                                    <a href="{{ route('journal.create') }}" class="btn btn-sm btn-secondary"
-                                       style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New
-                                        Journal</a>
+                                    @can('journal.index')
+                                        <a href="{{ route('journal.index') }}" class="btn btn-sm btn-secondary"
+                                            style="margin-left: 2px;"><span class="fa fa-list"> </span> List</a>
+                                    @endcan
+                                    @can('journal.create')
+                                        <a href="{{ route('journal.create') }}" class="btn btn-sm btn-secondary"
+                                            style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New
+                                            Journal</a>
+                                    @endcan
                                 </div>
                             </div>
                             <div class="row">
@@ -65,8 +69,8 @@
                                         @csrf
                                         <div class="input-group">
                                             <input type="search" class="form-control rounded" required
-                                                   placeholder="Search by Receipt number" name="refno" aria-label="Search"
-                                                   aria-describedby="search-addon" />
+                                                placeholder="Search by Receipt number" name="refno" aria-label="Search"
+                                                aria-describedby="search-addon" />
                                             <button type="submit" class="btn btn-outline-primary">search</button>
                                         </div>
                                     </form>

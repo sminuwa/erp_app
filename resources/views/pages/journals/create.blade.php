@@ -20,7 +20,9 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('journal.index') }}">Journals List</a></li>
+                            @can('journal.index')
+                                <li class="breadcrumb-item"><a href="{{ route('journal.index') }}">Journals List</a></li>
+                            @endcan
                             <li class="breadcrumb-item active">New Journal</li>
                         </ol>
                     </div>
@@ -30,12 +32,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a href="{{ route('journal.create') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;">
-                <span class="fa fa-plus-circle"> </span> New Journal
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('journal.index') }}">
-                <span class="fa fa-list"></span> Journals List
-            </a>
+            @can('journal.create')
+                <a href="{{ route('journal.create') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;">
+                    <span class="fa fa-plus-circle"> </span> New Journal
+                </a>
+            @endcan
+            @can('journal.index')
+                <a class="btn btn-secondary btn-sm" href="{{ route('journal.index') }}">
+                    <span class="fa fa-list"></span> Journals List
+                </a>
+            @endcan
             <div class="container-fluid py-4">
                 <livewire:create-journal />
             </div><!-- /.container-fluid -->
@@ -49,14 +55,12 @@
 
 
 @push('css')
-
-
     @livewireStyles
 @endpush
 @push('js')
     @livewireScripts
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded')
             /*$(".select2-single, .select2-multiple, .select2").select2({
                 theme: "bootstrap",
@@ -64,6 +68,5 @@
                 containerCssClass: ':all:'
             });*/
         })
-
     </script>
 @endpush

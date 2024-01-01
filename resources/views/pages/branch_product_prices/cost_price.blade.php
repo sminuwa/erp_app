@@ -28,16 +28,21 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.create') }}">
-                <span class="fa fa-plus-circle"> New Price</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.index') }}">
-                <span class="fa fa-list"> View Prices</span>
-            </a>
+            @can('branch_product_prices.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.create') }}">
+                    <span class="fa fa-plus-circle"> New Price</span>
+                </a>
+            @endcan
+            @can('branch_product_prices.index')
+                <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.index') }}">
+                    <span class="fa fa-list"> View Prices</span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>
-                        <form action="{{ isset($route) ? $route : route('store_product_cost_prices.store') }}" method="POST">
+                        <form action="{{ isset($route) ? $route : route('store_product_cost_prices.store') }}"
+                            method="POST">
                             {{ csrf_field() }}
                             <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
                             <div class="form-group">

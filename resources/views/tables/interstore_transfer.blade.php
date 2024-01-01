@@ -30,10 +30,12 @@
                     <td> {{ optional($record->user)->name }} </td>
                     <td> {{ $record->status == 1 ? 'Completed' : 'Cancelled' }} </td>
                     <td>
-                        <a class="btn btn-secondary btn-sm" title="Stock Tranfer Report" target="_BLANK"
-                           href="{{ route('interstore.print', $record->transfer_id) }}">
-                            <span class="fa fa-print"></span> Print
-                        </a>
+                        @can('interstore.print')
+                            <a class="btn btn-secondary btn-sm" title="Stock Tranfer Report" target="_BLANK"
+                                href="{{ route('interstore.print', $record->transfer_id) }}">
+                                <span class="fa fa-print"></span> Print
+                            </a>
+                        @endcan
 
                     </td>
                 </tr>

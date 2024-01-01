@@ -24,17 +24,17 @@
                 <td> {{ $record->receipt_no }} </td>
                 <td> {{ $record->due_date }} </td>
                 <td>
-                    @can('view.loan.granted')
+                    @can('loans.show')
                         <a class="btn btn-secondary btn-sm" href="{{ route('loans.show', $record->id) }}">
                             <span class="fa fa-eye"></span>
                         </a>
                     @endcan
-                    @can('edit.loan.granted')
+                    @can('loans.edit')
                         <a class="btn btn-secondary btn-sm" href="{{ route('loans.edit', $record->id) }}">
                             <span class="fa fa-pencil"></span>
                         </a>
                     @endcan
-                    @can('delete.loan.granted')
+                    @can('loans.destroy')
                         <form onsubmit="return confirm('Are you sure you want to delete?')"
                             action="{{ route('loans.destroy', $record->id) }}" method="post" style="display: inline">
                             {{ csrf_field() }}

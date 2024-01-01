@@ -26,7 +26,6 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
                             <li class="breadcrumb-item active">Intersite Transfer</li>
                         </ol>
                     </div>
@@ -37,48 +36,52 @@
         <!-- Main content -->
         <section class="content">
             <div class="container">
-                <a class="btn btn-secondary btn-sm"
-                   href="{{ route('intersite.index', $record->id) }}">
-                    <span class="fa fa-list"></span> Instersites
-                </a>
-
-                <a class="btn btn-secondary btn-sm" title="Print" target="_BLANK"
-                   href="{{ route('intersite.print', $record->id) }}">
-                    <span class="fa fa-print"></span> Print
-                </a>
+                @can('intersite.index')
+                    <a class="btn btn-secondary btn-sm" href="{{ route('intersite.index', $record->id) }}">
+                        <span class="fa fa-list"></span> Instersites
+                    </a>
+                @endcan
+                @can('intersite.print')
+                    <a class="btn btn-secondary btn-sm" title="Print" target="_BLANK"
+                        href="{{ route('intersite.print', $record->id) }}">
+                        <span class="fa fa-print"></span> Print
+                    </a>
+                @endcan
                 @if ($record->status == 1 && $record->destination_branch_id == auth()->user()->branch->id)
-                    <form action="{{ route('intersite.receive', $record->id) }}"
-                          style="display:inline;"
-                          method="post" onsubmit="return confirm('Are you sure you want receive this invoice?')">
-                        @csrf
-                        <button type="submit" class="btn btn-success btn-sm">
-                            <i class="fa fa-check" aria-hidden="true"></i> Receive
-                        </button>
-                    </form>
+                    @can('intersite.receive')
+                        <form action="{{ route('intersite.receive', $record->id) }}" style="display:inline;" method="post"
+                            onsubmit="return confirm('Are you sure you want receive this invoice?')">
+                            @csrf
+                            <button type="submit" class="btn btn-success btn-sm">
+                                <i class="fa fa-check" aria-hidden="true"></i> Receive
+                            </button>
+                        </form>
+                    @endcan
                 @endif
                 @if ($record->status == 0)
-                    <form onsubmit="return confirm('Are you sure you want to post this intersite?')"
-                          action="{{ route('intersite.post', $record->id) }}"
-                          method="post" style="display: inline">
-                        {{ csrf_field() }}
-                        <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
-                            <i class="text-white fa fa-check"></i> Post
-                        </button>
-                    </form>
-
-                    <a class="btn btn-secondary btn-sm"
-                       href="{{ route('intersite.edit', $record->id) }}">
-                        <span class="fa fa-pencil"></span> Edit
-                    </a>
-
-                    <form onsubmit="return confirm('Are you sure you want to delete this intersite?')"
-                          action="{{ route('intersite.delete', $record->id) }}"
-                          method="post" style="display: inline">
-                        {{ csrf_field() }}
-                        <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
-                            <i class="text-danger fa fa-remove"></i> Delete
-                        </button>
-                    </form>
+                    @can('intersite.post')
+                        <form onsubmit="return confirm('Are you sure you want to post this intersite?')"
+                            action="{{ route('intersite.post', $record->id) }}" method="post" style="display: inline">
+                            {{ csrf_field() }}
+                            <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
+                                <i class="text-white fa fa-check"></i> Post
+                            </button>
+                        </form>
+                    @endcan
+                    @can('intersite.edit')
+                        <a class="btn btn-secondary btn-sm" href="{{ route('intersite.edit', $record->id) }}">
+                            <span class="fa fa-pencil"></span> Edit
+                        </a>
+                    @endcan
+                    @can('intersite.delete')
+                        <form onsubmit="return confirm('Are you sure you want to delete this intersite?')"
+                            action="{{ route('intersite.delete', $record->id) }}" method="post" style="display: inline">
+                            {{ csrf_field() }}
+                            <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
+                                <i class="text-danger fa fa-remove"></i> Delete
+                            </button>
+                        </form>
+                    @endcan
                 @endif
                 <div class="row">
                     <div class="col-sm-12">
@@ -111,15 +114,16 @@
                                             <th>Source</th>
                                             <td> {{ $record->source->code ?? '' }}-{{ $record->source->name ?? '' }} </td>
                                             <th>Destination</th>
-                                            <td> {{ $record->destination->code ?? '' }}-{{ $record->destination->name ?? '' }} </td>
+                                            <td> {{ $record->destination->code ?? '' }}-{{ $record->destination->name ?? '' }}
+                                            </td>
                                         </tr>
                                         <tr>
                                             <th>Created By</th>
-                                            <td colspan="3">{{ $record->createdBy->name ?? ''}}</td>
+                                            <td colspan="3">{{ $record->createdBy->name ?? '' }}</td>
                                         </tr>
                                         <tr>
                                             <th>Received By</th>
-                                            <td colspan="3">{{ $record->receivedBy->name ?? ''}}</td>
+                                            <td colspan="3">{{ $record->receivedBy->name ?? '' }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -151,19 +155,19 @@
                                                 <th>{{ $loop->index + 1 }}</th>
                                                 <td>{{ $product->product->code }}</td>
                                                 <td>{{ $product->product->name }}</td>
-                                                <td>{{ ($product->quantity - $product->totalReceive()) }}</td>
-                                                <td>{{ ($product->totalReceive()) }}</td>
+                                                <td>{{ $product->quantity - $product->totalReceive() }}</td>
+                                                <td>{{ $product->totalReceive() }}</td>
                                                 <td class="text-right">
-                                                    @if(($product->quantity - $product->totalReceive()) > 0)
-                                                        @if($product->intersite->status == 2 && $product->intersite->destination_branch_id == auth()->user()->branch->id)
+                                                    @if ($product->quantity - $product->totalReceive() > 0)
+                                                        @if ($product->intersite->status == 2 && $product->intersite->destination_branch_id == auth()->user()->branch->id)
                                                             <a href="javascript:void(0)" data-toggle="modal"
-                                                               data-target="#add_store_product_form"
-                                                               class="btn btn-sm btn-success add-product"
-                                                               data-product-id="{{ $product->product_id }}"
-                                                               data-store-id="{{ $product->store_id }}"
-                                                               data-quantity="{{ $product->quantity-$product->totalReceive() }}"
-                                                               data-cost="{{ $product->cost_price }}"
-                                                               ><i class="fa fa-plus"></i> Add Product </a>
+                                                                data-target="#add_store_product_form"
+                                                                class="btn btn-sm btn-success add-product"
+                                                                data-product-id="{{ $product->product_id }}"
+                                                                data-store-id="{{ $product->store_id }}"
+                                                                data-quantity="{{ $product->quantity - $product->totalReceive() }}"
+                                                                data-cost="{{ $product->cost_price }}"><i
+                                                                    class="fa fa-plus"></i> Add Product </a>
                                                         @endif
                                                     @endif
                                                 </td>
@@ -192,31 +196,31 @@
                             <div class="card-body table-responsive">
                                 <table class="table table-bordered" id="record1">
                                     <thead>
-                                    <tr>
-                                        <th>S/N</th>
-                                        <th>Product</th>
-                                        <th>Store</th>
-                                        <th>Quantity</th>
+                                        <tr>
+                                            <th>S/N</th>
+                                            <th>Product</th>
+                                            <th>Store</th>
+                                            <th>Quantity</th>
 
-                                    </tr>
+                                        </tr>
                                     </thead>
                                     <tbody>
-                                    @php $total = 0; @endphp
-                                    @foreach ($record->receivedProducts as $product)
-                                        <tr>
-                                            <th>{{ $loop->iteration }}</th>
-                                            <td>{{ $product->product->code }} - {{ $product->product->name }}</td>
-                                            <td>{{ $product->store->code }} - {{ $product->store->name }}</td>
-                                            <td>{{ $product->quantity }}</td>
-                                            @php $total += $product->cost_price * $product->quantity_requested; @endphp
-                                        </tr>
-                                    @endforeach
+                                        @php $total = 0; @endphp
+                                        @foreach ($record->receivedProducts as $product)
+                                            <tr>
+                                                <th>{{ $loop->iteration }}</th>
+                                                <td>{{ $product->product->code }} - {{ $product->product->name }}</td>
+                                                <td>{{ $product->store->code }} - {{ $product->store->name }}</td>
+                                                <td>{{ $product->quantity }}</td>
+                                                @php $total += $product->cost_price * $product->quantity_requested; @endphp
+                                            </tr>
+                                        @endforeach
                                     </tbody>
                                     <tfoot>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
                                     </tfoot>
                                 </table>
                             </div>
@@ -239,7 +243,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('intersite.add-to-store') }}" method="POST" >
+                    <form action="{{ route('intersite.add-to-store') }}" method="POST">
                         {{ csrf_field() }}
                         <input type="hidden" name="intersite_transfer_id" value="{{ $record->id }}">
                         <input type="hidden" name="source_store_id" value="">
@@ -248,8 +252,9 @@
                         <input type="hidden" name="cost_price" value="">
                         <div class="form-group">
                             <label for="source_store_id">Store</label>
-                            <select class="form-control select2-single {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
-                                    name="store_id" id="store_id" required="required">
+                            <select
+                                class="form-control select2-single {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
+                                name="store_id" id="store_id" required="required">
                                 <option value="">Select...</option>
                                 @if (isset($stores))
                                     @foreach ($stores as $data)
@@ -262,13 +267,13 @@
 
                         <div class="form-group">
                             <label for="quantity">Quantity</label>
-                            <input type="number" class="form-control"
-                                   name="quantity" id="quantity" placeholder="Quantity"
-                                   required="required">
+                            <input type="number" class="form-control" name="quantity" id="quantity"
+                                placeholder="Quantity" required="required">
                         </div>
-                        <input type="hidden" value="0" name="cost_price" id="cost_price"/>
+                        <input type="hidden" value="0" name="cost_price" id="cost_price" />
                         <div class="form-group text-right ">
-                            <button type="submit" class="btn btn-primary"><span class="ion-ios-cart-outline"></span> Add</button>
+                            <button type="submit" class="btn btn-primary"><span class="ion-ios-cart-outline"></span>
+                                Add</button>
                         </div>
                     </form>
                 </div>
@@ -287,8 +292,7 @@
     <script src="{{ asset('assets/backend/plugins/fastclick/fastclick.js') }}"></script>
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script type="text/javascript">
-
-        $(document).on('click', '.add-product', function(){
+        $(document).on('click', '.add-product', function() {
             let item = $(this)
             let s_id = item.data('store-id')
             let p_id = item.data('product-id')
@@ -304,7 +308,7 @@
             product_id.val(p_id)
             total_quantity.val(qty)
             cost_price.val(cost)
-            quantity.attr('max',item.attr('data-quantity'))
+            quantity.attr('max', item.attr('data-quantity'))
             quantity.val(qty)
         })
 

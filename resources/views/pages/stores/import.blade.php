@@ -22,7 +22,9 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('stores.index') }}">Stores</a></li>
+                            @can('stores.index')
+                                <li class="breadcrumb-item"><a href="{{ route('stores.index') }}">Stores</a></li>
+                            @endcan
                             <li class="breadcrumb-item active">Import</li>
                         </ol>
                     </div>
@@ -32,12 +34,11 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.create') }}">
-                <span class="fa fa-plus-circle"> New Store</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ url('upload_templates/stores_template.xlsx') }}">
-                <span class="fa fa-download"> Template</span>
-            </a>
+            @can('stores.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('stores.create') }}">
+                    <span class="fa fa-plus-circle"> New Store</span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 table-responsive">
@@ -47,8 +48,8 @@
                             <button type="submit" class="btn btn-primary">Import</button>
                         </form>
                         @if (isset($count))
-                            <h4 class="text text-success">A total of {{$count}} branches were successfully uploaded</h4>
-                           
+                            <h4 class="text text-success">A total of {{ $count }} branches were successfully uploaded
+                            </h4>
                         @endif
                     </div>
                 </div>
@@ -66,8 +67,8 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         $(function() {
-             $("#record1").DataTable({
-                'iDisplayLength':100
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
             $('#record2').DataTable({
                 "paging": true,

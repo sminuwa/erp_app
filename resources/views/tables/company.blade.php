@@ -9,17 +9,22 @@
         @foreach ($records as $record)
             <tr>
                 <td> {{ $record->name }} </td>
-                <td><a class="btn btn-secondary btn-sm" href="{{ route('companies.edit', $record->id) }}">
-                        <span class="fa fa-pencil"></span>
-                    </a>
-                    <form onsubmit="return confirm('Are you sure you want to delete?')"
-                        action="{{ route('companies.destroy', $record->id) }}" method="post" style="display: inline">
-                        {{ csrf_field() }}
-                        {{ method_field('DELETE') }}
-                        <button type="submit" class="btn btn-danger btn-sm cursor-pointer">
-                            <i class="text-white fa fa-remove"></i>
-                        </button>
-                    </form>
+                <td>
+                    @can('companies.edit')
+                        <a class="btn btn-secondary btn-sm" href="{{ route('companies.edit', $record->id) }}">
+                            <span class="fa fa-pencil"></span>
+                        </a>
+                    @endcan
+                    @can('companies.destroy')
+                        <form onsubmit="return confirm('Are you sure you want to delete?')"
+                            action="{{ route('companies.destroy', $record->id) }}" method="post" style="display: inline">
+                            {{ csrf_field() }}
+                            {{ method_field('DELETE') }}
+                            <button type="submit" class="btn btn-danger btn-sm cursor-pointer">
+                                <i class="text-white fa fa-remove"></i>
+                            </button>
+                        </form>
+                    @endcan
                 </td>
             </tr>
         @endforeach

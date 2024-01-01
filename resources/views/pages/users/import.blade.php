@@ -22,7 +22,9 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('users.index') }}">Users</a></li>
+                            @can('users.index')
+                                <li class="breadcrumb-item"><a href="{{ route('users.index') }}">Users</a></li>
+                            @endcan
                             <li class="breadcrumb-item active">Import</li>
                         </ol>
                     </div>
@@ -32,9 +34,11 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('users.create') }}">
-                <span class="fa fa-plus-circle"> New User</span>
-            </a>
+            @can('users.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('users.create') }}">
+                    <span class="fa fa-plus-circle"> New User</span>
+                </a>
+            @endcan
             <a class="btn btn-secondary btn-sm" href="{{ url('upload_templates/users_account_template.xlsx') }}">
                 <span class="fa fa-download"> Template</span>
             </a>
@@ -44,12 +48,13 @@
                         <form action="{{ route('users.import.form') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <input type="file" name="file" class="form-control">
-                            <input type="password" name="default_password" class="form-control" placeholder="Default password" autocomplete="off"/>
+                            <input type="password" name="default_password" class="form-control"
+                                placeholder="Default password" autocomplete="off" />
                             <button type="submit" class="btn btn-primary">Import</button>
                         </form>
                         @if (isset($count))
-                            <h4 class="text text-success">A total of {{$count}} users were successfully uploaded</h4>
-                           
+                            <h4 class="text text-success">A total of {{ $count }} users were successfully uploaded
+                            </h4>
                         @endif
                     </div>
                 </div>
@@ -67,8 +72,8 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         $(function() {
-             $("#record1").DataTable({
-                'iDisplayLength':100
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
             $('#record2').DataTable({
                 "paging": true,

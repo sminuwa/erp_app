@@ -31,12 +31,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('product_unit_measures.create') }}">
-                <span class="fa fa-plus-circle"> New UTM</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('product_unit_measures.import.form') }}">
-                <span class="fa fa-upload"> Upload UTM</span>
-            </a>
+            @can('product_unit_measures.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('product_unit_measures.create') }}">
+                    <span class="fa fa-plus-circle"> New UTM</span>
+                </a>
+            @endcan
+            @can('product_unit_measures.import.form')
+                <a class="btn btn-secondary btn-sm" href="{{ route('product_unit_measures.import.form') }}">
+                    <span class="fa fa-upload"> Upload UTM</span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 table-responsive">
@@ -57,8 +61,8 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         $(function() {
-             $("#record1").DataTable({
-                'iDisplayLength':100
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
             $('#record2').DataTable({
                 "paging": true,

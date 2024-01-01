@@ -29,16 +29,22 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.create') }}">
-                <span class="fa fa-plus-circle"> New Suppliers</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.import.form') }}">
-                <span class="fa fa-upload"> Upload Suppliers</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.index') }}">
-                <span class="fa fa-list"> View Suppliers</span>
-            </a>
-            
+            @can('suppliers.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.create') }}">
+                    <span class="fa fa-plus-circle"> New Suppliers</span>
+                </a>
+            @endcan
+            @can('suppliers.import.form')
+                <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.import.form') }}">
+                    <span class="fa fa-upload"> Upload Suppliers</span>
+                </a>
+            @endcan
+            @can('suppliers.index')
+                <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.index') }}">
+                    <span class="fa fa-list"> View Suppliers</span>
+                </a>
+            @endcan
+
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>

@@ -20,7 +20,6 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
                             <li class="breadcrumb-item active">Stock Adjustment</li>
                         </ol>
                     </div>
@@ -31,9 +30,11 @@
         <!-- Main content -->
         <section class="content">
             <div class="container">
-                <a class="btn btn-secondary btn-sm" href="{{ route('stock_adjustments.create') }}">
-                    <span class="fa fa-plus-circle"></span> New
-                </a>
+                @can('stock_adjustments.create')
+                    <a class="btn btn-secondary btn-sm" href="{{ route('stock_adjustments.create') }}">
+                        <span class="fa fa-plus-circle"></span> New
+                    </a>
+                @endcan
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
@@ -70,38 +71,48 @@
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('stock_adjustments.show', $record->id) }}">
-                                                                <span class="fa fa-eye"></span> View
-                                                            </a>
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('stock_adjustments.print', $record->id) }}"
-                                                                title="Print GRN" target="_BLANK">
-                                                                <span class="fa fa-print"></span> Print
-                                                            </a>
-                                                            @if ($record->status == 0)
-                                                                <form
-                                                                    action="{{ route('stock_adjustments.post', $record->id) }}"
-                                                                    method="post"
-                                                                    onsubmit="return confirm('Are you sure you want to post this order?')">
-                                                                    @csrf
-                                                                    <button type="submit" class="dropdown-item">
-                                                                        <i class="fa fa-check" aria-hidden="true"></i> Post
-                                                                    </button>
-                                                                </form>
+                                                            @can('stock_adjustments.show')
                                                                 <a class="dropdown-item"
-                                                                    href="{{ route('stock_adjustments.edit', $record->id) }}">
-                                                                    <span class="fa fa-pencil"></span> Edit
+                                                                    href="{{ route('stock_adjustments.show', $record->id) }}">
+                                                                    <span class="fa fa-eye"></span> View
                                                                 </a>
-                                                                <form
-                                                                    onsubmit="return confirm('Are you sure you want to cancel?')"
-                                                                    action="{{ route('stock_adjustments.delete', $record->id) }}"
-                                                                    method="post" style="display: inline">
-                                                                    {{ csrf_field() }}
-                                                                    <button type="submit" class="dropdown-item">
-                                                                        <i class="text-danger fa fa-remove"></i> Delete
-                                                                    </button>
-                                                                </form>
+                                                            @endcan
+                                                            @can('stock_adjustments.print')
+                                                                <a class="dropdown-item"
+                                                                    href="{{ route('stock_adjustments.print', $record->id) }}"
+                                                                    title="Print GRN" target="_BLANK">
+                                                                    <span class="fa fa-print"></span> Print
+                                                                </a>
+                                                            @endcan
+                                                            @if ($record->status == 0)
+                                                                @can('stock_adjustments.post')
+                                                                    <form
+                                                                        action="{{ route('stock_adjustments.post', $record->id) }}"
+                                                                        method="post"
+                                                                        onsubmit="return confirm('Are you sure you want to post this order?')">
+                                                                        @csrf
+                                                                        <button type="submit" class="dropdown-item">
+                                                                            <i class="fa fa-check" aria-hidden="true"></i> Post
+                                                                        </button>
+                                                                    </form>
+                                                                @endcan
+                                                                @can('stock_adjustments.edit')
+                                                                    <a class="dropdown-item"
+                                                                        href="{{ route('stock_adjustments.edit', $record->id) }}">
+                                                                        <span class="fa fa-pencil"></span> Edit
+                                                                    </a>
+                                                                @endcan
+                                                                @can('stock_adjustments.delete')
+                                                                    <form
+                                                                        onsubmit="return confirm('Are you sure you want to cancel?')"
+                                                                        action="{{ route('stock_adjustments.delete', $record->id) }}"
+                                                                        method="post" style="display: inline">
+                                                                        {{ csrf_field() }}
+                                                                        <button type="submit" class="dropdown-item">
+                                                                            <i class="text-danger fa fa-remove"></i> Delete
+                                                                        </button>
+                                                                    </form>
+                                                                @endcan
                                                             @endif
                                                         </div>
                                                     </div>
@@ -124,8 +135,8 @@
 @push('js')
     <script type="text/javascript">
         $(function() {
-             $("#record1").DataTable({
-                'iDisplayLength':100
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
             $('#record2').DataTable({
                 "paging": true,

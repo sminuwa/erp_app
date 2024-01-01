@@ -38,26 +38,32 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <a href="{{ route('interbank.list') }}" class="btn btn-sm btn-secondary"
-                                        style="margin-left: 2px;"><span class="fa fa-list"> </span> List</a>
-                                    <a href="{{ route('create.interbank') }}" class="btn btn-sm btn-secondary"
-                                        style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New
-                                        Transfer</a>
+                                    @can('interbank.list')
+                                        <a href="{{ route('interbank.list') }}" class="btn btn-sm btn-secondary"
+                                            style="margin-left: 2px;"><span class="fa fa-list"> </span> List</a>
+                                    @endcan
+                                    @can('create.interbank')
+                                        <a href="{{ route('create.interbank') }}" class="btn btn-sm btn-secondary"
+                                            style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New
+                                            Transfer</a>
+                                    @endcan
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <form action="{{ route('payment.search') }}" method="POST">
-                                        @csrf
-                                        <div class="input-group">
-                                            <input type="search" class="form-control rounded" required
-                                                placeholder="Search by Receipt number" name="refno" aria-label="Search"
-                                                aria-describedby="search-addon" />
-                                            <button type="submit" class="btn btn-outline-primary">search</button>
-                                        </div>
-                                    </form>
+                            @can('payment.search')
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <form action="{{ route('payment.search') }}" method="POST">
+                                            @csrf
+                                            <div class="input-group">
+                                                <input type="search" class="form-control rounded" required
+                                                    placeholder="Search by Receipt number" name="refno" aria-label="Search"
+                                                    aria-describedby="search-addon" />
+                                                <button type="submit" class="btn btn-outline-primary">search</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
+                            @endcan
                             <!-- /.card-header -->
                             <div class="card-body table-responsive">
                                 <table id="example1"
@@ -88,7 +94,7 @@
                                     </tfoot>
                                     <tbody>
                                         @foreach ($interbanks as $interbank)
-                                            <tr class="@if($interbank->status == 0) bg-warning @endif">
+                                            <tr class="@if ($interbank->status == 0) bg-warning @endif">
 
                                                 <td>{{ Carbon\Carbon::parse($interbank->date)->toFormattedDateString() }}
                                                 </td>
@@ -100,39 +106,48 @@
                                                 <td>{{ optional($interbank->createdBy)->name }}</td>
                                                 <td align="center">
                                                     <div class="dropdown">
-                                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <button class="btn btn-default dropdown-toggle" type="button"
+                                                            id="dropdownMenuButton" data-toggle="dropdown"
+                                                            aria-haspopup="true" aria-expanded="false">
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            <a href="{{ route('interbank.print', $interbank->id) }}" target="_blank"
-                                                               class="dropdown-item">
+                                                            <a href="{{ route('interbank.print', $interbank->id) }}"
+                                                                target="_blank" class="dropdown-item">
                                                                 <i class="fa fa-print" aria-hidden="true"></i> Print
                                                             </a>
-                                                            <a href="{{ route('interbank.print.pos', $interbank->id) }}" target="_blank"
-                                                               class="dropdown-item">
+                                                            <a href="{{ route('interbank.print.pos', $interbank->id) }}"
+                                                                target="_blank" class="dropdown-item">
                                                                 <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
                                                             </a>
-                                                            @if($interbank->status == 0)
-                                                                <form action="{{ route('interbank.post', $interbank->id) }}" method="post" onsubmit="return confirm('Are you sure you want post this transaction?')">
+                                                            @if ($interbank->status == 0)
+                                                                <form
+                                                                    action="{{ route('interbank.post', $interbank->id) }}"
+                                                                    method="post"
+                                                                    onsubmit="return confirm('Are you sure you want post this transaction?')">
                                                                     @csrf
                                                                     <button type="submit" class="dropdown-item">
                                                                         <i class="fa fa-check" aria-hidden="true"></i> Post
                                                                     </button>
                                                                 </form>
                                                                 <a href="{{ route('interbank.edit', $interbank->id) }}"
-                                                                   class="dropdown-item">
+                                                                    class="dropdown-item">
                                                                     <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                                                 </a>
-                                                                <form action="{{ route('interbank.delete', $interbank->id) }}" method="post" onsubmit="return confirm('Are you sure you want delete this transaction?')">
+                                                                <form
+                                                                    action="{{ route('interbank.delete', $interbank->id) }}"
+                                                                    method="post"
+                                                                    onsubmit="return confirm('Are you sure you want delete this transaction?')">
                                                                     @csrf
                                                                     <button type="submit" class="dropdown-item">
-                                                                        <i class="fa fa-check" aria-hidden="true"></i> Delete
+                                                                        <i class="fa fa-check" aria-hidden="true"></i>
+                                                                        Delete
                                                                     </button>
                                                                 </form>
                                                             @else
-                                                                <a href="{{ route('interbank.reverse',[$interbank->id]) }}"
-                                                                   onclick="return confirm('Are you sure you want reverse this transaction?')"
-                                                                   class="dropdown-item">
+                                                                <a href="{{ route('interbank.reverse', [$interbank->id]) }}"
+                                                                    onclick="return confirm('Are you sure you want reverse this transaction?')"
+                                                                    class="dropdown-item">
                                                                     <i class="fa fa-reply" aria-hidden="true"></i> Reverse
                                                                 </a>
                                                             @endif
@@ -140,7 +155,6 @@
                                                     </div>
                                                 </td>
                                             </tr>
-
                                         @endforeach
                                     </tbody>
 

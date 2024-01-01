@@ -20,7 +20,9 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
+                            @can('products.index')
+                                <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
+                            @endcan
                             <li class="breadcrumb-item active">Purchase</li>
                         </ol>
                     </div>
@@ -30,12 +32,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('purchases.create') }}">
-                <span class="fa fa-plus-circle"></span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('purchases.index') }}">
-                <span class="fa fa-list"></span>
-            </a>
+            @can('purchases.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('purchases.create') }}">
+                    <span class="fa fa-plus-circle"></span>
+                </a>
+            @endcan
+            @can('purchases.index')
+                <a class="btn btn-secondary btn-sm" href="{{ route('purchases.index') }}">
+                    <span class="fa fa-list"></span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-12'>

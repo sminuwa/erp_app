@@ -41,54 +41,57 @@
                                 <a href="javascript:history.back()" class="btn btn-warning btn-sm">
                                     <i class="fa fa-arrow-left"></i> Back
                                 </a>
-                                <a href="{{ route('pos.index') }}" class="btn btn-secondary btn-sm ">
-                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> New Invoice
-                                </a>
-
-
+                                @can('pos.index')
+                                    <a href="{{ route('pos.index') }}" class="btn btn-secondary btn-sm ">
+                                        <i class="fa fa-plus-circle" aria-hidden="true"></i> New Invoice
+                                    </a>
+                                @endcan
                                 @if ($order->status == 1)
-                                    <a href="javascript:void(0)" data-toggle="modal"
-                                       data-target="#order_detail_form{{ $order->id }}" data-val="{{ $order->id }}"
-                                       class="btn btn-success btn-sm  show">
-                                        <i class="fa fa-check" aria-hidden="true"></i> Confirm
-                                    </a>
-                                    <a href="{{ route('waybill.order_print', $order->id) }}" target="_BLANK"
-                                       class="btn btn-primary btn-sm ">
-                                        <i class="fa fa-print" aria-hidden="true"></i> Waybill
-                                    </a>
-                                    <a href="{{ route('invoice.print', $order->id) }}" target="_BLANK"
-                                       class="btn btn-dark btn-sm ">
-                                        <i class="fa fa-print" aria-hidden="true"></i> Print
-                                    </a>
-                                    <a href="{{ route('pos.order_print', $order->id) }}" target="_BLANK"
-                                       class="btn btn-dark btn-sm ">
-                                        <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
-                                    </a>
+                                    @can('waybill.order_print')
+                                        <a href="{{ route('waybill.order_print', $order->id) }}" target="_BLANK"
+                                            class="btn btn-primary btn-sm ">
+                                            <i class="fa fa-print" aria-hidden="true"></i> Waybill
+                                        </a>
+                                    @endcan
+                                    @can('invoice.print')
+                                        <a href="{{ route('invoice.print', $order->id) }}" target="_BLANK"
+                                            class="btn btn-dark btn-sm ">
+                                            <i class="fa fa-print" aria-hidden="true"></i> Print
+                                        </a>
+                                    @endcan
+                                    @can('pos.order_print')
+                                        <a href="{{ route('pos.order_print', $order->id) }}" target="_BLANK"
+                                            class="btn btn-dark btn-sm ">
+                                            <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
+                                        </a>
+                                    @endcan
                                 @endif
                                 @if ($order->status == 0)
-                                    <a href="{{ route('pos.edit', $order->id) }}" class="btn btn-info btn-sm ">
-                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                    </a>
-                                    <form class="d-inline" action="{{ route('invoice.post', $order->id) }}" method="post"
-                                        onsubmit="return confirm('Are you sure you want to post this invoice?')">
-                                        @csrf
-                                        <button type="submit" class="btn btn-success btn-sm ">
-                                            <i class="fa fa-check" aria-hidden="true"></i> Post
-                                        </button>
-                                    </form>
-
-                                    <form class="d-inline" id="delete-form-{{ $order->id }}"
-                                        action="{{ route('invoice.delete', $order->id) }}" method="post"
-                                        onsubmit="return confirm('Are you sure you want to close this invoice?')">
-                                        @csrf
-                                        <button class="btn btn-danger btn-sm " type="submit">
-                                            <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                        </button>
-                                    </form>
-
+                                    @can('pos.edit')
+                                        <a href="{{ route('pos.edit', $order->id) }}" class="btn btn-info btn-sm ">
+                                            <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                        </a>
+                                    @endcan
+                                    @can('invoice.post')
+                                        <form class="d-inline" action="{{ route('invoice.post', $order->id) }}" method="post"
+                                            onsubmit="return confirm('Are you sure you want to post this invoice?')">
+                                            @csrf
+                                            <button type="submit" class="btn btn-success btn-sm ">
+                                                <i class="fa fa-check" aria-hidden="true"></i> Post
+                                            </button>
+                                        </form>
+                                    @endcan
+                                    @can('invoice.delete')
+                                        <form class="d-inline" id="delete-form-{{ $order->id }}"
+                                            action="{{ route('invoice.delete', $order->id) }}" method="post"
+                                            onsubmit="return confirm('Are you sure you want to close this invoice?')">
+                                            @csrf
+                                            <button class="btn btn-danger btn-sm " type="submit">
+                                                <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                            </button>
+                                        </form>
+                                    @endcan
                                 @endif
-
-
                             </div>
                         </div>
                         <div class="invoice p-3 mt-3">
@@ -194,7 +197,7 @@
                                             @endif
                                             @if ($order_detail->order->discount != 0 || $order_detail->order->refund != 0)
                                                 <tr>
-                                                    <th style="text-align: right"  colspan="7">Total Amount := </th>
+                                                    <th style="text-align: right" colspan="7">Total Amount := </th>
                                                     <th style="text-align: right;">
                                                         &#8358;{{ number_format($total - $order_detail->order->discount + $order_detail->order->refund, 2, '.', ',') }}
                                                     </th>

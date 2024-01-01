@@ -41,36 +41,45 @@
                                 <a href="javascript:history.back()" class="btn btn-warning btn-sm">
                                     <i class="fa fa-arrow-left"></i> Back
                                 </a>
-                                <a href="{{ route('credit.note.create') }}" class="btn btn-secondary btn-sm ">
-                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> New Credit Note
-                                </a>
-
-                                <a href="{{ route('credit.note.print', $order->id) }}"
-                                   target="_BLANK" class="btn btn-dark btn-sm ">
-                                    <i class="fa fa-print" aria-hidden="true"></i> Print
-                                </a>
+                                @can('credit.note.create')
+                                    <a href="{{ route('credit.note.create') }}" class="btn btn-secondary btn-sm ">
+                                        <i class="fa fa-plus-circle" aria-hidden="true"></i> New Credit Note
+                                    </a>
+                                @endcan
+                                @can('credit.note.print')
+                                    <a href="{{ route('credit.note.print', $order->id) }}" target="_BLANK"
+                                        class="btn btn-dark btn-sm ">
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                    </a>
+                                @endcan
 
                                 @if ($order->status == 0)
-                                    <a href="{{ route('credit.note.edit', $order->id) }}"
-                                       class="btn btn-info btn-sm ">
-                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                    </a>
-                                    <form class="d-inline" action="{{ route('credit.note.post', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to post this invoice?')">
-                                        @csrf
-                                        <button type="submit"
-                                                class="btn btn-success btn-sm ">
-                                            <i class="fa fa-check" aria-hidden="true"></i> Post
-                                        </button>
-                                    </form>
-
-                                    <form class="d-inline" action="{{ route('credit.note.delete', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to close this invoice?')">
-                                        @csrf
-                                        @method('POST')
-                                        <button class="btn btn-danger btn-sm " type="submit">
-                                            <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                        </button>
-                                    </form>
-
+                                    @can('credit.note.edit')
+                                        <a href="{{ route('credit.note.edit', $order->id) }}" class="btn btn-info btn-sm ">
+                                            <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                        </a>
+                                    @endcan
+                                    @can('credit.note.post')
+                                        <form class="d-inline" action="{{ route('credit.note.post', $order->id) }}"
+                                            method="post"
+                                            onsubmit="return confirm('Are you sure you want to post this invoice?')">
+                                            @csrf
+                                            <button type="submit" class="btn btn-success btn-sm ">
+                                                <i class="fa fa-check" aria-hidden="true"></i> Post
+                                            </button>
+                                        </form>
+                                    @endcan
+                                    @can('credit.note.delete')
+                                        <form class="d-inline" action="{{ route('credit.note.delete', $order->id) }}"
+                                            method="post"
+                                            onsubmit="return confirm('Are you sure you want to close this invoice?')">
+                                            @csrf
+                                            @method('POST')
+                                            <button class="btn btn-danger btn-sm " type="submit">
+                                                <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                            </button>
+                                        </form>
+                                    @endcan
                                 @endif
 
 
@@ -109,10 +118,11 @@
                                 <div class="col-sm-4 invoice-col">
                                     <b>Invoice No: {{ $order->reference }}</b><br><br>
                                     <b>Invoice Status:</b>
-                                    {!!
-                                        $order->status == 0 ? '<span class="badge badge-warning">Pending</span>':
-                                        ($order->status == 1 ? '<span class="badge badge-success">Posted</span>': '<span class="badge badge-success">Pending</span>' )
-                                    !!}
+                                    {!! $order->status == 0
+                                        ? '<span class="badge badge-warning">Pending</span>'
+                                        : ($order->status == 1
+                                            ? '<span class="badge badge-success">Posted</span>'
+                                            : '<span class="badge badge-success">Pending</span>') !!}
                                 </div>
                                 <!-- /.col -->
                             </div>

@@ -45,18 +45,18 @@
                                         Customer
                                         <span>
                                             &nbsp
-                                            @can('view.customer.ledger')
+                                            @can('customer.ledger')
                                                 <a href="javascript:void(0)" data-toggle="modal"
                                                     data-target="#customer_ledgerform"
                                                     class="btn btn-sm btn-secondary float-md-right"
                                                     style="margin-left: 2px;">Customer Ledger </a>
                                             @endcan
-                                            @can('increase.customer.credit.limit')
+                                            @can('credit_limits.create')
                                                 <a href="javascript:void(0)" data-toggle="modal" data-target="#credit_limitform"
                                                     class="btn btn-sm btn-success float-md-right"
                                                     style="margin-left: 2px;">Increase Limit </a>
                                             @endcan
-                                            @can('add.customer')
+                                            @can('customers.create')
                                                 <a href="javascript:void(0)" data-toggle="modal" data-target="#customermodal"
                                                     class="btn btn-sm btn-primary float-md-right">Add New</a>
                                             @endcan
@@ -98,7 +98,7 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <input type="hidden" class="form-control" name="customer_id"
-                                                        id="customer_val_id" value="">
+                                                    id="customer_val_id" value="">
                                                 <label>Customer</label>
                                                 <div class="form-group">
                                                     <select name="customer_id" id="customer_record"
@@ -120,18 +120,18 @@
                                                     class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button> --}}
                                             </div>
                                         </div>
-                                        
+
                                     </div>
                                     <div class="row">
                                         <div class="col-md-4">
                                             <input type="number" class="form-control" name="discount"
-                                                placeholder="Discount" id="discount" value="{{$order->discount}}" />
+                                                placeholder="Discount" id="discount" value="{{ $order->discount }}" />
                                         </div>
 
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <input type="number" class="form-control" placeholder="Refund"
-                                                    name="refund" id="refund" value="{{$order->refund}}" />
+                                                    name="refund" id="refund" value="{{ $order->refund }}" />
 
                                             </div>
                                         </div>
@@ -188,7 +188,7 @@
                                                     class="addCartItemForm">
                                                     @csrf
                                                     <input type="hidden" name="customer" class="customer"
-                                                            value="@if (session()->has('customer')) {{ session('customer')->id }} @endif">
+                                                        value="@if (session()->has('customer')) {{ session('customer')->id }} @endif">
                                                     <input type="hidden" name="id" value="{{ $store->id }}">
                                                     <input type="hidden" name="name" value="{{ $store->name }}">
                                                     <input type="hidden" name="code" value="{{ $store->code }}">
@@ -426,7 +426,7 @@
         $(function() {
             $("#example1").DataTable({
                 'iDisplayLength': 100,
-                
+
             });
 
 

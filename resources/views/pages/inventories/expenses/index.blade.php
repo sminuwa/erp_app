@@ -40,8 +40,11 @@
                             <div class="card-body table-responsive">
                                 <div class="row mb-3">
                                     <div class="col-sm-4">
-                                        <a href="{{ route('purchase.additional-invoice.create') }}" class="btn btn-sm btn-secondary"
-                                           style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Invoice</a>
+                                        @can('purchase.additional-invoice.create')
+                                            <a href="{{ route('purchase.additional-invoice.create') }}"
+                                                class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
+                                                    class="fa fa-plus-circle"> </span> New Invoice</a>
+                                        @endcan
                                     </div>
                                 </div>
                                 <table id="example1"
@@ -70,46 +73,63 @@
                                     </tfoot>
                                     <tbody>
                                         @foreach ($invoices as $invoice)
-                                            <tr class="@if($invoice->status == 0) bg-warning @endif">
+                                            <tr class="@if ($invoice->status == 0) bg-warning @endif">
 
                                                 <td>{{ Carbon\Carbon::parse($invoice->date)->toFormattedDateString() }}</td>
                                                 <td>{{ $invoice->reference }}</td>
                                                 <td>{{ $invoice->purchase->reference }}</td>
-                                                <td>{{ $invoice->supplier->code ?? null }} - {{ $invoice->supplier->name ?? '' }}</td>
+                                                <td>{{ $invoice->supplier->code ?? null }} -
+                                                    {{ $invoice->supplier->name ?? '' }}</td>
 
                                                 <td align="right">{{ number_format($invoice->amount, 2, '.', ',') }}</td>
                                                 <td>{{ $invoice->createdBy->name ?? '' }}</td>
                                                 <td align="center">
                                                     <div class="dropdown">
-                                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <button class="btn btn-default dropdown-toggle" type="button"
+                                                            id="dropdownMenuButton" data-toggle="dropdown"
+                                                            aria-haspopup="true" aria-expanded="false">
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 
-                                                            @if($invoice->status == 0)
-                                                                <form action="{{ route('purchase.additional-invoice.post', $invoice->id) }}" method="post" onsubmit="return confirm('Are you sure you want post this invoice?')">
-                                                                    @csrf
-                                                                    <button type="submit" class="dropdown-item">
-                                                                        <i class="fa fa-check" aria-hidden="true"></i> Post
-                                                                    </button>
-                                                                </form>
-
-                                                                <a href="{{ route('purchase.additional-invoice.edit', $invoice->id) }}"
-                                                                   class="dropdown-item">
-                                                                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                                                </a>
+                                                            @if ($invoice->status == 0)
+                                                                @can('purchase.additional-invoice.post')
+                                                                    <form
+                                                                        action="{{ route('purchase.additional-invoice.post', $invoice->id) }}"
+                                                                        method="post"
+                                                                        onsubmit="return confirm('Are you sure you want post this invoice?')">
+                                                                        @csrf
+                                                                        <button type="submit" class="dropdown-item">
+                                                                            <i class="fa fa-check" aria-hidden="true"></i> Post
+                                                                        </button>
+                                                                    </form>
+                                                                @endcan
+                                                                @can('purchase.additional-invoice.edit')
+                                                                    <a href="{{ route('purchase.additional-invoice.edit', $invoice->id) }}"
+                                                                        class="dropdown-item">
+                                                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                                                    </a>
+                                                                @endcan
                                                             @else
-                                                                <form action="{{ route('purchase.additional-invoice.reverse', $invoice->id) }}" method="post" onsubmit="return confirm('Are you sure you want reverse this invoice?')">
-                                                                    @csrf
-                                                                    <button type="submit" class="dropdown-item">
-                                                                        <i class="fa fa-reply" aria-hidden="true"></i> Reverse
-                                                                    </button>
-                                                                </form>
+                                                                @can('purchase.additional-invoice.reverse')
+                                                                    <form
+                                                                        action="{{ route('purchase.additional-invoice.reverse', $invoice->id) }}"
+                                                                        method="post"
+                                                                        onsubmit="return confirm('Are you sure you want reverse this invoice?')">
+                                                                        @csrf
+                                                                        <button type="submit" class="dropdown-item">
+                                                                            <i class="fa fa-reply" aria-hidden="true"></i>
+                                                                            Reverse
+                                                                        </button>
+                                                                    </form>
+                                                                @endcan
                                                             @endif
-                                                                <a href="{{ route('purchase.additional-invoice.print', $invoice->id) }}" target="_blank"
-                                                                   class="dropdown-item">
+                                                            @can('purchase.additional-invoice.print')
+                                                                <a href="{{ route('purchase.additional-invoice.print', $invoice->id) }}"
+                                                                    target="_blank" class="dropdown-item">
                                                                     <i class="fa fa-print" aria-hidden="true"></i> Print
                                                                 </a>
+                                                            @endcan
                                                         </div>
                                                     </div>
                                                 </td>
@@ -150,8 +170,8 @@
         $(function() {
 
             $("#example1").DataTable({
-                    'iDisplayLength':100
-                });
+                'iDisplayLength': 100
+            });
             $('#example2').DataTable({
                 "paging": true,
                 "lengthChange": false,
@@ -160,7 +180,7 @@
                 "info": true,
                 "autoWidth": false
             });
-            $(document).on('click', '".show"',function() {
+            $(document).on('click', '".show"', function() {
                 order_id = $(this).attr('data-val');
                 $.ajax({
                     type: 'get',

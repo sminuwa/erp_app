@@ -19,7 +19,6 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
                             <li class="breadcrumb-item active">Stock Adjustment</li>
                         </ol>
                     </div>
@@ -40,9 +39,12 @@
                             <div class="card-header">
                                 <i class="ion-android-cart"></i> Stock Adjustment Cart
                                 <div class="float-right">
-                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
-                                        class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
-                                            class="fa fa-plus"></i> Add Product </a>
+                                    @can('ajax.cart.add')
+                                        <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
+                                            class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
+                                                class="fa fa-plus"></i> Add Product </a>
+                                    @endcan
+
                                 </div>
                             </div>
                             <div class="card-body">
@@ -240,11 +242,11 @@
         }
         $(function() {
             $('#operation').change(function() {
-               
+
                 toggleTextField();
             });
             toggleTextField();
-            
+
 
             $(document).on("change", "#product_id,#store_id", function(event) {
                 $("#available_qty").val("");

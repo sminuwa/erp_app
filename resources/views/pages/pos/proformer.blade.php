@@ -29,8 +29,10 @@
         <!-- Main content -->
         <section class="content">
             <div class="container">
-                <a href="{{ route('proformer.list') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                        class="fa fa-list"> </span> Proforma List</a>
+                @can('proformer.list')
+                    <a href="{{ route('proformer.list') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
+                            class="fa fa-list"> </span> Proforma List</a>
+                @endcan
                 <div class="row">
                     <!-- left column -->
                     <div class="col-md-12">
@@ -54,8 +56,8 @@
                                         value="{{ date('Y-m-d') }}" />
 
                                     <div class="row">
-                                        <input type="hidden" class="form-control" name="customer_id"
-                                        id="customer_val_id" value="">
+                                        <input type="hidden" class="form-control" name="customer_id" id="customer_val_id"
+                                            value="">
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Customer Type</label>
@@ -97,8 +99,10 @@
                                                 <div class="form-group">
                                                     <textarea class="form-control" name="description" placeholder="Description" id="description"></textarea>
                                                 </div>
-                                                <button type="submit" id="create_invoice"
-                                                    class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button>
+                                                @can('proformer.update')
+                                                    <button type="submit" id="create_invoice"
+                                                        class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button>
+                                                @endcan
                                             </div>
                                         </div>
                                     </div>
@@ -223,10 +227,12 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="form-group text-right ">
-                            <button type="submit" class="btn btn-primary"><span class="ion-android-cart"> </span>Add to
-                                Cart</button>
-                        </div>
+                        @can('ajax.cart.add')
+                            <div class="form-group text-right ">
+                                <button type="submit" class="btn btn-primary"><span class="ion-android-cart"> </span>Add to
+                                    Cart</button>
+                            </div>
+                        @endcan
                     </form>
                 </div>
             </div>
@@ -242,9 +248,9 @@
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script>
         /*$('.cart-container').addClass('d-none')
-                                                                                                $('select[name=account_type]').change( () => {
-                                                                                                    $('.cart-container').removeClass('d-none')
-                                                                                                })*/
+                                                                                                                                            $('select[name=account_type]').change( () => {
+                                                                                                                                                $('.cart-container').removeClass('d-none')
+                                                                                                                                            })*/
         $(function() {
             $("#example1").DataTable({
                 'iDisplayLength': 100

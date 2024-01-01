@@ -38,24 +38,28 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <a href="{{ route('suppliers.debit.note.create') }}" class="btn btn-sm btn-secondary"
-                                        style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Debit
-                                        Note</a>
+                                    @can('suppliers.debit.note.create')
+                                        <a href="{{ route('suppliers.debit.note.create') }}" class="btn btn-sm btn-secondary"
+                                            style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Debit
+                                            Note</a>
+                                    @endcan
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <form action="{{ route('suppliers.debit.note.search') }}" method="POST">
-                                        @csrf
-                                        <div class="input-group">
-                                            <input type="search" class="form-control rounded" required
-                                                placeholder="Search by reference No" name="refno"
-                                                aria-label="Search" aria-describedby="search-addon" />
-                                            <button type="submit" class="btn btn-outline-primary">search</button>
-                                        </div>
-                                    </form>
+                            @can('suppliers.debit.note.search')
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <form action="{{ route('suppliers.debit.note.search') }}" method="POST">
+                                            @csrf
+                                            <div class="input-group">
+                                                <input type="search" class="form-control rounded" required
+                                                    placeholder="Search by reference No" name="refno" aria-label="Search"
+                                                    aria-describedby="search-addon" />
+                                                <button type="submit" class="btn btn-outline-primary">search</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
+                            @endcan
                             <!-- /.card-header -->
                             <div class="card-body table-responsive">
                                 <table id="example1"
@@ -91,10 +95,12 @@
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
                                                 <td>{{ $payment->postedBy->name ?? '' }}</td>
                                                 <td align="center">
-                                                    <a href="{{ route('suppliers.debit.note.print', $payment->id) }}"
-                                                        target="_BLANK" class="btn btn-secondary btn-sm">
-                                                        <i class="fa fa-print" aria-hidden="true"></i>
-                                                    </a>
+                                                    @can('suppliers.debit.note.print')
+                                                        <a href="{{ route('suppliers.debit.note.print', $payment->id) }}"
+                                                            target="_BLANK" class="btn btn-secondary btn-sm">
+                                                            <i class="fa fa-print" aria-hidden="true"></i>
+                                                        </a>
+                                                    @endcan
                                                     {{-- <a href="javascript:void(0)" data-toggle="modal"
                                                         data-target="#payment_edit{{$payment->id}}"
                                                         class="btn btn-primary btn-sm">
@@ -104,12 +110,14 @@
                                                         onclick="deleteItem({{ $payment->id }})">
                                                         <i class="fa fa-trash" aria-hidden="true"></i>
                                                     </button>
-                                                    <form id="delete-form-{{ $payment->id }}"
-                                                        action="{{ route('suppliers.debit.note.destroy', $payment->id) }}"
-                                                        method="post" style="display:none;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                    </form>
+                                                    @can('suppliers.debit.note.destroy')
+                                                        <form id="delete-form-{{ $payment->id }}"
+                                                            action="{{ route('suppliers.debit.note.destroy', $payment->id) }}"
+                                                            method="post" style="display:none;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                        </form>
+                                                    @endcan
                                                 </td>
                                             </tr>
                                             <div class="modal fade" id="payment_edit{{ $payment->id }}"
@@ -271,8 +279,8 @@
         $(function() {
 
             $("#example1").DataTable({
-                    'iDisplayLength':100
-                });
+                'iDisplayLength': 100
+            });
             $('#example2').DataTable({
                 "paging": true,
                 "lengthChange": false,
@@ -281,7 +289,7 @@
                 "info": true,
                 "autoWidth": false
             });
-            $(document).on('click', '".show"',function() {
+            $(document).on('click', '".show"', function() {
                 order_id = $(this).attr('data-val');
                 $.ajax({
                     type: 'get',

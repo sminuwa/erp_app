@@ -24,26 +24,32 @@
                             Action
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" href="{{ route('purchases.show', $record->id) }}">
-                                <span class="fa fa-eye">View</span>
-                            </a>
-                            <form action="{{ route('purchase.post', $record->id) }}" method="post"
-                                onsubmit="return confirm('Are you sure you want to post this order?')">
-                                @csrf
-                                <button type="submit" class="dropdown-item">
-                                    <i class="fa fa-check" aria-hidden="true"></i> Post
-                                </button>
-                            </form>
-                            @can('edit.item.purchase')
+                            @can('purchases.show')
+                                <a class="dropdown-item" href="{{ route('purchases.show', $record->id) }}">
+                                    <span class="fa fa-eye">View</span>
+                                </a>
+                            @endcan
+                            @can('purchase.post')
+                                <form action="{{ route('purchase.post', $record->id) }}" method="post"
+                                    onsubmit="return confirm('Are you sure you want to post this order?')">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="fa fa-check" aria-hidden="true"></i> Post
+                                    </button>
+                                </form>
+                            @endcan
+                            @can('purchases.edit')
                                 <a class="dropdown-item" href="{{ route('purchases.edit', $record->id) }}">
                                     <span class="fa fa-pencil"> Edit</span>
                                 </a>
                             @endcan
-                            <a class="dropdown-item" href="{{ route('purchase.print', $record->id) }}"
-                                title="Print GRN" target="_BLANK">
-                                <span class="fa fa-print"></span> Print
-                            </a>
-                            @can('delete.item.purchase')
+                            @can('purchase.print')
+                                <a class="dropdown-item" href="{{ route('purchase.print', $record->id) }}" title="Print GRN"
+                                    target="_BLANK">
+                                    <span class="fa fa-print"></span> Print
+                                </a>
+                            @endcan
+                            @can('purchases.destroy')
                                 <form onsubmit="return confirm('Are you sure you want to cancel?')"
                                     action="{{ route('purchases.destroy', $record->id) }}" method="post"
                                     style="display: inline">
@@ -55,15 +61,18 @@
                                 </form>
                             @endcan
                             @if ($record->waybill_no != null)
-                                <a class="dropdown-item"
-                                    href="{{ route('purchase.waybill.print', $record->id) }}" title="Print Invoice"
-                                    target="_BLANK">
-                                    <span class="ion-printer">Waybill</span>
-                                </a>
+                                @can('purchase.waybill.print')
+                                    <a class="dropdown-item" href="{{ route('purchase.waybill.print', $record->id) }}"
+                                        title="Print Invoice" target="_BLANK">
+                                        <span class="ion-printer">Waybill</span>
+                                    </a>
+                                @endcan
                             @endif
-                            <a href="javascript:void(0)" data-toggle="modal"
-                                data-target="#customermodal{{ $loop->index + 1 }}"
-                                class="dropdown-item float-md-right"><i class="fa fa-address-book"></i> WayBill Fill</a>
+                            @can('purchase.generate.waybill')
+                                <a href="javascript:void(0)" data-toggle="modal"
+                                    data-target="#customermodal{{ $loop->index + 1 }}"
+                                    class="dropdown-item float-md-right"><i class="fa fa-address-book"></i> WayBill Fill</a>
+                            @endcan
                         </div>
                     </div>
                 </td>

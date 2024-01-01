@@ -41,26 +41,34 @@
                                 <a href="javascript:history.back()" class="btn btn-warning btn-sm">
                                     <i class="fa fa-arrow-left"></i> Back
                                 </a>
-                                <a href="{{ route('customers.credit.note.create') }}" class="btn btn-secondary btn-sm ">
-                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> New Order
-                                </a>
-
-                                <a href="{{ route('credit.note.print', $order->id) }}"
-                                   target="_BLANK" class="btn btn-dark btn-sm ">
-                                    <i class="fa fa-print" aria-hidden="true"></i> Print
-                                </a>
-                                @if ($order->status == 0)
-                                    <a href="{{ route('credit.note.edit', $order->id) }}"
-                                       class="btn btn-primary btn-sm ">
-                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                @can('customers.credit.note.create')
+                                    <a href="{{ route('customers.credit.note.create') }}" class="btn btn-secondary btn-sm ">
+                                        <i class="fa fa-plus-circle" aria-hidden="true"></i> New Order
                                     </a>
-                                    <form action="{{ route('customers.credit.note.destroy', $order->id) }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this order?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-danger btn-sm" type="submit">
-                                            <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                        </button>
-                                    </form>
+                                @endcan
+                                @can('credit.note.print')
+                                    <a href="{{ route('credit.note.print', $order->id) }}" target="_BLANK"
+                                        class="btn btn-dark btn-sm ">
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                    </a>
+                                @endcan
+                                @if ($order->status == 0)
+                                    @can('credit.note.edit')
+                                        <a href="{{ route('credit.note.edit', $order->id) }}" class="btn btn-primary btn-sm ">
+                                            <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                        </a>
+                                    @endcan
+                                    @can('customers.credit.note.destroy')
+                                        <form action="{{ route('customers.credit.note.destroy', $order->id) }}" method="post"
+                                            class="d-inline"
+                                            onsubmit="return confirm('Are you sure you want to delete this order?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-danger btn-sm" type="submit">
+                                                <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                            </button>
+                                        </form>
+                                    @endcan
                                 @endif
 
                             </div>
@@ -98,10 +106,11 @@
                                 <div class="col-sm-4 invoice-col">
                                     <b>Reference No: {{ $order->reference }}</b><br><br>
                                     <b>Order Status:</b>
-                                    {!!
-                                        $order->status == 0 ? '<span class="badge badge-warning">Pending</span>':
-                                        ($order->status == 1 ? '<span class="badge badge-success">Close</span>': '<span class="badge badge-success">Completed</span>' )
-                                    !!}
+                                    {!! $order->status == 0
+                                        ? '<span class="badge badge-warning">Pending</span>'
+                                        : ($order->status == 1
+                                            ? '<span class="badge badge-success">Close</span>'
+                                            : '<span class="badge badge-success">Completed</span>') !!}
                                 </div>
                                 <!-- /.col -->
                             </div>
@@ -131,10 +140,10 @@
                                             @foreach ($order_details as $order_detail)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $order_detail->store_product->product->code ?? "" }}</td>
-                                                    <td>{{ $order_detail->store_product->product->name ?? "" }}</td>
-                                                    <td>{{ $order_detail->store_product->product->unit ?? "" }}</td>
-                                                    <td>{{ $order_detail->store_product->store->code ?? "" }}</td>
+                                                    <td>{{ $order_detail->store_product->product->code ?? '' }}</td>
+                                                    <td>{{ $order_detail->store_product->product->name ?? '' }}</td>
+                                                    <td>{{ $order_detail->store_product->product->unit ?? '' }}</td>
+                                                    <td>{{ $order_detail->store_product->store->code ?? '' }}</td>
                                                     <td align="center">{{ $order_detail->quantity }}</td>
                                                     <td align="right">{{ number_format($order_detail->sold_price, 2) }}
                                                     </td>

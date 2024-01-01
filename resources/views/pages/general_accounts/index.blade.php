@@ -30,12 +30,17 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('general_accounts.create') }}">
-                <span class="fa fa-plus-circle"> New General Account</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('general_accounts.import.form') }}">
-                <span class="fa fa-upload"> Upload General Account</span>
-            </a><br/>
+            @can('general_accounts.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('general_accounts.create') }}">
+                    <span class="fa fa-plus-circle"> New General Account</span>
+                </a>
+            @endcan
+            @can('general_accounts.import.form')
+                <a class="btn btn-secondary btn-sm" href="{{ route('general_accounts.import.form') }}">
+                    <span class="fa fa-upload"> Upload General Account</span>
+                </a>
+            @endcan
+            <br />
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 table-responsive">
@@ -55,8 +60,8 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         $(function() {
-             $("#record1").DataTable({
-                'iDisplayLength':100
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
             $('#record2').DataTable({
                 "paging": true,

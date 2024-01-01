@@ -42,53 +42,47 @@
                             <td class="text-left">{{ $product->attributes['unit'] }}</td>
                             <td class="text-left">{{ $product->attributes['sold_price'] }}</td>
 
-                            <form action="{{ route('credit.note.cart.update') }}" method="post" id="p{{ $product->id }}">
-                                @csrf
-                                <td>
-                                    <input type="hidden" name="sold_price"
-                                           id="price{{ $product->id }}" class="form-control"
-                                           style="min-width:65px;"
-                                           onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
-                                           value="{{ $product->price }}"
-                                           data-val="{{ $product->price }}"
-                                           data-value="p{{ $product->id }}">
-                                    <span style="color: red;" id="valid_price{{ $product->id }}"></span>
-                                    <input
-                                        type="text"
-                                        name="quantity"
-                                        id="quantity{{ $product->id }}"
-                                        class="form-control quantity"
-                                        data-value="p{{ $product->id }}"
-                                        style="min-width:58px;"
-                                        value="{{ $product->quantity }}"
-                                        min="1"
-                                        max-qty="{{ $product->quantity }}"
-                                        required>
-                                </td>
-                                <td>
-                                    <span class="subtotal{{ $product->id }}">{{ number_format($product->price * $product->quantity, 2) }}</span>
-                                </td>
-                                <input type="hidden" name="id" class="form-control" value="{{ $product->id }}">
-                                <input type="hidden" name="selling_price" class="form-control"
-                                    value="{{ $product->attributes['selling_price'] }}">
-                                <input type="hidden" name="cost_price" class="form-control"
-                                    value="{{ $product->attributes['cost_price'] }}">
-                                <input type="hidden" name="unit" class="form-control"
-                                       value="{{ $product->attributes['unit'] }}">
-                            </form>
-
-                            <td>
-                                <form class="deleteForm" id="delete-form-{{ $product->id }}"
-                                    action="{{ route('credit.note.cart.remove', $product->id) }}" method="post"
-                                    data-val="{{ $product->id }}"
-                                    >
-                                    <input type="hidden" name="order" id="order" value="{{ $order->id }}" />
+                            @can('credit.note.cart.update')
+                                <form action="{{ route('credit.note.cart.update') }}" method="post"
+                                    id="p{{ $product->id }}">
                                     @csrf
-                                    <button class="btn btn-danger btn-sm delete" type="submit"
-                                            >
-                                        <i class="fa fa-trash" aria-hidden="true"></i>
-                                    </button>
+                                    <td>
+                                        <input type="hidden" name="sold_price" id="price{{ $product->id }}"
+                                            class="form-control" style="min-width:65px;"
+                                            onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
+                                            value="{{ $product->price }}" data-val="{{ $product->price }}"
+                                            data-value="p{{ $product->id }}">
+                                        <span style="color: red;" id="valid_price{{ $product->id }}"></span>
+                                        <input type="text" name="quantity" id="quantity{{ $product->id }}"
+                                            class="form-control quantity" data-value="p{{ $product->id }}"
+                                            style="min-width:58px;" value="{{ $product->quantity }}" min="1"
+                                            max-qty="{{ $product->quantity }}" required>
+                                    </td>
+                                    <td>
+                                        <span
+                                            class="subtotal{{ $product->id }}">{{ number_format($product->price * $product->quantity, 2) }}</span>
+                                    </td>
+                                    <input type="hidden" name="id" class="form-control" value="{{ $product->id }}">
+                                    <input type="hidden" name="selling_price" class="form-control"
+                                        value="{{ $product->attributes['selling_price'] }}">
+                                    <input type="hidden" name="cost_price" class="form-control"
+                                        value="{{ $product->attributes['cost_price'] }}">
+                                    <input type="hidden" name="unit" class="form-control"
+                                        value="{{ $product->attributes['unit'] }}">
                                 </form>
+                            @endcan
+                            <td>
+                                @can('credit.note.cart.remove')
+                                    <form class="deleteForm" id="delete-form-{{ $product->id }}"
+                                        action="{{ route('credit.note.cart.remove', $product->id) }}" method="post"
+                                        data-val="{{ $product->id }}">
+                                        <input type="hidden" name="order" id="order" value="{{ $order->id }}" />
+                                        @csrf
+                                        <button class="btn btn-danger btn-sm delete" type="submit">
+                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                        </button>
+                                    </form>
+                                @endcan
                             </td>
                         </tr>
                     @endforeach
@@ -106,7 +100,8 @@
             <input name="comment" placeholder="Comment" class="form-control">
 
             <div class="form-group text-right mt-3">
-                <input type="submit" onclick="$('.date').val($('.date_').val())" class=" btn btn-primary" value="Submit" />
+                <input type="submit" onclick="$('.date').val($('.date_').val())" class=" btn btn-primary"
+                    value="Submit" />
             </div>
 
         </form>

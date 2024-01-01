@@ -29,7 +29,7 @@
                             Close
                         </button>
                         @if (!$order?->issued_by > 0)
-                        @can('verify.invoice')
+                        @can('sales_products.verify')
                         <button type="submit" class="btn btn-success"><i class="fa fa-ticket"></i>
                             Confirm
                         </button>

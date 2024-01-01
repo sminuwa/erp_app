@@ -41,37 +41,50 @@
                                 <a href="javascript:history.back()" class="btn btn-primary btn-sm">
                                     <i class="fa fa-arrow-left"></i> Back
                                 </a>
-                                <a href="{{ route('proforma.index') }}" class="btn btn-secondary btn-sm ">
-                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> New Proforma
-                                </a>
-
-                                <a href="{{ route('proformer.print', $order->id) }}"
-                                   target="_BLANK" class="btn btn-dark btn-sm ">
-                                    <i class="fa fa-print" aria-hidden="true"></i> Print
-                                </a>
+                                @can('proforma.index')
+                                    <a href="{{ route('proforma.index') }}" class="btn btn-secondary btn-sm ">
+                                        <i class="fa fa-plus-circle" aria-hidden="true"></i> New Proforma
+                                    </a>
+                                @endcan
+                                @can('proformer.print')
+                                    <a href="{{ route('proformer.print', $order->id) }}" target="_BLANK"
+                                        class="btn btn-dark btn-sm ">
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                    </a>
+                                @endcan
                                 @if ($order->status == 0)
-                                    <a href="{{ route('order.invoice.edit', $order->id) }}"
-                                       class="btn btn-primary btn-sm ">
-                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                    </a>
-                                    <a href="{{ route('order.invoice.linking', $order->id) }}" title="Linking"
-                                       class="btn btn-success btn-sm ">
-                                        <i class="fa fa-link" aria-hidden="true"></i> Create Invoice
-                                    </a>
-                                    <form action="{{ route('order.invoice.close', $order->id) }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to close this order?')">
-                                        @csrf
-                                        <button type="submit"
-                                                class="btn btn-warning btn-sm">
-                                            <i class="fa fa-close" aria-hidden="true"></i> Close
-                                        </button>
-                                    </form>
-                                    <form action="{{ route('order.invoice.destroy', $order->id) }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this order?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-danger btn-sm" type="submit">
-                                            <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                        </button>
-                                    </form>
+                                    @can('order.invoice.edit')
+                                        <a href="{{ route('order.invoice.edit', $order->id) }}" class="btn btn-primary btn-sm ">
+                                            <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                        </a>
+                                    @endcan
+                                    @can('order.invoice.linking')
+                                        <a href="{{ route('order.invoice.linking', $order->id) }}" title="Linking"
+                                            class="btn btn-success btn-sm ">
+                                            <i class="fa fa-link" aria-hidden="true"></i> Create Invoice
+                                        </a>
+                                    @endcan
+                                    @can('order.invoice.close')
+                                        <form action="{{ route('order.invoice.close', $order->id) }}" method="post"
+                                            class="d-inline"
+                                            onsubmit="return confirm('Are you sure you want to close this order?')">
+                                            @csrf
+                                            <button type="submit" class="btn btn-warning btn-sm">
+                                                <i class="fa fa-close" aria-hidden="true"></i> Close
+                                            </button>
+                                        </form>
+                                    @endcan
+                                    @can('order.invoice.destroy')
+                                        <form action="{{ route('order.invoice.destroy', $order->id) }}" method="post"
+                                            class="d-inline"
+                                            onsubmit="return confirm('Are you sure you want to delete this order?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-danger btn-sm" type="submit">
+                                                <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                            </button>
+                                        </form>
+                                    @endcan
                                 @endif
 
                             </div>
@@ -118,43 +131,43 @@
                                 <div class="col-12 table-responsive">
                                     <table class="table table-bordered text-left">
                                         <thead>
-                                        <tr>
-                                            <th>S.N</th>
-                                            <th>Product Code</th>
-                                            <th>Product Name</th>
-                                            <th>UTM</th>
-                                            <th>Store Code</th>
-                                            <th>Quantity</th>
-                                            <th>Unit Cost</th>
-                                            <th>Subtotal</th>
-                                        </tr>
+                                            <tr>
+                                                <th>S.N</th>
+                                                <th>Product Code</th>
+                                                <th>Product Name</th>
+                                                <th>UTM</th>
+                                                <th>Store Code</th>
+                                                <th>Quantity</th>
+                                                <th>Unit Cost</th>
+                                                <th>Subtotal</th>
+                                            </tr>
                                         </thead>
                                         <tbody>
-                                        @php
-                                            $total = 0;
-                                            $total_discount = 0;
-                                        @endphp
-                                        @foreach ($order_details as $order_detail)
+                                            @php
+                                                $total = 0;
+                                                $total_discount = 0;
+                                            @endphp
+                                            @foreach ($order_details as $order_detail)
+                                                <tr>
+                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ $order_detail->storeProduct->product->code ?? '' }}</td>
+                                                    <td>{{ $order_detail->storeProduct->product->name ?? '' }}</td>
+                                                    <td>{{ $order_detail->storeProduct->product->unit ?? '' }}</td>
+                                                    <td>{{ $order_detail->storeProduct->store->code ?? '' }}</td>
+                                                    <td align="center">{{ $order_detail->quantity }}</td>
+                                                    <td align="right">{{ number_format($order_detail->sold_price, 2) }}
+                                                    </td>
+                                                    <td align="right">
+                                                        {{ number_format($order_detail->sold_price * $order_detail->quantity, 2) }}
+                                                    </td>
+                                                </tr>
+                                                @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
+                                            @endforeach
                                             <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $order_detail->storeProduct->product->code ?? "" }}</td>
-                                                <td>{{ $order_detail->storeProduct->product->name ?? "" }}</td>
-                                                <td>{{ $order_detail->storeProduct->product->unit ?? "" }}</td>
-                                                <td>{{ $order_detail->storeProduct->store->code ?? "" }}</td>
-                                                <td align="center">{{ $order_detail->quantity }}</td>
-                                                <td align="right">{{ number_format($order_detail->sold_price, 2) }}
-                                                </td>
-                                                <td align="right">
-                                                    {{ number_format($order_detail->sold_price * $order_detail->quantity, 2) }}
-                                                </td>
-                                            </tr>
-                                            @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
-                                        @endforeach
-                                        <tr>
-                                            <th colspan="7" align="right">Total</th>
-                                            <th style="text-align: right">{{ number_format($total, 2, '.', ',') }}</th>
+                                                <th colspan="7" align="right">Total</th>
+                                                <th style="text-align: right">{{ number_format($total, 2, '.', ',') }}</th>
 
-                                        </tr>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>

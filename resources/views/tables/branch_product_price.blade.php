@@ -36,13 +36,13 @@
                             Action
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            @can('set.product.price')
+                            @can('branch_product_prices.edit')
                                 <a class="dropdown-item"
                                     href="{{ route('branch_product_prices.edit', $record->id) }}">
                                     <span class="fa fa-pencil"> Edit</span>
                                 </a>
                             @endcan
-                            @can('delete.product.price')
+                            @can('branch_product_prices.destroy')
                                 <form onsubmit="return confirm('Are you sure you want to delete?')"
                                     action="{{ route('branch_product_prices.destroy', $record->id) }}" method="post"
                                     style="display: inline">

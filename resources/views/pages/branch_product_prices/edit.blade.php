@@ -29,12 +29,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.create') }}">
-                <span class="fa fa-plus-circle"></span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.index') }}">
-                <span class="fa fa-list"></span>
-            </a>
+            @can('branch_product_prices.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.create') }}">
+                    <span class="fa fa-plus-circle"></span>
+                </a>
+            @endcan
+            @can('branch_product_prices.index')
+                <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.index') }}">
+                    <span class="fa fa-list"></span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>
@@ -58,6 +62,4 @@
 @endsection
 
 @push('js')
-   
-    
 @endpush

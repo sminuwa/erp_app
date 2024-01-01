@@ -38,124 +38,146 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <a href="{{ route('payments.list') }}" class="btn btn-sm btn-secondary"
-                                        style="margin-left: 2px;"><span class="fa fa-list"> </span> List</a>
-                                    <a href="{{ route('create.payment') }}" class="btn btn-sm btn-secondary"
-                                        style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New
-                                        Payment</a>
+                                    @can('payments.list')
+                                        <a href="{{ route('payments.list') }}" class="btn btn-sm btn-secondary"
+                                            style="margin-left: 2px;"><span class="fa fa-list"> </span> List</a>
+                                    @endcan
+                                    @can('create.payment')
+                                        <a href="{{ route('create.payment') }}" class="btn btn-sm btn-secondary"
+                                            style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New
+                                            Payment</a>
+                                    @endcan
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <form action="{{ route('payment.search') }}" method="POST">
-                                        @csrf
-                                        <div class="input-group">
-                                            <input type="search" class="form-control rounded" required
-                                                placeholder="Search by Receipt number" name="refno" aria-label="Search"
-                                                aria-describedby="search-addon" />
-                                            <button type="submit" class="btn btn-outline-primary">search</button>
-                                        </div>
-                                    </form>
+                                    @can('payments.search')
+                                        <form action="{{ route('payment.search') }}" method="POST">
+                                            @csrf
+                                            <div class="input-group">
+                                                <input type="search" class="form-control rounded" required
+                                                    placeholder="Search by Receipt number" name="refno" aria-label="Search"
+                                                    aria-describedby="search-addon" />
+                                                <button type="submit" class="btn btn-outline-primary">search</button>
+                                            </div>
+                                        </form>
+                                    @endcan
                                 </div>
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body table-responsive">
                                 <table id="example1"
-                                       class="table table-bordered table-striped text-left table-responsive-xl">
+                                    class="table table-bordered table-striped text-left table-responsive-xl">
                                     <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Payment No</th>
-                                        <th>Payee</th>
-                                        <th>Account</th>
-                                        <th>Amount</th>
-                                        <th>Description</th>
-                                        <th>Created By</th>
-                                        <th>Actions</th>
-                                    </tr>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Payment No</th>
+                                            <th>Payee</th>
+                                            <th>Account</th>
+                                            <th>Amount</th>
+                                            <th>Description</th>
+                                            <th>Created By</th>
+                                            <th>Actions</th>
+                                        </tr>
                                     </thead>
                                     <tfoot>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Payment No</th>
-                                        <th>Payee</th>
-                                        <th>Account</th>
-                                        <th>Amount</th>
-                                        <th>Description</th>
-                                        <th>Created By</th>
-                                        <th>Actions</th>
-                                    </tr>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Payment No</th>
+                                            <th>Payee</th>
+                                            <th>Account</th>
+                                            <th>Amount</th>
+                                            <th>Description</th>
+                                            <th>Created By</th>
+                                            <th>Actions</th>
+                                        </tr>
                                     </tfoot>
                                     <tbody>
-                                    @foreach ($payments as $payment)
-                                        <tr class="@if($payment->status == 0) bg-warning @endif">
+                                        @foreach ($payments as $payment)
+                                            <tr class="@if ($payment->status == 0) bg-warning @endif">
 
-                                            <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
-                                            </td>
-                                            <td>{{ $payment->receipt_no }}</td>
-                                            <td>
-                                                {{--@if ($payment->model_name == 'Customer')
+                                                <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
+                                                </td>
+                                                <td>{{ $payment->receipt_no }}</td>
+                                                <td>
+                                                    {{-- @if ($payment->model_name == 'Customer')
                                                     {{ optional($payment->customer)->code ?? '' }}-{{ optional($payment->customer)->name ?? '' }}
                                                 @elseif($payment->model_name == 'Supplier')
                                                     {{ optional($payment->supplier)->name ?? '' }}{{ optional($payment->supplier)->name ?? '' }}
-                                                @endif--}}
-                                                {{
-                                                    $payment->payer()->code ? $payment->payer()->code.' - '.$payment->payer()->name : ($payment->payer()->number.' - '.$payment->payer()->description)
-                                                }}
-                                            </td>
-                                            <td>
-                                                {{
-                                                    $payment->account()->code ? $payment->account()->code.' - '.$payment->account()->name : ($payment->account()->number.' - '.$payment->account()->description)
-                                                }}
-                                            </td>
+                                                @endif --}}
+                                                    {{ $payment->payer()->code ? $payment->payer()->code . ' - ' . $payment->payer()->name : $payment->payer()->number . ' - ' . $payment->payer()->description }}
+                                                </td>
+                                                <td>
+                                                    {{ $payment->account()->code ? $payment->account()->code . ' - ' . $payment->account()->name : $payment->account()->number . ' - ' . $payment->account()->description }}
+                                                </td>
 
-                                            <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
-                                            <td>{{ $payment->description }}</td>
-                                            <td>{{ optional($payment->createdBy)->name }}</td>
-                                            <td align="center">
-                                                <div class="dropdown">
-                                                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                        Action
-                                                    </button>
-                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                        @if($payment->status == 0)
-                                                            <form action="{{ route('payment.post', $payment->id) }}" method="post" onsubmit="return confirm('Are you sure you want post this transaction?')">
-                                                                @csrf
-                                                                <button type="submit" class="dropdown-item">
-                                                                    <i class="fa fa-check" aria-hidden="true"></i> Post
-                                                                </button>
-                                                            </form>
-                                                            <a href="{{ route('create.payment', ['payment_id'=>$payment->id]) }}"
-                                                               class="dropdown-item">
-                                                                <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                                            </a>
-                                                            <form action="{{ route('payment.delete', $payment->id) }}" method="post" onsubmit="return confirm('Are you sure you want delete this transaction?')">
-                                                                @csrf
-                                                                <button type="submit" class="dropdown-item">
-                                                                    <i class="fa fa-check" aria-hidden="true"></i> Delete
-                                                                </button>
-                                                            </form>
-                                                        @else
-                                                            <a href="{{ route('payment.print', $payment->id) }}" target="_blank"
-                                                               class="dropdown-item">
-                                                                <i class="fa fa-print" aria-hidden="true"></i> Print
-                                                            </a>
-                                                            <a href="{{ route('payment.print.pos', $payment->id) }}" target="_blank"
-                                                               class="dropdown-item">
-                                                                <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
-                                                            </a>
-                                                            <a href="{{ route('payment.reverse',[$payment->id]) }}"
-                                                               onclick="return confirm('Are you sure you want reverse this transaction?')"
-                                                               class="dropdown-item">
-                                                                <i class="fa fa-reply" aria-hidden="true"></i> Reverse
-                                                            </a>
-                                                        @endif
+                                                <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
+                                                <td>{{ $payment->description }}</td>
+                                                <td>{{ optional($payment->createdBy)->name }}</td>
+                                                <td align="center">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-default dropdown-toggle" type="button"
+                                                            id="dropdownMenuButton" data-toggle="dropdown"
+                                                            aria-haspopup="true" aria-expanded="false">
+                                                            Action
+                                                        </button>
+                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                            @if ($payment->status == 0)
+                                                                @can('payment.post')
+                                                                    <form action="{{ route('payment.post', $payment->id) }}"
+                                                                        method="post"
+                                                                        onsubmit="return confirm('Are you sure you want post this transaction?')">
+                                                                        @csrf
+                                                                        <button type="submit" class="dropdown-item">
+                                                                            <i class="fa fa-check" aria-hidden="true"></i> Post
+                                                                        </button>
+                                                                    </form>
+                                                                @endcan
+                                                                @can('create.payment')
+                                                                    <a href="{{ route('create.payment', ['payment_id' => $payment->id]) }}"
+                                                                        class="dropdown-item">
+                                                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                                                    </a>
+                                                                @endcan
+                                                                @can('payment.delete')
+                                                                    <form action="{{ route('payment.delete', $payment->id) }}"
+                                                                        method="post"
+                                                                        onsubmit="return confirm('Are you sure you want delete this transaction?')">
+                                                                        @csrf
+                                                                        <button type="submit" class="dropdown-item">
+                                                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                                                            Delete
+                                                                        </button>
+                                                                    </form>
+                                                                @endcan
+                                                            @else
+                                                                @can('payment.print')
+                                                                    <a href="{{ route('payment.print', $payment->id) }}"
+                                                                        target="_blank" class="dropdown-item">
+                                                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                    </a>
+                                                                @endcan
+                                                                @can('payment.print.pos')
+                                                                    <a href="{{ route('payment.print.pos', $payment->id) }}"
+                                                                        target="_blank" class="dropdown-item">
+                                                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                        (PoS)
+                                                                    </a>
+                                                                @endcan
+                                                                @can('payment.reverse')
+                                                                    <a href="{{ route('payment.reverse', [$payment->id]) }}"
+                                                                        onclick="return confirm('Are you sure you want reverse this transaction?')"
+                                                                        class="dropdown-item">
+                                                                        <i class="fa fa-reply" aria-hidden="true"></i> Reverse
+                                                                    </a>
+                                                                @endcan
+                                                            @endif
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                            </td>
-                                        </tr>
-                                    @endforeach
+                                                </td>
+                                            </tr>
+                                        @endforeach
                                     </tbody>
 
                                 </table>

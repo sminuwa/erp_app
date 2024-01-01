@@ -27,6 +27,7 @@ class ProductUnitMeasureController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('product_unit_measures.index');
         return view('pages.product_unit_measures.index', ['records' => ProductUnitMeasure::orderBy('value')->get()]);
     } /**
       * Display the specified resource.

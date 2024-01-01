@@ -5,7 +5,7 @@ namespace App\Http\Requests\Stores;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Store;
 
-class StoreRequest extends FormRequest 
+class StoreRequest extends FormRequest
 {
 
     /**
@@ -13,9 +13,9 @@ class StoreRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('create.store', Store::class);
+        return $this->user()->can('stores.create', Store::class);
     }
 
     /**
@@ -23,7 +23,7 @@ class StoreRequest extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 			'name' => 'required|max:191',
@@ -41,7 +41,7 @@ class StoreRequest extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

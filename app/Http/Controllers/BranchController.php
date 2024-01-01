@@ -140,10 +140,12 @@ class BranchController extends Controller
     }
     public function importForm()
     {
+        $this->authorize('branches.import.form');
         return view('pages.branches.import');
     }
     public function import(Request $request)
     {
+        $this->authorize('branches.import');
         $request->validate([
             'file' => 'required|file|mimes:xlsx',
         ]);

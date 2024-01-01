@@ -5,7 +5,7 @@ namespace App\Http\Requests\Roles;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Role;
 
-class Destroy extends FormRequest 
+class Destroy extends FormRequest
 {
 
     /**
@@ -13,9 +13,9 @@ class Destroy extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('delete.role', Role::class);
+        return $this->user()->can('roles.destroy', Role::class);
     }
 
     /**
@@ -23,7 +23,7 @@ class Destroy extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 
@@ -38,7 +38,7 @@ class Destroy extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

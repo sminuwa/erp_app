@@ -5,7 +5,7 @@ namespace App\Http\Requests\BranchProductPrices;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\BranchProductPrice;
 
-class StoreRequest extends FormRequest 
+class StoreRequest extends FormRequest
 {
 
     /**
@@ -13,9 +13,9 @@ class StoreRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('set.product.price', BranchProductPrice::class);
+        return $this->user()->can('branch_product_prices.create', BranchProductPrice::class);
     }
 
     /**
@@ -23,7 +23,7 @@ class StoreRequest extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 			'branch_id' => 'required|exists:branches,id',
@@ -43,7 +43,7 @@ class StoreRequest extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

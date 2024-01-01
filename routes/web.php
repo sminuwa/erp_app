@@ -259,6 +259,7 @@ Route::middleware('auth')->group(function () {
 
     });
 
+//completed authorization
     Route::group(['prefix' => 'expenses'], function () {
         Route::group(
             ['prefix' => 'items'],

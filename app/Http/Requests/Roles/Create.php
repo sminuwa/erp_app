@@ -13,10 +13,10 @@ class Create extends FormRequest
      *
      * @return bool
      */
-    /*public function authorize()
+    public function authorize()
     {
         return $this->user()->can('roles.create', Role::class);
-    }*/
+    }
 
     /**
      * Get the validation rules that apply to the request.

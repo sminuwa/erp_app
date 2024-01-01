@@ -48,7 +48,6 @@ class StockAdjustmentController extends Controller
 
     public function show(Show $request, StockAdjustment $stockAdjustment)
     {
-        auth()->user()->can('stock_adjustments.index');
         return view('pages.inventories.stock_adjustments.show', [
             'record' => $stockAdjustment,
         ]);
@@ -57,7 +56,6 @@ class StockAdjustmentController extends Controller
 
     public function create(Create $request)
     {
-
         $products = Product::select('products.id', 'products.name','code')
             ->join('store_products', 'store_products.product_id', 'products.id')
             ->orderBy('code','asc')
@@ -72,7 +70,7 @@ class StockAdjustmentController extends Controller
 
     public function store(Request $request)
     {
-
+        $this->authorize('stock_adjustments.create');
         $user = auth()->user();
         $branch = $user->branch;
         $stock_adjustment_id = $request->stock_adjustment_id;
@@ -128,6 +126,7 @@ class StockAdjustmentController extends Controller
 
     public function edit(Request $request, StockAdjustment $stockAdjustment)
     {
+        $this->authorize('stock_adjustments.edit');
         $products = Product::select('products.id', 'products.name','code')
             ->join('store_products', 'store_products.product_id', 'products.id')
             ->orderBy('code','asc')

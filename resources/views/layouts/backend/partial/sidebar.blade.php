@@ -43,6 +43,7 @@
                         </p>
                     </a>
                 </li>
+                @can('menu.accounting')
                 <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
                         <i class="ion-android-list"></i>
@@ -78,43 +79,51 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
+                @endcan
+                @can('menu.sale')
+                <li class="nav-item has-treeview {{ Request::is('sales/*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ Request::is('sales/*') ? 'active' : '' }}">
                         <i class="ion-android-list"></i>
                         <p>
                             Sales
                             <i class="right fa fa-angle-left"></i>
                         </p>
                     </a>
+
                     <ul class="nav nav-treeview">
+
                         <li class="nav-item">
                             <a href="{{ route('order.invoice.list') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Orders</p>
                             </a>
                         </li>
-                        @can('make.daily.sale')
-                            <li class="nav-item">
-                                <a href="{{ route('invoice.index') }}" class="nav-link ">
-                                    <i class="ion-card"></i>
-                                    <p>Invoice (POS)</p>
-                                </a>
-                            </li>
-                        @endcan
+
+                        <li class="nav-item">
+                            <a href="{{ route('invoice.index') }}" class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>Invoice (POS)</p>
+                            </a>
+                        </li>
+
                         <li class="nav-item">
                             <a href="{{ route('proformer.list') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Proforma Invoice</p>
                             </a>
                         </li>
+
                         <li class="nav-item">
                             <a href="{{ route('customers.credit.note') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Credit Note</p>
                             </a>
                         </li>
+
                     </ul>
                 </li>
+                @endcan
+                @can('menu.purchase')
                 <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
                         <i class="ion-android-list"></i>
@@ -174,7 +183,7 @@
 
                     </ul>
                 </li>
-
+                @endcan
 
                 @can('menu.setting')
                     <li class="nav-item has-treeview {{ Request::is('settings/*') ? 'menu-open' : '' }}">
@@ -254,12 +263,12 @@
                                     </a>
                                 </li>
                                 <!--                                <li class="nav-item">
-                                                    <a href="{{ route('product_expire_settings.index') }}"
-                                                        class="nav-link {{ Request::is('settings/products/manage/expiration*') ? 'active' : '' }}">
-                                                        <i class="ion-ios-cart-outline"></i>
-                                                        <p>Product Expire Settings</p>
-                                                    </a>
-                                                </li>-->
+                                                                                                                    <a href="{{ route('product_expire_settings.index') }}"
+                                                                                                                        class="nav-link {{ Request::is('settings/products/manage/expiration*') ? 'active' : '' }}">
+                                                                                                                        <i class="ion-ios-cart-outline"></i>
+                                                                                                                        <p>Product Expire Settings</p>
+                                                                                                                    </a>
+                                                                                                                </li>-->
                             @endcan
 
                             {{-- @can('view.bank')
@@ -330,7 +339,7 @@
                         </ul>
                     </li>
                 @endcan
-                @can('view.report')
+                @can('menu.report')
                     <li class="nav-item has-treeview {{ Request::is('reports/*') ? 'menu-open' : '' }}">
                         <a href="#" class="nav-link {{ Request::is('reports/*') ? 'active' : '' }}">
                             <i class="ion-ios-timer-outline"></i>
@@ -340,7 +349,7 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                            @can('stock.control.report')
+                            @can('submenu.stock.control')
                                 <li class="nav-item has-treeview {{ Request::is('reports/sc/stock*') ? 'menu-open' : '' }}">
                                     <a href="#"
                                         class="nav-link {{ Request::is('reports/sc/stock*') ? 'active' : '' }}">
@@ -403,7 +412,7 @@
                                     </ul>
                                 </li>
                             @endcan
-                            @can('sale.cash.analysis.report')
+                            @can('submenu.sale.report')
                                 <li class="nav-item has-treeview {{ Request::is('reports/sa/sales*') ? 'menu-open' : '' }}">
                                     <a href="#"
                                         class="nav-link {{ Request::is('reports/sa/sales*') ? 'active' : '' }}">
@@ -509,7 +518,7 @@
                                     </ul>
                                 </li>
                             @endcan
-                            @can('customer.ledger.analysis.report')
+                            @can('submenu.customer.report')
                                 <li
                                     class="nav-item has-treeview {{ Request::is('reports/ca/customer*') ? 'menu-open' : '' }}">
                                     <a href="#"
@@ -561,9 +570,9 @@
                                 </li>
                             @endcan
 
-                            @can('purchase.analysis.report')
+                            @can('submenu.inventory.report')
                                 <li
-                                    class="nav-item has-treeview {{ Request::is('reports/pa/supplier*') ? 'menu-open' : '' }}">
+                                    class="nav-item has-treeview {{ Request::is('reports/inventory*') ? 'menu-open' : '' }}">
                                     <a href="#" class="nav-link {{ Request::is('reports/pa/*') ? 'active' : '' }}">
                                         <i class="ion-ios-time"></i>
                                         <p>
@@ -574,78 +583,72 @@
                                     <ul class="nav nav-treeview">
                                         <li class="nav-item">
                                             <a href="javascript:void(0)"
-                                                class="nav-link {{ Request::is('reports/pa/purchase/transaction/check*') ? 'active' : '' }}">
+                                                class="nav-link {{ Request::is('reports/inventory/check*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Inventory Valuation</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="javascript:void(0)"
-                                                class="nav-link {{ Request::is('reports/pa/purchase/transaction/check*') ? 'active' : '' }}">
+                                                class="nav-link {{ Request::is('reports/inventory/check*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Average Cost Movement</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="javascript:void(0)"
-                                                class="nav-link {{ Request::is('reports/pa/purchase/transaction/check*') ? 'active' : '' }}">
+                                                class="nav-link {{ Request::is('reports/inventory/check*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Expiry Date Tracking</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="javascript:void(0)"
-                                                class="nav-link {{ Request::is('reports/pa/purchase/transaction/check*') ? 'active' : '' }}">
+                                            <a href="{{route('goods.in.transit.report')}}"
+                                                class="nav-link {{ Request::is('reports/inventory/goods/in-transit*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Goods in Transit</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="javascript:void(0)"
-                                                class="nav-link {{ Request::is('reports/pa/purchase/transaction/check*') ? 'active' : '' }}">
+                                            <a href="{{ route('purchase.request.report') }}"
+                                                class="nav-link {{ Request::is('reports/inventory/request*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Purchase Requests</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="{{ route('purchase.invoice.report') }}"
-                                                class="nav-link {{ Request::is('reports/pa/supplier/transaction*') ? 'active' : '' }}">
+                                                class="nav-link {{ Request::is('reports/inventory/invoice*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Purchase Invoices</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="{{route('purchase.invoice.lines.report')}}"
-                                                class="nav-link {{ Request::is('reports/pa/purchase/transaction/check*') ? 'active' : '' }}">
+                                            <a href="{{ route('purchase.invoice.lines.report') }}"
+                                                class="nav-link {{ Request::is('reports/inventory/invoice/lines*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Purchase Invoices Lines</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="javascript:void(0)"
-                                                class="nav-link {{ Request::is('reports/pa/purchase/transaction/check*') ? 'active' : '' }}">
+                                                class="nav-link {{ Request::is('reports/inventory/check*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Return & Debit</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="javascript:void(0)"
-                                                class="nav-link {{ Request::is('reports/pa/total/purchases/item*') ? 'active' : '' }}">
+                                            <a href="{{route('additional.invoice.report')}}"
+                                                class="nav-link {{ Request::is('reports/inventory/additional/invoice*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Additional Invoices</p>
                                             </a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a href="javascript:void(0)"
-                                                class="nav-link {{ Request::is('reports/pa/total/purchases/item*') ? 'active' : '' }}">
-                                                <i class="ion-cash"></i>
-                                                <p>Debit Notes</p>
-                                            </a>
-                                        </li>
+
                                     </ul>
                                 </li>
                             @endcan
-                            @can('user.ledger.and.loan')
+                            @can('submenu.user.ledger.and.loan')
                                 <li class="nav-item has-treeview {{ Request::is('reports/us/user*') ? 'menu-open' : '' }}">
                                     <a href="#" class="nav-link {{ Request::is('reports/us/*') ? 'active' : '' }}">
                                         <i class="ion-ios-time"></i>
@@ -679,7 +682,7 @@
                                     </ul>
                                 </li>
                             @endcan
-                            @can('user.ledger.and.loan')
+                            @can('submenu.accounting.report')
                                 <li class="nav-item has-treeview {{ Request::is('reports/ap_ar*') ? 'menu-open' : '' }}">
                                     <a href="#" class="nav-link {{ Request::is('reports/ap_ar*') ? 'active' : '' }}">
                                         <i class="ion-ios-time"></i>

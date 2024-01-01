@@ -38,6 +38,7 @@ class StockAdjustmentController extends Controller
 
     public function index(Index $request)
     {
+        auth()->user()->can('stock_adjustments.index');
         \Cart::clear();
         $user = auth()->user();
         $branch = $user->branch;
@@ -47,6 +48,7 @@ class StockAdjustmentController extends Controller
 
     public function show(Show $request, StockAdjustment $stockAdjustment)
     {
+        auth()->user()->can('stock_adjustments.index');
         return view('pages.inventories.stock_adjustments.show', [
             'record' => $stockAdjustment,
         ]);

@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Purchase Invoice Lines - {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Additional Invoice Report - {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -40,7 +40,7 @@
                             <h3 style="text-align: center;">
                                 {{ $branch->name ?? 'All Branches' }}
                             </h3>
-                            <h5 style="text-align: center;">Purchase Invoice Lines Report
+                            <h5 style="text-align: center;">Additional Invoices Report
                                 From
                                 {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                                 AND
@@ -59,13 +59,12 @@
                                     <tr>
                                         <th>DATE</th>
                                         <th>INVOICE</th>
-                                        <th>ITEM</th>
-                                        <th>ITEM PRICE</th>
-                                        <th>QTY</th>
-                                        <th>TOTAL COST</th>
-                                        <th>STORE</th>
+                                        <th>NAME</th>
+                                        <th>DESCRIPTION</th>
                                         <th>WAYBILL</th>
                                         <th>SUPP NAME</th>
+                                        <th>AMOUNT</th>
+                                        <th>STATUS</th>
                                     </tr>
                                 </thead>
                                 @php
@@ -75,28 +74,27 @@
                                     <tr>
                                         <td>{{ \Carbon\Carbon::parse($sale->purchase_date)->toFormattedDateString() }}</td>
                                         <td>{{ $sale->reference }}</td>
-                                        <td>{{ $sale->product }}</td>
-                                        <td>{{ $sale->unit_price }}</td>
-                                        <td>{{ $sale->quantity }}</td>
-                                        <td style="text-align: right">
-                                            &#8358;{{ number_format($sale->unit_price * $sale->quantity, 2, '.', ',') }}</td>
-                                        <td>{{ $sale->store }}</td>
+                                        <td>{{ $sale->name }}</td>
+                                        <td>{{ $sale->description }}</td>
                                         <td>{{ $sale->wbno }}</td>
                                         <td>{{ $sale->supplier }}</td>
+                                        <td style="text-align: right">
+                                            {{ number_format($sale->amount, 2, '.', ',') }}</td>
+                                        <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
+                            
+                            
                             
                                     </tr>
                                     @php
-                                        $total_cost += $sale->unit_price * $sale->quantity;
+                                        $total_cost += $sale->amount;
                                     @endphp
                                 @endforeach
                                 <tfoot>
                                     <tr>
-                                        <th colspan="5" style="text-align: right">TOTAL</th>
+                                        <th colspan="6" style="text-align: right">TOTAL</th>
                                         <th style="text-align: right">
                                             &#8358;{{ number_format($total_cost, 2, '.', ',') }}
                                         </th>
-                                        <th></th>
-                                        <th></th>
                                         <th></th>
                                     </tr>
                                 </tfoot>

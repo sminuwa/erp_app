@@ -81,27 +81,27 @@
                 <a href="{{ route('profile') }}" class="dropdown-item">
                     <i class="ion-ios-person-outline"></i> Profile
                 </a>
-                @can('view.user')
+                @can('users.index')
                     <a href="{{ route('users.index') }}" class="dropdown-item">
                         <i class="ion-ios-personadd"></i> Manage Users
                     </a>
                 @endcan
-                @can('send.notification')
+                @can('notification')
                     <a href="{{ route('notification') }}" class="dropdown-item">
                         <i class=""></i> Notification
                     </a>
                 @endcan
-                @can('view.role')
+                @can('roles.index')
                     <a href="{{ route('roles.index') }}" class="dropdown-item">
                         <i class="ion-ios-locked-outline"></i> Roles
                     </a>
                 @endcan
-                @can('view.permission')
+                @can('permissions.index')
                     <a href="{{ route('permissions.index') }}" class="dropdown-item">
                         <i class="ion-ios-locked-outline"></i> Permissions
                     </a>
                 @endcan
-                @can('assign.permission.to.role')
+                @can('role-permission')
                     <div class="dropdown-divider"></div>
                     <a href="{{ route('role-permission') }}" class="dropdown-item">
                         <i class="ion-ios-sunny"></i> Role Permission

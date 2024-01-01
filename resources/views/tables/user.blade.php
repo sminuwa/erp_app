@@ -29,22 +29,22 @@
                             Action
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            @can('assign.user.role')
+                            @can('users.show')
                                 <a class="dropdown-item" href="{{ route('users.show', $record->id) }}">
                                     <span class="fa fa-eye"> View</span>
                                 </a>
                             @endcan
-                            @can('view.user.activity.log')
+                            @can('users.logs')
                                 <a class="dropdown-item" href="{{ route('users.logs', $record->id) }}">
                                     <span class="fa fa-adjust"> Logs</span>
                                 </a>
                             @endcan
-                            @can('edit.user')
+                            @can('users.edit')
                                 <a class="dropdown-item" href="{{ route('users.edit', $record->id) }}">
                                     <span class="fa fa-pencil"> Edit</span>
                                 </a>
                             @endcan
-                            @can('delete.user')
+                            @can('users.destroy')
                                 <form onsubmit="return confirm('Are you sure you want to delete?')"
                                     action="{{ route('users.destroy', $record->id) }}" method="post"
                                     style="display: inline">

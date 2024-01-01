@@ -5,7 +5,7 @@ namespace App\Http\Requests\Roles;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Role;
 
-class Create extends FormRequest 
+class Create extends FormRequest
 {
 
     /**
@@ -13,17 +13,17 @@ class Create extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    /*public function authorize()
     {
-        return $this->user()->can('create.role', Role::class);
-    }
+        return $this->user()->can('roles.create', Role::class);
+    }*/
 
     /**
      * Get the validation rules that apply to the request.
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 
@@ -38,7 +38,7 @@ class Create extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

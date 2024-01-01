@@ -145,10 +145,12 @@ class StoreController extends Controller
     }
     public function importForm()
     {
+        $this->authorize('stores.import.form');
         return view('pages.stores.import');
     }
     public function import(Request $request)
     {
+        $this->authorize('stores.import');
         $request->validate([
             'file' => 'required|file|mimes:xlsx',
         ]);

@@ -147,10 +147,12 @@ class CategoryController extends Controller
     }
     public function importForm()
     {
+        $this->authorize('categories.import.form');
         return view('pages.categories.import');
     }
     public function import(Request $request)
     {
+        $this->authorize('categories.import');
         $request->validate([
             'file' => 'required|file|mimes:xlsx',
         ]);

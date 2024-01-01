@@ -5,7 +5,7 @@ namespace App\Http\Requests\Roles;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Role;
 
-class Update extends FormRequest 
+class Update extends FormRequest
 {
 
     /**
@@ -13,9 +13,9 @@ class Update extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('edit.role', Role::class);
+        return $this->user()->can('roles.edit', Role::class);
     }
 
     /**
@@ -23,7 +23,7 @@ class Update extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 			'name' => 'required|max:255',
@@ -38,7 +38,7 @@ class Update extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

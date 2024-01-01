@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Users;
+namespace App\Http\Requests\BankAccounts;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\User;
+use App\Models\BankAccount;
 
-class Create extends FormRequest
+class Index extends FormRequest
 {
 
     /**
@@ -15,7 +15,7 @@ class Create extends FormRequest
      */
     public function authorize()
     {
-        return $this->user()->can('users.create', User::class);
+        return $this->user()->can('bank_accounts.index', BankAccount::class);
     }
 
     /**

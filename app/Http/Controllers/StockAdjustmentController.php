@@ -38,6 +38,7 @@ class StockAdjustmentController extends Controller
 
     public function index(Index $request)
     {
+        $this->authorize('stock_adjustments.index');
         \Cart::clear();
         $user = auth()->user();
         $branch = $user->branch;
@@ -55,7 +56,6 @@ class StockAdjustmentController extends Controller
 
     public function create(Create $request)
     {
-
         $products = Product::select('products.id', 'products.name','code')
             ->join('store_products', 'store_products.product_id', 'products.id')
             ->orderBy('code','asc')
@@ -70,7 +70,7 @@ class StockAdjustmentController extends Controller
 
     public function store(Request $request)
     {
-
+        $this->authorize('stock_adjustments.create') ;
         $user = auth()->user();
         $branch = $user->branch;
         $stock_adjustment_id = $request->stock_adjustment_id;
@@ -126,6 +126,7 @@ class StockAdjustmentController extends Controller
 
     public function edit(Request $request, StockAdjustment $stockAdjustment)
     {
+        $this->authorize('stock_adjustments.edit');
         $products = Product::select('products.id', 'products.name','code')
             ->join('store_products', 'store_products.product_id', 'products.id')
             ->orderBy('code','asc')
@@ -160,6 +161,7 @@ class StockAdjustmentController extends Controller
     }
 
     public function post(Request $request, StockAdjustment $stockAdjustment){
+        $this->authorize('stock_adjustments.post');
         $method = $request->method();
         if($method == 'POST'){
             $stockAdjustment->status = 1;
@@ -215,11 +217,13 @@ class StockAdjustmentController extends Controller
 
     public function print(StockAdjustment $stockAdjustment)
     {
+        $this->authorize('stock_adjustments.print');
         $record = $stockAdjustment;
         return view('pages.inventories.stock_adjustments.print', compact('record'));
     }
 
     public function delete(Request $request, StockAdjustment $stockAdjustment){
+        $this->authorize('stock_adjustments.delete');
         $method = $request->method();
         $stock_adjustment_id = $stockAdjustment->id;
         if($method == 'POST'){

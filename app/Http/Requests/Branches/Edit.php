@@ -5,7 +5,7 @@ namespace App\Http\Requests\Branches;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Branch;
 
-class Edit extends FormRequest 
+class Edit extends FormRequest
 {
 
     /**
@@ -13,9 +13,9 @@ class Edit extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('edit.office.branch', Branch::class);
+        return $this->user()->can('branches.edit', Branch::class);
     }
 
     /**
@@ -23,7 +23,7 @@ class Edit extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 
@@ -38,7 +38,7 @@ class Edit extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

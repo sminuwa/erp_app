@@ -153,6 +153,7 @@ class ProductController extends Controller
 
     public function purchasePrice(Request $request)
     {
+        $this->authorize('products.purchase_prices');
         $method = $request->method();
         switch ($method) {
             case 'GET':
@@ -176,10 +177,12 @@ class ProductController extends Controller
     }
     public function importForm()
     {
+        $this->authorize('products.import.form');
         return view('pages.products.import');
     }
     public function import(Request $request)
     {
+        $this->authorize('products.import');
         $request->validate([
             'file' => 'required|file|mimes:xlsx',
         ]);

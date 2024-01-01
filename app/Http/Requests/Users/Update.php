@@ -16,7 +16,7 @@ class Update extends FormRequest
      */
     public function authorize()
     {
-        return $this->user()->can('edit.user', User::class);
+        return $this->user()->can('users.edit', User::class);
     }
 
     /**

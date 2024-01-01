@@ -55,7 +55,7 @@ class RoleController extends Controller
     public function create(Create $request)
     {
 
-        $this->authorize('rroles.create');
+        $this->authorize('roles.create');
         return view('pages.roles.create', [
             'model' => new Role,
 

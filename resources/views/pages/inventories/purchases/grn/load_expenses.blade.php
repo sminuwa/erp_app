@@ -19,16 +19,17 @@
                 <td style="text-align: right;"> {{ number_format($expense->amount, 2) }}</td>
                 <td style="text-align: right;">
                     @if ($expense->status == 0)
-                        <button class="btn btn-danger btn-sm" type="button"
-                            onclick="deleteItem({{ $expense->id }})">
+                        <button class="btn btn-danger btn-sm" type="button" onclick="deleteItem({{ $expense->id }})">
                             <i class="fa fa-trash" aria-hidden="true"></i>
                         </button>
-                        <form id="delete-form-{{ $expense->id }}"
-                            action="{{ route('delete.purchase.expense', $expense->id) }}"
-                            method="post" style="display:none;">
-                            @csrf
-                            @method('DELETE')
-                        </form>
+                        @can('delete.purchase.expense')
+                            <form id="delete-form-{{ $expense->id }}"
+                                action="{{ route('delete.purchase.expense', $expense->id) }}" method="post"
+                                style="display:none;">
+                                @csrf
+                                @method('DELETE')
+                            </form>
+                        @endcan
                     @endif
                 </td>
             </tr>

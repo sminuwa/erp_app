@@ -29,8 +29,10 @@
         <!-- Main content -->
         <section class="content">
             <div class="container">
-                <a href="{{ route('order.invoice.list') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                        class="fa fa-list"> </span> Order List</a>
+                @can('order.invoice.list')
+                    <a href="{{ route('order.invoice.list') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
+                            class="fa fa-list"> </span> Order List</a>
+                @endcan
                 <div class="row">
                     <!-- left column -->
                     <div class="col-md-12">
@@ -70,7 +72,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <input type="hidden" class="form-control" name="customer_id"
-                                            id="customer_val_id" value="">
+                                                id="customer_val_id" value="">
                                             <div class="form-group">
                                                 <label>Customer</label>
                                                 <div class="form-group">
@@ -95,8 +97,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
-                                                    <textarea class="form-control" name="description"
-                                                        placeholder="Description" id="description" ></textarea>
+                                                    <textarea class="form-control" name="description" placeholder="Description" id="description"></textarea>
                                                 </div>
                                                 <button type="submit" id="create_invoice"
                                                     class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button>
@@ -113,15 +114,17 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">Products</h3>
-                                @can('make.daily.sale')
+                                @can('order.invoice.create')
                                     <input type="text" id="barcode" class="form-control" name="barcode"
                                         placeholder="Scan barcode">
                                 @endcannot
-                                <div class="float-right">
-                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
-                                        class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
-                                            class="fa fa-plus"></i> Add Product </a>
-                                </div>
+                                @can('order.invoice.create')
+                                    <div class="float-right">
+                                        <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
+                                            class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
+                                                class="fa fa-plus"></i> Add Product </a>
+                                    </div>
+                                @endcan
                             </div>
                             <!-- /.card-header -->
 
@@ -245,9 +248,9 @@
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script>
         /*$('.cart-container').addClass('d-none')
-                        $('select[name=account_type]').change( () => {
-                            $('.cart-container').removeClass('d-none')
-                        })*/
+                                                                            $('select[name=account_type]').change( () => {
+                                                                                $('.cart-container').removeClass('d-none')
+                                                                            })*/
         $(function() {
             $("#example1").DataTable({
                 'iDisplayLength': 100

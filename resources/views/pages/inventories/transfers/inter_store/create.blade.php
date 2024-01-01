@@ -19,7 +19,6 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
                             <li class="breadcrumb-item active">Stock Transfer</li>
                         </ol>
                     </div>
@@ -39,22 +38,22 @@
                             <div class="card-header">
                                 <i class="ion-android-cart"></i> Transfer Product Cart
                                 <div class="float-right">
-                                    <a href="javascript:void(0)" data-toggle="modal"
-                                       data-target="#add_product_form"
-                                       class="btn btn-sm btn-secondary float-md-right"
-                                       style="margin-left: 2px;"><i class="fa fa-plus"></i> Add Product </a>
+                                    @can('ajax.cart.add')
+                                        <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
+                                            class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
+                                                class="fa fa-plus"></i> Add Product </a>
+                                    @endcan
                                 </div>
                             </div>
                             <div class="card-body">
                                 <form action="{{ isset($route) ? $route : route('interstore.store') }}" method="POST">
-                                <div class="form-group">
-                                    <label for="date">Date</label>
-                                    <input type="text" name="date" class="form-control datepicker"
-                                           value="{{ isset($model->date) ? $model->date : old('date', date('Y-m-d')) }}" />
-                                </div>
+                                    <div class="form-group">
+                                        <label for="date">Date</label>
+                                        <input type="text" name="date" class="form-control datepicker"
+                                            value="{{ isset($model->date) ? $model->date : old('date', date('Y-m-d')) }}" />
+                                    </div>
                                     {{ csrf_field() }}
-                                    <input type="hidden" name="_method"
-                                        value="{{ isset($method) ? $method : 'POST' }}" />
+                                    <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
 
                                     @if (isset($model) && $model->status != null)
                                         <div class="form-check">
@@ -81,7 +80,10 @@
                                             value="{{ Auth::id() }}" required="required">
                                     </div>
                                     <div class="form-group text-right ">
-                                        <button type="submit" class="btn btn-success"><span class="ion-forward">Transfer</span></button>
+                                        @can('interstore.store')
+                                            <button type="submit" class="btn btn-success"><span
+                                                    class="ion-forward">Transfer</span></button>
+                                        @endcan
                                     </div>
                                 </form>
                                 <div class="cart-container"></div>
@@ -110,8 +112,9 @@
                         {{ csrf_field() }}
                         <div class="form-group">
                             <label for="source_store_id">Source Store</label>
-                            <select class="form-control select2-single {{ $errors->has('source_store_id') ? ' is-invalid' : '' }}"
-                                    name="source_store_id" id="source_store_id" required="required">
+                            <select
+                                class="form-control select2-single {{ $errors->has('source_store_id') ? ' is-invalid' : '' }}"
+                                name="source_store_id" id="source_store_id" required="required">
                                 <option value="">Select...</option>
                                 @if (isset($stores))
                                     @foreach ($stores as $data)
@@ -129,8 +132,9 @@
                         </div>
                         <div class="form-group">
                             <label for="product_id">Product</label>
-                            <select class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
-                                    name="product_id" id="product_id" required="required">
+                            <select
+                                class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
+                                name="product_id" id="product_id" required="required">
                                 <option value="">Select...</option>
 
                                 @if (old('category_id', $model->category_id))
@@ -161,8 +165,9 @@
                         </div>
                         <div class="form-group">
                             <label for="destination_store_id">Destination Store</label>
-                            <select class="form-control select2-single {{ $errors->has('destination_store_id') ? ' is-invalid' : '' }}"
-                                    name="destination_store_id" id="destination_store_id" required="required">
+                            <select
+                                class="form-control select2-single {{ $errors->has('destination_store_id') ? ' is-invalid' : '' }}"
+                                name="destination_store_id" id="destination_store_id" required="required">
                                 <option value="">Select...</option>
                                 @if (isset($stores))
                                     @foreach ($stores as $data)
@@ -180,9 +185,10 @@
                         </div>
                         <div class="form-group">
                             <label for="qty_transfered">Qty</label>
-                            <input type="number" class="form-control {{ $errors->has('qty_transfered') ? ' is-invalid' : '' }}"
-                                   name="qty_transfered" id="qty_transfered" value="{{ $model->qty_transfered }}" placeholder=""
-                                   required="required">
+                            <input type="number"
+                                class="form-control {{ $errors->has('qty_transfered') ? ' is-invalid' : '' }}"
+                                name="qty_transfered" id="qty_transfered" value="{{ $model->qty_transfered }}"
+                                placeholder="" required="required">
                             @if ($errors->has('qty_transfered'))
                                 <div class="invalid-feedback">
                                     <strong>{{ $errors->first('qty_transfered') }}</strong>
@@ -190,7 +196,8 @@
                             @endif
                         </div>
                         <div class="form-group text-right ">
-                            <button type="submit" class="btn btn-primary"><span class="ion-ios-cart-outline"></span> Add to Cart</button>
+                            <button type="submit" class="btn btn-primary"><span class="ion-ios-cart-outline"></span> Add
+                                to Cart</button>
                         </div>
                     </form>
                 </div>

@@ -8,7 +8,6 @@
         caption {
             caption-side: top;
         }
-
     </style>
 @endpush
 
@@ -63,8 +62,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>
     <script type="text/javascript">
         $(function() {
-             $("#record1").DataTable({
-                'iDisplayLength':100
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
         });
     </script>

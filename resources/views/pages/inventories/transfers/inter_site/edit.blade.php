@@ -20,7 +20,6 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
                             <li class="breadcrumb-item active">Stock Transfer</li>
                         </ol>
                     </div>
@@ -30,12 +29,17 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('intersite.create') }}">
-                <span class="fa fa-plus-circle"></span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('intersite.index') }}">
-                <span class="fa fa-list"></span>
-            </a>
+            @can('intersite.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('intersite.create') }}">
+                    <span class="fa fa-plus-circle"></span>
+                </a>
+            @endcan
+
+            @can('intersite.index')
+                <a class="btn btn-secondary btn-sm" href="{{ route('intersite.index') }}">
+                    <span class="fa fa-list"></span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>
@@ -81,23 +85,27 @@
 
 
                                                     <td>
-                                                        <button class="btn btn-danger btn-sm" type="button"
-                                                            onclick="deleteItem({{ $product->id }})">
-                                                            <i class="fa fa-trash" aria-hidden="true"></i>
-                                                        </button>
+                                                        @can('interstore.cart.remove')
+                                                            <button class="btn btn-danger btn-sm" type="button"
+                                                                onclick="deleteItem({{ $product->id }})">
+                                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                                            </button>
+                                                        @endcan
                                                         <form id="delete-form-{{ $product->id }}"
                                                             action="{{ route('interstore.cart.remove', $product->id) }}"
                                                             method="post" style="display:none;">
                                                             @csrf
                                                             @method('DELETE')
                                                         </form>
+
                                                     </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
                                 @endif
-                                <form action="{{ isset($route) ? $route : route('intersite.update',$model->id) }}" method="POST">
+                                <form action="{{ isset($route) ? $route : route('intersite.update', $model->id) }}"
+                                    method="POST">
                                     {{ csrf_field() }}
                                     {{-- <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" /> --}}
                                     @method('PUT')
@@ -162,10 +170,12 @@
                                         <input type="hidden" name="transfered_by" id="transfered_by"
                                             value="{{ Auth::id() }}" required="required">
                                     </div>
-                                    <div class="form-group text-right ">
-                                        <button type="submit" class="btn btn-success"><span class="ion-forward">
-                                                Transfer</span></button>
-                                    </div>
+                                    @can('intersite.update')
+                                        <div class="form-group text-right ">
+                                            <button type="submit" class="btn btn-success"><span class="ion-forward">
+                                                    Transfer</span></button>
+                                        </div>
+                                    @endcan
                                 </form>
                             </div>
 

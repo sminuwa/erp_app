@@ -32,12 +32,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('categories.create') }}">
-                <span class="fa fa-plus-circle"> New Category</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('categories.import.form') }}">
-                <span class="fa fa-upload"> Upload Categories</span>
-            </a>
+            @can('categories.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('categories.create') }}">
+                    <span class="fa fa-plus-circle"> New Category</span>
+                </a>
+            @endcan
+            @can('categories.import.form')
+                <a class="btn btn-secondary btn-sm" href="{{ route('categories.import.form') }}">
+                    <span class="fa fa-upload"> Upload Categories</span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-8 table-responsive">
@@ -53,22 +57,22 @@
 @endsection
 
 @push('js')
-     <!-- DataTables -->
-     <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
-     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-     <script type="text/javascript">
-         $(function() {
-              $("#record1").DataTable({
-                'iDisplayLength':100
+    <!-- DataTables -->
+    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
-             $('#record2').DataTable({
-                 "paging": true,
-                 "lengthChange": false,
-                 "searching": true,
-                 "ordering": true,
-                 "info": true,
-                 "autoWidth": false
-             });
-         });
-     </script>
+            $('#record2').DataTable({
+                "paging": true,
+                "lengthChange": false,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false
+            });
+        });
+    </script>
 @endpush

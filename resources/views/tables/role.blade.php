@@ -11,12 +11,12 @@
                 <td> {{ $record->name }} </td>
                 <td>
                 <td>
-                    @can('edit.role')
+                    @can('roles.edit')
                         <a class="btn btn-secondary btn-sm" href="{{ route('roles.edit', $record->id) }}">
                             <span class="fa fa-pencil"></span>
                         </a>
                     @endcan
-                    @can('delete.role')
+                    @can('roles.destroy')
                         <form onsubmit="return confirm('Are you sure you want to delete?')"
                             action="{{ route('roles.destroy', $record->id) }}" method="post" style="display: inline">
                             {{ csrf_field() }}

@@ -20,12 +20,12 @@
                 <td> {{ $record->reg_code }} </td>
                 <td> {{ $record->registered->name }} </td>
                 <td>
-                    @can('edit.loan.collector')
+                    @can('loan_collectors.edit')
                         <a class="btn btn-secondary btn-sm" href="{{ route('loan_collectors.edit', $record->id) }}">
                             <span class="fa fa-pencil"></span>
                         </a>
                     @endcan
-                    @can('delete.loan.collector')
+                    @can('loan_collectors.destroy')
                         <form onsubmit="return confirm('Are you sure you want to delete?')"
                             action="{{ route('loan_collectors.destroy', $record->id) }}" method="post"
                             style="display: inline">

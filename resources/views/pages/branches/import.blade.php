@@ -32,9 +32,11 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.create') }}">
-                <span class="fa fa-plus-circle"> New Branch</span>
-            </a>
+            @can('branches.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('branches.create') }}">
+                    <span class="fa fa-plus-circle"> New Branch</span>
+                </a>
+            @endcan
             <a class="btn btn-secondary btn-sm" href="{{ url('upload_templates/branches_template.xlsx') }}">
                 <span class="fa fa-download"> Template</span>
             </a>
@@ -47,8 +49,8 @@
                             <button type="submit" class="btn btn-primary">Import</button>
                         </form>
                         @if (isset($count))
-                            <h4 class="text text-success">A total of {{$count}} stores were successfully uploaded</h4>
-                           
+                            <h4 class="text text-success">A total of {{ $count }} stores were successfully uploaded
+                            </h4>
                         @endif
                     </div>
                 </div>
@@ -66,8 +68,8 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         $(function() {
-             $("#record1").DataTable({
-                'iDisplayLength':100
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
             $('#record2').DataTable({
                 "paging": true,

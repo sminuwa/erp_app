@@ -28,12 +28,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('credit_limits.create') }}">
-                <span class="fa fa-plus-circle"></span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('credit_limits.index') }}">
-                <span class="fa fa-list"></span>
-            </a>
+            @can('credit_limits.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('credit_limits.create') }}">
+                    <span class="fa fa-plus-circle"></span>
+                </a>
+            @endcan
+            @can('credit_limits.index')
+                <a class="btn btn-secondary btn-sm" href="{{ route('credit_limits.index') }}">
+                    <span class="fa fa-list"></span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>

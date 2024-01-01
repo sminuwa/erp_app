@@ -8,7 +8,6 @@
         caption {
             caption-side: top;
         }
-
     </style>
 @endpush
 
@@ -20,9 +19,11 @@
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <div class="container-fluid">
-                <a class="btn btn-secondary tooltip" title="Add new role" href="{{ route('roles.create') }}">
-                    <span data-lucide="plus-circle" class="text-succcess">Add New</span>
-                </a>
+                @can('roles.create')
+                    <a class="btn btn-secondary tooltip" title="Add new role" href="{{ route('roles.create') }}">
+                        <span data-lucide="plus-circle" class="text-succcess">Add New</span>
+                    </a>
+                @endcan
                 <div class="intro-y flex items-center mt-8">
                     <h2 class="text-lg font-medium mr-auto">Assign Permission to Role</h2>
                 </div>
@@ -61,8 +62,8 @@
                                                         <div class="form-group">
                                                             <label for="">&nbsp;</label>
                                                             <button type="button" name="add" id="addbtn"
-                                                                class="btn btn-primary text-right"><span
-                                                                    class="ti-save"> Save
+                                                                class="btn btn-primary text-right"><span class="ti-save">
+                                                                    Save
                                                                 </span></button>
                                                             @if (isset($model) && $model != null)
                                                                 <button type="button" id="close" name="close"
@@ -106,8 +107,8 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         $(function() {
-             $("#record1").DataTable({
-                'iDisplayLength':100
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
             $('#record2').DataTable({
                 "paging": true,
@@ -133,7 +134,7 @@
                         role_id: role
                     }
                 }).done(function(data) {
-                   
+
                     $('#display').html(data);
                     $("#checkAll").click(function() {
                         $('input:checkbox').not(this).prop('checked', this.checked);

@@ -32,9 +32,11 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.create') }}">
-                <span class="fa fa-plus-circle"> New Price</span>
-            </a>
+            @can('branch_product_prices.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('branch_product_prices.create') }}">
+                    <span class="fa fa-plus-circle"> New Price</span>
+                </a>
+            @endcan
             <a class="btn btn-secondary btn-sm" href="{{ url('upload_templates/price_template.xlsx') }}">
                 <span class="fa fa-download"> Template</span>
             </a>
@@ -47,7 +49,9 @@
                             <button type="submit" class="btn btn-primary">Import</button>
                         </form>
                         @if (isset($faileds))
-                            <h4 class="text text-danger">Prices of {{$count}} products were successfully updated, however, there are {{count($faileds)}} invalid product codes that are failed to update as shown below:</h4>
+                            <h4 class="text text-danger">Prices of {{ $count }} products were successfully updated,
+                                however, there are {{ count($faileds) }} invalid product codes that are failed to update as
+                                shown below:</h4>
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
@@ -58,13 +62,13 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @for ($i = 0; $i<count($faileds); $i++)
+                                    @for ($i = 0; $i < count($faileds); $i++)
                                         <tr>
-                                            <td>{{ $i+1 }}</td>
+                                            <td>{{ $i + 1 }}</td>
                                             <td>{{ $faileds[$i][0] }}</td>
                                             <td>{{ $faileds[$i][1] }}</td>
                                             <td>{{ $faileds[$i][2] }}</td>
-                                            
+
                                         </tr>
                                     @endfor
                                 </tbody>
@@ -87,8 +91,8 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         $(function() {
-             $("#record1").DataTable({
-                'iDisplayLength':100
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
             $('#record2').DataTable({
                 "paging": true,

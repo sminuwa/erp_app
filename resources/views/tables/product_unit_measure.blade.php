@@ -18,18 +18,22 @@
                 <td> {{ ucfirst($record->type) }} </td>
                 <td> {{ $record->value }} </td>
                 <td>
-                    <a class="btn btn-secondary btn-sm" href="{{ route('product_unit_measures.edit', $record->id) }}">
-                        <span class="fa fa-pencil"></span>
-                    </a>
-                    <form onsubmit="return confirm('Are you sure you want to delete?')"
-                        action="{{ route('product_unit_measures.destroy', $record->id) }}" method="post"
-                        style="display: inline">
-                        {{ csrf_field() }}
-                        {{ method_field('DELETE') }}
-                        <button type="submit" class="btn btn-secondary cursor-pointer btn-sm">
-                            <i class="text-danger fa fa-remove"></i>
-                        </button>
-                    </form>
+                    @can('product_unit_measures.edit')
+                        <a class="btn btn-secondary btn-sm" href="{{ route('product_unit_measures.edit', $record->id) }}">
+                            <span class="fa fa-pencil"></span>
+                        </a>
+                    @endcan
+                    @can('product_unit_measures.destroy')
+                        <form onsubmit="return confirm('Are you sure you want to delete?')"
+                            action="{{ route('product_unit_measures.destroy', $record->id) }}" method="post"
+                            style="display: inline">
+                            {{ csrf_field() }}
+                            {{ method_field('DELETE') }}
+                            <button type="submit" class="btn btn-secondary cursor-pointer btn-sm">
+                                <i class="text-danger fa fa-remove"></i>
+                            </button>
+                        </form>
+                    @endcan
                 </td>
             </tr>
         @endforeach

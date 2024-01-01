@@ -41,42 +41,54 @@
                                 <a href="javascript:history.back()" class="btn btn-warning btn-sm">
                                     <i class="fa fa-arrow-left"></i> Back
                                 </a>
-                                <a href="{{ route('create.payment.reciept') }}" class="btn btn-secondary btn-sm ">
-                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> New Receipt
-                                </a>
+                                @can('create.payment.reciept')
+                                    <a href="{{ route('create.payment.reciept') }}" class="btn btn-secondary btn-sm ">
+                                        <i class="fa fa-plus-circle" aria-hidden="true"></i> New Receipt
+                                    </a>
+                                @endcan
 
 
 
                                 @if ($receipt->status == 0)
-                                    <a href="{{ route('create.payment.reciept', ['receipt_id'=>$receipt->id]) }}" class="btn btn-info btn-sm ">
-                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                    </a>
-                                    <form class="d-inline" action="{{ route('receipt.payment.post', $receipt->id) }}" method="post"
-                                        onsubmit="return confirm('Are you sure you want to post this receipt?')">
-                                        @csrf
-                                        <button type="submit" class="btn btn-success btn-sm ">
-                                            <i class="fa fa-check" aria-hidden="true"></i> Post
-                                        </button>
-                                    </form>
-
-                                    <form class="d-inline" id="delete-form-{{ $receipt->id }}"
-                                        action="{{ route('receipt.payment.delete', $receipt->id) }}" method="post"
-                                        onsubmit="return confirm('Are you sure you want to close this receipt?')">
-                                        @csrf
-                                        <button class="btn btn-danger btn-sm " type="submit">
-                                            <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                        </button>
-                                    </form>
-
+                                    @can('create.payment.reciept')
+                                        <a href="{{ route('create.payment.reciept', ['receipt_id' => $receipt->id]) }}"
+                                            class="btn btn-info btn-sm ">
+                                            <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                        </a>
+                                    @endcan
+                                    @can('receipt.payment.post')
+                                        <form class="d-inline" action="{{ route('receipt.payment.post', $receipt->id) }}"
+                                            method="post"
+                                            onsubmit="return confirm('Are you sure you want to post this receipt?')">
+                                            @csrf
+                                            <button type="submit" class="btn btn-success btn-sm ">
+                                                <i class="fa fa-check" aria-hidden="true"></i> Post
+                                            </button>
+                                        </form>
+                                    @endcan
+                                    @can('receipt.payment.delete')
+                                        <form class="d-inline" id="delete-form-{{ $receipt->id }}"
+                                            action="{{ route('receipt.payment.delete', $receipt->id) }}" method="post"
+                                            onsubmit="return confirm('Are you sure you want to close this receipt?')">
+                                            @csrf
+                                            <button class="btn btn-danger btn-sm " type="submit">
+                                                <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                            </button>
+                                        </form>
+                                    @endcan
                                 @else
-                                    <a href="{{ route('receipt.payment.print', $receipt->id) }}" target="_BLANK"
-                                       class="btn btn-dark btn-sm ">
-                                        <i class="fa fa-print" aria-hidden="true"></i> Print
-                                    </a>
-                                    <a href="{{ route('receipt.payment.print.pos', $receipt->id) }}" target="_BLANK"
-                                       class="btn btn-dark btn-sm ">
-                                        <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
-                                    </a>
+                                    @can('receipt.payment.print')
+                                        <a href="{{ route('receipt.payment.print', $receipt->id) }}" target="_BLANK"
+                                            class="btn btn-dark btn-sm ">
+                                            <i class="fa fa-print" aria-hidden="true"></i> Print
+                                        </a>
+                                    @endcan
+                                    @can('receipt.payment.print.pos')
+                                        <a href="{{ route('receipt.payment.print.pos', $receipt->id) }}" target="_BLANK"
+                                            class="btn btn-dark btn-sm ">
+                                            <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
+                                        </a>
+                                    @endcan
                                 @endif
 
 
@@ -156,10 +168,15 @@
 
 
                                             <tr>
-                                                <td>{{ $receipt->account()->code ?? $receipt->account()->number }} - {{ $receipt->account()->name ?? $receipt->account()->description }}</td>
-                                                <td>{{$receipt->description}}</td>
-                                                <th style="text-align: right">{{ currency_sign().number_format($receipt->amount, 2, '.', ',') }}</th>
-                                                <td>{{Carbon\Carbon::parse($receipt->date)->toFormattedDateString()}}</td>
+                                                <td>{{ $receipt->account()->code ?? $receipt->account()->number }} -
+                                                    {{ $receipt->account()->name ?? $receipt->account()->description }}
+                                                </td>
+                                                <td>{{ $receipt->description }}</td>
+                                                <th style="text-align: right">
+                                                    {{ currency_sign() . number_format($receipt->amount, 2, '.', ',') }}
+                                                </th>
+                                                <td>{{ Carbon\Carbon::parse($receipt->date)->toFormattedDateString() }}
+                                                </td>
 
                                             </tr>
                                             <tr>
@@ -173,7 +190,7 @@
                                                         @endphp
                                                         <strong>
                                                             {{ convertNumberToWords($receipt->amount) }}</strong>
-                {{--                                            {{ $a->format($payment->amount/2.3) }}</strong>--}}
+                                                        {{--                                            {{ $a->format($payment->amount/2.3) }}</strong> --}}
                                                     </p>
                                                 </td>
                                             </tr>

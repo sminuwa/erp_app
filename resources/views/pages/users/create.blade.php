@@ -14,7 +14,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4> Add new  User</h4>
+                        <h4> Add new User</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -28,15 +28,21 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('users.create') }}">
-                <span class="fa fa-plus-circle">New User</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('users.import.form') }}">
-                <span class="fa fa-upload"> Upload Users</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('users.index') }}">
-                <span class="fa fa-list"> View Users</span>
-            </a>
+            @can('users.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('users.create') }}">
+                    <span class="fa fa-plus-circle">New User</span>
+                </a>
+            @endcan
+            @can('users.import.form')
+                <a class="btn btn-secondary btn-sm" href="{{ route('users.import.form') }}">
+                    <span class="fa fa-upload"> Upload Users</span>
+                </a>
+            @endcan
+            @can('users.index')
+                <a class="btn btn-secondary btn-sm" href="{{ route('users.index') }}">
+                    <span class="fa fa-list"> View Users</span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>
@@ -51,7 +57,5 @@
 
 @endsection
 @push('js')
-    <script type="text/javascript">
-
-    </script>
+    <script type="text/javascript"></script>
 @endpush

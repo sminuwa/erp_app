@@ -21,9 +21,10 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('customers.index') }}">Customers</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('customers.return.debit') }}">R&D List</a>
-                            </li>
+                            @can('customers.return.debit')
+                                <li class="breadcrumb-item"><a href="{{ route('customers.return.debit') }}">R&D List</a>
+                                </li>
+                            @endcan
                             <li class="breadcrumb-item active">Return & Debit</li>
                         </ol>
                     </div>
@@ -65,7 +66,8 @@
                                             <tbody id="table-body">
                                                 @foreach ($purchases as $purchase)
                                                     <tr>
-                                                        <td><a href="javascript:void(0)" class="invoice" onclick="load()"
+                                                        <td>
+                                                            <a href="javascript:void(0)" class="invoice" onclick="load()"
                                                                 data-val="{{ $purchase->reference }}">{{ $purchase->reference }}</a>
                                                         </td>
                                                         <td>{{ $purchase->supplier->name }}</td>
@@ -83,77 +85,6 @@
                                 </div>
                             </div>
                         </div>
-                        {{-- <div class="card-body table-responsive" id="load">
-                            <table id="store_data" class="table table-bordered table-striped text-left"
-                                style="font-size: 12px;">
-                                <thead>
-                                    <tr>
-                                        <th>Store</th>
-                                        <th>Code</th>
-                                        <th>Item</th>
-                                        <th>Unit</th>
-                                        <th>QTY</th>
-                                      
-                                        <th>Add To Cart</th>
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <tr>
-                                        <th>Store</th>
-                                        <th>Code</th>
-                                        <th>Name</th>
-                                        <th>Unit</th>
-                                        <th>QTY</th>
-                                       
-                                        <th>Add To Cart</th>
-                                    </tr>
-                                </tfoot>
-                                <tbody>
-
-                                    @foreach ($stores as $key => $store)
-                                        <tr>
-                                            <form action="{{ route('return.debit.cart.store') }}" method="post">
-                                                @csrf
-                                                <input type="hidden" name="id" value="{{ $store->id }}">
-                                                <input type="hidden" name="order" value="{{ isset($order->id) ? $order->id: '' }}">
-                                                <input type="hidden" name="name" value="{{ $store->name }}">
-                                                <input type="hidden" name="code" value="{{ $store->code }}">
-                                                <input type="hidden" name="store" value="{{ $store->store }}">
-                                                <input type="hidden" name="qty" value="1">
-                                                <input type="hidden" name="selling_price"
-                                                    value="{{ $store->selling_price }}">
-                                                <input type="hidden" name="qty_available"
-                                                    value="{{ $store->qty_available }}">
-                                                <input type="hidden" name="sold_price"
-                                                    value="{{ $store->selling_price }}">
-                                                <input type="hidden" name="cost_price" value="{{ $store->cost_price }}">
-
-                                                <td>{{ ucwords($store->store) }}</td>
-                                                <td>{{ $store->code }}</td>
-                                                <td>{{ $store->name }}</td>
-                                                <td>{{ $store->unit }}</td>
-                                                <td align="center">{{ $store->qty_available }}</td>
-                                               
-                                                @if ($store->retail_selling_price > 0 || $store->whole_selling_price > 0)
-                                                    <td align="center">
-                                                        <button type="submit" class="btn btn-sm btn-success px-2">
-                                                            <i class="fa fa-cart-plus" aria-hidden="true"></i>
-                                                        </button>
-                                                    </td>
-                                                @else
-                                                    <td align="center">
-                                                        <span class="fa fa-crosshairs text text-danger"></span>
-                                                    </td>
-                                                @endif
-                                            </form>
-                                        </tr>
-                                    @endforeach
-
-                                </tbody>
-
-                            </table>
-
-                        </div> --}}
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
@@ -284,7 +215,7 @@
                 };
             })();
             $(document).on('keyup', '.quantity,.price', function() {
-                
+
                 id = $(this).attr('data-value');
                 $("#valid_qty" + id.substr(1)).html("");
                 if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(
@@ -307,7 +238,7 @@
                         data: $('#' + id).serialize(),
                         success: function(data) {
                             id = id.substr(1);
-alert(data);
+                            alert(data);
                             subtotal = $('#price' + id).val() * $('#quantity' + id)
                                 .val();
                             $('.subtotal' + id).text(formatMoney(subtotal));

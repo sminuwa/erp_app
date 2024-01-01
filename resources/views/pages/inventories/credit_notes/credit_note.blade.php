@@ -38,24 +38,28 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <a href="{{ route('credit.note.create') }}" class="btn btn-sm btn-secondary"
-                                        style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Credit
-                                        Note</a>
+                                    @can('credit.note.create')
+                                        <a href="{{ route('credit.note.create') }}" class="btn btn-sm btn-secondary"
+                                            style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Credit
+                                            Note</a>
+                                    @endcan
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <form action="{{ route('customers.credit.note.search') }}" method="POST">
-                                        @csrf
-                                        <div class="input-group">
-                                            <input type="search" class="form-control rounded" required
-                                                placeholder="Search by Receipt or Cheque number" name="refno"
-                                                aria-label="Search" aria-describedby="search-addon" />
-                                            <button type="submit" class="btn btn-outline-primary">search</button>
-                                        </div>
-                                    </form>
+                            @can('customers.credit.note.search')
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <form action="{{ route('customers.credit.note.search') }}" method="POST">
+                                            @csrf
+                                            <div class="input-group">
+                                                <input type="search" class="form-control rounded" required
+                                                    placeholder="Search by Receipt or Cheque number" name="refno"
+                                                    aria-label="Search" aria-describedby="search-addon" />
+                                                <button type="submit" class="btn btn-outline-primary">search</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
+                            @endcan
                             <!-- /.card-header -->
                             <div class="card-body table-responsive">
                                 <table id="example1"
@@ -82,7 +86,7 @@
                                     </tfoot>
                                     <tbody>
                                         @foreach ($payments as $payment)
-                                            <tr class="@if($payment->status == 0) bg-warning @endif">
+                                            <tr class="@if ($payment->status == 0) bg-warning @endif">
 
                                                 <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                                                 <td>{{ $payment->reference }}</td>
@@ -93,42 +97,54 @@
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button"
-                                                                id="dropdownMenuButton" data-toggle="dropdown"
-                                                                aria-haspopup="true" aria-expanded="false">
+                                                            id="dropdownMenuButton" data-toggle="dropdown"
+                                                            aria-haspopup="true" aria-expanded="false">
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            <a href="{{ route('credit.note.show', $payment->id) }}"
-                                                               class="dropdown-item">
-                                                                <i class="fa fa-eye" aria-hidden="true"></i> View
-                                                            </a>
-                                                            <a href="{{ route('credit.note.print', $payment->id) }}"
-                                                               target="_BLANK" class="dropdown-item">
-                                                                <i class="fa fa-print" aria-hidden="true"></i> Print
-                                                            </a>
-                                                            @if ($payment->status == 0)
-                                                                <a href="{{ route('credit.note.edit', $payment->id) }}"
-                                                                   class="dropdown-item">
-                                                                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                                            @can('credit.note.show')
+                                                                <a href="{{ route('credit.note.show', $payment->id) }}"
+                                                                    class="dropdown-item">
+                                                                    <i class="fa fa-eye" aria-hidden="true"></i> View
                                                                 </a>
-
-                                                                <form action="{{ route('credit.note.post', $payment->id) }}" method="post" onsubmit="return confirm('Are you sure you want to post this order?')">
-                                                                    @csrf
-                                                                    <button type="submit"
-                                                                            class="dropdown-item">
-                                                                        <i class="fa fa-check" aria-hidden="true"></i> Post
-                                                                    </button>
-                                                                </form>
-
-
-                                                                <form  action="{{ route('credit.note.delete', $payment->id) }}" method="post" onsubmit="return confirm('Are you sure you want to close this order?')">
-                                                                    @csrf
-                                                                    @method('POST')
-                                                                    <button class="dropdown-item" type="submit">
-                                                                        <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                                                    </button>
-                                                                </form>
-
+                                                            @endcan
+                                                            @can('credit.note.print')
+                                                                <a href="{{ route('credit.note.print', $payment->id) }}"
+                                                                    target="_BLANK" class="dropdown-item">
+                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                </a>
+                                                            @endcan
+                                                            @if ($payment->status == 0)
+                                                                @can('credit.note.edit')
+                                                                    <a href="{{ route('credit.note.edit', $payment->id) }}"
+                                                                        class="dropdown-item">
+                                                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                                                    </a>
+                                                                @endcan
+                                                                @can('credit.note.post')
+                                                                    <form
+                                                                        action="{{ route('credit.note.post', $payment->id) }}"
+                                                                        method="post"
+                                                                        onsubmit="return confirm('Are you sure you want to post this order?')">
+                                                                        @csrf
+                                                                        <button type="submit" class="dropdown-item">
+                                                                            <i class="fa fa-check" aria-hidden="true"></i> Post
+                                                                        </button>
+                                                                    </form>
+                                                                @endcan
+                                                                @can('credit.note.delete')
+                                                                    <form
+                                                                        action="{{ route('credit.note.delete', $payment->id) }}"
+                                                                        method="post"
+                                                                        onsubmit="return confirm('Are you sure you want to close this order?')">
+                                                                        @csrf
+                                                                        @method('POST')
+                                                                        <button class="dropdown-item" type="submit">
+                                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                            Delete
+                                                                        </button>
+                                                                    </form>
+                                                                @endcan
                                                             @endif
 
                                                         </div>
@@ -295,8 +311,8 @@
         $(function() {
 
             $("#example1").DataTable({
-                    'iDisplayLength':100
-                });
+                'iDisplayLength': 100
+            });
             $('#example2').DataTable({
                 "paging": true,
                 "lengthChange": false,
@@ -305,7 +321,7 @@
                 "info": true,
                 "autoWidth": false
             });
-            $(document).on('click', '".show"',function() {
+            $(document).on('click', '".show"', function() {
                 order_id = $(this).attr('data-val');
                 $.ajax({
                     type: 'get',

@@ -209,6 +209,7 @@ class BranchProductPriceController extends Controller
     }
     public function openingBalance(Create $request)
     {
+        $this->authorize('stock_opening_balance.create');
         $products = Product::all(['id', 'name']);
         $stores = Store::where('branch_id', User::userBranchAction())->get();
         $categories = Category::all(['id', 'name']);
@@ -221,6 +222,7 @@ class BranchProductPriceController extends Controller
     }
     public function storeStockBalance(Request $request)
     {
+        $this->authorize('stock_opening_balance.store');
         $data = $request->store_id;
         DB::beginTransaction();
         try {
@@ -260,6 +262,7 @@ class BranchProductPriceController extends Controller
     }
     public function editCostPrice(Request $request)
     {
+        $this->authorize('store_product_cost_prices.edit');
         $user_branch = User::userBranchAction();
         $products = Product::all(['id', 'name']);
         $stores = Store::select('id', 'name')->where('branch_id', 'LIKE', $user_branch)->get();
@@ -276,6 +279,7 @@ class BranchProductPriceController extends Controller
     }
     public function updateCostPrice(Request $request)
     {
+        $this->authorize('store_product_cost_prices.edit');
         $count = 0;
         if ($request->store_id == "all") {
             $stores = Store::where('branch_id', User::userBranchAction())->get();
@@ -319,10 +323,12 @@ class BranchProductPriceController extends Controller
     }
     public function importForm()
     {
+        $this->authorize('price.import.form');
         return view('pages.branch_product_prices.import');
     }
     public function import(Request $request)
     {
+        $this->authorize('price.import');
         $request->validate([
             'file' => 'required|file|mimes:xlsx',
         ]);

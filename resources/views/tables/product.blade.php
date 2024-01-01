@@ -15,24 +15,24 @@
                 <td> {{ $record->code }} </td>
                 <td> {{ $record->name }} </td>
                 <td> {{ $record->category?->name }} </td>
-                <td><span style="font-size: 10pt;">{{$record->barcode}}</span>
+                <td><span style="font-size: 10pt;">{{ $record->barcode }}</span>
                     {{-- @if ($record->barcode != null)
                         {!! DNS1D::getBarcodeHTML($record->barcode, 'CODABAR') !!}
                     @endif --}}
                 </td>
                 <td> {{ $record->status == 1 ? 'Active' : 'Inactive' }} </td>
                 <td>
-                    @can('view.product')
+                    @can('products.show')
                         <a class="btn btn-secondary btn-sm" href="{{ route('products.show', $record->id) }}">
                             <span class="fa fa-eye"></span>
                         </a>
                     @endcan
-                    @can('edit.product')
+                    @can('products.edit')
                         <a class="btn btn-secondary btn-sm" href="{{ route('products.edit', $record->id) }}">
                             <span class="fa fa-pencil"></span>
                         </a>
                     @endcan
-                    @can('delete.product')
+                    @can('products.destroy')
                         <form onsubmit="return confirm('Are you sure you want to delete?')"
                             action="{{ route('products.destroy', $record->id) }}" method="post" style="display: inline">
                             {{ csrf_field() }}

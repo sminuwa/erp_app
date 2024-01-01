@@ -19,7 +19,7 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                            <li class="breadcrumb-item active">Products</li>
+                            <li class="breadcrumb-item active">Unit of Measure</li>
                         </ol>
                     </div>
                 </div>
@@ -28,12 +28,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('product_unit_measures.create') }}">
-                <span class="fa fa-plus-circle">New Product </span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('product_unit_measures.index') }}">
-                <span class="fa fa-list"> View UTM</span>
-            </a>
+            @can('product_unit_measures.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('product_unit_measures.create') }}">
+                    <span class="fa fa-plus-circle">New Product </span>
+                </a>
+            @endcan
+            @can('product_unit_measures.index')
+                <a class="btn btn-secondary btn-sm" href="{{ route('product_unit_measures.index') }}">
+                    <span class="fa fa-list"> View UTM</span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>

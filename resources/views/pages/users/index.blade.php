@@ -31,12 +31,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('users.create') }}">
-                <span class="fa fa-plus-circle"> New User</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('users.import.form') }}">
-                <span class="fa fa-upload"> Upload Users</span>
-            </a>
+            @can('users.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('users.create') }}">
+                    <span class="fa fa-plus-circle"> New User</span>
+                </a>
+            @endcan
+            @can('users.import.form')
+                <a class="btn btn-secondary btn-sm" href="{{ route('users.import.form') }}">
+                    <span class="fa fa-upload"> Upload Users</span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 table-responsive">
@@ -57,8 +61,8 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         $(function() {
-             $("#record1").DataTable({
-                'iDisplayLength':100
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
         });
     </script>

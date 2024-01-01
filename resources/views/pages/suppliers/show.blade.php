@@ -25,7 +25,9 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('suppliers.index') }}">Supplier</a></li>
+                            @can('suppliers.index')
+                                <li class="breadcrumb-item"><a href="{{ route('suppliers.index') }}">Supplier</a></li>
+                            @endcan
                             <li class="breadcrumb-item active">Supplier Detail</li>
                         </ol>
                     </div>
@@ -99,8 +101,7 @@
                             $sum_dr = 0;
                             $dif = 0; ?>
 
-                            @foreach ($record->supplierLedgers()->orderBy('date')->get()
-        as $ledger)
+                            @foreach ($record->supplierLedgers()->orderBy('date')->get() as $ledger)
                                 <tr>
                                     <td>{{ \Carbon\Carbon::parse($ledger->date)->toFormattedDateString() }}</td>
                                     <td>{{ $ledger->description }}</td>

@@ -44,11 +44,11 @@
                                     <div class="col-sm-4">
                                         @can('view.daily.sale')
                                             <a href="{{ route('order.invoice.index') }}" class="btn btn-sm btn-secondary"
-                                               style="margin-left: 2px;"><span class="fa fa-list"> </span> View Orders </a>
+                                                style="margin-left: 2px;"><span class="fa fa-list"> </span> View Orders </a>
                                         @endcan
                                         @can('make.daily.sale')
                                             <a href="{{ route('order.invoice.index') }}" class="btn btn-sm btn-secondary"
-                                               style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Order
+                                                style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Order
                                                 Invoice</a>
                                         @endcan
                                     </div>
@@ -59,8 +59,8 @@
                                             @csrf
                                             <div class="input-group">
                                                 <input type="search" class="form-control rounded" required
-                                                       placeholder="Search by name, phone or invoice number" name="refno"
-                                                       aria-label="Search" aria-describedby="search-addon" />
+                                                    placeholder="Search by name, phone or invoice number" name="refno"
+                                                    aria-label="Search" aria-describedby="search-addon" />
                                                 <button type="submit" class="btn btn-outline-primary">search</button>
                                             </div>
                                         </form>
@@ -84,17 +84,18 @@
                                         @php $total = 0; @endphp
                                         @foreach ($orders as $order)
                                             @php $total = $total + $order->total; @endphp
-                                            <tr class="@if($order->status == 0) bg-warning @endif">
+                                            <tr class="@if ($order->status == 0) bg-warning @endif">
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}
                                                 </td>
                                                 <td>{{ $order->reference }}</td>
                                                 <td>{{ $order->customer->name }}</td>
                                                 <td>
-                                                    {!!
-                                                        $order->status == 0 ? '<span class="badge badge-warning">Pending</span>':
-                                                        ($order->status == 1 ? '<span class="badge badge-success">Close</span>': '<span class="badge badge-success">Completed</span>' )
-                                                    !!}
+                                                    {!! $order->status == 0
+                                                        ? '<span class="badge badge-warning">Pending</span>'
+                                                        : ($order->status == 1
+                                                            ? '<span class="badge badge-success">Close</span>'
+                                                            : '<span class="badge badge-success">Completed</span>') !!}
                                                 </td>
                                                 <td align="right">&#8358;{{ number_format($order->total, 2, '.', ',') }}
                                                 </td>
@@ -106,40 +107,56 @@
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            <a href="{{ route('order.invoice.show', $order->id) }}"
-                                                                class="dropdown-item">
-                                                                <i class="fa fa-eye" aria-hidden="true"></i> View
-                                                            </a>
-                                                            <a href="{{ route('invoice.order_print', $order->id) }}"
-                                                               target="_BLANK" class="dropdown-item">
-                                                                <i class="fa fa-print" aria-hidden="true"></i> Print
-                                                            </a>
+                                                            @can('order.invoice.show')
+                                                                <a href="{{ route('order.invoice.show', $order->id) }}"
+                                                                    class="dropdown-item">
+                                                                    <i class="fa fa-eye" aria-hidden="true"></i> View
+                                                                </a>
+                                                            @endcan
+                                                            @can('invoice.order_print')
+                                                                <a href="{{ route('invoice.order_print', $order->id) }}"
+                                                                    target="_BLANK" class="dropdown-item">
+                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                </a>
+                                                            @endcan
                                                             @if ($order->status == 0)
-                                                                <a href="{{ route('order.invoice.edit', $order->id) }}"
-                                                                   class="dropdown-item">
-                                                                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                                                </a>
-                                                                <a href="{{ route('order.invoice.linking', $order->id) }}" title="Linking"
-                                                                   class="dropdown-item">
-                                                                    <i class="fa fa-link" aria-hidden="true"></i> Create Invoice
-                                                                </a>
-                                                                <form action="{{ route('order.invoice.close', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this order?')">
-                                                                    @csrf
-                                                                    <button type="submit"
-                                                                       class="dropdown-item">
-                                                                        <i class="fa fa-close" aria-hidden="true"></i> Close
-                                                                    </button>
-                                                                </form>
-
-
-                                                                <form id="delete-form-{{ $order->id }}" action="{{ route('order.invoice.destroy', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to close this order?')">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button class="dropdown-item" type="submit">
-                                                                        <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                                                    </button>
-                                                                </form>
-
+                                                                @can('order.invoice.edit')
+                                                                    <a href="{{ route('order.invoice.edit', $order->id) }}"
+                                                                        class="dropdown-item">
+                                                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                                                    </a>
+                                                                @endcan
+                                                                @can('order.invoice.linking')
+                                                                    <a href="{{ route('order.invoice.linking', $order->id) }}"
+                                                                        title="Linking" class="dropdown-item">
+                                                                        <i class="fa fa-link" aria-hidden="true"></i> Create
+                                                                        Invoice
+                                                                    </a>
+                                                                @endcan
+                                                                @can('order.invoice.close')
+                                                                    <form
+                                                                        action="{{ route('order.invoice.close', $order->id) }}"
+                                                                        method="post"
+                                                                        onsubmit="return confirm('Are you sure you want to delete this order?')">
+                                                                        @csrf
+                                                                        <button type="submit" class="dropdown-item">
+                                                                            <i class="fa fa-close" aria-hidden="true"></i> Close
+                                                                        </button>
+                                                                    </form>
+                                                                @endcan
+                                                                @can('order.invoice.destroy')
+                                                                    <form id="delete-form-{{ $order->id }}"
+                                                                        action="{{ route('order.invoice.destroy', $order->id) }}"
+                                                                        method="post"
+                                                                        onsubmit="return confirm('Are you sure you want to close this order?')">
+                                                                        @csrf
+                                                                        @method('DELETE')
+                                                                        <button class="dropdown-item" type="submit">
+                                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                            Delete
+                                                                        </button>
+                                                                    </form>
+                                                                @endcan
                                                             @endif
 
                                                         </div>
@@ -225,8 +242,8 @@
         $(function() {
 
             $("#example1").DataTable({
-                    'iDisplayLength':100
-                });
+                'iDisplayLength': 100
+            });
             $('#example2').DataTable({
                 "paging": true,
                 "lengthChange": false,

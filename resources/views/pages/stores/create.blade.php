@@ -28,15 +28,21 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('stores.create') }}">
-                <span class="fa fa-plus-circle"> New Store</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('stores.import.form') }}">
-                <span class="fa fa-upload"> Upload Users</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('stores.index') }}">
-                <span class="fa fa-list"> View Stores</span>
-            </a>
+            @can('stores.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('stores.create') }}">
+                    <span class="fa fa-plus-circle"> New Store</span>
+                </a>
+            @endcan
+            @can('stores.import.form')
+                <a class="btn btn-secondary btn-sm" href="{{ route('stores.import.form') }}">
+                    <span class="fa fa-upload"> Upload Users</span>
+                </a>
+            @endcan
+            @can('stores.index')
+                <a class="btn btn-secondary btn-sm" href="{{ route('stores.index') }}">
+                    <span class="fa fa-list"> View Stores</span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>
@@ -51,7 +57,5 @@
 
 @endsection
 @push('js')
-    <script type="text/javascript">
-
-    </script>
+    <script type="text/javascript"></script>
 @endpush

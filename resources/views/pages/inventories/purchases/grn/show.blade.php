@@ -26,7 +26,9 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
+                            @can('products.index')
+                                <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
+                            @endcan
                             <li class="breadcrumb-item active">Purchase</li>
                         </ol>
                     </div>
@@ -39,71 +41,79 @@
 
             <div class="container">
 
-                @if(session()->has('message'))
+                @if (session()->has('message'))
                     <div class="alert alert-success">{{ session('message') }}</div>
                 @endif
-                @if(session()->has('error'))
+                @if (session()->has('error'))
                     <div class="alert alert-danger">{{ session('error') }}</div>
                 @endif
-                    <div class="btn-group">
+                <div class="btn-group">
+                    @can('purchases.index')
                         <a class="btn btn-secondary btn-sm" href="{{ route('purchases.index', $record->id) }}">
                             <span class="fa fa-list"></span> List
                         </a>
-                         @if ($record->status == 0)
+                    @endcan
+                    @if ($record->status == 0)
+                        @can('purchases.edit')
                             <a class="btn btn-secondary btn-sm" href="{{ route('purchases.edit', $record->id) }}">
                                 <span class="fa fa-pencil"></span> Edit
                             </a>
+                        @endcan
+                        @can('purchases.post')
                             <form onsubmit="return confirm('Are you sure you want to post this GRN?')"
-                                  action="{{ route('purchase.post', $record->id) }}" method="post" style="display: inline">
+                                action="{{ route('purchase.post', $record->id) }}" method="post" style="display: inline">
                                 {{ csrf_field() }}
                                 {{ method_field('POST') }}
                                 <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
                                     <i class="text-white fa fa-check"></i> Post
                                 </button>
                             </form>
+                        @endcan
+                        @can('purchases.destroy')
                             <form onsubmit="return confirm('Are you sure you want to delete?')"
-                                  action="{{ route('purchases.destroy', $record->id) }}" method="post" style="display: inline">
+                                action="{{ route('purchases.destroy', $record->id) }}" method="post" style="display: inline">
                                 {{ csrf_field() }}
                                 {{ method_field('DELETE') }}
                                 <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
                                     <i class="text-danger fa fa-remove"></i> Delete
                                 </button>
                             </form>
-
-                         @else
-
-                         @endif
+                        @endcan
+                    @else
+                    @endif
+                    @can('purchase.print')
                         <a class="btn btn-secondary btn-sm" href="{{ route('purchase.print', $record->id) }}" target="_blank">
                             <span class="fa fa-print"></span> Print
                         </a>
-
-                    </div>
+                    @endcan
+                </div>
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="card card-default">
                             <div class="card-header">
-                                <h4 class="card-title">GRN No.:: {{ $record->reference }} ({{ $record->status === 0 ? 'Pending' : 'Posted' }})</h4>
+                                <h4 class="card-title">GRN No.:: {{ $record->reference }}
+                                    ({{ $record->status === 0 ? 'Pending' : 'Posted' }})</h4>
                             </div>
                             <div class="card-body">
                                 <table class="table table-bordered table-striped">
                                     <tbody>
-                                    <tr>
-                                        <th>Supplier</th>
-                                        <td colspan="5">{{ optional($record->supplier)->name }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Purchase Date</th>
-                                        <td>{{ optional($record->purchase_date)->toDayDateTimeString() }}</td>
-                                        <th>ATC/WayBill No</th>
-                                        <td >{{ $record->atc_no }}</td>
-                                        <th>Truck No</th>
-                                        <td>{{ $record->truck_no }}</td>
-                                    </tr>
+                                        <tr>
+                                            <th>Supplier</th>
+                                            <td colspan="5">{{ optional($record->supplier)->name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Purchase Date</th>
+                                            <td>{{ optional($record->purchase_date)->toDayDateTimeString() }}</td>
+                                            <th>ATC/WayBill No</th>
+                                            <td>{{ $record->atc_no }}</td>
+                                            <th>Truck No</th>
+                                            <td>{{ $record->truck_no }}</td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                        {{--@include('cards.purchase')--}}
+                        {{-- @include('cards.purchase') --}}
                     </div>
                     <div class="col-sm-12">
                         <div class="card">
@@ -113,7 +123,7 @@
                                 </h4>
                             </div>
                             <div class="card-body">
-                                <table class="table table-bordered table-striped"  style="font-size: 12px;">
+                                <table class="table table-bordered table-striped" style="font-size: 12px;">
                                     <thead>
                                         <tr>
                                             <th>S/N</th>
@@ -166,49 +176,54 @@
                                     <h4 class="card-title">Additional Invoices</h4>
                                 </div>
                                 <div class="card-body">
-                                    <table class="table table-bordered table-striped" id=""  style="font-size: 12px;">
+                                    <table class="table table-bordered table-striped" id=""
+                                        style="font-size: 12px;">
                                         <thead>
-                                        <tr>
-                                            <th>S/N</th>
-                                            <th>General Account</th>
-                                            <th>Description</th>
-                                            <th>Amount</th>
-                                            <th>Action</th>
-                                        </tr>
+                                            <tr>
+                                                <th>S/N</th>
+                                                <th>General Account</th>
+                                                <th>Description</th>
+                                                <th>Amount</th>
+                                                <th>Action</th>
+                                            </tr>
                                         </thead>
                                         <tbody>
-                                        @php $total_expense = 0; @endphp
-                                        @foreach ($record->expenses()->get() as $expense)
-                                            <tr>
-                                                @php $total_expense +=$expense->amount; @endphp
-                                                <td>{{ $loop->index + 1 }}</td>
-                                                <td>{{ $expense->supplier->code ?? '' }} - {{ $expense->supplier->name ?? '' }}</td>
-                                                <td>{{ $expense->description }}</td>
-                                                <td style="text-align: right;"> {{ number_format($expense->amount, 2) }}</td>
-                                                <td style="text-align: right;">
-                                                    @if ($record->status == 0)
-                                                        <button class="btn btn-danger btn-sm" type="button"
+                                            @php $total_expense = 0; @endphp
+                                            @foreach ($record->expenses()->get() as $expense)
+                                                <tr>
+                                                    @php $total_expense +=$expense->amount; @endphp
+                                                    <td>{{ $loop->index + 1 }}</td>
+                                                    <td>{{ $expense->supplier->code ?? '' }} -
+                                                        {{ $expense->supplier->name ?? '' }}</td>
+                                                    <td>{{ $expense->description }}</td>
+                                                    <td style="text-align: right;">
+                                                        {{ number_format($expense->amount, 2) }}</td>
+                                                    <td style="text-align: right;">
+                                                        @if ($record->status == 0)
+                                                            <button class="btn btn-danger btn-sm" type="button"
                                                                 onclick="deleteItem({{ $expense->id }})">
-                                                            <i class="fa fa-trash" aria-hidden="true"></i>
-                                                        </button>
-                                                        <form id="delete-form-{{ $expense->id }}"
-                                                              action="{{ route('delete.purchase.expense', $expense->id) }}"
-                                                              method="post" style="display:none;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                        </form>
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @endforeach
+                                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                                            </button>
+                                                            @can('delete.purchase.expense')
+                                                                <form id="delete-form-{{ $expense->id }}"
+                                                                    action="{{ route('delete.purchase.expense', $expense->id) }}"
+                                                                    method="post" style="display:none;">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                </form>
+                                                            @endcan
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
                                         <tfoot>
-                                        <tr>
-                                            <td></td>
-                                            <td colspan="2">Total</td>
-                                            <td style="text-align: right;">
-                                                {{ number_format($total_expense, 2) }}</td>
-                                            <td></td>
-                                        </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td colspan="2">Total</td>
+                                                <td style="text-align: right;">
+                                                    {{ number_format($total_expense, 2) }}</td>
+                                                <td></td>
+                                            </tr>
                                         </tfoot>
                                         </tbody>
                                     </table>
@@ -236,8 +251,8 @@
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script type="text/javascript">
         $(function() {
-             $("#record1").DataTable({
-                'iDisplayLength':100
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
             $('body').on('submit', '.create-form', function(e) {
                 e.preventDefault();

@@ -22,7 +22,9 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('product_unit_measures.index') }}">UTM</a></li>
+                            @can('product_unit_measures.index')
+                                <li class="breadcrumb-item"><a href="{{ route('product_unit_measures.index') }}">UTM</a></li>
+                            @endcan
                             <li class="breadcrumb-item active">Import</li>
                         </ol>
                     </div>
@@ -32,23 +34,26 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('product_unit_measures.create') }}">
-                <span class="fa fa-plus-circle"> New UTM</span>
-            </a>
+            @can('product_unit_measures.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('product_unit_measures.create') }}">
+                    <span class="fa fa-plus-circle"> New UTM</span>
+                </a>
+            @endcan
             <a class="btn btn-secondary btn-sm" href="{{ url('upload_templates/utm_template.xlsx') }}">
                 <span class="fa fa-download"> Template</span>
             </a>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 table-responsive">
-                        <form action="{{ route('product_unit_measures.import') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('product_unit_measures.import') }}" method="POST"
+                            enctype="multipart/form-data">
                             @csrf
                             <input type="file" name="file" class="form-control">
                             <button type="submit" class="btn btn-primary">Import</button>
                         </form>
                         @if (isset($count))
-                            <h4 class="text text-success">A total of {{$count}} suppliers were successfully uploaded</h4>
-                           
+                            <h4 class="text text-success">A total of {{ $count }} suppliers were successfully
+                                uploaded</h4>
                         @endif
                     </div>
                 </div>
@@ -66,8 +71,8 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         $(function() {
-             $("#record1").DataTable({
-                'iDisplayLength':100
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
             $('#record2').DataTable({
                 "paging": true,

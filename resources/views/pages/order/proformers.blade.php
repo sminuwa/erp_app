@@ -40,25 +40,27 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-2">
-                                    @can('make.daily.sale')
+                                    @can('proforma.index')
                                         <a href="{{ route('proforma.index') }}" class="btn btn-sm btn-secondary"
                                             style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Proformer</a>
                                     @endcan
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <form action="{{ route('proformer.search') }}" method="POST">
-                                        @csrf
-                                        <div class="input-group">
-                                            <input type="search" class="form-control rounded" required
-                                                placeholder="Search by name, phone or invoice number" name="refno"
-                                                aria-label="Search" aria-describedby="search-addon" />
-                                            <button type="submit" class="btn btn-outline-primary">search</button>
-                                        </div>
-                                    </form>
+                            @can('proformer.search')
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <form action="{{ route('proformer.search') }}" method="POST">
+                                            @csrf
+                                            <div class="input-group">
+                                                <input type="search" class="form-control rounded" required
+                                                    placeholder="Search by name, phone or invoice number" name="refno"
+                                                    aria-label="Search" aria-describedby="search-addon" />
+                                                <button type="submit" class="btn btn-outline-primary">search</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
+                            @endcan
                             <!-- /.card-header -->
                             <div class="card-body table-responsive">
                                 <table id="example1"
@@ -97,33 +99,40 @@
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button"
-                                                                id="dropdownMenuButton" data-toggle="dropdown"
-                                                                aria-haspopup="true" aria-expanded="false">
+                                                            id="dropdownMenuButton" data-toggle="dropdown"
+                                                            aria-haspopup="true" aria-expanded="false">
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-
-                                                            <a href="{{ route('proformer.show', $order->id) }}"
-                                                               class="dropdown-item">
-                                                                <i class="fa fa-eye" aria-hidden="true"></i> View
-                                                            </a>
-
-                                                            <a href="{{ route('proformer.edit', $order->id) }}"
-                                                                class="dropdown-item">
-                                                                <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                                            </a>
-                                                            <a href="{{ route('proformer.print', $order->id) }}"
-                                                                target="_BLANK" class="dropdown-item">
-                                                                <i class="fa fa-print" aria-hidden="true"></i> Print
-                                                            </a>
-
-                                                            <form action="{{ route('proformer.delete', $order->id) }}" method="post" onsubmit="return confirm('Are you sure want to delete this proforma invoice?')">
-                                                                @csrf
-                                                                @method('POST')
-                                                                <button class="dropdown-item" type="submit">
-                                                                    <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                                                </button>
-                                                            </form>
+                                                            @can('proformer.show')
+                                                                <a href="{{ route('proformer.show', $order->id) }}"
+                                                                    class="dropdown-item">
+                                                                    <i class="fa fa-eye" aria-hidden="true"></i> View
+                                                                </a>
+                                                            @endcan
+                                                            @can('proformer.edit')
+                                                                <a href="{{ route('proformer.edit', $order->id) }}"
+                                                                    class="dropdown-item">
+                                                                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                                                </a>
+                                                            @endcan
+                                                            @can('proformer.print')
+                                                                <a href="{{ route('proformer.print', $order->id) }}"
+                                                                    target="_BLANK" class="dropdown-item">
+                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                </a>
+                                                            @endcan
+                                                            @can('proformer.delete')
+                                                                <form action="{{ route('proformer.delete', $order->id) }}"
+                                                                    method="post"
+                                                                    onsubmit="return confirm('Are you sure want to delete this proforma invoice?')">
+                                                                    @csrf
+                                                                    @method('POST')
+                                                                    <button class="dropdown-item" type="submit">
+                                                                        <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                                                    </button>
+                                                                </form>
+                                                            @endcan
                                                         </div>
                                                     </div>
                                                 </td>
@@ -132,7 +141,6 @@
                                                 style="display: none;" aria-hidden="true">
                                                 @include('pages.order.proformer_modal')
                                             </div>
-
                                         @endforeach
                                     </tbody>
                                     <tfoot>
@@ -217,7 +225,8 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Invoice Verification/Stock out Panel: {{ optional($order)->customer->name }} | Invoice:
+                        <h5 class="modal-title">Invoice Verification/Stock out Panel: {{ optional($order)->customer->name }} |
+                            Invoice:
                             {{ optional($order)->invoice_no }}</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
@@ -254,8 +263,8 @@
         $(function() {
 
             $("#example1").DataTable({
-                    'iDisplayLength':100
-                });
+                'iDisplayLength': 100
+            });
             $('#example2').DataTable({
                 "paging": true,
                 "lengthChange": false,
@@ -271,7 +280,7 @@
                     url: "{{ route('orders.load') }}",
                     data: {
                         order_id: order_id,
-                        type:'proformer'
+                        type: 'proformer'
                     }
                 }).done(function(data) {
                     $('.display').html();

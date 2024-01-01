@@ -22,7 +22,9 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
+                            @can('products.index')
+                                <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
+                            @endcan
                             <li class="breadcrumb-item active">Import</li>
                         </ol>
                     </div>
@@ -32,9 +34,11 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('categories.create') }}">
-                <span class="fa fa-plus-circle"> New Product</span>
-            </a>
+            @can('products.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('products.create') }}">
+                    <span class="fa fa-plus-circle"> New Product</span>
+                </a>
+            @endcan
             <a class="btn btn-secondary btn-sm" href="{{ url('upload_templates/products_template.xlsx') }}">
                 <span class="fa fa-download"> Template</span>
             </a>
@@ -47,8 +51,8 @@
                             <button type="submit" class="btn btn-primary">Import</button>
                         </form>
                         @if (isset($count))
-                            <h4 class="text text-success">A total of {{$count}} suppliers were successfully uploaded</h4>
-                           
+                            <h4 class="text text-success">A total of {{ $count }} suppliers were successfully
+                                uploaded</h4>
                         @endif
                     </div>
                 </div>
@@ -66,8 +70,8 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         $(function() {
-             $("#record1").DataTable({
-                'iDisplayLength':100
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
             $('#record2').DataTable({
                 "paging": true,

@@ -12,13 +12,13 @@
                 <td> {{ $record->code }} </td>
                 <td> {{ $record->name }} </td>
                 <td>
-                    @can('edit.product.group')
+                    @can('categories.edit')
                         <a class="btn btn-secondary btn-sm" href="{{ route('categories.edit', $record->id) }}">
                             <span class="fa fa-pencil"></span>
                         </a>
                     @endcan
-                    @if(!$record->has_record())
-                        @can('delete.product.group')
+                    @if (!$record->has_record())
+                        @can('categories.destroy')
                             <form onsubmit="return confirm('Are you sure you want to delete?')"
                                 action="{{ route('categories.destroy', $record->id) }}" method="post" style="display: inline">
                                 {{ csrf_field() }}

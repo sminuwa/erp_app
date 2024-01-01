@@ -20,7 +20,6 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
                             <li class="breadcrumb-item active">Stock Adjustment</li>
                         </ol>
                     </div>
@@ -30,12 +29,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('stock_adjustments.create') }}">
-                <span class="fa fa-plus-circle"></span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('stock_adjustments.index') }}">
-                <span class="fa fa-list"></span>
-            </a>
+            @can('stock_adjustments.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('stock_adjustments.create') }}">
+                    <span class="fa fa-plus-circle"></span>
+                </a>
+            @endcan
+            @can('stock_adjustments.index')
+                <a class="btn btn-secondary btn-sm" href="{{ route('stock_adjustments.index') }}">
+                    <span class="fa fa-list"></span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>
@@ -72,67 +75,70 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($adjusment_products as $product)
-                                                <tr>
-                                                    <form action="{{ route('stock_adjustments.cart.update') }}"
-                                                        method="post">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        @php $attr = $product->attributes @endphp
-                                                        <td>{{ $loop->iteration }}</td>
-                                                        <td class="text-left">{{ $product->name }}</td>
-                                                        <input type="hidden" name="id" class="form-control input-sm"
-                                                            value="{{ $product->id }}" />
-                                                        <input type="hidden" name="store_id" class="form-control input-sm"
-                                                            value="{{ $attr['store_id'] }}" />
-                                                        <input type="hidden" name="product_id" class="form-control input-sm"
-                                                            value="{{ $attr['product_id'] }}" />
-                                                            <input type="hidden" name="available_qty" class="form-control input-sm"
-                                                            value="{{ $attr['available_qty'] }}" />
-                                                            
-                                                        <td>
-
-                                                            @if ($attr['sign'] == '-')
-                                                                <input type="number" name="quantity" id="quantity"
-                                                                    class="form-control input-sm"
-                                                                    value="{{ 0 - $product->quantity }}" />
-                                                            @else
-                                                                <input type="number" name="quantity" id="quantity"
-                                                                    class="form-control input-sm"
-                                                                    value="{{ $product->quantity }}" />
-                                                            @endif
-
-                                                        </td>
-                                                        <td>{{ \App\Models\Store::find($attr['store_id'])->name }}</td>
-                                                        </td>
-                                                        <td>
-                                                            <button type="submit" class="btn btn-sm btn-success">
-                                                                <i class="fa fa-check-circle" aria-hidden="true"></i>
-                                                            </button>
-                                                        </td>
-                                                    </form>
-                                                    <td>
-                                                        <button class="btn btn-danger btn-sm" type="button"
-                                                            onclick="deleteItem({{ $product->id }})">
-                                                            <i class="fa fa-trash" aria-hidden="true"></i>
-                                                        </button>
-                                                        <form id="delete-form-{{ $product->id }}"
-                                                            action="{{ route('stock_adjustments.cart.remove', $product->id) }}"
-                                                            method="post" style="display:none;">
+                                            @can('stock_adjustments.cart.update')
+                                                @foreach ($adjusment_products as $product)
+                                                    <tr>
+                                                        <form action="{{ route('stock_adjustments.cart.update') }}"
+                                                            method="post">
                                                             @csrf
-                                                            @method('DELETE')
+                                                            @method('PUT')
+                                                            @php $attr = $product->attributes @endphp
+                                                            <td>{{ $loop->iteration }}</td>
+                                                            <td class="text-left">{{ $product->name }}</td>
+                                                            <input type="hidden" name="id" class="form-control input-sm"
+                                                                value="{{ $product->id }}" />
+                                                            <input type="hidden" name="store_id" class="form-control input-sm"
+                                                                value="{{ $attr['store_id'] }}" />
+                                                            <input type="hidden" name="product_id"
+                                                                class="form-control input-sm"
+                                                                value="{{ $attr['product_id'] }}" />
+                                                            <input type="hidden" name="available_qty"
+                                                                class="form-control input-sm"
+                                                                value="{{ $attr['available_qty'] }}" />
+
+                                                            <td>
+
+                                                                @if ($attr['sign'] == '-')
+                                                                    <input type="number" name="quantity" id="quantity"
+                                                                        class="form-control input-sm"
+                                                                        value="{{ 0 - $product->quantity }}" />
+                                                                @else
+                                                                    <input type="number" name="quantity" id="quantity"
+                                                                        class="form-control input-sm"
+                                                                        value="{{ $product->quantity }}" />
+                                                                @endif
+
+                                                            </td>
+                                                            <td>{{ \App\Models\Store::find($attr['store_id'])->name }}</td>
+                                                            </td>
+                                                            <td>
+                                                                <button type="submit" class="btn btn-sm btn-success">
+                                                                    <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                                                </button>
+                                                            </td>
                                                         </form>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
+                                                        <td>
+                                                            <button class="btn btn-danger btn-sm" type="button"
+                                                                onclick="deleteItem({{ $product->id }})">
+                                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                                            </button>
+                                                            <form id="delete-form-{{ $product->id }}"
+                                                                action="{{ route('stock_adjustments.cart.remove', $product->id) }}"
+                                                                method="post" style="display:none;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            @endcan
                                         </tbody>
                                     </table>
                                 @endif
-                                <form action="{{ isset($route) ? $route : route('stock_adjustments.update',$model->id) }}"
+                                <form action="{{ isset($route) ? $route : route('stock_adjustments.update', $model->id) }}"
                                     method="POST">
                                     {{ csrf_field() }}
-                                    <input type="hidden" name="_method"
-                                        value="{{ isset($method) ? $method : 'PUT' }}" />
+                                    <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'PUT' }}" />
                                     <div class="form-group">
                                         <label for="refno">Stock Adjustement ID</label>
                                         <input type="text"

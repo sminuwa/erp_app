@@ -5,7 +5,7 @@ namespace App\Http\Requests\Roles;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Role;
 
-class Store extends FormRequest 
+class Store extends FormRequest
 {
 
     /**
@@ -13,9 +13,9 @@ class Store extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('create.role', Role::class);
+        return $this->user()->can('roles.create', Role::class);
     }
 
     /**
@@ -23,7 +23,7 @@ class Store extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 			'name' => 'required|max:255|unique:roles,name',
@@ -38,7 +38,7 @@ class Store extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

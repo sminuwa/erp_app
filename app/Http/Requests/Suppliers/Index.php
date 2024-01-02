@@ -13,10 +13,10 @@ class Index extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    /*public function authorize()
     {
         return $this->user()->can('suppliers.index', Supplier::class);
-    }
+    }*/
 
     /**
      * Get the validation rules that apply to the request.

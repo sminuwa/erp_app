@@ -5,7 +5,7 @@ namespace App\Http\Requests\Suppliers;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Supplier;
 
-class Store extends FormRequest 
+class Store extends FormRequest
 {
 
     /**
@@ -13,9 +13,9 @@ class Store extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('add.supplier', Supplier::class);
+        return $this->user()->can('suppliers.create', Supplier::class);
     }
 
     /**
@@ -23,7 +23,7 @@ class Store extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 			'name' => 'required|max:191',
@@ -42,7 +42,7 @@ class Store extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

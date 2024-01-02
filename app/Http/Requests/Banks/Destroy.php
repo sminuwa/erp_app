@@ -4,7 +4,7 @@ namespace App\Http\Requests\Banks;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Bank;
-class Destroy extends FormRequest 
+class Destroy extends FormRequest
 {
 
     /**
@@ -12,9 +12,9 @@ class Destroy extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('delete.bank', Bank::class);
+        return $this->user()->can('banks.destroy', Bank::class);
     }
 
     /**
@@ -22,7 +22,7 @@ class Destroy extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 
@@ -37,7 +37,7 @@ class Destroy extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

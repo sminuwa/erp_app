@@ -29,9 +29,11 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('credit_limits.create') }}">
-                <span class="fa fa-plus-circle"></span>
-            </a>
+            @can('credit_limits.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('credit_limits.create') }}">
+                    <span class="fa fa-plus-circle"></span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 table-responsive">
@@ -52,8 +54,8 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         $(function() {
-             $("#record1").DataTable({
-                'iDisplayLength':100
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
             $('#record2').DataTable({
                 "paging": true,

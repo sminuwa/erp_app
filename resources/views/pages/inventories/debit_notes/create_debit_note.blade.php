@@ -21,9 +21,6 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('suppliers.index') }}">Supplier</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('suppliers.payments') }}">Supplier Payment</a>
-                            </li>
                             <li class="breadcrumb-item active">Credit Note</li>
                         </ol>
                     </div>
@@ -33,9 +30,11 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('customers.credit.note') }}">
-                <span class="fa fa-list"> Credit Notes</span>
-            </a>
+            @can('customers.credit.note')
+                <a class="btn btn-secondary btn-sm" href="{{ route('customers.credit.note') }}">
+                    <span class="fa fa-list"> Credit Notes</span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12">
@@ -50,8 +49,8 @@
                                         <div class="form-group">
                                             <label for="date">Date</label>
                                             <input type="text" name="date" class="form-control date_ datepicker"
-                                                   value="{{ $purchase ? $purchase->purchase_date : date('Y-m-d') }}" required
-                                            />
+                                                value="{{ $purchase ? $purchase->purchase_date : date('Y-m-d') }}"
+                                                required />
                                         </div>
 
                                     </div>
@@ -60,8 +59,9 @@
                                             <label>Supplier</label>
                                             <select name="supplier_id" id="supplier_id" class="form-control" required>
                                                 <option value="" disabled selected>Select...</option>
-                                                @foreach($suppliers as $supplier)
-                                                    <option value="{{$supplier->id}}">{{ $supplier->code }} - {{ $supplier->name }}</option>
+                                                @foreach ($suppliers as $supplier)
+                                                    <option value="{{ $supplier->id }}">{{ $supplier->code }} -
+                                                        {{ $supplier->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -79,14 +79,14 @@
                                 <input type="text" id="search" class="form-control" placeholder="Search">
                                 <table class="table" id="" style="font-size: 12px;">
                                     <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Reference</th>
-                                        <th>Supplier</th>
-                                        <th>Amount</th>
-                                        <th>Description</th>
-                                        <th>Created By</th>
-                                    </tr>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Reference</th>
+                                            <th>Supplier</th>
+                                            <th>Amount</th>
+                                            <th>Description</th>
+                                            <th>Created By</th>
+                                        </tr>
                                     </thead>
                                     <tbody id="table-body" class="load-invoices">
 
@@ -98,9 +98,9 @@
                     </div>
 
                     <div class="col-md-8" id="load">
-                        {{--@if (isset($order) && $order != null)
+                        {{-- @if (isset($order) && $order != null)
                             @include('pages.inventories.credit_notes.load_products')
-                        @endif--}}
+                        @endif --}}
                     </div>
 
                 </div>
@@ -121,8 +121,6 @@
     <!-- Sweet Alert Js -->
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script>
-
-
         $(function() {
             $("#example1,#store_data").DataTable();
             $('#example2').DataTable({
@@ -146,7 +144,7 @@
                 });
             });
 
-            $('.customer_id').on('change',function() {
+            $('.customer_id').on('change', function() {
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.customer-orders') }}",
@@ -236,12 +234,14 @@
                 };
             })();*/
 
-            $(document).on('keyup','.quantity', function() {
+            $(document).on('keyup', '.quantity', function() {
                 let id = $(this).attr('data-value');
                 $("#valid_qty" + id.substr(1)).html("");
-                if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
-                    'max-qty'))) {
-                    $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $('#quantity' +
+                if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(
+                        1)).attr(
+                        'max-qty'))) {
+                    $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $(
+                        '#quantity' +
                         id.substr(1)).attr('max-qty') + ")");
                     $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
                     return false;
@@ -261,7 +261,8 @@
                         success: function(data) {
                             // console.log(data)
                             id = id.substr(1);
-                            subtotal = $('#price' + id).val() * $('#quantity' + id).val();
+                            subtotal = $('#price' + id).val() * $('#quantity' + id)
+                                .val();
                             $('.subtotal' + id).text(formatMoney(subtotal));
                             $('.total').text(formatMoney(data));
                         },
@@ -314,7 +315,7 @@
                             }
                         }).done(function(data) {
                             $('.total').text(formatMoney(data));
-                            $('.item'+id).remove();
+                            $('.item' + id).remove();
                         });
                         // return
                     } else if (

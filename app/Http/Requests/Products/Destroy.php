@@ -5,7 +5,7 @@ namespace App\Http\Requests\Products;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Product;
 
-class Destroy extends FormRequest 
+class Destroy extends FormRequest
 {
 
     /**
@@ -13,9 +13,9 @@ class Destroy extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('delete.product', Product::class);
+        return $this->user()->can('products.destroy', Product::class);
     }
 
     /**
@@ -23,7 +23,7 @@ class Destroy extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 
@@ -38,7 +38,7 @@ class Destroy extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

@@ -33,9 +33,11 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('customers.credit.note') }}">
-                <span class="fa fa-list"> Credit Notes</span>
-            </a>
+            @can('customers.credit.note')
+                <a class="btn btn-secondary btn-sm" href="{{ route('customers.credit.note') }}">
+                    <span class="fa fa-list"> Credit Notes</span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12">
@@ -136,17 +138,16 @@
     <!-- Sweet Alert Js -->
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script src="{{ asset('assets/backend/js/select2.full.js') }}"></script>
-    
+
     <script>
-        function Initialize()
-        {
-            if($('.customer_id').length) {
-                    $('.customer_id').select2({
-                        allowClear: true,
-                        width: '100%'
-                    });
+        function Initialize() {
+            if ($('.customer_id').length) {
+                $('.customer_id').select2({
+                    allowClear: true,
+                    width: '100%'
+                });
             }
-        } 
+        }
         $(function() {
             $("#example1,#store_data").DataTable();
             $('#example2').DataTable({

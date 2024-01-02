@@ -7,7 +7,6 @@
         .modal-lg {
             max-width: 50% !important;
         }
-
     </style>
 @endpush
 
@@ -139,16 +138,18 @@
                             <!-- /.row -->
 
                             <!-- this row will not appear when printing -->
-                            <div class="row no-print">
-                                <div class="col-12">
-                                    <a href="{{ route('invoice.print', $customer->id) }}" target="_blank"
-                                        class="btn btn-default"><i class="fa fa-print"></i> Print</a>
-                                    <button type="button" data-toggle="modal" data-target="#exampleModal"
-                                        class="btn btn-success float-right"><i class="fa fa-credit-card"></i>
-                                        Submit Payment
-                                    </button>
+                            @can('invoice.print')
+                                <div class="row no-print">
+                                    <div class="col-12">
+                                        <a href="{{ route('invoice.print', $customer->id) }}" target="_blank"
+                                            class="btn btn-default"><i class="fa fa-print"></i> Print</a>
+                                        <button type="button" data-toggle="modal" data-target="#exampleModal"
+                                            class="btn btn-success float-right"><i class="fa fa-credit-card"></i>
+                                            Submit Payment
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+                            @endcan
                         </div>
                         <!-- /.invoice -->
                     </div><!-- /.col -->

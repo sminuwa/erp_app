@@ -5,7 +5,7 @@ namespace App\Http\Requests\Products;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Product;
 
-class Index extends FormRequest 
+class Index extends FormRequest
 {
 
     /**
@@ -13,9 +13,9 @@ class Index extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('view.product', Product::class);
+        return $this->user()->can('products.index', Product::class);
     }
 
     /**
@@ -23,7 +23,7 @@ class Index extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 
@@ -38,7 +38,7 @@ class Index extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

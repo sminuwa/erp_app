@@ -4,7 +4,7 @@ namespace App\Http\Requests\BranchProductPrices;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\BranchProductPrice;
-class Update extends FormRequest 
+class Update extends FormRequest
 {
 
     /**
@@ -12,9 +12,9 @@ class Update extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('edit.product.price', BranchProductPrice::class);
+        return $this->user()->can('branch_product_prices.edit', BranchProductPrice::class);
     }
 
     /**
@@ -22,7 +22,7 @@ class Update extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 			'branch_id' => 'required|exists:branches,id',
@@ -42,7 +42,7 @@ class Update extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

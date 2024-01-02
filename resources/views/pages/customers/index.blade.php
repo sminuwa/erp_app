@@ -31,15 +31,21 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('customers.create') }}">
-                <span class="fa fa-plus-circle"> New Customer</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('customers.import.form') }}">
-                <span class="fa fa-upload"> Upload Customers</span>
-            </a>
-
-            <a href="javascript:void(0)" data-toggle="modal" data-target="#customer_ledgerform"
-                            class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span class="fa fa-money"> Customer Ledger</span> </a>
+            @can('customers.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('customers.create') }}">
+                    <span class="fa fa-plus-circle"> New Customer</span>
+                </a>
+            @endcan
+            @can('customers.import.form')
+                <a class="btn btn-secondary btn-sm" href="{{ route('customers.import.form') }}">
+                    <span class="fa fa-upload"> Upload Customers</span>
+                </a>
+            @endcan
+            @can('customer.ledger')
+                <a href="javascript:void(0)" data-toggle="modal" data-target="#customer_ledgerform"
+                    class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span class="fa fa-money"> Customer Ledger</span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 table-responsive">
@@ -72,8 +78,8 @@
                         </div>
                         <div class="form-group">
                             <label for="to_date">To Date</label>
-                            <input type="text" class="form-control datepicker" name="to_date" id="to_date" placeholder=""
-                                autocomplete="off">
+                            <input type="text" class="form-control datepicker" name="to_date" id="to_date"
+                                placeholder="" autocomplete="off">
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp;
@@ -105,21 +111,21 @@
 @endsection
 
 @push('js')
-     <!-- DataTables -->
-     <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
-     <!-- SlimScroll -->
-     <script src="{{ asset('assets/backend/plugins/slimScroll/jquery.slimscroll.min.js') }}"></script>
-     <!-- FastClick -->
-     <script src="{{ asset('assets/backend/plugins/fastclick/fastclick.js') }}"></script>
- 
-     <!-- Sweet Alert Js -->
-     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
- 
+    <!-- DataTables -->
+    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
+    <!-- SlimScroll -->
+    <script src="{{ asset('assets/backend/plugins/slimScroll/jquery.slimscroll.min.js') }}"></script>
+    <!-- FastClick -->
+    <script src="{{ asset('assets/backend/plugins/fastclick/fastclick.js') }}"></script>
+
+    <!-- Sweet Alert Js -->
+    <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
+
     <script type="text/javascript">
         $(function() {
             $("#example1").DataTable({
-                    'iDisplayLength':100
-                });
+                'iDisplayLength': 100
+            });
             $('#example2').DataTable({
                 "paging": true,
                 "lengthChange": false,

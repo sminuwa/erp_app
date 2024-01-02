@@ -16,12 +16,12 @@
                 <td> {{ $record->branch->name }} </td>
                 <td> {{ $record->status == 1 ? 'Active' : 'Inactive' }} </td>
                 <td>
-                    @can('edit.store')
+                    @can('stores.edit')
                         <a class="btn btn-secondary btn-sm" href="{{ route('stores.edit', $record->id) }}">
                             <span class="fa fa-pencil"></span>
                         </a>
                     @endcan
-                    @can('delete.store')
+                    @can('stores.destroy')
                         <form onsubmit="return confirm('Are you sure you want to delete?')"
                             action="{{ route('stores.destroy', $record->id) }}" method="post" style="display: inline">
                             {{ csrf_field() }}

@@ -38,39 +38,44 @@
                             <td class="text-left">{{ $supplier->code }}</td>
                             <td class="text-left">{{ $supplier->name }}</td>
                             <td class="text-left">{{ $product->name }}</td>
+                            @can('debit.note.cart.update', $user)
+                                <form action="{{ route('debit.note.cart.update') }}" method="post"
+                                    id="p{{ $product->id }}">
+                                    @csrf
+                                    @method('PUT')
+                                    <td>
+                                        <input type="text" name="price" id="price{{ $product->id }}"
+                                            class="form-control price" style="min-width:65px;" value="{{ $product->price }}"
+                                            data-val="{{ $product->price }}" data-value="p{{ $product->id }}">
+                                        <input type="hidden" name="id" class="form-control"
+                                            value="{{ $product->id }}">
+                                        <input type="hidden" name="supplier_id" class="form-control"
+                                            value="{{ $supplier->id }}">
+                                        <input type="hidden" name="name" class="form-control"
+                                            value="{{ $product->name }}">
 
-                            <form action="{{ route('debit.note.cart.update') }}" method="post" id="p{{ $product->id }}">
-                                @csrf
-                                @method('PUT')
-                                <td>
-                                    <input type="text" name="price" id="price{{ $product->id }}"
-                                        class="form-control price" style="min-width:65px;"
-                                        value="{{ $product->price }}"
-                                        data-val="{{ $product->price }}"
-                                        data-value="p{{ $product->id }}">
-                                <input type="hidden" name="id" class="form-control" value="{{ $product->id }}">
-                                <input type="hidden" name="supplier_id" class="form-control" value="{{ $supplier->id }}">
-                                <input type="hidden" name="name" class="form-control" value="{{ $product->name }}">
-                                
-                                {{-- <td>
-                                <button type="submit" class="btn btn-sm btn-success">
-                                    <i class="fa fa-check-circle" aria-hidden="true"></i>
-                                </button>
-                            </td> --}}
-                            </form>
+                                        {{-- <td>
+                            <button type="submit" class="btn btn-sm btn-success">
+                                <i class="fa fa-check-circle" aria-hidden="true"></i>
+                            </button>
+                        </td> --}}
+                                </form>
+                            @endcan
 
                             <td>
                                 <button class="btn btn-danger btn-sm delete" type="button"
                                     data-val="{{ $product->id }}">
                                     <i class="fa fa-trash" aria-hidden="true"></i>
                                 </button>
-                                <form id="delete-form-{{ $product->id }}"
-                                    action="{{ route('debit.note.cart.remove', $product->id) }}" method="post"
-                                    style="display:none;">
-                                    <input type="hidden" name="purchase" id="purchase" value="{{ $purchase->id }}" />
-                                    @csrf
-                                    @method('DELETE')
-                                </form>
+                                @can('debit.note.cart.remove')
+                                    <form id="delete-form-{{ $product->id }}"
+                                        action="{{ route('debit.note.cart.remove', $product->id) }}" method="post"
+                                        style="display:none;">
+                                        <input type="hidden" name="purchase" id="purchase" value="{{ $purchase->id }}" />
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                @endcan
                             </td>
                         </tr>
                     @endforeach
@@ -80,14 +85,16 @@
         <div class="alert alert-success">
             Total : &#8358; <span id="total">{{ number_format(Cart::getTotal()) }}</span>
         </div>
-        <form action="{{ route('suppliers.debit.note.store') }}" method="POST">
-            @csrf
-            <input type="hidden" name="purchase_id"  value="{{ $purchase->id }}" />
-            <textarea name="comment" placeholder="Comment" rows="5" cols="100" class="form-control"></textarea>
-            <div class="form-group text-right">
-                <input type="submit" name="Submit" class=" btn btn-primary" value="Submit" />
-            </div>
-        </form>
+        @can('suppliers.debit.note.store')
+            <form action="{{ route('suppliers.debit.note.store') }}" method="POST">
+                @csrf
+                <input type="hidden" name="purchase_id" value="{{ $purchase->id }}" />
+                <textarea name="comment" placeholder="Comment" rows="5" cols="100" class="form-control"></textarea>
+                <div class="form-group text-right">
+                    <input type="submit" name="Submit" class=" btn btn-primary" value="Submit" />
+                </div>
+            </form>
+        @endcan
     </div>
     <!-- /.card-body -->
 </div>

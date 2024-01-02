@@ -30,12 +30,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a href="{{ route('journal.create') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;">
-                <span class="fa fa-plus-circle"> </span> New Journal
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('journal.index') }}">
-                <span class="fa fa-list"></span> Journals List
-            </a>
+            @can('journal.create')
+                <a href="{{ route('journal.create') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;">
+                    <span class="fa fa-plus-circle"> </span> New Journal
+                </a>
+            @endcan
+            @can('journal.index')
+                <a class="btn btn-secondary btn-sm" href="{{ route('journal.index') }}">
+                    <span class="fa fa-list"></span> Journals List
+                </a>
+            @endcan
             <div class="container-fluid py-4">
                 <livewire:edit-journal :journal="$journal" />
             </div><!-- /.container-fluid -->
@@ -49,13 +53,9 @@
 
 
 @push('css')
-
-
     @livewireStyles
 @endpush
 @push('js')
     @livewireScripts
-    <script>
-
-    </script>
+    <script></script>
 @endpush

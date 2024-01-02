@@ -28,15 +28,21 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('customers.create') }}">
-                <span class="fa fa-plus-circle"> New Customer</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('customers.import.form') }}">
-                <span class="fa fa-upload"> Upload Customers</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('customers.index') }}">
-                <span class="fa fa-list"> View Customers</span>
-            </a>
+            @can('customers.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('customers.create') }}">
+                    <span class="fa fa-plus-circle"> New Customer</span>
+                </a>
+            @endcan
+            @can('customers.import.form')
+                <a class="btn btn-secondary btn-sm" href="{{ route('customers.import.form') }}">
+                    <span class="fa fa-upload"> Upload Customers</span>
+                </a>
+            @endcan
+            @can('customers.index')
+                <a class="btn btn-secondary btn-sm" href="{{ route('customers.index') }}">
+                    <span class="fa fa-list"> View Customers</span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>

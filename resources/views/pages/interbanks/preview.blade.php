@@ -41,41 +41,52 @@
                                 <a href="javascript:history.back()" class="btn btn-warning btn-sm">
                                     <i class="fa fa-arrow-left"></i> Back
                                 </a>
-                                <a href="{{ route('create.interbank') }}" class="btn btn-secondary btn-sm ">
-                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> New Transfer
-                                </a>
+                                @can('create.interbank')
+                                    <a href="{{ route('create.interbank') }}" class="btn btn-secondary btn-sm ">
+                                        <i class="fa fa-plus-circle" aria-hidden="true"></i> New Transfer
+                                    </a>
+                                @endcan
 
-                                <a href="{{ route('interbank.print', $interbank->id) }}" target="_BLANK"
-                                    class="btn btn-dark btn-sm ">
-                                    <i class="fa fa-print" aria-hidden="true"></i> Print
-                                </a>
-                                <a href="{{ route('interbank.print.pos', $interbank->id) }}" target="_BLANK"
-                                    class="btn btn-dark btn-sm ">
-                                    <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
-                                </a>
+                                @can('interbank.print')
+                                    <a href="{{ route('interbank.print', $interbank->id) }}" target="_BLANK"
+                                        class="btn btn-dark btn-sm ">
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                    </a>
+                                @endcan
+                                @can('interbank.print.pos')
+                                    <a href="{{ route('interbank.print.pos', $interbank->id) }}" target="_BLANK"
+                                        class="btn btn-dark btn-sm ">
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
+                                    </a>
+                                @endcan
 
                                 @if ($interbank->status == 0)
-                                    <a href="{{ route('create.interbank', ['interbank_id' => $interbank->id]) }}"
-                                        class="btn btn-info btn-sm ">
-                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                    </a>
-                                    <form class="d-inline" action="{{ route('interbank.post', $interbank->id) }}"
-                                        method="post"
-                                        onsubmit="return confirm('Are you sure you want to post this interbank?')">
-                                        @csrf
-                                        <button type="submit" class="btn btn-success btn-sm ">
-                                            <i class="fa fa-check" aria-hidden="true"></i> Post
-                                        </button>
-                                    </form>
-
-                                    <form class="d-inline" id="delete-form-{{ $interbank->id }}"
-                                        action="{{ route('interbank.delete', $interbank->id) }}" method="post"
-                                        onsubmit="return confirm('Are you sure you want to close this interbank?')">
-                                        @csrf
-                                        <button class="btn btn-danger btn-sm " type="submit">
-                                            <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                        </button>
-                                    </form>
+                                    @can('create.interbank')
+                                        <a href="{{ route('create.interbank', ['interbank_id' => $interbank->id]) }}"
+                                            class="btn btn-info btn-sm ">
+                                            <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                        </a>
+                                    @endcan
+                                    @can('interbank.post')
+                                        <form class="d-inline" action="{{ route('interbank.post', $interbank->id) }}"
+                                            method="post"
+                                            onsubmit="return confirm('Are you sure you want to post this interbank?')">
+                                            @csrf
+                                            <button type="submit" class="btn btn-success btn-sm ">
+                                                <i class="fa fa-check" aria-hidden="true"></i> Post
+                                            </button>
+                                        </form>
+                                    @endcan
+                                    @can('interbank.delete')
+                                        <form class="d-inline" id="delete-form-{{ $interbank->id }}"
+                                            action="{{ route('interbank.delete', $interbank->id) }}" method="post"
+                                            onsubmit="return confirm('Are you sure you want to close this interbank?')">
+                                            @csrf
+                                            <button class="btn btn-danger btn-sm " type="submit">
+                                                <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                            </button>
+                                        </form>
+                                    @endcan
                                 @endif
 
 
@@ -137,7 +148,8 @@
                                                     @endif
                                                 </td>
                                                 <td class="col-md-3" align="right">
-                                                    &#8358; {{ currency_sign().number_format($interbank->amount, 2) }}</td>
+                                                    &#8358; {{ currency_sign() . number_format($interbank->amount, 2) }}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td class="text-left text-danger" colspan="2">

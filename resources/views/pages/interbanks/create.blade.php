@@ -30,38 +30,50 @@
 
         <!-- Main content -->
         <section class="content">
-            <a href="{{ route('create.interbank') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                    class="fa fa-plus-circle"> </span> New
-                Transfer</a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('interbank.list') }}">
-                <span class="fa fa-list"> Transfers</span>
-            </a>
-            @if (Session::get('prev_id') != null)
-                <a href="{{ route('interbank.print', Session::get('prev_id')) }}" target="_BLANK"
-                    class="btn btn-sm btn-primary" style="margin-left: 2px;"><span class="fa fa-print"> Print</span> </a>
-                <a href="{{ route('interbank.print.pos', Session::get('prev_id')) }}" target="_BLANK"
-                    class="btn btn-secondary btn-sm">
-                    <i class="fa fa-print" aria-hidden="true">PoS</i>
+            @can('create.interbank')
+                <a href="{{ route('create.interbank') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
+                        class="fa fa-plus-circle"> </span> New
+                    Transfer</a>
+            @endcan
+            @can('interbank.list')
+                <a class="btn btn-secondary btn-sm" href="{{ route('interbank.list') }}">
+                    <span class="fa fa-list"> Transfers</span>
                 </a>
+            @endcan
+            @if (Session::get('prev_id') != null)
+                @can('interbank.print')
+                    <a href="{{ route('interbank.print', Session::get('prev_id')) }}" target="_BLANK"
+                        class="btn btn-sm btn-primary" style="margin-left: 2px;"><span class="fa fa-print"> Print</span> </a>
+                @endcan
+                @can('interbank.print.pos')
+                    <a href="{{ route('interbank.print.pos', Session::get('prev_id')) }}" target="_BLANK"
+                        class="btn btn-secondary btn-sm">
+                        <i class="fa fa-print" aria-hidden="true">PoS</i>
+                    </a>
+                @endcan
             @endif
             <div class="container-fluid py-4">
-                <div class="card" >
+                <div class="card">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-sm-12 ">
                                 <form action="{{ isset($route) ? $route : route('interbank.store') }}" method="POST">
                                     {{ csrf_field() }}
                                     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
-                                    <input type="hidden" name="interbank_id" value="{{ isset($model) ? $model->id : '' }}" />
+                                    <input type="hidden" name="interbank_id"
+                                        value="{{ isset($model) ? $model->id : '' }}" />
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="source_account_id">Source Account</label>
-                                                <select class="form-control select2-single {{ $errors->has('source_account_id') ? ' is-invalid' : '' }}"
-                                                        name="source_account_id" id="source_account_id" required="required">
+                                                <select
+                                                    class="form-control select2-single {{ $errors->has('source_account_id') ? ' is-invalid' : '' }}"
+                                                    name="source_account_id" id="source_account_id" required="required">
                                                     <option value="">Select...</option>
                                                     @foreach ($accounts as $account)
-                                                        <option value="{{ $account->id }}" {{ $account->id == $model->source_account_id ? 'selected' : '' }} {{ $account->id == old('source_account_id', $model->source_account_id) }}>
+                                                        <option value="{{ $account->id }}"
+                                                            {{ $account->id == $model->source_account_id ? 'selected' : '' }}
+                                                            {{ $account->id == old('source_account_id', $model->source_account_id) }}>
                                                             {{ $account->number }} - {{ $account->description }}</option>
                                                     @endforeach
                                                 </select>
@@ -76,11 +88,15 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="destination_account_id">Destination Account</label>
-                                                <select class="form-control select2-single {{ $errors->has('destination_account_id') ? ' is-invalid' : '' }}"
-                                                        name="destination_account_id" id="destination_account_id" required="required">
+                                                <select
+                                                    class="form-control select2-single {{ $errors->has('destination_account_id') ? ' is-invalid' : '' }}"
+                                                    name="destination_account_id" id="destination_account_id"
+                                                    required="required">
                                                     <option value="">Select...</option>
                                                     @foreach ($accounts as $account)
-                                                        <option value="{{ $account->id }}" {{ $account->id == $model->destination_account_id ? 'selected' : '' }} {{ $account->id == old('destination_account_id', $model->source_account_id) }}>
+                                                        <option value="{{ $account->id }}"
+                                                            {{ $account->id == $model->destination_account_id ? 'selected' : '' }}
+                                                            {{ $account->id == old('destination_account_id', $model->source_account_id) }}>
                                                             {{ $account->number }} - {{ $account->description }}</option>
                                                     @endforeach
                                                 </select>
@@ -98,10 +114,10 @@
                                             <div class="form-group">
                                                 <label for="payment_date">Transfer Date</label>
                                                 <input type="text"
-                                                       class="form-control datepicker {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
-                                                       name="payment_date" id="payment_date"
-                                                       value="@if($model) {{ $model->payment_date }} @endif {{ old('payment_date', $model->payment_date) == '' ? date('Y-m-d') : old('payment_date', $model->payment_mode) }}"
-                                                       required="required">
+                                                    class="form-control datepicker {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
+                                                    name="payment_date" id="payment_date"
+                                                    value="@if ($model) {{ $model->payment_date }} @endif {{ old('payment_date', $model->payment_date) == '' ? date('Y-m-d') : old('payment_date', $model->payment_mode) }}"
+                                                    required="required">
                                                 @if ($errors->has('payment_date'))
                                                     <div class="invalid-feedback">
                                                         <strong>{{ $errors->first('payment_date') }}</strong>
@@ -112,8 +128,10 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="amount">Amount</label>
-                                                <input type="number" class="form-control {{ $errors->has('amount') ? ' is-invalid' : '' }}"
-                                                       name="amount" id="amount" value="{{ old('amount', $model->amount) }}" required>
+                                                <input type="number"
+                                                    class="form-control {{ $errors->has('amount') ? ' is-invalid' : '' }}"
+                                                    name="amount" id="amount"
+                                                    value="{{ old('amount', $model->amount) }}" required>
                                                 @if ($errors->has('amount'))
                                                     <div class="invalid-feedback">
                                                         <strong>{{ $errors->first('amount') }}</strong>

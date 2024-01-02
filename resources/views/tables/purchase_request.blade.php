@@ -26,36 +26,44 @@
                             Action
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" href="{{ route('purchases.request.show', $record->id) }}">
-                                <span class="fa fa-eye"> View</span>
-                            </a>
+                            @can('purchases.request.show')
+                                <a class="dropdown-item" href="{{ route('purchases.request.show', $record->id) }}">
+                                    <span class="fa fa-eye"> View</span>
+                                </a>
+                            @endcan
                             @if ($record->status == 0)
-                                <form action="{{ route('purchase.request.close', $record->id) }}" method="post"
-                                    onsubmit="return confirm('Are you sure you want to close this order?')">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item">
-                                        <i class="fa fa-close" aria-hidden="true"></i> Close
-                                    </button>
-                                </form>
-                                <form action="{{ route('purchase.request.link', $record->id) }}" method="post"
-                                    onsubmit="return confirm('Are you sure you want to post this order?')">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item">
-                                        <i class="fa fa-link" aria-hidden="true"></i> Link to GRN
-                                    </button>
-                                </form>
+                                @can('purchase.request.close')
+                                    <form action="{{ route('purchase.request.close', $record->id) }}" method="post"
+                                        onsubmit="return confirm('Are you sure you want to close this order?')">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="fa fa-close" aria-hidden="true"></i> Close
+                                        </button>
+                                    </form>
+                                @endcan
+                                @can('purchase.request.link')
+                                    <form action="{{ route('purchase.request.link', $record->id) }}" method="post"
+                                        onsubmit="return confirm('Are you sure you want to post this order?')">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="fa fa-link" aria-hidden="true"></i> Link to GRN
+                                        </button>
+                                    </form>
+                                @endcan
 
-                                @can('edit.item.purchase')
+                                @can('purchases.request.edit')
                                     <a class="dropdown-item" href="{{ route('purchases.request.edit', $record->id) }}">
                                         <span class="fa fa-pencil"> Edit</span>
                                     </a>
                                 @endcan
                             @endif
-                            <a class="dropdown-item" href="{{ route('purchase.request.print', $record->id) }}"
-                                title="Print Invoice" target="_BLANK">
-                                <span class="fa fa-print"> Print</span>
-                            </a>
-                            @can('delete.item.purchase')
+                            @can('purchase.request.print', $user)
+                                <a class="dropdown-item" href="{{ route('purchase.request.print', $record->id) }}"
+                                    title="Print Invoice" target="_BLANK">
+                                    <span class="fa fa-print"> Print</span>
+                                </a>
+                            @endcan
+                            @can('purchases.request.destroy')
                                 <form onsubmit="return confirm('Are you sure you want to cancel?')"
                                     action="{{ route('purchases.request.destroy', $record->id) }}" method="post"
                                     style="display: inline">

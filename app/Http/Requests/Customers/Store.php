@@ -15,7 +15,7 @@ class Store extends FormRequest
      */
     public function authorize()
     {
-        return $this->user()->can('add.customer', Customer::class);
+        return $this->user()->can('customers.create', Customer::class);
     }
 
     /**

@@ -14,12 +14,12 @@
                 <td> {{ $record->code }} </td>
                 <td> {{ $record->user->name }} </td>
                 <td>
-                    @can('edit.expense.item')
+                    @can('expense_items.edit')
                         <a class="btn btn-secondary btn-sm" href="{{ route('expense_items.edit', $record->id) }}">
                             <span class="fa fa-pencil"></span>
                         </a>
                     @endcan
-                    @can('delete.expense.item')
+                    @can('expense_items.destroy')
                         <form onsubmit="return confirm('Are you sure you want to delete?')"
                             action="{{ route('expense_items.destroy', $record->id) }}" method="post" style="display: inline">
                             {{ csrf_field() }}

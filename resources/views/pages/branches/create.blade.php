@@ -28,15 +28,21 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('branches.create') }}">
-                <span class="fa fa-plus-circle"> New Branch</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('branches.import.form') }}">
-                <span class="fa fa-upload"> Upload Prices</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('branches.index') }}">
-                <span class="fa fa-list"> View Branch</span>
-            </a>
+            @can('branches.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('branches.create') }}">
+                    <span class="fa fa-plus-circle"> New Branch</span>
+                </a>
+            @endcan
+            @can('branches.import.form')
+                <a class="btn btn-secondary btn-sm" href="{{ route('branches.import.form') }}">
+                    <span class="fa fa-upload"> Upload Prices</span>
+                </a>
+            @endcan
+            @can('branches.index')
+                <a class="btn btn-secondary btn-sm" href="{{ route('branches.index') }}">
+                    <span class="fa fa-list"> View Branch</span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>
@@ -51,7 +57,5 @@
 
 @endsection
 @push('js')
-    <script type="text/javascript">
-
-    </script>
+    <script type="text/javascript"></script>
 @endpush

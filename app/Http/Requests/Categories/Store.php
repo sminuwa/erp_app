@@ -15,7 +15,7 @@ class Store extends FormRequest
      */
     public function authorize()
     {
-        return $this->user()->can('create.product.group', Category::class);
+        return $this->user()->can('categories.create', Category::class);
     }
 
     /**

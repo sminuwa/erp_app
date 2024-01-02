@@ -28,12 +28,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('roles.create') }}">
-                <span class="fa fa-plus-circle"></span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('roles.index') }}">
-                <span class="fa fa-list"></span>
-            </a>
+            @can('roles.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('roles.create') }}">
+                    <span class="fa fa-plus-circle"></span>
+                </a>
+            @endcan
+            @can('roles.index')
+                <a class="btn btn-secondary btn-sm" href="{{ route('roles.index') }}">
+                    <span class="fa fa-list"></span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>

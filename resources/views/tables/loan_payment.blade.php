@@ -22,18 +22,18 @@
                 <td> {{ $record->receipt_no }} </td>
                 <td> {{ $record->received->name }} </td>
                 <td>
-                    @can('view.loan.payment')
+                    @can('loan_payments.print')
                         <a class="btn btn-secondary btn-sm" href="{{ route('loan_payments.print', $record->id) }}"
                             target="_BLANK">
                             <span class="fa fa-print"></span>
                         </a>
                     @endcan
-                    @can('edit.loan.payment')
+                    @can('loan_payments.edit')
                         <a class="btn btn-secondary btn-sm" href="{{ route('loan_payments.edit', $record->id) }}">
                             <span class="fa fa-pencil"></span>
                         </a>
                     @endcan
-                    @can('delete.loan.payment')
+                    @can('loan_payments.destroy')
                         <form onsubmit="return confirm('Are you sure you want to delete?')"
                             action="{{ route('loan_payments.destroy', $record->id) }}" method="post"
                             style="display: inline">

@@ -35,38 +35,38 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    @cannot('view.sales')
-                                        Daily Sales
-                                    @endcannot
+                                    Daily Sales
                                 </h3>
                             </div>
-                            <br/>
+                            <br />
                             <div class="row">
                                 <div class="col-sm-2">
-                                    @can('view.daily.sale')
+                                    @can('invoice.index')
                                         <a href="{{ route('invoice.index') }}" class="btn btn-sm btn-secondary"
                                             style="margin-left: 2px;"><span class="fa fa-list"> </span> List </a>
                                     @endcan
-                                    @can('make.daily.sale')
+                                    @can('pos.index')
                                         <a href="{{ route('pos.index') }}" class="btn btn-sm btn-secondary"
                                             style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New </a>
                                     @endcan
                                 </div>
                             </div>
-                            <br/>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <form action="{{ route('sales_products.search') }}" method="POST">
-                                        @csrf
-                                        <div class="input-group">
-                                            <input type="search" class="form-control rounded" required
-                                                placeholder="Search by name, phone or invoice number" name="refno"
-                                                aria-label="Search" aria-describedby="search-addon" />
-                                            <button type="submit" class="btn btn-outline-primary">search</button>
-                                        </div>
-                                    </form>
+                            <br />
+                            @can('pos.index')
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <form action="{{ route('sales_products.search') }}" method="POST">
+                                            @csrf
+                                            <div class="input-group">
+                                                <input type="search" class="form-control rounded" required
+                                                    placeholder="Search by name, phone or invoice number" name="refno"
+                                                    aria-label="Search" aria-describedby="search-addon" />
+                                                <button type="submit" class="btn btn-outline-primary">search</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
+                            @endcan
                             <!-- /.card-header -->
                             <div class="card-body table-responsive">
                                 <table id="example1"
@@ -96,7 +96,7 @@
                                                 $total_pay = $total_pay + $order->pay;
                                                 $total_due = $total_due + $order->due;
                                             @endphp
-                                            <tr class="@if($order->status == 0) bg-warning @endif">
+                                            <tr class="@if ($order->status == 0) bg-warning @endif">
                                                 <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}
                                                 </td>
                                                 <td>{{ $order->customer->name }}</td>
@@ -111,56 +111,76 @@
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button"
-                                                                id="dropdownMenuButton" data-toggle="dropdown"
-                                                                aria-haspopup="true" aria-expanded="false">
+                                                            id="dropdownMenuButton" data-toggle="dropdown"
+                                                            aria-haspopup="true" aria-expanded="false">
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            <a href="{{ route('orders.show', $order->id) }}"
-                                                               class="dropdown-item">
-                                                                <i class="fa fa-eye" aria-hidden="true"></i> View
-                                                            </a>
+                                                            @can('orders.show')
+                                                                <a href="{{ route('orders.show', $order->id) }}"
+                                                                    class="dropdown-item">
+                                                                    <i class="fa fa-eye" aria-hidden="true"></i> View
+                                                                </a>
+                                                            @endcan
 
                                                             @if ($order->status == 1)
-                                                                <a href="javascript:void(0)" data-toggle="modal"
-                                                                   data-target="#order_detail_form{{ $order->id }}"
-                                                                   data-val="{{ $order->id }}"
-                                                                   class="dropdown-item show">
-                                                                    <i class="fa fa-check" aria-hidden="true"></i> Confirm
-                                                                </a>
-                                                                <a href="{{ route('waybill.order_print', $order->id) }}"
-                                                                   target="_BLANK" class="dropdown-item">
-                                                                    <i class="fa fa-print" aria-hidden="true"></i> Waybill
-                                                                </a>
-                                                                <a href="{{ route('invoice.print', $order->id) }}"
-                                                                   target="_BLANK" class="dropdown-item">
-                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print
-                                                                </a>
-                                                                <a href="{{ route('pos.order_print', $order->id) }}"
-                                                                   target="_BLANK" class="dropdown-item">
-                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print (PoS)
-                                                                </a>
+                                                                @can('sales_products.verify')
+                                                                    <a href="javascript:void(0)" data-toggle="modal"
+                                                                        data-target="#order_detail_form{{ $order->id }}"
+                                                                        data-val="{{ $order->id }}"
+                                                                        class="dropdown-item show">
+                                                                        <i class="fa fa-check" aria-hidden="true"></i> Confirm
+                                                                    </a>
+                                                                @endcan
+                                                                @can('waybill.order_print')
+                                                                    <a href="{{ route('waybill.order_print', $order->id) }}"
+                                                                        target="_BLANK" class="dropdown-item">
+                                                                        <i class="fa fa-print" aria-hidden="true"></i> Waybill
+                                                                    </a>
+                                                                @endcan
+                                                                @can('invoice.print')
+                                                                    <a href="{{ route('invoice.print', $order->id) }}"
+                                                                        target="_BLANK" class="dropdown-item">
+                                                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                    </a>
+                                                                @endcan
+                                                                @can('pos.order_print')
+                                                                    <a href="{{ route('pos.order_print', $order->id) }}"
+                                                                        target="_BLANK" class="dropdown-item">
+                                                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                        (PoS)
+                                                                    </a>
+                                                                @endcan
                                                             @endif
                                                             @if ($order->status == 0)
-                                                                <a href="{{ route('pos.edit', $order->id) }}"
-                                                                   class="dropdown-item">
-                                                                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                                                </a>
-                                                                <form action="{{ route('invoice.post', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to post this invoice?')">
-                                                                    @csrf
-                                                                    <button type="submit"
-                                                                            class="dropdown-item">
-                                                                        <i class="fa fa-check" aria-hidden="true"></i> Post
-                                                                    </button>
-                                                                </form>
-
-                                                                <form id="delete-form-{{ $order->id }}" action="{{ route('invoice.delete', $order->id) }}" method="post" onsubmit="return confirm('Are you sure you want to close this invoice?')">
-                                                                    @csrf
-                                                                    <button class="dropdown-item" type="submit">
-                                                                        <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                                                    </button>
-                                                                </form>
-
+                                                                @can('pos.edit')
+                                                                    <a href="{{ route('pos.edit', $order->id) }}"
+                                                                        class="dropdown-item">
+                                                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                                                    </a>
+                                                                @endcan
+                                                                @can('invoice.post')
+                                                                    <form action="{{ route('invoice.post', $order->id) }}"
+                                                                        method="post"
+                                                                        onsubmit="return confirm('Are you sure you want to post this invoice?')">
+                                                                        @csrf
+                                                                        <button type="submit" class="dropdown-item">
+                                                                            <i class="fa fa-check" aria-hidden="true"></i> Post
+                                                                        </button>
+                                                                    </form>
+                                                                @endcan
+                                                                @can('invoice.delete')
+                                                                    <form id="delete-form-{{ $order->id }}"
+                                                                        action="{{ route('invoice.delete', $order->id) }}"
+                                                                        method="post"
+                                                                        onsubmit="return confirm('Are you sure you want to close this invoice?')">
+                                                                        @csrf
+                                                                        <button class="dropdown-item" type="submit">
+                                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                            Delete
+                                                                        </button>
+                                                                    </form>
+                                                                @endcan
                                                             @endif
 
                                                         </div>
@@ -251,8 +271,8 @@
         $(function() {
 
             $("#example1").DataTable({
-                    'iDisplayLength':100
-                });
+                'iDisplayLength': 100
+            });
             $('#example2').DataTable({
                 "paging": true,
                 "lengthChange": false,

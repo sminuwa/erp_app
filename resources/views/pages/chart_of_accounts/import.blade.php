@@ -22,7 +22,8 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('chart_of_accounts.index') }}">Chart of Acconuts</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('chart_of_accounts.index') }}">Chart of
+                                    Acconuts</a></li>
                             <li class="breadcrumb-item active">Import</li>
                         </ol>
                     </div>
@@ -32,9 +33,11 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('chart_of_accounts.create') }}">
-                <span class="fa fa-plus-circle">New CoA</span>
-            </a>
+            @can('chart_of_accounts.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('chart_of_accounts.create') }}">
+                    <span class="fa fa-plus-circle">New CoA</span>
+                </a>
+            @endcan
             <a class="btn btn-secondary btn-sm" href="{{ url('upload_templates/coa_template.xlsx') }}">
                 <span class="fa fa-download"> Template</span>
             </a>
@@ -47,9 +50,9 @@
                             <button type="submit" class="btn btn-primary">Import</button>
                         </form>
                         @if (isset($count))
-                        <h4 class="text text-success">A total of {{$count}} stores were successfully uploaded</h4>
-                       
-                    @endif
+                            <h4 class="text text-success">A total of {{ $count }} stores were successfully uploaded
+                            </h4>
+                        @endif
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
@@ -61,5 +64,4 @@
 @endsection
 
 @push('js')
-
 @endpush

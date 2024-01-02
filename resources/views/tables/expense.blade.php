@@ -22,18 +22,18 @@
                 <td> {{ $record->account_name }} ({{ $record->account_no }}) </td>
                 <td> {{ $record->status }} </td>
                 <td>
-                    @can('view.expenditure')
+                    @can('expenses.show')
                         <a class="btn btn-secondary btn-sm" href="{{ route('expenses.show', $record->id) }}">
                             <span class="fa fa-eye"></span>
                         </a>
                     @endcan
-                    @can('edit.expenditure')
+                    @can('expenses.edit')
                         <a class="btn btn-secondary btn-sm" href="{{ route('expenses.edit', $record->id) }}">
                             <span class="fa fa-pencil"></span>
                         </a>
                     @endcan
                     @if ($record->status != 'Cancelled')
-                        @can('delete.expenditure')
+                        @can('expenses.destroy')
                             <form onsubmit="return confirm('Are you sure you want to cancel?')"
                                 action="{{ route('expenses.destroy', $record->id) }}" method="post"
                                 style="display: inline">

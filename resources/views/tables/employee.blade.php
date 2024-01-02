@@ -22,17 +22,17 @@
                 <td> {{ $record->salary }} </td>
                 <td> {{ $record->city }} </td>
                 <td>
-                    @can('view.staff')
+                    @can('employees.show')
                         <a class="btn btn-secondary btn-sm" href="{{ route('employees.show', $record->id) }}">
                             <span class="fa fa-eye"></span>
                         </a>
                     @endcan
-                    @can('edit.staff')
+                    @can('employees.edit')
                         <a class="btn btn-secondary btn-sm" href="{{ route('employees.edit', $record->id) }}">
                             <span class="fa fa-pencil"></span>
                         </a>
                     @endcan
-                    @can('delete.staff')
+                    @can('employees.destroy')
                         <form onsubmit="return confirm('Are you sure you want to delete?')"
                             action="{{ route('employees.destroy', $record->id) }}" method="post" style="display: inline">
                             {{ csrf_field() }}

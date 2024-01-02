@@ -29,9 +29,11 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('roles.create') }}">
-                <span class="fa fa-plus-circle"></span>
-            </a>
+            @can('roles.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('roles.create') }}">
+                    <span class="fa fa-plus-circle"></span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-6 table-responsive">
@@ -48,8 +50,5 @@
 
 @push('js')
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-
-
-    </script>
+    <script type="text/javascript"></script>
 @endpush

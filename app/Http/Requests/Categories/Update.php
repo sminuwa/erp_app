@@ -5,7 +5,7 @@ namespace App\Http\Requests\Categories;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Category;
 
-class Update extends FormRequest 
+class Update extends FormRequest
 {
 
     /**
@@ -13,9 +13,9 @@ class Update extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('edit.product.group', Category::class);
+        return $this->user()->can('categories.edit', Category::class);
     }
 
     /**
@@ -23,7 +23,7 @@ class Update extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 			'name' => 'required|max:191',
@@ -39,7 +39,7 @@ class Update extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

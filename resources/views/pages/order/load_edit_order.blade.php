@@ -1,8 +1,8 @@
 <div class="card-body table-responsive">
-    @foreach ($order->order_items()->where('status',1)->get() as $item)
+    @foreach ($order->order_items()->where('status', 1)->get() as $item)
         <form action="{{ route('orders.update', $item->id) }}" method="post">
             @csrf
-            
+
             <div class="row">
                 <div class="form-group col-sm-2 mb-2">
                     <label for="qty" class="col-sm-2 col-form-label">QTY</label>
@@ -18,8 +18,7 @@
                     <label for="store_product_id" class="col-sm-2 col-form-label">Store</label>
                     <select class="form-control form-control-sm" name="store_product_id"
                         id="store_product_id{{ $item->id }}">
-                        @foreach (App\Models\StoreProduct::where('qty_available', '>', 0)->where('product_id', $item->storeProduct->product_id)->get()
-    as $store)
+                        @foreach (App\Models\StoreProduct::where('qty_available', '>', 0)->where('product_id', $item->storeProduct->product_id)->get() as $store)
                             <option value="{{ $store->id }}"
                                 {{ $item->store_product_id == $store->id ? 'selected' : '' }}>
                                 {{ $store->store->name }}({{ $store->qty_available }})</option>

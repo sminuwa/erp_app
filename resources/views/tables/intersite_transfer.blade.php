@@ -30,21 +30,25 @@
                                 Action
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="btn btn-secondary btn-sm" href="{{ route('intersite.show', $record->id) }}">
-                                    <span class="fa fa-eye"></span>
-                                </a>
-                                @can('edit.stock.transfer')
+                                @can('intersite.show')
+                                    <a class="btn btn-secondary btn-sm" href="{{ route('intersite.show', $record->id) }}">
+                                        <span class="fa fa-eye"></span>
+                                    </a>
+                                @endcan
+                                @can('intersite.edit')
                                     <a class="btn btn-secondary btn-sm" href="{{ route('intersite.edit', $record->id) }}">
                                         <span class="fa fa-pencil"></span>
                                     </a>
                                 @endcan
                                 @if (App\Models\User::find($record->approved_by) != null)
-                                    <a class="btn btn-secondary btn-sm" title="Stock Tranfer Report" target="_BLANK"
-                                        href="{{ route('intersite.print', $record->transfer_id) }}">
-                                        <span class="fa fa-print"></span>
-                                    </a>
+                                    @can('intersite.print')
+                                        <a class="btn btn-secondary btn-sm" title="Stock Tranfer Report" target="_BLANK"
+                                            href="{{ route('intersite.print', $record->transfer_id) }}">
+                                            <span class="fa fa-print"></span>
+                                        </a>
+                                    @endcan
                                 @endif
-                                @can('delete.stock.transfer')
+                                @can('intersite.destroy')
                                     <form onsubmit="return confirm('Are you sure you want to cancel ?')"
                                         action="{{ route('intersite.destroy', $record->id) }}" method="post"
                                         style="display: inline">

@@ -31,12 +31,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.create') }}">
-                <span class="fa fa-plus-circle"> New Supplier</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.import.form') }}">
-                <span class="fa fa-upload"> Upload Suppliers</span>
-            </a>
+            @can('suppliers.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.create') }}">
+                    <span class="fa fa-plus-circle"> New Supplier</span>
+                </a>
+            @endcan
+            @can('suppliers.import.form')
+                <a class="btn btn-secondary btn-sm" href="{{ route('suppliers.import.form') }}">
+                    <span class="fa fa-upload"> Upload Suppliers</span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 table-responsive">
@@ -112,8 +116,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>
     <script type="text/javascript">
         $(function() {
-             $("#record1").DataTable({
-                'iDisplayLength':100
+            $("#record1").DataTable({
+                'iDisplayLength': 100
             });
             $('#record2').DataTable({
                 "paging": true,

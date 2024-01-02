@@ -46,25 +46,14 @@ class RoleController extends Controller
             'record' => $role,
         ]);
 
-    } /**
-      * Show the form for creating a new resource.
-      *
-      * @param  Create  $request
-      * @return \Illuminate\Http\Response
-      */
+    }
     public function create(Create $request)
     {
-
         return view('pages.roles.create', [
             'model' => new Role,
-
         ]);
-    } /**
-      * Store a newly created resource in storage.
-      *
-      * @param  Store  $request
-      * @return \Illuminate\Http\Response
-      */
+    }
+
     public function store(Store $request)
     {
         $model = new Role;

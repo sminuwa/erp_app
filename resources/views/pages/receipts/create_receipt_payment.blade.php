@@ -20,7 +20,9 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('receipt.payments') }}">Receipts</a></li>
+                            @can('receipt.payments')
+                                <li class="breadcrumb-item"><a href="{{ route('receipt.payments') }}">Receipts</a></li>
+                            @endcan
                             <li class="breadcrumb-item active">New Receipt</li>
                         </ol>
                     </div>
@@ -30,27 +32,33 @@
 
         <!-- Main content -->
         <section class="content">
-            <a href="{{ route('create.payment.reciept') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                    class="fa fa-plus-circle"> </span> New
-                Receipt</a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('receipt.payments') }}">
-                <span class="fa fa-list"> Receipts</span>
-            </a>
-<!--            <a href="javascript:void(0)" data-toggle="modal" data-target="#customer_ledgerform"
-                class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span class="fa fa-money"> General Ledger</span>
-            </a>-->
-            @if (Session::get('prev_id') != null)
-                <a href="{{ route('receipt.payment.print', Session::get('prev_id')) }}" target="_BLANK"
-                    class="btn btn-sm btn-primary" style="margin-left: 2px;"><span class="fa fa-print"> Print</span> </a>
-                <a href="{{ route('receipt.payment.print.pos', Session::get('prev_id')) }}" target="_BLANK"
-                    class="btn btn-secondary btn-sm">
-                    <i class="fa fa-print" aria-hidden="true">PoS</i>
+            @can('create.payment.reciept')
+                <a href="{{ route('create.payment.reciept') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
+                        class="fa fa-plus-circle"> </span> New
+                    Receipt</a>
+            @endcan
+            @can('receipt.payments')
+                <a class="btn btn-secondary btn-sm" href="{{ route('receipt.payments') }}">
+                    <span class="fa fa-list"> Receipts</span>
                 </a>
+            @endcan
+
+            @if (Session::get('prev_id') != null)
+                @can('receipt.payment.print')
+                    <a href="{{ route('receipt.payment.print', Session::get('prev_id')) }}" target="_BLANK"
+                        class="btn btn-sm btn-primary" style="margin-left: 2px;"><span class="fa fa-print"> Print</span> </a>
+                @endcan
+                @can('receipt.payment.print.pos')
+                    <a href="{{ route('receipt.payment.print.pos', Session::get('prev_id')) }}" target="_BLANK"
+                        class="btn btn-secondary btn-sm">
+                        <i class="fa fa-print" aria-hidden="true">PoS</i>
+                    </a>
+                @endcan
             @endif
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 mt-4">
-{{--                        @include('pages.receipts.receipt_payment_form')--}}
+                        {{--                        @include('pages.receipts.receipt_payment_form') --}}
                         <form action="{{ isset($route) ? $route : route('receipt.payment.store') }}" method="POST">
                             {{ csrf_field() }}
                             <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
@@ -59,12 +67,17 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="type">Category</label>
-                                        <select class="form-control select2-single {{ $errors->has('type') ? ' is-invalid' : '' }}"
-                                                name="type" id="type" required="required">
+                                        <select
+                                            class="form-control select2-single {{ $errors->has('type') ? ' is-invalid' : '' }}"
+                                            name="type" id="type" required="required">
                                             <option value="">Select...</option>
-                                            <option value="Customer" {{ 'Customer' == $model->model_name ? 'selected' : '' }}>Customer</option>
-                                            <option value="Supplier" {{ 'Suppplier' == $model->model_name ? 'selected' : '' }}>Suppplier
-                                            <option value="GeneralAccount" {{ 'GeneralAccount' == $model->model_name ? 'selected' : '' }}>General Accounts
+                                            <option value="Customer"
+                                                {{ 'Customer' == $model->model_name ? 'selected' : '' }}>Customer</option>
+                                            <option value="Supplier"
+                                                {{ 'Suppplier' == $model->model_name ? 'selected' : '' }}>Suppplier
+                                            <option value="GeneralAccount"
+                                                {{ 'GeneralAccount' == $model->model_name ? 'selected' : '' }}>General
+                                                Accounts
                                             </option>
                                         </select>
                                         @if ($errors->has('type'))
@@ -77,19 +90,23 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="payer_id">Receiver</label>
-                                        @if(isset($model) && $model->model_name == 'Customer')
-                                            <?php $payers = \App\Models\Customer::orderBy('code','asc')->get(); ?>
+                                        @if (isset($model) && $model->model_name == 'Customer')
+                                            <?php $payers = \App\Models\Customer::orderBy('code', 'asc')->get(); ?>
                                         @elseif(isset($model) && $model->model_name == 'Supplier')
-                                            <?php $payers = \App\Models\Supplier::orderBy('code','asc')->get(); ?>
+                                            <?php $payers = \App\Models\Supplier::orderBy('code', 'asc')->get(); ?>
                                         @else
-                                            <?php $payers = \App\Models\GeneralAccount::orderBy('number','asc')->get(); ?>
+                                            <?php $payers = \App\Models\GeneralAccount::orderBy('number', 'asc')->get(); ?>
                                         @endif
-                                        <select class="form-control select2-single {{ $errors->has('payer_id') ? ' is-invalid' : '' }}"
-                                                name="payer_id" id="payer_id" selected_item="{{ $model->model_id }}" required>
+                                        <select
+                                            class="form-control select2-single {{ $errors->has('payer_id') ? ' is-invalid' : '' }}"
+                                            name="payer_id" id="payer_id" selected_item="{{ $model->model_id }}" required>
                                             <option value="">Select...</option>
-                                            @if(isset($payers))
-                                                @foreach($payers as $payer)
-                                                    <option value="{{ $payer->id }}" {{ $payer->id==$model->model_id ? 'selected' : '' }}>{{ $payer->code ?? $payer->number }} - {{ $payer->name ?? $payer->description }}</option>
+                                            @if (isset($payers))
+                                                @foreach ($payers as $payer)
+                                                    <option value="{{ $payer->id }}"
+                                                        {{ $payer->id == $model->model_id ? 'selected' : '' }}>
+                                                        {{ $payer->code ?? $payer->number }} -
+                                                        {{ $payer->name ?? $payer->description }}</option>
                                                 @endforeach
                                             @endif
                                         </select>
@@ -106,10 +123,10 @@
                                     <div class="form-group">
                                         <label for="payment_date">Receipt Date</label>
                                         <input type="text"
-                                               class="form-control datepicker {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
-                                               name="payment_date" id="payment_date"
-                                               value="{{ old('payment_date', $model->payment_date) == '' ? date('Y-m-d') : old('payment_date', $model->payment_mode) }}"
-                                               required>
+                                            class="form-control datepicker {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
+                                            name="payment_date" id="payment_date"
+                                            value="{{ old('payment_date', $model->payment_date) == '' ? date('Y-m-d') : old('payment_date', $model->payment_mode) }}"
+                                            required>
                                         @if ($errors->has('payment_date'))
                                             <div class="invalid-feedback">
                                                 <strong>{{ $errors->first('payment_date') }}</strong>
@@ -120,11 +137,13 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="account_id">Bank/Cashbook</label>
-                                        <select class="form-control select2-single {{ $errors->has('account_id') ? ' is-invalid' : '' }}"
-                                                name="account_id" id="account_id" required="required">
+                                        <select
+                                            class="form-control select2-single {{ $errors->has('account_id') ? ' is-invalid' : '' }}"
+                                            name="account_id" id="account_id" required="required">
                                             <option value="">Select...</option>
                                             @foreach ($accounts as $account)
-                                                <option value="{{ $account->id }}" {{ $account->id == $model->charged_account_id ? 'selected': null }}>
+                                                <option value="{{ $account->id }}"
+                                                    {{ $account->id == $model->charged_account_id ? 'selected' : null }}>
                                                     {{ $account->number }} - {{ $account->description }}</option>
                                             @endforeach
                                         </select>
@@ -140,8 +159,10 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="amount_paid">Amount</label>
-                                        <input type="number" class="form-control {{ $errors->has('amount_paid') ? ' is-invalid' : '' }}"
-                                               name="amount_paid" id="amount_paid" value="{{ old('amount_paid', $model->amount) }}" required>
+                                        <input type="number"
+                                            class="form-control {{ $errors->has('amount_paid') ? ' is-invalid' : '' }}"
+                                            name="amount_paid" id="amount_paid"
+                                            value="{{ old('amount_paid', $model->amount) }}" required>
                                         @if ($errors->has('amount_paid'))
                                             <div class="invalid-feedback">
                                                 <strong>{{ $errors->first('amount_paid') }}</strong>

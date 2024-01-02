@@ -43,14 +43,16 @@
                             <div class="form-group">
                                 <label for="from_date">From Date</label>
                                 <input type="text"
-                                    class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}" autocomplete="off"
-                                    name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="">
+                                    class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
+                                    autocomplete="off" name="from_date" id="from_date" value="{{ old('from_date') }}"
+                                    placeholder="">
                             </div>
                             <div class="form-group">
                                 <label for="to_date">To Date</label>
                                 <input type="text"
-                                    class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}" autocomplete="off"
-                                    name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
+                                    class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
+                                    autocomplete="off" name="to_date" id="to_date" value="{{ old('to_date') }}"
+                                    placeholder="">
                             </div>
                             <div class="form-group text-right ">
                                 <input type="button" class="btn btn-primary" id="generate" name="generate"
@@ -65,12 +67,12 @@
                     </div>
 
                     <div class="col-sm-8 table-responsive" id="load">
-                        <table class="table table-bordered" id="example1" data-ordering="false" border="1" cellpadding="0" cellspacing="0">
+                        <table class="table table-bordered" id="example1" data-ordering="false" border="1"
+                            cellpadding="0" cellspacing="0">
                             <thead>
                                 <tr>
                                     <th>Date</th>
                                     <th>Description</th>
-                                    <th>System/Invoice</th>
                                     <th>Ref</th>
                                     <th>Cr</th>
                                     <th>Dr</th>
@@ -80,12 +82,10 @@
                             <?php $sum_cr = 0;
                             $sum_dr = 0;
                             $dif = 0; ?>
-                            @foreach ($record->ledgers()->orderBy('date')->get()
-        as $ledger)
+                            @foreach ($record->ledgers()->orderBy('date')->get() as $ledger)
                                 <tr>
                                     <td>{{ $ledger->date->toFormattedDateString() }}</td>
                                     <td>{{ $ledger->description }}</td>
-                                    <td>{{ $ledger->systemid }}</td>
                                     <td>{{ $ledger->ref }}</td>
                                     <td style="text-align: right"> &#8358;{{ number_format($ledger->cr, 2) }}</td>
                                     <td style="text-align: right"> &#8358;{{ number_format($ledger->dr, 2) }}</td>
@@ -93,7 +93,15 @@
                                         <?php $sum_cr += $ledger->cr;
                                         $sum_dr += $ledger->dr;
                                         $dif = $sum_cr - $sum_dr;
-                                        $balance = $ledger->where('id', '<=', $ledger->id)->where('customer_id',$record->id)->sum('cr') - $ledger->where('id', '<=', $ledger->id)->where('customer_id',$record->id)->sum('dr'); ?>
+                                        $balance =
+                                            $ledger
+                                                ->where('id', '<=', $ledger->id)
+                                                ->where('customer_id', $record->id)
+                                                ->sum('cr') -
+                                            $ledger
+                                                ->where('id', '<=', $ledger->id)
+                                                ->where('customer_id', $record->id)
+                                                ->sum('dr'); ?>
                                         @if ($balance < 0)
                                             &#8358;({{ number_format(abs($dif), 2) }})
                                         @else
@@ -106,7 +114,6 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Description</th>
-                                    <th>System/Invoice</th>
                                     <th>Ref</th>
                                     <th style="text-align: right;">&#8358;{{ number_format($sum_cr, 2) }}</th>
                                     <th style="text-align: right;">&#8358;{{ number_format($sum_dr, 2) }}</th>
@@ -120,7 +127,7 @@
 
                                 </tr>
                                 <tr>
-                                    <td colspan="7">
+                                    <td colspan="6">
                                         <h5 style="text-align: center;">{{ strtoupper($record->name) }} Closing Running
                                             Balance: = @if ($dif < 0)
                                                 &#8358;({{ number_format(abs($dif), 2) }})

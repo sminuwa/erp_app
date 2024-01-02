@@ -14,18 +14,22 @@
                 <td> {{ $record->class }} </td>
                 <td> {{ $record->description }} </td>
                 <td>
-                    <a class="btn btn-secondary btn-sm" href="{{ route('chart_of_accounts.edit', $record->id) }}">
-                        <span class="fa fa-pencil"></span>
-                    </a>
-                    <form onsubmit="return confirm('Are you sure you want to delete?')"
-                        action="{{ route('chart_of_accounts.destroy', $record->id) }}" method="post"
-                        style="display: inline">
-                        {{ csrf_field() }}
-                        {{ method_field('DELETE') }}
-                        <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
-                            <i class="text-danger fa fa-remove"></i>
-                        </button>
-                    </form>
+                    @can('chart_of_accounts.edit')
+                        <a class="btn btn-secondary btn-sm" href="{{ route('chart_of_accounts.edit', $record->id) }}">
+                            <span class="fa fa-pencil"></span>
+                        </a>
+                    @endcan
+                    @can('chart_of_accounts.destroy', $user)
+                        <form onsubmit="return confirm('Are you sure you want to delete?')"
+                            action="{{ route('chart_of_accounts.destroy', $record->id) }}" method="post"
+                            style="display: inline">
+                            {{ csrf_field() }}
+                            {{ method_field('DELETE') }}
+                            <button type="submit" class="btn btn-secondary btn-sm cursor-pointer">
+                                <i class="text-danger fa fa-remove"></i>
+                            </button>
+                        </form>
+                    @endcan
                 </td>
             </tr>
         @endforeach

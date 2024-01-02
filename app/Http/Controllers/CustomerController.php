@@ -505,10 +505,12 @@ class CustomerController extends Controller
     }
     public function importForm()
     {
+        $this->authorize('customers.import.form');
         return view('pages.customers.import');
     }
     public function import(Request $request)
     {
+        $this->authorize('customers.import');
         $request->validate([
             'file' => 'required|file|mimes:xlsx',
         ]);

@@ -38,21 +38,26 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <a href="{{ route('customers.return.debit.create') }}" class="btn btn-sm btn-secondary"
-                                        style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Return & Debit</a>
+                                    @can('customers.return.debit.create')
+                                        <a href="{{ route('customers.return.debit.create') }}" class="btn btn-sm btn-secondary"
+                                            style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Return &
+                                            Debit</a>
+                                    @endcan
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <form action="{{ route('customers.return.debit.search') }}" method="POST">
-                                        @csrf
-                                        <div class="input-group">
-                                            <input type="search" class="form-control rounded" required
-                                                placeholder="Search by Receipt or Cheque number" name="refno"
-                                                aria-label="Search" aria-describedby="search-addon" />
-                                            <button type="submit" class="btn btn-outline-primary">search</button>
-                                        </div>
-                                    </form>
+                                    @can('customers.return.debit.search')
+                                        <form action="{{ route('customers.return.debit.search') }}" method="POST">
+                                            @csrf
+                                            <div class="input-group">
+                                                <input type="search" class="form-control rounded" required
+                                                    placeholder="Search by Receipt or Cheque number" name="refno"
+                                                    aria-label="Search" aria-describedby="search-addon" />
+                                                <button type="submit" class="btn btn-outline-primary">search</button>
+                                            </div>
+                                        </form>
+                                    @endcan
                                 </div>
                             </div>
                             <!-- /.card-header -->
@@ -91,10 +96,12 @@
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
                                                 <td>{{ $payment->postedBy->name ?? '' }}</td>
                                                 <td align="center">
-                                                    <a href="{{ route('customers.return.debit.print', $payment->id) }}"
-                                                        target="_BLANK" class="btn btn-secondary btn-sm">
-                                                        <i class="fa fa-print" aria-hidden="true"></i>
-                                                    </a>
+                                                    @can('customers.return.debit.print')
+                                                        <a href="{{ route('customers.return.debit.print', $payment->id) }}"
+                                                            target="_BLANK" class="btn btn-secondary btn-sm">
+                                                            <i class="fa fa-print" aria-hidden="true"></i>
+                                                        </a>
+                                                    @endcan
                                                     {{-- <a href="javascript:void(0)" data-toggle="modal"
                                                         data-target="#payment_edit{{$payment->id}}"
                                                         class="btn btn-primary btn-sm">
@@ -104,12 +111,14 @@
                                                         onclick="deleteItem({{ $payment->id }})">
                                                         <i class="fa fa-trash" aria-hidden="true"></i>
                                                     </button>
-                                                    <form id="delete-form-{{ $payment->id }}"
-                                                        action="{{ route('customers.return.debit.destroy', $payment->id) }}"
-                                                        method="post" style="display:none;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                    </form>
+                                                    @can('customers.return.debit.destroy')
+                                                        <form id="delete-form-{{ $payment->id }}"
+                                                            action="{{ route('customers.return.debit.destroy', $payment->id) }}"
+                                                            method="post" style="display:none;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                        </form>
+                                                    @endcan
                                                 </td>
                                             </tr>
                                             <div class="modal fade" id="payment_edit{{ $payment->id }}"
@@ -271,8 +280,8 @@
         $(function() {
 
             $("#example1").DataTable({
-                    'iDisplayLength':100
-                });
+                'iDisplayLength': 100
+            });
             $('#example2').DataTable({
                 "paging": true,
                 "lengthChange": false,
@@ -281,7 +290,7 @@
                 "info": true,
                 "autoWidth": false
             });
-            $(document).on('click', '".show"',function() {
+            $(document).on('click', '".show"', function() {
                 order_id = $(this).attr('data-val');
                 $.ajax({
                     type: 'get',
@@ -294,8 +303,9 @@
                     $('.display').html(data);
                 });
             });
-           
+
         });
+
         function deleteItem(id) {
             const swalWithBootstrapButtons = swal.mixin({
                 confirmButtonClass: 'btn btn-success',

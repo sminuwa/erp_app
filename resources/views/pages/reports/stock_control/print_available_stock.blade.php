@@ -56,7 +56,8 @@
                                         <th>ITEM</th>
                                         <th>QTY</th>
                                         <th>COST PRICE</th>
-                                        <th>SELLING PRICE</th>
+                                        <th>RETAIL PRICE</th>
+                                        <th>WHOLE PRICE</th>
                                         <th>STORE</th>
                                     </tr>
                                 </thead>
@@ -69,20 +70,22 @@
                                         <td> {{ $store->name }} </td>
                                         <td> {{ $store->qty_available }} </td>
                                         @php
-                                            $total_selling_price += $store->selling_price;
+                                            $total_selling_price += $store->retail_selling_price;
                                             $total_cost_price += $store->cost_price;
                                         
                                         @endphp
                                         <td style="text-align: right;"> &#8358;{{ number_format($store->cost_price,2,'.',',') }}
                                         </td>
-                                        <td style="text-align: right;"> &#8358;{{ number_format($store->selling_price,2,'.',',') }}
+                                        <td style="text-align: right;"> &#8358;{{ number_format($store->retail_selling_price,2,'.',',') }}
+                                        </td>
+                                        <td style="text-align: right;"> &#8358;{{ number_format($store->whole_selling_price,2,'.',',') }}
                                         </td>
                                         
                                         <td>{{ $store->store }} </td>
                                     </tr>
                                 @endforeach
                                 </tbody>
-                                <tfoot>
+                                {{-- <tfoot>
                                     <tr>
                                         <th></th>
                                         <th></th>
@@ -91,7 +94,7 @@
                                         
                                         <th></th>
                                     </tr>
-                                </tfoot>
+                                </tfoot> --}}
                             </table>
                         </div>
                         <!-- /.col -->

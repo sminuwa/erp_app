@@ -16,7 +16,7 @@
                 <td> {{ $record->adjusted_qty }} </td>
                 <td> {{ $record->user?->name }} </td>
                 <td style="text-align: right">
-                    @can('make.stock.adjustment')
+                    @can('stock_adjustments.show')
                         <a class="btn btn-secondary btn-sm" href="{{ route('stock_adjustments.show', $record->id) }}">
                             <span class="fa fa-eye"></span>
                         </a>

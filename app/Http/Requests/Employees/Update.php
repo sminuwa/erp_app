@@ -5,7 +5,7 @@ namespace App\Http\Requests\Employees;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Employee;
 
-class Update extends FormRequest 
+class Update extends FormRequest
 {
 
     /**
@@ -13,9 +13,9 @@ class Update extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('edit.staff', Employee::class);
+        return $this->user()->can('employees.edit', Employee::class);
     }
 
     /**
@@ -23,7 +23,7 @@ class Update extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 			'name' => 'required|max:191',
@@ -46,7 +46,7 @@ class Update extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

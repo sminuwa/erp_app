@@ -28,12 +28,16 @@
 
         <!-- Main content -->
         <section class="content">
-            <a class="btn btn-secondary btn-sm" href="{{ route('products.create') }}">
-                <span class="fa fa-plus-circle"> Add Product</span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ route('products.index') }}">
-                <span class="fa fa-list"> View Products</span>
-            </a>
+            @can('products.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('products.create') }}">
+                    <span class="fa fa-plus-circle"> Add Product</span>
+                </a>
+            @endcan
+            @can('products.index')
+                <a class="btn btn-secondary btn-sm" href="{{ route('products.index') }}">
+                    <span class="fa fa-list"> View Products</span>
+                </a>
+            @endcan
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-4'>
@@ -42,8 +46,8 @@
                             <div class="form-group">
                                 <label for="store_id">Store</label>
                                 <select type="number"
-                                    class="form-control {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
-                                    name="store_id" id="store_id" required="required">
+                                    class="form-control {{ $errors->has('store_id') ? ' is-invalid' : '' }}" name="store_id"
+                                    id="store_id" required="required">
                                     <option value="">Select...</option>
                                     @if (isset($stores))
                                         @foreach ($stores as $data)
@@ -156,7 +160,10 @@
                     if (msg == null || msg == 0)
                         msg = 0;
                     $("#available").html(
-                        "<span class='ion-alert-circled'></span>Note that the current balance is <strong>" + msg+"</strong>. Whatever quantity you entered will overwrite the current balance as opening balance");
+                        "<span class='ion-alert-circled'></span>Note that the current balance is <strong>" +
+                        msg +
+                        "</strong>. Whatever quantity you entered will overwrite the current balance as opening balance"
+                    );
 
                 });
             });

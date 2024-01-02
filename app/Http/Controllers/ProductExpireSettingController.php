@@ -32,6 +32,7 @@ class ProductExpireSettingController extends Controller
      */
     public function index(Index $request)
     {
+        $this->authorize('product_expire_settings.index');
         return view('pages.product_expire_settings.index', ['records' => ProductExpireSetting::latest()->get()]);
     }    /**
      * Display the specified resource.
@@ -54,6 +55,7 @@ class ProductExpireSettingController extends Controller
      */
     public function create(Create $request)
     {
+        $this->authorize('product_expire_settings.create');
 		$products = Product::all(['id','name']);
 		$users = User::all(['id','name']);
 
@@ -71,11 +73,12 @@ class ProductExpireSettingController extends Controller
      */
     public function store(Store $request)
     {
+        $this->authorize('product_expire_settings.create');
         $model=new ProductExpireSetting;
         $model->fill($request->all());
 
         if ($model->save()) {
-            
+
             session()->flash('app_message', 'Product expire setting saved successfully');
             return redirect()->route('product_expire_settings.index');
             } else {
@@ -91,6 +94,7 @@ class ProductExpireSettingController extends Controller
      */
     public function edit(Edit $request, ProductExpireSetting $productexpiresetting)
     {
+        $this->authorize('product_expire_settings.edit');
 		$products = Product::all(['id','name']);
 		$users = User::all(['id','name']);
 
@@ -109,10 +113,11 @@ class ProductExpireSettingController extends Controller
      */
     public function update(Update $request,ProductExpireSetting $productexpiresetting)
     {
+        $this->authorize('product_expire_settings.edit');
         $productexpiresetting->fill($request->all());
 
         if ($productexpiresetting->save()) {
-            
+
             session()->flash('app_message', 'Product expire setting successfully updated');
             return redirect()->route('product_expire_settings.index');
             } else {
@@ -129,6 +134,7 @@ class ProductExpireSettingController extends Controller
      */
     public function destroy(Destroy $request, ProductExpireSetting $productexpiresetting)
     {
+        $this->authorize('product_expire_settings.destroy');
         if ($productexpiresetting->delete()) {
                 session()->flash('app_message', 'Product expiration setting successfully deleted');
             } else {

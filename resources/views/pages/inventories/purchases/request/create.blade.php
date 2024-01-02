@@ -41,7 +41,8 @@
                             </div>
                             <div class="card-body">
                                 <h5 class="card-title"></h5>
-                                <form action="{{ isset($route) ? $route : route('purchases.request.store') }}" method="POST">
+                                <form action="{{ isset($route) ? $route : route('purchases.request.store') }}"
+                                    method="POST">
                                     {{ csrf_field() }}
                                     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
                                     <div class="row">
@@ -66,11 +67,14 @@
                                             <div class="form-group">
                                                 <label for="invoice">Reference No</label>
                                                 <input type="hidden"
-                                                       class="form-control {{ $errors->has('old_invoice') ? ' is-invalid' : '' }}"
-                                                       name="old_invoice" id="old_invoice" value="{{ old('old_invoice', $model->invoice) }}">
-                                                <input type="text" class="form-control {{ $errors->has('invoice') ? ' is-invalid' : '' }}"
-                                                       name="invoice" id="invoice" value="{{ old('invoice', $model->invoice) }}"
-                                                       placeholder="" maxlength="191" required="required">
+                                                    class="form-control {{ $errors->has('old_invoice') ? ' is-invalid' : '' }}"
+                                                    name="old_invoice" id="old_invoice"
+                                                    value="{{ old('old_invoice', $model->invoice) }}">
+                                                <input type="text"
+                                                    class="form-control {{ $errors->has('invoice') ? ' is-invalid' : '' }}"
+                                                    name="invoice" id="invoice"
+                                                    value="{{ old('invoice', $model->invoice) }}" placeholder=""
+                                                    maxlength="191" required="required">
                                                 @if ($errors->has('invoice'))
                                                     <div class="invalid-feedback">
                                                         <strong>{{ $errors->first('invoice') }}</strong>
@@ -80,10 +84,10 @@
                                         </div>
                                     </div>
 
-                                <input type="hidden" name="updated_by" value="{{ Auth::id() }}" />
-                                <div class="form-group text-right ">
-                                    <input type="submit" class="btn btn-primary" value="Save" />
-                                </div>
+                                    <input type="hidden" name="updated_by" value="{{ Auth::id() }}" />
+                                    <div class="form-group text-right ">
+                                        <input type="submit" class="btn btn-primary" value="Save" />
+                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -95,10 +99,11 @@
                             <div class="card-header">
                                 <i class="ion-android-cart"></i> Request Cart: <small>Purchased Products</small>
                                 <div class="float-right">
-                                    <a href="javascript:void(0)" data-toggle="modal"
-                                       data-target="#add_product_form"
-                                       class="btn btn-sm btn-secondary float-md-right"
-                                       style="margin-left: 2px;"><i class="fa fa-plus"></i> Add Product </a>
+                                    @can('ajax.cart.add')
+                                        <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
+                                            class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
+                                                class="fa fa-plus"></i> Add Product </a>
+                                    @endcan
                                 </div>
                             </div>
                             <div class="card-body table-responsive">
@@ -167,8 +172,8 @@
                         <div class="form-group">
                             <label for="qty_supplied">Quantity</label>
                             <input type="number"
-                                   class="form-control {{ $errors->has('qty_supplied') ? ' is-invalid' : '' }}"
-                                   name="qty_supplied" id="qty_supplied" placeholder="" required="required">
+                                class="form-control {{ $errors->has('qty_supplied') ? ' is-invalid' : '' }}"
+                                name="qty_supplied" id="qty_supplied" placeholder="" required="required">
                             @if ($errors->has('qty_supplied'))
                                 <div class="invalid-feedback">
                                     <strong>{{ $errors->first('qty_supplied') }}</strong>
@@ -178,8 +183,8 @@
                         <div class="form-group">
                             <label for="unit_price">Cost Price</label>
                             <input type="text"
-                                   class="form-control {{ $errors->has('unit_price') ? ' is-invalid' : '' }}"
-                                   name="unit_price" id="unit_price" placeholder="Optional">
+                                class="form-control {{ $errors->has('unit_price') ? ' is-invalid' : '' }}"
+                                name="unit_price" id="unit_price" placeholder="Optional">
                             @if ($errors->has('unit_price'))
                                 <div class="invalid-feedback">
                                     <strong>{{ $errors->first('unit_price') }}</strong>

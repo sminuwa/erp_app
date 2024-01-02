@@ -39,17 +39,17 @@
                             Action
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            @can('view.suppler.ledger')
+                            @can('suppliers.show')
                                 <a class="dropdown-item" href="{{ route('suppliers.show', $record->id) }}">
                                     <span class="fa fa-eye"> View</span>
                                 </a>
                             @endcan
-                            @can('edit.supplier')
+                            @can('suppliers.edit')
                                 <a class="dropdown-item" href="{{ route('suppliers.edit', $record->id) }}">
                                     <span class="fa fa-pencil"> Edit</span>
                                 </a>
                             @endcan
-                            @can('delete.supplier')
+                            @can('suppliers.destroy')
                                 <form onsubmit="return confirm('Are you sure you want to delete?')"
                                     action="{{ route('suppliers.destroy', $record->id) }}" method="post"
                                     style="display: inline">

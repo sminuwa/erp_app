@@ -18,12 +18,12 @@
                 <td> {{ $record->user->name }} </td>
                 <td> {{ $record->created_at->toDayDateTimeString() }} </td>
                 <td>
-                    @can('edit.customer.credit.limit')
+                    @can('credit_limits.limit')
                         <a class="btn btn-secondary btn-sm" href="{{ route('credit_limits.edit', $record->id) }}">
                             <span class="fa fa-pencil"></span>
                         </a>
                     @endcan
-                    @can('delete.customer.credit.limit')
+                    @can('credit_limits.destroy')
                         <form onsubmit="return confirm('Are you sure you want to delete?')"
                             action="{{ route('credit_limits.destroy', $record->id) }}" method="post" style="display: inline">
                             {{ csrf_field() }}

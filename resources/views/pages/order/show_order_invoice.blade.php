@@ -41,37 +41,50 @@
                                 <a href="javascript:history.back()" class="btn btn-warning btn-sm">
                                     <i class="fa fa-arrow-left"></i> Back
                                 </a>
-                                <a href="{{ route('order.invoice.index') }}" class="btn btn-secondary btn-sm ">
-                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> New Order
-                                </a>
-
-                                <a href="{{ route('invoice.order_print', $order->id) }}"
-                                   target="_BLANK" class="btn btn-dark btn-sm ">
-                                    <i class="fa fa-print" aria-hidden="true"></i> Print
-                                </a>
+                                @can('order.invoice.index')
+                                    <a href="{{ route('order.invoice.index') }}" class="btn btn-secondary btn-sm ">
+                                        <i class="fa fa-plus-circle" aria-hidden="true"></i> New Order
+                                    </a>
+                                @endcan
+                                @can('invoice.order_print')
+                                    <a href="{{ route('invoice.order_print', $order->id) }}" target="_BLANK"
+                                        class="btn btn-dark btn-sm ">
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                    </a>
+                                @endcan
                                 @if ($order->status == 0)
-                                    <a href="{{ route('order.invoice.edit', $order->id) }}"
-                                       class="btn btn-primary btn-sm ">
-                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                    </a>
-                                    <a href="{{ route('order.invoice.linking', $order->id) }}" title="Linking"
-                                       class="btn btn-success btn-sm ">
-                                        <i class="fa fa-link" aria-hidden="true"></i> Create Invoice
-                                    </a>
-                                    <form action="{{ route('order.invoice.close', $order->id) }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to close this order?')">
-                                        @csrf
-                                        <button type="submit"
-                                                class="btn btn-warning btn-sm">
-                                            <i class="fa fa-close" aria-hidden="true"></i> Close
-                                        </button>
-                                    </form>
-                                    <form action="{{ route('order.invoice.destroy', $order->id) }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this order?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-danger btn-sm" type="submit">
-                                            <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                        </button>
-                                    </form>
+                                    @can('order.invoice.edit')
+                                        <a href="{{ route('order.invoice.edit', $order->id) }}" class="btn btn-primary btn-sm ">
+                                            <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                        </a>
+                                    @endcan
+                                    @can('order.invoice.linking')
+                                        <a href="{{ route('order.invoice.linking', $order->id) }}" title="Linking"
+                                            class="btn btn-success btn-sm ">
+                                            <i class="fa fa-link" aria-hidden="true"></i> Create Invoice
+                                        </a>
+                                    @endcan
+                                    @can('order.invoice.close')
+                                        <form action="{{ route('order.invoice.close', $order->id) }}" method="post"
+                                            class="d-inline"
+                                            onsubmit="return confirm('Are you sure you want to close this order?')">
+                                            @csrf
+                                            <button type="submit" class="btn btn-warning btn-sm">
+                                                <i class="fa fa-close" aria-hidden="true"></i> Close
+                                            </button>
+                                        </form>
+                                    @endcan
+                                    @can('order.invoice.destroy')
+                                        <form action="{{ route('order.invoice.destroy', $order->id) }}" method="post"
+                                            class="d-inline"
+                                            onsubmit="return confirm('Are you sure you want to delete this order?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-danger btn-sm" type="submit">
+                                                <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                            </button>
+                                        </form>
+                                    @endcan
                                 @endif
 
                             </div>
@@ -109,10 +122,11 @@
                                 <div class="col-sm-4 invoice-col">
                                     <b>Reference No: {{ $order->reference }}</b><br><br>
                                     <b>Order Status:</b>
-                                    {!!
-                                        $order->status == 0 ? '<span class="badge badge-warning">Pending</span>':
-                                        ($order->status == 1 ? '<span class="badge badge-success">Close</span>': '<span class="badge badge-success">Completed</span>' )
-                                    !!}
+                                    {!! $order->status == 0
+                                        ? '<span class="badge badge-warning">Pending</span>'
+                                        : ($order->status == 1
+                                            ? '<span class="badge badge-success">Close</span>'
+                                            : '<span class="badge badge-success">Completed</span>') !!}
                                 </div>
                                 <!-- /.col -->
                             </div>
@@ -140,8 +154,8 @@
                                             @foreach ($order_details as $order_detail)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $order_detail->storeProduct->product->name ?? "" }}</td>
-                                                    <td>{{ $order_detail->storeProduct->product->unit ?? "" }}</td>
+                                                    <td>{{ $order_detail->storeProduct->product->name ?? '' }}</td>
+                                                    <td>{{ $order_detail->storeProduct->product->unit ?? '' }}</td>
                                                     <td align="center">{{ $order_detail->quantity }}</td>
                                                     <td align="right">{{ number_format($order_detail->sold_price, 2) }}
                                                     </td>

@@ -157,6 +157,7 @@ class SupplierController extends Controller
     }
     public function supplierCode($type)
     {
+        $this->authorize('suppliers.code');
         $no = DB::table('suppliers')
             ->whereRaw("SUBSTRING(code, 1, 2) LIKE '$type'")
             ->max(DB::raw("CAST(SUBSTRING(code, 3) AS UNSIGNED)"));
@@ -562,6 +563,7 @@ class SupplierController extends Controller
     }
     public function createOpeningBalance()
     {
+        $this->authorize('suppliers.create.opening_balance');
         $user_branch = User::userBranchAction();
         $suppliers = Supplier::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
         return view('pages.suppliers.create_opening_balance', [
@@ -571,6 +573,7 @@ class SupplierController extends Controller
     }
     public function openingBalanceStore(Request $request)
     {
+        $this->authorize('suppliers.opening_balance.store');
         $supplier_id = $request->supplier_id;
         $amount = $request->amount;
         Supplier::where(['id' => $supplier_id])->update(['opening_balance' => $amount]);
@@ -595,10 +598,12 @@ class SupplierController extends Controller
     }
     public function importForm()
     {
+        $this->authorize('suppliers.import.form');
         return view('pages.suppliers.import');
     }
     public function import(Request $request)
     {
+        $this->authorize('suppliers.import');
         $request->validate([
             'file' => 'required|file|mimes:xlsx',
         ]);

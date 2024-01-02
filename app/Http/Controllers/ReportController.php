@@ -2764,7 +2764,7 @@ class ReportController extends Controller
         if ($store == "all")
             $store = "%";
         $stores = DB::table('store_products')
-            ->select('products.name', 'stores.name as store', 'store_products.qty_available', 'selling_price', 'cost_price')
+            ->select('products.name', 'stores.name as store', 'store_products.qty_available', 'retail_selling_price','whole_selling_price', 'cost_price')
             ->distinct()
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
@@ -2773,7 +2773,7 @@ class ReportController extends Controller
             ->where('products.category_id', 'LIKE', $categor_id)
             ->where('store_products.store_id', 'LIKE', $store)
             ->where('store_products.qty_available', '>=', $number)
-            ->where('branch_id', 'LIKE', User::userBranchAction())
+            ->where('stores.branch_id', 'LIKE', User::userBranchAction())
             ->orderBy('products.name');
         $stores = $stores->get();
         return view('pages.reports.stock_control.print_available_stock', ['stores' => $stores]);

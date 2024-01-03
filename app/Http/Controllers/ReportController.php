@@ -2422,7 +2422,7 @@ class ReportController extends Controller
 
 
         $sales = DB::table('intersite_transfers')
-            ->select('vehicle_no','description', 'reference', 'products.name AS product','products.code AS code', 'intersite_transfer_products.quantity', 'cost_price', 'intersite_transfers.date','intersite_transfers.status','source_branch.code AS source','destination_branch.code AS destination')
+            ->select('vehicle_no', 'description', 'reference', 'products.name AS product', 'products.code AS code', 'intersite_transfer_products.quantity', 'cost_price', 'intersite_transfers.date', 'intersite_transfers.status', 'source_branch.code AS source', 'destination_branch.code AS destination')
             ->join('intersite_transfer_products', 'intersite_transfer_products.intersite_transfer_id', 'intersite_transfers.id')
             ->join('branches as source_branch', 'source_branch.id', '=', 'intersite_transfers.source_branch_id')
             ->join('branches as destination_branch', 'destination_branch.id', '=', 'intersite_transfers.destination_branch_id')
@@ -2455,7 +2455,7 @@ class ReportController extends Controller
             $status = '%';
         }
         $sales = DB::table('intersite_transfers')
-            ->select('vehicle_no','description', 'reference', 'products.name AS product','products.code AS code', 'intersite_transfer_products.quantity', 'cost_price', 'intersite_transfers.date','intersite_transfers.status','source_branch.code AS source','destination_branch.code AS destination')
+            ->select('vehicle_no', 'description', 'reference', 'products.name AS product', 'products.code AS code', 'intersite_transfer_products.quantity', 'cost_price', 'intersite_transfers.date', 'intersite_transfers.status', 'source_branch.code AS source', 'destination_branch.code AS destination')
             ->join('intersite_transfer_products', 'intersite_transfer_products.intersite_transfer_id', 'intersite_transfers.id')
             ->join('branches as source_branch', 'source_branch.id', '=', 'intersite_transfers.source_branch_id')
             ->join('branches as destination_branch', 'destination_branch.id', '=', 'intersite_transfers.destination_branch_id')
@@ -2764,7 +2764,7 @@ class ReportController extends Controller
         if ($store == "all")
             $store = "%";
         $stores = DB::table('store_products')
-            ->select('products.name', 'stores.name as store', 'store_products.qty_available', 'retail_selling_price','whole_selling_price', 'cost_price')
+            ->select('products.name', 'stores.name as store', 'store_products.qty_available', 'retail_selling_price', 'whole_selling_price', 'cost_price')
             ->distinct()
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
@@ -3073,7 +3073,7 @@ class ReportController extends Controller
 
         if ($to_month == '')
             $to_month = 'all';
-        if ($branch_id == '')
+        if ($branch_id == '' || $branch_id == '%')
             $branch_id = 'all';
         return view('pages.reports.ap_ar.statements.load_income_statement', [
             'revenues' => $revenues,
@@ -3088,6 +3088,8 @@ class ReportController extends Controller
     }
     public function printIncomeStatement($from_month, $to_month, $income_year, $branch_id)
     {
+        if ($branch_id == 'all')
+            $branch_id = '%';
         $revenue_class = ['R40'];
         $cost_of_sale_class = ['C50'];
         $expense_class = ['C51', 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C58', 'C59', 'C60', 'C61', 'C62', 'C63'];
@@ -3095,18 +3097,19 @@ class ReportController extends Controller
             ->whereYear('date', $income_year)
             ->join('general_accounts', 'general_accounts.class', 'chart_of_accounts.class')
             ->join('general_account_ledgers', 'model_id', 'general_accounts.id')
-            ->where('general_account_ledgers.branch_id', $branch_id)
+            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+            ->where('model_name', 'GeneralAccount')
             ->groupBy('number');
 
-        if ($from_month == '' || $to_month == '') {
+        if ($from_month == 'all' || $to_month == 'all') {
             $query->whereMonth('date', '<=', 12);
         }
 
-        if ($from_month != '') {
+        if ($from_month != 'all') {
             $query->whereMonth('date', '>=', $from_month);
         }
 
-        if ($to_month != '') {
+        if ($to_month != 'all') {
             $query->whereMonth('date', '<=', $to_month);
         }
 

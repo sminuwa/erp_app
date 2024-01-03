@@ -4,7 +4,7 @@ namespace App\Http\Requests\Purchases;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Purchase;
-class Edit extends FormRequest 
+class Edit extends FormRequest
 {
 
     /**
@@ -12,9 +12,9 @@ class Edit extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('edit.item.purchase', Purchase::class);
+        return $this->user()->can('purchases.edit', Purchase::class);
     }
 
     /**
@@ -22,7 +22,7 @@ class Edit extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 
@@ -37,7 +37,7 @@ class Edit extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

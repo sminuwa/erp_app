@@ -37,7 +37,7 @@
                             <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:50px;height:50px;"
                                 alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
                             <h3>
-                                {{$branch->name}}
+                                {{$branch->name ??'All Branches'}}
                             </h3>
                             <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
                                 INCOME STATEMENT FROM {{ $from_month=='all'?'January':monthName($from_month) }} AND

@@ -72,7 +72,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="to_month">Year</label>
+                            <label for="to_month">To Month</label>
                             <select class="form-control select2-single" name="to_month" id="to_month">
                                 <option value="">Select...</option>
                                 <option value="1">January</option>

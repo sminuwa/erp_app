@@ -1,9 +1,9 @@
-<div class="row">
+{{-- <div class="row">
     <div class="offset-10">
         <a href="{{ route('ajax.account.balance.report.print', [$date, $type, $branch_id]) }}" target="_BLANK"
             class="btn-success btn btn-sm">Print</a>
     </div>
-</div>
+</div> --}}
 <table class="table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
@@ -16,7 +16,7 @@
         </h5>
     </caption>
     <?php
-    $sum_cr = $sum_dr = $dif = 0;
+    $sum_cr = $sum_dr = $dif = $total_cr = $total_dr = 0;
     ?>
     <thead>
         <tr>
@@ -49,6 +49,8 @@
                 <td style="text-align: right">
                     <?php $sum_cr = $ledger->credit;
                     $sum_dr = $ledger->debit;
+                    $total_cr += $sum_cr;
+                    $total_dr += $sum_dr;
                     $dif = $sum_cr - $sum_dr;
                     ?>
                     @if ($dif < 0)
@@ -63,9 +65,9 @@
     <tfoot>
         <tr>
             <th colspan="2" style="text-align: right">Total</th>
-            <th style="text-align: right;">&#8358;{{ number_format($sum_cr, 2) }}</th>
-            <th style="text-align: right;">&#8358;{{ number_format($sum_dr, 2) }}</th>
-            <th style="text-align: right;">&#8358;{{ number_format($sum_cr - $sum_dr, 2) }}</th>
+            <th style="text-align: right;">&#8358;{{ number_format($total_cr, 2) }}</th>
+            <th style="text-align: right;">&#8358;{{ number_format($total_dr, 2) }}</th>
+            <th style="text-align: right;">&#8358;{{ number_format($total_cr - $total_dr, 2) }}</th>
         </tr>
         <tr>
             <th colspan="4" style="text-align: right">Balance C/F</th>

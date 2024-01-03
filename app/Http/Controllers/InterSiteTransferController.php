@@ -51,6 +51,7 @@ class InterSiteTransferController extends Controller
 
     public function received(Request $request)
     {
+        $this->authorize('intersite.received');
         \Cart::clear();
         $pending = IntersiteTransfer::where('source_branch_id', User::userBranchAction())
             ->pending()->count();
@@ -63,6 +64,7 @@ class InterSiteTransferController extends Controller
 
     public function post(IntersiteTransfer $intersite)
     {
+        $this->authorize('intersite.post');
         $user = auth()->user();
         $intersite->status = 1;
         $intersite->posted_by = $user->id;
@@ -86,6 +88,7 @@ class InterSiteTransferController extends Controller
 
     public function receive(IntersiteTransfer $intersite)
     {
+        $this->authorize('intersite.receive');
         $user = auth()->user();
         $intersite->status = 2;
         $intersite->received_by = $user->id;
@@ -205,7 +208,8 @@ class InterSiteTransferController extends Controller
     }
 
     public function store(Request $request)
-    { 
+    {
+        $this->authorize('intersite.create');
         $user = auth()->user();
         $intersite_id = $request->intersite_id;
         $source_branch_id = $user->branch->id;
@@ -290,7 +294,7 @@ class InterSiteTransferController extends Controller
 
     public function delete(Destroy $request, IntersiteTransfer $intersite)
     {
-        
+        $this->authorize('intersite.delete');
         DB::beginTransaction();
         try {
             $reference_no = $intersite->reference;
@@ -396,7 +400,8 @@ class InterSiteTransferController extends Controller
     }
     public function printStockTransfer(IntersiteTransfer $intersite)
     {
+        $this->authorize('intersite.print');
         return view('pages.inventories.transfers.inter_site.print')->with(['transfers' => TransferProduct::where(['transfer_id' => $intersite->id, 'stock_in_out' => 'out'])->get()]);
     }
-    
+
 }

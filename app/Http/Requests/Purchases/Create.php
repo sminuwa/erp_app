@@ -5,7 +5,7 @@ namespace App\Http\Requests\Purchases;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Purchase;
 
-class Create extends FormRequest 
+class Create extends FormRequest
 {
 
     /**
@@ -13,7 +13,7 @@ class Create extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
         return $this->user()->can('purchases.create', Purchase::class);
     }
@@ -23,7 +23,7 @@ class Create extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 
@@ -38,7 +38,7 @@ class Create extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

@@ -59,29 +59,29 @@
                         <div class="col-sm-4">
                             <address>
                                 <strong>{{ config('app.name') }}  </strong><br>
-                                Address <span class="ion-ios-contact-outline"></span>: {{ $company->address }}
-                                {{ $company->city }} , {{ $company->country }}<br>
+                                Address <span class="ion-ios-contact-outline"></span>: {{ $company->address ?? null }}
+                                {{ $company->city ?? null }} , {{ $company->country ?? null }}<br>
                                 Phone <span class="ion-android-phone-portrait"></span>:
-                                {{ $company->mobile }}
-                                {{ $company->phone !== null ? ', 0' . $company->phone : '' }}
+                                {{ $company->mobile ?? null }}
+                                {{ $company->phone !== null ? ', 0' . $company->phone ?? null : '' }}
                                 <br>
-                                Email <span class="ion-email"></span>: {{ $company->email }}
+                                Email <span class="ion-email"></span>: {{ $company->email ?? null }}
                             </address>
                         </div>
                         <div class="col-sm-8" style="text-align: right">
                             To
                             <address>
-                                <strong>{{ $purchase->supplier->name }}</strong><br>
+                                <strong>{{ $purchase->supplier->name ?? null }}</strong><br>
                                 Address <span class="ion-ios-contact-outline"></span>:
-                                {{ $purchase->supplier->address }}<br>
+                                {{ $purchase->supplier->address ?? null }}<br>
                                 Phone <span class="ion-android-phone-portrait"></span>:
-                                {{ $purchase->supplier->phone }}<br>
-                                Email <span class="ion-email"></span>: {{ $purchase->supplier->email }}
+                                {{ $purchase->supplier->phone ?? null }}<br>
+                                Email <span class="ion-email"></span>: {{ $purchase->supplier->email ?? null}}
                             </address>
-                            <b>Truck No: {{ $purchase->truck_no }}</b><br>
-                            <b>Reference: {{ $purchase->reference }}</b><br>
-                            <b>ATC/WayBill No.: {{ $purchase->atc_no }}</b><br>
-                            <b>Date: {{ $purchase->purchase_date->toFormattedDateString() }}</b><br>
+                            <b>Truck No: {{ $purchase->truck_no ?? null}}</b><br>
+                            <b>Reference: {{ $purchase->reference ?? null }}</b><br>
+                            <b>ATC/WayBill No.: {{ $purchase->atc_no ?? null}}</b><br>
+                            <b>Date: {{ $purchase->purchase_date->toFormattedDateString() ?? null}}</b><br>
                         </div>
                     </div>
                     <!-- /.row -->

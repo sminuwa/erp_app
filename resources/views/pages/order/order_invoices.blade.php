@@ -42,11 +42,11 @@
                             <div class="card-body table-responsive">
                                 <div class="row">
                                     <div class="col-sm-4">
-                                        @can('view.daily.sale')
+                                        @can('order.invoice.index')
                                             <a href="{{ route('order.invoice.index') }}" class="btn btn-sm btn-secondary"
                                                 style="margin-left: 2px;"><span class="fa fa-list"> </span> View Orders </a>
                                         @endcan
-                                        @can('make.daily.sale')
+                                        @can('order.invoice.index')
                                             <a href="{{ route('order.invoice.index') }}" class="btn btn-sm btn-secondary"
                                                 style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Order
                                                 Invoice</a>

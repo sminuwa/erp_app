@@ -177,13 +177,13 @@
                             <div class="card-header">
                                 <h3 class="card-title">POS</h3>
 
-                                @can('make.daily.sale')
+{{--                                @can('make.daily.sale')--}}
                                     <input type="text" id="barcode" class="form-control" name="barcode"
                                         placeholder="Scan barcode">
-                                @endcannot
+{{--                                @endcannot--}}
                             </div>
                             <!-- /.card-header -->
-                            @can('view.sale.products')
+{{--                            @can('view.sale.products')--}}
                                 <div class="card-body table-responsive" id="load">
                                     <table id="example1" class="table table-bordered table-striped text-left"
                                         style="font-size: 12px;">
@@ -264,7 +264,7 @@
                                     </table>
 
                                 </div>
-                            @endcan
+{{--                            @endcan--}}
                             <!-- /.card-body -->
                         </div>
                         <!-- /.card -->
@@ -578,7 +578,7 @@
                     unit: unit
                 }
             }).done(function(value) {
-                //console.log(value)  
+                //console.log(value)
                 $('#quantity' + formid).attr(
                     'max-qty', value)
             })

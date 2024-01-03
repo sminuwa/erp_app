@@ -5,7 +5,7 @@ namespace App\Http\Requests\TransferProducts;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\TransferProduct;
 
-class Edit extends FormRequest 
+class Edit extends FormRequest
 {
 
     /**
@@ -13,9 +13,9 @@ class Edit extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('edit.stock.transfer', TransferProduct::class);
+        return $this->user()->can('intersite.edit', TransferProduct::class);
     }
 
     /**
@@ -23,7 +23,7 @@ class Edit extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 
@@ -38,7 +38,7 @@ class Edit extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

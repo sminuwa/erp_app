@@ -788,11 +788,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/sa/sales/customer/sale/common-name/load', [ReportController::class, 'loadCustomerSaleReport'])->name('ajax.load.customer.sale.reports');
             Route::get('/sa/sales/customer/sale/common-name/print/{from_date}/{to_date}/{branch_id}/{store_id}/{category_id}/{product_id}/{customer}/{matching}', [ReportController::class, 'printCustomerSaleReport'])->name('ajax.customer.sale.report.print');
 
-            //Debtpr Balance Report
-            Route::get('/sa/sales/debtor/balance', [ReportController::class, 'debtorBalanceReport'])->name('debtor.balance.reports');
-            Route::get('/sa/sales/debtor/balance/load', [ReportController::class, 'loadDebtorBalanceReport'])->name('ajax.load.debtor.balance.reports');
-            Route::get('/sa/sales/debtor/balance/print/{from_date}/{to_date}/{customer}/', [ReportController::class, 'printDebtorBalanceReport'])->name('ajax.debtor.balance.report.print');
-
+           
             //Most Sold Item by Amount and by Quantity Report
             Route::get('/sa/sales/most/sold-item', [ReportController::class, 'mostSoldItemReport'])->name('most.sold.item.reports');
             Route::get('/sa/sales/most/sold-item/load', [ReportController::class, 'loadMostSoldItemReport'])->name('ajax.load.most.sold.item.reports');

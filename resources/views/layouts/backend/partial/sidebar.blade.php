@@ -420,13 +420,6 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="{{ route('debtor.balance.reports') }}"
-                                                class="nav-link {{ Request::is('reports/sa/debtor/balance*') ? 'active' : '' }}">
-                                                <i class="ion-code-working"></i>
-                                                <p>Debtor Balance Report</p>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
                                             <a href="{{ route('most.sold.item.reports') }}"
                                                 class="nav-link {{ Request::is('reports/sa/most/sold-item*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>

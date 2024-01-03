@@ -1209,68 +1209,6 @@ class ReportController extends Controller
         return view('pages.reports.sales_and_cash_analysis.print_report_with_common_name', compact('sales', 'from_date', 'to_date', 'branch', 'product_id', 'store_id', 'category_id', 'customer'));
     }
 
-    public function debtorBalanceReport()
-    {
-        return view('pages.reports.sales_and_cash_analysis.debtor_balance_report', [
-            'customers' => Customer::orderBy('name')->where('type', 'Credit')->get(),
-        ]);
-    }
-
-    public function loadDebtorBalanceReport(Request $request)
-    {
-        $from_date = $request->from_date;
-        $to_date = $request->to_date;
-        $customer_id = $request->customer_id;
-
-        if ($customer_id == 'all') {
-            $customer_id = '%';
-        }
-
-        $sales = DB::table('orders')
-            ->select('customers.name AS customer', 'orders.total', 'pay', 'due', 'discount', 'invoice_no', 'order_date')
-            ->join('order_details', 'order_details.order_id', 'orders.id')
-            ->join('store_products', 'store_products.id', 'order_details.store_product_id')
-            ->join('customers', 'customers.id', 'orders.customer_id')
-            ->join('stores', 'stores.id', 'store_products.store_id')
-            ->join('products', 'products.id', 'store_products.product_id')
-            ->where('orders.payment_mode', 'LIKE', 'Credit')
-            ->where('customers.type', 'LIKE', 'Credit')
-            ->where('orders.customer_id', 'LIKE', $customer_id)
-            ->where('order_details.status', 1)
-            ->where('stores.branch_id', 'LIKE', User::userBranchAction())
-            ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
-            ->orderBy('order_date')
-            ->get();
-        if ($customer_id == "%")
-            $customer_id = "all";
-        return view('pages.reports.sales_and_cash_analysis.load_debtor_balance_report', compact('sales', 'from_date', 'to_date', 'customer_id'));
-    }
-
-    public function printDebtorBalanceReport($from_date, $to_date, $customer_id)
-    {
-
-        if ($customer_id == 'all') {
-            $customer_id = '%';
-        }
-        $sales = DB::table('orders')
-            ->select('customers.name AS customer', 'orders.total', 'pay', 'due', 'discount', 'invoice_no', 'order_date')
-            ->join('order_details', 'order_details.order_id', 'orders.id')
-            ->join('store_products', 'store_products.id', 'order_details.store_product_id')
-            ->join('customers', 'customers.id', 'orders.customer_id')
-            ->join('stores', 'stores.id', 'store_products.store_id')
-            ->join('products', 'products.id', 'store_products.product_id')
-            ->where('orders.payment_mode', 'LIKE', 'Credit')
-            ->where('customers.type', 'LIKE', 'Credit')
-            ->where('orders.customer_id', 'LIKE', $customer_id)
-            ->where('order_details.status', 1)
-            ->where('stores.branch_id', 'LIKE', User::userBranchAction())
-            ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
-            ->orderBy('order_date')
-            ->get();
-        if ($customer_id == "%")
-            $customer_id = "all";
-        return view('pages.reports.sales_and_cash_analysis.print_debtor_balance_report', compact('sales', 'from_date', 'to_date', 'customer_id'));
-    }
 
     public function mostSoldItemReport()
     {

@@ -68,7 +68,8 @@
                     &#8358;{{ number_format($grand_total_profit, 2) }}
                 @endif
             </th>
-            <th style="text-align:right">{{ number_format(($grand_total_profit / $total_amount) * 100, 2) }}</th>
+            <th style="text-align:right">
+                {{ $total_amount != 0 ? number_format(($grand_total_profit / $total_amount) * 100, 2) : 0 }}</th>
         </tr>
     </tfoot>
 </table>

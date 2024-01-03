@@ -4,7 +4,7 @@ namespace App\Http\Requests\Purchases;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Purchase;
-class Update extends FormRequest 
+class Update extends FormRequest
 {
 
     /**
@@ -12,9 +12,13 @@ class Update extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('edit.item.purchase');
+<<<<<<< HEAD
+        return $this->user()->can('purchases.edit');
+=======
+        return $this->user()->can('purchases.update');
+>>>>>>> 9bbd79a83914354ccd77f4f5a4c86e3f1878d3f0
     }
 
     /**
@@ -22,7 +26,7 @@ class Update extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 			'supplier_id' => 'required|numeric',
@@ -41,7 +45,7 @@ class Update extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

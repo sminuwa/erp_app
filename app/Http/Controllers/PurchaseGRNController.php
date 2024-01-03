@@ -92,6 +92,7 @@ class PurchaseGRNController extends Controller
     }
     public function store(Request $request)
     {
+        $this->authorize('purchases.create');
         DB::beginTransaction();
         try {
             $purchase_datetime = date('Y-m-d H:i:s', strtotime("$request->purchase_date $request->purchase_time"));
@@ -401,6 +402,7 @@ class PurchaseGRNController extends Controller
     }
     public function printInvoice(Purchase $purchase)
     {
+        $this->authorize('purchase.print');
         $purchase = Purchase::with('supplier')->where('id', $purchase->id)->first();
 
         $purchase_details = PurchaseProduct::with('Product')->where('purchase_id', $purchase->id)->get();
@@ -411,6 +413,7 @@ class PurchaseGRNController extends Controller
     }
     public function generateWaybill(Request $request, Purchase $purchase)
     {
+        $this->authorize('purchase.generate.waybill');
         $purchase->waybill_no = $request->waybill_no;
         $purchase->driver_name = $request->driver_name;
         $purchase->transporter_phone = $request->transporter_phone;
@@ -422,6 +425,7 @@ class PurchaseGRNController extends Controller
     }
     public function printWaybill(Purchase $purchase)
     {
+        $this->authorize('purchase.waybill.print');
         $purchase = Purchase::with('supplier')->where('id', $purchase->id)->first();
 
         $purchase_details = PurchaseProduct::with('Product')->where('purchase_id', $purchase->id)->get();
@@ -440,6 +444,7 @@ class PurchaseGRNController extends Controller
     }
     public function deleteExpense(Request $request, PurchaseExpense $expense)
     {
+        $this->authorize('delete.purchase.expense');
         $expense_item = $expense->name;
         if ($expense->delete()) {
             $action = "Deleted purchase expense $expense_item";
@@ -453,6 +458,7 @@ class PurchaseGRNController extends Controller
     }
     public function approve(Request $request, Purchase $purchase)
     {
+        $this->authorize('purchase.approve');
         DB::beginTransaction();
         $purchase->status = 1;
         if ($purchase->save()) {
@@ -466,6 +472,7 @@ class PurchaseGRNController extends Controller
     }
     public function post(Request $request, Purchase $purchase)
     {
+        $this->authorize('purchase.post');
         $items = $purchase->purchasedProducts;
         DB::beginTransaction();
         $purchase->status = 1;

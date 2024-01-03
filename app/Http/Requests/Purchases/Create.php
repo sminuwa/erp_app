@@ -15,7 +15,7 @@ class Create extends FormRequest
      */
     public function authorize() 
     {
-        return $this->user()->can('make.item.purchase', Purchase::class);
+        return $this->user()->can('purchases.create', Purchase::class);
     }
 
     /**

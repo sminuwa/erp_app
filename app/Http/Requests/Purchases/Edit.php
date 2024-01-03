@@ -14,7 +14,7 @@ class Edit extends FormRequest
      */
     public function authorize() 
     {
-        return $this->user()->can('edit.item.purchase', Purchase::class);
+        return $this->user()->can('purchases.edit', Purchase::class);
     }
 
     /**

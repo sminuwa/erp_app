@@ -15,7 +15,7 @@ class Index extends FormRequest
      */
     public function authorize() 
     {
-        return $this->user()->can('view.item.purchase', Purchase::class);
+        return $this->user()->can('purchase.index', Purchase::class);
     }
 
     /**

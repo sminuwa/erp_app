@@ -14,7 +14,7 @@ class Update extends FormRequest
      */
     public function authorize() 
     {
-        return $this->user()->can('edit.item.purchase');
+        return $this->user()->can('purchases.update');
     }
 
     /**

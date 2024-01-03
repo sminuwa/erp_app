@@ -15,7 +15,7 @@ class Destroy extends FormRequest
      */
     public function authorize() 
     {
-        return $this->user()->can('delete.item.purchase', Purchase::class);
+        return $this->user()->can('purchases.delete', Purchase::class);
     }
 
     /**

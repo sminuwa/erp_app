@@ -92,7 +92,7 @@
                                                             <span class="fa fa-eye"></span> View
                                                         </a>
                                                     @endcan
-                                                    @can('purchases.print')
+                                                    @can('purchase.print')
                                                         <a class="dropdown-item"
                                                             href="{{ route('purchase.print', $record->id) }}" title="Print GRN"
                                                             target="_BLANK">
@@ -100,7 +100,7 @@
                                                         </a>
                                                     @endcan
                                                     @if ($record->status == 0)
-                                                        @can('purchases.post')
+                                                        @can('purchase.post')
                                                             <form action="{{ route('purchase.post', $record->id) }}"
                                                                 method="post"
                                                                 onsubmit="return confirm('Are you sure you want to post this order?')">

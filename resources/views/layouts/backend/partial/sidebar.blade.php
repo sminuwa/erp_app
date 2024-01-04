@@ -137,39 +137,46 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
+                        @can('purchases.request.index')
                         <li class="nav-item">
                             <a href="{{ route('purchases.request.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Purchases (Request)</p>
                             </a>
                         </li>
+                        @endcan
+                        @can('purchases.index')
                         <li class="nav-item">
                             <a href="{{ route('purchases.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Purchases (GRN)</p>
                             </a>
                         </li>
-
+                        @endcan
+                        @can('purchase.additional-invoice.index')
                         <li class="nav-item">
                             <a href="{{ route('purchase.additional-invoice.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Additional Invoice</p>
                             </a>
                         </li>
-
+                        @endcan
+                        @can('intersite.index')
                         <li class="nav-item">
                             <a href="{{ route('intersite.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Intersite Transfer</p>
                             </a>
                         </li>
-
+                        @endcan
+                        @can('interstore.index')
                         <li class="nav-item">
                             <a href="{{ route('interstore.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Interstore Transfer</p>
                             </a>
                         </li>
+                        @endcan
                         @can('stock_adjustments.index')
                         <li class="nav-item">
                             <a href="{{ route('stock_adjustments.index') }}" class="nav-link ">

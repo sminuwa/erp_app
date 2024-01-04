@@ -170,20 +170,22 @@
                                 <p>Interstore Transfer</p>
                             </a>
                         </li>
-
+                        @can('stock_adjustments.index')
                         <li class="nav-item">
                             <a href="{{ route('stock_adjustments.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Stock Adjustment</p>
                             </a>
                         </li>
-
+                        @endcan
+                        @can('customers.return.debit')
                         <li class="nav-item">
                             <a href="{{ route('customers.return.debit') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Return and Debit</p>
                             </a>
                         </li>
+                        @endcan
 
                     </ul>
                 </li>

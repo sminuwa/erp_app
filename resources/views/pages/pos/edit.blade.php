@@ -124,13 +124,13 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-4">
-                                            <input type="number" class="form-control" name="discount"
+                                            <input type="number" step=".01" class="form-control" name="discount"
                                                 placeholder="Discount" id="discount" value="{{ $order->discount }}" />
                                         </div>
 
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <input type="number" class="form-control" placeholder="Refund"
+                                                <input type="number" step=".01" class="form-control" placeholder="Refund"
                                                     name="refund" id="refund" value="{{ $order->refund }}" />
 
                                             </div>

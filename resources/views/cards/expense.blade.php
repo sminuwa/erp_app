@@ -65,7 +65,7 @@
                                 @csrf
                                 @method('PUT')
                                 <td>
-                                    <input type="number" name="amount" id="price{{ $loop->iteration }}" readonly
+                                    <input type="number" name="amount" id="price{{ $loop->iteration }}" readonly step=".01"
                                         class="form-control" style="min-width:65px;" value="{{ $expense->price }}">
                                 </td>
                                 <input type="hidden" name="id" class="form-control" value="{{ $expense->id }}">

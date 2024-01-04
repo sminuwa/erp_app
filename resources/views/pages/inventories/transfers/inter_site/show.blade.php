@@ -267,7 +267,7 @@
 
                         <div class="form-group">
                             <label for="quantity">Quantity</label>
-                            <input type="number" class="form-control" name="quantity" id="quantity"
+                            <input type="number" step=".01" class="form-control" name="quantity" id="quantity"
                                 placeholder="Quantity" required="required">
                         </div>
                         <input type="hidden" value="0" name="cost_price" id="cost_price" />

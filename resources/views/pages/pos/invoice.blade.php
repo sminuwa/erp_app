@@ -197,7 +197,7 @@
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="inputCity">Pay</label>
-                                <input type="number" name="pay" value="{{ Cart::getTotal() }}" class="form-control">
+                                <input type="number" step=".01" name="pay" value="{{ Cart::getTotal() }}" class="form-control">
                             </div>
                         </div>
                     </div>

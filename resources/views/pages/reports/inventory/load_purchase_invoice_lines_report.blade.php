@@ -35,10 +35,10 @@
             <td>{{ \Carbon\Carbon::parse($sale->purchase_date)->toFormattedDateString() }}</td>
             <td>{{ $sale->reference }}</td>
             <td>{{ $sale->product }}</td>
-            <td>{{ $sale->unit_price }}</td>
+            <td style="text-align: right">{{ number_format($sale->unit_price, 2) }}</td>
             <td>{{ $sale->quantity }}</td>
             <td style="text-align: right">
-                &#8358;{{ number_format($sale->unit_price * $sale->quantity, 2, '.', ',') }}</td>
+                {{ number_format($sale->unit_price * $sale->quantity, 2, '.', ',') }}</td>
             <td>{{ $sale->store }}</td>
             <td>{{ $sale->wbno }}</td>
             <td>{{ $sale->supplier }}</td>

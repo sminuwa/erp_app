@@ -62,7 +62,7 @@
                         <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="number">Number</label>
-                            <input type="number" name="number_limit" id="number_limit" class="form-control"
+                            <input type="number" step=".01" name="number_limit" id="number_limit" class="form-control"
                                 placeholder="Enter the number record to display" min="1" />
                         </div>
                         

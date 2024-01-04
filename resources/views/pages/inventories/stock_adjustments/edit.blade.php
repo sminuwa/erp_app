@@ -99,11 +99,11 @@
                                                             <td>
 
                                                                 @if ($attr['sign'] == '-')
-                                                                    <input type="number" name="quantity" id="quantity"
+                                                                    <input type="number" name="quantity" id="quantity" step=".01"
                                                                         class="form-control input-sm"
                                                                         value="{{ 0 - $product->quantity }}" />
                                                                 @else
-                                                                    <input type="number" name="quantity" id="quantity"
+                                                                    <input type="number" name="quantity" id="quantity" step=".01"
                                                                         class="form-control input-sm"
                                                                         value="{{ $product->quantity }}" />
                                                                 @endif

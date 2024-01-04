@@ -191,7 +191,7 @@
 
                         <div class="form-group">
                             <label for="quantity">Quantity</label>
-                            <input type="number"
+                            <input type="number" step=".01"
                                 class="form-control {{ $errors->has('quantity') ? ' is-invalid' : '' }}" name="quantity"
                                 id="quantity" value="" placeholder="Quantity" required="required"
                                 min="1">

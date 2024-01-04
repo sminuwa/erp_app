@@ -32,7 +32,7 @@
 
     <div class="form-group">
         <label for="purchase_price">Unit Price</label>
-        <input type="number" class="form-control" name="purchase_price" id="purchase_price" placeholder="0.0" required>
+        <input type="number" class="form-control" step=".01" name="purchase_price" id="purchase_price" placeholder="0.0" required>
         @if ($errors->has('purchase_price'))
             <div class="invalid-feedback">
                 <strong>{{ $errors->first('purchase_price') }}</strong>

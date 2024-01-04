@@ -46,7 +46,7 @@
 
     <div class="form-group">
         <label for="retail_selling_price">Retail Price</label>
-        <input type="number" class="form-control {{ $errors->has('retail_selling_price') ? ' is-invalid' : '' }}"
+        <input type="number" class="form-control {{ $errors->has('retail_selling_price') ? ' is-invalid' : '' }}" step=".01"
             name="retail_selling_price" id="retail_selling_price" value="{{ old('retail_selling_price', $model->retail_selling_price) }}"
             placeholder="" required="required">
         @if ($errors->has('retail_selling_price'))
@@ -57,7 +57,7 @@
     </div>
     <div class="form-group">
         <label for="whole_selling_price">Wholesale Price</label>
-        <input type="number" class="form-control {{ $errors->has('whole_selling_price') ? ' is-invalid' : '' }}"
+        <input type="number" class="form-control {{ $errors->has('whole_selling_price') ? ' is-invalid' : '' }}" step=".01"
             name="whole_selling_price" id="whole_selling_price" value="{{ old('whole_selling_price', $model->whole_selling_price) }}"
             placeholder="" required="required">
         @if ($errors->has('whole_selling_price'))

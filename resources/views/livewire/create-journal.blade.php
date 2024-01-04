@@ -69,7 +69,7 @@
                                        <td>
                                            <div class="col-12">
                                                <div class="form-group" wire:ignore>
-                                                   <input type="number" min="0" class="form-control" placeholder="Debit" wire:model.lazy="debit.{{ $key }}" wire:change="totals">
+                                                   <input type="number" min="0" step=".01" class="form-control" placeholder="Debit" wire:model.lazy="debit.{{ $key }}" wire:change="totals">
                                                    <label class="floating-label">Debit: @error('debit.'.$key) <br><span class="text-danger error">{{ $message }}</span>@enderror</label>
                                                </div>
                                            </div>
@@ -77,7 +77,7 @@
                                        <td>
                                            <div class="col-12">
                                                <div class="form-group" wire:ignore>
-                                                   <input type="number" min="0" class="form-control" placeholder="Credit" wire:model.lazy="credit.{{ $key }}" wire:change="totals">
+                                                   <input type="number" min="0" step=".01" class="form-control" placeholder="Credit" wire:model.lazy="credit.{{ $key }}" wire:change="totals">
                                                    <label class="floating-label">Credit: @error('credit.'.$key) <br><span class="text-danger error">{{ $message }}</span>@enderror</label>
                                                </div>
                                            </div>

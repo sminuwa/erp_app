@@ -167,7 +167,7 @@
                                                         @csrf
                                                         @method('PUT')
                                                         <td>
-                                                            <input type="number" name="sold_price"
+                                                            <input type="number" step=".01" name="sold_price"
                                                                 id="price{{ $product->id }}" class="form-control price"
                                                                 style="min-width:65px;"
                                                                 onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))"
@@ -178,7 +178,7 @@
                                                                 id="valid_price{{ $product->id }}"></span>
                                                         </td>
                                                         <td>
-                                                            <input type="number" name="quantity"
+                                                            <input type="number" name="quantity" step=".01"
                                                                 id="quantity{{ $product->id }}"
                                                                 class="form-control quantity"
                                                                 data-value="p{{ $product->id }}" style="min-width:58px;"
@@ -552,7 +552,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="amount_paid">Amount Paid</label>
-                                    <input type="number"
+                                    <input type="number" step=".01"
                                         class="form-control {{ $errors->has('amount_paid') ? ' is-invalid' : '' }}"
                                         name="amount_paid" id="amount_paid" required>
                                     @if ($errors->has('amount_paid'))

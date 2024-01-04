@@ -106,7 +106,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="qty">QTY</label>
-                                <input type="number" class="form-control {{ $errors->has('qty') ? ' is-invalid' : '' }}"
+                                <input type="number" step=".01" class="form-control {{ $errors->has('qty') ? ' is-invalid' : '' }}"
                                     name="qty" id="qty" value="{{ old('qty', $model->qty) }}" min="0"
                                     placeholder="" required="required">
                                 @if ($errors->has('qty'))

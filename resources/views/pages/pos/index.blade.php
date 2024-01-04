@@ -150,13 +150,13 @@
                                             <textarea class="form-control" name="description" placeholder="Description" id="description"></textarea>
                                         </div>
                                         <div class="col-md-4">
-                                            <input type="number" class="form-control" name="discount"
+                                            <input type="number" class="form-control" name="discount" step=".01"
                                                 placeholder="Discount" id="discount" />
                                         </div>
 
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <input type="number" class="form-control" placeholder="Refund"
+                                                <input type="number" step=".01" class="form-control" placeholder="Refund"
                                                     name="refund" id="refund" />
 
                                             </div>
@@ -397,7 +397,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <label for="amount_paid">Amount</label>
-                                <input type="number"
+                                <input type="number" step=".01"
                                     class="form-control {{ $errors->has('amount_paid') ? ' is-invalid' : '' }}"
                                     name="amount_paid" id="amount_paid" value="{{ old('amount_paid') }}" required>
                                 @if ($errors->has('amount_paid'))

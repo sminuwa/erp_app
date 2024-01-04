@@ -128,7 +128,7 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="amount">Amount</label>
-                                                <input type="number"
+                                                <input type="number" step=".01"
                                                     class="form-control {{ $errors->has('amount') ? ' is-invalid' : '' }}"
                                                     name="amount" id="amount"
                                                     value="{{ old('amount', $model->amount) }}" required>

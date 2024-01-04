@@ -110,8 +110,8 @@
                         <div class="form-group  col-sm-1">
                             &nbsp;&nbsp;
                             <label for="lower">Range</label>
-                            <input type="number" name="lower" id="lower" value="1" class="form-control" min="1" placeholder="Min value"/> 
-                            <input type="number" name="upper" id="upper" value="100" class="form-control" min="1" placeholder="Max value"/> 
+                            <input type="number" step=".01" name="lower" id="lower" value="1" class="form-control" min="1" placeholder="Min value"/> 
+                            <input type="number" step=".01" name="upper" id="upper" value="100" class="form-control" min="1" placeholder="Max value"/> 
                         </div>
                         <div class="form-group text-right  col-sm-2">
                             <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />

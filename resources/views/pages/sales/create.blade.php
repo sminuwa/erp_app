@@ -49,7 +49,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label>Expense Amount</label>
-                                                <input type="number" name="amount" class="form-control" value="{{ old('amount') }}" placeholder="Enter Expense Amount">
+                                                <input type="number" step=".01" name="amount" class="form-control" value="{{ old('amount') }}" placeholder="Enter Expense Amount">
                                             </div>
                                         </div>
                                     </div>

@@ -26,7 +26,7 @@ class ReceiptController extends Controller
         $payments = Receipt::select('receipts.*')
             ->where('branch_id', 'LIKE', $user_branch)
             ->where('created_at', '>=', $date)
-            ->orderBy('status', 'ASC')->orderBy('reference', 'DESC')
+            ->orderBy('status', 'ASC')->orderBy('receipt_no', 'DESC')
             //->where('date', '>', Carbon::now()->subDays(7))
             ->get();
         return view('pages.receipts.receipt_payment', ['payments' => $payments]);

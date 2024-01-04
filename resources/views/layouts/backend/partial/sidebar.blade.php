@@ -91,34 +91,38 @@
                     </a>
 
                     <ul class="nav nav-treeview">
-
+                        @can('order.invoice.list')
                         <li class="nav-item">
                             <a href="{{ route('order.invoice.list') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Orders</p>
                             </a>
                         </li>
-
+                        @endcan
+                        @can('invoice.index')
                         <li class="nav-item">
                             <a href="{{ route('invoice.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Invoice (POS)</p>
                             </a>
                         </li>
-
+                        @endcan
+                        @can('proformer.list')
                         <li class="nav-item">
                             <a href="{{ route('proformer.list') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Proforma Invoice</p>
                             </a>
                         </li>
-
+                        @endcan
+                        @can('customers.credit.note')
                         <li class="nav-item">
                             <a href="{{ route('customers.credit.note') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Credit Note</p>
                             </a>
                         </li>
+                        @endcan
 
                     </ul>
                 </li>

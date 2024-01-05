@@ -2920,7 +2920,7 @@ class ReportController extends Controller
                 ->where('general_account_ledgers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '>=', $from_date)
                 ->whereDate('date', '<=', $to_date)
-                ->where('model_nam', 'GeneralAccount');
+                ->where('model_name', 'GeneralAccount');
         }
         return GeneralAccountLedger::join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
             ->where('general_account_ledgers.branch_id', 'like', $branch_id)

@@ -172,15 +172,15 @@ class ReceiptController extends Controller
                 session()->flash('app_message', 'Something went wrong');
             }
         }
-        return back();
+        return redirect()->route('receipt.payments');
     }
 
     public function delete(Receipt $receipt)
-    {
+    { 
         if ($receipt->delete()) {
 
         }
-        return back();
+        return redirect()->route('receipt.payments');
     }
 
     public function printReceipt(Receipt $payment)

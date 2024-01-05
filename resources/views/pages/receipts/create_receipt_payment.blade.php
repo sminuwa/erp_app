@@ -32,14 +32,9 @@
 
         <!-- Main content -->
         <section class="content">
-            @can('create.payment.reciept')
-                <a href="{{ route('create.payment.reciept') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                        class="fa fa-plus-circle"> </span> New
-                    Receipt</a>
-            @endcan
             @can('receipt.payments')
                 <a class="btn btn-secondary btn-sm" href="{{ route('receipt.payments') }}">
-                    <span class="fa fa-list"> Receipts</span>
+                    <span class="fa fa-list"> List</span>
                 </a>
             @endcan
 

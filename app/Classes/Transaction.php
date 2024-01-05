@@ -930,14 +930,15 @@ class Transaction
         }
 
         $credit_limit = Customer::find($customer_id)->credit_limit;
-        $balance = Customer::find($customer_id)->runningBalance();
-        if ($balance <= 0 && $credit_limit == 0) {
+        $balance = Customer::find($customer_id)->runningBalance() - $total_sales;
+        if ($balance <= 0 && ($credit_limit == 0 || $credit_limit == 1)) {
             return false;
         }
-        if (($balance <= 0 && $credit_limit > 0 && (abs($balance + $total_sales)) > $credit_limit)) {
+        if (($balance <= 0 && $credit_limit > 1 && (abs($balance)) > $credit_limit)) {
             return false;
         }
-        if ($balance > 0 && $credit_limit > 0 && (abs($balance + $total_sales) > $credit_limit)) {
+        if ($balance > 0 && $credit_limit > 1 && (abs($balance) > $credit_limit)) {
+
             return false;
         }
         return true;

@@ -34,7 +34,7 @@
         <section class="content">
             @can('receipt.payments')
                 <a class="btn btn-secondary btn-sm" href="{{ route('receipt.payments') }}">
-                    <span class="fa fa-list"> List</span>
+                    <span class="fa fa-list"> </span> List
                 </a>
             @endcan
 

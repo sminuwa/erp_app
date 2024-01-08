@@ -76,16 +76,16 @@
 
                                     <div class="row">
                                         <div class="col-md-4">
-                                            @hasanyrole('Super-admin|Admin')
+{{--                                            @hasanyrole('Super-admin|Admin')--}}
                                                 <div class="form-group">
                                                     <label for="order_date">Sale Date</label>
                                                     <input type="text" name="order_date" class="form-control datepicker"
                                                         value="{{ isset($order) ? Carbon\Carbon::parse($order->order_date)->format('Y-m-d') : date('Y-m-d') }}" />
                                                 </div>
-                                            @else
-                                                <input type="hidden" name="order_date" class="form-control datepicker"
-                                                    value="{{ date('Y-m-d') }}" />
-                                            @endhasanyrole
+{{--                                            @else--}}
+{{--                                                <input type="hidden" name="order_date" class="form-control datepicker"--}}
+{{--                                                    value="{{ date('Y-m-d') }}" />--}}
+{{--                                            @endhasanyrole--}}
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">

@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Purchases;
+namespace App\Http\Requests\PurchaseRequest;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\Purchase;
 
-class Destroy extends FormRequest
+class Show extends FormRequest 
 {
 
     /**
@@ -13,10 +12,9 @@ class Destroy extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize() 
     {
-
-        return $this->user()->can('purchases.destroy', Purchase::class);
+        return true;
     }
 
     /**
@@ -24,7 +22,7 @@ class Destroy extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules() 
     {
         return [
 
@@ -39,7 +37,7 @@ class Destroy extends FormRequest
     public function messages()
     {
         return [
-
+     
         ];
     }
 

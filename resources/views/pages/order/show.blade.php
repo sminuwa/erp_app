@@ -179,27 +179,27 @@
                                                 <th style="text-align: right">{{ number_format($total, 2, '.', ',') }}</th>
 
                                             </tr>
-                                            @if ($order_detail->order->discount != 0)
+                                            @if ($order->discount != 0)
                                                 <tr>
                                                     <th style="text-align: right" colspan="7">Discount := </th>
                                                     <th style="text-align: right;">
-                                                        &#8358;{{ number_format($order_detail->order->discount, 2, '.', ',') }}
+                                                        &#8358;{{ number_format($order->discount, 2, '.', ',') }}
                                                     </th>
                                                 </tr>
                                             @endif
-                                            @if ($order_detail->order->refund != 0)
+                                            @if ($order->refund != 0)
                                                 <tr>
                                                     <th style="text-align: right" colspan="7">Refund := </th>
                                                     <th style="text-align: right;">
-                                                        &#8358;{{ number_format($order_detail->order->refund, 2, '.', ',') }}
+                                                        &#8358;{{ number_format($order->refund, 2, '.', ',') }}
                                                     </th>
                                                 </tr>
                                             @endif
-                                            @if ($order_detail->order->discount != 0 || $order_detail->order->refund != 0)
+                                            @if ($order->discount != 0 || $order->refund != 0)
                                                 <tr>
                                                     <th style="text-align: right" colspan="7">Total Amount := </th>
                                                     <th style="text-align: right;">
-                                                        &#8358;{{ number_format($total - $order_detail->order->discount + $order_detail->order->refund, 2, '.', ',') }}
+                                                        &#8358;{{ number_format($total - $order->discount + $order->refund, 2, '.', ',') }}
                                                     </th>
                                                 </tr>
                                             @endif

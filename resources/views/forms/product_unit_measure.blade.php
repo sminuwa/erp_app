@@ -48,7 +48,7 @@
     </div>
     <div class="form-group">
       <label for="value">Value</label>
-      <input type="number" class="form-control {{ $errors->has('value') ? ' is-invalid' : '' }}" name="value"
+      <input type="number" class="form-control {{ $errors->has('value') ? ' is-invalid' : '' }}" name="value" step=".01"
           id="value" value="{{ old('value', $model->value) }}" placeholder="" min="1" required="required">
       @if ($errors->has('value'))
           <div class="invalid-feedback">

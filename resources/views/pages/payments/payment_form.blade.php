@@ -85,7 +85,7 @@
         <div class="col-md-4">
             <div class="form-group">
                 <label for="amount_paid">Amount</label>
-                <input type="number" class="form-control {{ $errors->has('amount_paid') ? ' is-invalid' : '' }}"
+                <input type="number" step=".01" class="form-control {{ $errors->has('amount_paid') ? ' is-invalid' : '' }}"
                        name="amount_paid" id="amount_paid" value="{{ old('amount_paid', $model->amount) }}" required>
                 @if ($errors->has('amount_paid'))
                     <div class="invalid-feedback">

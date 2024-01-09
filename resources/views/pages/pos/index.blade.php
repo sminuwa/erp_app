@@ -76,16 +76,16 @@
 
                                     <div class="row">
                                         <div class="col-md-4">
-                                            @hasanyrole('Super-admin|Admin')
+{{--                                            @hasanyrole('Super-admin|Admin')--}}
                                                 <div class="form-group">
                                                     <label for="order_date">Sale Date</label>
                                                     <input type="text" name="order_date" class="form-control datepicker"
                                                         value="{{ isset($order) ? Carbon\Carbon::parse($order->order_date)->format('Y-m-d') : date('Y-m-d') }}" />
                                                 </div>
-                                            @else
-                                                <input type="hidden" name="order_date" class="form-control datepicker"
-                                                    value="{{ date('Y-m-d') }}" />
-                                            @endhasanyrole
+{{--                                            @else--}}
+{{--                                                <input type="hidden" name="order_date" class="form-control datepicker"--}}
+{{--                                                    value="{{ date('Y-m-d') }}" />--}}
+{{--                                            @endhasanyrole--}}
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
@@ -150,13 +150,13 @@
                                             <textarea class="form-control" name="description" placeholder="Description" id="description"></textarea>
                                         </div>
                                         <div class="col-md-4">
-                                            <input type="number" class="form-control" name="discount"
+                                            <input type="number" class="form-control" name="discount" step=".01"
                                                 placeholder="Discount" id="discount" />
                                         </div>
 
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <input type="number" class="form-control" placeholder="Refund"
+                                                <input type="number" step=".01" class="form-control" placeholder="Refund"
                                                     name="refund" id="refund" />
 
                                             </div>
@@ -177,13 +177,13 @@
                             <div class="card-header">
                                 <h3 class="card-title">POS</h3>
 
-                                @can('make.daily.sale')
+{{--                                @can('make.daily.sale')--}}
                                     <input type="text" id="barcode" class="form-control" name="barcode"
                                         placeholder="Scan barcode">
-                                @endcannot
+{{--                                @endcannot--}}
                             </div>
                             <!-- /.card-header -->
-                            @can('view.sale.products')
+{{--                            @can('view.sale.products')--}}
                                 <div class="card-body table-responsive" id="load">
                                     <table id="example1" class="table table-bordered table-striped text-left"
                                         style="font-size: 12px;">
@@ -264,7 +264,7 @@
                                     </table>
 
                                 </div>
-                            @endcan
+{{--                            @endcan--}}
                             <!-- /.card-body -->
                         </div>
                         <!-- /.card -->
@@ -397,7 +397,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <label for="amount_paid">Amount</label>
-                                <input type="number"
+                                <input type="number" step=".01"
                                     class="form-control {{ $errors->has('amount_paid') ? ' is-invalid' : '' }}"
                                     name="amount_paid" id="amount_paid" value="{{ old('amount_paid') }}" required>
                                 @if ($errors->has('amount_paid'))
@@ -578,7 +578,7 @@
                     unit: unit
                 }
             }).done(function(value) {
-                //console.log(value)  
+                //console.log(value)
                 $('#quantity' + formid).attr(
                     'max-qty', value)
             })

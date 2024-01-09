@@ -53,30 +53,38 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
+                        @can('receipt.payments')
                         <li class="nav-item">
                             <a href="{{ route('receipt.payments') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Receipts</p>
                             </a>
                         </li>
+                        @endcan
+                        @can('payments.list')
                         <li class="nav-item">
                             <a href="{{ route('payments.list') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Payments</p>
                             </a>
                         </li>
+                        @endcan
+                        @can('interbank.list')
                         <li class="nav-item">
                             <a href="{{ route('interbank.list') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Interbanks</p>
                             </a>
                         </li>
+                        @endcan
+                        @can('journal.index')
                         <li class="nav-item">
                             <a href="{{ route('journal.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Journals</p>
                             </a>
                         </li>
+                        @endcan
                     </ul>
                 </li>
                 @endcan
@@ -91,34 +99,38 @@
                     </a>
 
                     <ul class="nav nav-treeview">
-
+                        @can('order.invoice.list')
                         <li class="nav-item">
                             <a href="{{ route('order.invoice.list') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Orders</p>
                             </a>
                         </li>
-
+                        @endcan
+                        @can('invoice.index')
                         <li class="nav-item">
                             <a href="{{ route('invoice.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Invoice (POS)</p>
                             </a>
                         </li>
-
+                        @endcan
+                        @can('proformer.list')
                         <li class="nav-item">
                             <a href="{{ route('proformer.list') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Proforma Invoice</p>
                             </a>
                         </li>
-
+                        @endcan
+                        @can('customers.credit.note')
                         <li class="nav-item">
                             <a href="{{ route('customers.credit.note') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Credit Note</p>
                             </a>
                         </li>
+                        @endcan
 
                     </ul>
                 </li>
@@ -133,53 +145,62 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
+                        @can('purchases.request.index')
                         <li class="nav-item">
                             <a href="{{ route('purchases.request.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Purchases (Request)</p>
                             </a>
                         </li>
+                        @endcan
+                        @can('purchases.index')
                         <li class="nav-item">
                             <a href="{{ route('purchases.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Purchases (GRN)</p>
                             </a>
                         </li>
-
+                        @endcan
+                        @can('purchase.additional-invoice.index')
                         <li class="nav-item">
                             <a href="{{ route('purchase.additional-invoice.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Additional Invoice</p>
                             </a>
                         </li>
-
+                        @endcan
+                        @can('intersite.index')
                         <li class="nav-item">
                             <a href="{{ route('intersite.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Intersite Transfer</p>
                             </a>
                         </li>
-
+                        @endcan
+                        @can('interstore.index')
                         <li class="nav-item">
                             <a href="{{ route('interstore.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Interstore Transfer</p>
                             </a>
                         </li>
-
+                        @endcan
+                        @can('stock_adjustments.index')
                         <li class="nav-item">
                             <a href="{{ route('stock_adjustments.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Stock Adjustment</p>
                             </a>
                         </li>
-
+                        @endcan
+                        @can('customers.return.debit')
                         <li class="nav-item">
                             <a href="{{ route('customers.return.debit') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Return and Debit</p>
                             </a>
                         </li>
+                        @endcan
 
                     </ul>
                 </li>
@@ -417,13 +438,6 @@
                                                 class="nav-link {{ Request::is('reports/sa/sales/customer/sale/common-name*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
                                                 <p>Sales With Common Name</p>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="{{ route('debtor.balance.reports') }}"
-                                                class="nav-link {{ Request::is('reports/sa/debtor/balance*') ? 'active' : '' }}">
-                                                <i class="ion-code-working"></i>
-                                                <p>Debtor Balance Report</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">

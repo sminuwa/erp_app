@@ -70,7 +70,7 @@
     </div>
     <div class="form-group">
         <label for="available_qty">Available Qty</label>
-        <input type="number" class="form-control {{ $errors->has('available_qty') ? ' is-invalid' : '' }}" readonly
+        <input type="number" class="form-control {{ $errors->has('available_qty') ? ' is-invalid' : '' }}" step=".01" readonly
             name="available_qty" id="available_qty" value="" placeholder="">
         @if ($errors->has('available_qty'))
             <div class="invalid-feedback">
@@ -81,7 +81,7 @@
     <div class="form-group">
         <span>Type Number: </span>
         <label for="adjusted_qty">Adjusted Qty</label>
-        <input type="number" class="form-control {{ $errors->has('adjusted_qty') ? ' is-invalid' : '' }}"
+        <input type="number" class="form-control {{ $errors->has('adjusted_qty') ? ' is-invalid' : '' }}" step=".01"
             name="adjusted_qty" id="adjusted_qty" value="" placeholder="" required="required" min="1">
         @if ($errors->has('adjusted_qty'))
             <div class="invalid-feedback">

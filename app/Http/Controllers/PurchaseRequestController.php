@@ -7,13 +7,13 @@ use App\Models\PurchaseProductRequest;
 use App\Models\PurchaseRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Purchases\Index;
-use App\Http\Requests\Purchases\Show;
-use App\Http\Requests\Purchases\Create;
-use App\Http\Requests\Purchases\StoreRequest;
-use App\Http\Requests\Purchases\Edit;
-use App\Http\Requests\Purchases\Update;
-use App\Http\Requests\Purchases\Destroy;
+use App\Http\Requests\PurchaseRequest\Index;
+use App\Http\Requests\PurchaseRequest\Show;
+use App\Http\Requests\PurchaseRequest\Create;
+use App\Http\Requests\PurchaseRequest\StoreRequest;
+use App\Http\Requests\PurchaseRequest\Edit;
+use App\Http\Requests\PurchaseRequest\Update;
+use App\Http\Requests\PurchaseRequest\Destroy;
 use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\Store;
@@ -76,7 +76,7 @@ class PurchaseRequestController extends Controller
 
         ]);
     }
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
 
         $amount = 0;

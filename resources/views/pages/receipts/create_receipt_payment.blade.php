@@ -32,14 +32,9 @@
 
         <!-- Main content -->
         <section class="content">
-            @can('create.payment.reciept')
-                <a href="{{ route('create.payment.reciept') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                        class="fa fa-plus-circle"> </span> New
-                    Receipt</a>
-            @endcan
             @can('receipt.payments')
                 <a class="btn btn-secondary btn-sm" href="{{ route('receipt.payments') }}">
-                    <span class="fa fa-list"> Receipts</span>
+                    <span class="fa fa-list"> </span> List
                 </a>
             @endcan
 
@@ -159,7 +154,7 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="amount_paid">Amount</label>
-                                        <input type="number"
+                                        <input type="number" step=".01"
                                             class="form-control {{ $errors->has('amount_paid') ? ' is-invalid' : '' }}"
                                             name="amount_paid" id="amount_paid"
                                             value="{{ old('amount_paid', $model->amount) }}" required>

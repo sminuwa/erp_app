@@ -59,7 +59,7 @@
                                 <span class="fa fa-pencil"></span> Edit
                             </a>
                         @endcan
-                        @can('purchases.post')
+                        @can('purchase.post')
                             <form onsubmit="return confirm('Are you sure you want to post this GRN?')"
                                 action="{{ route('purchase.post', $record->id) }}" method="post" style="display: inline">
                                 {{ csrf_field() }}

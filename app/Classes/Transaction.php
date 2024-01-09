@@ -913,16 +913,49 @@ class Transaction
         return self::transaction($source_id, $source_name, $destination_id, $destination_name, $amount, $reference, $date, 'ITB');
     }
 
+    // public static function check_transaction_limit($customer_id, $cart_contents)
+    // {
+    //     $total_sales = 0;
+    //     //This is to determine the total amount based on the selected unit, if different from base unit
+    //     foreach ($cart_contents as $cart) {
+    //         $store_product_id = $cart->id;
+    //         $unit = $cart->attributes['unit'];
+    //         $product = StoreProduct::find($store_product_id)->product;
+    //         if ($product->unit == $unit) {
+    //             $total_sales += $cart->price;
+    //         } else {
+    //             $quantity_sold = Transaction::quantity_sold($product->id, $cart->quantity, $unit);
+    //             $total_sales += $quantity_sold * $cart->price;
+    //         }
+    //     }
+
+    //     $credit_limit = Customer::find($customer_id)->credit_limit;
+    //     $balance = Customer::find($customer_id)->runningBalance() - $total_sales;
+    //     if ($balance <= 0 && ($credit_limit == 0 || $credit_limit == 1)) {
+    //         return false;
+    //     }
+    //     if (($balance <= 0 && $credit_limit > 1 && (abs($balance)) > $credit_limit)) {
+
+    //         return false;
+    //     }
+    //     if ($balance > 0 && $credit_limit > 1 && $balance > $credit_limit) {
+
+    //         return false;
+    //     }
+    //     return true;
+    // }
     public static function check_transaction_limit($customer_id, $cart_contents)
     {
         $total_sales = 0;
-        //This is to determine the total amount based on the selected unit, if different from base unit
+
+        // This is to determine the total amount based on the selected unit, if different from base unit
         foreach ($cart_contents as $cart) {
             $store_product_id = $cart->id;
             $unit = $cart->attributes['unit'];
             $product = StoreProduct::find($store_product_id)->product;
+
             if ($product->unit == $unit) {
-                $total_sales += $cart->price;
+                $total_sales += $cart->quantity * $cart->price;
             } else {
                 $quantity_sold = Transaction::quantity_sold($product->id, $cart->quantity, $unit);
                 $total_sales += $quantity_sold * $cart->price;
@@ -930,18 +963,19 @@ class Transaction
         }
 
         $credit_limit = Customer::find($customer_id)->credit_limit;
-        $balance = Customer::find($customer_id)->runningBalance();
-        if ($balance <= 0 && $credit_limit == 0) {
+        $balance = Customer::find($customer_id)->runningBalance() - $total_sales;
+
+        if ($balance <= 0 && $credit_limit <= 1) {
             return false;
         }
-        if (($balance <= 0 && $credit_limit > 0 && (abs($balance + $total_sales)) > $credit_limit)) {
+
+        if ($balance < 0 && abs($balance) > $credit_limit && $credit_limit > 1) {
             return false;
         }
-        if ($balance > 0 && $credit_limit > 0 && (abs($balance + $total_sales) > $credit_limit)) {
-            return false;
-        }
+
         return true;
     }
+
     public static function quantity_sold($product_id, $quantity, $unit)
     {
         //determine the quantity sold based on unit of measure

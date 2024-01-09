@@ -43,7 +43,7 @@ class SupplierController extends Controller
      */
     public function index(Index $request)
     {
-        $this->authorize('suppliers.index');
+
         //        $user_branch = User::userBranchAction();
         return view('pages.suppliers.index', ['records' => Supplier::orderBy('name')->get()]);
     } /**

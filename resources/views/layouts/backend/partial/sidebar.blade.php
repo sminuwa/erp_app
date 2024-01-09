@@ -53,30 +53,38 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
+                        @can('receipt.payments')
                         <li class="nav-item">
                             <a href="{{ route('receipt.payments') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Receipts</p>
                             </a>
                         </li>
+                        @endcan
+                        @can('payments.list')
                         <li class="nav-item">
                             <a href="{{ route('payments.list') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Payments</p>
                             </a>
                         </li>
+                        @endcan
+                        @can('interbank.list')
                         <li class="nav-item">
                             <a href="{{ route('interbank.list') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Interbanks</p>
                             </a>
                         </li>
+                        @endcan
+                        @can('journal.index')
                         <li class="nav-item">
                             <a href="{{ route('journal.index') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Journals</p>
                             </a>
                         </li>
+                        @endcan
                     </ul>
                 </li>
                 @endcan

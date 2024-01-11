@@ -89,18 +89,20 @@ class InterBankController extends Controller
 
     public function post(InterBank $interbank)
     {
-        $interbank->status = 1;
-        $interbank->posted_by = auth()->id();
-        DB::beginTransaction();
-        if ($interbank->save()) {
-            if (Transaction::interbank($interbank->destination_account_id, 'GeneralAccount', $interbank->source_account_id, 'GeneralAccount', $interbank->amount, $interbank->reference, $interbank->date)) {
-                $action = "Made payment of $interbank->amount for : " . $interbank->receipt_no;
-                AuditLog::auditLog(auth()->id(), $action);
-                session()->flash('app_message', 'Payment generated successfully');
-                DB::commit();
-            } else {
-                DB::rollBack();
-                session()->flash('app_message', 'Something went wrong');
+        if($interbank->status ==0) {
+            $interbank->status = 1;
+            $interbank->posted_by = auth()->id();
+            DB::beginTransaction();
+            if ($interbank->save()) {
+                if (Transaction::interbank($interbank->destination_account_id, 'GeneralAccount', $interbank->source_account_id, 'GeneralAccount', $interbank->amount, $interbank->reference, $interbank->date)) {
+                    $action = "Made payment of $interbank->amount for : " . $interbank->receipt_no;
+                    AuditLog::auditLog(auth()->id(), $action);
+                    session()->flash('app_message', 'Payment generated successfully');
+                    DB::commit();
+                } else {
+                    DB::rollBack();
+                    session()->flash('app_message', 'Something went wrong');
+                }
             }
         }
         return back();

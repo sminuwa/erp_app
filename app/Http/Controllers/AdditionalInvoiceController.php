@@ -24,7 +24,7 @@ class AdditionalInvoiceController extends Controller
     }
 
     public function create(){
-        
+
         $purchases = Purchase::where('branch_id',User::userBranchAction())->orderBy('id','desc')->get();
         $suppliers = Supplier::orderBy('code','asc')->get();
         return view('pages.inventories.expenses.create',compact('purchases', 'suppliers'));
@@ -68,22 +68,24 @@ class AdditionalInvoiceController extends Controller
     }
 
     public function post(PurchaseExpense $invoice){
-        $purchase = $invoice->purchase;
-        $supplier = $invoice->supplier;
-        DB::beginTransaction();
-        $invoice->status = 1;
-        $invoice->posted_by = auth()->id();
-        if ($invoice->save()) {
-            if (
-                CostPrice::additionalInvoiceCostPrice($invoice->purchase_id, $invoice->id,TRANSACTION_TYPE_GRN, 'A')['status']
-            ) {
-                $action = "Posted additional invoice with reference $invoice->reference for supplier: " . $supplier->name;
-                AuditLog::auditLog(Auth::id(), $action);
-                DB::commit();
-                session()->flash('app_message', 'Additional invoice posted successfully');
-            } else
-                DB::rollback();
+        if($invoice->status == 0) {
+            $purchase = $invoice->purchase;
+            $supplier = $invoice->supplier;
+            DB::beginTransaction();
+            $invoice->status = 1;
+            $invoice->posted_by = auth()->id();
+            if ($invoice->save()) {
+                if (
+                    CostPrice::additionalInvoiceCostPrice($invoice->purchase_id, $invoice->id, TRANSACTION_TYPE_GRN, 'A')['status']
+                ) {
+                    $action = "Posted additional invoice with reference $invoice->reference for supplier: " . $supplier->name;
+                    AuditLog::auditLog(Auth::id(), $action);
+                    DB::commit();
+                    session()->flash('app_message', 'Additional invoice posted successfully');
+                } else
+                    DB::rollback();
 
+            }
         }
         return back();
     }

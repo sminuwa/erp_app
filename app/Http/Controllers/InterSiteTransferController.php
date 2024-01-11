@@ -64,23 +64,25 @@ class InterSiteTransferController extends Controller
 
     public function post(IntersiteTransfer $intersite)
     {
-        $this->authorize('intersite.post');
-        $user = auth()->user();
-        $intersite->status = 1;
-        $intersite->posted_by = $user->id;
-        DB::beginTransaction();
-        if ($intersite->save()) {
-            $items = $intersite->products;
-            foreach ($items as $item) {
-                StoreProduct::where(['store_id' => $item->store_id, 'product_id' => $item->product_id])->decrement('qty_available', $item->quantity);
-            }
-            if (Transaction::intersite_post($intersite->id)['status']) {
-                $action = "Posted intersite transfer of product from " . $user->branch->name . " to  branch" . Branch::find($intersite->destination_branch_id)->name;
-                AuditLog::auditLog(Auth::id(), $action);
-                session()->flash('app_message', 'Intersite transfer saved successfully');
-                DB::commit();
-            } else {
-                DB::rollBack();
+        if($intersite->status == 0){
+            $this->authorize('intersite.post');
+            $user = auth()->user();
+            $intersite->status = 1;
+            $intersite->posted_by = $user->id;
+            DB::beginTransaction();
+            if ($intersite->save()) {
+                $items = $intersite->products;
+                foreach ($items as $item) {
+                    StoreProduct::where(['store_id' => $item->store_id, 'product_id' => $item->product_id])->decrement('qty_available', $item->quantity);
+                }
+                if (Transaction::intersite_post($intersite->id)['status']) {
+                    $action = "Posted intersite transfer of product from " . $user->branch->name . " to  branch" . Branch::find($intersite->destination_branch_id)->name;
+                    AuditLog::auditLog(Auth::id(), $action);
+                    session()->flash('app_message', 'Intersite transfer saved successfully');
+                    DB::commit();
+                } else {
+                    DB::rollBack();
+                }
             }
         }
         return back();

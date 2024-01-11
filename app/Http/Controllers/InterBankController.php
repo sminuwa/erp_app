@@ -40,7 +40,7 @@ class InterBankController extends Controller
     {
 
         $interbank_id = $request->interbank_id;
-        $amount = $request->amount;
+        $amount = str_replace(',', '', $request->amount);
         $source_account_id = $request->source_account_id;
         $destination_account_id = $request->destination_account_id;
         $reference = InterBank::generateNewNumber();

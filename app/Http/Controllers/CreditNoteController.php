@@ -119,52 +119,54 @@ class CreditNoteController extends Controller
     }
     public function post(CreditNote $credit_note)
     {
-        $credit_note->status = 1;
-        $credit_note->posted_by = auth()->id();
-        $items = $credit_note->credit_note_items;
-        DB::beginTransaction();
-        if ($credit_note->save()) {
-            $products = $new_cost_price = [];
-            foreach ($items as $item) {
-                $products[$item->store_product_id] = [
-                    'quantity' => $item->quantity,
-                    'cost_price' => $item->cost_price,
-                    'sold_price' => $item->sold_price
-                ];
-                $new_cost_price[$item->store_product->product_id] = [
-                    'quantity' => $item->quantity,
-                    'price' => $item->cost_price,
-                    'store_id' => $item->store_product->store_id,
-                    'expiry_date' => ''
-                ];
-            }
-            if (
-                Transaction::credit_note(
-                    $products,
-                    $credit_note->customer_id,
-                    $credit_note->reference,
-                    $credit_note->date
-                )['status']
-            ) {
-
-                //update stock and calculate new cost price
+        if($credit_note->status == 0) {
+            $credit_note->status = 1;
+            $credit_note->posted_by = auth()->id();
+            $items = $credit_note->credit_note_items;
+            DB::beginTransaction();
+            if ($credit_note->save()) {
+                $products = $new_cost_price = [];
+                foreach ($items as $item) {
+                    $products[$item->store_product_id] = [
+                        'quantity' => $item->quantity,
+                        'cost_price' => $item->cost_price,
+                        'sold_price' => $item->sold_price
+                    ];
+                    $new_cost_price[$item->store_product->product_id] = [
+                        'quantity' => $item->quantity,
+                        'price' => $item->cost_price,
+                        'store_id' => $item->store_product->store_id,
+                        'expiry_date' => ''
+                    ];
+                }
                 if (
-                    CostPrice::newCostPrice(
-                        $new_cost_price,
+                    Transaction::credit_note(
+                        $products,
+                        $credit_note->customer_id,
                         $credit_note->reference,
-                        $credit_note->branch_id,
-                        $credit_note->date,
-                        TRANSACTION_TYPE_CREDIT_NOTE,
+                        $credit_note->date
                     )['status']
-                )
+                ) {
 
-                    $action = "Credit Note of $credit_note->total for : " . $credit_note->reference;
-                AuditLog::auditLog(auth()->id(), $action);
-                session()->flash('app_message', 'Credit note posted successfully');
-                DB::commit();
-            } else {
-                DB::rollBack();
-                session()->flash('app_message', 'Something went wrong.');
+                    //update stock and calculate new cost price
+                    if (
+                        CostPrice::newCostPrice(
+                            $new_cost_price,
+                            $credit_note->reference,
+                            $credit_note->branch_id,
+                            $credit_note->date,
+                            TRANSACTION_TYPE_CREDIT_NOTE,
+                        )['status']
+                    )
+
+                        $action = "Credit Note of $credit_note->total for : " . $credit_note->reference;
+                    AuditLog::auditLog(auth()->id(), $action);
+                    session()->flash('app_message', 'Credit note posted successfully');
+                    DB::commit();
+                } else {
+                    DB::rollBack();
+                    session()->flash('app_message', 'Something went wrong.');
+                }
             }
         }
         return back();

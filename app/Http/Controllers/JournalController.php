@@ -36,33 +36,36 @@ class JournalController extends Controller
 
     public function post(Journal $journal)
     {
-        DB::beginTransaction();
-        $journal->status = 1;
-        $journal->posted_by = auth()->id();
-        $account_details = [];
-        $debit = $credit = 0;
-        foreach ($journal->items as $item) {
-            $debit += intval($item->debit);
-            $credit += intval($item->credit);
-            $account_details[] = [
-                'account_id' => $item->account_id,
-                'account_type' => $item->account_type,
-                'debit' => $item->debit,
-                'credit' => $item->credit,
-            ];
-        }
-        if (($debit - $credit) != 0)
-            return back()->with('error', 'Cannot post journal. Make sure total debit and credit are equal.');
-        //        return Transaction::journal($account_details,$journal->reference,$journal->date);
-        if ($journal->save()) {
+        if($journal->status == 0) {
+            DB::beginTransaction();
+            $journal->status = 1;
+            $journal->posted_by = auth()->id();
+            $account_details = [];
+            $debit = $credit = 0;
+            foreach ($journal->items as $item) {
+                $debit += intval($item->debit);
+                $credit += intval($item->credit);
+                $account_details[] = [
+                    'account_id' => $item->account_id,
+                    'account_type' => $item->account_type,
+                    'debit' => $item->debit,
+                    'credit' => $item->credit,
+                ];
+            }
+            if (($debit - $credit) != 0)
+                return back()->with('error', 'Cannot post journal. Make sure total debit and credit are equal.');
+            //        return Transaction::journal($account_details,$journal->reference,$journal->date);
+            if ($journal->save()) {
 
-            if (Transaction::journal($account_details, $journal->reference, $journal->date)) {
-                DB::commit();
-                return back()->with('success', 'Reversed successfully');
-            } else
-                DB::rollback();
-            return back()->with('error', 'Something went wrong.');
+                if (Transaction::journal($account_details, $journal->reference, $journal->date)) {
+                    DB::commit();
+                    return back()->with('success', 'Reversed successfully');
+                } else
+                    DB::rollback();
+                return back()->with('error', 'Something went wrong.');
+            }
         }
+        return back();
     }
 
     public function reverse(Journal $journal)

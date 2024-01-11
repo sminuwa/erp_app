@@ -574,69 +574,71 @@ class OrderController extends Controller
     }
     public function post(Order $invoice)
     {
-        $invoice->status = 1;
-        $invoice->posted_by = auth()->id();
-        $items = $invoice->order_items;
-        $is_out_of_stock = false;
-        $out_of_stock_products = "";
-        DB::beginTransaction();
-        if ($invoice->save()) {
-            $products = [];
-            foreach ($items as $item) {
+        if($invoice->status == 0) {
+            $invoice->status = 1;
+            $invoice->posted_by = auth()->id();
+            $items = $invoice->order_items;
+            $is_out_of_stock = false;
+            $out_of_stock_products = "";
+            DB::beginTransaction();
+            if ($invoice->save()) {
+                $products = [];
+                foreach ($items as $item) {
 
-                $store = StoreProduct::find($item->store_product_id);
+                    $store = StoreProduct::find($item->store_product_id);
 
-                //get unit of measure
-                $quantity_sold = Transaction::quantity_sold($store->product->id, $item->quantity, $item->unit);
-                if ($quantity_sold > $store->qty_available) {
-                    $is_out_of_stock = true;
-                    $out_of_stock_products .= $store->product->code . ",";
+                    //get unit of measure
+                    $quantity_sold = Transaction::quantity_sold($store->product->id, $item->quantity, $item->unit);
+                    if ($quantity_sold > $store->qty_available) {
+                        $is_out_of_stock = true;
+                        $out_of_stock_products .= $store->product->code . ",";
+                    }
+                    DB::table('store_products')->where('id', $item->store_product_id)->update([
+                        'qty_available' => str_replace(',', '', $store->qty_available) - $quantity_sold,
+                        'updated_at' => Carbon::now()
+                    ]);
+
+                    DB::table('stock_cards')->insert([
+                        'store_id' => $store->store->id,
+                        'product_id' => $store->product->id,
+                        'cr' => 0,
+                        'dr' => $quantity_sold,
+                        'refno' => $invoice->reference,
+                        'type' => 0,
+                        'date' => $invoice->order_date,
+                        'charged_account' => $invoice->customer->code ?? '',
+                        'user_id' => auth()->id(),
+                        'priority' => 2,
+                    ]);
+                    $products[$item->store_product_id] = ['quantity' => $item->quantity, 'cost_price' => $item->cost_price, 'sold_price' => $item->sold_price];
                 }
-                DB::table('store_products')->where('id', $item->store_product_id)->update([
-                    'qty_available' => str_replace(',', '', $store->qty_available) - $quantity_sold,
-                    'updated_at' => Carbon::now()
-                ]);
-
-                DB::table('stock_cards')->insert([
-                    'store_id' => $store->store->id,
-                    'product_id' => $store->product->id,
-                    'cr' => 0,
-                    'dr' => $quantity_sold,
-                    'refno' => $invoice->reference,
-                    'type' => 0,
-                    'date' => $invoice->order_date,
-                    'charged_account' => $invoice->customer->code ?? '',
-                    'user_id' => auth()->id(),
-                    'priority' => 2,
-                ]);
-                $products[$item->store_product_id] = ['quantity' => $item->quantity, 'cost_price' => $item->cost_price, 'sold_price' => $item->sold_price];
-            }
-            if ($is_out_of_stock == true) {
-                session()->flash('app_error', 'Please check, the following products are out of stock\n' . $out_of_stock_products);
-                DB::rollBack();
-                return redirect()->back()->withInput();
-            }
-            /*return Transaction::sale(
-                $products,
-                $invoice->customer_id,
-                $invoice->reference,
-                $invoice->order_date);*/
-            if (
-                Transaction::sale(
+                if ($is_out_of_stock == true) {
+                    session()->flash('app_error', 'Please check, the following products are out of stock\n' . $out_of_stock_products);
+                    DB::rollBack();
+                    return redirect()->back()->withInput();
+                }
+                /*return Transaction::sale(
                     $products,
                     $invoice->customer_id,
                     $invoice->reference,
-                    $invoice->order_date
-                )['status']
-            ) {
+                    $invoice->order_date);*/
+                if (
+                    Transaction::sale(
+                        $products,
+                        $invoice->customer_id,
+                        $invoice->reference,
+                        $invoice->order_date
+                    )['status']
+                ) {
 
-                $action = "Invoice of $invoice->total for : " . $invoice->reference;
-                AuditLog::auditLog(auth()->id(), $action);
-                session()->flash('app_message', 'Sale posted successfully');
-                DB::commit();
-            } else {
-                DB::rollBack();
-                session()->flash('app_message', 'Something went wrong.');
+                    $action = "Invoice of $invoice->total for : " . $invoice->reference;
+                    AuditLog::auditLog(auth()->id(), $action);
+                    session()->flash('app_message', 'Sale posted successfully');
+                    DB::commit();
+                } else {
+                    DB::rollBack();
+                    session()->flash('app_message', 'Something went wrong.');
+                }
             }
         }
         return back();

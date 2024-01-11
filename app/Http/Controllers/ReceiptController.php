@@ -50,7 +50,7 @@ class ReceiptController extends Controller
     public function payReciept(Request $request)
     {
         $receipt_id = $request->receipt_id;
-        $amount = $request->amount_paid;
+        $amount = str_replace(',', '', $request->amount_paid);
         $bank_account_id = $request->account_id;
         $date = $request->payment_date;
         $ym = Carbon::parse($date)->format('ym');
@@ -176,7 +176,7 @@ class ReceiptController extends Controller
     }
 
     public function delete(Receipt $receipt)
-    { 
+    {
         if ($receipt->delete()) {
 
         }

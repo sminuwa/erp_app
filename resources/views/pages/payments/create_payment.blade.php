@@ -158,7 +158,7 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="amount_paid">Amount</label>
-                                        <input type="number" step=".01"
+                                        <input type="text" oninput="formatNumber(this)"
                                             class="form-control {{ $errors->has('amount_paid') ? ' is-invalid' : '' }}"
                                             name="amount_paid" id="amount_paid"
                                             value="{{ old('amount_paid', $model->amount) }}" required>
@@ -206,6 +206,29 @@
 
 @push('js')
     <script>
+        function formatNumber(input) {
+            // Remove non-numeric and non-decimal characters
+            let value = input.value.replace(/[^\d.]/g, '');
+
+            // Split the value into integer and decimal parts
+            const parts = value.split('.');
+            let integerPart = parts[0] ? parseFloat(parts[0]) : 0;
+            let decimalPart = parts[1] !== undefined ? '.' + parts[1] : '';
+
+            // Check if the integer part is not NaN
+            if (!isNaN(integerPart)) {
+                // Format the integer part with commas and dot as decimal separator
+                integerPart = integerPart.toLocaleString('en-US', {
+                    maximumFractionDigits: 2,
+                    useGrouping: true
+                });
+
+                // Set the formatted value back to the input
+                input.value = integerPart + decimalPart;
+            }
+        }
+
+
         $(function() {
             $('#type').on("change", function() {
                 $("#payer_id").html(" < option value = '' > Loading... < /option>");

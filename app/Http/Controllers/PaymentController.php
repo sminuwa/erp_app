@@ -48,7 +48,7 @@ class PaymentController extends Controller
     public function pay(Request $request)
     {
         $payment_id = $request->payment_id;
-        $amount = $request->amount_paid;
+        $amount = str_replace(',', '', $request->amount_paid);
         $bank_account_id = $request->account_id;
         $date = $request->payment_date;
         $ym = Carbon::parse($date)->format('ym');
@@ -85,7 +85,7 @@ class PaymentController extends Controller
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Payment generated successfully');
                 DB::commit();
-                
+
             }
             return redirect()->route('payment.show', $record->id);
         } catch (\Exception $e) {

@@ -45,6 +45,20 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="category_id1">From Category</label>
+                            <select class="form-control select2-single ajax-categories" name="category_id1"
+                                id="category_id1">
+                            </select>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="category_id2">To Category</label>
+                            <select class="form-control select2-single ajax-categories" name="category_id2"
+                                id="category_id2">
+                            </select>
+
+                        </div>
+                        <div class="form-group">
                             <label for="income_year">Year</label>
                             <select class="form-control select2-single" name="income_year" id="income_year">
                                 @for ($i = date('Y'); $i > 40; $i--)
@@ -131,6 +145,8 @@
                 income_year = $('#income_year').val();
                 from_month = $('#from_month').val();
                 to_month = $('#to_month').val();
+                category_id1 = $('#category_id1').val();
+                category_id2 = $('#category_id2').val();
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
@@ -140,7 +156,9 @@
                         branch_id: branch_id,
                         from_month: from_month,
                         to_month: to_month,
-                        income_year:income_year
+                        income_year: income_year,
+                        category_id1: category_id1,
+                        category_id2: category_id2
                     }
                 }).done(function(data) {
                     $('#img-loader').hide();

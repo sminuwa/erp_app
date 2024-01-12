@@ -965,7 +965,7 @@ class Transaction
         $credit_limit = Customer::find($customer_id)->credit_limit;
         $balance = Customer::find($customer_id)->runningBalance() - $total_sales;
 
-        if ($balance <= 0 && $credit_limit <= 1) {
+        if ($balance < 0 && $credit_limit <= 1) {
             return false;
         }
 

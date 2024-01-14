@@ -937,7 +937,7 @@ Route::middleware('auth')->group(function () {
                 //Income Statement
                 Route::get('/income_statement', [ReportController::class, 'incomeStatement'])->name('income.statement.report');
                 Route::get('/income_statement/load', [ReportController::class, 'loadIncomeStatement'])->name('ajax.load.income.statement.report');
-                Route::get('/income_statement/print/{from_month}/{to_month}/{income_year}/{branch_id}', [ReportController::class, 'printIncomeStatement'])->name('ajax.income.statement.report.print');
+                Route::get('/income_statement/print/{from_month}/{to_month}/{income_year}/{branch_id}/{category_id1}/{category_id2}', [ReportController::class, 'printIncomeStatement'])->name('ajax.income.statement.report.print');
 
                 //Trial Balance
                 Route::get('/trial_balance', [ReportController::class, 'trialBalance'])->name('trial.balance.report');

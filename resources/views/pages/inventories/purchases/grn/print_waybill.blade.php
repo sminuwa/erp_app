@@ -34,7 +34,7 @@
                     <div class="row">
                         <div class="col-12">
                             <h4>
-                                <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:80px;height:80px;"
+                                <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:100px;height:60px;"
                                     alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
                                 <small class="float-right">Date: {{ date('l, d-M-Y h:i:s A') }}</small>
                             </h4>

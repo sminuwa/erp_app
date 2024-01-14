@@ -2964,8 +2964,15 @@ class ReportController extends Controller
     public function loadIncomeStatement(Request $request)
     {
         $branch_id = $request->branch_id;
+        $category_id1 = $request->category_id1;
+        $category_id2 = $request->category_id2;
+
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
+        if ($category_id1 == 'all' || $category_id1 == '')
+            $category_id1 = '%';
+        if ($category_id2 == 'all' || $category_id2 == '')
+            $category_id2 = '%';
         $income_year = $request->income_year;
         $from_month = $request->from_month;
         $to_month = $request->to_month;
@@ -2977,8 +2984,7 @@ class ReportController extends Controller
             ->join('general_accounts', 'general_accounts.class', 'chart_of_accounts.class')
             ->join('general_account_ledgers', 'model_id', 'general_accounts.id')
             ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
-            ->where('model_name', 'GeneralAccount')
-            ->groupBy('number');
+            ->where('model_name', 'GeneralAccount')->groupBy('number');
 
         if ($from_month == '' || $to_month == '') {
             $query->whereMonth('date', '<=', 12);
@@ -2998,10 +3004,26 @@ class ReportController extends Controller
         $expenses = $expenses->whereIn('chart_of_accounts.class', $expense_class)->get();
 
         $cost_of_sales = clone $query;
-        $cost_of_sales = $cost_of_sales->whereIn('chart_of_accounts.class', $cost_of_sale_class)->get();
+        $cost_of_sales = $cost_of_sales->whereIn('chart_of_accounts.class', $cost_of_sale_class)
+            ->leftjoin('categories', 'categories.cost_account', 'general_accounts.id');
+        if ($category_id2 == '%' && $category_id1 != '%') {
+            $cost_of_sales = $cost_of_sales->where('categories.id', 'LIKE', $category_id1);
+        } elseif ($category_id2 != '%') {
+            $cost_of_sales = $cost_of_sales->where('categories.id', '>=', $category_id1)
+                ->where('categories.id', '<=', $category_id2);
+        }
+        $cost_of_sales = $cost_of_sales->get();
 
         $revenues = clone $query;
-        $revenues = $revenues->whereIn('chart_of_accounts.class', $revenue_class)->get();
+        $revenues = $revenues->whereIn('chart_of_accounts.class', $revenue_class)
+            ->leftjoin('categories', 'categories.revenue_account', 'general_accounts.id');
+        if ($category_id2 == '%' && $category_id1 != '%') {
+            $revenues = $revenues->where('categories.id', 'LIKE', $category_id1);
+        } elseif ($category_id2 != '%') {
+            $revenues = $revenues->where('categories.id', '>=', $category_id1)
+                ->where('categories.id', '<=', $category_id2);
+        }
+        $revenues = $revenues->get();
 
         $branch = null;
         if ($branch_id != 'all')
@@ -3013,6 +3035,10 @@ class ReportController extends Controller
             $to_month = 'all';
         if ($branch_id == '' || $branch_id == '%')
             $branch_id = 'all';
+        if ($category_id1 == '' || $category_id1 == '%')
+            $category_id1 = 'all';
+        if ($category_id1 == '' || $category_id2 == '%')
+            $category_id1 = 'all';
         return view('pages.reports.ap_ar.statements.load_income_statement', [
             'revenues' => $revenues,
             'cost_of_sales' => $cost_of_sales,
@@ -3022,12 +3048,18 @@ class ReportController extends Controller
             'income_year' => $income_year,
             'branch' => $branch,
             'branch_id' => $branch_id,
+            'category_id1' => $category_id1,
+            'category_id2' => $category_id2
         ]);
     }
-    public function printIncomeStatement($from_month, $to_month, $income_year, $branch_id)
+    public function printIncomeStatement($from_month, $to_month, $income_year, $branch_id, $category_id1, $category_id2)
     {
         if ($branch_id == 'all')
             $branch_id = '%';
+        if ($category_id1 == 'all')
+            $category_id1 = '%';
+        if ($category_id2 == 'all')
+            $category_id2 = '%';
         $revenue_class = ['R40'];
         $cost_of_sale_class = ['C50'];
         $expense_class = ['C51', 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C58', 'C59', 'C60', 'C61', 'C62', 'C63'];
@@ -3057,10 +3089,27 @@ class ReportController extends Controller
         $expenses = $expenses->whereIn('chart_of_accounts.class', $expense_class)->get();
 
         $cost_of_sales = clone $query;
-        $cost_of_sales = $cost_of_sales->whereIn('chart_of_accounts.class', $cost_of_sale_class)->get();
+        $cost_of_sales = $cost_of_sales->whereIn('chart_of_accounts.class', $cost_of_sale_class)
+            ->leftjoin('categories', 'categories.cost_account', 'general_accounts.id');
+        if ($category_id2 == '%' && $category_id1 != '%') {
+            $cost_of_sales = $cost_of_sales->where('categories.id', 'LIKE', $category_id1);
+        } elseif ($category_id2 != '%') {
+            $cost_of_sales = $cost_of_sales->where('categories.id', '>=', $category_id1)
+                ->where('categories.id', '<=', $category_id2);
+        }
+        $cost_of_sales = $cost_of_sales->get();
 
         $revenues = clone $query;
-        $revenues = $revenues->whereIn('chart_of_accounts.class', $revenue_class)->get();
+        $revenues = $revenues->whereIn('chart_of_accounts.class', $revenue_class)
+            ->leftjoin('categories', 'categories.revenue_account', 'general_accounts.id');
+        if ($category_id2 == '%' && $category_id1 != '%') {
+            $revenues = $revenues->where('categories.id', 'LIKE', $category_id1);
+        } elseif ($category_id2 != '%') {
+            $revenues = $revenues->where('categories.id', '>=', $category_id1)
+                ->where('categories.id', '<=', $category_id2);
+        }
+        $revenues = $revenues->get();
+
 
         $branch = null;
         if ($branch_id != 'all')
@@ -3072,6 +3121,10 @@ class ReportController extends Controller
             $to_month = 'all';
         if ($branch_id == '')
             $branch_id = 'all';
+        if ($category_id1 == '')
+            $category_id1 = 'all';
+        if ($category_id2 == '')
+            $category_id2 = 'all';
         return view('pages.reports.ap_ar.statements.print_income_statement', [
             'revenues' => $revenues,
             'cost_of_sales' => $cost_of_sales,
@@ -3081,6 +3134,8 @@ class ReportController extends Controller
             'income_year' => $income_year,
             'branch' => $branch,
             'branch_id' => $branch_id,
+            'category_id1' => $category_id1,
+            'category_id2' => $category_id2
         ]);
     }
     public function remittance()

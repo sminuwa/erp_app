@@ -34,14 +34,15 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:50px;height:50px;"
+                            <img src="{{ asset('assets/backend/img/logo' . '.png') }}" style="width:80px;height:40px;"
                                 alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
                             <h3>
-                                {{$branch->name ??'All Branches'}}
+                                {{ $branch->name ?? 'All Branches' }}
                             </h3>
                             <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
-                                INCOME STATEMENT FROM {{ $from_month=='all'?'January':monthName($from_month) }} AND
-                                {{ $to_month=='all'?'December':monthName($to_month) }}
+                                INCOME STATEMENT FROM {{ $from_month == 'all' ? 'January' : monthName($from_month) }}
+                                AND
+                                {{ $to_month == 'all' ? 'December' : monthName($to_month) }}
                             </h5>
 
                         </div>
@@ -61,7 +62,8 @@
                                     <tr>
                                         <th rowspan="2">Account No</th>
                                         <th rowspan="2">Description</th>
-                                        <th colspan="2" style="text-align: center; align-content: center">Balance</th>
+                                        <th colspan="2" style="text-align: center; align-content: center">Balance
+                                        </th>
                                     </tr>
                                     <tr>
                                         <th style="text-align: center; align-content: center">Credit (Cr.)</th>
@@ -110,7 +112,8 @@
                                     <tr>
                                         <th colspan="4" style="text-align: right">TOTAL REVENUE</th>
                                         @php $total_revenue = $credit_sum - $debit_sum  @endphp
-                                        <th colspan="3" style="text-align: right;">&#8358;{{ number_format($total_revenue, 2) }}</th>
+                                        <th colspan="3" style="text-align: right;">
+                                            &#8358;{{ number_format($total_revenue, 2) }}</th>
                                     </tr>
                                     <?php
                                     $total_cost_of_sale = 0;
@@ -157,12 +160,14 @@
                                     <tr>
                                         <th colspan="4" style="text-align: right">TOTAL COST</th>
                                         @php $total_cost = $credit_sum - $debit_sum  @endphp
-                                        <th colspan="3" style="text-align: right;">&#8358;{{ number_format($total_cost, 2) }}</th>
+                                        <th colspan="3" style="text-align: right;">
+                                            &#8358;{{ number_format($total_cost, 2) }}</th>
                                     </tr>
                                     <tr>
                                         <th colspan="4" style="text-align: right">GROSS PROFIT/LOSS</th>
                                         @php $gross_profit_loss = $total_revenue - $total_cost  @endphp
-                                        <th colspan="3" style="text-align: right;">&#8358;{{ number_format($gross_profit_loss, 2) }}</th>
+                                        <th colspan="3" style="text-align: right;">
+                                            &#8358;{{ number_format($gross_profit_loss, 2) }}</th>
                                     </tr>
                                     <tr>
                                         <th colspan="6">
@@ -214,17 +219,20 @@
                                     <tr>
                                         <th colspan="4" style="text-align: right">TOTAL EXPENSE</th>
                                         @php $total_expense = $credit_sum - $debit_sum  @endphp
-                                        <th colspan="3" style="text-align: right;">&#8358;{{ number_format($total_expense, 2) }}</th>
+                                        <th colspan="3" style="text-align: right;">
+                                            &#8358;{{ number_format($total_expense, 2) }}</th>
                                     </tr>
                                     <tr>
                                         <th colspan="4" style="text-align: right">TAX DIVIDEND</th>
-                                        <th colspan="3" style="text-align: right;">&#8358;{{ number_format(0, 2) }}</th>
+                                        <th colspan="3" style="text-align: right;">&#8358;{{ number_format(0, 2) }}
+                                        </th>
                                     </tr>
-                                    
+
                                     <tr>
                                         <th colspan="4" style="text-align: right">NET PROFIT /LOSS</th>
-                                        @php $net_profit_loss = $gross_profit_loss - $total_expense+ $other_income  @endphp
-                                        <th colspan="3" style="text-align: right;">&#8358;{{ number_format($net_profit_loss, 2) }}</th>
+                                        @php $net_profit_loss = abs($gross_profit_loss) - $total_expense+ $other_income  @endphp
+                                        <th colspan="3" style="text-align: right;">
+                                            &#8358;{{ number_format($net_profit_loss, 2) }}</th>
                                     </tr>
                                 </tbody>
                             </table>

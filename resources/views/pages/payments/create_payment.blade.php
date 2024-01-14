@@ -121,7 +121,7 @@
                                     <div class="form-group">
                                         <label for="payment_date">Payment Date</label>
                                         <input type="text"
-                                            class="form-control datepicker {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
+                                            class="form-control datepicker2 {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
                                             name="payment_date" id="payment_date"
                                             value="{{ old('payment_date', $model->payment_date) == '' ? date('Y-m-d') : old('payment_date', $model->payment_mode) }}"
                                             required="required">
@@ -161,7 +161,7 @@
                                         <input type="text" oninput="formatNumber(this)"
                                             class="form-control {{ $errors->has('amount_paid') ? ' is-invalid' : '' }}"
                                             name="amount_paid" id="amount_paid"
-                                            value="{{ old('amount_paid', $model->amount) }}" required>
+                                            value="{{ old('amount_paid', number_format($model->amount, 2)) }}" required>
                                         @if ($errors->has('amount_paid'))
                                             <div class="invalid-feedback">
                                                 <strong>{{ $errors->first('amount_paid') }}</strong>

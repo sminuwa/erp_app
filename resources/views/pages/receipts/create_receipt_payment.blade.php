@@ -118,7 +118,7 @@
                                     <div class="form-group">
                                         <label for="payment_date">Receipt Date</label>
                                         <input type="text"
-                                            class="form-control datepicker2 {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
+                                            class="form-control datepicker {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
                                             name="payment_date" id="payment_date"
                                             value="{{ old('payment_date', \Carbon\Carbon::parse($model->date)->format('Y-m-d')) == '' ? date('Y-m-d') : old('payment_date', \Carbon\Carbon::parse($model->date)->format('Y-m-d')) }}"
                                             required>

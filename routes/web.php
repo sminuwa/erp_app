@@ -996,6 +996,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [JournalController::class, 'store'])->name('journal.store');
         Route::get('/create', [JournalController::class, 'create'])->name('journal.create');
         Route::get('/show/{journal}', [JournalController::class, 'show'])->name('journal.show');
+        Route::put('/update/{journal}', [JournalController::class, 'update'])->name('journal.update');
         Route::get('/post/{journal}', [JournalController::class, 'post'])->name('journal.post');
         Route::get('/reverse/{journal}', [JournalController::class, 'reverse'])->name('journal.reverse');
         Route::get('/print/{journal}', [JournalController::class, 'print'])->name('journal.print');

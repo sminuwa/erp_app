@@ -122,7 +122,7 @@
         </tr>
         <tr>
             <th colspan="4" style="text-align: right">GROSS PROFIT/LOSS</th>
-            @php $gross_profit_loss = $total_revenue - $total_cost  @endphp
+            @php $gross_profit_loss = $total_revenue - abs($total_cost)  @endphp
             <th colspan="3" style="text-align: right;">&#8358;{{ number_format($gross_profit_loss, 2) }}</th>
         </tr>
         <tr>
@@ -184,7 +184,7 @@
 
         <tr>
             <th colspan="4" style="text-align: right">NET PROFIT /LOSS</th>
-            @php $net_profit_loss = abs($gross_profit_loss) - $total_expense + $other_income  @endphp
+            @php $net_profit_loss = abs($gross_profit_loss) - abs($total_expense) + $other_income  @endphp
             <th colspan="3" style="text-align: right;">&#8358;{{ number_format($net_profit_loss, 2) }}</th>
         </tr>
     </tbody>

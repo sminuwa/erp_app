@@ -6,7 +6,7 @@
 @endpush
 
 @section('content')
-
+<input name="cart_page_type" type="hidden" value="journal">
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
@@ -32,80 +32,97 @@
 
         <!-- Main content -->
         <section class="content">
-            @can('journal.create')
-                <a href="{{ route('journal.create') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;">
-                    <span class="fa fa-plus-circle"> </span> New Journal
-                </a>
-            @endcan
-            @can('journal.index')
-                <a class="btn btn-secondary btn-sm" href="{{ route('journal.index') }}">
-                    <span class="fa fa-list"></span> Journals List
-                </a>
-            @endcan
-            <div class="container-fluid py-4">
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <input type="date" class="form-control datepicker" name="date" id="date" required>
-                        <label class="floating-label">Date: @error('journal_date')
-                                <span class="text-danger error">{{ $message }}</span>
-                            @enderror
-                        </label>
+            <div class="container-fluid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            Journal
+                        </h3>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <input name="description" id="description" type="text" class="form-control"
-                            placeholder="Description">
-                        <label class="floating-label">Description: @error('description')
-                                <span class="text-danger error">{{ $message }}</span>
-                            @enderror
-                        </label>
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        <button type="button" data-toggle="modal" data-target="#journal_modal"
-                            class="btn btn-primary float-right"><i class="fa fa-cart-plus"></i>
-                            Add more
-                        </button>
-                    </div>
+                    <div class="card-body table-responsive">
+                        @can('journal.create')
+                            <a href="{{ route('journal.create') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;">
+                                <span class="fa fa-plus-circle"> </span> New Journal
+                            </a>
+                        @endcan
+                        @can('journal.index')
+                            <a class="btn btn-secondary btn-sm" href="{{ route('journal.index') }}">
+                                <span class="fa fa-list"></span> Journals List
+                            </a>
+                        @endcan
+                        <div class="container-fluid py-4">
+                            <form action="{{route('journal.store')}}" method="POST">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <input type="text" class="form-control datepicker" name="date" id="date"
+                                            required>
+                                        <label class="floating-label">Date: @error('journal_date')
+                                                <span class="text-danger error">{{ $message }}</span>
+                                            @enderror
+                                        </label>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <textarea name="description" id="description" type="text" class="form-control" placeholder="Description"></textarea>
+                                        <label class="floating-label">Description: @error('description')
+                                                <span class="text-danger error">{{ $message }}</span>
+                                            @enderror
+                                        </label>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <button type="button" data-toggle="modal" data-target="#journal_modal"
+                                            class="btn btn-primary float-right"><i class="fa fa-cart-plus"></i>
+                                            Add
+                                        </button>
+                                    </div>
 
-                </div>
-                <div class="row">
-                    <div class="col-md-12 mt-3">
-                        @isset($total_credit)
-                            <h4>
-                                <small>Total Credit:</small> N{{ $total_credit }} <br>
-                                <small>Total Debit:</small> N{{ $total_debit }} <br>
-                                <small>Balance:</small> N{{ $total_credit - $total_debit }}
-                            </h4>
-                        @endisset
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-8 mb-7 text-right">
+                                        <button type="submit"
+                                            class="btn btn-primary float-right"><i class="fa fa-cart-plus"></i>
+                                            Submit
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body table-responsive cart-container">
+
+                                </div>
+                            </form>
+                        </div><!-- /.container-fluid -->
                     </div>
                 </div>
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
-    <form action="{{ route('invoice.final_invoice') }}" method="post">
-        @csrf
-        <div class="modal fade" id="journal_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">
-                            Journal
-                        </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
+
+    <div class="modal fade" id="journal_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">
+                        Journal
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('ajax.cart.add') }}" method="POST" class="addCartItemForm">
+                        @csrf
+                        <input type="hidden" name="type" id="type" value="{{ 'journal' }}" />
                         <div class="row">
                             <div class="col-md-12">
+
                                 <table>
                                     <tr>
                                         <td>
                                             <div class="col-12">
-                                                <div class="form-group" wire:ignore>
-                                                    <select name="type" id="type"
+                                                <div class="form-group">
+                                                    <select name="account_type" id="account_type"
                                                         class="form-control  type select2-single" required>
                                                         <option value="">Select...</option>
                                                         <option value="Customer">Customer</option>
@@ -123,7 +140,7 @@
                                         <td>
                                             <div class="col-12">
                                                 <div class="form-group">
-                                                    <select name="account" id="account"
+                                                    <select name="payer_id" id="payer_id"
                                                         class="form-control select2-single ajax-general-accounts" required>
                                                         <option value="">Select...</option>
                                                     </select>
@@ -139,10 +156,9 @@
                                         <td>
                                             <div class="col-12">
                                                 <div class="form-group">
-                                                    <input type="number" min="0" step=".01" class="form-control"
-                                                        placeholder="Debit" debit="debit" id="debit"
-                                                        wire:change="totals">
-                                                    <label class="floating-label">Debit: @error('debit')
+                                                    <input type="text" class="form-control" placeholder="Credit"
+                                                        name="credit" id="credit">
+                                                    <label class="floating-label">Credit: @error('credit')
                                                             <br><span class="text-danger error">{{ $message }}</span>
                                                         @enderror
                                                     </label>
@@ -151,25 +167,22 @@
                                         </td>
                                         <td>
                                             <div class="col-12">
-                                                <div class="form-group" wire:ignore>
-                                                    <input type="number" min="0" step=".01"
-                                                        class="form-control" placeholder="Credit" name="credit"
-                                                        id="credit" wire:change="totals">
-                                                    <label class="floating-label">Credit: @error('credit')
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control" placeholder="Debit"
+                                                        name="debit" id="debit">
+                                                    <label class="floating-label">Debit: @error('debit')
                                                             <br><span class="text-danger error">{{ $message }}</span>
                                                         @enderror
                                                     </label>
                                                 </div>
                                             </div>
                                         </td>
-
                                     </tr>
                                     <tr>
                                         <td colspan="2">
                                             <div class="col-12">
                                                 <div class="input-group mb-3">
-                                                    <input type="text" class="form-control" placeholder="Description"
-                                                        name="description">
+                                                    <textarea class="form-control" placeholder="Description" name="description"></textarea>
                                                     <label class="floating-label">Description: @error('description')
                                                             <br><span class="text-danger error">{{ $message }}</span>
                                                         @enderror
@@ -181,39 +194,81 @@
                                     </tr>
                                 </table>
 
-                                {{-- <div class="col-md-12 mt-3">
-                                    <button type="submit" class="btn btn-success btn-sm">Save</button>
-                                </div> --}}
-
                             </div>
                         </div>
-                    </div>
-                    {{-- <input type="hidden" name="customer_id" value="{{ $customer->id }}"> --}}
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add to Cart</button>
+                        </div>
+                    </form>
                 </div>
+
             </div>
         </div>
+    </div>
     </form>
 @endsection
-
-
-
-@push('css')
-    @livewireStyles
-@endpush
 @push('js')
-    @livewireScripts
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded')
-            /*$(".select2-single, .select2-multiple, .select2").select2({
-                theme: "bootstrap",
-                maximumSelectionSize: 6,
-                containerCssClass: ':all:'
-            });*/
-        })
+        function formatNumber(input) {
+            // Remove non-numeric and non-decimal characters
+            let value = input.value.replace(/[^\d.]/g, '');
+
+            // Split the value into integer and decimal parts
+            const parts = value.split('.');
+            let integerPart = parts[0] ? parseFloat(parts[0]) : 0;
+            let decimalPart = parts[1] !== undefined ? '.' + parts[1] : '';
+
+            // Check if the integer part is not NaN
+            if (!isNaN(integerPart)) {
+                // Format the integer part with commas and dot as decimal separator
+                integerPart = integerPart.toLocaleString('en-US', {
+                    maximumFractionDigits: 2,
+                    useGrouping: true
+                });
+
+                // Set the formatted value back to the input
+                input.value = integerPart + decimalPart;
+            }
+        }
+
+        var creditInput = document.getElementById('credit');
+        var debitInput = document.getElementById('debit');
+
+        creditInput.addEventListener('input', function() {
+            formatNumber(this);
+            if (parseFloat(this.value) !== 0) {
+                debitInput.value = '0';
+                debitInput.dispatchEvent(new Event('input', {
+                    bubbles: true
+                }));
+            }
+        });
+
+        debitInput.addEventListener('input', function() {
+            formatNumber(this);
+            if (parseFloat(this.value) !== 0) {
+                creditInput.value = '0';
+                creditInput.dispatchEvent(new Event('input', {
+                    bubbles: true
+                }));
+            }
+        });
+
+
+        $(function() {
+            $('#account_type').on("change", function() {
+                $("#payer_id").html(" < option value = '' > Loading... < /option>");
+                $.ajax({
+                    url: "{{ route('ajax.load.payers') }}",
+                    type: 'GET',
+                    data: {
+                        type: $(this).val()
+                    }
+                }).done(function(msg) {
+                    $("#payer_id").html(msg);
+                });
+            });
+        });
     </script>
 @endpush

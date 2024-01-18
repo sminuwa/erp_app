@@ -6,7 +6,7 @@
 @endpush
 
 @section('content')
-<input name="cart_page_type" type="hidden" value="journal">
+    <input name="cart_page_type" type="hidden" value="journal">
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
@@ -51,7 +51,7 @@
                             </a>
                         @endcan
                         <div class="container-fluid py-4">
-                            <form action="{{route('journal.store')}}" method="POST">
+                            <form action="{{ route('journal.store') }}" method="POST">
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
@@ -79,16 +79,17 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-8 mb-7 text-right">
-                                        <button type="submit"
-                                            class="btn btn-primary float-right"><i class="fa fa-cart-plus"></i>
+                                        <button type="submit" class="btn btn-primary float-right"><i
+                                                class="fa fa-cart-plus"></i>
                                             Submit
                                         </button>
                                     </div>
                                 </div>
-                                <div class="card-body table-responsive cart-container">
 
-                                </div>
                             </form>
+                            <div class="card-body table-responsive cart-container">
+
+                            </div>
                         </div><!-- /.container-fluid -->
                     </div>
                 </div>
@@ -270,5 +271,127 @@
                 });
             });
         });
+
+        // $(document).on('input', '.ajax-update-input', function() {
+        //     let formId = $(this).attr('data-value').substring(1); //$(this).closest('form').attr('id');
+
+        //     // Validate credit and debit values
+        //     var creditValue = parseFloat($('#credit' + formId).val().replace(/,/g, '')) || 0;
+        //     var debitValue = parseFloat($('#debit' + formId).val().replace(/,/g, '')) || 0;
+
+        //     if (creditValue > 0 && debitValue > 0 && !$(this).hasClass('description')) {
+        //         // Display validation error
+        //         alert("Credit and debit cannot have values greater than zero at the same time");
+        //         $(this).val(0);
+        //         return false;
+        //     }
+        //     if (!$(this).hasClass('description')) {
+        //         formatNumber(this);
+        //     }
+
+        //     delayUpdateCart(formId, 1000); // Adjust the delay time (in milliseconds) as needed
+        // });
+
+        // function delayUpdateCart(formId, delay) {
+        //     setTimeout(function() {
+        //         updateJournalCart(formId);
+        //     }, delay);
+        // }
+
+        // function updateJournalCart(formId) {
+        //     let form = $('#p' + formId);
+        //     console.log('Form Action:', form.attr('action'));
+
+        //     if (form.length === 0) {
+        //         let action = "{{ route('ajax.cart.update', ['id' => ':formid']) }}".replace(':formid', formId);
+        //         form = $(this).closest('form').attr('action', action);
+        //         console.log('Form Action:', form);
+        //     }
+
+        //     type = 'journal';
+        //     $.ajax({
+        //         url: form.attr('action'),
+        //         type: 'GET',
+        //         data: form.serialize() + '&type=' + type,
+        //     }).done(function(component) {
+        //         //console.log(component);
+        //     });
+        // }
+        function updateTotals() {
+            let totalCredit = 0;
+            let totalDebit = 0;
+
+            // Iterate over elements with class "credit" and calculate totalCredit
+            $('.credit').each(function() {
+                totalCredit += parseFloat($(this).val().replace(/,/g, '')) || 0;
+            });
+
+            // Iterate over elements with class "debit" and calculate totalDebit
+            $('.debit').each(function() {
+                totalDebit += parseFloat($(this).val().replace(/,/g, '')) || 0;
+            });
+
+            // Calculate the balance
+            let result = totalCredit - totalDebit;
+
+            // Display the totals in the respective elements
+            $('#total_credit').text(formatMoney(totalCredit.toFixed(2)));
+            $('#total_debit').text(formatMoney(totalDebit.toFixed(2)));
+            $('#total_balance').text(formatMoney(result.toFixed(2)));
+        }
+
+        $(document).on('input', '.ajax-update-input', function() {
+            let formId = $(this).attr('data-value').substring(1);
+
+
+            // Validate credit and debit values
+            var creditValue = parseFloat($('#credit' + formId).val().replace(/,/g, '')) || 0;
+            var debitValue = parseFloat($('#debit' + formId).val().replace(/,/g, '')) || 0;
+
+            if (creditValue > 0 && debitValue > 0 && !$(this).hasClass('description')) {
+                // Display validation error
+                alert("Credit and debit cannot have values greater than zero at the same time");
+                $(this).val((0).toFixed(2));
+                return false;
+            }
+
+            if (!$(this).hasClass('description')) {
+                // Format the number for the current input
+                formatNumber(this);
+
+                // Update the totals
+                updateTotals();
+            }
+
+
+            // Adjust the delay time (in milliseconds) as needed
+            delayUpdateCart(formId, 1000);
+        });
+
+        function delayUpdateCart(formId, delay) {
+            setTimeout(function() {
+                updateJournalCart(formId);
+            }, delay);
+        }
+
+        function updateJournalCart(formId) {
+            let form = $('#p' + formId);
+            console.log('Form Action:', form.attr('action'));
+
+            if (form.length === 0) {
+                let action = "{{ route('ajax.cart.update', ['id' => ':formid']) }}".replace(':formid', formId);
+                form = $(this).closest('form').attr('action', action);
+                console.log('Form Action:', form);
+            }
+
+            type = 'journal';
+            $.ajax({
+                url: form.attr('action'),
+                type: 'GET',
+                data: form.serialize() + '&type=' + type,
+            }).done(function(component) {
+                // console.log(component);
+            });
+        }
     </script>
 @endpush

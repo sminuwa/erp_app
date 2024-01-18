@@ -326,7 +326,7 @@
                     <form class="c-tr" action="{{ route('ajax.cart.update', $product->id) }}" method="get"
                         id="p{{ $product->id }}">
                         @csrf
-                        @php $attr = $product->attributes @endphp
+                        @php $attr = $product->attributes; @endphp
                         <input type="hidden" name="id" value="{{ $product->id }}">
                         <input type="hidden" name="product_id" value="{{ $attr->product_id }}">
                         <input type="hidden" name="store_id" value="{{ $attr->store_id }}">
@@ -373,38 +373,39 @@
                     $total_debit = 0;
                 @endphp
                 @foreach (\Cart::getContent() as $item)
-                    <form class="c-tr" action="{{ route('ajax.cart.update', $item->id) }}" method="get"
-                        id="p{{ $item->id }}" data-value="p{{ $item->id }}">
+                    <form class="c-tr ajax-update-input" action="{{ route('ajax.cart.update', $item->id) }}"
+                        method="get" id="p{{ $item->id }}" data-value="p{{ $item->id }}">
                         @csrf
-                        @php $attr = $item->attributes @endphp
+                        @php $attr = $item->attributes; @endphp
                         @isset($journal)
                             <input type="hidden" name="journal_id" value="{{ $journal->id }}">
                         @endisset
+                        <input type="hidden" name="f{{ $item->id }}" value="{{ $item->id }}">
                         <input type="hidden" name="id" value="{{ $item->id }}">
                         <input type="hidden" name="payer_id" value="{{ $attr->payer_id }}">
                         <input type="hidden" name="account_type" value="{{ $attr->account_type }}">
-                        <input type="hidden" name="credit" value="{{ $item->credit }}">
+                        <input type="hidden" name="credit" value="{{ $attr->credit }}">
                         <input type="hidden" name="debit" value="{{ $attr->debit }}">
                         <div class="c-cell">{{ $loop->iteration }}</div>
                         <div class="c-cell text-left">{{ $attr->code ?? null }} - {{ $item->name }}</div>
                         <div class="c-cell">
                             <span style="color: red;" id="valid_credit{{ $item->id }}"></span>
                             <input type="text" name="credit" id="credit{{ $item->id }}"
-                                class="form-control credit" data-value="p{{ $item->id }}"
+                                class="form-control credit ajax-update-input" data-value="p{{ $item->id }}"
                                 style="min-width:58px;" value="{{ number_format($attr->credit, 2) }}"
-                                min="0" required>
+                                required>
                         </div>
                         <div class="c-cell">
                             <span style="color: red;" id="valid_debit{{ $item->id }}"></span>
                             <input type="text" name="debit" id="debit{{ $item->id }}"
-                                class="form-control debit" data-value="p{{ $item->id }}"
-                                style="min-width:58px;" value="{{ number_format($attr->debit, 2) }}" min="0"
+                                class="form-control debit ajax-update-input" data-value="p{{ $item->id }}"
+                                style="min-width:58px;" value="{{ number_format($attr->debit, 2) }}"
                                 required>
                         </div>
                         <div class="c-cell">
                             <span style="color: red;" id="valid_desc{{ $item->id }}"></span>
                             <input type="text" name="description" id="description{{ $item->id }}"
-                                class="form-control description" data-value="p{{ $item->id }}"
+                                class="form-control description ajax-update-input" data-value="p{{ $item->id }}"
                                 style="min-width:58px;" value="{{ $attr->description }}">
                         </div>
                         <div class="c-cell">
@@ -414,6 +415,8 @@
                             </a>
                         </div>
                     </form>
+
+
                     @php
                         $total_credit += $attr->credit;
                         $total_debit += $attr->debit;
@@ -425,11 +428,11 @@
                     <div class="c-cell">
                         <span style="font-size:16px;">
                             <small>Total Credit:</small>
-                            {{ currency_sign() . number_format($total_credit, 2) }} <br>
+                            <span id="total_credit">{{ currency_sign() . number_format($total_credit, 2) }}</span> <br>
                             <small>Total Debit:</small>
-                            {{ currency_sign() . number_format($total_debit, 2) }} <br>
+                            <span id="total_debit">{{ currency_sign() . number_format($total_debit, 2) }}</span> <br>
                             <small>Balance:</small>
-                            {{ currency_sign() . number_format($total_credit - $total_debit, 2) }}
+                            <span id="total_balance">{{ currency_sign() . number_format($total_credit - $total_debit, 2) }}</span>
                         </span>
                     </div>
                 </div>

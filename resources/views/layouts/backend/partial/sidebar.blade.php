@@ -193,9 +193,9 @@
                             </a>
                         </li>
                         @endcan
-                        @can('customers.return.debit')
+                        @can('return.debit')
                         <li class="nav-item">
-                            <a href="{{ route('customers.return.debit') }}" class="nav-link ">
+                            <a href="{{ route('return.debit') }}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Return and Debit</p>
                             </a>

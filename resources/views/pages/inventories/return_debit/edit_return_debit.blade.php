@@ -16,7 +16,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Return & Debit</h4>
+                        <h4>Edit Return & Debit {{$reference}}</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -45,46 +45,7 @@
                         @endif
                     </div>
                     <div class="col-sm-6">
-                        <div class="container mt-5" style="max-height: 300px;overflow: scroll;">
-                            <div class="card">
-                                <div class="card-header">
-                                    Previous Invoices
-                                </div>
-                                <div class="card-body">
-                                    <h5 class="card-title">Invoices</h5>
-                                    <input type="text" id="search" class="form-control mt-3" placeholder="Search">
-                                    <div id="table-container">
-                                        <table class="table" id="example1" style="font-size: 12px;">
-                                            <thead>
-                                                <tr>
-                                                    <th>Reference No</th>
-                                                    <th>Supplier</th>
-                                                    <th>Date</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="table-body">
-                                                @foreach ($purchases as $purchase)
-                                                    <tr>
-                                                        <td>
-                                                            <a href="javascript:void(0)" class="invoice" onclick="load()"
-                                                                data-val="{{ $purchase->reference }}">{{ $purchase->reference }}</a>
-                                                        </td>
-                                                        <td>{{ $purchase->supplier->name }}</td>
-                                                        <td>{{ Carbon\Carbon::parse($purchase->purchase_date)->toFormattedDateString() }}
-                                                        </td>
-                                                        <td style="text-align: right"><a href="javascript:void(0)"
-                                                                onclick="load()" class="invoice"
-                                                                data-val="{{ $purchase->reference }}"><span
-                                                                    class=""></span>Select</a></td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                       
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
@@ -114,56 +75,10 @@
                 "info": true,
                 "autoWidth": false
             });
-            $(document).on('keyup', '#search', function() {
-                var searchText = $(this).val();
-                $.ajax({
-                    url: "{{ route('load.order.invoices') }}",
-                    method: 'GET',
-                    data: {
-                        search: searchText
-                    },
-                    success: function(response) {
-                        if (response == null)
-                            $('#table-body').html("");
-                        $('#table-body').html(response);
-
-                    },
-                    error: function(error) {
-                        console.log(error);
-                    }
-                });
-            });
-            var delay = (function() {
-                var timer = 0;
-                return function(callback, ms) {
-                    clearTimeout(timer);
-                    timer = setTimeout(callback, ms);
-                };
-            })();
-
-            // function load() {
-            $(document).on('click', '.invoice', function() {
-                var invoice_no = $(this).attr('data-val');
-
-                $('#load').html("<h3>Please wait... while it is loading...</h3>");
-                $.ajax({
-                    url: "{{ route('load.order.cart') }}",
-                    method: 'GET',
-                    data: {
-                        invoice_no: invoice_no
-                    },
-                    success: function(response) {
-
-                        $('#load').html(response);
-                    },
-                    error: function(error) {
-                        console.log(error);
-                    }
-                });
-            });
+            
+           
 
             // }
-
 
             function formatMoney(n, c, d, t) {
                 var c = isNaN(c = Math.abs(c)) ? 2 : c,

@@ -483,7 +483,7 @@ class CartController extends Controller
                 ]
             );
         }
-        if ($request->type =='journal') {
+        if ($request->type == 'journal') {
             $payer_id = $request->payer_id;
             $account_type = $request->account_type;
             $credit = $request->credit;
@@ -525,6 +525,29 @@ class CartController extends Controller
             );
             $type = 'journal';
         }
+
+        if ($request->type == "returndebit") {
+
+            $cost_price = $request->unit_price;
+            $quantity = $request->quantity;
+            \Cart::update(
+                $request->id,
+                [
+                    'quantity' => [
+                        'relative' => false,
+                        'value' => $request->quantity
+                    ],
+                    'price' => str_replace(',', '', $cost_price),
+                    'attributes' => array(
+                        'cost_price' => $request->unit_price,
+                        'code' => $request->code,
+                        'store' => $request->store
+                    ),
+                ]
+            );
+            $type = 'returndebit';
+        }
+        
 
         if ($request->ajax()) {
             return \Cart::getTotal();

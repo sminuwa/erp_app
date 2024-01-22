@@ -82,7 +82,7 @@ class CustomerController extends Controller
       */
     public function store(Store $request)
     {
-        //        return $request;
+//                return $request;
         $model = new Customer;
         $model->fill($request->all());
         $model->type = $request->account_type == 'R' ? 'Retail' : "Wholesale";

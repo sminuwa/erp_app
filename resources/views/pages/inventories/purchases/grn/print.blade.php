@@ -123,7 +123,7 @@
                                             <td align="center">{{ $purchase_detail->quantity }}</td>
                                             <td align="right">
                                                 &#8358;{{ number_format($purchase_detail->unit_price, 2) }}</td>
-                                            <td>{{ $purchase->sourceStore->name ?? null }}</td>
+                                            <td>{{ $purchase_detail->store->code ?? null }}</td>
                                             <td align="right">
                                                 &#8358;{{ number_format($purchase_detail->unit_price * $purchase_detail->quantity, 2) }}
                                             </td>

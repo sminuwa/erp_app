@@ -166,6 +166,7 @@ function updateCart(formId, formData = '') {
 
 //delete card
 $(document).on('click', '.deleteCartItem', function (e) {
+    
     e.preventDefault()
     $.ajax({
         url: $(this).attr('url'),

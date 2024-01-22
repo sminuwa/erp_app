@@ -38,8 +38,8 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-4">
-                                    @can('customers.return.debit.create')
-                                        <a href="{{ route('customers.return.debit.create') }}" class="btn btn-sm btn-secondary"
+                                    @can('return.debit.create')
+                                        <a href="{{ route('return.debit.create') }}" class="btn btn-sm btn-secondary"
                                             style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Return &
                                             Debit</a>
                                     @endcan
@@ -47,8 +47,8 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
-                                    @can('customers.return.debit.search')
-                                        <form action="{{ route('customers.return.debit.search') }}" method="POST">
+                                    @can('return.debit.search')
+                                        <form action="{{ route('return.debit.search') }}" method="POST">
                                             @csrf
                                             <div class="input-group">
                                                 <input type="search" class="form-control rounded" required
@@ -88,32 +88,38 @@
                                         @foreach ($payments as $payment)
                                             <tr>
 
-                                                <td>{{ $payment->customer->name ?? '' }}</td>
+                                                <td>{{ $payment->purchase->supplier->code ?? '' }}-{{ $payment->purchase->supplier->name ?? '' }}
+                                                </td>
                                                 <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                                                 </td>
-                                                <td>{{ $payment->reference_no }}</td>
+                                                <td>{{ $payment->reference }}</td>
 
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
                                                 <td>{{ $payment->postedBy->name ?? '' }}</td>
                                                 <td align="center">
-                                                    @can('customers.return.debit.print')
-                                                        <a href="{{ route('customers.return.debit.print', $payment->id) }}"
+                                                    @can('return.debit.show')
+                                                        <a href="{{ route('return.debit.show', $payment->id) }}"
+                                                            class="btn btn-secondary btn-sm">
+                                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                                        </a>
+                                                    @endcan
+                                                    @can('return.debit.print')
+                                                        <a href="{{ route('return.debit.print', $payment->id) }}"
                                                             target="_BLANK" class="btn btn-secondary btn-sm">
                                                             <i class="fa fa-print" aria-hidden="true"></i>
                                                         </a>
                                                     @endcan
-                                                    {{-- <a href="javascript:void(0)" data-toggle="modal"
-                                                        data-target="#payment_edit{{$payment->id}}"
+                                                    <a href="{{ route('return.debit.edit', $payment->id) }}"
                                                         class="btn btn-primary btn-sm">
                                                         <i class="fa fa-edit" aria-hidden="true"></i>
-                                                    </a> --}}
+                                                    </a>
                                                     <button class="btn btn-danger btn-sm" type="button"
                                                         onclick="deleteItem({{ $payment->id }})">
                                                         <i class="fa fa-trash" aria-hidden="true"></i>
                                                     </button>
-                                                    @can('customers.return.debit.destroy')
+                                                    @can('return.debit.destroy')
                                                         <form id="delete-form-{{ $payment->id }}"
-                                                            action="{{ route('customers.return.debit.destroy', $payment->id) }}"
+                                                            action="{{ route('return.debit.destroy', $payment->id) }}"
                                                             method="post" style="display:none;">
                                                             @csrf
                                                             @method('DELETE')
@@ -121,129 +127,6 @@
                                                     @endcan
                                                 </td>
                                             </tr>
-                                            <div class="modal fade" id="payment_edit{{ $payment->id }}"
-                                                style="display: none;" aria-hidden="true">
-                                                <div class="modal-dialog">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Return & Debit to
-                                                                {{ $payment->customer->name ?? '' }} | Cheque No:
-                                                                {{ $payment->Ref }}</h5>
-                                                            <button type="button" class="close" data-dismiss="modal"
-                                                                aria-label="Close">
-                                                                <span aria-hidden="true">×</span>
-                                                            </button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <form
-                                                                action="{{ route('customers.return.debit.update', $payment->id) }}"
-                                                                method="POST" target="_BLANK">
-                                                                @csrf
-                                                                @method('PUT')
-                                                                <input type="hidden" name="payment_id" id="payment_id"
-                                                                    value="{{ $payment->id }}" />
-                                                                <div class="row">
-                                                                    <div class="col-md-6">
-                                                                        <div class="form-group">
-                                                                            <label for="amount_paid">Amount Paid</label>
-                                                                            <input type="text"
-                                                                                class="form-control {{ $errors->has('amount_paid') ? ' is-invalid' : '' }}"
-                                                                                name="amount_paid" id="amount_paid"
-                                                                                value="{{ old('amount_paid', $payment->dr) }}">
-                                                                            @if ($errors->has('amount_paid'))
-                                                                                <div class="invalid-feedback">
-                                                                                    <strong>{{ $errors->first('amount_paid') }}</strong>
-                                                                                </div>
-                                                                            @endif
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <div class="form-group">
-                                                                            <label for="payment_date">Payment Date</label>
-                                                                            <input type="text"
-                                                                                class="form-control datepicker {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
-                                                                                name="payment_date" id="payment_date"
-                                                                                value="{{ old('payment_date', $payment->date) == '' ? date('Y-m-d') : old('payment_date', $payment->date) }}"
-                                                                                required="required">
-                                                                            @if ($errors->has('payment_date'))
-                                                                                <div class="invalid-feedback">
-                                                                                    <strong>{{ $errors->first('payment_date') }}</strong>
-                                                                                </div>
-                                                                            @endif
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <div class="form-group">
-                                                                            <label for="teller_no">Teller No</label>
-                                                                            <input type="text" class="form-control"
-                                                                                name="teller_no" id="teller_no"
-                                                                                value="{{ old('teller_no', $payment->teller_no) }}">
-                                                                            @if ($errors->has('teller_no'))
-                                                                                <div class="invalid-feedback">
-                                                                                    <strong>{{ $errors->first('teller_no') }}</strong>
-                                                                                </div>
-                                                                            @endif
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <div class="form-group">
-                                                                            <label for="cheque_no">Cheque No</label>
-                                                                            <input type="text" class="form-control"
-                                                                                name="cheque_no" id="cheque_no" readonly
-                                                                                value="{{ old('cheque_no', $payment->Ref) }}">
-                                                                            @if ($errors->has('cheque_no'))
-                                                                                <div class="invalid-feedback">
-                                                                                    <strong>{{ $errors->first('cheque_no') }}</strong>
-                                                                                </div>
-                                                                            @endif
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <div class="form-group">
-                                                                            <label for="group_id">Group Name</label>
-                                                                            <select
-                                                                                class="form-control select2-single {{ $errors->has('group_id') ? ' is-invalid' : '' }}"
-                                                                                name="group_id" id="group_id"
-                                                                                required="required">
-                                                                                <option value="">Select...</option>
-                                                                                @if (isset($categories))
-                                                                                    @foreach ($categories as $data)
-                                                                                        <option
-                                                                                            value="{{ $data->id }}"
-                                                                                            {{ $data->id == old('group_id', $payment->bank_account_id) ? 'selected' : '' }}>
-                                                                                            {{ $data->name }}</option>
-                                                                                    @endforeach
-                                                                                @endif
-                                                                            </select>
-                                                                            @if ($errors->has('group_id'))
-                                                                                <div class="invalid-feedback">
-                                                                                    <strong>{{ $errors->first('group_id') }}</strong>
-                                                                                </div>
-                                                                            @endif
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="row">
-                                                                    <div class="offset-10">
-                                                                        <button type="submut" class="btn btn-success"><i
-                                                                                class="fa fa-save"></i>
-                                                                            Save
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            </form>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-dark"
-                                                                    data-dismiss="modal"><i class="fa fa-times"></i>
-                                                                    Close
-                                                                </button>
-
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                            </div>
                                         @endforeach
                                     </tbody>
 

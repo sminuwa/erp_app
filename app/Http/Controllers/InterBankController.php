@@ -40,7 +40,7 @@ class InterBankController extends Controller
     {
 
         $interbank_id = $request->interbank_id;
-        $amount = $request->amount;
+        $amount = str_replace(',', '', $request->amount);
         $source_account_id = $request->source_account_id;
         $destination_account_id = $request->destination_account_id;
         $reference = InterBank::generateNewNumber();
@@ -89,18 +89,20 @@ class InterBankController extends Controller
 
     public function post(InterBank $interbank)
     {
-        $interbank->status = 1;
-        $interbank->posted_by = auth()->id();
-        DB::beginTransaction();
-        if ($interbank->save()) {
-            if (Transaction::interbank($interbank->destination_account_id, 'GeneralAccount', $interbank->source_account_id, 'GeneralAccount', $interbank->amount, $interbank->reference, $interbank->date)) {
-                $action = "Made payment of $interbank->amount for : " . $interbank->receipt_no;
-                AuditLog::auditLog(auth()->id(), $action);
-                session()->flash('app_message', 'Payment generated successfully');
-                DB::commit();
-            } else {
-                DB::rollBack();
-                session()->flash('app_message', 'Something went wrong');
+        if($interbank->status ==0) {
+            $interbank->status = 1;
+            $interbank->posted_by = auth()->id();
+            DB::beginTransaction();
+            if ($interbank->save()) {
+                if (Transaction::interbank($interbank->destination_account_id, 'GeneralAccount', $interbank->source_account_id, 'GeneralAccount', $interbank->amount, $interbank->reference, $interbank->date)) {
+                    $action = "Made payment of $interbank->amount for : " . $interbank->receipt_no;
+                    AuditLog::auditLog(auth()->id(), $action);
+                    session()->flash('app_message', 'Payment generated successfully');
+                    DB::commit();
+                } else {
+                    DB::rollBack();
+                    session()->flash('app_message', 'Something went wrong');
+                }
             }
         }
         return back();

@@ -14,7 +14,7 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
     <!-- IonIcons -->
-{{--    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">--}}
+    {{--    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"> --}}
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('assets/backend/css/adminlte.min.css') }}">
     <!-- Google Font: Source Sans Pro -->
@@ -47,8 +47,8 @@
                     <div class="row">
                         <div class="col-12">
                             <h4>
-                                <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" width="80"
-                                    alt="Albabello Logo" class="" style="opacity: .8">
+                                <img src="{{ asset('assets/backend/img/logo.png') }}"
+                                    width="80" alt="Albabello Logo" class="" style="opacity: .8">
                                 <small class="float-right">Date: {{ date('l, d-M-Y h:i:s A') }}</small>
                             </h4>
                         </div>
@@ -58,12 +58,12 @@
                     <div class="row">
                         <div class="col-sm-4">
                             <address>
-                                <strong>{{ config('app.name') }}  </strong><br>
+                                <strong>{{ config('app.name') }} </strong><br>
                                 Address <span class="ion-ios-contact-outline"></span>: {{ $company->address ?? null }}
                                 {{ $company->city ?? null }} , {{ $company->country ?? null }}<br>
                                 Phone <span class="ion-android-phone-portrait"></span>:
                                 {{ $company->mobile ?? null }}
-                                {{ $company->phone !== null ? ', 0' . $company->phone ?? null : '' }}
+                                {{ $company->phone ?? null }}
                                 <br>
                                 Email <span class="ion-email"></span>: {{ $company->email ?? null }}
                             </address>
@@ -76,12 +76,12 @@
                                 {{ $purchase->supplier->address ?? null }}<br>
                                 Phone <span class="ion-android-phone-portrait"></span>:
                                 {{ $purchase->supplier->phone ?? null }}<br>
-                                Email <span class="ion-email"></span>: {{ $purchase->supplier->email ?? null}}
+                                Email <span class="ion-email"></span>: {{ $purchase->supplier->email ?? null }}
                             </address>
-                            <b>Truck No: {{ $purchase->truck_no ?? null}}</b><br>
+                            <b>Truck No: {{ $purchase->truck_no ?? null }}</b><br>
                             <b>Reference: {{ $purchase->reference ?? null }}</b><br>
-                            <b>ATC/WayBill No.: {{ $purchase->atc_no ?? null}}</b><br>
-                            <b>Date: {{ $purchase->purchase_date->toFormattedDateString() ?? null}}</b><br>
+                            <b>ATC/WayBill No.: {{ $purchase->atc_no ?? null }}</b><br>
+                            <b>Date: {{ $purchase->purchase_date->toFormattedDateString() ?? null }}</b><br>
                         </div>
                     </div>
                     <!-- /.row -->
@@ -94,7 +94,7 @@
                         </div>
 
                     </div>
-                    <div class="row" style="line-height: 0.4">
+                    <div class="row" style="line-height: 0.6">
                         <div class="col-12">
                             <table class="table table-bordered text-left">
                                 <thead>
@@ -154,7 +154,7 @@
                         <div class="col-sm-4">
                             Signature<br>
                             _______________________________________<br><br>
-                            For: {{App\Models\User::UserBranchName()->long_name}}
+                            For: {{ App\Models\User::UserBranchName()->long_name }}
 
                         </div>
                         <div class="col-sm-4">

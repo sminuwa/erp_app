@@ -5,7 +5,7 @@ namespace App\Http\Requests\TransferProducts;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\TransferProduct;
 
-class StoreRequest extends FormRequest 
+class StoreRequest extends FormRequest
 {
 
     /**
@@ -13,9 +13,9 @@ class StoreRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
-        return $this->user()->can('make.stock.transfer', TransferProduct::class);
+        return true;
     }
 
     /**
@@ -23,11 +23,11 @@ class StoreRequest extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
-			
-	
+
+
         ];
     }
 
@@ -39,7 +39,7 @@ class StoreRequest extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

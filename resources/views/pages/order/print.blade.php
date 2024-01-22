@@ -46,8 +46,8 @@
                     <!-- title row -->
                     <div class="row">
                         <div class="col-11">
-                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
-                                style="width:80px;height:80px;" alt="logo" class="img-circle elevation-3"
+                            <img src="{{ asset('assets/backend/img/logo' . '.png') }}"
+                                style="width:100px;height:60px;" alt="logo" class="img-circle elevation-3"
                                 style="opacity: .8">
                             <span
                                 style="font-size:24px;">&nbsp;{{ App\Models\User::userBranchName()->long_name }}</span>

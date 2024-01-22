@@ -198,7 +198,7 @@ class CostPrice
                 'final_cost' => (
                     (($value['grn_cost'] / $total_grn) * $invoice->amount)
                     + $value['total_existing_cost'])
-                    / $value['total_quantity'],
+                    / ($value['total_quantity'] == 0 ? 1 : $value['total_quantity']),//to avoid division by zero
             ];
         }
 
@@ -570,7 +570,7 @@ class CostPrice
             $product_ids[] = $key;
             $store_id = $p['store_id'];
             $total_new_cost[$key] = intval($p['quantity']) * intval($p['price']);
-            $store_ids = implode(',', Store::where('branch_id',$branch_id)->pluck('id')->toArray());
+            $store_ids = implode(',', Store::where('branch_id', $branch_id)->pluck('id')->toArray());
             $details = StoreProduct::selectRaw("
                 store_products.product_id,
                 qty_available,

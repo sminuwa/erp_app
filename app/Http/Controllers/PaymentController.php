@@ -48,7 +48,7 @@ class PaymentController extends Controller
     public function pay(Request $request)
     {
         $payment_id = $request->payment_id;
-        $amount = $request->amount_paid;
+        $amount = str_replace(',', '', $request->amount_paid);
         $bank_account_id = $request->account_id;
         $date = $request->payment_date;
         $ym = Carbon::parse($date)->format('ym');
@@ -85,7 +85,7 @@ class PaymentController extends Controller
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Payment generated successfully');
                 DB::commit();
-                
+
             }
             return redirect()->route('payment.show', $record->id);
         } catch (\Exception $e) {
@@ -117,28 +117,30 @@ class PaymentController extends Controller
     }
     public function post(Payment $payment)
     {
-        $payment->status = 1;
-        $payment->posted_by = auth()->id();
-        DB::beginTransaction();
-        if ($payment->save()) {
-            if (
-                Transaction::receipt(
-                    $payment->model_id,
-                    $payment->model_name,
-                    $payment->charged_account_id,
-                    $payment->charged_account_name,
-                    $payment->amount,
-                    $payment->receipt_no,
-                    $payment->date
-                )
-            ) {
-                $action = "Made payment of $payment->amount for : " . $payment->receipt_no;
-                AuditLog::auditLog(auth()->id(), $action);
-                session()->flash('app_message', 'Payment generated successfully');
-                DB::commit();
-            } else {
-                DB::rollBack();
-                session()->flash('app_message', 'Something went wrong');
+        if($payment->status ==0) {
+            $payment->status = 1;
+            $payment->posted_by = auth()->id();
+            DB::beginTransaction();
+            if ($payment->save()) {
+                if (
+                    Transaction::receipt(
+                        $payment->model_id,
+                        $payment->model_name,
+                        $payment->charged_account_id,
+                        $payment->charged_account_name,
+                        $payment->amount,
+                        $payment->receipt_no,
+                        $payment->date
+                    )
+                ) {
+                    $action = "Made payment of $payment->amount for : " . $payment->receipt_no;
+                    AuditLog::auditLog(auth()->id(), $action);
+                    session()->flash('app_message', 'Payment generated successfully');
+                    DB::commit();
+                } else {
+                    DB::rollBack();
+                    session()->flash('app_message', 'Something went wrong');
+                }
             }
         }
         return back();

@@ -38,11 +38,11 @@
                             <div class="card-header">
                                 <i class="ion-android-cart"></i> Transfer Product Cart
                                 <div class="float-right">
-                                    @can('ajax.cart.add')
+{{--                                    @can('ajax.cart.add')--}}
                                         <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
                                             class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
                                                 class="fa fa-plus"></i> Add Product </a>
-                                    @endcan
+{{--                                    @endcan--}}
                                 </div>
                             </div>
                             <div class="card-body">
@@ -80,10 +80,10 @@
                                             value="{{ Auth::id() }}" required="required">
                                     </div>
                                     <div class="form-group text-right ">
-                                        @can('interstore.store')
+{{--                                        @can('interstore.store')--}}
                                             <button type="submit" class="btn btn-success"><span
                                                     class="ion-forward">Transfer</span></button>
-                                        @endcan
+{{--                                        @endcan--}}
                                     </div>
                                 </form>
                                 <div class="cart-container"></div>

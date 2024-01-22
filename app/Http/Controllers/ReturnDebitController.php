@@ -7,8 +7,10 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Purchase;
 use App\Models\ReturnDebit;
+use App\Models\ReturnDebitItem;
 use App\Models\Setting;
 use App\Models\StoreProduct;
+use App\Models\Supplier;
 use App\Models\User;
 use Carbon\Carbon;
 use DB;
@@ -17,24 +19,22 @@ use Illuminate\Support\Facades\Auth;
 
 class ReturnDebitController extends Controller
 {
-    public function customerReturnDebit()
+    public function returnDebit()
     {
-        $payments = ReturnDebit::where('branch_id', User::userBranchAction())->orderBy('return_debits.created_at', 'DESC')->take(10)->get();
-        $model = new CustomerController();
+        \Cart::clear();
+        $payments = ReturnDebit::where('branch_id', User::userBranchAction())->orderBy('return_debits.created_at', 'DESC')->take(100)->get();
+        $model = null;
         return view('pages.inventories.return_debit.return_debit', ['payments' => $payments, 'model' => $model]);
     }
-    public function createReturnDebit(Order $order = null)
+    public function createReturnDebit(Purchase $purchase = null)
     {
         $user_branch = User::userBranchAction();
-        // $orders = Order::where('status', 1)
-        //     ->where('branch_id', 'LIKE', $user_branch)
-        //     ->whereNotIn('reference', DB::table('credit_notes')->select('reference')->pluck('reference')->toArray())
-        //     ->orderBy('order_date', 'DESC')->take(20)->get();
-       $purchases = Purchase::where('status',1)
-       ->where('branch_id', 'LIKE', $user_branch)
-       ->orderBy('purchase_date', 'DESC')->take(50)->get();
 
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price','retail_selling_price','whole_selling_price', 'cost_price', 'unit')->distinct()
+        $purchases = Purchase::where('status', 1)
+            ->where('branch_id', 'LIKE', $user_branch)
+            ->orderBy('purchase_date', 'DESC')->take(50)->get();
+
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'retail_selling_price', 'whole_selling_price', 'cost_price', 'unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
             ->join('products', 'products.id', 'store_products.product_id')
@@ -48,57 +48,53 @@ class ReturnDebitController extends Controller
             //->where('store_products.qty_available', '>', 0)
             ->orderBy('products.name')->orderBy('stores.name')->get();
 
-        if ($order == null)
+        if ($purchase == null)
             \Cart::clear();
         $model = new Customer;
         $cart_products = \Cart::getContent();
-        return view('pages.inventories.return_debit.create_return_debit', compact('purchases', 'model', 'cart_products', 'order', 'stores'));
+        return view('pages.inventories.return_debit.create_return_debit', compact('purchases', 'model', 'cart_products', 'purchase', 'stores'));
     }
-    public function payReturnDebit(Request $request)
+    public function storeReturnDebit(Request $request)
     {
+
         //return "To call your function 8888";
-        $order_id = $request->order_id;
+        $purchase_id = $request->purchase_id;
         $comment = $request->comment;
-        $order = Order::find($order_id);
+        $order = Purchase::find($purchase_id);
         $reference = ReturnDebit::generateNewNumber();
         $items = \Cart::getContent();
         $total = \Cart::getTotal();
 
         DB::beginTransaction();
         try {
-            //Bank Withdrawal
-            // DB::table('bank_transactions')->insert([
-            //     'bank_account_id' => $order->customer_id,
-            //     'trans_date' => date('Y-m-d'),
-            //     'cr' => 0,
-            //     'dr' => $total,
-            //     'ref_no' => $order->invoice_no,
-            //     'created_at' => Carbon::now(),
-            //     'updated_at' => Carbon::now(),
-            // ]);
+
             $return_debit_id = DB::table('return_debits')->insertGetId([
-                'order_id' => $order->id,
-                'invoice_no' => $order->invoice_no,
-                'reference_no' => $reference,
-                'customer_id' => $order->customer_id,
-                'amount' => $order->total,
-                'comment' => $request->comment,
+                'purchase_id' => $order->id,
+                'invoice_no' => $order->reference,
+                'reference' => $reference,
+                'supplier_id' => $order->supplier_id,
+                'date' => $request->date,
+                'amount' => $total,
+                'comment' => $comment,
                 'branch_id' => User::userBranchAction(),
                 'posted_by' => Auth::id(),
             ]);
-            $items = \Cart::getContent();
+
             foreach ($items as $item) {
+                $purchase = $order->purchasedProducts()->where('id', $item->id)->first();
                 DB::table('return_debit_items')->insert([
                     'return_debit_id' => $return_debit_id,
-                    'store_product_id' => $item->id,
+                    'product_id' => $item->id,
+                    'store_id' => $purchase->store_id,
                     'current_quantity' => $item->quantity,
-                    'original_quantity_sold' => $item->quantity,
-                    'price' => $item->price,
+                    'original_quantity_purchased' => $purchase->quantity,
+                    'current_unit_cost' => $item->price,
+                    'original_unit_cost' => $purchase->unit_price,
                 ]);
             }
 
             session()->flash('app_message', 'Return and debit captured successfully');
-            $action = "Posted return and debit $order->invoice_no for customer: " . $order->customer->name;
+            $action = "Posted return and debit $order->reference for customer: " . $order->supplier->name;
             AuditLog::auditLog(Auth::id(), $action);
             DB::commit();
         } catch (\Exception $e) {
@@ -106,15 +102,35 @@ class ReturnDebitController extends Controller
             throw $e;
         }
 
-        return redirect()->back();
+        return redirect()->route('return.debit.show', $return_debit_id);
     }
+    public function show(Request $request, ReturnDebit $returndebit)
+    {
+        return view('pages.inventories.return_debit.preview_return_debit', compact('returndebit'));
+    }
+    public function edit(Request $request, ReturnDebit $returndebit)
+    {
+        foreach ($returndebit->returnItems()->get() as $data) {
+            $qty = $data->current_quantity == 0 ? 1 : $data->current_quantity;
 
+            \Cart::add([
+                'id' => $data->id,
+                'name' => $data->product->name ?? 'No name found',
+                'price' => $data->current_unit_cost ?? 1,
+                'quantity' => $qty,
+                'attributes' => array('code' => $data->product->code),
+            ]);
+        }
+        $cart_products = \Cart::getContent();
+
+        return view('pages.inventories.return_debit.edit_return_debit', ['cart_products' => $cart_products, 'reference' => $returndebit->reference, 'operation' => 'update', 'purchase' => $returndebit]);
+    }
     public function searchReturnDebit(Request $request)
     {
         $search_value = $request->refno;
 
-        $payments = Order::where('status', 1)
-            ->where('invoice_no', 'LIKE', "%$search_value%")
+        $payments = ReturnDebit::where('status', 1)
+            ->where('reference', 'LIKE', "%$search_value%")
             ->where('branch_id', 'LIKE', User::userBranchAction())
             ->orderBy('order_date', 'DESC')->get();
         return view('pages.inventories.return_debit.return_debit', ['payments' => $payments]);
@@ -125,10 +141,11 @@ class ReturnDebitController extends Controller
     }
     public function loadInvoices(Request $request)
     {
+        \Cart::clear();
         $word_search = $request->search;
         if (strlen($word_search) > 0) {
-            $orders = Order::where('status', 1)
-                ->where('invoice_no', 'LIKE', "%$word_search%")
+            $orders = Purchase::where('status', 1)
+                ->where('reference', 'LIKE', "%$word_search%")
                 ->where('branch_id', 'LIKE', User::userBranchAction())
                 ->orderBy('order_date', 'DESC')->get();
         } else {
@@ -154,91 +171,19 @@ class ReturnDebitController extends Controller
             ]);
         }
         $cart_products = \Cart::getContent();
-        
+
         return view('pages.inventories.return_debit.load_products', ['cart_products' => $cart_products, 'reference' => $reference, 'purchase' => $purchase]);
     }
-    public function addToCart(Request $request)
-    {
 
-        $validated = $request->validate([
-            'id' => 'required',
-            'name' => 'required',
-            'code' => 'required',
-            'sold_price' => 'required',
-            'qty' => 'required',
-            'cost_price' => 'required'
-        ]);
-        $qty = $request->qty;
-        $selling_price = $request->selling_price;
-        $cost_price = $request->cost_price;
-        $qty_available = $request->qty_available;
-        $store = $request->store;
-        $add = \Cart::add([
-            'id' => $request->id,
-            'name' => $request->name,
-            'price' => $request->sold_price,
-            'quantity' => $qty == 0 ? 1 : $qty,
-            'attributes' => array('cost_price' => $cost_price, 'code' => $request->code, 'selling_price' => $selling_price, 'qty_available' => $qty_available, 'discount' => 0, 'store' => $store),
-        ]);
-        //dd(\Cart::getContent());
-        if ($add) {
-            session()->flash('success', 'Product is Added to Cart Successfully !');
-            //return redirect()->back();
-            return redirect()->route('customers.return.debit.create', Order::find($request->order));
 
-        } else {
 
-            session()->flash('Product not added to cart');
-            return redirect()->back();
-        }
-    }
-
-    public function updateCart(Request $request)
-    { 
-        $sold_price = $request->unit_price;
-
-        \Cart::update(
-            $request->id,
-            [
-                'quantity' => [
-                    'relative' => false,
-                    'value' => $request->quantity
-                ],
-                'price' => $sold_price,
-                'attributes' => array('cost_price' => $request->unit_price,  'code' => $request->code, 'store' => $request->store)
-            ]
-        );
-
-        session()->flash('success', 'Item Cart is Updated Successfully !');
-        if ($request->ajax()) {
-            return \Cart::getTotal();
-        }
-        return redirect()->back();
-    }
-
-    public function removeCart(Request $request, $id)
-    {
-        \Cart::remove($request->id);
-        session()->flash('success', 'Item Cart Remove Successfully !');
-        return redirect()->route('customers.return.debit.create', Order::find($request->order));
-        //return redirect()->back()->with('order',Order::find($request->order));
-    }
     public function deletReturnDebit(Request $request, ReturnDebit $returnDebit)
     {
         //return "To call your function 8888";
         $reference = $returnDebit;
         DB::beginTransaction();
         try {
-            // //Bank Withdrawal
-            // DB::table('bank_transactions')->insert([
-            //     'bank_account_id' => $order->customer_id,
-            //     'trans_date' => date('Y-m-d'),
-            //     'cr' => 0,
-            //     'dr' => $total,
-            //     'ref_no' => $order->invoice_no,
-            //     'created_at' => Carbon::now(),
-            //     'updated_at' => Carbon::now(),
-            // ]);
+
 
             $returnDebit->returnItems()->delete();
             $returnDebit->delete();
@@ -252,5 +197,64 @@ class ReturnDebitController extends Controller
         }
 
         return redirect()->back();
+    }
+    public function updateReturnDebit(Request $request, ReturnDebit $returndebit)
+    {
+        $contents = \Cart::getContent();
+        DB::beginTransaction();
+        try {
+            $returndebit->comment = $request->comment;
+            $returndebit->date = $request->date;
+            $returndebit->save();
+            foreach ($contents as $item) {
+                ReturnDebitItem::where('id', $item->id)->update(['current_quantity' => $item->quantity, 'current_unit_cost' => $item->price]);
+            }
+            session()->flash('app_message', 'Return and debit updated successfully');
+            $action = "Modifiied return and debit with reference $returndebit->reference";
+            AuditLog::auditLog(Auth::id(), $action);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        return redirect()->route('return.debit');
+    }
+    public function post(Request $request, ReturnDebit $returndebit)
+    {
+        if ($returndebit->status == 0) {
+            $this->authorize('purchase.post');
+            $items = $returndebit->returnItems;
+            DB::beginTransaction();
+            $returndebit->status = 1;
+            $returndebit->posted_by = auth()->id();
+            if ($returndebit->save()) {
+                $new_cost_price = [];
+                foreach ($items as $item) {
+                    $new_cost_price[$item->product_id] = [
+                        'quantity' => $item->current_quantity,
+                        'price' => $item->current_unit_cost,
+                        'product_id' => $item->product_id,
+                        'store_id' => $item->store_id,
+                    ];
+                }
+                // if (
+                //     Transaction::purchases($purchase->id, $purchase->purchase_date)['status']
+                //     && CostPrice::newCostPrice(
+                //         $new_cost_price,
+                //         $purchase->reference,
+                //         $purchase->branch_id,
+                //         $purchase->purchase_date,
+                //         TRANSACTION_TYPE_GRN
+                //     )['status']
+                // ) {
+                $action = "Posted purchase GRN with reference $request->reference from supplier: " . Supplier::find($returndebit->supplier_id)->name;
+                AuditLog::auditLog(Auth::id(), $action);
+                DB::commit();
+                // } else
+                //     DB::rollback();
+                session()->flash('app_message', 'Purchase successfully posted');
+            }
+        }
+        return back();
     }
 }

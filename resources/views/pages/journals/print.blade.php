@@ -21,8 +21,8 @@
                     <div class="receipt-header">
                         <div class="col-xs-6 col-sm-6 col-md-6">
                             <div class="receipt-left">
-                                <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}"
-                                    style="width:71px;height:71px;border-radius: 43px;" alt="Albabello Logo"
+                                <img src="{{ asset('assets/backend/img/logo'.".png") }}"
+                                    style="width:100px;height:60px;border-radius: 43px;" alt="Albabello Logo"
                                     class="img-circle elevation-3 img-responsive" style="opacity: .8">
                                 <strong>{{App\Models\User::UserBranchName()->name}}</strong>
                             </div>
@@ -78,8 +78,8 @@
                                     {{ $journal_item->account()->code ?? $journal_item->account()->number }} -
                                     {{ $journal_item->account()->name ?? $journal_item->account()->description }}
                                 </td>
-                                <td>{{ $journal_item->debit }}</td>
-                                <td>{{ $journal_item->credit }}</td>
+                                <td style="text-align: right">{{ number_format($journal_item->debit,2) }}</td>
+                                <td style="text-align: right">{{ number_format($journal_item->credit,2) }}</td>
                                 <td>{{ $journal_item->description }}</td>
                             </tr>
                         @endforeach

@@ -472,37 +472,39 @@ class PurchaseGRNController extends Controller
     }
     public function post(Request $request, Purchase $purchase)
     {
-        $this->authorize('purchase.post');
-        $items = $purchase->purchasedProducts;
-        DB::beginTransaction();
-        $purchase->status = 1;
-        $purchase->posted_by = auth()->id();
-        if ($purchase->save()) {
-            $new_cost_price = [];
-            foreach ($items as $item) {
-                $new_cost_price[$item->product_id] = [
-                    'quantity' => $item->quantity,
-                    'price' => $item->unit_price,
-                    'store_id' => $item->store_id,
-                    'expiry_date' => $item->expire_date,
-                ];
+        if($purchase->status ==0) {
+            $this->authorize('purchase.post');
+            $items = $purchase->purchasedProducts;
+            DB::beginTransaction();
+            $purchase->status = 1;
+            $purchase->posted_by = auth()->id();
+            if ($purchase->save()) {
+                $new_cost_price = [];
+                foreach ($items as $item) {
+                    $new_cost_price[$item->product_id] = [
+                        'quantity' => $item->quantity,
+                        'price' => $item->unit_price,
+                        'store_id' => $item->store_id,
+                        'expiry_date' => $item->expire_date,
+                    ];
+                }
+                if (
+                    Transaction::purchases($purchase->id, $purchase->purchase_date)['status']
+                    && CostPrice::newCostPrice(
+                        $new_cost_price,
+                        $purchase->reference,
+                        $purchase->branch_id,
+                        $purchase->purchase_date,
+                        TRANSACTION_TYPE_GRN
+                    )['status']
+                ) {
+                    $action = "Posted purchase GRN with reference $request->reference from supplier: " . Supplier::find($purchase->supplier_id)->name;
+                    AuditLog::auditLog(Auth::id(), $action);
+                    DB::commit();
+                } else
+                    DB::rollback();
+                session()->flash('app_message', 'Purchase successfully posted');
             }
-            if (
-                Transaction::purchases($purchase->id, $purchase->purchase_date)['status']
-                && CostPrice::newCostPrice(
-                    $new_cost_price,
-                    $purchase->reference,
-                    $purchase->branch_id,
-                    $purchase->purchase_date,
-                    TRANSACTION_TYPE_GRN
-                )['status']
-            ) {
-                $action = "Posted purchase GRN with reference $request->reference from supplier: " . Supplier::find($purchase->supplier_id)->name;
-                AuditLog::auditLog(Auth::id(), $action);
-                DB::commit();
-            } else
-                DB::rollback();
-            session()->flash('app_message', 'Purchase successfully posted');
         }
         return back();
     }

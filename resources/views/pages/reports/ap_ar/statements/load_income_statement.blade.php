@@ -1,6 +1,6 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.income.statement.report.print', [$from_month, $to_month, $income_year, $branch_id]) }}"
+        <a href="{{ route('ajax.income.statement.report.print', [$from_month, $to_month, $income_year, $branch_id, $category_id1, $category_id2]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
@@ -8,8 +8,8 @@
 <table class="table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
-            INCOME STATEMENT FROM {{ $from_month=='all'?'January':monthName($from_month) }} AND
-            {{ $to_month=='all'?'December':monthName($to_month) }}
+            INCOME STATEMENT FROM {{ $from_month == 'all' ? 'January' : monthName($from_month) }} AND
+            {{ $to_month == 'all' ? 'December' : monthName($to_month) }}
         </h5>
     </caption>
     <?php
@@ -122,7 +122,7 @@
         </tr>
         <tr>
             <th colspan="4" style="text-align: right">GROSS PROFIT/LOSS</th>
-            @php $gross_profit_loss = $total_revenue - $total_cost  @endphp
+            @php $gross_profit_loss = $total_revenue - abs($total_cost)  @endphp
             <th colspan="3" style="text-align: right;">&#8358;{{ number_format($gross_profit_loss, 2) }}</th>
         </tr>
         <tr>
@@ -181,10 +181,10 @@
             <th colspan="4" style="text-align: right">TAX DIVIDEND</th>
             <th colspan="3" style="text-align: right;">&#8358;{{ number_format(0, 2) }}</th>
         </tr>
-        
+
         <tr>
             <th colspan="4" style="text-align: right">NET PROFIT /LOSS</th>
-            @php $net_profit_loss = $gross_profit_loss - $total_expense+ $other_income  @endphp
+            @php $net_profit_loss = abs($gross_profit_loss) - abs($total_expense) + $other_income  @endphp
             <th colspan="3" style="text-align: right;">&#8358;{{ number_format($net_profit_loss, 2) }}</th>
         </tr>
     </tbody>

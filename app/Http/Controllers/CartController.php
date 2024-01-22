@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\BranchProductPrice;
 use App\Models\Customer;
+use App\Models\GeneralAccount;
 use App\Models\Product;
 use App\Models\ProductUnitMeasure;
 use App\Models\Store;
 use App\Models\StoreProduct;
+use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Darryldecode\Cart\Cart;
@@ -286,6 +288,48 @@ class CartController extends Controller
             ]);
         }
 
+        if ($request->has('credit')) {
+            $payer_id = $request->payer_id;
+            $account_type = $request->account_type;
+            $credit = $request->credit;
+            $debit = $request->debit;
+            $request->description;
+            $payer = null;
+            $name = "";
+            $code = "";
+            if ($account_type == 'Customer') {
+                $payer = Customer::find($payer_id);
+                $name = $payer->name;
+                $code = $payer->code;
+            }
+            if ($account_type == 'Supplier') {
+                $payer = Supplier::find($payer_id);
+                $name = $payer->name;
+                $code = $payer->code;
+            }
+            if ($account_type == 'GeneralAccount') {
+                $payer = GeneralAccount::find($payer_id);
+                $name = $payer->description;
+                $code = $payer->number;
+            }
+
+            $add = \Cart::add([
+                'id' => generateRandomString(),
+                'name' => $name,
+                'price' => str_replace(',', '', $credit) ?? 1,
+                'quantity' => 1,
+                'attributes' => array(
+                    'credit' => str_replace(',', '', $credit) ?? 1,
+                    'debit' => str_replace(',', '', $debit) ?? 1,
+                    'description' => $request->description,
+                    'code' => $code,
+                    'account_type' => $account_type,
+                    'payer_id' => $payer_id,
+                ),
+            ]);
+            $type = 'journal';
+        }
+
         return view('components.cart', compact('type'));
     }
 
@@ -439,6 +483,71 @@ class CartController extends Controller
                 ]
             );
         }
+        if ($request->type == 'journal') {
+            $payer_id = $request->payer_id;
+            $account_type = $request->account_type;
+            $credit = $request->credit;
+            $debit = $request->debit;
+            $request->description;
+            $payer = null;
+            $name = "";
+            $code = "";
+            if ($account_type == 'Customer') {
+                $payer = Customer::find($payer_id);
+                $name = $payer->name;
+                $code = $payer->code;
+            }
+            if ($account_type == 'Supplier') {
+                $payer = Supplier::find($payer_id);
+                $name = $payer->name;
+                $code = $payer->code;
+            }
+            if ($account_type == 'GeneralAccount') {
+                $payer = GeneralAccount::find($payer_id);
+                $name = $payer->description;
+                $code = $payer->number;
+            }
+            $add = \Cart::update(
+                $request->id,
+                [
+                    'name' => $name,
+                    'price' => str_replace(',', '', $credit) ?? 1,
+                    'quantity' => 1,
+                    'attributes' => array(
+                        'credit' => str_replace(',', '', $credit) ?? 1,
+                        'debit' => str_replace(',', '', $debit) ?? 1,
+                        'description' => $request->description,
+                        'code' => $code,
+                        'account_type' => $account_type,
+                        'payer_id' => $payer_id,
+                    ),
+                ]
+            );
+            $type = 'journal';
+        }
+
+        if ($request->type == "returndebit") {
+
+            $cost_price = $request->unit_price;
+            $quantity = $request->quantity;
+            \Cart::update(
+                $request->id,
+                [
+                    'quantity' => [
+                        'relative' => false,
+                        'value' => $request->quantity
+                    ],
+                    'price' => str_replace(',', '', $cost_price),
+                    'attributes' => array(
+                        'cost_price' => $request->unit_price,
+                        'code' => $request->code,
+                        'store' => $request->store
+                    ),
+                ]
+            );
+            $type = 'returndebit';
+        }
+        
 
         if ($request->ajax()) {
             return \Cart::getTotal();

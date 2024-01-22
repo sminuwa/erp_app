@@ -165,6 +165,11 @@
             autoclose: true,
             todayHighlight: true,
         });
+        $('.datepicker2').datepicker({
+            autoclose: true,
+            startDate: new Date(),
+            todayHighlight: true,
+        });
 
         $('.datetimepicker').datetimepicker({
             datepicker: false,

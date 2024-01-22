@@ -50,7 +50,7 @@ class ReceiptController extends Controller
     public function payReciept(Request $request)
     {
         $receipt_id = $request->receipt_id;
-        $amount = $request->amount_paid;
+        $amount = str_replace(',', '', $request->amount_paid);
         $bank_account_id = $request->account_id;
         $date = $request->payment_date;
         $ym = Carbon::parse($date)->format('ym');
@@ -128,29 +128,31 @@ class ReceiptController extends Controller
 
     public function post(Receipt $receipt)
     {
-        $receipt->status = 1;
-        $receipt->posted_by = auth()->id();
-        DB::beginTransaction();
-        if ($receipt->save()) {
-            if (
-                Transaction::receipt(
-                    $receipt->charged_account_id,
-                    $receipt->charged_account_name,
-                    $receipt->model_id,
-                    $receipt->model_name,
-                    $receipt->amount,
-                    $receipt->receipt_no,
-                    $receipt->date
-                )
-            ) {
-                $ledger = new CustomerLedger();
-                $action = "Generated receipt of $receipt->amount for : " . $receipt->receipt_no;
-                AuditLog::auditLog(auth()->id(), $action);
-                session()->flash('app_message', 'Receipt generated successfully');
-                DB::commit();
-            } else {
-                DB::rollBack();
-                session()->flash('app_message', 'Something went wrong');
+        if ($receipt->status == 0) {
+            $receipt->status = 1;
+            $receipt->posted_by = auth()->id();
+            DB::beginTransaction();
+            if ($receipt->save()) {
+                if (
+                    Transaction::receipt(
+                        $receipt->charged_account_id,
+                        $receipt->charged_account_name,
+                        $receipt->model_id,
+                        $receipt->model_name,
+                        $receipt->amount,
+                        $receipt->receipt_no,
+                        $receipt->date
+                    )
+                ) {
+                    $ledger = new CustomerLedger();
+                    $action = "Generated receipt of $receipt->amount for : " . $receipt->receipt_no;
+                    AuditLog::auditLog(auth()->id(), $action);
+                    session()->flash('app_message', 'Receipt generated successfully');
+                    DB::commit();
+                } else {
+                    DB::rollBack();
+                    session()->flash('app_message', 'Something went wrong');
+                }
             }
         }
         return back();
@@ -176,7 +178,7 @@ class ReceiptController extends Controller
     }
 
     public function delete(Receipt $receipt)
-    { 
+    {
         if ($receipt->delete()) {
 
         }

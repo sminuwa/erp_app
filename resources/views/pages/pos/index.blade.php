@@ -76,16 +76,16 @@
 
                                     <div class="row">
                                         <div class="col-md-4">
-{{--                                            @hasanyrole('Super-admin|Admin')--}}
-                                                <div class="form-group">
-                                                    <label for="order_date">Sale Date</label>
-                                                    <input type="text" name="order_date" class="form-control datepicker"
-                                                        value="{{ isset($order) ? Carbon\Carbon::parse($order->order_date)->format('Y-m-d') : date('Y-m-d') }}" />
-                                                </div>
-{{--                                            @else--}}
-{{--                                                <input type="hidden" name="order_date" class="form-control datepicker"--}}
-{{--                                                    value="{{ date('Y-m-d') }}" />--}}
-{{--                                            @endhasanyrole--}}
+                                            {{--                                            @hasanyrole('Super-admin|Admin') --}}
+                                            <div class="form-group">
+                                                <label for="order_date">Sale Date</label>
+                                                <input type="text" name="order_date" class="form-control datepicker"
+                                                    value="{{ isset($order) ? Carbon\Carbon::parse($order->order_date)->format('Y-m-d') : date('Y-m-d') }}" />
+                                            </div>
+                                            {{--                                            @else --}}
+                                            {{--                                                <input type="hidden" name="order_date" class="form-control datepicker" --}}
+                                            {{--                                                    value="{{ date('Y-m-d') }}" /> --}}
+                                            {{--                                            @endhasanyrole --}}
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
@@ -94,12 +94,13 @@
                                                     {{ !empty(old('account_type')) ? 'disabled' : '' }} required>
                                                     <option value="" disabled selected>Select...</option>
                                                     <option value="Retail"
-                                                        {{ (isset($order) && $order->customer->type) || old('account_type') == 'Retail' || (session()->has('customer') && session('customer')->type == 'Retail') ? 'selected' : '' }}>
+                                                        {{ (isset($order) && $order->customer->type == 'Retail') || old('account_type') == 'Retail' || (session()->has('customer') && session('customer')->type == 'Retail') ? 'selected' : '' }}>
                                                         Retail</option>
                                                     <option value="Wholesale"
-                                                        {{ (isset($order) && $order->customer->type) || old('account_type') == 'Wholesale' || (session()->has('customer') && session('customer')->type == 'Wholesale') ? 'selected' : '' }}>
+                                                        {{ (isset($order) && $order->customer->type == 'Wholesale') || old('account_type') == 'Wholesale' || (session()->has('customer') && session('customer')->type == 'Wholesale') ? 'selected' : '' }}>
                                                         WholeSale</option>
                                                 </select>
+                                                
                                             </div>
                                         </div>
                                         <div class="col-md-4">
@@ -133,7 +134,9 @@
 
                                                     <div class="form-group">
                                                         <span class="text text-danger ion-android-alert"
-                                                            id="credit_balance"></span>
+                                                            id="credit_balance"></span>: <span
+                                                            class="text text-danger ion-android-alert"
+                                                            id="customer_balance"></span>
                                                     </div>
                                                 </div>
                                                 @isset($order)
@@ -156,14 +159,17 @@
 
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <input type="number" step=".01" class="form-control" placeholder="Refund"
-                                                    name="refund" id="refund" />
+                                                <input type="number" step=".01" class="form-control"
+                                                    placeholder="Refund" name="refund" id="refund" />
 
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create
-                                                Invoice</button>
+                                                Invoice</button> 
+                                        </div>
+                                        <div class="col-md-6">
+                                            <span style="color:red;">If the credit limit is exceeded, click here to refresh <i class="fa fa-refresh" onclick="window.location.reload()"></i></span>
                                         </div>
                                     </div>
                                 </div>
@@ -177,94 +183,94 @@
                             <div class="card-header">
                                 <h3 class="card-title">POS</h3>
 
-{{--                                @can('make.daily.sale')--}}
-                                    <input type="text" id="barcode" class="form-control" name="barcode"
-                                        placeholder="Scan barcode">
-{{--                                @endcannot--}}
+                                {{--                                @can('make.daily.sale') --}}
+                                <input type="text" id="barcode" class="form-control" name="barcode"
+                                    placeholder="Scan barcode">
+                                {{--                                @endcannot --}}
                             </div>
                             <!-- /.card-header -->
-{{--                            @can('view.sale.products')--}}
-                                <div class="card-body table-responsive" id="load">
-                                    <table id="example1" class="table table-bordered table-striped text-left"
-                                        style="font-size: 12px;">
-                                        <thead>
+                            {{--                            @can('view.sale.products') --}}
+                            <div class="card-body table-responsive" id="load">
+                                <table id="example1" class="table table-bordered table-striped text-left"
+                                    style="font-size: 12px;">
+                                    <thead>
+                                        <tr>
+                                            <th>Store</th>
+                                            <th>Code</th>
+                                            <th>Item</th>
+                                            <th>Unit</th>
+                                            <th>QTY</th>
+                                            {{-- <th>Price</th> --}}
+                                            <th>Add To Cart</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Store</th>
+                                            <th>Code</th>
+                                            <th>Name</th>
+                                            <th>Unit</th>
+                                            <th>QTY</th>
+                                            {{-- <th>Price</th> --}}
+                                            <th>Add To Cart</th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody>
+
+                                        @foreach ($stores as $key => $store)
                                             <tr>
-                                                <th>Store</th>
-                                                <th>Code</th>
-                                                <th>Item</th>
-                                                <th>Unit</th>
-                                                <th>QTY</th>
-                                                {{-- <th>Price</th> --}}
-                                                <th>Add To Cart</th>
-                                            </tr>
-                                        </thead>
-                                        <tfoot>
-                                            <tr>
-                                                <th>Store</th>
-                                                <th>Code</th>
-                                                <th>Name</th>
-                                                <th>Unit</th>
-                                                <th>QTY</th>
-                                                {{-- <th>Price</th> --}}
-                                                <th>Add To Cart</th>
-                                            </tr>
-                                        </tfoot>
-                                        <tbody>
+                                                <form action="{{ route('ajax.cart.add') }}" method="POST"
+                                                    class="addCartItemForm">
+                                                    @csrf
 
-                                            @foreach ($stores as $key => $store)
-                                                <tr>
-                                                    <form action="{{ route('ajax.cart.add') }}" method="POST"
-                                                        class="addCartItemForm">
-                                                        @csrf
+                                                    <input type="hidden" name="customer" class="customer"
+                                                        value="@if (session()->has('customer')) {{ session('customer')->id }} @endif">
+                                                    <input type="hidden" name="id" value="{{ $store->id }}">
+                                                    <input type="hidden" name="name" value="{{ $store->name }}">
+                                                    <input type="hidden" name="code" value="{{ $store->code }}">
+                                                    <input type="hidden" name="store" value="{{ $store->store }}">
+                                                    <input type="hidden" name="unit" value="{{ $store->unit }}">
+                                                    <input type="hidden" name="qty" value="1">
+                                                    <input type="hidden" name="selling_price"
+                                                        value="{{ $store->selling_price }}">
+                                                    <input type="hidden" name="qty_available"
+                                                        value="{{ $store->qty_available }}">
+                                                    <input type="hidden" name="sold_price"
+                                                        value="{{ $store->selling_price }}">
+                                                    <input type="hidden" name="cost_price"
+                                                        value="{{ $store->cost_price }}">
 
-                                                        <input type="hidden" name="customer" class="customer"
-                                                            value="@if (session()->has('customer')) {{ session('customer')->id }} @endif">
-                                                        <input type="hidden" name="id" value="{{ $store->id }}">
-                                                        <input type="hidden" name="name" value="{{ $store->name }}">
-                                                        <input type="hidden" name="code" value="{{ $store->code }}">
-                                                        <input type="hidden" name="store" value="{{ $store->store }}">
-                                                        <input type="hidden" name="unit" value="{{ $store->unit }}">
-                                                        <input type="hidden" name="qty" value="1">
-                                                        <input type="hidden" name="selling_price"
-                                                            value="{{ $store->selling_price }}">
-                                                        <input type="hidden" name="qty_available"
-                                                            value="{{ $store->qty_available }}">
-                                                        <input type="hidden" name="sold_price"
-                                                            value="{{ $store->selling_price }}">
-                                                        <input type="hidden" name="cost_price"
-                                                            value="{{ $store->cost_price }}">
-
-                                                        <td>{{ ucwords($store->store) }}</td>
-                                                        <td>{{ $store->code }}</td>
-                                                        <td>{{ $store->name }}</td>
-                                                        <td>{{ $store->unit }}</td>
-                                                        <td align="center">{{ $store->qty_available }}</td>
-                                                        {{-- <td align="right">
+                                                    <td>{{ ucwords($store->store) }}</td>
+                                                    <td>{{ $store->code }}</td>
+                                                    <td>{{ $store->name }}</td>
+                                                    <td>{{ $store->unit }}</td>
+                                                    <td align="center">{{ $store->qty_available }}</td>
+                                                    {{-- <td align="right">
                                                             {{ number_format($store->selling_price, 2) }}
                                                         </td> --}}
-                                                        @if ($store->qty_available > 0 && str_replace(',', '', $store->retail_selling_price) > 0)
-                                                            <td align="center">
-                                                                <button type="submit"
-                                                                    class="btn btn-sm btn-success px-2 add">
-                                                                    <i class="fa fa-cart-plus" aria-hidden="true"></i>
-                                                                </button>
-                                                            </td>
-                                                        @else
-                                                            <td align="center">
-                                                                <span class="fa fa-crosshairs text text-danger"
-                                                                    title="Selling price not set!"></span>
-                                                            </td>
-                                                        @endif
-                                                    </form>
-                                                </tr>
-                                            @endforeach
+                                                    @if ($store->qty_available > 0 && str_replace(',', '', $store->retail_selling_price) > 0)
+                                                        <td align="center">
+                                                            <button type="submit"
+                                                                class="btn btn-sm btn-success px-2 add">
+                                                                <i class="fa fa-cart-plus" aria-hidden="true"></i>
+                                                            </button>
+                                                        </td>
+                                                    @else
+                                                        <td align="center">
+                                                            <span class="fa fa-crosshairs text text-danger"
+                                                                title="Selling price not set!"></span>
+                                                        </td>
+                                                    @endif
+                                                </form>
+                                            </tr>
+                                        @endforeach
 
-                                        </tbody>
+                                    </tbody>
 
-                                    </table>
+                                </table>
 
-                                </div>
-{{--                            @endcan--}}
+                            </div>
+                            {{--                            @endcan --}}
                             <!-- /.card-body -->
                         </div>
                         <!-- /.card -->
@@ -612,9 +618,24 @@
                 }
             }).done(function(data) {
                 balance = formatMoney(data);
-                $("#credit_balance").html("Credit limit: &#8358;" + balance);
+                $("#credit_balance").html("<b>Credit limit: &#8358;</b>" + balance);
                 $('#existing_amount').val(balance);
                 $('#credit_limit_customer').val(customer_id);
+            });
+        });
+        $('#customer_record').on("change", function() {
+            customer_id = $(this).val();
+            $('.customer').val(customer_id);
+            $('#payer_id').val(customer_id);
+            $.ajax({
+                type: "GET",
+                url: "{{ route('ajax.load.customer.balance') }}",
+                data: {
+                    customer_id: customer_id
+                }
+            }).done(function(data) {
+                balance = formatMoney(data);
+                $("#customer_balance").html("<b>Balance: &#8358;</b>" + balance);
             });
         });
 

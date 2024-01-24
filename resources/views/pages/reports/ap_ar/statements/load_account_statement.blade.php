@@ -48,16 +48,17 @@
                 <td>{{ $loop->index + 1 }}</td>
                 <td>{{ $ledger->date->toFormattedDateString() }}</td>
 
-                <td>{{ $ledger->payer()->name ?? $ledger->payer()->description }}</td>
+                {{-- <td>{{ $ledger->payer()->name ?? $ledger->payer()->description }}</td> --}}
+                <td>{{ $ledger->description }}</td>
                 <td>{{ $ledger->reference }}</td>
                 <td style="text-align: right">
                     @if ($credit > 0.0)
-                        &#8358; {{ $credit }}
+                        {{ $credit }}
                     @endif
                 </td>
                 <td style="text-align: right">
                     @if ($debit > 0.0)
-                        &#8358; {{ $debit }}
+                        {{ $debit }}
                     @endif
                 </td>
                 <td style="text-align: right">
@@ -66,9 +67,9 @@
                     $dif = $sum_cr - $sum_dr;
                     ?>
                     @if ($dif < 0)
-                        &#8358;({{ number_format(abs($dif), 2) }})
+                       ({{ number_format(abs($dif), 2) }})
                     @else
-                        &#8358;{{ number_format($dif, 2) }}
+                        {{ number_format($dif, 2) }}
                     @endif
                 </td>
             </tr>

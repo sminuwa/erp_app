@@ -64,6 +64,7 @@
                                     <tr>
                                         <th>CODE</th>
                                         <th>CUSTOMER</th>
+                                        <th>RO</th>
                                         <th>LAST INVOICE</th>
                                         <th>DATE</th>
                                         <th>AGE(days)</th>
@@ -76,6 +77,7 @@
                                     <tr>
                                         <td>{{ $sale->code }}</td>
                                         <td>{{ $sale->name }}</td>
+                                        <td>{{ $sale->relation_officer }}</td>
                                         <td>{{ $sale->reference}}</td>
                                         <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString()}}
                                         </td>

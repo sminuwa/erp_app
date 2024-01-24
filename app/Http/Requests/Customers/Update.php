@@ -26,19 +26,20 @@ class Update extends FormRequest
     public function rules()
     {
         return [
-			'name' => 'required|max:50',
-			'email' => 'nullable|max:191',
-			'phone' => 'required|max:191',
-			'address' => 'required|max:191',
-			'credit_limit' => 'nullable|numeric',
+            'name' => 'required|max:50',
+            'email' => 'nullable|max:191',
+            'phone' => 'required|max:191',
+            'address' => 'required|max:191',
+            'credit_limit' => 'nullable|numeric',
+            'relation_officer' => 'required',
         ];
     }
 
     /**
-    * Get the error messages for the defined validation rules.
-    *
-    * @return array
-    */
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array
+     */
     public function messages()
     {
         return [

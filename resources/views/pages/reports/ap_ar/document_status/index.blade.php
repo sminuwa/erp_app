@@ -55,7 +55,7 @@
                                         &nbsp;&nbsp;
                                         <label for="status">Status</label>
                                         <select
-                                            class="form-control select2-single ajax-users {{ $errors->has('status') ? ' is-invalid' : '' }}"
+                                            class="form-control select2-single {{ $errors->has('status') ? ' is-invalid' : '' }}"
                                             name="status" id="status">
                                             <option value="">Select...</option>
                                             <option value="0">Pending</option>

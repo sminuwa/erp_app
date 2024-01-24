@@ -82,7 +82,7 @@ class CustomerController extends Controller
       */
     public function store(Store $request)
     {
-//                return $request;
+        //                return $request;
         $model = new Customer;
         $model->fill($request->all());
         $model->type = $request->account_type == 'R' ? 'Retail' : "Wholesale";
@@ -122,7 +122,7 @@ class CustomerController extends Controller
       * @return \Illuminate\Http\Response
       */
     public function update(Update $request, Customer $customer)
-    {
+    { //return $request;
         $customer->fill($request->all());
 
         if ($customer->save()) {
@@ -282,9 +282,9 @@ class CustomerController extends Controller
         session()->flash('app_message', 'Customer opening balance successfully defined');
         return redirect()->route('customers.index');
     }
-    public function loadCustomerBalance(Request $request)
+    public function getCustomerBalance(Request $request)
     {
-        $balance = CustomerLedger::where('customer_id', $request->customer_id)->sum('cr') - CustomerLedger::where('customer_id', $request->customer_id)->sum('dr');
+        $balance = Customer::find($request->customer_id)->runningBalance() ?? 0;
         return $balance;
     }
     public function getCustomerCreditLimit(Request $request)

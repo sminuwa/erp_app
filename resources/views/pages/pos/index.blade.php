@@ -100,7 +100,7 @@
                                                         {{ (isset($order) && $order->customer->type == 'Wholesale') || old('account_type') == 'Wholesale' || (session()->has('customer') && session('customer')->type == 'Wholesale') ? 'selected' : '' }}>
                                                         WholeSale</option>
                                                 </select>
-                                                
+
                                             </div>
                                         </div>
                                         <div class="col-md-4">
@@ -166,11 +166,15 @@
                                         </div>
                                         <div class="col-md-4">
                                             <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create
-                                                Invoice</button> 
+                                                Invoice</button>
                                         </div>
-                                        <div class="col-md-6">
-                                            <span style="color:red;">If the credit limit is exceeded, click here to refresh <i class="fa fa-refresh" onclick="window.location.reload()"></i></span>
-                                        </div>
+                                        @if (old('customer_id'))
+                                            <div class="col-md-6">
+                                                <span style="color:red;">If the credit limit is exceeded, click here to
+                                                    refresh <i class="fa fa-refresh"
+                                                        onclick="window.location.reload()"></i></span>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </form>

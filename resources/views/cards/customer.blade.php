@@ -33,6 +33,10 @@
                     <td>{{ $record->address }}</td>
                 </tr>
                 <tr>
+                    <th>Relation Officer</th>
+                    <td>{{ $record->relationOfficer->code ?? '' }}-{{ $record->relationOfficer->name ?? '' }}</td>
+                </tr>
+                <tr>
                     <th>Credit Limit</th>
                     <td>{{ number_format($record->credit_limit, 2) }}</td>
                 </tr>

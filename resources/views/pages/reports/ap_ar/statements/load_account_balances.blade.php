@@ -4,7 +4,7 @@
             class="btn-success btn btn-sm">Print</a>
     </div>
 </div> --}}
-<table class="table table-bordered caption" id="example1" data-ordering="false">
+<table class="table table-bordered caption" id="example1" data-ordering="true">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
             ACCOUNT BALANCES AS AT {{ Carbon\carbon::parse($date)->toFormattedDateString() }}
@@ -22,6 +22,9 @@
         <tr>
             <th>Account No</th>
             <th>Description</th>
+            @if ($type == 'Customer')
+                <th>RO</th>
+            @endif
             <th style="text-align: center; align-content: center">Credit (Cr.)</th>
             <th style="text-align: center; align-content: center">Debit (Dr.)</th>
             <th>Balance</th>
@@ -36,6 +39,9 @@
             <tr>
                 <td>{{ $ledger->number }}</td>
                 <td>{{ $ledger->description }}</td>
+                @if ($type == 'Customer')
+                    <td>{{ $ledger->name }}</td>
+                @endif
                 <td style="text-align: right">
                     @if ($credit > 0.0)
                         &#8358; {{ $credit }}
@@ -64,7 +70,7 @@
     </tbody>
     <tfoot>
         <tr>
-            <th colspan="2" style="text-align: right">Total</th>
+            <th colspan="{{ $type == 'Customer' ? 3 : 2 }}" style="text-align: right">Total</th>
             <th style="text-align: right;">&#8358;{{ number_format($total_cr, 2) }}</th>
             <th style="text-align: right;">&#8358;{{ number_format($total_dr, 2) }}</th>
             <th style="text-align: right;">&#8358;{{ number_format($total_cr - $total_dr, 2) }}</th>

@@ -37,9 +37,12 @@ class ReturnDebit extends Model
         'posted_by'
     ];
 
-    public function customer()
+    public function supplier()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Supplier::class);
+    }
+    public function purchase(){
+        return $this->belongsTo(Purchase::class);
     }
     public function branch()
     {
@@ -58,7 +61,7 @@ class ReturnDebit extends Model
     public static function generateNewNumber($prefix = 'RAD', $length = 4)
     {
         $prefix = $prefix . date('ym') . auth()->user()->branch->code;
-        $record = self::where('reference_no', 'like', '%' . $prefix . '%')->orderBy('reference_no', 'desc')->first();
+        $record = self::where('reference', 'like', '%' . $prefix . '%')->orderBy('reference', 'desc')->first();
         if ($record) {
             $number = $record->reference;
             $new = intval(substr($number, strlen($prefix))) + 1;

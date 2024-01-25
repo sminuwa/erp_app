@@ -87,7 +87,7 @@
     <div class="form-group">
         <?php $officers = App\Models\User::orderBy('user_code', 'asc')->get(); ?>
         <label for="code">Relation Officer</label>
-        <select class="form-control ajax-users select2-single {{ $errors->has('relation_officer') ? ' is-invalid' : '' }}"
+        <select class="form-control ajax-users{{ $errors->has('relation_officer') ? ' is-invalid' : '' }}"
                 name="relation_officer" id="relation_officer"
                 required>
             @foreach($officers as $officer)

@@ -25,32 +25,28 @@
         <table class="table table-bordered table-striped">
             <tbody>
                 <tr>
-                    <th>Brand Name</th>
-                    <td>{{ $record->name }}</td>
+                    <th>Item Code</th>
+                    <td>{{ $record->code }}</td>
                 </tr>
                 <tr>
-                    <th>Strength</th>
-                    <td>{{ $record->strength }}</td>
+                    <th>Item Name</th>
+                    <td>{{ $record->name }}</td>
                 </tr>
                 <tr>
                     <th>Company</th>
                     <td>{{ $record->company?->name }}</td>
                 </tr>
                 <tr>
-                    <th>Generic Name</th>
-                    <td>{{ $record->generic_name }}</td>
-                </tr>
-                <tr>
                     <th>Category</th>
-                    <td>{{ $record->category->name }}</td>
+                    <td>{{ $record->category->name ?? '' }}</td>
                 </tr>
                 <tr>
-                    <th>Dosage</th>
-                    <td>{{ $record->dosage?->name }}</td>
+                    <th>Base Unit of Measure</th>
+                    <td>{{ $record->unit }}</td>
                 </tr>
                 <tr>
                     <th>Barcode</th>
-                    <td>{{$record->barcode}}<br/>
+                    <td>{{ $record->barcode }}<br />
                         @if ($record->barcode != null)
                             {!! DNS1D::getBarcodeHTML($record->barcode, 'CODABAR') !!}
                         @endif

@@ -90,7 +90,8 @@ class Product extends Model
     public static function generateNewCode($category_id, $length = 4)
     {
         $prefix = Category::find($category_id)->code;
-        $record = self::where('code', 'like', '%' . $prefix . '%')->orderBy('code', 'desc')->first();
+        //$record = self::where('code', 'like', '%' . $prefix . '%')->orderBy('code', 'desc')->first();
+        $record = self::where('code', 'like', $prefix . '%')->orderBy('code', 'desc')->first();
         if ($record) {
             $code = $record->code;
             $new = intval(substr($code, strlen($prefix))) + 1;

@@ -689,7 +689,9 @@ class CostPrice
                 StockCard::createBatchRecord($stock_card_param, $batch_no, $date, $type)
                 && StoreProduct::upsert($store_products, ['store_id', 'product_id'])
             ) {
-                BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id']);
+                if($type == TRANSACTION_TYPE_RETURN_DEBIT) {
+                    BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id']);
+                }
                 DB::commit();
                 return ['status' => true, 'message' => 'success'];
             } else {

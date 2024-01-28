@@ -62,13 +62,21 @@
 <form action="{{ isset($operation) ? route('return.debit.update', $purchase->id) : route('return.debit.store') }}"
     method="POST">
     @csrf
+    @php
+        $date = new DateTime(date('Y-m-d'));
+    @endphp
+    @isset($purchase->date)
+        @php $date = new DateTime($purchase->date); @endphp
+    @endisset
+
     <input type="hidden" name="purchase_id" id="purchase_id" value="{{ $purchase->id }}" />
-    <input type="text" class="form-control datepicker" name="date" id="date"
-        value="{{ $purchase->date ?? '' }}" />
-    <textarea name="comment" placeholder="Comment" rows="5" cols="100" class="form-control"> @isset($operation)
+    <input type="date" class="form-control" name="date" id="date" placeholder="R&D Date"
+        value="{{ $date->format('d/m/Y') ?? '' }}" />
+    <textarea name="comment" rows="5" cols="100" placeholder="Description" class="form-control">
+@isset($operation)
 {{ $purchase->comment }}
 @endisset
-    </textarea>
+</textarea>
     <div class="form-group text-right">
         <input type="submit" name="Submit" class=" btn btn-primary" value="Submit" />
     </div>

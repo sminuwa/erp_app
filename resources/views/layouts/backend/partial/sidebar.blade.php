@@ -585,8 +585,8 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="javascript:void(0)"
-                                                class="nav-link {{ Request::is('reports/inventory/check*') ? 'active' : '' }}">
+                                            <a href="{{route('expiry.date.report')}}"
+                                                class="nav-link {{ Request::is('reports/inventory/expiring*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Expiry Date Tracking</p>
                                             </a>
@@ -620,8 +620,8 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="javascript:void(0)"
-                                                class="nav-link {{ Request::is('reports/inventory/check*') ? 'active' : '' }}">
+                                            <a href="{{route('return.debit.report')}}"
+                                                class="nav-link {{ Request::is('reports/inventory/returndebit*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Return & Debit</p>
                                             </a>

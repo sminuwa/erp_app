@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 @property bigint $posted_by posted by
 @property timestamp $created_at created at
 @property timestamp $updated_at updated at
-   
+
  */
 class ReturnDebit extends Model
 {
@@ -54,7 +54,13 @@ class ReturnDebit extends Model
         return $this->belongsTo(User::class, 'posted_by');
     }
     protected $dates = [];
+
     public function returnItems()
+    {
+        return $this->hasMany(ReturnDebitItem::class);
+    }
+
+    public function products()
     {
         return $this->hasMany(ReturnDebitItem::class);
     }

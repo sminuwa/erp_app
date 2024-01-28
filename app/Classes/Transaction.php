@@ -11,6 +11,7 @@ use App\Models\Order;
 use App\Models\ProductUnitMeasure;
 use App\Models\Purchase;
 use App\Models\PurchaseExpense;
+use App\Models\ReturnDebit;
 use App\Models\StockAdjustment;
 use App\Models\Store;
 use App\Models\StoreProduct;
@@ -19,6 +20,96 @@ use App\Models\Supplier;
 class Transaction
 {
 
+
+    public static function return_debit($return_debit_id, $date, $type = 'RAD')
+    {
+        /*
+         * supplier payment
+         * additional invoice payment
+         * $formula A=Amount, Q = Quantity, W = weight
+         * Find percentage of each total product prices
+         * Add percentage of the total cost to total products price
+         * New Cost Price = Divide the new total product price by number of quantity of each product
+         * New cost price to be added to product categories
+         *
+         * */
+        $user = auth()->user();
+        $branch = $user->branch;
+
+        $return_debit = ReturnDebit::find($return_debit_id);
+        $purchase_grn = Purchase::find($return_debit->purchase_id);
+        $supplier = $purchase_grn->supplier;
+        $items = $return_debit->products;
+        $expenses = $purchase_grn->expenses;
+        $amount = $expense_amount = 0;
+        $expense_suppliers = $product_categories = $product_amounts = $product_percentages = [];
+        $products = $categories = [];
+        foreach ($items as $item) {
+            $product_categories[] = [
+                'id' => $item->product_id,
+                'category_id' => $item->product->category->id,
+                'category_name' => $item->product->category->name,
+                'asset_account_id' => $item->product->category->asset_account,
+                'cost_account_id' => $item->product->category->cost_account,
+                'amount' => ($item->current_unit_cost * $item->current_quantity),
+            ];
+            $product_amounts[] = [
+                'id' => $item->product_id,
+                'amount' => ($item->current_unit_cost * $item->current_quantity)
+            ];
+            $amount += ($item->current_unit_cost * $item->current_quantity);
+        }
+
+        foreach ($product_categories as $key => $value) {
+            if (isset($categories[$value['category_id']])) {
+                $categories[$value['category_id']]['amount'] += $value['amount'];
+                continue;
+            }
+            $categories[$value['category_id']] = [
+                'category_id' => $value['category_id'],
+                'category_name' => $value['category_name'],
+                'asset_account_id' => $value['asset_account_id'],
+                'cost_account_id' => $value['cost_account_id'],
+                'amount' => $value['amount'],
+            ];
+        }
+
+
+        $supplier_ledger = $asset_account = $cost_account = [];
+        foreach ($categories as $cat) {
+            $asset_account[] = [
+                'model_id' => $cat['asset_account_id'],
+                'model_name' => 'GeneralAccount',
+                'branch_id' => $branch->id,
+                'description' => $return_debit->reference,
+                'reference' => $return_debit->reference,
+                'credit' => $cat['amount'],
+                'debit' => 0,
+                'date' => $return_debit->date,
+                'user_id' => auth()->id(),
+                'receipt_no' => 'A' . $return_debit->reference
+            ];
+        }
+        $supplier_ledger[] = [
+            'model_id' => $return_debit->supplier_id,
+            'model_name' => 'Supplier',
+            'branch_id' => $branch->id,
+            'description' => $return_debit->reference,
+            'reference' => $return_debit->reference,
+            'credit' => 0,
+            'debit' => $amount,
+            'date' => $return_debit->date,
+            'user_id' => auth()->id(),
+            'receipt_no' => 'S' . $return_debit->reference
+        ];
+
+        $general_account_ledger = array_merge($asset_account, $cost_account, $supplier_ledger);
+        if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
+            return ['status' => true, 'message' => 'success'];
+        }
+        return ['status' => false, 'message' => 'Something went wrong.'];
+
+    }
 
     public static function purchases($purchase_id, $date, $type = 'GRN')
     {
@@ -894,11 +985,6 @@ class Transaction
 
 
     public static function debit_note()
-    {
-
-    }
-
-    public static function return_debit()
     {
 
     }

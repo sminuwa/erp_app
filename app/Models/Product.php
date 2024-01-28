@@ -23,7 +23,8 @@ class Product extends Model
         'company_id',
         'category_id',
         'barcode',
-        'status'
+        'status',
+        'unit',
     ];
 
     /**
@@ -68,7 +69,7 @@ class Product extends Model
         return Product::where('code', $code);
     }
 
-    public static function createRecord($company_id, $category_id, $name, $barcode = null, $expiry_status = 0, $status = 1)
+    public static function createRecord($company_id, $category_id, $name, $unit = null, $barcode = null, $expiry_status = 0, $status = 1)
     {
         $record = new self;
         $record->code = self::generateNewCode($category_id);
@@ -76,6 +77,7 @@ class Product extends Model
         $record->company_id = $company_id;
         $record->category_id = $category_id;
         $record->expiry_status = $expiry_status;
+        $record->unit = $unit;
         $record->status = $status;
         $record->barcode = $barcode;
         if (is_null($barcode))
@@ -88,7 +90,8 @@ class Product extends Model
     public static function generateNewCode($category_id, $length = 4)
     {
         $prefix = Category::find($category_id)->code;
-        $record = self::where('code', 'like', '%' . $prefix . '%')->orderBy('code', 'desc')->first();
+        //$record = self::where('code', 'like', '%' . $prefix . '%')->orderBy('code', 'desc')->first();
+        $record = self::where('code', 'like', $prefix . '%')->orderBy('code', 'desc')->first();
         if ($record) {
             $code = $record->code;
             $new = intval(substr($code, strlen($prefix))) + 1;

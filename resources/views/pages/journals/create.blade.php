@@ -3,6 +3,7 @@
 @section('title', 'Journal')
 
 @push('css')
+    <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
 @endpush
 
 @section('content')
@@ -99,7 +100,7 @@
     </div>
     <!-- /.content-wrapper -->
 
-    <div class="modal fade" id="journal_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    <div class="modal fade" id="journal_modal" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -142,7 +143,7 @@
                                             <div class="col-12">
                                                 <div class="form-group">
                                                     <select name="payer_id" id="payer_id"
-                                                        class="form-control select2-single ajax-general-accounts" required>
+                                                        class="form-control ajax-general-accounts select2-single" required>
                                                         <option value="">Select...</option>
                                                     </select>
                                                     <label class="floating-label">Account: @error('account')
@@ -210,7 +211,10 @@
     </form>
 @endsection
 @push('js')
+    <script src="{{ asset('assets/backend/js/select2.full.js') }}"></script>
     <script>
+        
+
         function formatNumber(input) {
             // Remove non-numeric and non-decimal characters
             let value = input.value.replace(/[^\d.]/g, '');
@@ -257,8 +261,9 @@
         });
 
 
-        $(function() {
-            $('#account_type').on("change", function() {
+        // $(function() {
+            $(document).on('change', '#account_type', function() {
+                // $('#account_type').on("change", function() {
                 $("#payer_id").html(" < option value = '' > Loading... < /option>");
                 $.ajax({
                     url: "{{ route('ajax.load.payers') }}",
@@ -270,7 +275,7 @@
                     $("#payer_id").html(msg);
                 });
             });
-        });
+        // });
 
         // $(document).on('input', '.ajax-update-input', function() {
         //     let formId = $(this).attr('data-value').substring(1); //$(this).closest('form').attr('id');

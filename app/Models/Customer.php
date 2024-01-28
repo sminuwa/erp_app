@@ -19,7 +19,7 @@ class Customer extends Model
     /**
      * Mass assignable columns
      */
-    protected $fillable = ['name', 'code', 'email', 'phone', 'address','type','credit_limit','relation_officer'];
+    protected $fillable = ['name', 'code', 'email', 'phone', 'address', 'type', 'credit_limit', 'relation_officer'];
 
     /**
      * Date time columns.
@@ -56,5 +56,9 @@ class Customer extends Model
             return $prefix . str_pad($new, $length, 0, STR_PAD_LEFT);
         }
         return $prefix . str_pad(1, $length, 0, STR_PAD_LEFT);
+    }
+    public function relationOfficer()
+    {
+        return $this->belongsTo(User::class, 'relation_officer');
     }
 }

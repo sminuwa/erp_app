@@ -1571,8 +1571,9 @@ class ReportController extends Controller
             $branch_id = '%';
         }
         $sales = DB::table('customers')
-            ->select(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'), 'reference', 'description', 'date', 'customers.name', 'customers.code')
+            ->select(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'), 'reference', 'description', 'date', 'customers.name', 'customers.code','users.name AS relation_officer')
             ->join('general_account_ledgers', 'general_account_ledgers.model_id', '=', 'customers.id')
+            ->leftJoin('users', 'users.id', '=', 'customers.relation_officer')
             ->where('general_account_ledgers.model_id', 'LIKE', $customer_id)
             ->where('general_account_ledgers.branch_id', '=', $branch_id)
             ->where('general_account_ledgers.model_name', '=', 'Customer')
@@ -1614,8 +1615,9 @@ class ReportController extends Controller
             $branch_id = '%';
         }
         $sales = DB::table('customers')
-            ->select(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'), 'reference', 'description', 'date', 'customers.name', 'customers.code')
+            ->select(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'), 'reference', 'description', 'date', 'customers.name', 'customers.code','users.name AS relation_officer')
             ->join('general_account_ledgers', 'general_account_ledgers.model_id', '=', 'customers.id')
+            ->leftJoin('users', 'users.id', '=', 'customers.relation_officer')
             ->where('general_account_ledgers.model_id', 'LIKE', $customer_id)
             ->where('general_account_ledgers.branch_id', '=', $branch_id)
             ->where('general_account_ledgers.model_name', '=', 'Customer')
@@ -2800,8 +2802,9 @@ class ReportController extends Controller
                 ->groupBy('model_id');
         }
         if ($type == "Customer") {
-            $query = GeneralAccountLedger::select(DB::raw('SUM(credit) AS credit'), DB::raw('SUM(debit) AS debit'), 'code AS number', 'customers.name AS description', 'general_account_ledgers.id')
+            $query = GeneralAccountLedger::select(DB::raw('SUM(credit) AS credit'), DB::raw('SUM(debit) AS debit'), 'code AS number', 'customers.name AS description', 'general_account_ledgers.id', 'users.name AS relation_officer')
                 ->join('customers', 'customers.id', '=', 'general_account_ledgers.model_id')
+                ->leftJoin('users', 'users.id', '=', 'customers.relation_officer')
                 ->where('general_account_ledgers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '<=', $date)
                 ->where('model_name', 'LIKE', 'Customer')

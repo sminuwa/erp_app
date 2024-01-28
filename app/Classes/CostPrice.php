@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 class CostPrice
 {
 
-    public static function returnDebitFormula(array $products, $batch_no, $store_id = 278, $branch_id = 2)
+    public static function returnDebit(array $products, $batch_no, $store_id = 278, $branch_id = 2)
     {
         /*
          * branch id of the destination store
@@ -24,11 +24,13 @@ class CostPrice
          *  2 =>[
          *        quantity => 20,
          *        price => 300,
+         *        store_id => 2
          *        expiry = null
          *      ]
          *  5 =>[
          *        quantity => 65,
          *        price => 1300,
+         *        store_id => 2
          *        expiry = 2023-12-31
          *      ]
          * ]
@@ -659,6 +661,7 @@ class CostPrice
             }
         }
         if ($operation == 'out') {
+
             foreach ($records as $key => $record) {
                 $stock_card_param[] = [
                     'store_id' => $record['store_id'],
@@ -666,17 +669,27 @@ class CostPrice
                     'quantity' => $record['new_quantity'],
                     'operation' => $operation,
                 ];
+                if($type == TRANSACTION_TYPE_RETURN_DEBIT){
+                    $product_costs[] = [
+                        'branch_id' => $branch_id,
+                        'product_id' => $key,
+                        'cost_price' => ($record['total_existing_cost'] - $record['total_new_cost']) / $record['qty_available'] - $record['new_quantity'],
+                        'updated_by' => $user->id
+                    ];
+                }
                 $store_products[] = [
                     'store_id' => $record['store_id'],
                     'product_id' => $key,
                     'qty_available' => $record['qty_available'] - $record['new_quantity']
                 ];
             }
+
             DB::beginTransaction();
             if (
                 StockCard::createBatchRecord($stock_card_param, $batch_no, $date, $type)
                 && StoreProduct::upsert($store_products, ['store_id', 'product_id'])
             ) {
+                BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id']);
                 DB::commit();
                 return ['status' => true, 'message' => 'success'];
             } else {

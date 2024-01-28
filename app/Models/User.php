@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use DateTime;
+
 /**
  @property varchar $name name @property varchar $email email @property varchar $phone phone @property enum $gender gender @property varchar $user_code user code @property bigint $branch_id branch id @property tinyint $status status @property timestamp $email_verified_at email verified at @property varchar $password password @property varchar $remember_token remember token @property timestamp $created_at created at @property timestamp $updated_at updated at
 
@@ -51,25 +52,26 @@ class User extends Authenticatable
 
     public function branch()
     {
-        return $this->belongsTo(Branch::class , 'branch_id', 'id');
+        return $this->belongsTo(Branch::class, 'branch_id', 'id');
     }
     public function getUserRole()
     {
-        return $this->hasOne(ModelHasRole::class , 'model_id');
+        return $this->hasOne(ModelHasRole::class, 'model_id');
     }
     public function getPermisions()
     {
-        return $this->hasMany(ModelHasPermission::class , 'model_id');
+        return $this->hasMany(ModelHasPermission::class, 'model_id');
     }
     public static function userBranchAction()
     {
-        return Auth::user()->branch_id;
+        return Auth::user()->branch_id ?? 0;
         /*if (Auth::user()->hasAnyRole('Super-admin')) {
          $user_branch = '%';
          }*/
     }
-    public static function UserBranchName(){
-        return Branch::where('id',User::userBranchAction())->first();
+    public static function UserBranchName()
+    {
+        return Branch::where('id', User::userBranchAction())->first();
     }
     public function totalSales()
     {

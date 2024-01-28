@@ -22,6 +22,7 @@
         <tr>
             <th>CODE</th>
             <th>CUSTOMER</th>
+            <th>RO</th>
             <th>LAST INVOICE</th>
             <th>DATE</th>
             <th>AGE(days)</th>
@@ -33,6 +34,7 @@
         <tr>
             <td>{{ $sale->code }}</td>
             <td>{{ $sale->name }}</td>
+            <td>{{ $sale->relation_officer }}</td>
             <td>{{ $sale->reference}}</td>
             <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString()}}
             </td>
@@ -46,7 +48,7 @@
     @endforeach
     <tfoot>
         <tr>
-            <th style="text-align: right" colspan="5">TOTAL BALANCE</th>
+            <th style="text-align: right" colspan="6">TOTAL BALANCE</th>
             <td style="text-align: right">
                 &#8358;{{ number_format($total, 2, '.', ',') }}
             </td>

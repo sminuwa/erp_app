@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\CostPrice;
+use App\Classes\Transaction;
 use App\Models\AuditLog;
 use App\Models\Customer;
 use App\Models\Order;
@@ -13,9 +15,9 @@ use App\Models\StoreProduct;
 use App\Models\Supplier;
 use App\Models\User;
 use Carbon\Carbon;
-use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ReturnDebitController extends Controller
 {
@@ -221,9 +223,10 @@ class ReturnDebitController extends Controller
     }
     public function post(Request $request, ReturnDebit $returndebit)
     {
+
         if ($returndebit->status == 0) {
             $this->authorize('purchase.post');
-            $items = $returndebit->returnItems;
+            $items = $returndebit->products;
             DB::beginTransaction();
             $returndebit->status = 1;
             $returndebit->posted_by = auth()->id();
@@ -233,25 +236,36 @@ class ReturnDebitController extends Controller
                     $new_cost_price[$item->product_id] = [
                         'quantity' => $item->current_quantity,
                         'price' => $item->current_unit_cost,
-                        'product_id' => $item->product_id,
                         'store_id' => $item->store_id,
+                        'expiry_date' => $item->expire_date ?? null,
                     ];
                 }
-                // if (
-                //     Transaction::purchases($purchase->id, $purchase->purchase_date)['status']
-                //     && CostPrice::newCostPrice(
-                //         $new_cost_price,
-                //         $purchase->reference,
-                //         $purchase->branch_id,
-                //         $purchase->purchase_date,
-                //         TRANSACTION_TYPE_GRN
-                //     )['status']
-                // ) {
+
+                /*return CostPrice::newCostPrice(
+                    $new_cost_price,
+                    $returndebit->reference,
+                    $returndebit->branch_id,
+                    $returndebit->date,
+                    TRANSACTION_TYPE_RETURN_DEBIT,
+                    'out'
+                );*/
+
+                 if (
+                     Transaction::return_debit($returndebit->id, $returndebit->date)['status']
+                     && CostPrice::newCostPrice(
+                         $new_cost_price,
+                         $returndebit->reference,
+                         $returndebit->branch_id,
+                         $returndebit->date,
+                         TRANSACTION_TYPE_RETURN_DEBIT,
+                         'out'
+                     )['status']
+                 ) {
                 $action = "Posted purchase GRN with reference $request->reference from supplier: " . Supplier::find($returndebit->supplier_id)->name;
                 AuditLog::auditLog(Auth::id(), $action);
                 DB::commit();
-                // } else
-                //     DB::rollback();
+                 } else
+                     DB::rollback();
                 session()->flash('app_message', 'Purchase successfully posted');
             }
         }

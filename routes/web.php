@@ -893,6 +893,16 @@ Route::middleware('auth')->group(function () {
             Route::get('/inventory/additional/invoice/load', [ReportController::class, 'loadAdditionalInvoiceReport'])->name('ajax.additional.invoice.report');
             Route::get('/inventory/additional/invoice/print/lines/{from_date}/{to_date}/{branch_id}/{supplier_id}/{status}', [ReportController::class, 'printAdditionalInvoiceReport'])->name('ajax.additional.invoice.report.print');
 
+            //Return & Debit  Report
+            Route::get('/inventory/returndebit', [ReportController::class, 'returnDebitReport'])->name('return.debit.report');
+            Route::get('/inventory/returndebit/load', [ReportController::class, 'loadReturnDebitReport'])->name('ajax.load.return.debit.report');
+            Route::get('/inventory/returndebit/print/{from_date}/{to_date}/{branch_id}/{status}', [ReportController::class, 'printReturnDebitReport'])->name('ajax.return.debit.report.print');
+
+             //Product Expiring Date  Report
+             Route::get('/inventory/expiring', [ReportController::class, 'expiryReport'])->name('expiry.date.report');
+             Route::get('/inventory/expiring/load', [ReportController::class, 'loadExpiryReport'])->name('ajax.load.expiry.date.report');
+             Route::get('/inventory/expiring/print/{from_date}/{to_date}/{branch_id}', [ReportController::class, 'printExpiryReport'])->name('ajax.expiry.date.report.print');
+ 
 
             //Purchase Check Report
             Route::get('/inventory/transaction/check', [ReportController::class, 'purchaseCheckReport'])->name('purchase.transaction.check.report');

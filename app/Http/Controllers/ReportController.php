@@ -8,6 +8,8 @@ use App\Models\CreditNote;
 use App\Models\GeneralAccount;
 use App\Models\GeneralAccountLedger;
 use App\Models\OrderInvoice;
+use App\Models\ReturnDebit;
+use App\Models\StoreProductBatch;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Store;
@@ -1571,7 +1573,7 @@ class ReportController extends Controller
             $branch_id = '%';
         }
         $sales = DB::table('customers')
-            ->select(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'), 'reference', 'description', 'date', 'customers.name', 'customers.code','users.name AS relation_officer')
+            ->select(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'), 'reference', 'description', 'date', 'customers.name', 'customers.code', 'users.name AS relation_officer')
             ->join('general_account_ledgers', 'general_account_ledgers.model_id', '=', 'customers.id')
             ->leftJoin('users', 'users.id', '=', 'customers.relation_officer')
             ->where('general_account_ledgers.model_id', 'LIKE', $customer_id)
@@ -1615,7 +1617,7 @@ class ReportController extends Controller
             $branch_id = '%';
         }
         $sales = DB::table('customers')
-            ->select(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'), 'reference', 'description', 'date', 'customers.name', 'customers.code','users.name AS relation_officer')
+            ->select(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'), 'reference', 'description', 'date', 'customers.name', 'customers.code', 'users.name AS relation_officer')
             ->join('general_account_ledgers', 'general_account_ledgers.model_id', '=', 'customers.id')
             ->leftJoin('users', 'users.id', '=', 'customers.relation_officer')
             ->where('general_account_ledgers.model_id', 'LIKE', $customer_id)
@@ -2070,6 +2072,110 @@ class ReportController extends Controller
             $branch = Branch::find($branch_id);
         return view('pages.reports.inventory.print_purchase_invoice_lines_report', compact('sales', 'from_date', 'to_date', 'branch'));
     }
+
+    public function returnDebitReport()
+    {
+        return view('pages.reports.inventory.return_debit_report');
+    }
+
+    public function loadReturnDebitReport(Request $request)
+    {
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
+        $branch_id = $request->branch_id;
+        $status = $request->status;
+
+        if ($branch_id == 'all' || $branch_id == '') {
+            $branch_id = '%';
+        }
+        if ($status == 'all' || $status == '') {
+            $status = '%';
+        }
+        $sales = ReturnDebit::where('branch_id', 'LIKE', $branch_id)
+            ->whereBetween(DB::raw("DATE(date)"), [$from_date, $to_date])
+            ->where('status', 'LIKE', $status)
+            ->orderBy('date', 'DESC')
+            ->get();
+        if ($branch_id == "%")
+            $branch_id = "all";
+        if ($status == "%")
+            $status = "all";
+        $branch = null;
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.inventory.load_return_debit_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'status', 'branch'));
+    }
+
+    public function printReturnDebitReport($from_date, $to_date, $branch_id, $status)
+    {
+
+        if ($branch_id == 'all' || $branch_id == '') {
+            $branch_id = '%';
+        }
+        if ($status == 'all' || $status == '') {
+            $status = '%';
+        }
+        $sales = ReturnDebit::where('branch_id', 'LIKE', $branch_id)
+            ->whereBetween(DB::raw("DATE(date)"), [$from_date, $to_date])
+            ->where('status', 'LIKE', $status)
+            ->orderBy('date', 'DESC')
+            ->get();
+        if ($branch_id == "%")
+            $branch_id = "all";
+        $branch = null;
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.inventory.print_return_debit_report', compact('sales', 'from_date', 'to_date', 'branch'));
+    }
+
+    public function expiryReport()
+    {
+        return view('pages.reports.inventory.expiry_date_report');
+    }
+
+    public function loadExpiryReport(Request $request)
+    {
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
+        $branch_id = $request->branch_id;
+
+
+        if ($branch_id == 'all' || $branch_id == '') {
+            $branch_id = '%';
+        }
+        $store_ids = Store::where('branch_id', 'LIKE', $branch_id)->get()->pluck('id')->toArray();
+        $sales = StoreProductBatch::whereIn('store_id', $store_ids)
+            ->whereBetween(DB::raw("DATE(expiry_date)"), [$from_date, $to_date])
+            ->orderBy('expiry_date', 'DESC')
+            ->get();
+        if ($branch_id == "%")
+            $branch_id = "all";
+        $branch = null;
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.inventory.load_expiry_date_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'branch'));
+    }
+
+    public function printExpiryReport($from_date, $to_date, $branch_id)
+    {
+
+        if ($branch_id == 'all' || $branch_id == '') {
+            $branch_id = '%';
+        }
+
+        $store_ids = Store::where('branch_id', 'LIKE', $branch_id)->get()->pluck('id')->toArray();
+        $sales = StoreProductBatch::whereIn('store_id', $store_ids)
+            ->whereBetween(DB::raw("DATE(expiry_date)"), [$from_date, $to_date])
+            ->orderBy('expiry_date', 'DESC')
+            ->get();
+        if ($branch_id == "%")
+            $branch_id = "all";
+        $branch = null;
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.inventory.print_expiry_date_report', compact('sales', 'from_date', 'to_date', 'branch'));
+    }
+
     public function additionalInvoiceReport()
     {
         return view('pages.reports.inventory.additional_invoice_report');

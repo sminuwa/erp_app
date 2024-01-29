@@ -540,6 +540,8 @@ class CartController extends Controller
                     'price' => str_replace(',', '', $cost_price),
                     'attributes' => array(
                         'cost_price' => $request->unit_price,
+                        'product_id' =>$request->product_id,
+                        'store_id' =>$request->store_id,
                         'code' => $request->code,
                         'store' => $request->store
                     ),
@@ -547,7 +549,7 @@ class CartController extends Controller
             );
             $type = 'returndebit';
         }
-        
+
 
         if ($request->ajax()) {
             return \Cart::getTotal();

@@ -60,6 +60,7 @@ class ReturnDebitController extends Controller
         $cart_products = \Cart::getContent();
         return view('pages.inventories.return_debit.create_return_debit', compact('purchases', 'model', 'cart_products', 'purchase', 'stores'));
     }
+
     public function storeReturnDebit(Request $request)
     {
 
@@ -90,8 +91,8 @@ class ReturnDebitController extends Controller
                 $purchase = $order->purchasedProducts()->where('id', $item->id)->first();
                 DB::table('return_debit_items')->insert([
                     'return_debit_id' => $return_debit_id,
-                    'product_id' => $item->id,
-                    'store_id' => $purchase->store_id,
+                    'product_id' => $item->attributes['product_id'] ?? 0,
+                    'store_id' => $item->attributes['store_id'] ?? 0,
                     'current_quantity' => $item->quantity,
                     'original_quantity_purchased' => $purchase->quantity,
                     'current_unit_cost' => $item->price,
@@ -124,13 +125,18 @@ class ReturnDebitController extends Controller
                 'name' => $data->product->name ?? 'No name found',
                 'price' => $data->current_unit_cost ?? 1,
                 'quantity' => $qty,
-                'attributes' => array('code' => $data->product->code),
+                'attributes' => array(
+                    'code' => $data->product->code,
+                    'product_id'=>$data->product_id,
+                    'store_id'=>$data->store_id
+                ),
             ]);
         }
         $cart_products = \Cart::getContent();
 
         return view('pages.inventories.return_debit.edit_return_debit', ['cart_products' => $cart_products, 'reference' => $returndebit->reference, 'operation' => 'update', 'purchase' => $returndebit]);
     }
+
     public function searchReturnDebit(Request $request)
     {
         $search_value = $request->refno;
@@ -141,10 +147,12 @@ class ReturnDebitController extends Controller
             ->orderBy('order_date', 'DESC')->get();
         return view('pages.inventories.return_debit.return_debit', ['payments' => $payments]);
     }
+
     public function printReturnDebitReceipt(ReturnDebit $returnDebit)
     {
         return view('pages.inventories.return_debit.print_return_debit_receipt', ['payment' => $returnDebit, 'setting' => Setting::first()]);
     }
+
     public function loadInvoices(Request $request)
     {
         \Cart::clear();
@@ -165,6 +173,7 @@ class ReturnDebitController extends Controller
         }
         return view('pages.inventories.return_debit.load_order_invoices', ['orders' => $orders]);
     }
+
     public function loadToCart(Request $request)
     {
         $reference = $request->invoice_no;
@@ -179,14 +188,16 @@ class ReturnDebitController extends Controller
                 'name' => $data->product->name ?? 'No name found',
                 'price' => $data->unit_price,
                 'quantity' => $qty,
-                'attributes' => array('code' => $data->product->code),
+                'attributes' => array(
+                    'code' => $data->product->code,
+                    'product_id'=>$data->product_id,
+                    'store_id'=>$data->store_id
+                ),
             ]);
         }
         $cart_products = \Cart::getContent();
-
         return view('pages.inventories.return_debit.load_products', ['cart_products' => $cart_products, 'reference' => $reference, 'purchase' => $purchase]);
     }
-
 
 
     public function deletReturnDebit(Request $request, ReturnDebit $returnDebit)
@@ -195,8 +206,6 @@ class ReturnDebitController extends Controller
         $reference = $returnDebit;
         DB::beginTransaction();
         try {
-
-
             $returnDebit->returnItems()->delete();
             $returnDebit->delete();
             session()->flash('app_message', 'Return and debit deleted successfully');
@@ -210,6 +219,7 @@ class ReturnDebitController extends Controller
 
         return redirect()->back();
     }
+
     public function updateReturnDebit(Request $request, ReturnDebit $returndebit)
     {
         $contents = \Cart::getContent();
@@ -231,6 +241,7 @@ class ReturnDebitController extends Controller
         }
         return redirect()->route('return.debit');
     }
+
     public function post(Request $request, ReturnDebit $returndebit)
     {
 

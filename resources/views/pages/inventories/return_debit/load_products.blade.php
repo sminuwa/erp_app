@@ -38,6 +38,9 @@
                         class="subtotal{{ $item->id }}">{{ number_format($item->price * $item->quantity, 2) }}</span>
                 </div>
                 <input name="type" type="hidden" value="returndebit">
+                <input name="product_id" type="hidden" value="{{ $item->attributes['product_id'] }}">
+                <input name="store_id" type="hidden" value="{{ $item->attributes['store_id'] }}">
+
                 {{-- <div class="c-cell">
                     <a url="{{ route('ajax.cart.delete', $item->id) }}" class="btn btn-danger btn-sm deleteCartItem">
                         <i class="fa fa-trash" aria-hidden="true"></i>

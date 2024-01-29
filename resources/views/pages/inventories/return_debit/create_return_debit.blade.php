@@ -95,11 +95,11 @@
 @endsection
 
 @push('js')
-    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
+    {{-- <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
     <!-- SlimScroll -->
     <script src="{{ asset('assets/backend/plugins/slimScroll/jquery.slimscroll.min.js') }}"></script>
     <!-- FastClick -->
-    <script src="{{ asset('assets/backend/plugins/fastclick/fastclick.js') }}"></script>
+    <script src="{{ asset('assets/backend/plugins/fastclick/fastclick.js') }}"></script> --}}
 
     <!-- Sweet Alert Js -->
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>

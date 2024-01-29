@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+
 /**
    @property varchar $batch_no batch no
 @property varchar $existing_quantity existing quantity
@@ -13,30 +14,39 @@ use Illuminate\Database\Eloquent\Model;
 @property timestamp $updated_at updated at
    
  */
-class StoreProductBatch extends Model 
+class StoreProductBatch extends Model
 {
-    
+
     /**
-    * Database table name
-    */
+     * Database table name
+     */
     protected $table = 'store_product_batches';
 
     /**
-    * Mass assignable columns
-    */
-    protected $fillable=['batch_no',
-'existing_quantity',
-'new_quantity',
-'total_quantity',
-'expiry_date',
-'created_by'];
+     * Mass assignable columns
+     */
+    protected $fillable = [
+        'batch_no',
+        'existing_quantity',
+        'new_quantity',
+        'total_quantity',
+        'expiry_date',
+        'created_by'
+    ];
 
     /**
-    * Date time columns.
-    */
-    protected $dates=['expiry_date'];
+     * Date time columns.
+     */
+    protected $dates = ['expiry_date'];
 
-
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
 
 
 }

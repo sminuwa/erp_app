@@ -31,9 +31,13 @@ class ReturnDebitController extends Controller
     public function createReturnDebit(Purchase $purchase = null)
     {
         $user_branch = User::userBranchAction();
-
+        //This is to get all purchases that have been returned and debited and posted to be excluded in the create page
+        $purchase_ids = ReturnDebit::where('branch_id', User::userBranchAction())
+            ->where('status', 1)
+            ->get()->pluck('purchase_id')->toArray();
         $purchases = Purchase::where('status', 1)
             ->where('branch_id', 'LIKE', $user_branch)
+            ->whereNotIn('id', $purchase_ids)
             ->orderBy('purchase_date', 'DESC')->take(50)->get();
 
         $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'retail_selling_price', 'whole_selling_price', 'cost_price', 'unit')->distinct()
@@ -145,13 +149,19 @@ class ReturnDebitController extends Controller
     {
         \Cart::clear();
         $word_search = $request->search;
+        $purchase_ids = ReturnDebit::where('branch_id', User::userBranchAction())
+            ->where('status', 1)
+            ->get()->pluck('purchase_id')->toArray();
         if (strlen($word_search) > 0) {
             $orders = Purchase::where('status', 1)
                 ->where('reference', 'LIKE', "%$word_search%")
                 ->where('branch_id', 'LIKE', User::userBranchAction())
-                ->orderBy('order_date', 'DESC')->get();
+                ->whereNotIn('id', $purchase_ids)
+                ->orderBy('purchase_date', 'DESC')->take(50)->get();
         } else {
-            $orders = Order::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('order_date', 'DESC')->take(20)->get();
+            $orders = Purchase::where('branch_id', 'LIKE', User::userBranchAction())
+                ->whereNotIn('id', $purchase_ids)
+                ->orderBy('purchase_date', 'DESC')->take(20)->get();
         }
         return view('pages.inventories.return_debit.load_order_invoices', ['orders' => $orders]);
     }
@@ -250,22 +260,22 @@ class ReturnDebitController extends Controller
                     'out'
                 );*/
 
-                 if (
-                     Transaction::return_debit($returndebit->id, $returndebit->date)['status']
-                     && CostPrice::newCostPrice(
-                         $new_cost_price,
-                         $returndebit->reference,
-                         $returndebit->branch_id,
-                         $returndebit->date,
-                         TRANSACTION_TYPE_RETURN_DEBIT,
-                         'out'
-                     )['status']
-                 ) {
-                $action = "Posted purchase GRN with reference $request->reference from supplier: " . Supplier::find($returndebit->supplier_id)->name;
-                AuditLog::auditLog(Auth::id(), $action);
-                DB::commit();
-                 } else
-                     DB::rollback();
+                if (
+                    Transaction::return_debit($returndebit->id, $returndebit->date)['status']
+                    && CostPrice::newCostPrice(
+                        $new_cost_price,
+                        $returndebit->reference,
+                        $returndebit->branch_id,
+                        $returndebit->date,
+                        TRANSACTION_TYPE_RETURN_DEBIT,
+                        'out'
+                    )['status']
+                ) {
+                    $action = "Posted purchase GRN with reference $request->reference from supplier: " . Supplier::find($returndebit->supplier_id)->name;
+                    AuditLog::auditLog(Auth::id(), $action);
+                    DB::commit();
+                } else
+                    DB::rollback();
                 session()->flash('app_message', 'Purchase successfully posted');
             }
         }

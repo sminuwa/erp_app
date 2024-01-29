@@ -673,7 +673,7 @@ class CostPrice
                     $product_costs[] = [
                         'branch_id' => $branch_id,
                         'product_id' => $key,
-                        'cost_price' => ($record['total_existing_cost'] - $record['total_new_cost']) / $record['qty_available'] - $record['new_quantity'],
+                        'cost_price' => ($record['total_existing_cost'] - $record['total_new_cost']) / ($record['qty_available'] - $record['new_quantity']),
                         'updated_by' => $user->id
                     ];
                 }
@@ -689,7 +689,9 @@ class CostPrice
                 StockCard::createBatchRecord($stock_card_param, $batch_no, $date, $type)
                 && StoreProduct::upsert($store_products, ['store_id', 'product_id'])
             ) {
-                BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id']);
+                if($type == TRANSACTION_TYPE_RETURN_DEBIT) {
+                    BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id']);
+                }
                 DB::commit();
                 return ['status' => true, 'message' => 'success'];
             } else {

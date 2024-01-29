@@ -86,7 +86,7 @@
                                     </tfoot>
                                     <tbody>
                                         @foreach ($payments as $payment)
-                                            <tr>
+                                            <tr class="@if ($payment->status == 0) bg-warning @endif">
 
                                                 <td>{{ $payment->purchase->supplier->code ?? '' }}-{{ $payment->purchase->supplier->name ?? '' }}
                                                 </td>
@@ -97,34 +97,59 @@
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
                                                 <td>{{ $payment->postedBy->name ?? '' }}</td>
                                                 <td align="center">
-                                                    @can('return.debit.show')
-                                                        <a href="{{ route('return.debit.show', $payment->id) }}"
-                                                            class="btn btn-secondary btn-sm">
-                                                            <i class="fa fa-eye" aria-hidden="true"></i>
-                                                        </a>
-                                                    @endcan
-                                                    @can('return.debit.print')
-                                                        <a href="{{ route('return.debit.print', $payment->id) }}"
-                                                            target="_BLANK" class="btn btn-secondary btn-sm">
-                                                            <i class="fa fa-print" aria-hidden="true"></i>
-                                                        </a>
-                                                    @endcan
-                                                    <a href="{{ route('return.debit.edit', $payment->id) }}"
-                                                        class="btn btn-primary btn-sm">
-                                                        <i class="fa fa-edit" aria-hidden="true"></i>
-                                                    </a>
-                                                    <button class="btn btn-danger btn-sm" type="button"
-                                                        onclick="deleteItem({{ $payment->id }})">
-                                                        <i class="fa fa-trash" aria-hidden="true"></i>
-                                                    </button>
-                                                    @can('return.debit.destroy')
-                                                        <form id="delete-form-{{ $payment->id }}"
-                                                            action="{{ route('return.debit.destroy', $payment->id) }}"
-                                                            method="post" style="display:none;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                        </form>
-                                                    @endcan
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-default dropdown-toggle" type="button"
+                                                                id="dropdownMenuButton" data-toggle="dropdown"
+                                                                aria-haspopup="true" aria-expanded="false">
+                                                            Action
+                                                        </button>
+                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                            @can('return.debit.show')
+                                                                <a href="{{ route('return.debit.show', $payment->id) }}"
+                                                                   class="dropdown-item">
+                                                                    <i class="fa fa-eye" aria-hidden="true"></i> View
+                                                                </a>
+                                                            @endcan
+                                                            @can('return.debit.print')
+                                                                <a href="{{ route('return.debit.print', $payment->id) }}"
+                                                                   target="_BLANK" class="dropdown-item">
+                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                </a>
+                                                            @endcan
+                                                            @if($payment->status == 0)
+                                                                @can('return.debit.edit')
+                                                                <a href="{{ route('return.debit.edit', $payment->id) }}"
+                                                                   class="dropdown-item">
+                                                                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                                                </a>
+                                                                @endcan
+                                                                @can('return.debit.post')
+                                                                    <form action="{{ route('return.debit.post', $payment->id) }}" method="post"
+                                                                          onsubmit="return confirm('Are you sure you want to post this R&D?')">
+                                                                        @csrf
+                                                                        <button type="submit" class="dropdown-item ">
+                                                                            <i class="fa fa-check" aria-hidden="true"></i> Post
+                                                                        </button>
+                                                                    </form>
+                                                                @endcan
+                                                                @can('return.debit.destroy')
+                                                                    <button class="dropdown-item" type="button"
+                                                                            onclick="deleteItem({{ $payment->id }})">
+                                                                        <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                                                    </button>
+                                                                    <form id="delete-form-{{ $payment->id }}"
+                                                                          action="{{ route('return.debit.destroy', $payment->id) }}"
+                                                                          method="post" style="display:none;">
+                                                                        @csrf
+                                                                        @method('DELETE')
+                                                                    </form>
+                                                                @endcan
+                                                            @endif
+
+
+                                                        </div>
+                                                    </div>
+
                                                 </td>
                                             </tr>
                                         @endforeach

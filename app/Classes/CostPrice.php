@@ -673,7 +673,7 @@ class CostPrice
                     $product_costs[] = [
                         'branch_id' => $branch_id,
                         'product_id' => $key,
-                        'cost_price' => ($record['total_existing_cost'] - $record['total_new_cost']) / $record['qty_available'] - $record['new_quantity'],
+                        'cost_price' => ($record['total_existing_cost'] - $record['total_new_cost']) / ($record['qty_available'] - $record['new_quantity']),
                         'updated_by' => $user->id
                     ];
                 }

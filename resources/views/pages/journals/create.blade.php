@@ -101,7 +101,7 @@
     <!-- /.content-wrapper -->
 
     <div class="modal fade" id="journal_modal" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
+        aria-hidden="true" style="z-index:9999">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -213,7 +213,7 @@
 @push('js')
     <script src="{{ asset('assets/backend/js/select2.full.js') }}"></script>
     <script>
-        
+
 
         function formatNumber(input) {
             // Remove non-numeric and non-decimal characters

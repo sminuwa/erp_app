@@ -134,11 +134,11 @@ $(document).on('submit', '.addCartItemForm', function (e) {
 $(document).on('keyup', '.quantity, .price', function () {
     let id = $(this).attr('data-value');
 
-    if (type == 'invoice') {
+    if (type == 'invoice' || type == 'returndebit') {
         $("#valid_qty" + id.substr(1)).html("");
         if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
             'max-qty'))) {
-            $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $('#quantity' +
+            $("#valid_qty" + id.substr(1)).html("Typed QTY is more than the available QTY(" + $('#quantity' +
                 id.substr(1)).attr('max-qty') + ")");
             $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
             return false;
@@ -166,7 +166,7 @@ function updateCart(formId, formData = '') {
 
 //delete card
 $(document).on('click', '.deleteCartItem', function (e) {
-    
+
     e.preventDefault()
     $.ajax({
         url: $(this).attr('url'),

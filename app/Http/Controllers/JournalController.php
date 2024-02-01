@@ -24,6 +24,7 @@ class JournalController extends Controller
     public function store(Request $request)
     {
         try {
+
             $cart_items = \Cart::getContent();
             if ($cart_items->count() == 1) {
                 session()->flash('app_error', 'You must add at least one journal to the cart!');
@@ -54,7 +55,7 @@ class JournalController extends Controller
                     ];
                 }
             }
-            if (JournalItem::upsert($items, ['journal_id', 'account_id'])) {
+            if (JournalItem::upsert($items, ['journal_id', 'account_id', 'credit', 'debit'])) {
                 DB::commit();
 
                 \Cart::clear();
@@ -107,7 +108,7 @@ class JournalController extends Controller
                     ];
                 }
             }
-            if (JournalItem::upsert($items, ['journal_id', 'account_id'])) {
+            if (JournalItem::upsert($items, ['journal_id', 'account_id', 'credit', 'debit'])) {
                 DB::commit();
                 \Cart::clear();
             } else {

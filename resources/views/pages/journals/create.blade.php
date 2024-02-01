@@ -100,8 +100,7 @@
     </div>
     <!-- /.content-wrapper -->
 
-    <div class="modal fade" id="journal_modal" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="journal_modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -139,7 +138,7 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>
+                                        <td style="width:80%">
                                             <div class="col-12">
                                                 <div class="form-group">
                                                     <select name="payer_id" id="payer_id"
@@ -208,13 +207,10 @@
             </div>
         </div>
     </div>
-    </form>
 @endsection
 @push('js')
     <script src="{{ asset('assets/backend/js/select2.full.js') }}"></script>
     <script>
-        
-
         function formatNumber(input) {
             // Remove non-numeric and non-decimal characters
             let value = input.value.replace(/[^\d.]/g, '');
@@ -262,19 +258,19 @@
 
 
         // $(function() {
-            $(document).on('change', '#account_type', function() {
-                // $('#account_type').on("change", function() {
-                $("#payer_id").html(" < option value = '' > Loading... < /option>");
-                $.ajax({
-                    url: "{{ route('ajax.load.payers') }}",
-                    type: 'GET',
-                    data: {
-                        type: $(this).val()
-                    }
-                }).done(function(msg) {
-                    $("#payer_id").html(msg);
-                });
+        $(document).on('change', '#account_type', function() {
+            // $('#account_type').on("change", function() {
+            $("#payer_id").html(" < option value = '' > Loading... < /option>");
+            $.ajax({
+                url: "{{ route('ajax.load.payers') }}",
+                type: 'GET',
+                data: {
+                    type: $(this).val()
+                }
+            }).done(function(msg) {
+                $("#payer_id").html(msg);
             });
+        });
         // });
 
         // $(document).on('input', '.ajax-update-input', function() {

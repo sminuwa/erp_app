@@ -127,8 +127,8 @@ class ReturnDebitController extends Controller
                 'quantity' => $qty,
                 'attributes' => array(
                     'code' => $data->product->code,
-                    'product_id'=>$data->product_id,
-                    'store_id'=>$data->store_id
+                    'product_id' => $data->product_id,
+                    'store_id' => $data->store_id
                 ),
             ]);
         }
@@ -183,6 +183,7 @@ class ReturnDebitController extends Controller
         //dd($purchase->purchasedProducts()->where('status', 1)->get());
         foreach ($purchase->purchasedProducts()->where('status', 1)->get() as $data) {
             $qty = $data->quantity == 0 ? 1 : $data->quantity;
+            $available = StoreProduct::where(['store_id' => $data->store_id, 'product_id' => $data->product_id])->first()->qty_available ?? $qty;
             \Cart::add([
                 'id' => $data->id,
                 'name' => $data->product->name ?? 'No name found',
@@ -190,8 +191,9 @@ class ReturnDebitController extends Controller
                 'quantity' => $qty,
                 'attributes' => array(
                     'code' => $data->product->code,
-                    'product_id'=>$data->product_id,
-                    'store_id'=>$data->store_id
+                    'product_id' => $data->product_id,
+                    'store_id' => $data->store_id,
+                    'available' => $available,
                 ),
             ]);
         }
@@ -217,7 +219,7 @@ class ReturnDebitController extends Controller
             throw $e;
         }
 
-        return redirect()->back();
+        return redirect()->route('return.debit');
     }
 
     public function updateReturnDebit(Request $request, ReturnDebit $returndebit)

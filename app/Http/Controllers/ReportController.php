@@ -3354,19 +3354,29 @@ class ReportController extends Controller
         $query = null;
         if ($type == "Invoice")
             $query = Order::where('branch_id', 'LIKE', $branch_id)
-                ->where('status', 'LIKE', $status)->orderBy('order_date', "DESC");
+                ->where('status', 'LIKE', $status)->orderBy('order_date', "DESC")
+                ->whereDate('order_date', '>=', $from_date)
+                ->whereDate('order_date', '<=', $to_date);
         if ($type == "Payment")
             $query = Payment::where('branch_id', 'LIKE', $branch_id)
-                ->where('status', 'LIKE', $status)->orderBy('date', "DESC");
+                ->where('status', 'LIKE', $status)->orderBy('date', "DESC")
+                ->whereDate('date', '>=', $from_date)
+                ->whereDate('date', '<=', $to_date);
         if ($type == "Receipt")
             $query = Receipt::where('branch_id', 'LIKE', $branch_id)
-                ->where('status', 'LIKE', $status)->orderBy('date', "DESC");
+                ->where('status', 'LIKE', $status)->orderBy('date', "DESC")
+                ->whereDate('date', '>=', $from_date)
+                ->whereDate('date', '<=', $to_date);
         if ($type == "Journal")
             $query = Journal::where('branch_id', 'LIKE', $branch_id)
-                ->where('status', 'LIKE', $status)->orderBy('date', "DESC");
+                ->where('status', 'LIKE', $status)->orderBy('date', "DESC")
+                ->whereDate('date', '>=', $from_date)
+                ->whereDate('date', '<=', $to_date);
         if ($type == "Interbank")
             $query = InterBank::where('branch_id', 'LIKE', $branch_id)
-                ->where('status', 'LIKE', $status)->orderBy('date', "DESC");
+                ->where('status', 'LIKE', $status)->orderBy('date', "DESC")
+                ->whereDate('date', '>=', $from_date)
+                ->whereDate('date', '<=', $to_date);
 
         $payments = $query->get();
 

@@ -611,7 +611,7 @@ class CostPrice
                 'store_id' => $products[$key]['store_id'],
             ];
         }
-
+//        return $records;
         $store_products = $product_costs = $batch = $stock_card_param = [];
         if ($operation == 'in') {
             foreach ($records as $key => $record) {
@@ -672,10 +672,11 @@ class CostPrice
                 if($type == TRANSACTION_TYPE_RETURN_DEBIT){
                     $remaining_value = $record['total_existing_cost'] - $record['total_new_cost'];
                     $remaining_quantity = $record['qty_available'] - $record['new_quantity'];
+                    $total_overall = $record['existing_quantity'] - $record['new_quantity'];
                     $product_costs[] = [
                         'branch_id' => $branch_id,
                         'product_id' => $key,
-                        'cost_price' => (($remaining_value < 1) ? 1 : $remaining_value) / (($remaining_quantity < 1) ? 1: $remaining_quantity),
+                        'cost_price' => (($remaining_value <= 0) ? 1 : $remaining_value) / (($total_overall <= 0) ? 1: $total_overall),
                         'updated_by' => $user->id
                     ];
                 }
@@ -684,6 +685,7 @@ class CostPrice
                     'product_id' => $key,
                     'qty_available' => $record['qty_available'] - $record['new_quantity']
                 ];
+//                return $store_products;
             }
 
             DB::beginTransaction();

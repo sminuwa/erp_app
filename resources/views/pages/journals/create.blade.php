@@ -100,12 +100,10 @@
     </div>
     <!-- /.content-wrapper -->
 
-<<<<<<< HEAD
+
     <div class="modal fade" id="journal_modal" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true" style="z-index:9999">
-=======
-    <div class="modal fade" id="journal_modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
->>>>>>> 8ba676baf6d20abc7b576b546a8b061880c8c323
+
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">

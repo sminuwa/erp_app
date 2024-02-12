@@ -88,6 +88,7 @@ class ReturnDebitController extends Controller
             ]);
 
             foreach ($items as $item) {
+//                $checks =
                 $purchase = $order->purchasedProducts()->where('id', $item->id)->first();
                 DB::table('return_debit_items')->insert([
                     'return_debit_id' => $return_debit_id,

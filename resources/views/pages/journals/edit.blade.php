@@ -85,7 +85,7 @@
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
-    <div class="modal fade" id="journal_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    <div class="modal fade" id="journal_modal"  role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -124,7 +124,7 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>
+                                        <td style="width:80%">
                                             <div class="col-12">
                                                 <div class="form-group">
                                                     <select name="payer_id" id="payer_id"
@@ -195,6 +195,7 @@
     </div>
 @endsection
 @push('js')
+    <script src="{{ asset('assets/backend/js/select2.full.js') }}"></script>
     <script>
         function formatNumber(input) {
             // Remove non-numeric and non-decimal characters

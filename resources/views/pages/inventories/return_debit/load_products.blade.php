@@ -30,8 +30,10 @@
                 <div class="c-cell">
                     <span style="color: red;" id="valid_quantity{{ $item->id }}"></span>
                     <input type="text" name="quantity" id="quantity{{ $item->id }}"
-                        class="form-control quantity" data-value="p{{ $item->id }}" style="min-width:58px;"
-                        value="{{ $item->quantity }}" min="1" required>
+                        max-qty="{{ $attr->available }}" class="form-control quantity"
+                        data-value="p{{ $item->id }}" style="min-width:58px;" value="{{ $item->quantity }}"
+                        min="1" required>
+                        <span style="color: red;" id="valid_qty{{ $item->id }}"></span>
                 </div>
                 <div class="c-cell">
                     <span

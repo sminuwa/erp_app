@@ -88,8 +88,13 @@ class ReturnDebitController extends Controller
             ]);
 
             foreach ($items as $item) {
-//                $checks =
+
                 $purchase = $order->purchasedProducts()->where('id', $item->id)->first();
+                $checks = StoreProduct::where(['product_id'=>$item->attributes['product_id'], 'store_id'=>$item->attributes['store_id']])->first();
+                if($checks->qty_available < $item->quantity) {
+                    session()->flash('app_error', 'Quantity is higher than current quantity. Total available is '.$checks->qty_available);
+                    return back();
+                }
                 DB::table('return_debit_items')->insert([
                     'return_debit_id' => $return_debit_id,
                     'product_id' => $item->attributes['product_id'] ?? 0,
@@ -107,6 +112,8 @@ class ReturnDebitController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
+            session()->flash('app_error', $e);
+            return back();
             throw $e;
         }
 
@@ -257,6 +264,11 @@ class ReturnDebitController extends Controller
             if ($returndebit->save()) {
                 $new_cost_price = [];
                 foreach ($items as $item) {
+                    $checks = StoreProduct::where(['product_id'=>$item->product_id, 'store_id'=>$item->store_id])->first();
+                    if($checks->qty_available < $item->current_quantity) {
+                        session()->flash('app_error', 'Quantity is higher than current quantity. Total available is '.$checks->qty_available);
+                        return back();
+                    }
                     $new_cost_price[$item->product_id] = [
                         'quantity' => $item->current_quantity,
                         'price' => $item->current_unit_cost,

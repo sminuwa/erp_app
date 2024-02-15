@@ -153,7 +153,7 @@
 
         $(".select2-single, .select2-multiple").select2({
             theme: "bootstrap",
-            maximumSelectionSize: 6,
+            maximumSelectionSize: 10,
             containerCssClass: ':all:'
         });
 

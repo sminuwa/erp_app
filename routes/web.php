@@ -789,7 +789,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/sa/sales/customer/sale/common-name/load', [ReportController::class, 'loadCustomerSaleReport'])->name('ajax.load.customer.sale.reports');
             Route::get('/sa/sales/customer/sale/common-name/print/{from_date}/{to_date}/{branch_id}/{store_id}/{category_id}/{product_id}/{customer}/{matching}', [ReportController::class, 'printCustomerSaleReport'])->name('ajax.customer.sale.report.print');
 
-           
+
             //Most Sold Item by Amount and by Quantity Report
             Route::get('/sa/sales/most/sold-item', [ReportController::class, 'mostSoldItemReport'])->name('most.sold.item.reports');
             Route::get('/sa/sales/most/sold-item/load', [ReportController::class, 'loadMostSoldItemReport'])->name('ajax.load.most.sold.item.reports');
@@ -902,7 +902,7 @@ Route::middleware('auth')->group(function () {
              Route::get('/inventory/expiring', [ReportController::class, 'expiryReport'])->name('expiry.date.report');
              Route::get('/inventory/expiring/load', [ReportController::class, 'loadExpiryReport'])->name('ajax.load.expiry.date.report');
              Route::get('/inventory/expiring/print/{from_date}/{to_date}/{branch_id}', [ReportController::class, 'printExpiryReport'])->name('ajax.expiry.date.report.print');
- 
+
 
             //Purchase Check Report
             Route::get('/inventory/transaction/check', [ReportController::class, 'purchaseCheckReport'])->name('purchase.transaction.check.report');
@@ -1029,10 +1029,12 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [AdditionalInvoiceController::class, 'index'])->name('purchase.additional-invoice.index');
             Route::get('/create', [AdditionalInvoiceController::class, 'create'])->name('purchase.additional-invoice.create');
             Route::get('/edit/{invoice}', [AdditionalInvoiceController::class, 'edit'])->name('purchase.additional-invoice.edit');
+            Route::get('/show/{invoice}', [AdditionalInvoiceController::class, 'show'])->name('purchase.additional-invoice.show');
             Route::post('/store', [AdditionalInvoiceController::class, 'store'])->name('purchase.additional-invoice.store');
             Route::post('/post/{invoice}', [AdditionalInvoiceController::class, 'post'])->name('purchase.additional-invoice.post');
             Route::post('/reverse/{invoice}', [AdditionalInvoiceController::class, 'reverse'])->name('purchase.additional-invoice.reverse');
             Route::get('/print/{invoice}', [AdditionalInvoiceController::class, 'print'])->name('purchase.additional-invoice.print');
+            Route::post('/delete/{invoice}', [AdditionalInvoiceController::class, 'delete'])->name('purchase.additional-invoice.delete');
 
         });
 

@@ -1,7 +1,7 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.customer.ageing.report.print', [$from_date, $to_date,$branch_id, $customer_id]) }}" target="_BLANK"
-            class="btn-success btn btn-sm">Print</a>
+        <a href="{{ route('ajax.customer.ageing.report.print', [$from_date, $to_date, $branch_id, $customer_id]) }}"
+            target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
 <table class="table table-bordered caption" id="example1" data-ordering="false">
@@ -35,15 +35,19 @@
             <td>{{ $sale->code }}</td>
             <td>{{ $sale->name }}</td>
             <td>{{ $sale->relation_officer }}</td>
-            <td>{{ $sale->reference}}</td>
-            <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString()}}
+            <td>{{ $sale->reference }}</td>
+            <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}
             </td>
             <td>{{ \Carbon\Carbon::parse($sale->date)->diffInDays() }}</td>
             <td style="text-align: right">
-                &#8358;{{ number_format($sale->balance, 2, '.', ',') }}
+                @if ($sale->balance < 0)
+                    ({{ number_format($sale->balance, 2, '.', ',') }})
+                @else
+                    {{ number_format($sale->balance, 2, '.', ',') }}
+                @endif
                 @php $total += $sale->balance @endphp
             </td>
-            
+
         </tr>
     @endforeach
     <tfoot>

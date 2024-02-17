@@ -34,9 +34,8 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo' . '.png') }}"
-                                style="width:100px;height:60px;" alt="Albabello Logo" class="img-circle elevation-3"
-                                style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo' . '.png') }}" style="width:100px;height:60px;"
+                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
                             <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>
                             <h5 style="text-align: center;">List of Customers Exceeded Credit Limit</h5>
                         </div>
@@ -54,8 +53,8 @@
                                         <th>BRANCH</th>
                                         <th>CREDIT LIMIT</th>
                                         <th>BALANCE</th>
-                                        <th>MARGIN</th>
-                                        
+                                        {{-- <th>MARGIN</th> --}}
+
                                     </tr>
                                 </thead>
                                 @foreach ($customers as $customer)
@@ -63,10 +62,17 @@
                                         <td>{{ $customer->code }}</td>
                                         <td>{{ strtoupper($customer->name) }}</td>
                                         <td>{{ $customer->type }}</td>
-                                        <td>{{ $customer->branch->name  }}</td>
-                                        <td style="text-align: right">{{ number_format($customer->credit_limit, 2) }}</td>
-                                        <td style="text-align: right">{{ number_format($customer->balance, 2) }}</td>
-                                        <td style="text-align: right">{{ number_format($customer->balance-$customer->credit_limit, 2) }}</td>
+                                        <td>{{ $customer->branch->name }}</td>
+                                        <td style="text-align: right">{{ number_format($customer->credit_limit, 2) }}
+                                        </td>
+                                        @if ($customer->balance < 0)
+                                            <td style="text-align: right">({{ number_format(abs($customer->balance), 2) }})
+                                            </td>
+                                        @else
+                                            <td style="text-align: right">{{ number_format($customer->balance, 2) }}
+                                            </td>
+                                        @endif
+                                        {{-- <td style="text-align: right">{{ number_format($customer->balance-$customer->credit_limit, 2) }}</td> --}}
                                     </tr>
                                 @endforeach
                             </table>

@@ -3,7 +3,7 @@
 @section('title', 'Journal')
 
 @push('css')
-    <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
+{{--    <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">--}}
 @endpush
 
 @section('content')
@@ -70,8 +70,9 @@
                                             @enderror
                                         </label>
                                     </div>
+
                                     <div class="col-md-2 mb-3">
-                                        <button type="button" data-toggle="modal" data-target="#journal_modal"
+                                        <button id="add-modal" type="button"  data-toggle="modal" data-target="#journal_modal"
                                             class="btn btn-primary float-right"><i class="fa fa-cart-plus"></i>
                                             Add
                                         </button>
@@ -102,9 +103,9 @@
 
 
     <div class="modal fade" id="journal_modal" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true" style="z-index:9999">
+        aria-hidden="true" >
 
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-lg" role="document" >
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">
@@ -120,21 +121,20 @@
                         <input type="hidden" name="type" id="type" value="{{ 'journal' }}" />
                         <div class="row">
                             <div class="col-md-12">
-
                                 <table>
                                     <tr>
                                         <td>
                                             <div class="col-12">
                                                 <div class="form-group">
                                                     <select name="account_type" id="account_type"
-                                                        class="form-control  type select2-single" required>
+                                                        class="form-control select2-single type" required>
                                                         <option value="">Select...</option>
                                                         <option value="Customer">Customer</option>
                                                         <option value="Supplier">Supplier
                                                         <option value="GeneralAccount">General Accounts
                                                         </option>
                                                     </select>
-                                                    <label class="floating-label">Account Type: @error('type')
+                                                    <label class="floating-label">Account Type: @error('account_type')
                                                             <span class="text-danger error">{{ $message }}</span>
                                                         @enderror
                                                     </label>
@@ -148,7 +148,7 @@
                                                         class="form-control ajax-general-accounts select2-single" required>
                                                         <option value="">Select...</option>
                                                     </select>
-                                                    <label class="floating-label">Account: @error('account')
+                                                    <label class="floating-label">Account: @error('payer_id')
                                                             <span class="text-danger error">{{ $message }}</span>
                                                         @enderror
                                                     </label>
@@ -213,12 +213,17 @@
 @endsection
 @push('js')
     <script src="{{ asset('assets/backend/js/select2.full.js') }}"></script>
+
     <script>
-<<<<<<< HEAD
 
+        $('#add-modal').click(function(){
+            $(".select2-single, .select2-multiple").select2({
+                theme: "bootstrap",
+                maximumSelectionSize: 10,
+                containerCssClass: ':all:'
+            });
+        })
 
-=======
->>>>>>> 8ba676baf6d20abc7b576b546a8b061880c8c323
         function formatNumber(input) {
             // Remove non-numeric and non-decimal characters
             let value = input.value.replace(/[^\d.]/g, '');

@@ -54,13 +54,9 @@
                             &nbsp;&nbsp;
                             <label for="customer_id">Customer</label>
                             <select
-                                class="form-control select2-single {{ $errors->has('customer_id') ? ' is-invalid' : '' }}"
+                                class="form-control select2-single ajax-customers {{ $errors->has('customer_id') ? ' is-invalid' : '' }}"
                                 name="customer_id" id="customer_id">
-                                <option value="all">All</option>
-                                @foreach ($customers as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name }}
-                                    </option>
-                                @endforeach
+                                
                             </select>
                         </div>
                         <div class="form-group text-right  col-sm-2">
@@ -69,7 +65,7 @@
                     </div>
                 </form>
                 <div class="row">
-                    <div class="col-sm-8 table-responsive" id="load">
+                    <div class="col-sm-12 table-responsive" id="load">
                         <img src="{{ asset('assets/backend/img/loader.png') }}" style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
                     </div>
                 </div>

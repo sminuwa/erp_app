@@ -34,9 +34,8 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo' . '.png') }}"
-                                style="width:100px;height:60px;" alt="Albabello Logo" class="img-circle elevation-3"
-                                style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo' . '.png') }}" style="width:100px;height:60px;"
+                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
                             <h3>
                                 {{ App\Models\User::UserBranchName()->long_name }}
                             </h3>
@@ -78,15 +77,19 @@
                                         <td>{{ $sale->code }}</td>
                                         <td>{{ $sale->name }}</td>
                                         <td>{{ $sale->relation_officer }}</td>
-                                        <td>{{ $sale->reference}}</td>
-                                        <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString()}}
+                                        <td>{{ $sale->reference }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}
                                         </td>
                                         <td>{{ \Carbon\Carbon::parse($sale->date)->diffInDays() }}</td>
                                         <td style="text-align: right">
-                                            &#8358;{{ number_format($sale->balance, 2, '.', ',') }}
+                                            @if ($sale->balance < 0)
+                                                ({{ number_format(abs($sale->balance), 2, '.', ',') }})
+                                            @else
+                                                {{ number_format($sale->balance, 2, '.', ',') }}
+                                            @endif
                                             @php $total += $sale->balance @endphp
                                         </td>
-                                        
+
                                     </tr>
                                 @endforeach
                                 <tfoot>

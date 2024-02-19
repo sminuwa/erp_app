@@ -115,7 +115,7 @@
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
-                    url: "{{ route('ajax.load.invoice.list.reports') }}",
+                    url: "{{ route('ajax.load.invoice.lines.reports') }}",
                     data: {
                         _token: "{{ csrf_token() }}",
                         from_date: from_date,

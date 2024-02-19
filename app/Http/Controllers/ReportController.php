@@ -1519,17 +1519,16 @@ class ReportController extends Controller
         $to_date = $request->to_date;
         $customer_id = $request->customer_id;
 
-        if ($customer_id == 'all') {
+        if ($customer_id == 'all' || $customer_id == '') {
             $customer_id = '%';
         }
 
-        $sales = CustomerLedger::where('customer_id', 'LIKE', $customer_id)
-            ->where('type', 'Credit')
+        $sales = GeneralAccountLedger::where('model_id', 'LIKE', $customer_id)
+            ->join('customers', 'customers.id', 'general_account_ledgers.model_id')
             ->whereBetween('date', [$from_date, $to_date])
-            ->where('branch_id', 'LIKE', User::userBranchAction())
-            ->select('customers.name AS customer', DB::raw('SUM(cr) AS total'), DB::raw('SUM(dr) AS pay'), DB::raw('SUM(cr)-SUM(dr) AS due'))
-            ->join('customers', 'customers.id', 'customer_ledgers.customer_id')
-            ->orderBy('name')->groupBy('customer_id')->get();
+            ->where('customers.branch_id', 'LIKE', User::userBranchAction())
+            ->select('customers.name AS customer', 'customers.code AS code', DB::raw('SUM(credit) AS total'), DB::raw('SUM(debit) AS pay'), DB::raw('SUM(credit)-SUM(debit) AS due'))
+            ->orderBy('name')->groupBy('model_id')->get();
         if ($customer_id == "%")
             $customer_id = "all";
         return view('pages.reports.customer_ledger_analysis.load_customer_total_debt_report', compact('sales', 'from_date', 'to_date', 'customer_id'));
@@ -1538,16 +1537,15 @@ class ReportController extends Controller
     public function printCustomerDebtReport($from_date, $to_date, $customer_id)
     {
 
-        if ($customer_id == 'all') {
+        if ($customer_id == 'all' || $customer_id == 'all') {
             $customer_id = '%';
         }
-        $sales = CustomerLedger::where('customer_id', 'LIKE', $customer_id)
-            ->where('type', 'Credit')
+        $sales = GeneralAccountLedger::where('model_id', 'LIKE', $customer_id)
+            ->join('customers', 'customers.id', 'general_account_ledgers.model_id')
             ->whereBetween('date', [$from_date, $to_date])
-            ->where('branch_id', 'LIKE', User::userBranchAction())
-            ->select('customers.name AS customer', DB::raw('SUM(cr) AS total'), DB::raw('SUM(dr) AS pay'), DB::raw('SUM(cr)-SUM(dr) AS due'))
-            ->join('customers', 'customers.id', 'customer_ledgers.customer_id')
-            ->orderBy('name')->groupBy('customer_id')->get();
+            ->where('customers.branch_id', 'LIKE', User::userBranchAction())
+            ->select('customers.name AS customer', 'customers.code AS code', DB::raw('SUM(credit) AS total'), DB::raw('SUM(debit) AS pay'), DB::raw('SUM(credit)-SUM(debit) AS due'))
+            ->orderBy('name')->groupBy('model_id')->get();
         if ($customer_id == "%")
             $customer_id = "all";
         return view('pages.reports.customer_ledger_analysis.print_customer_total_debt_report', compact('sales', 'from_date', 'to_date', 'customer_id'));
@@ -2849,7 +2847,9 @@ class ReportController extends Controller
 
         $query = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, $type)
             ->where('model_id', 'LIKE', $payer_id)
-            ->orderBy('date')->orderBy('general_account_ledgers.id');
+            ->orderBy('date')
+            ->orderBy('debit', 'DESC');
+        // ->orderBy('general_account_ledgers.id');
         $ledgers = $query->get();
 
 
@@ -3031,7 +3031,7 @@ class ReportController extends Controller
                 ->whereDate('date', '<=', $to_date)
                 ->where('model_name', 'GeneralAccount');
         }
-        return GeneralAccountLedger::join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+        return GeneralAccountLedger::leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
             ->where('general_account_ledgers.branch_id', 'like', $branch_id)
             ->whereDate('date', '>=', $from_date)
             ->whereDate('date', '<=', $to_date);

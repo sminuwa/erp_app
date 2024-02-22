@@ -34,14 +34,16 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:100px;height:60px;"
-                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
+                                style="width:100px;height:60px;" alt="Albabello Logo" class="img-circle elevation-3"
+                                style="opacity: .8">
                             <h3>
-                                {{App\Models\User::UserBranchName()->long_name}}
+                                {{ App\Models\User::UserBranchName()->long_name }}
                             </h3>
                             <h5 style="text-align: center;">Customer Total Debt Report
-                                From
-                                {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
+                                {{-- From
+            {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }} --}}
+                                As at
                                 AND
                                 {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
                             </h5>
@@ -72,8 +74,10 @@
                                     <tr>
                                         <td>{{ $sale->code }}</td>
                                         <td>{{ $sale->customer }}</td>
-                                        <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>
                                         <td style="text-align: right">{{ number_format($sale->pay, 2, '.', ',') }}</td>
+                                        <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}
+                                        </td>
+                                        
                                         <td style="text-align: right">
                                             @if ($sale->due < 0)
                                                 ({{ number_format(abs($sale->due), 2, '.', ',') }})
@@ -86,7 +90,7 @@
                                         $total_sold += $sale->total;
                                         $total_pay += $sale->pay;
                                         $total_due += $sale->due;
-                            
+
                                     @endphp
                                 @endforeach
                                 <tfoot>

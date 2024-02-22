@@ -7,9 +7,9 @@
 <table class="table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">Customer Total Debt Report
-            From
-            {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
-            AND
+            {{-- From
+            {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }} --}}
+            As at
             {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
         </h5>
     </caption>
@@ -31,8 +31,8 @@
         <tr>
             <td>{{ $sale->code }}</td>
             <td>{{ $sale->customer }}</td>
-            <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>
             <td style="text-align: right">{{ number_format($sale->pay, 2, '.', ',') }}</td>
+            <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>
             <td style="text-align: right">
                 @if ($sale->due < 0)
                 ({{ number_format(abs($sale->due), 2, '.', ',') }})

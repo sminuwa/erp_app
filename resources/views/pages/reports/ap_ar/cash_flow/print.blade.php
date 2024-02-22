@@ -39,8 +39,8 @@
                             <h3>
                                 <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
                             </h3>
-                            <h5 style="text-align: center;">BALANCE SHEET AS AT
-                                {{ Carbon\Carbon::parse($to)->toFormattedDateString() }}</h5>
+                            <h5 style="text-align: center;">CASH FLOW BETWEEN
+                                {{ Carbon\Carbon::parse($from_date)->toFormattedDateString() }} and {{ Carbon\Carbon::parse($to_date)->toFormattedDateString() }}</h5>
 
                         </div>
                         <!-- /.col -->
@@ -49,64 +49,29 @@
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
                             <table class="table table-bordered caption" id="example1" data-ordering="false">
-
-                                <thead>
-                                    <tr>
-                                        <th>Account No</th>
-                                        <th>Description</th>
-                                        <th style="text-align: center; align-content: center">Total (Dr.)</th>
-                                        <th style="text-align: center; align-content: center">Total (Cr.)</th>
-                                        <th style="text-align: center; align-content: center">Balance</th>
-                                    </tr>
-
-                                </thead>
+            
                                 <tbody>
-                                    @php
-                                        $total_credit = $total_debit = 0;
-                                    @endphp
-                                    @foreach ($ledger1 as $ledger)
-                                        @php
-                                            $credit = number_format($ledger->credit, 2);
-                                            $debit = number_format($ledger->debit, 2);
-                                        @endphp
-                                        <tr>
-                                            <td>{{ $ledger->number }}</td>
-                                            <td>{{ $ledger->description }}</td>
-                                            <td style="text-align: right">
-                                                @if ($debit > 0.0)
-                                                    &#8358; {{ $debit }}
-                                                @endif
-                                            </td>
-                                            <td style="text-align: right">
-                                                @if ($credit > 0.0)
-                                                    &#8358; {{ $credit }}
-                                                @endif
-                                            </td>
-
-                                            @php
-                                                $total_credit += $ledger->credit;
-                                                $total_debit += $ledger->debit;
-                                                $diff = $ledger->credit - $ledger->debit;
-                                            @endphp
-                                            @if ($diff >= 0)
-                                                <td style="text-align: right;">{{ number_format($diff, 2) }}</td>
-                                            @else
-                                                <td style="text-align: right;">({{ number_format(abs($diff), 2) }})
-                                                </td>
-                                            @endif
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                                <tfoot>
                                     <tr>
-                                        <th colspan="2" style="text-align: right;">Total</th>
-                                        <th style="text-align: right;">&#8358;{{ number_format($total_credit, 2) }}
-                                        </th>
-                                        <th style="text-align: right;">&#8358;{{ number_format($total_debit, 2) }}</th>
-                                        <th style="text-align: right;">
-                                            &#8358;{{ number_format($total_credit - $total_debit, 2) }}</th>
+                                        <th style="text-align: left">Total Cash Generated</th>
+                                        <td style="text-align: right">{{ number_format($total_generated, 2) }}</td>
                                     </tr>
-                                </tfoot>
+                                    <tr>
+                                        <th style="text-align: left">Total Bank Transfer</th>
+                                        <td style="text-align: right">{{ number_format($total_bank_transfer, 2) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th style="text-align: left">Total Cash at Hand</th>
+                                        <td style="text-align: right">{{ number_format($total_at_hand, 2) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th style="text-align: left">Total Cash in Bank</th>
+                                        <td style="text-align: right">{{ number_format($total_cash_in_bank, 2) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th style="text-align: left">Total Amount Expended</th>
+                                        <td style="text-align: right">{{ number_format($total_amount_expended, 2) }}</td>
+                                    </tr>
+                            
                                 </tbody>
                             </table>
                         </div>

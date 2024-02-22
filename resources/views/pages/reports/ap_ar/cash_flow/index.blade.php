@@ -84,7 +84,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-12 table-responsive" id="load"></div>
+                    <div class="col-sm-6 table-responsive" id="load"></div>
                 </div>
             </div><!-- /.container-fluid -->
         </section>
@@ -101,6 +101,7 @@
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
                 branch_id = $('#branch_id').val();
+                company_id = $('#company_id').val();
 
                 $.ajax({
                     type: "GET",
@@ -109,7 +110,8 @@
                         _token: "{{ csrf_token() }}",
                         from_date:from_date,
                         to_date: to_date,
-                        branch_id: branch_id
+                        branch_id: branch_id,
+                        company_id: company_id,
                     }
                 }).done(function (data) {
                     // console.log(data)

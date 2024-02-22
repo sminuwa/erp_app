@@ -964,7 +964,7 @@ Route::middleware('auth')->group(function () {
                 //Cash Flow
                 Route::get('/cash_flow', [ReportController::class, 'cashFlow'])->name('cash.flow.report');
                 Route::get('/cash_flow/load', [ReportController::class, 'loadCashFlow'])->name('ajax.load.cash.flow.report');
-                Route::get('/cash_flow/print/{from}/{to}/{branch_id}', [ReportController::class, 'printCashFlow'])->name('ajax.print.cash.flow.report');
+                Route::get('/cash_flow/print/{from}/{to}/{branch_id}/{company_id}', [ReportController::class, 'printCashFlow'])->name('ajax.print.cash.flow.report');
 
                 //Daily Remittance
                 Route::get('/remittance', [ReportController::class, 'remittance'])->name('remittance.report');

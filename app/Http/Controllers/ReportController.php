@@ -3064,6 +3064,130 @@ class ReportController extends Controller
             $branch = Branch::find($branch_id);
         return view('pages.reports.ap_ar.trial_balance.print', compact('ledger1', 'ledger2', 'branch', 'from', 'to', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1', 'balance2', 'credit_sum2', 'debit_sum2'));
     }
+    public function balanceSheet()
+    {
+        $branches = Branch::select(['id', 'name', 'code'])->orderBy('name')->get();
+
+        return view('pages.reports.ap_ar.balance_sheet.index', compact('branches'));
+    }
+    public function loadBalanceSheet(Request $request)
+    {
+        $to_date = $request->to_date;
+        $branch_id = $request->branch_id;
+
+        $query1 = $this->generalAccountLedgerBy(null, $to_date, $branch_id, 'GeneralAccount');
+        $ledger1 = $query1->select(
+            DB::raw('SUM(credit) AS credit'),
+            DB::raw('SUM(debit) AS debit'),
+            'number',
+            'general_accounts.description',
+            'general_account_ledgers.id'
+        )
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->orderBy('number')
+            ->groupBy('number')
+            ->get();
+
+
+
+
+        $credit_sum1 = $query1->sum('credit');
+        $debit_sum1 = $query1->sum('debit');
+        $balance1 = $credit_sum1 - $debit_sum1;
+
+
+        $branch = null;
+
+        if ($branch_id == '' || $branch_id == '%')
+            $branch_id = 'all';
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.ap_ar.balance_sheet.load', compact('ledger1', 'branch', 'to_date', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1'));
+    }
+
+    public function printBalanceSheet($to, $branch_id)
+    {
+        $query1 = $this->generalAccountLedgerBy(null, $to, $branch_id, 'GeneralAccount');
+        $ledger1 = $query1->select(
+            DB::raw('SUM(credit) AS credit'),
+            DB::raw('SUM(debit) AS debit'),
+            'number',
+            'general_accounts.description',
+            'general_account_ledgers.id'
+        )
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->orderBy('number')
+            ->groupBy('number')
+            ->get();
+
+
+        $credit_sum1 = $query1->sum('credit');
+        $debit_sum1 = $query1->sum('debit');
+        $balance1 = $credit_sum1 - $debit_sum1;
+
+
+        $branch = null;
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.ap_ar.balance_sheet.print', compact('ledger1', 'branch', 'to', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1'));
+    }
+
+    public function cashFlow()
+    {
+        return view('pages.reports.ap_ar.cash_flow.index');
+    }
+    public function loadCashFlow(Request $request)
+    {
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
+        $branch_id = $request->branch_id;
+
+        $total_generated = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, 'GeneralAccount')
+            ->whereIn('general_accounts.class', ['A12'])->select(
+                DB::raw('SUM(credit) AS credit'),
+                DB::raw('SUM(debit) AS debit'),
+                'number',
+                'general_accounts.description',
+                'general_account_ledgers.id'
+            )
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->orderBy('number')
+            ->get();
+        $query2 = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, 'GeneralAccount')
+            ->whereIn('general_accounts.class', ['A11']);
+
+
+
+
+
+        $branch = null;
+
+        if ($branch_id == '' || $branch_id == '%')
+            $branch_id = 'all';
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.ap_ar.cash_flow.load', compact('total_generated', 'branch', 'from_date', 'to_date', 'branch_id'));
+    }
+
+    public function printCashFlow($from, $to, $branch_id)
+    {
+        $total_generated = $this->generalAccountLedgerBy($from, $to, $branch_id, 'GeneralAccount')
+            ->whereIn('general_accounts.class', ['A12'])->select(
+                DB::raw('SUM(credit) AS credit'),
+                DB::raw('SUM(debit) AS debit'),
+                'number',
+                'general_accounts.description',
+                'general_account_ledgers.id'
+            )
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->orderBy('number')
+            ->get();
+
+        $branch = null;
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.ap_ar.cash_flow.print', compact('total_generated', 'branch', 'from', 'to', 'branch_id'));
+    }
 
     private function generalAccountLedgerBy($from_date, $to_date, $branch_id, $type = null)
     {

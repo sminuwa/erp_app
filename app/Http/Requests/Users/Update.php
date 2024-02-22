@@ -31,7 +31,7 @@ class Update extends FormRequest
             'email' => "required|unique:users,email,{$this->user->id}|max:50",
             'phone' => 'required|max:15',
             'gender' => 'required|in:Male,Female',
-            'user_code' => "required|unique:users,user_code,{$this->user->id}|max:3",
+            'user_code' => "required|unique:users,user_code,{$this->user->id}|max:15",
             'branch_id' => 'required|numeric',
             'status' => 'required|boolean',
         ];

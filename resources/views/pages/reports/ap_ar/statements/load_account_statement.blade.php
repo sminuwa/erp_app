@@ -34,8 +34,8 @@
             <th colspan="2" style="text-align: center; align-content: center">Balance</th>
         </tr>
         <tr>
-            <th style="text-align: center; align-content: center">Credit (Cr.)</th>
             <th style="text-align: center; align-content: center">Debit (Dr.)</th>
+            <th style="text-align: center; align-content: center">Credit (Cr.)</th>
             <th>Balance</th>
         </tr>
     </thead>
@@ -53,13 +53,13 @@
                 <td>{{ $ledger->description }}</td>
                 <td>{{ $ledger->reference }}</td>
                 <td style="text-align: right">
-                    @if ($credit > 0.0)
-                        {{ $credit }}
+                    @if ($debit > 0.0)
+                        {{ $debit }}
                     @endif
                 </td>
                 <td style="text-align: right">
-                    @if ($debit > 0.0)
-                        {{ $debit }}
+                    @if ($credit > 0.0)
+                        {{ $credit }}
                     @endif
                 </td>
                 <td style="text-align: right">

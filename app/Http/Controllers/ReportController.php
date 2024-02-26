@@ -43,6 +43,7 @@ use App\Models\Payment;
 use App\Models\Receipt;
 use App\Models\InterBank;
 use App\Models\Journal;
+use App\Models\Company;
 
 
 
@@ -1524,11 +1525,21 @@ class ReportController extends Controller
         }
 
         $sales = GeneralAccountLedger::where('model_id', 'LIKE', $customer_id)
-            ->join('customers', 'customers.id', 'general_account_ledgers.model_id')
-            ->whereBetween('date', [$from_date, $to_date])
+            ->join('customers', 'customers.id', '=', 'general_account_ledgers.model_id')
+            //->whereBetween('date', [$from_date, $to_date])
+            ->whereDate('date', '<=', $to_date)
             ->where('customers.branch_id', 'LIKE', User::userBranchAction())
-            ->select('customers.name AS customer', 'customers.code AS code', DB::raw('SUM(credit) AS total'), DB::raw('SUM(debit) AS pay'), DB::raw('SUM(credit)-SUM(debit) AS due'))
-            ->orderBy('name')->groupBy('model_id')->get();
+            ->select(
+                'customers.name AS customer',
+                'customers.code AS code',
+                DB::raw('SUM(credit) AS total'),
+                DB::raw('SUM(debit) AS pay'),
+                DB::raw('SUM(credit) - SUM(debit) AS due')
+            )
+            ->havingRaw('SUM(credit) - SUM(debit) < 0')
+            ->orderBy('customers.name')
+            ->groupBy('general_account_ledgers.model_id')
+            ->get();
         if ($customer_id == "%")
             $customer_id = "all";
         return view('pages.reports.customer_ledger_analysis.load_customer_total_debt_report', compact('sales', 'from_date', 'to_date', 'customer_id'));
@@ -1541,11 +1552,21 @@ class ReportController extends Controller
             $customer_id = '%';
         }
         $sales = GeneralAccountLedger::where('model_id', 'LIKE', $customer_id)
-            ->join('customers', 'customers.id', 'general_account_ledgers.model_id')
-            ->whereBetween('date', [$from_date, $to_date])
+            ->join('customers', 'customers.id', '=', 'general_account_ledgers.model_id')
+            //->whereBetween('date', [$from_date, $to_date])
+            ->whereDate('date', '<=', $to_date)
             ->where('customers.branch_id', 'LIKE', User::userBranchAction())
-            ->select('customers.name AS customer', 'customers.code AS code', DB::raw('SUM(credit) AS total'), DB::raw('SUM(debit) AS pay'), DB::raw('SUM(credit)-SUM(debit) AS due'))
-            ->orderBy('name')->groupBy('model_id')->get();
+            ->select(
+                'customers.name AS customer',
+                'customers.code AS code',
+                DB::raw('SUM(credit) AS total'),
+                DB::raw('SUM(debit) AS pay'),
+                DB::raw('SUM(credit) - SUM(debit) AS due')
+            )
+            ->havingRaw('SUM(credit) - SUM(debit) < 0')
+            ->orderBy('customers.name')
+            ->groupBy('general_account_ledgers.model_id')
+            ->get();
         if ($customer_id == "%")
             $customer_id = "all";
         return view('pages.reports.customer_ledger_analysis.print_customer_total_debt_report', compact('sales', 'from_date', 'to_date', 'customer_id'));
@@ -1571,17 +1592,17 @@ class ReportController extends Controller
             $branch_id = '%';
         }
         $sales = DB::table('customers')
-            ->select(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'), 'reference', 'description', 'date', 'customers.name', 'customers.code', 'users.name AS relation_officer')
+            ->select(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'), 'reference', 'description', 'date', 'customers.name', 'customers.code', 'model_id AS customer_id', 'users.name AS relation_officer')
             ->join('general_account_ledgers', 'general_account_ledgers.model_id', '=', 'customers.id')
             ->leftJoin('users', 'users.id', '=', 'customers.relation_officer')
             ->where('general_account_ledgers.model_id', 'LIKE', $customer_id)
-            ->where('general_account_ledgers.branch_id', '=', $branch_id)
-            ->where('general_account_ledgers.model_name', '=', 'Customer')
+            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+            ->where('general_account_ledgers.model_name', 'LIKE', 'Customer')
             ->groupBy('model_id')
-            ->having(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit)'), '>', 0);
+            ->having(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit)'), '<', 0);
 
-        if ($from_date != null)
-            $sales = $sales->whereDate('general_account_ledgers.date', '>=', $from_date); // Corrected the table alias
+        // if ($from_date != null)
+        //     $sales = $sales->whereDate('general_account_ledgers.date', '>=', $from_date); // Corrected the table alias
 
         if ($to_date != null)
             $sales = $sales->whereDate('general_account_ledgers.date', '<=', $to_date); // Corrected the table alias
@@ -1615,17 +1636,17 @@ class ReportController extends Controller
             $branch_id = '%';
         }
         $sales = DB::table('customers')
-            ->select(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'), 'reference', 'description', 'date', 'customers.name', 'customers.code', 'users.name AS relation_officer')
+            ->select(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'), 'reference', 'description', 'date', 'customers.name', 'customers.code', 'model_id AS customer_id', 'users.name AS relation_officer')
             ->join('general_account_ledgers', 'general_account_ledgers.model_id', '=', 'customers.id')
             ->leftJoin('users', 'users.id', '=', 'customers.relation_officer')
             ->where('general_account_ledgers.model_id', 'LIKE', $customer_id)
-            ->where('general_account_ledgers.branch_id', '=', $branch_id)
-            ->where('general_account_ledgers.model_name', '=', 'Customer')
+            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+            ->where('general_account_ledgers.model_name', 'LIKE', 'Customer')
             ->groupBy('model_id')
-            ->having(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit)'), '>', 0);
+            ->having(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit)'), '<', 0);
 
-        if ($from_date != null)
-            $sales = $sales->whereDate('general_account_ledgers.date', '>=', $from_date); // Corrected the table alias
+        // if ($from_date != null)
+        //     $sales = $sales->whereDate('general_account_ledgers.date', '>=', $from_date); // Corrected the table alias
 
         if ($to_date != null)
             $sales = $sales->whereDate('general_account_ledgers.date', '<=', $to_date); // Corrected the table alias
@@ -2848,8 +2869,7 @@ class ReportController extends Controller
         $query = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, $type)
             ->where('model_id', 'LIKE', $payer_id)
             ->orderBy('date')
-            ->orderBy('debit', 'DESC');
-        // ->orderBy('general_account_ledgers.id');
+            ->orderBy('general_account_ledgers.id');
         $ledgers = $query->get();
 
 
@@ -2955,8 +2975,23 @@ class ReportController extends Controller
         $to_date = $request->to_date;
         $branch_id = $request->branch_id;
 
-        $query = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id);
-        $ledgers = $query->select(
+        $query1 = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, 'GeneralAccount')
+            ->whereIn(DB::raw('SUBSTR(general_accounts.number, 1, 1)'), ['R', 'C']);
+        $query2 = $this->generalAccountLedgerBy(null, $to_date, $branch_id, 'GeneralAccount')
+            ->whereNotIn(DB::raw('SUBSTR(general_accounts.number, 1, 1)'), ['R', 'C']);
+        $ledger1 = $query1->select(
+            DB::raw('SUM(credit) AS credit'),
+            DB::raw('SUM(debit) AS debit'),
+            'number',
+            'general_accounts.description',
+            'general_account_ledgers.id'
+        )
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->orderBy('number')
+            ->groupBy('number')
+            ->get();
+
+        $ledger2 = $query2->select(
             DB::raw('SUM(credit) AS credit'),
             DB::raw('SUM(debit) AS debit'),
             'number',
@@ -2969,22 +3004,30 @@ class ReportController extends Controller
             ->get();
 
 
-        $credit_sum = $query->sum('credit');
-        $debit_sum = $query->sum('debit');
-        $balance = $credit_sum - $debit_sum;
+        $credit_sum1 = $query1->sum('credit');
+        $debit_sum1 = $query1->sum('debit');
+        $balance1 = $credit_sum1 - $debit_sum1;
+
+        $credit_sum2 = $query2->sum('credit');
+        $debit_sum2 = $query2->sum('debit');
+        $balance2 = $credit_sum2 - $debit_sum2;
+
         $branch = null;
 
         if ($branch_id == '' || $branch_id == '%')
             $branch_id = 'all';
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.ap_ar.trial_balance.load', compact('ledgers', 'branch', 'from_date', 'to_date', 'branch_id', 'balance', 'credit_sum', 'debit_sum'));
+        return view('pages.reports.ap_ar.trial_balance.load', compact('ledger1', 'ledger2', 'branch', 'from_date', 'to_date', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1', 'balance2', 'credit_sum2', 'debit_sum2'));
     }
 
     public function printTrialBalance($from, $to, $branch_id)
     {
-        $query = $this->generalAccountLedgerBy($from, $to, $branch_id);
-        $ledgers = $query->select(
+        $query1 = $this->generalAccountLedgerBy($from, $to, $branch_id, 'GeneralAccount')
+            ->whereIn(DB::raw('SUBSTR(general_accounts.number, 1, 1)'), ['R', 'C']);
+        $query2 = $this->generalAccountLedgerBy(null, $to, $branch_id, 'GeneralAccount')
+            ->whereNotIn(DB::raw('SUBSTR(general_accounts.number, 1, 1)'), ['R', 'C']);
+        $ledger1 = $query1->select(
             DB::raw('SUM(credit) AS credit'),
             DB::raw('SUM(debit) AS debit'),
             'number',
@@ -2996,15 +3039,228 @@ class ReportController extends Controller
             ->groupBy('number')
             ->get();
 
-        $credit_sum = $query->sum('credit');
-        $debit_sum = $query->sum('debit');
-        $balance = $credit_sum - $debit_sum;
-        $balance = $credit_sum - $debit_sum;
+        $ledger2 = $query2->select(
+            DB::raw('SUM(credit) AS credit'),
+            DB::raw('SUM(debit) AS debit'),
+            'number',
+            'general_accounts.description',
+            'general_account_ledgers.id'
+        )
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->orderBy('number')
+            ->groupBy('number')
+            ->get();
+
+
+        $credit_sum1 = $query1->sum('credit');
+        $debit_sum1 = $query1->sum('debit');
+        $balance1 = $credit_sum1 - $debit_sum1;
+
+        $credit_sum2 = $query2->sum('credit');
+        $debit_sum2 = $query2->sum('debit');
+        $balance2 = $credit_sum2 - $debit_sum2;
+
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.ap_ar.trial_balance.print', compact('ledgers', 'branch', 'from', 'to', 'balance', 'credit_sum', 'debit_sum'));
+        return view('pages.reports.ap_ar.trial_balance.print', compact('ledger1', 'ledger2', 'branch', 'from', 'to', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1', 'balance2', 'credit_sum2', 'debit_sum2'));
     }
+    public function balanceSheet()
+    {
+        $branches = Branch::select(['id', 'name', 'code'])->orderBy('name')->get();
+
+        return view('pages.reports.ap_ar.balance_sheet.index', compact('branches'));
+    }
+    public function loadBalanceSheet(Request $request)
+    {
+        $to_date = $request->to_date;
+        $branch_id = $request->branch_id;
+
+        $query1 = $this->generalAccountLedgerBy(null, $to_date, $branch_id, 'GeneralAccount');
+        $ledger1 = $query1->select(
+            DB::raw('SUM(credit) AS credit'),
+            DB::raw('SUM(debit) AS debit'),
+            'number',
+            'general_accounts.description',
+            'general_account_ledgers.id'
+        )
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->orderBy('number')
+            ->groupBy('number')
+            ->get();
+
+
+
+
+        $credit_sum1 = $query1->sum('credit');
+        $debit_sum1 = $query1->sum('debit');
+        $balance1 = $credit_sum1 - $debit_sum1;
+
+
+        $branch = null;
+
+        if ($branch_id == '' || $branch_id == '%')
+            $branch_id = 'all';
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.ap_ar.balance_sheet.load', compact('ledger1', 'branch', 'to_date', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1'));
+    }
+
+    public function printBalanceSheet($to, $branch_id)
+    {
+        $query1 = $this->generalAccountLedgerBy(null, $to, $branch_id, 'GeneralAccount');
+        $ledger1 = $query1->select(
+            DB::raw('SUM(credit) AS credit'),
+            DB::raw('SUM(debit) AS debit'),
+            'number',
+            'general_accounts.description',
+            'general_account_ledgers.id'
+        )
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->orderBy('number')
+            ->groupBy('number')
+            ->get();
+
+
+        $credit_sum1 = $query1->sum('credit');
+        $debit_sum1 = $query1->sum('debit');
+        $balance1 = $credit_sum1 - $debit_sum1;
+
+
+        $branch = null;
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.ap_ar.balance_sheet.print', compact('ledger1', 'branch', 'to', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1'));
+    }
+
+    public function cashFlow()
+    {
+        return view('pages.reports.ap_ar.cash_flow.index');
+    }
+    public function loadCashFlow(Request $request)
+    {
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
+        $branch_id = $request->branch_id;
+        $company_id = $request->company_id;
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
+
+        $total_generated = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, 'GeneralAccount')
+            ->join('branches', 'branches.id', 'general_account_ledgers.branch_id')
+            ->join('companies', 'companies.id', 'branches.company_id')
+            ->whereIn('general_accounts.class', ['A12'])
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->where('company_id', 'LIKE', $company_id)
+            ->sum('debit');
+
+        $total_bank_transfer = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, 'GeneralAccount')
+            ->join('branches', 'branches.id', 'general_account_ledgers.branch_id')
+            ->join('companies', 'companies.id', 'branches.company_id')
+            ->whereIn('general_accounts.class', ['A11'])
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->where('company_id', 'LIKE', $company_id)
+            ->sum('debit');
+
+        $total_at_hand = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, 'GeneralAccount')
+            ->join('branches', 'branches.id', 'general_account_ledgers.branch_id')
+            ->join('companies', 'companies.id', 'branches.company_id')
+            ->selectRaw('SUM(credit) - SUM(debit) AS total_at_hand')
+            ->whereIn('general_accounts.class', ['A12'])
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->where('company_id', 'LIKE', $company_id)
+            ->first()
+            ->total_at_hand;
+
+        $total_cash_in_bank = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, 'GeneralAccount')
+            ->join('branches', 'branches.id', 'general_account_ledgers.branch_id')
+            ->join('companies', 'companies.id', 'branches.company_id')
+            ->selectRaw('SUM(credit) - SUM(debit) AS total_in_bank')
+            ->whereIn('general_accounts.class', ['A11'])
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->where('company_id', 'LIKE', $company_id)
+            ->first()
+            ->total_in_bank;
+
+        $total_amount_expended = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, 'GeneralAccount')
+            ->join('branches', 'branches.id', 'general_account_ledgers.branch_id')
+            ->join('companies', 'companies.id', 'branches.company_id')
+            ->selectRaw('SUM(credit) - SUM(debit) AS expended')
+            ->whereIn('general_accounts.class', ['C51', 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C58', 'C59', 'C60', 'C61', 'C62', 'C63'])
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->where('company_id', 'LIKE', $company_id)
+            ->first()
+            ->expended;
+
+        $branch = $company = null;
+
+        if ($branch_id == '' || $branch_id == '%')
+            $branch_id = 'all';
+        if ($company_id == '' || $company_id == '%')
+            $company_id = 'all';
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
+        return view('pages.reports.ap_ar.cash_flow.load', compact('total_generated', 'total_bank_transfer', 'total_at_hand', 'total_cash_in_bank', 'total_amount_expended', 'branch', 'company', 'from_date', 'to_date', 'branch_id', 'company_id'));
+    }
+
+    public function printCashFlow($from_date, $to_date, $branch_id, $company_id)
+    {
+        $total_generated = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, 'GeneralAccount')
+            ->join('branches', 'branches.id', 'general_account_ledgers.branch_id')
+            ->join('companies', 'companies.id', 'branches.company_id')
+            ->whereIn('general_accounts.class', ['A12'])
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->where('company_id', 'LIKE', $company_id)
+            ->sum('debit');
+
+        $total_bank_transfer = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, 'GeneralAccount')
+            ->join('branches', 'branches.id', 'general_account_ledgers.branch_id')
+            ->join('companies', 'companies.id', 'branches.company_id')
+            ->whereIn('general_accounts.class', ['A11'])
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->where('company_id', 'LIKE', $company_id)
+            ->sum('debit');
+
+        $total_at_hand = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, 'GeneralAccount')
+            ->join('branches', 'branches.id', 'general_account_ledgers.branch_id')
+            ->join('companies', 'companies.id', 'branches.company_id')
+            ->selectRaw('SUM(credit) - SUM(debit) AS total_at_hand')
+            ->whereIn('general_accounts.class', ['A12'])
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->where('company_id', 'LIKE', $company_id)
+            ->first()
+            ->total_at_hand;
+
+        $total_cash_in_bank = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, 'GeneralAccount')
+            ->join('branches', 'branches.id', 'general_account_ledgers.branch_id')
+            ->join('companies', 'companies.id', 'branches.company_id')
+            ->selectRaw('SUM(credit) - SUM(debit) AS total_in_bank')
+            ->whereIn('general_accounts.class', ['A11'])
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->where('company_id', 'LIKE', $company_id)
+            ->first()
+            ->total_in_bank;
+
+        $total_amount_expended = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, 'GeneralAccount')
+            ->join('branches', 'branches.id', 'general_account_ledgers.branch_id')
+            ->join('companies', 'companies.id', 'branches.company_id')
+            ->selectRaw('SUM(credit) - SUM(debit) AS expended')
+            ->whereIn('general_accounts.class', ['C51', 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C58', 'C59', 'C60', 'C61', 'C62', 'C63'])
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->where('company_id', 'LIKE', $company_id)
+            ->first()
+            ->expended;
+
+        $branch = $company = null;
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
+        return view('pages.reports.ap_ar.cash_flow.print', compact('total_generated', 'total_bank_transfer', 'total_at_hand', 'total_cash_in_bank', 'total_amount_expended', 'branch', 'company','from_date', 'to_date'));
+    }
+
 
     private function generalAccountLedgerBy($from_date, $to_date, $branch_id, $type = null)
     {
@@ -3025,11 +3281,13 @@ class ReportController extends Controller
                 ->where('model_name', 'Supplier');
         }
         if ($type != null && $type == "GeneralAccount") {
-            return GeneralAccountLedger::join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+            $query = GeneralAccountLedger::leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
                 ->where('general_account_ledgers.branch_id', 'like', $branch_id)
-                ->whereDate('date', '>=', $from_date)
                 ->whereDate('date', '<=', $to_date)
                 ->where('model_name', 'GeneralAccount');
+            if ($from_date != null)
+                $query = $query->whereDate('date', '>=', $from_date);
+            return $query;
         }
         return GeneralAccountLedger::leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
             ->where('general_account_ledgers.branch_id', 'like', $branch_id)

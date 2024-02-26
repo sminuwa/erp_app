@@ -710,15 +710,15 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="{{ route('user.loan.history.report') }}"
-                                                class="nav-link {{ Request::is('reports/pa/loan/history*') ? 'active' : '' }}">
+                                            <a href="{{ route('balance.sheet.report') }}"
+                                                class="nav-link {{ Request::is('reports/ap_ar/balance_sheet*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Balance Sheet</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="{{ route('user.loan.history.report') }}"
-                                                class="nav-link {{ Request::is('reports/pa/loan/history*') ? 'active' : '' }}">
+                                            <a href="{{ route('cash.flow.report') }}"
+                                                class="nav-link {{ Request::is('reports/ap_ar/cash_flow*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Cash Flow</p>
                                             </a>

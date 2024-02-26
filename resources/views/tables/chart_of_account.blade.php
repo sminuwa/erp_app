@@ -19,7 +19,7 @@
                             <span class="fa fa-pencil"></span>
                         </a>
                     @endcan
-                    @can('chart_of_accounts.destroy', $user)
+                    @can('chart_of_accounts.destroy')
                         <form onsubmit="return confirm('Are you sure you want to delete?')"
                             action="{{ route('chart_of_accounts.destroy', $record->id) }}" method="post"
                             style="display: inline">

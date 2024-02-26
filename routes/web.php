@@ -955,6 +955,17 @@ Route::middleware('auth')->group(function () {
                 Route::get('/trial_balance/load', [ReportController::class, 'loadTrialBalance'])->name('ajax.load.trial.balance.report');
                 Route::get('/trial_balance/print/{from}/{to}/{branch_id}', [ReportController::class, 'printTrialBalance'])->name('ajax.print.trial.balance.report');
 
+                 //Balance Sheet
+                 Route::get('/balance_sheet', [ReportController::class, 'balanceSheet'])->name('balance.sheet.report');
+                 Route::get('/balance_sheet/load', [ReportController::class, 'loadBalanceSheet'])->name('ajax.load.balance.sheet.report');
+                 Route::get('/balance_sheet/print/{to}/{branch_id}', [ReportController::class, 'printBalanceSheet'])->name('ajax.print.balance.sheet.report');
+
+
+                //Cash Flow
+                Route::get('/cash_flow', [ReportController::class, 'cashFlow'])->name('cash.flow.report');
+                Route::get('/cash_flow/load', [ReportController::class, 'loadCashFlow'])->name('ajax.load.cash.flow.report');
+                Route::get('/cash_flow/print/{from}/{to}/{branch_id}/{company_id}', [ReportController::class, 'printCashFlow'])->name('ajax.print.cash.flow.report');
+
                 //Daily Remittance
                 Route::get('/remittance', [ReportController::class, 'remittance'])->name('remittance.report');
                 Route::get('/remittance/load', [ReportController::class, 'loadRemittance'])->name('ajax.load.remittance.report');

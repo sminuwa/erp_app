@@ -4,7 +4,7 @@
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
-<table class="table table-bordered caption" id="example1" data-ordering="false">
+<table class="table table-bordered caption" id="example1" data-ordering="true">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">Ageing Report
             @if ($from_date != 'all')
@@ -35,13 +35,24 @@
             <td>{{ $sale->code }}</td>
             <td>{{ $sale->name }}</td>
             <td>{{ $sale->relation_officer }}</td>
-            <td>{{ $sale->reference }}</td>
-            <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}
+            <td>{{ customerLastTransaction($sale->customer_id)->reference ?? '' }}</td>
+            <td>
+                @if (customerLastTransaction($sale->customer_id) != null)
+                    {{ \Carbon\Carbon::parse(customerLastTransaction($sale->customer_id)->date)->toFormattedDateString() }}
+                    @else
+                    {{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}
+                @endif
             </td>
-            <td>{{ \Carbon\Carbon::parse($sale->date)->diffInDays() }}</td>
+            <td>
+                @if (customerLastTransaction($sale->customer_id) != null)
+                    {{ \Carbon\Carbon::parse(customerLastTransaction($sale->customer_id)->date)->diffInDays() }}
+                    @else
+                    {{ \Carbon\Carbon::parse($sale->date)->diffInDays() }}
+                @endif
+            </td>
             <td style="text-align: right">
                 @if ($sale->balance < 0)
-                    ({{ number_format($sale->balance, 2, '.', ',') }})
+                    ({{ number_format(abs($sale->balance), 2, '.', ',') }})
                 @else
                     {{ number_format($sale->balance, 2, '.', ',') }}
                 @endif

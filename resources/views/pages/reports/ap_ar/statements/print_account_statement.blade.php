@@ -84,7 +84,7 @@
                                             <td>{{ $ledger->date->toFormattedDateString() }}</td>
                             
                                             <td>{{ $ledger->payer()->code ?? $ledger->payer()->number ?? '' }}</td>
-                                            <td>{{ $ledger->description }}</td>
+                                            <td>{{ transactionDecription($ledger->reference) != '' ? transactionDecription($ledger->reference) : $ledger->description }}</td>
                                             <td>{{ $ledger->reference }}</td>
                                             <td style="text-align: right">
                                                 @if ($credit > 0.0)

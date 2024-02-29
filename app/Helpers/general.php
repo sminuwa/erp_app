@@ -242,10 +242,23 @@ function monthName($number)
 function customerLastTransaction($customer_id)
 {
     return DB::table('general_account_ledgers')
-    ->where('model_id', $customer_id)
-    ->where('model_name', 'Customer')
-    ->whereRaw("SUBSTR(reference, 1, 3) = 'INV'")
-    ->orderBy('date', 'DESC')
-    ->first();
+        ->where('model_id', $customer_id)
+        ->where('model_name', 'Customer')
+        ->whereRaw("SUBSTR(reference, 1, 3) = 'INV'")
+        ->orderBy('date', 'DESC')
+        ->first();
 
+}
+function transactionDecription($reference)
+{//This function is meant fo particularly the description of the transaction captured
+    if (substr($reference, 0, 3) == "PAY")
+        return DB::table('payments')->where('reference', $reference)->first()->description ?? '';
+    if (substr($reference, 0, 3) == "RCT")
+        return DB::table('receipts')->where('receipt_no', $reference)->first()->description ?? '';
+    if (substr($reference, 0, 3) == "STK")
+        return DB::table('stock_adjustments')->where('reference', $reference)->first()->description ?? '';
+    if (substr($reference, 0, 3) == "INV")
+        return DB::table('orders')->where('reference', $reference)->first()->description ?? '';
+    if (substr($reference, 0, 3) == "CRN")
+        return DB::table('credit_notes')->where('reference', $reference)->first()->description ?? '';
 }

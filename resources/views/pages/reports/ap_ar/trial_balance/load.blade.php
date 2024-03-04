@@ -24,7 +24,7 @@
         @php
             $total_credit = $total_debit = 0;
         @endphp
-        @foreach ($ledger1 as $ledger)
+        @foreach ($ledger2 as $ledger)
             @php
                 $credit = number_format($ledger->credit, 2);
                 $debit = number_format($ledger->debit, 2);
@@ -55,38 +55,7 @@
                 @endif
             </tr>
         @endforeach
-    </tbody>
-    <tfoot>
-        <tr>
-            <th colspan="2" style="text-align: right;">Total</th>
-            <th style="text-align: right;">&#8358;{{ number_format($total_credit, 2) }}</th>
-            <th style="text-align: right;">&#8358;{{ number_format($total_debit, 2) }}</th>
-            <th style="text-align: right;">&#8358;{{ number_format($total_credit - $total_debit, 2) }}</th>
-        </tr>
-    </tfoot>
-</table>
-
-<table class="table table-bordered caption" id="example1" data-ordering="false">
-    <caption style="caption-size:top">
-        <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
-            TRIAL BALANCE AS AT {{ $to_date }}
-        </h5>
-    </caption>
-    <thead>
-        <tr>
-            <th>Account No</th>
-            <th>Description</th>
-            <th style="text-align: center; align-content: center">Total (Dr.)</th>
-            <th style="text-align: center; align-content: center">Total (Cr.)</th>
-            <th style="text-align: center; align-content: center">Balance</th>
-        </tr>
-
-    </thead>
-    <tbody>
-        @php
-            $total_credit = $total_debit = 0;
-        @endphp
-        @foreach ($ledger2 as $ledger)
+        @foreach ($ledger1 as $ledger)
             @php
                 $credit = number_format($ledger->credit, 2);
                 $debit = number_format($ledger->debit, 2);

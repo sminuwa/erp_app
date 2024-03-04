@@ -100,6 +100,7 @@
             </div>
         </section>
     </div>
+
 @endsection
 @push('js')
     <!-- DataTables -->
@@ -107,17 +108,17 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         $(function() {
-            $("#record1").DataTable({
-                'iDisplayLength': 100
-            });
-            $('#record2').DataTable({
-                "paging": true,
-                "lengthChange": false,
-                "searching": true,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false
-            });
+            // $("#record1").DataTable({
+            //     'iDisplayLength': 100
+            // });
+            // $('#record2').DataTable({
+            //     "paging": true,
+            //     "lengthChange": false,
+            //     "searching": true,
+            //     "ordering": true,
+            //     "info": true,
+            //     "autoWidth": false
+            // });
         });
     </script>
     <script>
@@ -125,6 +126,7 @@
             $('#close').click(function() {
                 window.location.href = "{{ url('/role/permission') }}";
             });
+
             $('#role').on("change", function() {
                 var role = $(this).val();
                 $.ajax({
@@ -134,8 +136,9 @@
                         role_id: role
                     }
                 }).done(function(data) {
-
+                   
                     $('#display').html(data);
+                    
                     $("#checkAll").click(function() {
                         $('input:checkbox').not(this).prop('checked', this.checked);
                     });

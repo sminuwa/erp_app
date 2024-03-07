@@ -58,7 +58,7 @@
                     <?php
                     $credit_sum += $revenue->credit;
                     $debit_sum += $revenue->debit;
-                    $dif = $credit_sum - $debit_sum;
+                    $dif = $debit_sum - $credit_sum;
                     ?>
                     @if ($dif < 0)
                         &#8358;({{ number_format(abs($dif), 2) }})
@@ -70,7 +70,7 @@
         @endforeach
         <tr>
             <th colspan="4" style="text-align: right">TOTAL REVENUE</th>
-            @php $total_revenue = $credit_sum - $debit_sum  @endphp
+            @php $total_revenue = $debit_sum-$credit_sum;  @endphp
             <th colspan="3" style="text-align: right;">&#8358;{{ number_format($total_revenue, 2) }}</th>
         </tr>
         <?php
@@ -105,7 +105,7 @@
                     <?php
                     $credit_sum += $sale->credit;
                     $debit_sum += $sale->debit;
-                    $dif = $credit_sum - $debit_sum;
+                    $dif = $debit_sum - $credit_sum;
                     ?>
                     @if ($dif < 0)
                         &#8358;({{ number_format(abs($dif), 2) }})
@@ -117,7 +117,7 @@
         @endforeach
         <tr>
             <th colspan="4" style="text-align: right">TOTAL COST</th>
-            @php $total_cost = $credit_sum - $debit_sum  @endphp
+            @php $total_cost = $debit_sum-$credit_sum;  @endphp
             <th colspan="3" style="text-align: right;">&#8358;{{ number_format($total_cost, 2) }}</th>
         </tr>
         <tr>
@@ -158,12 +158,12 @@
                         &#8358; {{ $credit }}
                     @endif
                 </td>
-                
+
                 <td style="text-align: right">
                     <?php
                     $credit_sum += $expense->credit;
                     $debit_sum += $expense->debit;
-                    $dif = $credit_sum - $debit_sum;
+                    $dif = $debit_sum - $credit_sum;
                     ?>
                     @if ($dif < 0)
                         &#8358;({{ number_format(abs($dif), 2) }})
@@ -175,7 +175,7 @@
         @endforeach
         <tr>
             <th colspan="4" style="text-align: right">TOTAL EXPENSE</th>
-            @php $total_expense = $credit_sum - $debit_sum  @endphp
+            @php $total_expense = $debit_sum-$credit_sum;  @endphp
             <th colspan="3" style="text-align: right;">&#8358;{{ number_format($total_expense, 2) }}</th>
         </tr>
         <tr>

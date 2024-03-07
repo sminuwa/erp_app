@@ -25,8 +25,8 @@
             <th colspan="2" style="text-align: center; align-content: center">Balance</th>
         </tr>
         <tr>
-            <th style="text-align: center; align-content: center">Credit (Cr.)</th>
             <th style="text-align: center; align-content: center">Debit (Dr.)</th>
+            <th style="text-align: center; align-content: center">Credit (Cr.)</th>
             <th>Balance</th>
         </tr>
     </thead>
@@ -45,13 +45,13 @@
                 <td>{{ $revenue->number }}</td>
                 <td>{{ $revenue->description }}</td>
                 <td style="text-align: right">
-                    @if ($credit > 0.0)
-                        &#8358; {{ $credit }}
+                    @if ($debit > 0.0)
+                        &#8358; {{ $debit }}
                     @endif
                 </td>
                 <td style="text-align: right">
-                    @if ($debit > 0.0)
-                        &#8358; {{ $debit }}
+                    @if ($credit > 0.0)
+                        &#8358; {{ $credit }}
                     @endif
                 </td>
                 <td style="text-align: right">
@@ -92,13 +92,13 @@
                 <td>{{ $sale->number }}</td>
                 <td>{{ $sale->description }}</td>
                 <td style="text-align: right">
-                    @if ($credit > 0.0)
-                        &#8358; {{ $credit }}
+                    @if ($debit > 0.0)
+                        &#8358; {{ $debit }}
                     @endif
                 </td>
                 <td style="text-align: right">
-                    @if ($debit > 0.0)
-                        &#8358; {{ $debit }}
+                    @if ($credit > 0.0)
+                        &#8358; {{ $credit }}
                     @endif
                 </td>
                 <td style="text-align: right">
@@ -149,15 +149,16 @@
                 <td>{{ $expense->number }}</td>
                 <td>{{ $expense->description }}</td>
                 <td style="text-align: right">
-                    @if ($credit > 0.0)
-                        &#8358; {{ $credit }}
-                    @endif
-                </td>
-                <td style="text-align: right">
                     @if ($debit > 0.0)
                         &#8358; {{ $debit }}
                     @endif
                 </td>
+                <td style="text-align: right">
+                    @if ($credit > 0.0)
+                        &#8358; {{ $credit }}
+                    @endif
+                </td>
+                
                 <td style="text-align: right">
                     <?php
                     $credit_sum += $expense->credit;

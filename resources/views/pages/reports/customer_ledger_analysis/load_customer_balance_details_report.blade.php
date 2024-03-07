@@ -13,7 +13,7 @@
             {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
         </h5>
         <h5 style="text-align: center;">
-            CUSTOMER NAME: {{\App\Models\Customer::find($customer_id)->name}}
+            CUSTOMER NAME: {{ \App\Models\Customer::find($customer_id)->name }}
         </h5>
     </caption>
     <thead>
@@ -35,12 +35,12 @@
         @php
             $total_credit += $sale->cr;
             $total_debit += $sale->dr;
-            $running_balance += $total_credit - $total_debit;
+            $running_balance += $total_debit - $total_credit;
         @endphp
         <tr>
 
             <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}</td>
-            <td>{{ $sale->receipt_no !=null ?$sale->receipt_no:$sale->systemid }}</td>
+            <td>{{ $sale->receipt_no != null ? $sale->receipt_no : $sale->systemid }}</td>
             <td>{{ $sale->description }}</td>
             <td style="text-align: right">&#8358;{{ number_format($sale->cr, 2, '.', ',') }}</td>
             <td style="text-align: right">&#8358;{{ number_format($sale->dr, 2, '.', ',') }}</td>

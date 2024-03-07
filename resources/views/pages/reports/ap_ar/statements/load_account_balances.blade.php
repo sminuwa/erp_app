@@ -57,7 +57,7 @@
                     $sum_dr = $ledger->debit;
                     $total_cr += $sum_cr;
                     $total_dr += $sum_dr;
-                    $dif = $sum_cr - $sum_dr;
+                    $dif = $sum_dr-$sum_cr;
                     ?>
                     @if ($dif < 0)
                         &#8358;({{ number_format(abs($dif), 2) }})

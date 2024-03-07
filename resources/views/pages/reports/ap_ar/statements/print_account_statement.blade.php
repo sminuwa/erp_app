@@ -99,7 +99,7 @@
                                             <td style="text-align: right">
                                                 <?php $sum_cr += $ledger->credit;
                                                 $sum_dr += $ledger->debit;
-                                                $dif = $sum_cr - $sum_dr;
+                                                $dif = $sum_dr-$sum_cr;
                                                 ?>
                                                 @if ($dif < 0)
                                                    ({{ number_format(abs($dif), 2) }})

@@ -46,7 +46,7 @@
                 @php
                     $total_credit += $ledger->credit;
                     $total_debit += $ledger->debit;
-                    $diff = $ledger->credit - $ledger->debit;
+                    $diff = $ledger->debit - $ledger->credit;
                 @endphp
                 @if ($diff >= 0)
                     <td style="text-align: right;">{{ number_format($diff, 2) }}</td>
@@ -77,7 +77,7 @@
                 @php
                     $total_credit += $ledger->credit;
                     $total_debit += $ledger->debit;
-                    $diff = $ledger->credit - $ledger->debit;
+                    $diff = $ledger->debit - $ledger->credit;
                 @endphp
                 @if ($diff >= 0)
                     <td style="text-align: right;">{{ number_format($diff, 2) }}</td>
@@ -90,9 +90,9 @@
     <tfoot>
         <tr>
             <th colspan="2" style="text-align: right;">Total</th>
-            <th style="text-align: right;">&#8358;{{ number_format($total_credit, 2) }}</th>
             <th style="text-align: right;">&#8358;{{ number_format($total_debit, 2) }}</th>
-            <th style="text-align: right;">&#8358;{{ number_format($total_credit - $total_debit, 2) }}</th>
+            <th style="text-align: right;">&#8358;{{ number_format($total_credit, 2) }}</th>
+            <th style="text-align: right;">&#8358;{{ number_format($total_debit - $total_credit, 2) }}</th>
         </tr>
     </tfoot>
 </table>

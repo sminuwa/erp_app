@@ -66,7 +66,7 @@
                 <td style="text-align: right">
                     <?php $sum_cr += $ledger->credit;
                     $sum_dr += $ledger->debit;
-                    $dif = $sum_cr - $sum_dr;
+                    $dif =  $sum_dr-$sum_cr;
                     ?>
                     @if ($dif < 0)
                         ({{ number_format(abs($dif), 2) }})
@@ -81,8 +81,8 @@
         <tr>
 
             <th colspan="5" style="text-align: right">Total</th>
-            <th style="text-align: right;">&#8358;{{ number_format($credit_sum, 2) }}</th>
             <th style="text-align: right;">&#8358;{{ number_format($debit_sum, 2) }}</th>
+            <th style="text-align: right;">&#8358;{{ number_format($credit_sum, 2) }}</th>
             <th></th>
         </tr>
         <tr>

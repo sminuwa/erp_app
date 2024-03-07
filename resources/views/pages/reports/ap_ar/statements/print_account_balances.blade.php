@@ -81,7 +81,7 @@
                                         <td style="text-align: right">
                                             <?php $sum_cr += $ledger->cr;
                                             $sum_dr += $ledger->dr;
-                                            $dif = $sum_cr - $sum_dr;
+                                            $dif = $sum_dr-$sum_cr;
                                             $balance =
                                                 $ledger
                                                     ->where('id', '<=', $ledger->id)

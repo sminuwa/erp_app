@@ -34,10 +34,11 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:100px;height:60px;"
-                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
+                                style="width:100px;height:60px;" alt="Albabello Logo" class="img-circle elevation-3"
+                                style="opacity: .8">
                             <h3>
-                                {{App\Models\User::UserBranchName()->long_name}}
+                                {{ App\Models\User::UserBranchName()->long_name }}
                             </h3>
                             <h5 style="text-align: center;">Customer Balance Details Report
                                 From
@@ -75,7 +76,7 @@
                                     @php
                                         $total_credit += $sale->cr;
                                         $total_debit = $sale->dr;
-                                        $running_balance += $total_credit - $total_debit;
+                                        $running_balance += $total_debit - $total_credit;
                                     @endphp
                                     <tr>
 

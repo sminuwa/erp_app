@@ -2887,8 +2887,8 @@ class ReportController extends Controller
         $sum_dr_b_d = $this->generalAccountLedgerB4D($from_date, $branch_id, $type)
             ->where('model_id', 'LIKE', $payer_id)
             ->where('model_name', 'LIKE', $type)->sum('debit');
-        $balance_b_d = $sum_cr_b_d - $sum_dr_b_d;
-        $balance = $credit_sum - $debit_sum + $balance_b_d;
+        $balance_b_d = $sum_dr_b_d - $sum_cr_b_d;
+        $balance = $debit_sum - $credit_sum + $balance_b_d;
 
         if ($branch_id == '%')
             $branch_id = 'all';
@@ -2955,7 +2955,7 @@ class ReportController extends Controller
 
         $branch = Branch::find($branch_id);
 
-        $balance = $credit_sum - $debit_sum;
+        $balance = $debit_sum - $credit_sum;
         if ($type == '%' || $type == '')
             $type = 'all';
 
@@ -3006,11 +3006,11 @@ class ReportController extends Controller
 
         $credit_sum1 = $query1->sum('credit');
         $debit_sum1 = $query1->sum('debit');
-        $balance1 = $credit_sum1 - $debit_sum1;
+        $balance1 = $debit_sum1 - $credit_sum1;
 
         $credit_sum2 = $query2->sum('credit');
         $debit_sum2 = $query2->sum('debit');
-        $balance2 = $credit_sum2 - $debit_sum2;
+        $balance2 = $debit_sum2 - $credit_sum2;
 
         $branch = null;
 
@@ -3054,11 +3054,11 @@ class ReportController extends Controller
 
         $credit_sum1 = $query1->sum('credit');
         $debit_sum1 = $query1->sum('debit');
-        $balance1 = $credit_sum1 - $debit_sum1;
+        $balance1 = $debit_sum1 - $credit_sum1;
 
         $credit_sum2 = $query2->sum('credit');
         $debit_sum2 = $query2->sum('debit');
-        $balance2 = $credit_sum2 - $debit_sum2;
+        $balance2 = $debit_sum2 - $credit_sum2;
 
         $branch = null;
         if ($branch_id != 'all')
@@ -3094,7 +3094,7 @@ class ReportController extends Controller
 
         $credit_sum1 = $query1->sum('credit');
         $debit_sum1 = $query1->sum('debit');
-        $balance1 = $credit_sum1 - $debit_sum1;
+        $balance1 = $debit_sum1 - $credit_sum1;
 
 
         $branch = null;
@@ -3124,7 +3124,7 @@ class ReportController extends Controller
 
         $credit_sum1 = $query1->sum('credit');
         $debit_sum1 = $query1->sum('debit');
-        $balance1 = $credit_sum1 - $debit_sum1;
+        $balance1 = $debit_sum1 - $credit_sum1;
 
 
         $branch = null;
@@ -3258,7 +3258,7 @@ class ReportController extends Controller
             $branch = Branch::find($branch_id);
         if ($company_id != 'all')
             $company = Company::find($company_id);
-        return view('pages.reports.ap_ar.cash_flow.print', compact('total_generated', 'total_bank_transfer', 'total_at_hand', 'total_cash_in_bank', 'total_amount_expended', 'branch', 'company','from_date', 'to_date'));
+        return view('pages.reports.ap_ar.cash_flow.print', compact('total_generated', 'total_bank_transfer', 'total_at_hand', 'total_cash_in_bank', 'total_amount_expended', 'branch', 'company', 'from_date', 'to_date'));
     }
 
 
@@ -3547,7 +3547,7 @@ class ReportController extends Controller
 
         $credit_sum = $query->sum('credit');
         $debit_sum = $query->sum('debit');
-        $balance = $credit_sum - $debit_sum;
+        $balance = $debit_sum - $credit_sum;
         $branch = Branch::find($branch_id);
         if ($user_id == '%')
             $user_id = 'all';
@@ -3587,8 +3587,8 @@ class ReportController extends Controller
 
         $credit_sum = $query->sum('credit');
         $debit_sum = $query->sum('debit');
-        $balance = $credit_sum - $debit_sum;
-        $balance = $credit_sum - $debit_sum;
+        $balance = $debit_sum - $credit_sum;
+        //$balance = $debit_sum - $credit_sum;
         if ($branch_id != '%')
             $branch = Branch::find($branch_id);
         return view('pages.reports.ap_ar.remittance.print', compact('ledgers', 'branch', 'from', 'to', 'balance', 'credit_sum', 'debit_sum'));

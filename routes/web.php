@@ -918,6 +918,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/activity/load/logs', [ReportController::class, 'viewLogs'])->name('user.activity.logs');
             Route::get('/activity/load/logs/print/{from_date}/{to_date}/{user_id}', [ReportController::class, 'printLogs'])->name('user.activity.logs.print');
 
+             //Purchase Request  Report
+             Route::get('/product/valuation', [ReportController::class, 'productValuation'])->name('product.valuation.report');
+             Route::get('/product/valuation/load', [ReportController::class, 'loadProductValuationReport'])->name('ajax.product.valuation.report');
+             Route::get('/product/valuation/print/{from_date}/{to_date}/{branch_id}/{category_id}/{product_id}/', [ReportController::class, 'printProductValuationReport'])->name('ajax.product.valuation.report.print');
             //User Ledger and Loans
 
             //Loan Balances

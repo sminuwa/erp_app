@@ -61,6 +61,15 @@
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp;
+                            <label for="store_id">Store</label>
+                            <select
+                                class="form-control select2-single ajax-stores {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
+                                name="store_id" id="store_id">
+
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            &nbsp;&nbsp;
                             <label for="category_id">Category</label>
                             <select
                                 class="form-control select2-single ajax-categories {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
@@ -121,6 +130,7 @@
                 product_id = $('#product_id').val();
                 category_id = $('#category_id').val();
                 branch_id = $('#branch_id').val();
+                store_id = $('#store_id').val();
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
@@ -131,7 +141,8 @@
                         to_date: to_date,
                         product_id: product_id,
                         category_id: category_id,
-                        branch_id: branch_id
+                        branch_id: branch_id,
+                        store_id: store_id
                     }
                 }).done(function(data) {
                     $('#img-loader').hide();

@@ -571,19 +571,19 @@
                                     </a>
                                     <ul class="nav nav-treeview">
                                         <li class="nav-item">
-                                            <a href="javascript:void(0)"
-                                                class="nav-link {{ Request::is('reports/inventory/check*') ? 'active' : '' }}">
+                                            <a href="{{route('product.valuation.report')}}"
+                                                class="nav-link {{ Request::is('reports/inventory/product/valuation*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Inventory Valuation</p>
                                             </a>
                                         </li>
-                                        <li class="nav-item">
+                                        {{-- <li class="nav-item">
                                             <a href="javascript:void(0)"
                                                 class="nav-link {{ Request::is('reports/inventory/check*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Average Cost Movement</p>
                                             </a>
-                                        </li>
+                                        </li> --}}
                                         <li class="nav-item">
                                             <a href="{{route('expiry.date.report')}}"
                                                 class="nav-link {{ Request::is('reports/inventory/expiring*') ? 'active' : '' }}">

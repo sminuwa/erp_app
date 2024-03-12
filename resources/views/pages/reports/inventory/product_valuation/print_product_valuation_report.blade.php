@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Purchase Request Report - {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Product Valuation Report - {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -34,9 +34,8 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo' . '.png') }}"
-                                style="width:100px;height:60px;" alt="Albabello Logo" class="img-circle elevation-3"
-                                style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo' . '.png') }}" style="width:100px;height:60px;"
+                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
                             <h3 style="text-align: center;">
                                 {{ $branch->name ?? 'All Branches' }}
                             </h3>
@@ -58,14 +57,13 @@
                                 <thead>
                                     <tr>
                                         <th>DATE</th>
-                                        <th>INVOICE</th>
-                                        <th>ITEM</th>
+                                        <th>STORE</th>
+                                        <th>REFERENCE</th>
+                                        <th>ITEM CODE</th>
+                                        <th>ITEM NAME</th>
                                         <th>ITEM PRICE</th>
                                         <th>QTY</th>
-                                        <th>TOTAL COST</th>
-                                        <th>WAYBILL</th>
-                                        <th>SUPP NAME</th>
-                                        <th>STATUS</th>
+                                        <th>TOTAL </th>
                                     </tr>
                                 </thead>
                                 @php
@@ -73,20 +71,18 @@
                                 @endphp
                                 @foreach ($sales as $sale)
                                     <tr>
-                                        <td>{{ \Carbon\Carbon::parse($sale->purchase_date)->toFormattedDateString() }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}</td>
+                                        <td>{{ $sale->store_code }}</td>
                                         <td>{{ $sale->reference }}</td>
+                                        <td>{{ $sale->code }}</td>
                                         <td>{{ $sale->product }}</td>
-                                        <td style="text-align: right">{{ number_format($sale->unit_price, 2) }}</td>
+                                        <td style="text-align: right">{{ number_format($sale->cost_price, 2) }}</td>
                                         <td>{{ $sale->quantity }}</td>
                                         <td style="text-align: right">
-                                            {{ number_format($sale->unit_price * $sale->quantity, 2, '.', ',') }}</td>
-                                        <td>{{ $sale->wbno }}</td>
-                                        <td>{{ $sale->supplier }}</td>
-                                        <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
-                            
+                                            {{ number_format($sale->cost_price * $sale->quantity, 2, '.', ',') }}</td>
                                     </tr>
                                     @php
-                                        $total_cost += $sale->unit_price * $sale->quantity;
+                                        $total_cost += $sale->cost_price * $sale->quantity;
                                     @endphp
                                 @endforeach
                                 <tfoot>

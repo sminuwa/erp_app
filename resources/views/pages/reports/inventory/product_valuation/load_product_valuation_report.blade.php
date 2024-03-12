@@ -1,6 +1,6 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.product.valuation.report.print', [$from_date, $to_date, $branch_id, $category_id, $product_id]) }}"
+        <a href="{{ route('ajax.product.valuation.report.print', [$from_date, $to_date, $branch_id, $store_id,$category_id, $product_id]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
@@ -32,15 +32,14 @@
     @foreach ($sales as $sale)
         <tr>
             <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}</td>
-            <td>{{ $sale->store->code ?? '' }}</td>
+            <td>{{ $sale->store_code  }}</td>
             <td>{{ $sale->reference }}</td>
-            <td>{{ $sale->product->code ?? ''}}</td>
-            <td>{{ $sale->product->name ?? ''}}</td>
+            <td>{{ $sale->code}}</td>
+            <td>{{ $sale->product}}</td>
             <td style="text-align: right">{{ number_format($sale->cost_price, 2) }}</td>
             <td>{{ $sale->quantity }}</td>
             <td style="text-align: right">
                 {{ number_format($sale->cost_price * $sale->quantity, 2, '.', ',') }}</td>
-
         </tr>
         @php
             $total_cost += $sale->cost_price * $sale->quantity;

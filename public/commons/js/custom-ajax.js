@@ -28,6 +28,11 @@ bodi.on('change', '.ajax-categories', function () {
     ajerks('GET', '/misc/ajax/products', 'ajax-products')
 })
 
+bodi.on('change', '.ajax-companies', function () {
+    $('.ajax-branches').attr('company_id', $(this).val())
+    ajerks('GET', '/misc/ajax/branches', 'ajax-branches')
+})
+
 
 function ajerks(method, url, cssClass) {
     let element = $('.' + cssClass);

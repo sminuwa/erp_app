@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Customer Total Debt Report - {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Product Valuation Report - {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -34,16 +34,14 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
-                                style="width:100px;height:60px;" alt="Albabello Logo" class="img-circle elevation-3"
-                                style="opacity: .8">
-                            <h3>
-                                {{ App\Models\User::UserBranchName()->long_name }}
+                            <img src="{{ asset('assets/backend/img/logo' . '.png') }}" style="width:100px;height:60px;"
+                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
+                            <h3 style="text-align: center;">
+                                {{ $branch->name ?? 'All Branches' }}
                             </h3>
-                            <h5 style="text-align: center;">Customer Total Debt Report
-                                {{-- From
-            {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }} --}}
-                                As at
+                            <h5 style="text-align: center;">Purchase Request Report
+                                From
+                                {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                                 AND
                                 {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
                             </h5>
@@ -58,52 +56,44 @@
                                 cellspacing="0" data-ordering="false">
                                 <thead>
                                     <tr>
-                                        <th>ACCOUNT NO</th>
-                                        <th>CUSTOMER NAME</th>
-                                        <th>TOTAL AMOUNT</th>
-                                        <th>TOTAL PAID</th>
-                                        <th>DEBT</th>
+                                        <th>DATE</th>
+                                        <th>STORE</th>
+                                        <th>REFERENCE</th>
+                                        <th>ITEM CODE</th>
+                                        <th>ITEM NAME</th>
+                                        <th>ITEM PRICE</th>
+                                        <th>QTY</th>
+                                        <th>TOTAL </th>
                                     </tr>
                                 </thead>
                                 @php
-                                    $total_sold = 0;
-                                    $total_pay = 0;
-                                    $total_due = 0;
+                                    $total_cost = 0;
                                 @endphp
                                 @foreach ($sales as $sale)
                                     <tr>
+                                        <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}</td>
+                                        <td>{{ $sale->store_code }}</td>
+                                        <td>{{ $sale->reference }}</td>
                                         <td>{{ $sale->code }}</td>
-                                        <td>{{ $sale->customer }}</td>
-                                        <td style="text-align: right">{{ number_format($sale->pay, 2, '.', ',') }}</td>
-                                        <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}
-                                        </td>
-                                        
+                                        <td>{{ $sale->product }}</td>
+                                        <td style="text-align: right">{{ number_format($sale->cost_price, 2) }}</td>
+                                        <td>{{ $sale->quantity }}</td>
                                         <td style="text-align: right">
-                                            @if ($sale->due < 0)
-                                                ({{ number_format(abs($sale->due), 2, '.', ',') }})
-                                            @else
-                                                {{ number_format($sale->due, 2, '.', ',') }}
-                                            @endif
-                                        </td>
+                                            {{ number_format($sale->cost_price * $sale->quantity, 2, '.', ',') }}</td>
                                     </tr>
                                     @php
-                                        $total_sold += $sale->total;
-                                        $total_pay += $sale->pay;
-                                        $total_due += $sale->due;
-
+                                        $total_cost += $sale->cost_price * $sale->quantity;
                                     @endphp
                                 @endforeach
                                 <tfoot>
                                     <tr>
-                                        <th></th>
-                                        <th style="text-align: right">TOTAL</th>
+                                        <th colspan="5" style="text-align: right">TOTAL</th>
                                         <th style="text-align: right">
-                                            &#8358;{{ number_format($total_sold, 2, '.', ',') }}</th>
-                                        <th style="text-align: right">
-                                            &#8358;{{ number_format($total_pay, 2, '.', ',') }}</th>
-                                        <th style="text-align: right">
-                                            &#8358;{{ number_format($total_due, 2, '.', ',') }}
+                                            &#8358;{{ number_format($total_cost, 2, '.', ',') }}
                                         </th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
                                     </tr>
                                 </tfoot>
                             </table>

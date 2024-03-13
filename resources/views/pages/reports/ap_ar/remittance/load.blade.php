@@ -7,7 +7,7 @@
 <table class="table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
-            DAILY REMITTANCE BETWEEN  {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
+            DAILY REMITTANCE BETWEEN {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
             AND
             {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
         </h5>
@@ -49,7 +49,7 @@
                 @php
                     $total_credit += $ledger->credit;
                     $total_debit += $ledger->debit;
-                    $diff = $total_credit - $total_debit;
+                    $diff = $total_debit - $total_credit;
                 @endphp
                 @if ($diff > 0)
                     <td style="text-align: right;">{{ number_format($total_credit, 2) }}</td>

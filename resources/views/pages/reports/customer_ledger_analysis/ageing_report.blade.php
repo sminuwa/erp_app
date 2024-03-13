@@ -38,14 +38,14 @@
             <div class="container-fluid">
                 <form method="POST" >
                     <div class="row">
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             <label for="from_date">From Date</label>
                             <input type="text" autocomplete="off"
                                 class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
                                 name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="">
-                        </div>
+                        </div> --}}
                         <div class="form-group">
-                            <label for="to_date">To Date</label>
+                            <label for="to_date">End Date</label>
                             <input type="text" autocomplete="off"
                                 class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
                                 name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
@@ -102,7 +102,7 @@
             $('#generate').on("click", function() {
                 
                 from_date = $('#from_date').val();
-                to_date = $('#to_date').val();
+                to_date = 'all';//$('#to_date').val();
                 branch_id = $('#branch_id').val();
                 customer_id = $('#customer_id').val();
                 $('#img-loader').show();

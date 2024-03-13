@@ -93,6 +93,12 @@
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 
                                                             @if ($invoice->status == 0)
+                                                                @can('purchase.additional-invoice.show')
+                                                                    <a href="{{ route('purchase.additional-invoice.show', $invoice->id) }}"
+                                                                       class="dropdown-item">
+                                                                        <i class="fa fa-eye" aria-hidden="true"></i> View
+                                                                    </a>
+                                                                @endcan
                                                                 @can('purchase.additional-invoice.post')
                                                                     <form
                                                                         action="{{ route('purchase.additional-invoice.post', $invoice->id) }}"
@@ -109,6 +115,18 @@
                                                                         class="dropdown-item">
                                                                         <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                                                     </a>
+                                                                @endcan
+                                                                @can('purchase.additional-invoice.delete')
+                                                                    <form
+                                                                        action="{{ route('purchase.additional-invoice.delete', $invoice->id) }}"
+                                                                        method="post"
+                                                                        onsubmit="return confirm('Are you sure you want reverse this invoice?')">
+                                                                        @csrf
+                                                                        <button type="submit" class="dropdown-item">
+                                                                            <i class="fa fa-reply" aria-hidden="true"></i>
+                                                                            Delete
+                                                                        </button>
+                                                                    </form>
                                                                 @endcan
                                                             @else
                                                                 @can('purchase.additional-invoice.reverse')

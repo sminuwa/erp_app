@@ -111,7 +111,9 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-12 table-responsive" id="load"></div>
+                    <div class="col-sm-12 table-responsive" id="load">
+                        <img src="{{ asset('assets/backend/img/loader.png') }}" style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                    </div>
                 </div>
             </div><!-- /.container-fluid -->
         </section>
@@ -158,7 +160,7 @@
                 payer_id = $('#payer_id').val();
                 branch_id = $('#branch_id').val();
                 type = $('#type').val();
-
+                $('#img-loader').show();
 
                 $.ajax({
                     type: "GET",
@@ -172,7 +174,7 @@
                         type: type
                     }
                 }).done(function(data) {
-
+                    $('#img-loader').hide();
                     $("#load").html(data);
                     $('#example1').DataTable({
                         dom: 'Bfrtip',

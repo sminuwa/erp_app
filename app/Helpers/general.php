@@ -13,32 +13,42 @@ function app_name($type = 'full', $style = 'uppercase')
 {
     if ($type == 'abbr') {
         switch ($style) {
-            case 'uppercase': return 'ABTC';
-            case 'propercase': return 'Abtc';
-            case 'lowercase': return 'abtc';
+            case 'uppercase':
+                return 'ABTC';
+            case 'propercase':
+                return 'Abtc';
+            case 'lowercase':
+                return 'abtc';
         }
-    }elseif ($type == 'short') {
+    } elseif ($type == 'short') {
         switch ($style) {
-            case 'uppercase': return 'ALBABELLO';
-            case 'propercase': return 'Albabello';
-            case 'lowercase': return 'albabello';
+            case 'uppercase':
+                return 'ALBABELLO';
+            case 'propercase':
+                return 'Albabello';
+            case 'lowercase':
+                return 'albabello';
         }
-    }
-    else {
+    } else {
         switch ($style) {
-            case 'uppercase': return 'ALBABELLO TRADING COMPANY LIMITED';
-            case 'propercase': return 'Albabello Trading Company Limited';
-            case 'lowercase': return 'albabello trading company limited';
+            case 'uppercase':
+                return 'ALBABELLO TRADING COMPANY LIMITED';
+            case 'propercase':
+                return 'Albabello Trading Company Limited';
+            case 'lowercase':
+                return 'albabello trading company limited';
         }
     }
 }
 
-function app_logo(){
+function app_logo()
+{
     return asset('assets/backend/img/logo.png');
 }
 
 
-function in_array_r($needle, $haystack, $strict = true) {
+function in_array_r($needle, $haystack, $strict = true)
+{
     foreach ($haystack as $item) {
         if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && in_array_r($needle, $item, $strict))) {
             return true;
@@ -56,11 +66,13 @@ function currency_sign($currency = 'NG')
 }
 
 
-function ceiling($num, $nearest){
+function ceiling($num, $nearest)
+{
     return ceil($num / $nearest) * $nearest;
 }
 
-function roundDown($number, $nearest){
+function roundDown($number, $nearest)
+{
     $result = ($number - fmod($number, $nearest)) + $nearest;
     return $result;
 }
@@ -76,7 +88,8 @@ function generateRandomString($length = 5)
     return $randomString;
 }
 
-function convertNumberToWords($number) {
+function convertNumberToWords($number)
+{
     $hyphen = '-';
     $conjunction = ' and ';
     $separator = ', ';
@@ -127,7 +140,8 @@ function convertNumberToWords($number) {
     if (($number >= 0 && (int) $number < 0) || (int) $number < 0 - PHP_INT_MAX) {
         // overflow
         trigger_error(
-            'convert number to words only accepts numbers between -' . PHP_INT_MAX . ' and ' . PHP_INT_MAX, E_USER_WARNING
+            'convert number to words only accepts numbers between -' . PHP_INT_MAX . ' and ' . PHP_INT_MAX,
+            E_USER_WARNING
         );
         return false;
     }
@@ -159,7 +173,7 @@ function convertNumberToWords($number) {
             $remainder = $number % 100;
             $string = $dictionary[$hundreds] . ' ' . $dictionary[100];
             if ($remainder) {
-                $string .= $conjunction .convertNumberToWords($remainder);
+                $string .= $conjunction . convertNumberToWords($remainder);
             }
             break;
         default:
@@ -187,18 +201,64 @@ function convertNumberToWords($number) {
 
     return ucwords($string);
 }
-function monthName($number){
-    switch($number) {
-        case 1: return "January";break;
-        case 2: return "February";break;
-        case 3: return "March";break;
-        case 4: return "April";break;
-        case 5: return "May";break;
-        case 6: return "June";break;
-        case 7: return "July";break;
-        case 8: return "August";break;
-        case 9: return "September";break;
-        case 10: return "October";break;
-        case 12: return "December";break;
+function monthName($number)
+{
+    switch ($number) {
+        case 1:
+            return "January";
+            break;
+        case 2:
+            return "February";
+            break;
+        case 3:
+            return "March";
+            break;
+        case 4:
+            return "April";
+            break;
+        case 5:
+            return "May";
+            break;
+        case 6:
+            return "June";
+            break;
+        case 7:
+            return "July";
+            break;
+        case 8:
+            return "August";
+            break;
+        case 9:
+            return "September";
+            break;
+        case 10:
+            return "October";
+            break;
+        case 12:
+            return "December";
+            break;
     }
+}
+function customerLastTransaction($customer_id)
+{
+    return DB::table('general_account_ledgers')
+        ->where('model_id', $customer_id)
+        ->where('model_name', 'Customer')
+        ->whereRaw("SUBSTR(reference, 1, 3) = 'INV'")
+        ->orderBy('date', 'DESC')
+        ->first();
+
+}
+function transactionDecription($reference)
+{//This function is meant fo particularly the description of the transaction captured
+    if (substr($reference, 0, 3) == "PAY")
+        return DB::table('payments')->where('reference', $reference)->first()->description ?? '';
+    if (substr($reference, 0, 3) == "RCT")
+        return DB::table('receipts')->where('receipt_no', $reference)->first()->description ?? '';
+    if (substr($reference, 0, 3) == "STK")
+        return DB::table('stock_adjustments')->where('reference', $reference)->first()->description ?? '';
+    if (substr($reference, 0, 3) == "INV")
+        return DB::table('orders')->where('reference', $reference)->first()->description ?? '';
+    if (substr($reference, 0, 3) == "CRN")
+        return DB::table('credit_notes')->where('reference', $reference)->first()->description ?? '';
 }

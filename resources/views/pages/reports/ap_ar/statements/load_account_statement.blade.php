@@ -28,13 +28,14 @@
         <tr>
             <th rowspan="2" style="width: 5%;">S/N</th>
             <th rowspan="2">Date</th>
+            <th rowspan="2">Account No</th>
             <th rowspan="2">Description</th>
             <th rowspan="2">Reference</th>
             <th colspan="2" style="text-align: center; align-content: center">Balance</th>
         </tr>
         <tr>
-            <th style="text-align: center; align-content: center">Credit (Cr.)</th>
             <th style="text-align: center; align-content: center">Debit (Dr.)</th>
+            <th style="text-align: center; align-content: center">Credit (Cr.)</th>
             <th>Balance</th>
         </tr>
     </thead>
@@ -48,26 +49,27 @@
                 <td>{{ $loop->index + 1 }}</td>
                 <td>{{ $ledger->date->toFormattedDateString() }}</td>
 
-                {{-- <td>{{ $ledger->payer()->name ?? $ledger->payer()->description }}</td> --}}
-                <td>{{ $ledger->description }}</td>
-                <td>{{ $ledger->reference }}</td>
-                <td style="text-align: right">
-                    @if ($credit > 0.0)
-                        {{ $credit }}
-                    @endif
+                <td>{{ $ledger->payer()->code ?? ($ledger->payer()->number ?? '') }}</td>
+                <td>{{ transactionDecription($ledger->reference) != '' ? transactionDecription($ledger->reference) : $ledger->description }}
                 </td>
+                <td>{{ $ledger->reference }}</td>
                 <td style="text-align: right">
                     @if ($debit > 0.0)
                         {{ $debit }}
                     @endif
                 </td>
                 <td style="text-align: right">
+                    @if ($credit > 0.0)
+                        {{ $credit }}
+                    @endif
+                </td>
+                <td style="text-align: right">
                     <?php $sum_cr += $ledger->credit;
                     $sum_dr += $ledger->debit;
-                    $dif = $sum_cr - $sum_dr;
+                    $dif =  $sum_dr-$sum_cr;
                     ?>
                     @if ($dif < 0)
-                       ({{ number_format(abs($dif), 2) }})
+                        ({{ number_format(abs($dif), 2) }})
                     @else
                         {{ number_format($dif, 2) }}
                     @endif
@@ -78,15 +80,15 @@
     <tfoot>
         <tr>
 
-            <th colspan="4" style="text-align: right">Total</th>
-            <th style="text-align: right;">&#8358;{{ number_format($credit_sum, 2) }}</th>
+            <th colspan="5" style="text-align: right">Total</th>
             <th style="text-align: right;">&#8358;{{ number_format($debit_sum, 2) }}</th>
+            <th style="text-align: right;">&#8358;{{ number_format($credit_sum, 2) }}</th>
             <th></th>
         </tr>
         <tr>
             <th colspan="4" style="text-align: right">Balance C/F</th>
             <th colspan="3" style="text-align: right;">&#8358;{{ number_format($dif, 2) }}</th>
-
+            <th></th>
         </tr>
     </tfoot>
 </table>

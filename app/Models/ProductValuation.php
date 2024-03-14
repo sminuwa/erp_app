@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @property varchar $reference reference
@@ -83,9 +84,10 @@ class ProductValuation extends Model
          * types: 1= opening balance, 2= Purchase, 3=Sale, 4 = Transfer, 5 = Adjustment
          *
          * */
+        Log::info(print_r($records, true));
         $valuations = [];
         foreach ($records as $record) {
-            $record = self::where(['store_id' => $record['store_id'], 'product_id' => $record['product_id'], 'branch_id' => $record['branch_id'], 'cost_price' => $record['cost_price']])->first();
+//            $record = self::where(['store_id' => $record['store_id'], 'product_id' => $record['product_id'], 'branch_id' => $record['branch_id'], 'cost_price' => $record['cost_price']])->first();
             $valuations[] = [
                 'reference' => $reference,
                 'branch_id' => $record['branch_id'],
@@ -93,7 +95,7 @@ class ProductValuation extends Model
                 'product_id' => $record['product_id'],
                 'quantity' => $record['quantity'],
                 'cost_price' => $record['cost_price'],
-                'date' => $date,
+                'date' => $date ?? date('Y-m-d'),
                 'action_by' => $record['action_by'] ?? auth()->id(),
 
             ];

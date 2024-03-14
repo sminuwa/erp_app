@@ -2650,6 +2650,97 @@ class ReportController extends Controller
         ]);
     }
 
+    public function productValuation()
+    {
+        return view('pages.reports.inventory.product_valuation.product_valuation_report');
+    }
+
+    public function loadProductValuationReport(Request $request)
+    {
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
+        $product_id = $request->product_id;
+        $category_id = $request->category_id;
+        $branch_id = $request->branch_id;
+        $store_id = $request->store_id;
+
+        if ($product_id == 'all' || $product_id == '') {
+            $product_id = '%';
+        }
+        if ($category_id == 'all' || $category_id == '') {
+            $category_id = '%';
+        }
+
+
+        if ($branch_id == 'all' || $branch_id == '') {
+            $branch_id = '%';
+        }
+        if ($store_id == 'all' || $store_id == '') {
+            $store_id = '%';
+        }
+
+
+        $sales = DB::table('product_valuations')
+            ->select('products.code', 'reference', 'products.name AS product', 'quantity', 'cost_price', 'product_valuations.date', 'stores.code AS store_code')
+            ->join('products', 'products.id', 'product_valuations.product_id')
+            ->join('stores', 'stores.id', 'product_valuations.store_id')
+            ->where('products.category_id', 'LIKE', $category_id)
+            ->where('product_valuations.product_id', 'LIKE', $product_id)
+            ->where('product_valuations.branch_id', 'LIKE', $branch_id)
+            ->where('product_valuations.store_id', 'LIKE', $store_id)
+            ->where(DB::raw("DATE(date)"), '>=', $from_date)
+            ->where(DB::raw("DATE(date)"), '<=', $to_date)
+            ->orderBy('date')
+            ->get();
+        if ($category_id == "%")
+            $category_id = "all";
+
+        if ($product_id == "%")
+            $product_id = "all";
+
+        if ($branch_id == "%")
+            $branch_id = "all";
+        if ($store_id == "%")
+            $store_id = "all";
+        $branch = null;
+        if ($branch_id != "all")
+            $branch = Branch::find($branch_id);
+
+        return view('pages.reports.inventory.product_valuation.load_product_valuation_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'store_id', 'category_id', 'product_id', 'branch'));
+    }
+
+    public function printProductValuationReport($from_date, $to_date, $branch_id, $store_id, $category_id, $product_id)
+    {
+        if ($product_id == 'all') {
+            $product_id = '%';
+        }
+        if ($category_id == 'all') {
+            $category_id = '%';
+        }
+
+        if ($branch_id == 'all') {
+            $branch_id = '%';
+        }
+        if ($store_id == 'all') {
+            $store_id = '%';
+        }
+        $sales = DB::table('product_valuations')
+            ->select('products.code', 'reference', 'products.name AS product', 'quantity', 'cost_price', 'product_valuations.date', 'stores.code AS store_code')
+            ->join('products', 'products.id', 'product_valuations.product_id')
+            ->join('stores', 'stores.id', 'product_valuations.store_id')
+            ->where('products.category_id', 'LIKE', $category_id)
+            ->where('product_valuations.product_id', 'LIKE', $product_id)
+            ->where('product_valuations.branch_id', 'LIKE', $branch_id)
+            ->where('product_valuations.store_id', 'LIKE', $store_id)
+            ->where(DB::raw("DATE(date)"), '>=', $from_date)
+            ->where(DB::raw("DATE(date)"), '<=', $to_date)
+            ->orderBy('date')
+            ->get();
+        $branch = null;
+        if ($branch_id != "all")
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.inventory.product_valuation.print_product_valuation_report', compact('sales', 'from_date', 'to_date', 'branch'));
+    }
     public function loadTotalPurchaseItemReport(Request $request)
     {
         $from_date = $request->from_date;

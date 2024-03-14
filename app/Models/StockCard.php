@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class StockCard extends Model
 {
@@ -57,6 +58,7 @@ class StockCard extends Model
          * types: 1= opening balance, 2= Purchase, 3=Sale, 4 = Transfer, 5 = Adjustment
          *
          * */
+        Log::info(print_r($records, true));
         $cards = [];
         foreach($records as $record){
             $credit = $debit = $qty_after =$qty_before  = 0;

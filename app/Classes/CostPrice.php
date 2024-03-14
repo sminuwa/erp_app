@@ -65,7 +65,7 @@ class CostPrice
         }
 
         foreach ($products as $key => $p) {
-            //            return isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0;
+            // return isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0;
             $records[$key] = [
                 'existing_quantity' => isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0,
                 'return_quantity' => $products[$key]['quantity'],
@@ -85,7 +85,7 @@ class CostPrice
                 'store_id' => $store_id,
                 'product_id' => $key,
                 'quantity' => $record['quantity'],
-                'cost_price' => round(($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'], 2),,
+                'cost_price' => round(($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'], 2),
                 'action_by' => $user->id,
             ];
             $product_costs[] = [
@@ -117,6 +117,7 @@ class CostPrice
             StoreProduct::upsert($store_products, ['store_id', 'product_id'])
             && BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id'])
             && StoreProductBatch::upsert($batch, ['batch_no'])
+            && ProductValuation::createBatchRecord($valuation_param, $batch_no)
         ) {
             DB::commit();
             return ['status' => true, 'message' => 'success'];

@@ -1011,7 +1011,7 @@ class ReportController extends Controller
             ->where('stores.branch_id', 'LIKE', $branch_id)
             ->where('stock_cards.store_id', 'LIKE', $store_id)
             ->whereBetween('stock_cards.date', [$from_date, $to_date])
-            ->orderBy('date', 'DESC')
+            ->orderBy('stock_cards.updated_at', 'ASC')
             ->get();
         $qty_available = 0;
         if ($store_id > 0)
@@ -1071,7 +1071,7 @@ class ReportController extends Controller
             ->where('stores.branch_id', 'LIKE', $branch_id)
             ->where('stock_cards.store_id', 'LIKE', $store_id)
             ->whereBetween('stock_cards.date', [$from_date, $to_date])
-            ->orderBy('date', 'DESC')
+            ->orderBy('stock_cards.updated_at', 'ASC')
             ->get();
         $qty_available = 0;
         if ($store_id > 0)

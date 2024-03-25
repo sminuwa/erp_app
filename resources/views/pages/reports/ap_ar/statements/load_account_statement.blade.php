@@ -42,8 +42,8 @@
     <tbody>
         @foreach ($ledgers as $ledger)
             @php
-                $credit = number_format($ledger->credit, 2);
-                $debit = number_format($ledger->debit, 2);
+                $credit = number_format(abs($ledger->credit), 2);
+                $debit = number_format(abs($ledger->debit), 2);
             @endphp
             <tr>
                 <td>{{ $loop->index + 1 }}</td>
@@ -66,7 +66,7 @@
                 <td style="text-align: right">
                     <?php $sum_cr += $ledger->credit;
                     $sum_dr += $ledger->debit;
-                    $dif =  $sum_dr-$sum_cr;
+                    $dif = $sum_dr - $sum_cr;
                     ?>
                     @if ($dif < 0)
                         ({{ number_format(abs($dif), 2) }})

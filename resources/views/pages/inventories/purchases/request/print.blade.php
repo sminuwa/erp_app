@@ -87,9 +87,6 @@
                         </div>
                         <div class="col-sm-3 invoice-col">
                             <div>
-                                {{--@php
-                                    $uc = substr($order->reference, 0, 6) . substr($order->reference, 6, 10) + 3000;
-                                @endphp--}}
                                 {{ QrCode::size(70)->generate($purchase->reference) }}<br />
                                 <span style="font-size:28px;margin-top:-5px">
                                      Purchase Request

@@ -68,8 +68,8 @@
                                         <th colspan="2" style="text-align: center; align-content: center">Balance</th>
                                     </tr>
                                     <tr>
-                                        <th style="text-align: center; align-content: center">Credit (Cr.)</th>
                                         <th style="text-align: center; align-content: center">Debit (Dr.)</th>
+                                        <th style="text-align: center; align-content: center">Credit (Cr.)</th>
                                         <th>Balance</th>
                                     </tr>
                                 </thead>
@@ -88,12 +88,12 @@
                                             <td>{{ $ledger->reference }}</td>
                                             <td style="text-align: right">
                                                 @if ($credit > 0.0)
-                                                    {{ $credit }}
+                                                    {{ abs($credit) }}
                                                 @endif
                                             </td>
                                             <td style="text-align: right">
                                                 @if ($debit > 0.0)
-                                                    {{ $debit }}
+                                                    {{ abs($debit) }}
                                                 @endif
                                             </td>
                                             <td style="text-align: right">
@@ -114,8 +114,8 @@
                                     <tr>
                             
                                         <th colspan="5" style="text-align: right">Total</th>
-                                        <th style="text-align: right;">&#8358;{{ number_format($credit_sum, 2) }}</th>
                                         <th style="text-align: right;">&#8358;{{ number_format($debit_sum, 2) }}</th>
+                                        <th style="text-align: right;">&#8358;{{ number_format($credit_sum, 2) }}</th>
                                         <th></th>
                                     </tr>
                                     <tr>

@@ -17,14 +17,14 @@
     <thead>
         <tr>
             <th>DATE</th>
-            <th>INVOICE</th>
+            <th>DOCUMENT NO</th>
             <th>ITEM</th>
             <th>ITEM PRICE</th>
             <th>QTY</th>
             <th>TOTAL COST</th>
             <th>STORE</th>
             <th>WAYBILL</th>
-            <th>SUPP NAME</th>
+            <th>SUPPLIER</th>
         </tr>
     </thead>
     @php

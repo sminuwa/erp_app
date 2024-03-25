@@ -150,7 +150,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-4">
-                                            <textarea class="form-control" name="description" placeholder="Description" id="description"></textarea>
+                                            <textarea class="form-control" name="description" placeholder="Description" id="description" required></textarea>
                                         </div>
                                         <div class="col-md-4">
                                             <input type="number" class="form-control" name="discount" step=".01"

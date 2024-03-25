@@ -25,16 +25,16 @@
             @if ($type == 'Customer')
                 <th>RO</th>
             @endif
-            <th style="text-align: center; align-content: center">Credit (Cr.)</th>
             <th style="text-align: center; align-content: center">Debit (Dr.)</th>
+            <th style="text-align: center; align-content: center">Credit (Cr.)</th>
             <th>Balance</th>
         </tr>
     </thead>
     <tbody>
         @foreach ($ledgers as $ledger)
             @php
-                $credit = number_format($ledger->credit, 2);
-                $debit = number_format($ledger->debit, 2);
+                $credit = number_format(abs($ledger->credit), 2);
+                $debit = number_format(abs($ledger->debit), 2);
             @endphp
             <tr>
                 <td>{{ $ledger->number }}</td>
@@ -43,26 +43,27 @@
                     <td>{{ $ledger->name }}</td>
                 @endif
                 <td style="text-align: right">
-                    @if ($credit > 0.0)
-                        &#8358; {{ $credit }}
+                    @if ($debit > 0.0)
+                        {{$debit}}
                     @endif
                 </td>
                 <td style="text-align: right">
-                    @if ($debit > 0.0)
-                        &#8358; {{ $debit }}
+                    @if ($credit > 0.0)
+                        {{ $credit }}
                     @endif
                 </td>
+
                 <td style="text-align: right">
                     <?php $sum_cr = $ledger->credit;
                     $sum_dr = $ledger->debit;
                     $total_cr += $sum_cr;
                     $total_dr += $sum_dr;
-                    $dif = $sum_dr-$sum_cr;
+                    $dif = $sum_dr - $sum_cr;
                     ?>
                     @if ($dif < 0)
-                        &#8358;({{ number_format(abs($dif), 2) }})
+                        ({{ number_format(abs($dif), 2) }})
                     @else
-                        &#8358;{{ number_format($dif, 2) }}
+                        {{ number_format($dif, 2) }}
                     @endif
                 </td>
             </tr>
@@ -71,9 +72,9 @@
     <tfoot>
         <tr>
             <th colspan="{{ $type == 'Customer' ? 3 : 2 }}" style="text-align: right">Total</th>
-            <th style="text-align: right;">&#8358;{{ number_format($total_cr, 2) }}</th>
             <th style="text-align: right;">&#8358;{{ number_format($total_dr, 2) }}</th>
-            <th style="text-align: right;">&#8358;{{ number_format($total_cr - $total_dr, 2) }}</th>
+            <th style="text-align: right;">&#8358;{{ number_format($total_cr, 2) }}</th>
+            <th style="text-align: right;">&#8358;{{ number_format($total_dr - $total_cr, 2) }}</th>
         </tr>
         <tr>
             <th colspan="4" style="text-align: right">Balance C/F</th>

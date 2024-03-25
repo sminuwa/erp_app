@@ -46,9 +46,8 @@
                     <!-- title row -->
                     <div class="row">
                         <div class="col-11">
-                            <img src="{{ asset('assets/backend/img/logo' . '.png') }}"
-                                style="width:100px;height:60px;" alt="logo" class="img-circle elevation-3"
-                                style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo' . '.png') }}" style="width:100px;height:60px;"
+                                alt="logo" class="img-circle elevation-3" style="opacity: .8">
                             <span
                                 style="font-size:24px;">&nbsp;{{ App\Models\User::userBranchName()->long_name }}</span>
 
@@ -101,9 +100,6 @@
                         </div>
                         <div class="col-sm-3 invoice-col">
                             <div style="color:aliceblue;">
-                                {{-- @php
-                                    $uc = substr($order->reference, 0, 6) . substr($order->reference, 6, 10) + 3000;
-                                @endphp --}}
                                 {{ QrCode::size(70)->generate($order->total) }}<br />
                                 <span style="font-size:28px;margin-top:-5px">
                                     {{ $order->payment_mode }} Sales
@@ -175,7 +171,6 @@
                                     <th style="text-align: right;">
                                         &#8358;{{ number_format($total, 2, '.', ',') }}</th>
                                 </tr>
-
                                 @if ($order->discount != 0)
                                     <tr>
                                         <th style="text-align: right">Discount := </th>
@@ -192,14 +187,19 @@
                                         </th>
                                     </tr>
                                 @endif
-                                @if ($order->discount != 0 || $order->refund != 0)
-                                    <tr>
-                                        <th style="text-align: right">Total Amount := </th>
-                                        <th style="text-align: right;">
-                                            &#8358;{{ number_format($total - $order->discount + $order->refund, 2, '.', ',') }}
-                                        </th>
-                                    </tr>
-                                @endif
+                                <tr>
+                                    <th style="text-align: right">VAT := </th>
+                                    <th style="text-align: right;">
+                                        &#8358;0.00
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align: right">Total Amount := </th>
+                                    <th style="text-align: right;">
+                                        &#8358;{{ number_format($total - $order->discount + $order->refund, 2, '.', ',') }}
+                                    </th>
+                                </tr>
+
 
                                 <tr>
                                     <td colspan="4">Amoun Paid in Words:

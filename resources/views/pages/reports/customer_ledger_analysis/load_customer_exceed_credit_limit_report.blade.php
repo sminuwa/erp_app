@@ -21,6 +21,7 @@
 
         </tr>
     </thead>
+    @php $total = 0; @endphp
     @foreach ($customers as $customer)
         <tr>
             <td>{{ $customer->code }}</td>
@@ -28,6 +29,9 @@
             <td>{{ $customer->type }}</td>
             <td>{{ $customer->branch->name }}</td>
             <td style="text-align: right">{{ number_format($customer->credit_limit, 2) }}</td>
+            @php
+                $total += $customer->balance;
+            @endphp
             @if ($customer->balance < 0)
                 <td style="text-align: right">({{ number_format(abs($customer->balance), 2) }})</td>
             @else
@@ -36,4 +40,10 @@
             {{-- <td style="text-align: right">{{ number_format($customer->balance-$customer->credit_limit, 2) }}</td> --}}
         </tr>
     @endforeach
+    <tfoot>
+        <tr>
+            <th colspan="5">TOTAL</th>
+            <th style="text-align: right">{{ number_format($total, 2) }}</th>
+        </tr>
+    </tfoot>
 </table>

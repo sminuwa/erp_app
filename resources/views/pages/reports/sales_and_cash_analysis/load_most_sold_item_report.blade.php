@@ -20,33 +20,43 @@
             <th>CODE</th>
             <th>ITEM</th>
             <th>QUANTITY</th>
-            <th>TOTAL AMOUNT</th>
+            <th>TOTAL COST (&#8358;)</th>
+            <th>TOTAL SELLING PRICE (&#8358;)</th>
+            <th>MARGIN (&#8358;)</th>
+        
         </tr>
     </thead>
     @php
         $total_quantity = 0;
         $total_amount = 0;
+        $total_cost = 0;
     @endphp
     @foreach ($sales as $sale)
         <tr>
             <td>{{ $sale->code }}</td>
             <td>{{ $sale->item }}</td>
-            <td>{{ $sale->quantity }}</td>
-            <td style="text-align: right">&#8358;{{ number_format($sale->total, 2, '.', ',') }}</td>
+            <td style="text-align: right">{{ $sale->quantity }}</td>
+            <td style="text-align: right">{{ number_format($sale->total_cost, 2, '.', ',') }}</td>
+            <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>
+            <td style="text-align: right">{{ number_format($sale->total - $sale->total_cost, 2, '.', ',') }}</td>
         </tr>
         @php
             $total_quantity += $sale->quantity;
             $total_amount += $sale->total;
+            $total_cost += $sale->total_cost;
 
         @endphp
     @endforeach
     <tfoot>
         <tr>
-            <th style="text-align: right"  colspan="2">TOTAL</th>
+            <th style="text-align: right"  colspan="3">TOTAL</th>
             <th style="text-align: right">
-                {{ number_format($total_quantity, 0, '.', ',') }}</th>
+                &#8358;{{ number_format($total_cost, 0, '.', ',') }}</th>
             <th style="text-align: right">
                 &#8358;{{ number_format($total_amount, 2, '.', ',') }}
+            </th>
+            <th style="text-align: right">
+                &#8358;{{ number_format($total_amount-$total_cost, 2, '.', ',') }}
             </th>
         </tr>
     </tfoot>

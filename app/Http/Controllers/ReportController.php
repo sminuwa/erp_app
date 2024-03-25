@@ -691,7 +691,8 @@ class ReportController extends Controller
                 'categories.code AS code',
                 DB::raw('SUM(order_details.quantity) AS quantity'),
                 DB::raw('SUM(order_details.total) AS amount'),
-                DB::raw('SUM(order_details.cost_price * order_details.quantity) AS cost')
+                DB::raw('SUM(order_details.cost_price * order_details.quantity) AS cost'),
+                DB::raw('SUM(store_products.qty_available) AS qty_available'),
             )
             ->join('order_details', 'order_details.order_id', 'orders.id')
             ->join('store_products', 'store_products.id', 'order_details.store_product_id')
@@ -743,7 +744,8 @@ class ReportController extends Controller
                 'categories.code AS code',
                 DB::raw('SUM(order_details.quantity) AS quantity'),
                 DB::raw('SUM(order_details.total) AS amount'),
-                DB::raw('SUM(order_details.cost_price * order_details.quantity) AS cost')
+                DB::raw('SUM(order_details.cost_price * order_details.quantity) AS cost'),
+                DB::raw('SUM(store_products.qty_available) AS qty_available'),
             )
             ->join('order_details', 'order_details.order_id', 'orders.id')
             ->join('store_products', 'store_products.id', 'order_details.store_product_id')
@@ -800,7 +802,7 @@ class ReportController extends Controller
             $staff_id = '%';
         }
         $sales = DB::table('orders')
-            ->select('customers.code AS customer', 'orders.reference', 'products.name AS product', 'stores.code AS store', 'order_details.quantity', 'sold_price', 'cost_price', 'users.user_code AS user', 'order_date')
+            ->select('customers.code AS customer', 'orders.reference', 'products.name AS product', 'stores.code AS store', 'order_details.quantity', 'sold_price', 'cost_price', 'users.user_code AS user','users.name AS name', 'order_date')
             ->join('order_details', 'order_details.order_id', 'orders.id')
             ->join('store_products', 'store_products.id', 'order_details.store_product_id')
             ->join('customers', 'customers.id', 'orders.customer_id')
@@ -856,23 +858,23 @@ class ReportController extends Controller
 
 
         $sales = DB::table('orders')
-            ->select('customers.code AS customer', 'orders.reference', 'products.name AS product', 'stores.code AS store', 'order_details.quantity', 'sold_price', 'cost_price', 'users.user_code AS user', 'order_date')
-            ->join('order_details', 'order_details.order_id', 'orders.id')
-            ->join('store_products', 'store_products.id', 'order_details.store_product_id')
-            ->join('customers', 'customers.id', 'orders.customer_id')
-            ->join('stores', 'stores.id', 'store_products.store_id')
-            ->join('products', 'products.id', 'store_products.product_id')
-            ->where('products.category_id', 'LIKE', $category_id)
-            ->where('store_products.product_id', 'LIKE', $product_id)
-            ->where('store_products.store_id', 'LIKE', $store_id)
-            ->where('orders.sold_by', 'LIKE', $staff_id)
-            ->where('order_details.status', 1)
-            ->where('orders.status', 1)
-            ->where('stores.branch_id', 'LIKE', $branch_id)
-            ->join('users', 'users.id', 'orders.sold_by')
-            ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
-            ->orderBy('order_date')
-            ->get();
+        ->select('customers.code AS customer', 'orders.reference', 'products.name AS product', 'stores.code AS store', 'order_details.quantity', 'sold_price', 'cost_price', 'users.user_code AS user','users.name AS name', 'order_date')
+        ->join('order_details', 'order_details.order_id', 'orders.id')
+        ->join('store_products', 'store_products.id', 'order_details.store_product_id')
+        ->join('customers', 'customers.id', 'orders.customer_id')
+        ->join('stores', 'stores.id', 'store_products.store_id')
+        ->join('products', 'products.id', 'store_products.product_id')
+        ->where('products.category_id', 'LIKE', $category_id)
+        ->where('store_products.product_id', 'LIKE', $product_id)
+        ->where('store_products.store_id', 'LIKE', $store_id)
+        ->where('orders.sold_by', 'LIKE', $staff_id)
+        ->where('order_details.status', 1)
+        ->where('orders.status', 1)
+        ->where('stores.branch_id', 'LIKE', $branch_id)
+        ->join('users', 'users.id', 'orders.sold_by')
+        ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
+        ->orderBy('order_date')
+        ->get();
         $total_cash = Order::where('sold_by', 'LIKE', $staff_id)->where('status', 1)->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])->sum('total');
         $user = User::find($staff_id);
         $branch = null;
@@ -1230,7 +1232,7 @@ class ReportController extends Controller
             $branch_id = '%';
 
         $sales = DB::table('orders')
-            ->select('products.name AS item', 'products.code AS code', DB::raw("SUM(order_details.quantity) AS quantity"), DB::raw("SUM(order_details.total) AS total"))
+            ->select('products.name AS item', 'products.code AS code', DB::raw("SUM(order_details.quantity) AS quantity"), DB::raw("SUM(order_details.quantity * cost_price) AS total_cost"), DB::raw("SUM(order_details.total) AS total"), DB::raw("SUM(order_details.quantity * cost_price) - SUM(order_details.total) AS margin"))
             ->join('order_details', 'order_details.order_id', 'orders.id')
             ->join('store_products', 'store_products.id', 'order_details.store_product_id')
             ->join('customers', 'customers.id', 'orders.customer_id')
@@ -1243,6 +1245,8 @@ class ReportController extends Controller
             $sales = $sales->orderBy(DB::raw("SUM(order_details.quantity)"), 'DESC');
         if ($type == 'amt')
             $sales = $sales->orderBy(DB::raw("SUM(order_details.total)"), 'DESC');
+        if ($type == 'mgn')
+            $sales = $sales->orderBy('margin', 'DESC');
         $sales = $sales->groupBy('store_products.product_id')
             ->take($number_limit)
             ->get();
@@ -1257,8 +1261,8 @@ class ReportController extends Controller
         if ($branch_id == '' || $branch_id == 'all')
             $branch_id = '%';
 
-        $sales = DB::table('orders')
-            ->select('products.name AS item', 'products.code AS code', DB::raw("SUM(order_details.quantity) AS quantity"), DB::raw("SUM(order_details.total) AS total"))
+            $sales = DB::table('orders')
+            ->select('products.name AS item', 'products.code AS code', DB::raw("SUM(order_details.quantity) AS quantity"), DB::raw("SUM(order_details.quantity * cost_price) AS total_cost"), DB::raw("SUM(order_details.total) AS total"), DB::raw("SUM(order_details.quantity * cost_price) - SUM(order_details.total) AS margin"))
             ->join('order_details', 'order_details.order_id', 'orders.id')
             ->join('store_products', 'store_products.id', 'order_details.store_product_id')
             ->join('customers', 'customers.id', 'orders.customer_id')
@@ -1271,6 +1275,8 @@ class ReportController extends Controller
             $sales = $sales->orderBy(DB::raw("SUM(order_details.quantity)"), 'DESC');
         if ($type == 'amt')
             $sales = $sales->orderBy(DB::raw("SUM(order_details.total)"), 'DESC');
+        if ($type == 'mgn')
+            $sales = $sales->orderBy('margin', 'DESC');
         $sales = $sales->groupBy('store_products.product_id')
             ->take($number_limit)
             ->get();

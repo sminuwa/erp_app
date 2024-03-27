@@ -62,8 +62,8 @@
                                         <th>Description</th>
                                         <th>System/Invoice</th>
                                         <th>Ref</th>
-                                        <th>Cr (&#8358;)</th>
                                         <th>Dr (&#8358;)</th>
+                                        <th>Cr (&#8358;)</th>
                                         <th>Running Balance</th>
                                     </tr>
                                 </thead>
@@ -76,8 +76,8 @@
                                         <td>{{ $ledger->description }}</td>
                                         <td>{{ $ledger->systemid }}</td>
                                         <td>{{ $ledger->ref }}</td>
-                                        <td style="text-align: right"> &#8358;{{ number_format($ledger->cr, 2) }}</td>
-                                        <td style="text-align: right"> &#8358;{{ number_format($ledger->dr, 2) }}</td>
+                                        <td style="text-align: right"> {{ number_format(abs($ledger->dr), 2) }}</td>
+                                        <td style="text-align: right"> {{ number_format(abs($ledger->cr), 2) }}</td>
                                         <td style="text-align: right">
                                             <?php $sum_cr += $ledger->cr;
                                             $sum_dr += $ledger->dr;
@@ -92,9 +92,9 @@
                                                     ->where('customer_id', $customer->id)
                                                     ->sum('dr'); ?>
                                             @if ($dif < 0)
-                                                &#8358;({{ number_format(abs($dif), 2) }})
+                                                ({{ number_format(abs($dif), 2) }})
                                             @else
-                                                &#8358;{{ number_format($dif, 2) }}
+                                                {{ number_format($dif, 2) }}
                                             @endif
                                         </td>
                                     </tr>
@@ -104,13 +104,13 @@
                                     <th></th>
                                     <th></th>
                                     <th></th>
-                                    <th style="text-align: right;">&#8358;{{ number_format($sum_cr, 2) }}</th>
-                                    <th style="text-align: right;">&#8358;{{ number_format($sum_dr, 2) }}</th>
+                                    <th style="text-align: right;">&#8358;{{ number_format(abs($sum_dr), 2) }}</th>
+                                    <th style="text-align: right;">&#8358;{{ number_format(abs($sum_cr), 2) }}</th>
                                     <th style="text-align: right">
                                         @if ($dif < 0)
-                                            &#8358;({{ number_format(abs($dif), 2) }})
+                                            ({{ number_format(abs($dif), 2) }})
                                         @else
-                                            &#8358;{{ number_format($dif, 2) }}
+                                            {{ number_format($dif, 2) }}
                                         @endif
                                     </th>
                                 </tr>

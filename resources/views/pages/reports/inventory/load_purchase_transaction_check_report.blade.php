@@ -22,7 +22,7 @@
             <th>QTY PURCH</th>
             <th>QTY A. PURCH</th>
             <th>STORE</th>
-            <th>SUPP NAME</th>
+            <th>SUPPLIER</th>
         </tr>
     </thead>
     @php

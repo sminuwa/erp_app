@@ -18,7 +18,8 @@
         <tr>
             <th>CODE</th>
             <th>CATEGORY</th>
-            <th>QTY</th>
+            <th>QTY AVAILBLE</th>
+            <th>QTY SOLD</th>
             <th>AMOUNT(&#8358;)</th>
             <th>COST(&#8358;)</th>
             <th>MARGIN(&#8358;)</th>
@@ -35,7 +36,8 @@
         <tr>
             <td>{{ $sale->code }}</td>
             <td>{{ $sale->category }}</td>
-            <td>{{ $sale->quantity }}</td>
+            <td style="text-align: right">{{ $sale->qty_available }}</td>
+            <td style="text-align: right">{{ $sale->quantity }}</td>
             <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}</td>
             <td style="text-align: right">{{ number_format($sale->cost, 2, '.', ',') }}</td>
             <td style="text-align: right">
@@ -56,7 +58,7 @@
     @endforeach
     <tfoot>
         <tr>
-            <th colspan="3" style="text-align: right">TOTAL</th>
+            <th colspan="4" style="text-align: right">TOTAL</th>
             <th style="text-align: right">
                 &#8358;{{ number_format($total_amount, 2, '.', ',') }}</th>
             <th style="text-align: right">

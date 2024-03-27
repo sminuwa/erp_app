@@ -26,20 +26,20 @@
         @endphp
         @foreach ($ledger2 as $ledger)
             @php
-                $credit = number_format($ledger->credit, 2);
-                $debit = number_format($ledger->debit, 2);
+                $credit = number_format(abs($ledger->credit), 2);
+                $debit = number_format(abs($ledger->debit), 2);
             @endphp
             <tr>
                 <td>{{ $ledger->number }}</td>
                 <td>{{ $ledger->description }}</td>
                 <td style="text-align: right">
                     @if ($debit > 0.0)
-                        &#8358; {{ $debit }}
+                        {{ $debit }}
                     @endif
                 </td>
                 <td style="text-align: right">
                     @if ($credit > 0.0)
-                        &#8358; {{ $credit }}
+                        {{ $credit }}
                     @endif
                 </td>
 
@@ -57,20 +57,20 @@
         @endforeach
         @foreach ($ledger1 as $ledger)
             @php
-                $credit = number_format($ledger->credit, 2);
-                $debit = number_format($ledger->debit, 2);
+                $credit = number_format(abs($ledger->credit), 2);
+                $debit = number_format(abs($ledger->debit), 2);
             @endphp
             <tr>
                 <td>{{ $ledger->number }}</td>
                 <td>{{ $ledger->description }}</td>
                 <td style="text-align: right">
                     @if ($debit > 0.0)
-                        &#8358; {{ $debit }}
+                        {{ $debit }}
                     @endif
                 </td>
                 <td style="text-align: right">
                     @if ($credit > 0.0)
-                        &#8358; {{ $credit }}
+                        {{ $credit }}
                     @endif
                 </td>
 

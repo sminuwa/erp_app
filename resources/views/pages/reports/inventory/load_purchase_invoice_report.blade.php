@@ -17,11 +17,11 @@
     <thead>
         <tr>
             <th>DATE</th>
-            <th>INVOICE</th>
+            <th>DOCUMENT NO</th>
             <th>AMOUNT</th>
             <th>WAYBILL</th>
-            <th>SUPP NAME</th>
-            <th>STATAUS</th>
+            <th>SUPPLIER</th>
+            <th>STATUS</th>
         </tr>
     </thead>
     @php

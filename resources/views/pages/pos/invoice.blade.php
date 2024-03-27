@@ -124,7 +124,11 @@
                                                 <td class="text-right">&#8358;
                                                     {{ number_format(Cart::getSubTotal(), 2) }}</td>
                                             </tr>
-
+                                            <tr>
+                                                <th style="width:50%">VAT:</th>
+                                                <td class="text-right">&#8358;
+                                                    {{ number_format(0, 2) }}</td>
+                                            </tr>
                                             <tr>
                                                 <th>Total:</th>
                                                 <td class="text-right">&#8358;

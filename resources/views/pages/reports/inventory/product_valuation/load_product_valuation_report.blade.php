@@ -1,6 +1,6 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.product.valuation.report.print', [$from_date, $to_date, $branch_id, $store_id,$category_id, $product_id]) }}"
+        <a href="{{ route('ajax.product.valuation.report.print', [$date, $branch_id, $store_id, $category_id, $product_id]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
@@ -8,46 +8,41 @@
     <caption style="caption-size:top">
         <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>
         <h5 style="text-align: center;">Product Valuation Report
-            From
-            {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
-            AND
-            {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
+            Date:
+            {{ \Carbon\Carbon::parse($date)->toFormattedDateString() }}
         </h5>
     </caption>
     <thead>
         <tr>
-            <th>DATE</th>
             <th>STORE</th>
-            <th>REFERENCE</th>
             <th>ITEM CODE</th>
             <th>ITEM NAME</th>
-            <th>ITEM PRICE</th>
             <th>QTY</th>
+            <th>COST PRICE</th>
             <th>TOTAL </th>
         </tr>
     </thead>
     @php
         $total_cost = 0;
     @endphp
-    @foreach ($sales as $sale)
+    @foreach ($stock_cards as $stock_card)
         <tr>
-            <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}</td>
-            <td>{{ $sale->store_code  }}</td>
-            <td>{{ $sale->reference }}</td>
-            <td>{{ $sale->code}}</td>
-            <td>{{ $sale->product}}</td>
-            <td style="text-align: right">{{ number_format($sale->cost_price, 2) }}</td>
-            <td>{{ $sale->quantity }}</td>
+            <td>{{ $stock_card->store->code ?? 'All'  }}</td>
+            <td>{{ $stock_card->product->code ?? 'All' }}</td>
+            <td>{{ $stock_card->product->name ?? 'All' }}</td>
+            <td>{{ number_format($stock_card->credit - $stock_card->debit, 2) }}</td>
+            <td></td>
             <td style="text-align: right">
-                {{ number_format($sale->cost_price * $sale->quantity, 2, '.', ',') }}</td>
+                {{--{{ number_format($stock_card->cost_price * $stock_card->quantity, 2) }}--}}
+            </td>
         </tr>
-        @php
-            $total_cost += $sale->cost_price * $sale->quantity;
-        @endphp
+        {{--@php
+            $total_cost += $stock_card->cost_price * $stock_card->quantity;
+        @endphp--}}
     @endforeach
-    <tfoot>
+<!--    <tfoot>
         <tr>
-            <th colspan="5" style="text-align: right">TOTAL</th>
+            <th colspan="2" style="text-align: right">TOTAL</th>
             <th style="text-align: right">
                 &#8358;{{ number_format($total_cost, 2, '.', ',') }}
             </th>
@@ -55,5 +50,5 @@
             <th></th>
             <th></th>
         </tr>
-    </tfoot>
+    </tfoot>-->
 </table>

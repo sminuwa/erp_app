@@ -2657,30 +2657,39 @@ class ReportController extends Controller
 
     public function loadProductValuationReport(Request $request)
     {
-        $from_date = $request->from_date;
-        $to_date = $request->to_date;
+
+        $date = $request->date;
         $product_id = $request->product_id;
         $category_id = $request->category_id;
         $branch_id = $request->branch_id;
         $store_id = $request->store_id;
+        $stock_cards = StockCard::selectRaw("sum(cr) as credit, sum(dr) as debit")
+            ->groupBy('product_id')
+            ->where('date', '<', $date)
+            ->with('store', 'product')
+            ->orderBy('created_at', 'desc');
 
-        if ($product_id == 'all' || $product_id == '') {
-            $product_id = '%';
+        if ($product_id != 'all' || $product_id != '') {
+            $stock_cards->where('product_id',$product_id);
+        }
+        if ($store_id != 'all' || $store_id != '') {
+            $stock_cards->where('store_id',$store_id);
         }
         if ($category_id == 'all' || $category_id == '') {
             $category_id = '%';
         }
-
-
-        if ($branch_id == 'all' || $branch_id == '') {
-            $branch_id = '%';
-        }
-        if ($store_id == 'all' || $store_id == '') {
-            $store_id = '%';
+        if ($branch_id != 'all' || $branch_id != '') {
+            $store_ids = Store::where('branch_id', $branch_id)->get('id')->toArray();
+            return $store_ids;
+            $stock_cards->wherein('store_id',$store_ids);
         }
 
+        return $stock_cards->get();
 
-        $sales = DB::table('product_valuations')
+//        return $stock_cards;
+
+
+        /*$sales = DB::table('product_valuations')
             ->select('products.code', 'reference', 'products.name AS product', 'quantity', 'cost_price', 'product_valuations.date', 'stores.code AS store_code')
             ->join('products', 'products.id', 'product_valuations.product_id')
             ->join('stores', 'stores.id', 'product_valuations.store_id')
@@ -2688,10 +2697,10 @@ class ReportController extends Controller
             ->where('product_valuations.product_id', 'LIKE', $product_id)
             ->where('product_valuations.branch_id', 'LIKE', $branch_id)
             ->where('product_valuations.store_id', 'LIKE', $store_id)
-            ->where(DB::raw("DATE(date)"), '>=', $from_date)
-            ->where(DB::raw("DATE(date)"), '<=', $to_date)
+            ->where(DB::raw("DATE(date)"), '>=', $date)
+
             ->orderBy('date')
-            ->get();
+            ->get();*/
         if ($category_id == "%")
             $category_id = "all";
 
@@ -2706,7 +2715,7 @@ class ReportController extends Controller
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
 
-        return view('pages.reports.inventory.product_valuation.load_product_valuation_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'store_id', 'category_id', 'product_id', 'branch'));
+        return view('pages.reports.inventory.product_valuation.load_product_valuation_report', compact('stock_cards', 'date', 'branch_id', 'store_id', 'category_id', 'product_id', 'branch'));
     }
 
     public function printProductValuationReport($from_date, $to_date, $branch_id, $store_id, $category_id, $product_id)

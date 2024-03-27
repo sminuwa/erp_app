@@ -38,17 +38,12 @@
             <div class="container-fluid">
                 <form method="POST">
                     <div class="row">
+
                         <div class="form-group">
-                            <label for="from_date">From Date</label>
-                            <input type="text" autocomplete="off"
-                                class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
-                                name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="">
-                        </div>
-                        <div class="form-group">
-                            <label for="to_date">To Date</label>
+                            <label for="to_date">Date</label>
                             <input type="text" autocomplete="off"
                                 class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
-                                name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
+                                name="date" id="date" value="{{ old('to_date') }}" placeholder="">
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp;
@@ -65,7 +60,6 @@
                             <select
                                 class="form-control select2-single ajax-stores {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
                                 name="store_id" id="store_id">
-
                             </select>
                         </div>
                         <div class="form-group">
@@ -82,7 +76,6 @@
                             <select
                                 class="form-control select2-single ajax-products {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
                                 name="product_id" id="product_id">
-
                             </select>
                         </div>
                         <div class="form-group text-right">
@@ -125,8 +118,7 @@
 
 
             $('#generate').on("click", function() {
-                from_date = $('#from_date').val();
-                to_date = $('#to_date').val();
+                date = $('#date').val();
                 product_id = $('#product_id').val();
                 category_id = $('#category_id').val();
                 branch_id = $('#branch_id').val();
@@ -137,14 +129,14 @@
                     url: "{{ route('ajax.product.valuation.report') }}",
                     data: {
                         _token: "{{ csrf_token() }}",
-                        from_date: from_date,
-                        to_date: to_date,
+                        date: date,
                         product_id: product_id,
                         category_id: category_id,
                         branch_id: branch_id,
                         store_id: store_id
                     }
                 }).done(function(data) {
+                    console.log(data)
                     $('#img-loader').hide();
                     $("#load").html(data);
                     $('#example1').DataTable({

@@ -80,7 +80,7 @@
                                         <td>{{ $sale->reference }}</td>
                                         <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}
                                         </td>
-                                        <td>{{ \Carbon\Carbon::parse($sale->date)->diffInDays() }}</td>
+                                        <td>{{ $sale->age }}</td>
                                         <td style="text-align: right">
                                             @if ($sale->balance < 0)
                                                 ({{ number_format(abs($sale->balance), 2, '.', ',') }})
@@ -94,7 +94,7 @@
                                 @endforeach
                                 <tfoot>
                                     <tr>
-                                        <th style="text-align: right" colspan="5">TOTAL BALANCE</th>
+                                        <th style="text-align: right" colspan="6">TOTAL BALANCE</th>
                                         <td style="text-align: right">
                                             &#8358;{{ number_format($total, 2, '.', ',') }}
                                         </td>

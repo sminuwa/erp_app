@@ -219,6 +219,10 @@
                 </tr>
             @endif
             <tr>
+                <td colspan="6" class="sum-up line">VAT: </td>
+                <td class="line price">0.00</td>
+            </tr>
+            <tr>
                 <td colspan="6" class="sum-up line">Total Amount</td>
                 <td class="line price">{{ number_format($total - $order->discount + $order->refund, 2) }}</td>
             </tr>

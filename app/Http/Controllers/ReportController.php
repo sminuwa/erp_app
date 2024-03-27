@@ -691,7 +691,8 @@ class ReportController extends Controller
                 'categories.code AS code',
                 DB::raw('SUM(order_details.quantity) AS quantity'),
                 DB::raw('SUM(order_details.total) AS amount'),
-                DB::raw('SUM(order_details.cost_price * order_details.quantity) AS cost')
+                DB::raw('SUM(order_details.cost_price * order_details.quantity) AS cost'),
+                DB::raw('SUM(store_products.qty_available) AS qty_available'),
             )
             ->join('order_details', 'order_details.order_id', 'orders.id')
             ->join('store_products', 'store_products.id', 'order_details.store_product_id')
@@ -743,7 +744,8 @@ class ReportController extends Controller
                 'categories.code AS code',
                 DB::raw('SUM(order_details.quantity) AS quantity'),
                 DB::raw('SUM(order_details.total) AS amount'),
-                DB::raw('SUM(order_details.cost_price * order_details.quantity) AS cost')
+                DB::raw('SUM(order_details.cost_price * order_details.quantity) AS cost'),
+                DB::raw('SUM(store_products.qty_available) AS qty_available'),
             )
             ->join('order_details', 'order_details.order_id', 'orders.id')
             ->join('store_products', 'store_products.id', 'order_details.store_product_id')
@@ -800,7 +802,7 @@ class ReportController extends Controller
             $staff_id = '%';
         }
         $sales = DB::table('orders')
-            ->select('customers.code AS customer', 'orders.reference', 'products.name AS product', 'stores.code AS store', 'order_details.quantity', 'sold_price', 'cost_price', 'users.user_code AS user', 'order_date')
+            ->select('customers.code AS customer', 'orders.reference', 'products.name AS product', 'stores.code AS store', 'order_details.quantity', 'sold_price', 'cost_price', 'users.user_code AS user', 'users.name AS name', 'order_date')
             ->join('order_details', 'order_details.order_id', 'orders.id')
             ->join('store_products', 'store_products.id', 'order_details.store_product_id')
             ->join('customers', 'customers.id', 'orders.customer_id')
@@ -856,7 +858,7 @@ class ReportController extends Controller
 
 
         $sales = DB::table('orders')
-            ->select('customers.code AS customer', 'orders.reference', 'products.name AS product', 'stores.code AS store', 'order_details.quantity', 'sold_price', 'cost_price', 'users.user_code AS user', 'order_date')
+            ->select('customers.code AS customer', 'orders.reference', 'products.name AS product', 'stores.code AS store', 'order_details.quantity', 'sold_price', 'cost_price', 'users.user_code AS user', 'users.name AS name', 'order_date')
             ->join('order_details', 'order_details.order_id', 'orders.id')
             ->join('store_products', 'store_products.id', 'order_details.store_product_id')
             ->join('customers', 'customers.id', 'orders.customer_id')
@@ -1009,7 +1011,7 @@ class ReportController extends Controller
             ->where('stores.branch_id', 'LIKE', $branch_id)
             ->where('stock_cards.store_id', 'LIKE', $store_id)
             ->whereBetween('stock_cards.date', [$from_date, $to_date])
-            ->orderBy('date', 'DESC')
+            ->orderBy('stock_cards.updated_at', 'ASC')
             ->get();
         $qty_available = 0;
         if ($store_id > 0)
@@ -1069,7 +1071,7 @@ class ReportController extends Controller
             ->where('stores.branch_id', 'LIKE', $branch_id)
             ->where('stock_cards.store_id', 'LIKE', $store_id)
             ->whereBetween('stock_cards.date', [$from_date, $to_date])
-            ->orderBy('date', 'DESC')
+            ->orderBy('stock_cards.updated_at', 'ASC')
             ->get();
         $qty_available = 0;
         if ($store_id > 0)
@@ -1230,7 +1232,7 @@ class ReportController extends Controller
             $branch_id = '%';
 
         $sales = DB::table('orders')
-            ->select('products.name AS item', 'products.code AS code', DB::raw("SUM(order_details.quantity) AS quantity"), DB::raw("SUM(order_details.total) AS total"))
+            ->select('products.name AS item', 'products.code AS code', DB::raw("SUM(order_details.quantity) AS quantity"), DB::raw("SUM(order_details.quantity * cost_price) AS total_cost"), DB::raw("SUM(order_details.total) AS total"), DB::raw("SUM(order_details.quantity * cost_price) - SUM(order_details.total) AS margin"))
             ->join('order_details', 'order_details.order_id', 'orders.id')
             ->join('store_products', 'store_products.id', 'order_details.store_product_id')
             ->join('customers', 'customers.id', 'orders.customer_id')
@@ -1243,6 +1245,8 @@ class ReportController extends Controller
             $sales = $sales->orderBy(DB::raw("SUM(order_details.quantity)"), 'DESC');
         if ($type == 'amt')
             $sales = $sales->orderBy(DB::raw("SUM(order_details.total)"), 'DESC');
+        if ($type == 'mgn')
+            $sales = $sales->orderBy('margin', 'DESC');
         $sales = $sales->groupBy('store_products.product_id')
             ->take($number_limit)
             ->get();
@@ -1258,7 +1262,7 @@ class ReportController extends Controller
             $branch_id = '%';
 
         $sales = DB::table('orders')
-            ->select('products.name AS item', 'products.code AS code', DB::raw("SUM(order_details.quantity) AS quantity"), DB::raw("SUM(order_details.total) AS total"))
+            ->select('products.name AS item', 'products.code AS code', DB::raw("SUM(order_details.quantity) AS quantity"), DB::raw("SUM(order_details.quantity * cost_price) AS total_cost"), DB::raw("SUM(order_details.total) AS total"), DB::raw("SUM(order_details.quantity * cost_price) - SUM(order_details.total) AS margin"))
             ->join('order_details', 'order_details.order_id', 'orders.id')
             ->join('store_products', 'store_products.id', 'order_details.store_product_id')
             ->join('customers', 'customers.id', 'orders.customer_id')
@@ -1271,6 +1275,8 @@ class ReportController extends Controller
             $sales = $sales->orderBy(DB::raw("SUM(order_details.quantity)"), 'DESC');
         if ($type == 'amt')
             $sales = $sales->orderBy(DB::raw("SUM(order_details.total)"), 'DESC');
+        if ($type == 'mgn')
+            $sales = $sales->orderBy('margin', 'DESC');
         $sales = $sales->groupBy('store_products.product_id')
             ->take($number_limit)
             ->get();
@@ -1592,20 +1598,58 @@ class ReportController extends Controller
             $branch_id = '%';
         }
         $sales = DB::table('customers')
-            ->select(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'), 'reference', 'description', 'date', 'customers.name', 'customers.code', 'model_id AS customer_id', 'users.name AS relation_officer')
+            ->select(
+                DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'),
+                'reference',
+                'description',
+                'date',
+                'customers.name',
+                'customers.code',
+                'model_id AS customer_id',
+                'users.name AS relation_officer',
+                DB::raw('DATEDIFF(NOW(), general_account_ledgers.date) AS age')
+            )
             ->join('general_account_ledgers', 'general_account_ledgers.model_id', '=', 'customers.id')
             ->leftJoin('users', 'users.id', '=', 'customers.relation_officer')
             ->where('general_account_ledgers.model_id', 'LIKE', $customer_id)
             ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
             ->where('general_account_ledgers.model_name', 'LIKE', 'Customer')
             ->groupBy('model_id')
-            ->having(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit)'), '<', 0);
+            ->having(DB::raw('SUM(general_account_ledgers.debit) - SUM(general_account_ledgers.credit)'), '<', 0);
+
+        switch ($to_date) {
+            case 1:
+                $lowerdays = 0;
+                $upperdays = 14;
+                break;
+            case 2:
+                $lowerdays = 15;
+                $upperdays = 30;
+                break;
+            case 3:
+                $lowerdays = 30;
+                $upperdays = null; // No upper limit
+                break;
+            default:
+                $lowerdays = $upperdays = 0; // Default to all data
+                break;
+        }
+
+        if ($lowerdays !== null) {
+            $sales = $sales->whereRaw('DATEDIFF(NOW(), general_account_ledgers.date) >= ?', [$lowerdays]);
+        }
+
+        if ($upperdays !== null) {
+            $sales = $sales->whereRaw('DATEDIFF(NOW(), general_account_ledgers.date) < ?', [$upperdays]);
+        }
+
 
         // if ($from_date != null)
         //     $sales = $sales->whereDate('general_account_ledgers.date', '>=', $from_date); // Corrected the table alias
 
-        if ($to_date != null)
-            $sales = $sales->whereDate('general_account_ledgers.date', '<=', $to_date); // Corrected the table alias
+        // if ($to_date != null)
+        //     $sales = $sales->whereDate('general_account_ledgers.date', '<=', $to_date); // Corrected the table alias
+
 
         $sales = $sales->orderBy('general_account_ledgers.date', 'DESC')->get();
 
@@ -1636,20 +1680,50 @@ class ReportController extends Controller
             $branch_id = '%';
         }
         $sales = DB::table('customers')
-            ->select(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'), 'reference', 'description', 'date', 'customers.name', 'customers.code', 'model_id AS customer_id', 'users.name AS relation_officer')
+            ->select(
+                DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'),
+                'reference',
+                'description',
+                'date',
+                'customers.name',
+                'customers.code',
+                'model_id AS customer_id',
+                'users.name AS relation_officer',
+                DB::raw('DATEDIFF(NOW(), general_account_ledgers.date) AS age')
+            )
             ->join('general_account_ledgers', 'general_account_ledgers.model_id', '=', 'customers.id')
             ->leftJoin('users', 'users.id', '=', 'customers.relation_officer')
             ->where('general_account_ledgers.model_id', 'LIKE', $customer_id)
             ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
             ->where('general_account_ledgers.model_name', 'LIKE', 'Customer')
             ->groupBy('model_id')
-            ->having(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit)'), '<', 0);
+            ->having(DB::raw('SUM(general_account_ledgers.debit) - SUM(general_account_ledgers.credit)'), '<', 0);
 
-        // if ($from_date != null)
-        //     $sales = $sales->whereDate('general_account_ledgers.date', '>=', $from_date); // Corrected the table alias
+        switch ($to_date) {
+            case 1:
+                $lowerdays = 0;
+                $upperdays = 14;
+                break;
+            case 2:
+                $lowerdays = 15;
+                $upperdays = 30;
+                break;
+            case 3:
+                $lowerdays = 30;
+                $upperdays = null; // No upper limit
+                break;
+            default:
+                $lowerdays = $upperdays = 0; // Default to all data
+                break;
+        }
 
-        if ($to_date != null)
-            $sales = $sales->whereDate('general_account_ledgers.date', '<=', $to_date); // Corrected the table alias
+        if ($lowerdays !== null) {
+            $sales = $sales->whereRaw('DATEDIFF(NOW(), general_account_ledgers.date) >= ?', [$lowerdays]);
+        }
+
+        if ($upperdays !== null) {
+            $sales = $sales->whereRaw('DATEDIFF(NOW(), general_account_ledgers.date) < ?', [$upperdays]);
+        }
 
         $sales = $sales->orderBy('general_account_ledgers.date', 'DESC')->get();
         if ($customer_id == "%")

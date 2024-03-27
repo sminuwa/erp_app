@@ -1,12 +1,12 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.current.stock.report.print', [$branch_id,$store_id,$category_id, $product_id]) }}" target="_BLANK"
-            class="btn-success btn btn-sm">Print</a>
+        <a href="{{ route('ajax.current.stock.report.print', [$branch_id, $store_id, $category_id, $product_id]) }}"
+            target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
 <table class="table table-bordered caption" id="example1">
     <caption style="caption-size:top">
-        <h3 style="text-align: center;">{{ $branch == null ? 'All Branches' : $branch->name."($branch->code)" }} </h3>
+        <h3 style="text-align: center;">{{ $branch == null ? 'All Branches' : $branch->name . "($branch->code)" }} </h3>
         <h5 style="text-align: center;">CURRENT STOCK REPORT </h5>
     </caption>
     <thead>
@@ -19,8 +19,10 @@
             <th>R PRICE (&#8358;)</th>
             <th>W PRICE (&#8358;)</th>
             <th>TOTAL COST (&#8358;)</th>
-            {{-- <th>TOTAL R Price (&#8358;)</th>
-            <th>TOTAL W Price (&#8358;)</th> --}}
+            <th>TOTAL R (&#8358;)</th>
+            <th>TOTAL W (&#8358;)</th>
+            <th>R MARGIN</th>
+            <th>W MARGIN</th>
         </tr>
     </thead>
     @foreach ($stores as $store)
@@ -36,14 +38,23 @@
             <td style="text-align: right;">
                 {{ number_format(str_replace(',', '', $store->whole_selling_price), 2, '.', ',') }} </td>
             <td style="text-align: right;">
-                {{ number_format(str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->cost_price), 2, '.', ',') }}
-            </td>
-            {{-- <td style="text-align: right;">
-                {{ number_format(str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->retail_selling_price), 2, '.', ',') }}
+                @php $total_cost = str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->cost_price); @endphp
+                {{ number_format($total_cost, 2, '.', ',') }}
             </td>
             <td style="text-align: right;">
-                {{ number_format(str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->whole_selling_price), 2, '.', ',') }}
-            </td> --}}
+                @php $total_r_price = str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->retail_selling_price); @endphp
+                {{ number_format($total_r_price, 2, '.', ',') }}
+            </td>
+            <td style="text-align: right;">
+                @php $total_w_price = str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->whole_selling_price); @endphp
+                {{ number_format($total_w_price, 2, '.', ',') }}
+            </td>
+            <td style="text-align: right;">
+                {{ number_format($total_r_price - $total_cost, 2, '.', ',') }}
+            </td>
+            <td style="text-align: right;">
+                {{ number_format($total_w_price - $total_cost, 2, '.', ',') }}
+            </td>
 
         </tr>
     @endforeach
@@ -56,6 +67,9 @@
         <th></th>
         <th></th>
         <th></th>
-        {{-- <th></th> --}}
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
     </tfoot>
 </table>

@@ -4,7 +4,7 @@
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
-<table class="table table-bordered caption" id="example1" data-ordering="true">
+<table class="table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">Ageing Report
             @if ($from_date != 'all')
@@ -47,7 +47,7 @@
                 @if (customerLastTransaction($sale->customer_id) != null)
                     {{ \Carbon\Carbon::parse(customerLastTransaction($sale->customer_id)->date)->diffInDays() }}
                     @else
-                    {{ \Carbon\Carbon::parse($sale->date)->diffInDays() }}
+                    {{ $sale->age }}
                 @endif
             </td>
             <td style="text-align: right">

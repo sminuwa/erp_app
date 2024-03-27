@@ -74,12 +74,12 @@
                                             <td>{{ $ledger->description }}</td>
                                             <td style="text-align: right">
                                                 @if ($debit > 0.0)
-                                                    &#8358; {{ $debit }}
+                                                    &#8358; {{ abs($debit) }}
                                                 @endif
                                             </td>
                                             <td style="text-align: right">
                                                 @if ($credit > 0.0)
-                                                    &#8358; {{ $credit }}
+                                                    &#8358; {{ abs($credit) }}
                                                 @endif
                                             </td>
 

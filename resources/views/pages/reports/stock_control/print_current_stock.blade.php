@@ -61,6 +61,10 @@
                                         <th>R PRICE (&#8358;)</th>
                                         <th>W PRICE (&#8358;)</th>
                                         <th>TOTAL COST (&#8358;)</th>
+                                        <th>TOTAL R (&#8358;)</th>
+                                        <th>TOTAL W (&#8358;)</th>
+                                        <th>R MARGIN</th>
+                                        <th>W MARGIN</th>
                                     </tr>
                                 </thead>
                                 @foreach ($stores as $store)
@@ -79,14 +83,23 @@
                                             {{ number_format(str_replace(',', '', $store->whole_selling_price), 2, '.', ',') }}
                                         </td>
                                         <td style="text-align: right;">
-                                            {{ number_format(str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->cost_price), 2, '.', ',') }}
+                                            @php $total_cost = str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->cost_price); @endphp
+                                            {{ number_format($total_cost, 2, '.', ',') }}
                                         </td>
-                                        {{-- <td style="text-align: right;">
-                {{ number_format(str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->retail_selling_price), 2, '.', ',') }}
-            </td>
-            <td style="text-align: right;">
-                {{ number_format(str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->whole_selling_price), 2, '.', ',') }}
-            </td> --}}
+                                        <td style="text-align: right;">
+                                            @php $total_r_price = str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->retail_selling_price); @endphp
+                                            {{ number_format($total_r_price, 2, '.', ',') }}
+                                        </td>
+                                        <td style="text-align: right;">
+                                            @php $total_w_price = str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->whole_selling_price); @endphp
+                                            {{ number_format($total_w_price, 2, '.', ',') }}
+                                        </td>
+                                        <td style="text-align: right;">
+                                            {{ number_format($total_r_price - $total_cost, 2, '.', ',') }}
+                                        </td>
+                                        <td style="text-align: right;">
+                                            {{ number_format($total_w_price - $total_cost, 2, '.', ',') }}
+                                        </td>
 
                                     </tr>
                                 @endforeach
@@ -99,7 +112,10 @@
                                     <th></th>
                                     <th></th>
                                     <th></th>
-                                    {{-- <th></th> --}}
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
                                 </tfoot>
                             </table>
                         </div>

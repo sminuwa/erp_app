@@ -28,6 +28,7 @@
             <th>TOTAL COST(&#8358;)</th>
             <th>TOTAL SALES(&#8358;)</th>
             <th>MARGIN(&#8358;)</th>
+            <th>MARGIN %</th>
         </tr>
     </thead>
     @php
@@ -64,11 +65,12 @@
                     $total_cost += str_replace(',', '', $sale->cost_price) * $sale->quantity;
                     $total_sold += str_replace(',', '', $sale->sold_price) * $sale->quantity;
                 @endphp
-                @if ($total_profit < 0)
-                    ({{ number_format(abs($total_profit), 2, '.', ',') }})
-                @else
-                    {{ number_format($total_profit, 2) }}
-                @endif
+
+                {{ number_format($total_profit, 2) }}
+
+            </td>
+            <td>
+                {{ number_format(($total_profit / (str_replace(',', '', $sale->sold_price) * $sale->quantity))*100,2)  }}
             </td>
         </tr>
         @php $credit_notes = App\Models\Order::find($sale->order_id)->creditNotes @endphp
@@ -103,6 +105,9 @@
                                 {{ number_format($total_profit_note, 2) }}
                             @endif
                         </td>
+                        <td>
+                            {{ number_format(($total_profit_note / (str_replace(',', '', $item->sold_price) * $item->quantity))*100,2)  }}
+                        </td>
                     </tr>
                     @php
                         $total_cost_price += str_replace(',', '', $item->cost_price);
@@ -133,6 +138,9 @@
                 @else
                     &#8358;{{ number_format($grand_total_profit, 2) }}
                 @endif
+            </th>
+            <th>
+
             </th>
         </tr>
     </tfoot>

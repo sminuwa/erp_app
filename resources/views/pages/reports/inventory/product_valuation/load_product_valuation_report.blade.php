@@ -1,7 +1,6 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.product.valuation.report.print', [$date, $branch_id, $store_id, $category_id, $product_id]) }}"
-            target="_BLANK" class="btn-success btn btn-sm">Print</a>
+
     </div>
 </div>
 <table class="table table-bordered caption" id="example1" data-ordering="false">

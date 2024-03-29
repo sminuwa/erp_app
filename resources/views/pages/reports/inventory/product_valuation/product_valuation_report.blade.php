@@ -115,6 +115,13 @@
             };
 
 
+            $("body").on('change','.ajax-branches', function(){
+                let value = $(this).val()
+                if(value == null){
+                    // $('.ajax-store').attr('disabled','disabled')
+                    $('.ajax-stores').prop('disabled', true);
+                }
+            })
 
 
             $('#generate').on("click", function() {

@@ -2731,37 +2731,45 @@ class ReportController extends Controller
 
     public function loadProductValuationReport(Request $request)
     {
-
+//        return $request;
         $date = $request->date;
         $product_id = $request->product_id;
         $category_id = $request->category_id;
         $branch_id = $request->branch_id;
         $store_id = $request->store_id;
-        $stock_cards = StockCard::selectRaw("sum(cr) as credit, sum(dr) as debit")
+        $stock_cards = StockCard::selectRaw("
+            store_id,
+            product_id,
+            sum(cr) as credit,
+            sum(dr) as debit,
+            (
+                SELECT count(cost)
+                FROM stock_cards sc
+                WHERE sc.product_id = product_id
+                AND
+            ) as cost
+            ")
             ->groupBy('product_id')
             ->where('date', '<', $date)
             ->with('store', 'product')
+            ->havingRaw("(credit - debit) > 0")
             ->orderBy('created_at', 'desc');
-
-        if ($product_id != 'all' || $product_id != '') {
-            $stock_cards->where('product_id',$product_id);
+        if (!is_null($branch_id)) {
+            $store_ids = Store::where('branch_id', $branch_id)->get('id')->toArray();
+            $stock_cards->whereIn('store_id',$store_ids);
         }
-        if ($store_id != 'all' || $store_id != '') {
+        if ($store_id != '') {
             $stock_cards->where('store_id',$store_id);
         }
-        if ($category_id == 'all' || $category_id == '') {
-            $category_id = '%';
+        if ($category_id != '') {
+            $product_ids = Product::where('category_id', $category_id)->get('id')->toArray();
+            $stock_cards->whereIn('product_id',$product_ids);
         }
-        if ($branch_id != 'all' || $branch_id != '') {
-            $store_ids = Store::where('branch_id', $branch_id)->get('id')->toArray();
-            return $store_ids;
-            $stock_cards->wherein('store_id',$store_ids);
+        if ($product_id != '') {
+            $stock_cards->where('product_id',$product_id);
         }
 
-        return $stock_cards->get();
-
-//        return $stock_cards;
-
+        $stock_cards = $stock_cards->get();
 
         /*$sales = DB::table('product_valuations')
             ->select('products.code', 'reference', 'products.name AS product', 'quantity', 'cost_price', 'product_valuations.date', 'stores.code AS store_code')
@@ -2775,6 +2783,7 @@ class ReportController extends Controller
 
             ->orderBy('date')
             ->get();*/
+
         if ($category_id == "%")
             $category_id = "all";
 
@@ -2786,7 +2795,7 @@ class ReportController extends Controller
         if ($store_id == "%")
             $store_id = "all";
         $branch = null;
-        if ($branch_id != "all")
+        if ($branch_id != "")
             $branch = Branch::find($branch_id);
 
         return view('pages.reports.inventory.product_valuation.load_product_valuation_report', compact('stock_cards', 'date', 'branch_id', 'store_id', 'category_id', 'product_id', 'branch'));

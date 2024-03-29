@@ -6,6 +6,7 @@ use App\Models\BranchProductPrice;
 use App\Models\ProductValuation;
 use App\Models\Purchase;
 use App\Models\PurchaseExpense;
+use App\Models\ReturnDebit;
 use App\Models\StockCard;
 use App\Models\Store;
 use App\Models\StoreProduct;
@@ -78,15 +79,14 @@ class CostPrice
             ];
         }
 
-        $store_products = $product_costs = $batch = $valuation_param= [];
+        $store_products = $product_costs = $batch = $stock_card_param = [];
         foreach ($records as $key => $record) {
-            $valuation_param[] = [
-                'branch_id' => $branch_id,
-                'store_id' => $store_id,
+            $stock_card_param[] = [
+                'store_id' => $record['store_id'],
                 'product_id' => $key,
-                'quantity' => $record['quantity'],
-                'cost_price' => round(($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'], 2),
-                'action_by' => $user->id,
+                'quantity' => $record['new_quantity'],
+                'cost' => round(($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'], 2),
+                'operation' => 'in',
             ];
             $product_costs[] = [
                 'branch_id' => $branch_id,
@@ -114,10 +114,10 @@ class CostPrice
         DB::beginTransaction();
 
         if (
-            StoreProduct::upsert($store_products, ['store_id', 'product_id'])
+            StockCard::createBatchRecord($stock_card_param, $batch_no, (ReturnDebit::where('reference',$batch_no)->first()->date ?? date('Y-m-d')), TRANSACTION_TYPE_RETURN_DEBIT)
+            && StoreProduct::upsert($store_products, ['store_id', 'product_id'])
             && BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id'])
             && StoreProductBatch::upsert($batch, ['batch_no'])
-            && ProductValuation::createBatchRecord($valuation_param, $batch_no)
         ) {
             DB::commit();
             return ['status' => true, 'message' => 'success'];
@@ -214,15 +214,14 @@ class CostPrice
             ];
         }
 
-        $store_products = $product_costs = $batch = $stock_card_param = $valuation_param = [];
+        $store_products = $product_costs = $batch = $stock_card_param = [];
         foreach ($percentages as $key => $percentage) {
-            $valuation_param[] = [
-                'branch_id' => $purchase_grn->branch_id,
+            $stock_card_param[] = [
                 'store_id' => 0,
                 'product_id' => $key,
                 'quantity' => 0,
-                'cost_price' => $percentage['final_cost'],
-                'action_by' => $user->id,
+                'cost' => $percentage['final_cost'],
+                'operation' => 'in',
             ];
             $product_costs[] = [
                 'branch_id' => $purchase_grn->branch_id,
@@ -235,8 +234,8 @@ class CostPrice
 
         DB::beginTransaction();
 
-        if (BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id'])
-            && ProductValuation::createBatchRecord($valuation_param, $invoice->reference ,$invoice->date)) {
+        if (StockCard::createBatchRecord($stock_card_param, $invoice->reference, $invoice->date, TRANSACTION_TYPE_GRN)
+            && BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id'])) {
             if (Transaction::purchase_invoices($purchase_grn->id, $invoice->id, $formula)['status']) {
                 DB::commit();
                 return ['status' => true, 'message' => 'success'];
@@ -332,13 +331,12 @@ class CostPrice
 
         $store_products = $product_costs = $batch = $stock_card_param = $valuation_param = [];
         foreach ($percentages as $key => $percentage) {
-            $valuation_param[] = [
-                'branch_id' => $purchase_grn->branch_id,
+            $stock_card_param[] = [
                 'store_id' => 0,
                 'product_id' => $key,
                 'quantity' => 0,
-                'cost_price' => $percentage['final_cost'],
-                'action_by' => $user->id,
+                'cost' => $percentage['final_cost'],
+                'operation' => 'in',
             ];
             $product_costs[] = [
                 'branch_id' => $purchase_grn->branch_id,
@@ -351,8 +349,8 @@ class CostPrice
 
         DB::beginTransaction();
 
-        if (BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id']
-            && ProductValuation::createBatchRecord($valuation_param, $invoice->reference ,$invoice->date))
+        if (StockCard::createBatchRecord($stock_card_param, $invoice->reference, $invoice->date, TRANSACTION_TYPE_GRN)
+            && BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id'])
         ) {
             if (Transaction::reversal($invoice->reference)['status']) {
                 DB::commit();
@@ -642,18 +640,11 @@ class CostPrice
         $store_products = $product_costs = $batch = $stock_card_param = $valuation_param = [];
         if ($operation == 'in') {
             foreach ($records as $key => $record) {
-                $valuation_param[] = [
-                    'branch_id' => $branch_id,
-                    'store_id' => $record['store_id'],
-                    'product_id' => $key,
-                    'quantity' => $record['new_quantity'],
-                    'cost_price' => ($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'],
-                    'action_by' => $user->id,
-                ];
                 $stock_card_param[] = [
                     'store_id' => $record['store_id'],
                     'product_id' => $key,
                     'quantity' => $record['new_quantity'],
+                    'cost' => ($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'],
                     'operation' => $operation,
                 ];
                 $product_costs[] = [
@@ -687,7 +678,6 @@ class CostPrice
                 && StoreProduct::upsert($store_products, ['store_id', 'product_id'])
                 && BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id'])
                 && StoreProductBatch::upsert($batch, ['batch_no'])
-                && ProductValuation::createBatchRecord($valuation_param, $batch_no ,$date)
             ) {
                 DB::commit();
                 return ['status' => true, 'message' => 'success'];
@@ -703,15 +693,8 @@ class CostPrice
                     'store_id' => $record['store_id'],
                     'product_id' => $key,
                     'quantity' => $record['new_quantity'],
+                    'cost' => ($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'],
                     'operation' => $operation,
-                ];
-                $valuation_param[] = [
-                    'branch_id' => $branch_id,
-                    'store_id' => $record['store_id'],
-                    'product_id' => $key,
-                    'quantity' => $record['new_quantity'],
-                    'cost_price' => ($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'],
-                    'action_by' => $user->id,
                 ];
                 if($type == TRANSACTION_TYPE_RETURN_DEBIT){
                     $remaining_value = $record['total_existing_cost'] - $record['total_new_cost'];
@@ -736,7 +719,6 @@ class CostPrice
             if (
                 StockCard::createBatchRecord($stock_card_param, $batch_no, $date, $type)
                 && StoreProduct::upsert($store_products, ['store_id', 'product_id'])
-                && ProductValuation::createBatchRecord($valuation_param, $batch_no ,$date)
             ) {
                 if($type == TRANSACTION_TYPE_RETURN_DEBIT) {
                     BranchProductPrice::upsert($product_costs, ['branch_id', 'product_id']);

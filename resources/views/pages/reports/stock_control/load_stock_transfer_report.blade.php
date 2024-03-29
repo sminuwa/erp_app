@@ -19,7 +19,7 @@
             <th>From Store</th>
             <th>To Store</th>
             <th>QTY Before Transfer</th>
-            <th>QTY Transfer</th>
+            <th>QTY Transferred</th>
             <th>Transfer No</th>
         </tr>
     </thead>
@@ -30,7 +30,7 @@
             <th>From Store</th>
             <th>To Store</th>
             <th>QTY Before Transfer</th>
-            <th>QTY Transfer</th>
+            <th>QTY Transferred</th>
             <th>Transfer No</th>
         </tr>
     </tfoot>

@@ -43,11 +43,13 @@ class StockCard extends Model
          *    [ store_id => 1,
          *      product_id => 2,
          *      quantity => 210,
+         *      cost => 2300,
          *      operation => 'out
          *    ],
          *    [ store_id => 1,
          *      product_id => 2,
          *      quantity => 210,
+         *      cost => 1200,
          *      operation => 'in'
          *    ]
          *  ]
@@ -83,6 +85,7 @@ class StockCard extends Model
                 'dr' => $debit,
                 'qty_before' => $qty_before,
                 'qty_after' => $qty_after,
+                'cost' => $record['cost'],
                 'refno' => $reference,
                 'type' => $type,
                 'date' => $date,

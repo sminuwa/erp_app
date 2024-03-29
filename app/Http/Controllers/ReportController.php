@@ -2787,15 +2787,14 @@ class ReportController extends Controller
             ->get();*/
 
         if ($category_id == "%")
-            $category_id = "all";
-
+            $category_id = "";
         if ($product_id == "%")
-            $product_id = "all";
+            $product_id = "";
 
         if ($branch_id == "%")
-            $branch_id = "all";
+            $branch_id = "";
         if ($store_id == "%")
-            $store_id = "all";
+            $store_id = "";
         $branch = null;
         if ($branch_id != "")
             $branch = Branch::find($branch_id);

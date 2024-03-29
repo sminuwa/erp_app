@@ -40,10 +40,8 @@
                                 {{ $branch->name ?? 'All Branches' }}
                             </h3>
                             <h5 style="text-align: center;">Purchase Request Report
-                                From
-                                {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
-                                AND
-                                {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
+                                Date
+                                {{ \Carbon\Carbon::parse($date)->toFormattedDateString() }}
                             </h5>
 
                         </div>
@@ -55,34 +53,31 @@
                             <table class="table table-bordered caption" id="example1" border="1" cellpadding="0"
                                 cellspacing="0" data-ordering="false">
                                 <thead>
-                                    <tr>
-                                        <th>DATE</th>
-                                        <th>STORE</th>
-                                        <th>REFERENCE</th>
-                                        <th>ITEM CODE</th>
-                                        <th>ITEM NAME</th>
-                                        <th>ITEM PRICE</th>
-                                        <th>QTY</th>
-                                        <th>TOTAL </th>
-                                    </tr>
+                                <tr>
+                                    <th>STORE</th>
+                                    <th>ITEM CODE</th>
+                                    <th>ITEM NAME</th>
+                                    <th>QTY</th>
+                                    <th>COST PRICE</th>
+                                    <th>TOTAL </th>
+                                </tr>
                                 </thead>
                                 @php
                                     $total_cost = 0;
                                 @endphp
-                                @foreach ($sales as $sale)
+                                @foreach ($stock_cards as $stock_card)
                                     <tr>
-                                        <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}</td>
-                                        <td>{{ $sale->store_code }}</td>
-                                        <td>{{ $sale->reference }}</td>
-                                        <td>{{ $sale->code }}</td>
-                                        <td>{{ $sale->product }}</td>
-                                        <td style="text-align: right">{{ number_format($sale->cost_price, 2) }}</td>
-                                        <td>{{ $sale->quantity }}</td>
+                                        <td>{{ $stock_card->store->code ?? 'All'  }}</td>
+                                        <td>{{ $stock_card->product->code ?? 'All' }}</td>
+                                        <td>{{ $stock_card->product->name ?? 'All' }}</td>
+                                        <td>{{ number_format($stock_card->quantity, 2) }}</td>
+                                        <td>{{ number_format($stock_card->cost, 2) }}</td>
                                         <td style="text-align: right">
-                                            {{ number_format($sale->cost_price * $sale->quantity, 2, '.', ',') }}</td>
+                                            {{ number_format(($stock_card->quantity) * $stock_card->cost, 2) }}
+                                        </td>
                                     </tr>
                                     @php
-                                        $total_cost += $sale->cost_price * $sale->quantity;
+                                        $total_cost += $stock_card->cost * $stock_card->quantity;
                                     @endphp
                                 @endforeach
                                 <tfoot>

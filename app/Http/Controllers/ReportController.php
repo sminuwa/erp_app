@@ -1246,7 +1246,8 @@ class ReportController extends Controller
         if ($type == 'amt')
             $sales = $sales->orderBy(DB::raw("SUM(order_details.total)"), 'DESC');
         if ($type == 'mgn')
-            $sales = $sales->orderBy('margin', 'DESC');
+            $sales = $sales->orderByRaw("SUM(order_details.quantity * cost_price) - SUM(order_details.total) ASC");
+//            $sales = $sales->orderBy('margin', 'DESC');
         $sales = $sales->groupBy('store_products.product_id')
             ->take($number_limit)
             ->get();

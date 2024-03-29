@@ -15,6 +15,7 @@
             <th>ITEM CODE</th>
             <th>ITEM NAME</th>
             <th>QUANTITY</th>
+            <th>TYPE</th>
             <th>STORE</th>
             <th>ADJUSTMENT NO</th>
 

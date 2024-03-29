@@ -2733,6 +2733,7 @@ class ReportController extends Controller
     {
 //        return $request;
         $date = $request->date;
+        $yesterday = date('Y-m-d',strtotime($date.'-1 days'));
         $product_id = $request->product_id;
         $category_id = $request->category_id;
         $branch_id = $request->branch_id;
@@ -2743,13 +2744,16 @@ class ReportController extends Controller
             sum(cr) as credit,
             sum(dr) as debit,
             (
-                SELECT count(cost)
+                SELECT SUM(cost)
                 FROM stock_cards sc
-                WHERE sc.product_id = product_id
+                WHERE sc.product_id = stock_cards.product_id
+                AND sc.date < '$date'
+                GROUP BY sc.product_id
+
             ) as cost
             ")
             ->groupBy('product_id')
-            ->where('date', '<', $date)
+            ->where('date', '<=', $date)
             ->with('store', 'product')
             ->havingRaw("(credit - debit) > 0")
             ->orderBy('created_at', 'desc');
@@ -2767,7 +2771,7 @@ class ReportController extends Controller
         if ($product_id != '') {
             $stock_cards->where('product_id',$product_id);
         }
-
+        return $stock_cards->get();
         $stock_cards = $stock_cards->get();
 
         /*$sales = DB::table('product_valuations')

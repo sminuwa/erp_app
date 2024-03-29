@@ -2744,12 +2744,12 @@ class ReportController extends Controller
             sum(cr) as credit,
             sum(dr) as debit,
             (
-                SELECT SUM(cost)
+                SELECT cost
                 FROM stock_cards sc
                 WHERE sc.product_id = stock_cards.product_id
-                AND sc.date < '$date'
-                GROUP BY sc.product_id
-
+                AND sc.date <= '$date'
+                ORDER BY sc.id DESC
+                LIMIT 1
             ) as cost
             ")
             ->groupBy('product_id')
@@ -2771,7 +2771,6 @@ class ReportController extends Controller
         if ($product_id != '') {
             $stock_cards->where('product_id',$product_id);
         }
-        return $stock_cards->get();
         $stock_cards = $stock_cards->get();
 
         /*$sales = DB::table('product_valuations')

@@ -56,11 +56,11 @@
                                     <tr>
                                         <th>CODE</th>
                                         <th>ITEM NAME</th>
-                                        <th>GROUP NAME</th>
+                                        <th>CATEGORY NAME</th>
                                         <th>STORE</th>
                                         <th>QUANTITY</th>
                                         <th>COST PRICE (&#8358;)</th>
-                            
+                                        <th>TOTAL PRICE (&#8358;)</th>
                                     </tr>
                                 </thead>
                                 @foreach ($stores as $store)
@@ -72,9 +72,12 @@
                                         <td> {{ $store->qty_available }} </td>
                                         <td style="text-align: right;">
                                             {{ number_format(str_replace(',', '', $store->cost_price), 2, '.', ',') }} </td>
+                                        <td style="text-align: right;">
+                                            {{ number_format(str_replace(',', '', $store->cost_price * $store->qty_available), 2, '.', ',') }} </td>
                                     </tr>
                                 @endforeach
                                 <tfoot>
+                                    <th></th>
                                     <th></th>
                                     <th></th>
                                     <th></th>

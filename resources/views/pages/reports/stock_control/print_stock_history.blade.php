@@ -67,8 +67,7 @@
                                         <th>Code</th>
                                         <th>Item</th>
                                         <th>QTY</th>
-                                        <th>Rate</th>
-                                        <th>Total Amount</th>
+
                                         <th>Store</th>
                                         <th>Branch</th>
                                     </tr>
@@ -80,8 +79,7 @@
                                         <th>Code</th>
                                         <th>Item</th>
                                         <th>QTY</th>
-                                        <th>Rate</th>
-                                        <th>Total Amount</th>
+
                                         <th>Store</th>
                                         <th>Branch</th>
                                     </tr>
@@ -98,10 +96,6 @@
                                             @else
                                                 -{{ $quantity = $record->dr }}
                                             @endif
-                                        </td>
-                                        <td style="text-align: right">{{ number_format(0, 2, '.', ',') }}</td>
-                                        <td style="text-align: right">
-                                            {{ number_format(0 * $quantity, 2, '.', ',') }}
                                         </td>
                                         <td>{{ $record->store_code }}</td>
                                         <td>{{ $record->branch_code }}</td>

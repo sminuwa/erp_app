@@ -356,13 +356,13 @@
                                         </p>
                                     </a>
                                     <ul class="nav nav-treeview">
-                                        <li class="nav-item">
-                                            <a href="{{ route('stock.balances.report') }}"
-                                                class="nav-link {{ Request::is('reports/sc/stock/balances*') ? 'active' : '' }}">
+<!--                                        <li class="nav-item">
+                                            <a href="{{--{{ route('stock.balances.report') }}--}}"
+                                                class="nav-link {{--{{ Request::is('reports/sc/stock/balances*') ? 'active' : '' }}--}}">
                                                 <i class="ion-code-working"></i>
                                                 <p>Previous Stock Balances</p>
                                             </a>
-                                        </li>
+                                        </li>-->
                                         <li class="nav-item">
                                             <a href="{{ route('current.stock.report') }}"
                                                 class="nav-link {{ Request::is('reports/sc/current-stock*') ? 'active' : '' }}">

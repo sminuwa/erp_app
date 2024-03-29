@@ -921,7 +921,7 @@ Route::middleware('auth')->group(function () {
              //Purchase Request  Report
              Route::get('/product/valuation', [ReportController::class, 'productValuation'])->name('product.valuation.report');
              Route::get('/product/valuation/load', [ReportController::class, 'loadProductValuationReport'])->name('ajax.product.valuation.report');
-             Route::get('/product/valuation/print/{from_date}/{to_date}/{branch_id}/{store_id}/{category_id}/{product_id}/', [ReportController::class, 'printProductValuationReport'])->name('ajax.product.valuation.report.print');
+             Route::get('/product/valuation/print/{date}/{branch_id}/{store_id}/{category_id}/{product_id}/', [ReportController::class, 'printProductValuationReport'])->name('ajax.product.valuation.report.print');
             //User Ledger and Loans
 
             //Loan Balances

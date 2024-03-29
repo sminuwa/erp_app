@@ -1,10 +1,14 @@
 <div class="row">
     <div class="offset-10">
-        <form action="">
-
+        <form action="{{ route('ajax.product.valuation.report.print') }}" method="post" target="_blank" class="d-inline">
+            @csrf
+            <input type="hidden" name="product_id" value="{{ $product_id }}">
+            <input type="hidden" name="store_id" value="{{ $store_id }}">
+            <input type="hidden" name="branch_id" value="{{ $branch_id }}">
+            <input type="hidden" name="category_id" value="{{ $category_id }}">
+            <input type="hidden" name="date" value="{{ $date }}">
+            <button type="submit" class="btn btn-success btn-sm" name="submit">Print</button>
         </form>
-        <a href="{{ route('ajax.product.valuation.report.print', [$from_date, $to_date, $branch_id, $store_id, $category_id, $product_id]) }}"
-           target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
 <table class="table table-bordered caption" id="example1" data-ordering="false">
@@ -33,17 +37,17 @@
             <td>{{ $stock_card->store->code ?? 'All'  }}</td>
             <td>{{ $stock_card->product->code ?? 'All' }}</td>
             <td>{{ $stock_card->product->name ?? 'All' }}</td>
-            <td>{{ number_format($stock_card->credit - $stock_card->debit, 2) }}</td>
+            <td>{{ number_format($stock_card->quantity, 2) }}</td>
             <td>{{ number_format($stock_card->cost, 2) }}</td>
             <td style="text-align: right">
-                {{ number_format(($stock_card->credit - $stock_card->debit) * $stock_card->cost, 2) }}
+                {{ number_format(($stock_card->quantity) * $stock_card->cost, 2) }}
             </td>
         </tr>
-        {{--@php
-            $total_cost += $stock_card->cost_price * $stock_card->quantity;
-        @endphp--}}
+        @php
+            $total_cost += $stock_card->cost * $stock_card->quantity;
+        @endphp
     @endforeach
-<!--    <tfoot>
+    <tfoot>
         <tr>
             <th colspan="2" style="text-align: right">TOTAL</th>
             <th style="text-align: right">
@@ -53,5 +57,5 @@
             <th></th>
             <th></th>
         </tr>
-    </tfoot>-->
+    </tfoot>
 </table>

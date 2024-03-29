@@ -2746,7 +2746,6 @@ class ReportController extends Controller
                 SELECT count(cost)
                 FROM stock_cards sc
                 WHERE sc.product_id = product_id
-                AND
             ) as cost
             ")
             ->groupBy('product_id')

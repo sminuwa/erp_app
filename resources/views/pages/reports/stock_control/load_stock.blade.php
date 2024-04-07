@@ -31,12 +31,15 @@
             <td> {{ $store->name }} </td>
             <td>{{ $store->store_code }} </td>
             <td> {{ $store->qty_available }} </td>
-            <td style="text-align: right;"> {{ number_format(str_replace(',', '', $store->cost_price), 2, '.', ',') }}
+            @php $cost_price = str_replace(',', '', $store->cost_price); @endphp
+            <td style="text-align: right;"> {{ number_format($cost_price, 2, '.', ',') }}
             </td>
             <td style="text-align: right;">
-                {{ number_format(str_replace(',', '', $store->retail_selling_price), 2, '.', ',') }} </td>
+                @php $retail_price = str_replace(',', '', $store->retail_selling_price); @endphp
+                {{ number_format($retail_price, 2, '.', ',') }} </td>
             <td style="text-align: right;">
-                {{ number_format(str_replace(',', '', $store->whole_selling_price), 2, '.', ',') }} </td>
+                @php $whole_price = str_replace(',', '', $store->whole_selling_price); @endphp
+                {{ number_format($whole_price, 2, '.', ',') }} </td>
             <td style="text-align: right;">
                 @php $total_cost = str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->cost_price); @endphp
                 {{ number_format($total_cost, 2, '.', ',') }}
@@ -50,10 +53,10 @@
                 {{ number_format($total_w_price, 2, '.', ',') }}
             </td>
             <td style="text-align: right;">
-                {{ number_format($total_r_price - $total_cost, 2, '.', ',') }}
+                {{ number_format($retail_price - $cost_price, 2, '.', ',') }}
             </td>
             <td style="text-align: right;">
-                {{ number_format($total_w_price - $total_cost, 2, '.', ',') }}
+                {{ number_format($whole_price - $cost_price, 2, '.', ',') }}
             </td>
 
         </tr>

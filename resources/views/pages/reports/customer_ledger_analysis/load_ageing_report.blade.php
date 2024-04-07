@@ -20,43 +20,58 @@
     </caption>
     <thead>
         <tr>
+            <th colspan="6"></th>
+            <th colspan="2" style="text-align: center">BALANCE</th>
+        </tr>
+        <tr>
             <th>CODE</th>
             <th>CUSTOMER</th>
             <th>RO</th>
             <th>LAST INVOICE</th>
             <th>DATE</th>
             <th>AGE(days)</th>
-            <th>BALANCE</th>
+            <th>Dr.</th>
+            <th>Cr.</th>
         </tr>
+
     </thead>
-    @php $total = 0 @endphp
+    @php $total_dr = $total_cr = 0; @endphp
     @foreach ($sales as $sale)
         <tr>
             <td>{{ $sale->code }}</td>
             <td>{{ $sale->name }}</td>
             <td>{{ $sale->relation_officer }}</td>
-            <td>{{ customerLastTransaction($sale->customer_id)->reference ?? '' }}</td>
+            {{-- <td>{{ customerLastTransaction($sale->customer_id)->reference ?? '' }}</td> --}}
+            <td>{{ $sale->reference }}</td>
             <td>
-                @if (customerLastTransaction($sale->customer_id) != null)
+                {{-- @if (customerLastTransaction($sale->customer_id) != null)
                     {{ \Carbon\Carbon::parse(customerLastTransaction($sale->customer_id)->date)->toFormattedDateString() }}
                     @else
                     {{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}
-                @endif
+                @endif --}}
+                {{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}
             </td>
             <td>
-                @if (customerLastTransaction($sale->customer_id) != null)
+                {{-- @if (customerLastTransaction($sale->customer_id) != null)
                     {{ \Carbon\Carbon::parse(customerLastTransaction($sale->customer_id)->date)->diffInDays() }}
                     @else
                     {{ $sale->age }}
-                @endif
+                @endif --}}
+                {{ $sale->age }}
             </td>
+
             <td style="text-align: right">
                 @if ($sale->balance < 0)
-                    ({{ number_format(abs($sale->balance), 2, '.', ',') }})
-                @else
-                    {{ number_format($sale->balance, 2, '.', ',') }}
+                    {{ number_format(abs($sale->balance), 2, '.', ',') }}
+                    @php $total_dr += $sale->balance; @endphp
                 @endif
-                @php $total += $sale->balance @endphp
+            </td>
+
+            <td style="text-align: right">
+                @if ($sale->balance > 0)
+                    {{ number_format(abs($sale->balance), 2, '.', ',') }}
+                    @php $total_cr += $sale->balance; @endphp
+                @endif
             </td>
 
         </tr>
@@ -65,8 +80,12 @@
         <tr>
             <th style="text-align: right" colspan="6">TOTAL BALANCE</th>
             <td style="text-align: right">
-                &#8358;{{ number_format($total, 2, '.', ',') }}
+                {{ $total_dr - $total_cr < 0 ? number_format(abs($total_dr - $total_cr), 2, '.', ',') : '' }}
             </td>
+            <td style="text-align: right">
+                {{ $total_dr - $total_cr > 0 ? number_format($total_dr - $total_cr, 2, '.', ',') : '' }}
+            </td>
+
         </tr>
     </tfoot>
 </table>

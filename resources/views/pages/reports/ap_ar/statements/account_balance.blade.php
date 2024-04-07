@@ -1,6 +1,6 @@
 @extends('layouts.backend.app')
 
-@section('title', 'Ledger')
+@section('title', 'Account Balances')
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">

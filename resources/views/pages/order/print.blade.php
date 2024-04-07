@@ -187,12 +187,14 @@
                                         </th>
                                     </tr>
                                 @endif
-                                <tr>
-                                    <th style="text-align: right">VAT := </th>
-                                    <th style="text-align: right;">
-                                        &#8358;0.00
-                                    </th>
-                                </tr>
+                                @if ($order->show_vat == 1)
+                                    <tr>
+                                        <th style="text-align: right">VAT := </th>
+                                        <th style="text-align: right;">
+                                            &#8358;0.00
+                                        </th>
+                                    </tr>
+                                @endif
                                 <tr>
                                     <th style="text-align: right">Total Amount := </th>
                                     <th style="text-align: right;">

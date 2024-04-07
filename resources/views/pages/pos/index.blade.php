@@ -164,7 +164,11 @@
 
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-2">
+                                            <input type="checkbox" id="show_vat" name="show_vat"  data-switch="bool">
+                                            <label for="show_vat" data-on-label="On" data-off-label="Off">Show VAT</label>
+                                        </div>
+                                        <div class="col-md-2">
                                             <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create
                                                 Invoice</button>
                                         </div>

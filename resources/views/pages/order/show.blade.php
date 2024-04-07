@@ -195,6 +195,12 @@
                                                     </th>
                                                 </tr>
                                             @endif
+                                            @if ($order->show_vat == 1)
+                                                <tr>
+                                                    <th colspan="7" style="text-align: right">VAT: </th>
+                                                    <th class="line price" style="text-align: right;">&#8358;0.00</th>
+                                                </tr>
+                                            @endif
                                             @if ($order->discount != 0 || $order->refund != 0)
                                                 <tr>
                                                     <th style="text-align: right" colspan="7">Total Amount := </th>

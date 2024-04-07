@@ -26,24 +26,28 @@
     $dif = 0; ?>
     <thead>
         <tr>
+            <th colspan="7"></th>
+            <th colspan="2" style="text-align: center; align-content: center">Balance</th>
+        </tr>
+        <tr>
             <th rowspan="2" style="width: 5%;">S/N</th>
             <th rowspan="2">Date</th>
             <th rowspan="2">Account No</th>
             <th rowspan="2">Description</th>
             <th rowspan="2">Reference</th>
-            <th colspan="2" style="text-align: center; align-content: center">Balance</th>
         </tr>
         <tr>
             <th style="text-align: center; align-content: center">Debit (Dr.)</th>
             <th style="text-align: center; align-content: center">Credit (Cr.)</th>
-            <th>Balance</th>
+            <th>Dr.</th>
+            <th>Cr.</th>
         </tr>
     </thead>
     <tbody>
         @foreach ($ledgers as $ledger)
             @php
-                $credit = number_format(abs($ledger->credit), 2);
-                $debit = number_format(abs($ledger->debit), 2);
+                $credit = $ledger->credit;
+                $debit = $ledger->debit;
             @endphp
             <tr>
                 <td>{{ $loop->index + 1 }}</td>
@@ -55,22 +59,26 @@
                 <td>{{ $ledger->reference }}</td>
                 <td style="text-align: right">
                     @if ($debit > 0.0)
-                        {{ $debit }}
+                        {{ number_format(abs($debit), 2) }}
                     @endif
                 </td>
                 <td style="text-align: right">
                     @if ($credit > 0.0)
-                        {{ $credit }}
+                        {{ number_format(abs($credit), 2) }}
+                    @endif
+                </td>
+
+                <?php $sum_cr += $ledger->credit;
+                $sum_dr += $ledger->debit;
+                $dif = $sum_dr - $sum_cr;
+                ?>
+                <td style="text-align: right">
+                    @if ($dif < 0)
+                        {{ number_format(abs($dif), 2) }}
                     @endif
                 </td>
                 <td style="text-align: right">
-                    <?php $sum_cr += $ledger->credit;
-                    $sum_dr += $ledger->debit;
-                    $dif = $sum_dr - $sum_cr;
-                    ?>
-                    @if ($dif < 0)
-                        ({{ number_format(abs($dif), 2) }})
-                    @else
+                    @if ($dif > 0)
                         {{ number_format($dif, 2) }}
                     @endif
                 </td>
@@ -81,14 +89,14 @@
         <tr>
 
             <th colspan="5" style="text-align: right">Total</th>
-            <th style="text-align: right;">&#8358;{{ number_format($debit_sum, 2) }}</th>
-            <th style="text-align: right;">&#8358;{{ number_format($credit_sum, 2) }}</th>
-            <th></th>
+            <th style="text-align: right;">{{ number_format($debit_sum, 2) }}</th>
+            <th style="text-align: right;">{{ number_format($credit_sum, 2) }}</th>
+            <th style="text-align: right;">{{ $dif < 0 ? number_format($dif, 2) : '' }}</th>
+            <th style="text-align: right;">{{ $dif > 0 ? number_format($dif, 2) : '' }}</th>
         </tr>
-        <tr>
+        {{-- <tr>
             <th colspan="4" style="text-align: right">Balance C/F</th>
-            <th colspan="3" style="text-align: right;">&#8358;{{ number_format($dif, 2) }}</th>
-            <th></th>
-        </tr>
+           
+        </tr> --}}
     </tfoot>
 </table>

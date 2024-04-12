@@ -3441,8 +3441,7 @@ class ReportController extends Controller
             ->orderBy('number')
             ->groupBy('number')
             ->get();
-
-
+        
 
         $credit_sum1 = $query1->sum('credit');
         $debit_sum1 = $query1->sum('debit');

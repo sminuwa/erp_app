@@ -122,8 +122,10 @@ class InvoiceController extends Controller
     public function final_invoice(Request $request)
     {
         //dd(\Cart::getContent());
+
         $invoice_id = $request->invoice_id;
         $description = $request->description;
+        $show_vat = 0;
         $inputs = $request->except('_token');
         $rules = [];
         $rules = [
@@ -141,9 +143,10 @@ class InvoiceController extends Controller
         }
 
         $customer_id = $request->input('customer_id');
-
+        if ($request->has('show_vat'))
+            $show_vat = 1;
         $total_sales = \Cart::getTotal();
-        
+
         //Check to make sure that the amount has not exceeded the credit limit set for the customer.
         if (Transaction::check_transaction_limit($customer_id, \Cart::getContent()) == false) {
             session()->flash('app_error', 'The amount has exceeded the customer credit limit');
@@ -195,11 +198,13 @@ class InvoiceController extends Controller
                 $invoice->refund = $refund;
                 $invoice->customer_id = $customer_id;
                 $invoice->invoice_no = $reference;
+                $invoice->show_vat = $show_vat;
 
             } else {
                 $invoice->order_invoice_id = $request->order_invoice_id ?? 0;
                 $invoice->discount = $discount;
                 $invoice->refund = $refund;
+                $invoice->show_vat = $show_vat;
             }
             $invoice->pay = $amount_paid;
             $invoice->due = $total - $amount_paid;
@@ -210,6 +215,7 @@ class InvoiceController extends Controller
             $invoice->total = $total;
             $invoice->description = $description;
             $invoice->status = 0;
+            $invoice->show_vat = $show_vat;
             if ($invoice->save()) {
                 OrderDetail::where('order_id', $invoice->id)->delete();
                 $contents = \Cart::getContent();

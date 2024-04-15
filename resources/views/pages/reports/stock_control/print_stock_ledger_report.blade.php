@@ -117,12 +117,12 @@
                                         </tr>
                                     @endforeach
                                 </tbody>
-                                <tfoot>
+                                {{-- <tfoot>
                                     <tr>
                                         <td colspan="7" align="right">Current Stock Balance B/F</td>
                                         <td>{{ number_format($qty_after, 0) }}</td>
                                     </tr>
-                                </tfoot>
+                                </tfoot> --}}
                             </table>
                         </div>
                         <!-- /.col -->

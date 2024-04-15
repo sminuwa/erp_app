@@ -116,10 +116,15 @@
                 branch_id = $('#branch_id').val();
                 store_id = $('#store_id').val();
                 product_id = $('#product_id').val();
+                if (!store_id > 0) {
+                    alert("Please select a store")
+                    return false;
+                }
                 if (!product_id > 0) {
                     alert("Please select a product")
                     return false;
                 }
+                
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",

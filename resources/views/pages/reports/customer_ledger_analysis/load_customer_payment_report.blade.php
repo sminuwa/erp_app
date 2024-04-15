@@ -50,12 +50,12 @@
                 <td>{{ $sale->customer }}</td>
                 <td style="text-align: right">
                     @if ($balance < 0)
-                        &#8358;({{ number_format(abs($balance), 2) }})
+                        ({{ number_format(abs($balance), 2) }})
                     @else
-                        &#8358;{{ number_format($balance, 2) }}
+                        {{ number_format($balance, 2) }}
                     @endif
                 </td>
-                <td style="text-align: right">&#8358;{{ number_format($sale->dr, 2, '.', ',') }}</td>
+                <td style="text-align: right">{{ number_format($sale->dr, 2, '.', ',') }}</td>
                 <td>{{ $sale->teller_no }}</td>
                 <td>{{ $sale->payment_mode }}</td>
                 <td>{{ $sale->account_name }}</td>
@@ -68,12 +68,12 @@
             <th colspan="2"></th>
             <th style="text-align: right">B/F:
                 @if ($balance < 0)
-                    &#8358;({{ number_format(abs($balance), 2) }})
+                    ({{ number_format(abs($balance), 2) }})
                 @else
-                    &#8358;{{ number_format($balance, 2) }}
+                    {{ number_format($balance, 2) }}
                 @endif
             </th>
-            <th style="text-align: right">&#8358;{{ number_format($total_pay, 2, '.', ',') }}</th>
+            <th style="text-align: right">{{ number_format($total_pay, 2, '.', ',') }}</th>
             <th colspan="4"></th>
         </tr>
     </tfoot>

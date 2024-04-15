@@ -13,12 +13,16 @@
     </caption>
     <thead>
         <tr>
-
+            <th colspan="4"></th>
+            <th colspan="2">BALANCE</th>
+        </tr>
+        <tr>
             <th>ACCOUNT NO</th>
             <th>CUSTOMER NAMES</th>
             <th>LAST INVOICE</th>
             <th>LAST DATE</th>
-            <th>BALANCE</th>
+            <th>DR.</th>
+            <th>CR.</th>
         </tr>
     </thead>
     @php
@@ -33,13 +37,17 @@
         <tr>
             <td>{{ $sale->code }}</td>
             <td>{{ $sale->customer }}</td>
-            <td>{{ $sale->reference }}</td>
-            <td>{{ \Carbon\Carbon::parse($sale->last_date)->toFormattedDateString() }}</td>
+            <td>{{ customerLastTransaction($sale->customer_id)?->reference }}</td>
+            <td>{{ \Carbon\Carbon::parse(customerLastTransaction($sale->customer_id)?->date)->toFormattedDateString() }}
+            </td>
             <td style="text-align: right">
                 @if ($running_balance < 0)
-                    &#8358;({{ number_format(abs($running_balance), 2) }})
-                @else
-                    &#8358;{{ number_format($running_balance, 2) }}
+                    {{ number_format(abs($running_balance), 2) }}
+                @endif
+            </td>
+            <td style="text-align: right">
+                @if ($running_balance > 0)
+                    {{ number_format($running_balance, 2) }}
                 @endif
             </td>
 
@@ -50,9 +58,12 @@
             <th style="text-align: right" colspan="4">TOTAL</th>
             <th style="text-align: right">
                 @if ($total_balance < 0)
-                    &#8358;({{ number_format(abs($total_balance), 2) }})
-                @else
-                    &#8358;{{ number_format($total_balance, 2) }}
+                    ({{ number_format(abs($total_balance), 2) }})
+                @endif
+            </th>
+            <th style="text-align: right">
+                @if ($total_balance > 0)
+                    {{ number_format($total_balance, 2) }}
                 @endif
             </th>
         </tr>

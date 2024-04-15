@@ -92,6 +92,7 @@
             $('#generate').on("click", function() {
                 branch_id = $('#branch_id').val();
                 customer_id = $('#customer_id').val();
+                
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",

@@ -244,7 +244,6 @@ function customerLastTransaction($customer_id)
     return DB::table('general_account_ledgers')
         ->where('model_id', $customer_id)
         ->where('model_name', 'Customer')
-        ->whereRaw("SUBSTR(reference, 1, 3) = 'INV'")
         ->orderBy('date', 'DESC')
         ->first();
 

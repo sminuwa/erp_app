@@ -1,6 +1,6 @@
 @extends('layouts.backend.app')
 
-@section('title', 'Current Stock Report')
+@section('title', 'Income Statement')
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">

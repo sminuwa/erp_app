@@ -38,12 +38,12 @@
                 <td>{{ $ledger->name ?? '' }}</td>
                 {{-- <td style="text-align: right">
                     @if ($credit > 0.0)
-                        &#8358; {{ $credit }}
+                         {{ $credit }}
                     @endif
                 </td>
                 <td style="text-align: right">
                     @if ($debit > 0.0)
-                        &#8358; {{ $debit }}
+                         {{ $debit }}
                     @endif
                 </td> --}}
                 @php
@@ -61,9 +61,9 @@
     <tfoot>
         <tr>
             <th colspan="3" style="text-align: right;">Total</th>
-            {{-- <th style="text-align: right;">&#8358;{{ number_format($total_credit, 2) }}</th>
-            <th style="text-align: right;">&#8358;{{ number_format($total_debit, 2) }}</th> --}}
-            <th style="text-align: right;">&#8358;{{ number_format($diff, 2) }}</th>
+            {{-- <th style="text-align: right;">{{ number_format($total_credit, 2) }}</th>
+            <th style="text-align: right;">{{ number_format($total_debit, 2) }}</th> --}}
+            <th style="text-align: right;">{{ number_format($diff, 2) }}</th>
         </tr>
     </tfoot>
     </tbody>

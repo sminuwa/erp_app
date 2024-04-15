@@ -20,6 +20,10 @@
     ?>
     <thead>
         <tr>
+            <th colspan="{{ $type == 'Customer' ? 5 : 4 }}"></th>
+            <th colspan="2" style="text-align: center; align-content: center">Balance</th>
+        </tr>
+        <tr>
             <th>Account No</th>
             <th>Description</th>
             @if ($type == 'Customer')
@@ -27,7 +31,8 @@
             @endif
             <th style="text-align: center; align-content: center">Debit (Dr.)</th>
             <th style="text-align: center; align-content: center">Credit (Cr.)</th>
-            <th>Balance</th>
+            <th>Dr.</th>
+            <th>Cr.</th>
         </tr>
     </thead>
     <tbody>
@@ -44,7 +49,7 @@
                 @endif
                 <td style="text-align: right">
                     @if ($debit > 0.0)
-                        {{$debit}}
+                        {{ $debit }}
                     @endif
                 </td>
                 <td style="text-align: right">
@@ -52,17 +57,19 @@
                         {{ $credit }}
                     @endif
                 </td>
-
-                <td style="text-align: right">
                     <?php $sum_cr = $ledger->credit;
                     $sum_dr = $ledger->debit;
                     $total_cr += $sum_cr;
                     $total_dr += $sum_dr;
                     $dif = $sum_dr - $sum_cr;
                     ?>
+                <td style="text-align: right">
                     @if ($dif < 0)
-                        ({{ number_format(abs($dif), 2) }})
-                    @else
+                        {{ number_format(abs($dif), 2) }}
+                    @endif
+                </td>
+                <td style="text-align: right">
+                    @if ($dif > 0)
                         {{ number_format($dif, 2) }}
                     @endif
                 </td>
@@ -72,14 +79,18 @@
     <tfoot>
         <tr>
             <th colspan="{{ $type == 'Customer' ? 3 : 2 }}" style="text-align: right">Total</th>
-            <th style="text-align: right;">&#8358;{{ number_format($total_dr, 2) }}</th>
-            <th style="text-align: right;">&#8358;{{ number_format($total_cr, 2) }}</th>
-            <th style="text-align: right;">&#8358;{{ number_format($total_dr - $total_cr, 2) }}</th>
+            <th style="text-align: right;">{{ number_format($total_dr, 2) }}</th>
+            <th style="text-align: right;">{{ number_format($total_cr, 2) }}</th>
+            <th style="text-align: right;">
+                {{ $total_dr - $total_cr < 0 ? number_format(abs($total_dr - $total_cr), 2) : '' }}
+            </th>
+            <th style="text-align: right;">
+                {{ $total_dr - $total_cr > 0 ? number_format(abs($total_dr - $total_cr, 2)) : '' }}
+            </th>
         </tr>
-        <tr>
+        {{-- <tr>
             <th colspan="4" style="text-align: right">Balance C/F</th>
-            <th style="text-align: right;">&#8358;{{ number_format($balance, 2) }}</th>
-
-        </tr>
+            <th style="text-align: right;">{{ number_format($balance, 2) }}</th>
+        </tr> --}}
     </tfoot>
 </table>

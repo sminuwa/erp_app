@@ -56,9 +56,14 @@
                             <select class="form-control select2-single {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
                                 name="to_date" id="to_date">
                                 <option value="0">Select...</option>
-                                <option value="1">0-14 days</option>
-                                <option value="2">15-30 days</option>
-                                <option value="3">Above days</option>
+                                <option value="1">0-7 days</option>
+                                <option value="2">8 - 14 days</option>
+                                <option value="3">15 - 30 days</option>
+                                <option value="4">31 - 60 days</option>
+                                <option value="5">61 - 90 days</option>
+                                <option value="6">91 - 120 days</option>
+                                <option value="7">121 - 180 days</option>
+                                <option value="8">Above 180 days</option>
                             </select>
                         </div>
                         <div class="form-group">

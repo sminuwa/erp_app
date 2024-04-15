@@ -9,9 +9,9 @@
         <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
             ACCOUNT BALANCES AS AT {{ Carbon\carbon::parse($date)->toFormattedDateString() }}
             @if ($balance < 0)
-                &#8358;({{ number_format(abs($balance), 2) }})
+                &#8358;{{ number_format(abs($balance), 2) }}Dr.
             @else
-                &#8358;{{ number_format($balance, 2) }}
+                &#8358;{{ number_format($balance, 2) }}Cr.
             @endif
         </h5>
     </caption>
@@ -61,7 +61,7 @@
                     $sum_dr = $ledger->debit;
                     $total_cr += $sum_cr;
                     $total_dr += $sum_dr;
-                    $dif = $sum_dr - $sum_cr;
+                    $dif = $sum_cr - $sum_dr;
                     ?>
                 <td style="text-align: right">
                     @if ($dif < 0)
@@ -85,7 +85,7 @@
                 {{ $total_dr - $total_cr < 0 ? number_format(abs($total_dr - $total_cr), 2) : '' }}
             </th>
             <th style="text-align: right;">
-                {{ $total_dr - $total_cr > 0 ? number_format(abs($total_dr - $total_cr, 2)) : '' }}
+                {{ $total_dr - $total_cr > 0 ? number_format(abs($total_dr - $total_cr), 2) : '' }}
             </th>
         </tr>
         {{-- <tr>

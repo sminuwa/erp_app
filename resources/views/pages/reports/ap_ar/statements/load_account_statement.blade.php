@@ -10,14 +10,14 @@
             ACCOUNT STATEMENTS BETWEEN {{ Carbon\carbon::parse($from_date)->toFormattedDateString() }} AND
             {{ Carbon\carbon::parse($to_date)->toFormattedDateString() }}
             <br /> B/F = @if ($balance_b_d < 0)
-                &#8358;({{ number_format(abs($balance_b_d), 2) }})
+                &#8358;{{ number_format(abs($balance_b_d), 2) }}Dr.
             @else
-                &#8358;{{ number_format($balance_b_d, 2) }}
+                &#8358;{{ number_format($balance_b_d, 2) }}Cr.
             @endif
             <br /> B/C = @if ($balance < 0)
-                &#8358;({{ number_format(abs($balance), 2) }})
+                &#8358;{{ number_format(abs($balance), 2) }}Dr.
             @else
-                &#8358;{{ number_format($balance, 2) }}
+                &#8358;{{ number_format($balance, 2) }}Cr.
             @endif
         </h5>
     </caption>
@@ -70,7 +70,7 @@
 
                 <?php $sum_cr += $ledger->credit;
                 $sum_dr += $ledger->debit;
-                $dif = $sum_dr - $sum_cr;
+                $dif = $sum_cr - $sum_dr;
                 ?>
                 <td style="text-align: right">
                     @if ($dif < 0)

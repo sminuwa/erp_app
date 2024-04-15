@@ -197,7 +197,7 @@
                                 exportOptions: {
                                     columns: ':visible'
                                 },
-                                messageTop: 'Sales Report',
+                                messageTop: 'Account Statement',
                                 orientation: 'landscape',
                                 pageSize: 'LEGAL'
                             },

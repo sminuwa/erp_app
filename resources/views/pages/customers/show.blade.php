@@ -74,8 +74,8 @@
                                     <th>Date</th>
                                     <th>Description</th>
                                     <th>Ref</th>
-                                    <th>Cr</th>
                                     <th>Dr</th>
+                                    <th>Cr</th>
                                     <th>Running Balance</th>
                                 </tr>
                             </thead>
@@ -87,8 +87,8 @@
                                     <td>{{ $ledger->date->toFormattedDateString() }}</td>
                                     <td>{{ $ledger->description }}</td>
                                     <td>{{ $ledger->ref }}</td>
-                                    <td style="text-align: right"> &#8358;{{ number_format($ledger->cr, 2) }}</td>
-                                    <td style="text-align: right"> &#8358;{{ number_format($ledger->dr, 2) }}</td>
+                                    <td style="text-align: right"> {{ number_format($ledger->dr, 2) }}</td>
+                                    <td style="text-align: right">{{ number_format($ledger->cr, 2) }}</td>
                                     <td style="text-align: right">
                                         <?php $sum_cr += $ledger->cr;
                                         $sum_dr += $ledger->dr;
@@ -103,9 +103,9 @@
                                                 ->where('customer_id', $record->id)
                                                 ->sum('dr'); ?>
                                         @if ($balance < 0)
-                                            &#8358;({{ number_format(abs($dif), 2) }})
+                                            {{ number_format(abs($dif), 2) }}Dr.
                                         @else
-                                            &#8358;{{ number_format($dif, 2) }}
+                                            {{ number_format($dif, 2) }}Cr.
                                         @endif
                                     </td>
                                 </tr>
@@ -119,9 +119,9 @@
                                     <th style="text-align: right;">&#8358;{{ number_format($sum_dr, 2) }}</th>
                                     <th style="text-align: right">
                                         @if ($dif < 0)
-                                            &#8358;({{ number_format(abs($dif), 2) }})
+                                            &#8358;{{ number_format(abs($dif), 2) }}Dr.
                                         @else
-                                            &#8358;{{ number_format($dif, 2) }}
+                                            &#8358;{{ number_format($dif, 2) }}Cr.
                                         @endif
                                     </th>
 
@@ -130,9 +130,9 @@
                                     <td colspan="6">
                                         <h5 style="text-align: center;">{{ strtoupper($record->name) }} Closing Running
                                             Balance: = @if ($dif < 0)
-                                                &#8358;({{ number_format(abs($dif), 2) }})
+                                                &#8358;{{ number_format(abs($dif), 2) }}Dr.
                                             @else
-                                                &#8358;{{ number_format($dif, 2) }}
+                                                &#8358;{{ number_format($dif, 2) }}Cr.
                                             @endif
                                         </h5>
                                     </td>

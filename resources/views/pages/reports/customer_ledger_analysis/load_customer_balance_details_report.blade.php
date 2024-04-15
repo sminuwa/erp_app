@@ -35,7 +35,7 @@
         @php
             $total_credit += $sale->cr;
             $total_debit += $sale->dr;
-            $running_balance += $total_debit - $total_credit;
+            $running_balance += $total_credit - $total_debit;
         @endphp
         <tr>
 

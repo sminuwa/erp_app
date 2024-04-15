@@ -637,7 +637,7 @@
                                     </ul>
                                 </li>
                             @endcan
-                            @can('submenu.user.ledger.and.loan')
+                            {{-- @can('submenu.user.ledger.and.loan')
                                 <li class="nav-item has-treeview {{ Request::is('reports/us/user*') ? 'menu-open' : '' }}">
                                     <a href="#" class="nav-link {{ Request::is('reports/us/*') ? 'active' : '' }}">
                                         <i class="ion-ios-time"></i>
@@ -670,7 +670,7 @@
                                         </li>
                                     </ul>
                                 </li>
-                            @endcan
+                            @endcan --}}
                             @can('submenu.accounting.report')
                                 <li class="nav-item has-treeview {{ Request::is('reports/ap_ar*') ? 'menu-open' : '' }}">
                                     <a href="#" class="nav-link {{ Request::is('reports/ap_ar*') ? 'active' : '' }}">

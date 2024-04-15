@@ -4,10 +4,11 @@
             class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
-<table class="table table-bordered caption" id="example1" data-ordering="false">
+<table class="table table-bordered caption" id="example1" data-ordering="true">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
-            TRIAL BALANCE BETWEEN {{ Carbon\Carbon::parse($from_date)->toFormattedDateString() }} AND {{ Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
+            TRIAL BALANCE BETWEEN {{ Carbon\Carbon::parse($from_date)->toFormattedDateString() }} AND
+            {{ Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
         </h5>
     </caption>
     <thead>
@@ -102,77 +103,77 @@
             </tr>
         @endforeach
         @foreach ($ledger3 as $ledger)
-        @php
-            $credit = number_format(abs($ledger->credit), 2);
-            $debit = number_format(abs($ledger->debit), 2);
-        @endphp
-        <tr>
-            <td>{{ $ledger->number }}</td>
-            <td>{{ $ledger->description }}</td>
-            <td style="text-align: right">
-                @if ($debit > 0.0)
-                    {{ $debit }}
-                @endif
-            </td>
-            <td style="text-align: right">
-                @if ($credit > 0.0)
-                    {{ $credit }}
-                @endif
-            </td>
-
             @php
-                $total_credit += $ledger->credit;
-                $total_debit += $ledger->debit;
-                $diff = $ledger->debit - $ledger->credit;
+                $credit = number_format(abs($ledger->credit), 2);
+                $debit = number_format(abs($ledger->debit), 2);
             @endphp
-            <td style="text-align: right">
-                @if ($diff < 0)
-                    {{ number_format(abs($diff), 2) }}
-                @endif
-            </td>
-            <td style="text-align: right">
-                @if ($diff > 0)
-                    {{ number_format($diff, 2) }}
-                @endif
-            </td>
-        </tr>
-    @endforeach
-    @foreach ($ledger4 as $ledger)
-    @php
-        $credit = number_format(abs($ledger->credit), 2);
-        $debit = number_format(abs($ledger->debit), 2);
-    @endphp
-    <tr>
-        <td>{{ $ledger->number }}</td>
-        <td>{{ $ledger->description }}</td>
-        <td style="text-align: right">
-            @if ($debit > 0.0)
-                {{ $debit }}
-            @endif
-        </td>
-        <td style="text-align: right">
-            @if ($credit > 0.0)
-                {{ $credit }}
-            @endif
-        </td>
+            <tr>
+                <td>A150001</td>
+                <td>General Customer Control Account</td>
+                <td style="text-align: right">
+                    @if ($debit > 0.0)
+                        {{ $debit }}
+                    @endif
+                </td>
+                <td style="text-align: right">
+                    @if ($credit > 0.0)
+                        {{ $credit }}
+                    @endif
+                </td>
 
-        @php
-            $total_credit += $ledger->credit;
-            $total_debit += $ledger->debit;
-            $diff = $ledger->debit - $ledger->credit;
-        @endphp
-        <td style="text-align: right">
-            @if ($diff < 0)
-                {{ number_format(abs($diff), 2) }}
-            @endif
-        </td>
-        <td style="text-align: right">
-            @if ($diff > 0)
-                {{ number_format($diff, 2) }}
-            @endif
-        </td>
-    </tr>
-@endforeach
+                @php
+                    $total_credit += $ledger->credit;
+                    $total_debit += $ledger->debit;
+                    $diff = $ledger->debit - $ledger->credit;
+                @endphp
+                <td style="text-align: right">
+                    @if ($diff < 0)
+                        {{ number_format(abs($diff), 2) }}
+                    @endif
+                </td>
+                <td style="text-align: right">
+                    @if ($diff > 0)
+                        {{ number_format($diff, 2) }}
+                    @endif
+                </td>
+            </tr>
+        @endforeach
+        @foreach ($ledger4 as $ledger)
+            @php
+                $credit = number_format(abs($ledger->credit), 2);
+                $debit = number_format(abs($ledger->debit), 2);
+            @endphp
+            <tr>
+                <td>L220010</td>
+                <td>Accounts Payable Control</td>
+                <td style="text-align: right">
+                    @if ($debit > 0.0)
+                        {{ $debit }}
+                    @endif
+                </td>
+                <td style="text-align: right">
+                    @if ($credit > 0.0)
+                        {{ $credit }}
+                    @endif
+                </td>
+
+                @php
+                    $total_credit += $ledger->credit;
+                    $total_debit += $ledger->debit;
+                    $diff = $ledger->debit - $ledger->credit;
+                @endphp
+                <td style="text-align: right">
+                    @if ($diff < 0)
+                        {{ number_format(abs($diff), 2) }}
+                    @endif
+                </td>
+                <td style="text-align: right">
+                    @if ($diff > 0)
+                        {{ number_format($diff, 2) }}
+                    @endif
+                </td>
+            </tr>
+        @endforeach
     </tbody>
     <tfoot>
         <tr>
@@ -180,9 +181,9 @@
             <th style="text-align: right;">{{ number_format($total_debit, 2) }}</th>
             <th style="text-align: right;">{{ number_format($total_credit, 2) }}</th>
             <th style="text-align: right;">
-                {{ $total_debit - $total_credit < 0 ? number_format(abs($total_debit - $total_credit), 2) : '' }}</th>
+                {{ $total_credit - $total_debit < 0 ? number_format(abs($total_credit - $total_debit), 2) : '' }}</th>
             <th style="text-align: right;">
-                {{ $total_debit - $total_credit > 0 ? number_format(abs($total_debit - $total_credit), 2) : '' }}</th>
+                {{ $total_credit - $total_debit > 0 ? number_format(abs($total_credit - $total_debit), 2) : '' }}</th>
         </tr>
     </tfoot>
 </table>

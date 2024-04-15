@@ -42,9 +42,9 @@
                             <h5 style="text-align: center;">{{ strtoupper($customer->name) }} ACOOUNT BALANCES AS AT
                                 {{ $from_date }}
                                 was = @if ($balance_b_d < 0)
-                                    &#8358;({{ number_format(abs($balance_b_d), 2) }})
+                                    &#8358;{{ number_format(abs($balance_b_d), 2) }}Dr.
                                 @else
-                                    &#8358;{{ number_format($balance_b_d, 2) }}
+                                    &#8358;{{ number_format($balance_b_d, 2) }}Cr.
                                 @endif
                             </h5>
 
@@ -99,7 +99,7 @@
                                                 $sum_dr = $ledger->debit;
                                                 $total_cr += $sum_cr;
                                                 $total_dr += $sum_dr;
-                                                $dif = $sum_dr - $sum_cr;
+                                                $dif = $sum_cr - $sum_dr;
                                                 ?>
                                             <td style="text-align: right">
                                                 @if ($dif < 0)
@@ -123,7 +123,7 @@
                                             {{ $total_dr - $total_cr < 0 ? number_format(abs($total_dr - $total_cr), 2) : '' }}
                                         </th>
                                         <th style="text-align: right;">
-                                            {{ $total_dr - $total_cr > 0 ? number_format(abs($total_dr - $total_cr, 2)) : '' }}
+                                            {{ $total_dr - $total_cr > 0 ? number_format(abs($total_dr - $total_cr), 2) : '' }}
                                         </th>
                                     </tr>
                                     {{-- <tr>

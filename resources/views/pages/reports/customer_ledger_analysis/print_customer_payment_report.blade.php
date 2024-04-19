@@ -83,7 +83,7 @@
                                             $sum_dr = \App\Models\CustomerLedger::where('id', '<', $sale->id)
                                                 ->where('customer_id', $sale->customer_id)
                                                 ->sum('dr');
-                                            $balance = $sum_dr - $sum_cr;
+                                            $balance = $sum_cr - $sum_dr;
                                             $total_pay += $sale->dr;
                                         @endphp
                                         <tr>

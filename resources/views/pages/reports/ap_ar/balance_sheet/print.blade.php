@@ -113,10 +113,10 @@
                                         <th style="text-align: right;">{{ number_format($total_credit, 2) }}</th>
                                         <th style="text-align: right;">{{ number_format($total_debit, 2) }}</th>
                                         <th style="text-align: right;">
-                                            {{ $total_debit - $total_credit < 0 ? number_format(abs($total_debit - $total_credit), 2) : '' }}
+                                            {{ $total_credit - $total_debit < 0 ? number_format(abs($total_credit - $total_debit), 2) : '' }}
                                         </th>
                                         <th style="text-align: right;">
-                                            {{ $total_debit - $total_credit > 0 ? number_format($total_debit - $total_credit, 2) : '' }}
+                                            {{ $total_credit - $total_debit > 0 ? number_format($total_credit - $total_debit, 2) : '' }}
                                         </th>
                                     </tr>
                                 </tfoot>

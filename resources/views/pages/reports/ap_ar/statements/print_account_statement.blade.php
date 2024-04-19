@@ -45,9 +45,9 @@
                                 AND
                                 {{ $to_date }}<br /> Runining Balance B/d Before this date {{ $from_date }}
                                 was = @if ($balance_b_d < 0)
-                                    &#8358;({{ number_format(abs($balance_b_d), 2) }})
+                                    &#8358;{{ number_format(abs($balance_b_d), 2) }}Dr.
                                 @else
-                                    &#8358;{{ number_format($balance_b_d, 2) }}
+                                    &#8358;{{ number_format($balance_b_d, 2) }}Cr.
                                 @endif
                             </h5>
 
@@ -105,7 +105,7 @@
                             
                                             <?php $sum_cr += $ledger->credit;
                                             $sum_dr += $ledger->debit;
-                                            $dif = $sum_dr - $sum_cr;
+                                            $dif = $sum_cr - $sum_dr;
                                             ?>
                                             <td style="text-align: right">
                                                 @if ($dif < 0)

@@ -14,12 +14,16 @@
     </caption>
     <thead>
         <tr>
+            <th colspan="3"></th>
+            <th colspan="2" style="text-align: center; align-content: center">Total Balance</th>
+        </tr>
+        <tr>
             <th>Account No</th>
             <th>Description</th>
             <th>User</th>
-            {{-- <th style="text-align: center; align-content: center">Total (Cr.)</th>
-            <th style="text-align: center; align-content: center">Total (Dr.)</th> --}}
-            <th style="text-align: center; align-content: center">Total</th>
+            <th style="text-align: center; align-content: center">Total (Dr.)</th>
+            <th style="text-align: center; align-content: center">Total (Cr.)</th>
+            {{-- <th style="text-align: center; align-content: center">Total</th> --}}
         </tr>
 
     </thead>
@@ -49,13 +53,12 @@
                 @php
                     $total_credit += $ledger->credit;
                     $total_debit += $ledger->debit;
-                    $diff = $total_debit - $total_credit;
+                    $diff = $total_credit - $total_debit;
                 @endphp
-                @if ($diff > 0)
-                    <td style="text-align: right;">{{ number_format($total_credit, 2) }}</td>
-                @else
-                    <td style="text-align: right;">({{ number_format($total_debit, 2) }})</td>
-                @endif
+
+                <td style="text-align: right;">{{ $diff < 0 ? number_format(abs($total_credit), 2) : '' }}</td>
+
+                <td style="text-align: right;">{{ $diff > 0 ? number_format(abs($total_debit), 2) : '' }}</td>
             </tr>
         @endforeach
     <tfoot>
@@ -63,7 +66,8 @@
             <th colspan="3" style="text-align: right;">Total</th>
             {{-- <th style="text-align: right;">{{ number_format($total_credit, 2) }}</th>
             <th style="text-align: right;">{{ number_format($total_debit, 2) }}</th> --}}
-            <th style="text-align: right;">{{ number_format($diff, 2) }}</th>
+            <th style="text-align: right;">{{ $diff < 0 ? number_format(abs($diff), 2) : '' }}</th>
+            <th style="text-align: right;">{{ $diff > 0 ? number_format(abs($diff), 2) : '' }}</th>
         </tr>
     </tfoot>
     </tbody>

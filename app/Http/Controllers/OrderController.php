@@ -163,50 +163,7 @@ class OrderController extends Controller
         return view('pages.order.view_orders', compact('order'));
     }
 
-    public function destroy(Request $request, Order $order)
-    {
-
-        DB::beginTransaction();
-        try {
-            $amount_paid = $order->pay;
-            $payment_mode = $order->payment_mode;
-            $bank_account_id = CustomerLedger::where('order_id', $order->id)->first()->bank_account_id;
-            if ($payment_mode == "Credit") {
-                DB::table('customers')->where(['id' => $order->customer_id, 'type' => 'Credit'])->decrement('opening_balance', $amount_paid);
-            }
-            if ($payment_mode == "Cash") {
-                DB::table('bank_accounts')->where('id', $bank_account_id)->decrement('account_balance', $amount_paid);
-                DB::table('customer_ledgers')->where('order_id', $order->id)->decrement('cr', $amount_paid);
-                DB::table('customer_ledgers')->where('order_id', $order->id)->decrement('dr', $amount_paid);
-                //Bank Deposit
-                DB::table('bank_transactions')->where(['ref_no' => $order->invoice_no, 'bank_account_id' => $bank_account_id])->update(['status' => 0]);
-            } else {
-                DB::table('customer_ledgers')->where('order_id', $order->id)->decrement('cr', $amount_paid);
-            }
-            $order_details = DB::table('order_details')->where(['order_id' => $order->id, 'status' => 1])->get();
-            foreach ($order_details as $order_detail) {
-                DB::table('store_products')->where('id', $order_detail->store_product_id)->increment('qty_available', $order_detail->quantity);
-
-            }
-            DB::table('transfer_products')->where(['refno' => $order->invoice_no, 'nature' => 'Sale'])->update(['status' => 'Cancelled']);
-            DB::table('stock_cards')->where(['refno' => $order->invoice_no, 'type' => 'Sale'])->update(['status' => 0]);
-            DB::table('customer_ledgers')->where('order_id', $order->id)->delete();
-            DB::table('orders')->where('id', $order->id)->update(['status' => 0]);
-            DB::table('order_details')->where('order_id', $order->id)->update(['status' => 0]);
-            session()->flash('app_message', 'Order deleted successfully');
-            $action = "Modified order made with invoice $order->invoice_no ";
-            AuditLog::auditLog(Auth::id(), $action);
-            DB::commit();
-        } catch (\Exception $e) {
-            session()->flash('app_error', 'Order could not be deleted!');
-            DB::rollBack();
-            throw $e;
-        }
-        if ($request->has('from_pos')) {
-            return redirect()->route('orders.approved');
-        }
-        return redirect()->back();
-    }
+   
     public function destroy_order_invoice(Request $request, Order $order)
     {
 
@@ -242,59 +199,6 @@ class OrderController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             session()->flash('app_error', 'Order could not be deleted!');
-            DB::rollBack();
-            throw $e;
-        }
-        return redirect()->back();
-    }
-    public function removeItem(Request $request, OrderDetail $orderdetail)
-    {
-        DB::beginTransaction();
-        try {
-            $item_cost = $orderdetail->total;
-            $order = $orderdetail->order;
-            $payment_mode = $order->payment_mode;
-
-            $bank_account_id = CustomerLedger::where('order_id', $order->id)->first()->bank_account_id;
-            if ($payment_mode == "Credit") {
-                DB::table('customers')->where(['id' => $order->customer_id, 'type' => 'Credit'])->decrement('opening_balance', $item_cost);
-            }
-            if ($payment_mode == "Cash") {
-                DB::table('bank_accounts')->where('id', $bank_account_id)->decrement('account_balance', $item_cost);
-                DB::table('customer_ledgers')->where('order_id', $order->id)->decrement('cr', $item_cost);
-                DB::table('customer_ledgers')->where('order_id', $order->id)->decrement('dr', $item_cost);
-                DB::table('orders')->where('id', $order->id)->decrement('total', $item_cost);
-                DB::table('orders')->where('id', $order->id)->decrement('sub_total', $item_cost);
-                DB::table('orders')->where('id', $order->id)->decrement('pay', $item_cost);
-                DB::table('orders')->where('id', $order->id)->decrement('due', $item_cost);
-                //Bank Deposit
-                DB::table('bank_transactions')->where(['ref_no' => $order->invoice_no, 'bank_account_id' => $bank_account_id])->update(
-                    [
-                        'cr' => $item_cost,
-                        'updated_at' => Carbon::now(),
-                    ]
-                );
-            } else {
-                DB::table('customer_ledgers')->where('order_id', $order->id)->decrement('cr', $item_cost);
-                DB::table('orders')->where('id', $order->id)->decrement('total', $item_cost);
-                DB::table('orders')->where('id', $order->id)->decrement('sub_total', $item_cost);
-                DB::table('orders')->where('id', $order->id)->decrement('due', $item_cost);
-                if ($order->pay > 0) {
-                    DB::table('orders')->where('id', $order->id)->decrement('pay', $item_cost);
-                }
-            }
-            DB::table('transfer_products')->where(['source_store_id' => $orderdetail->storeProduct->store_id, 'product_id' => $orderdetail->storeProduct->product_id, 'refno' => $order->invoice_no])->update(['status' => 'Cancelled']);
-            DB::table('store_products')->where('id', $orderdetail->store_product_id)->increment('qty_available', $orderdetail->quantity);
-
-
-            DB::table('order_details')->where('id', $orderdetail->id)->update(['status' => 0]);
-
-            session()->flash('app_message', 'Item deleted successfully');
-            $action = "Removed item of order made with invoice $order->invoice_no ";
-            AuditLog::auditLog(Auth::id(), $action);
-            DB::commit();
-        } catch (\Exception $e) {
-            session()->flash('app_error', 'Item could not be deleted!');
             DB::rollBack();
             throw $e;
         }
@@ -650,98 +554,6 @@ class OrderController extends Controller
         //return $order_details;
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         return view('pages.order.show', compact('order_details', 'order', 'company'));
-    }
-    public function updateOrder(Request $request, OrderDetail $orderdetail)
-    {
-        $store_product_id = $request->store_product_id;
-        $source_store_id = optional(StoreProduct::where('id', $store_product_id)->first())->store_id;
-        $new_cost = $request->new_cost;
-        $new_qty = $request->qty;
-        $old_qty = $orderdetail->quantity;
-        $old_cost = $orderdetail->unit_cost;
-        $new_total_cost = $new_cost * $new_qty;
-        $old_total_cost = $old_cost * $old_qty;
-
-        DB::beginTransaction();
-        try {
-            $order = $orderdetail->order;
-            $payment_mode = $order->payment_mode;
-
-            $bank_account_id = CustomerLedger::where('order_id', $order->id)->first()->bank_account_id;
-            if ($payment_mode == "Credit") {
-                DB::table('customers')->where(['id' => $order->customer_id, 'type' => 'Credit'])->decrement('opening_balance', $old_total_cost);
-                DB::table('customers')->where(['id' => $order->customer_id, 'type' => 'Credit'])->increment('opening_balance', $new_total_cost);
-            }
-            if ($payment_mode == "Cash") {
-                DB::table('bank_accounts')->where('id', $bank_account_id)->decrement('account_balance', $old_total_cost);
-                DB::table('bank_accounts')->where('id', $bank_account_id)->increment('account_balance', $new_total_cost);
-
-                DB::table('customer_ledgers')->where('order_id', $order->id)->decrement('cr', $old_total_cost);
-                DB::table('customer_ledgers')->where('order_id', $order->id)->decrement('dr', $old_total_cost);
-                DB::table('customer_ledgers')->where('order_id', $order->id)->increment('cr', $new_total_cost);
-                DB::table('customer_ledgers')->where('order_id', $order->id)->increment('dr', $new_total_cost);
-
-                DB::table('orders')->where('id', $order->id)->decrement('total', $old_total_cost);
-                DB::table('orders')->where('id', $order->id)->decrement('sub_total', $old_total_cost);
-                DB::table('orders')->where('id', $order->id)->decrement('pay', $old_total_cost);
-                DB::table('orders')->where('id', $order->id)->decrement('due', $old_total_cost);
-
-                DB::table('orders')->where('id', $order->id)->increment('total', $new_total_cost);
-                DB::table('orders')->where('id', $order->id)->increment('sub_total', $new_total_cost);
-                DB::table('orders')->where('id', $order->id)->increment('pay', $new_total_cost);
-                DB::table('orders')->where('id', $order->id)->increment('due', $new_total_cost);
-
-                //Bank Deposit
-                DB::table('bank_transactions')->where(['ref_no' => $order->invoice_no, 'bank_account_id' => $bank_account_id])->update(
-                    [
-                        'cr' => $new_total_cost,
-                        'updated_at' => Carbon::now(),
-                    ]
-                );
-            } else {
-                DB::table('customer_ledgers')->where('order_id', $order->id)->decrement('cr', $old_total_cost);
-                DB::table('customer_ledgers')->where('order_id', $order->id)->increment('cr', $new_total_cost);
-
-                DB::table('orders')->where('id', $order->id)->decrement('total', $old_total_cost);
-                DB::table('orders')->where('id', $order->id)->decrement('sub_total', $old_total_cost);
-                DB::table('orders')->where('id', $order->id)->decrement('due', $old_total_cost);
-
-                DB::table('orders')->where('id', $order->id)->increment('total', $new_total_cost);
-                DB::table('orders')->where('id', $order->id)->increment('sub_total', $new_total_cost);
-                DB::table('orders')->where('id', $order->id)->increment('due', $new_total_cost);
-
-                if ($order->pay > 0) {
-                    DB::table('orders')->where('id', $order->id)->decrement('pay', $old_total_cost);
-                    DB::table('orders')->where('id', $order->id)->increment('pay', $new_total_cost);
-
-                }
-            }
-            DB::table('transfer_products')->where(['source_store_id' => $orderdetail->storeProduct->store_id, 'product_id' => $orderdetail->storeProduct->product_id, 'refno' => $order->invoice_no])
-                ->update(
-                    [
-                        'status' => 'Cancelled',
-                        'source_store_id' => $source_store_id,
-                        'destination_store_id' => $source_store_id,
-                        'qty_transfered' => $new_qty,
-                        'qty_available' => $new_qty
-                    ]
-                );
-            DB::table('store_products')->where('id', $orderdetail->store_product_id)->decrement('qty_available', $old_qty);
-            DB::table('store_products')->where('id', $store_product_id)->increment('qty_available', $new_qty);
-
-            DB::table('order_details')->where('id', $orderdetail->id)->update(['unit_cost' => $new_cost, 'quantity' => $new_qty]);
-
-            session()->flash('app_message', 'Item modified successfully');
-            $action = "Updated  order made with invoice $order->invoice_no ";
-            AuditLog::auditLog(Auth::id(), $action);
-            DB::commit();
-        } catch (\Exception $e) {
-            session()->flash('app_error', 'Item could not be modified!');
-            DB::rollBack();
-            throw $e;
-        }
-        //return json_encode($orderdetail,true);
-        return redirect()->route('orders.approved');
     }
     public function loadEdit(Request $request)
     {

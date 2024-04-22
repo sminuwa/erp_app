@@ -11,13 +11,14 @@ class StockCard extends Model
 {
     use HasFactory;
 
-    public function createRecord($store_id, $product_id, $quantity, $reference, $date, $type, $is_credit = false){
-        $credit = $debit = $qty_after =$qty_before  = 0;
-        $store_product = self::where(['store_id'=>$store_id, 'product_id'=>$product_id])->first();
+    public function createRecord($store_id, $product_id, $quantity, $reference, $date, $type, $is_credit = false)
+    {
+        $credit = $debit = $qty_after = $qty_before = 0;
+        $store_product = self::where(['store_id' => $store_id, 'product_id' => $product_id])->first();
         $qty_available = $store_product->qty_available;
         $qty_before = $qty_available;
         $qty_after = $qty_available - $quantity;
-        if($is_credit) // meaning if record type is credit then assign the quantity to credit else debit
+        if ($is_credit) // meaning if record type is credit then assign the quantity to credit else debit
             $credit = $quantity;
         else
             $debit = $quantity;
@@ -35,7 +36,8 @@ class StockCard extends Model
                 'priority' => $type,*/
     }
 
-    public static function createBatchRecord(array $records, string $reference, $date, $type) {
+    public static function createBatchRecord(array $records, string $reference, $date, $type)
+    {
         /*
          * find store_product record and get the following
          * array of records looks like below
@@ -60,19 +62,19 @@ class StockCard extends Model
          * types: 1= opening balance, 2= Purchase, 3=Sale, 4 = Transfer, 5 = Adjustment
          *
          * */
+       
         Log::info(print_r($records, true));
         $cards = [];
-        foreach($records as $record){
-            $credit = $debit = $qty_after =$qty_before  = 0;
-            $store_product = StoreProduct::where(['store_id'=>$record['store_id'], 'product_id'=>$record['product_id']])->first();
-            if($store_product){
+        foreach ($records as $record) {
+            $credit = $debit = $qty_after = $qty_before = 0;
+            $store_product = StoreProduct::where(['store_id' => $record['store_id'], 'product_id' => $record['product_id']])->first();
+            if ($store_product) {
                 $qty_before = $store_product->qty_available;
-                if($record['operation'] == 'in') // meaning if record type is credit then assign the quantity to credit else debit
+                if ($record['operation'] == 'in') // meaning if record type is credit then assign the quantity to credit else debit
                 {
                     $credit = $record['quantity'];
                     $qty_after = ($qty_before + $record['quantity']);
-                }
-                else{
+                } else {
                     $debit = $record['quantity'];
                     $qty_after = $qty_before - $record['quantity'];
                 }
@@ -85,7 +87,7 @@ class StockCard extends Model
                 'dr' => $debit,
                 'qty_before' => $qty_before,
                 'qty_after' => $qty_after,
-                'cost' => $record['cost'],
+                'cost' => $record['cost'] ?? 0,
                 'refno' => $reference,
                 'type' => $type,
                 'date' => $date,
@@ -94,9 +96,9 @@ class StockCard extends Model
             ];
         }
 
-        if(StockCard::upsert($cards, ['store_id', 'product_id'])){
+        if (StockCard::upsert($cards, ['store_id', 'product_id'])) {
             return true;
-        }else{
+        } else {
             return false;
         }
 
@@ -106,11 +108,13 @@ class StockCard extends Model
     }
 
 
-    public function store(){
-        return $this->belongsTo(Store::class,'store_id');
+    public function store()
+    {
+        return $this->belongsTo(Store::class, 'store_id');
     }
 
-    public function product(){
-        return $this->belongsTo(Product::class,'product_id');
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
     }
 }

@@ -494,6 +494,7 @@ class CostPrice
                         'product_id' => $k,
                         'quantity' => $r['new_quantity'],
                         'operation' => 'out',
+                        'cost'=> $r['new_cost'],
                     ];
                     $source_store_products[] = [
                         'store_id' => $r['store_id'],

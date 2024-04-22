@@ -139,7 +139,9 @@
                                         <thead>
                                             <tr>
                                                 <th>S.N</th>
+                                                <th>Code</th>
                                                 <th>Product Name</th>
+                                                <th>Store</th>
                                                 <th>Unit</th>
                                                 <th>Quantity</th>
                                                 <th>Unit Cost</th>
@@ -154,8 +156,10 @@
                                             @foreach ($order_details as $order_detail)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ $order_detail->storeProduct->product->code ?? '' }}</td>
                                                     <td>{{ $order_detail->storeProduct->product->name ?? '' }}</td>
                                                     <td>{{ $order_detail->storeProduct->product->unit ?? '' }}</td>
+                                                    <td>{{ $order_detail->storeProduct->store->code ?? '' }}</td>
                                                     <td align="center">{{ $order_detail->quantity }}</td>
                                                     <td align="right">{{ number_format($order_detail->sold_price, 2) }}
                                                     </td>

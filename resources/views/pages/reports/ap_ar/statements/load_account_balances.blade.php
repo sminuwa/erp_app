@@ -82,10 +82,10 @@
             <th style="text-align: right;">{{ number_format($total_dr, 2) }}</th>
             <th style="text-align: right;">{{ number_format($total_cr, 2) }}</th>
             <th style="text-align: right;">
-                {{ $total_dr - $total_cr < 0 ? number_format(abs($total_dr - $total_cr), 2) : '' }}
+                {{  $total_cr - $total_dr  < 0 ? number_format(abs($total_cr - $total_dr), 2) : '' }}
             </th>
             <th style="text-align: right;">
-                {{ $total_dr - $total_cr > 0 ? number_format(abs($total_dr - $total_cr), 2) : '' }}
+                {{ $total_cr - $total_dr > 0 ? number_format(abs($total_cr - $total_dr), 2) : '' }}
             </th>
         </tr>
         {{-- <tr>

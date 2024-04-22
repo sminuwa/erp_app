@@ -261,3 +261,10 @@ function transactionDecription($reference)
     if (substr($reference, 0, 3) == "CRN")
         return DB::table('credit_notes')->where('reference', $reference)->first()->description ?? '';
 }
+function storeByCode($code)
+{
+    return DB::table('stores')
+        ->where('code', $code)
+        ->first();
+
+}

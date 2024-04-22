@@ -105,7 +105,7 @@
                                 @endphp
                                 {{ QrCode::size(70)->generate($order->total) }}<br />
                                 <span style="font-size:28px;margin-top:-5px">
-                                    Proformer Invoice
+                                    Proforma Invoice
                                 </span>
                             </div>
                         </div>

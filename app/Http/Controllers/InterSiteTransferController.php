@@ -401,9 +401,10 @@ class InterSiteTransferController extends Controller
         return "TR" . date('y') . '' . date('m') . str_pad(($no), 4, "0", STR_PAD_LEFT);
     }
     public function printStockTransfer(IntersiteTransfer $intersite)
-    {
+    { 
         $this->authorize('intersite.print');
-        return view('pages.inventories.transfers.inter_site.print')->with(['transfers' => TransferProduct::where(['transfer_id' => $intersite->id, 'stock_in_out' => 'out'])->get()]);
+        
+        return view('pages.inventories.transfers.inter_site.print')->with(['intersite'=>$intersite]);
     }
 
 }

@@ -54,7 +54,7 @@ class IntersiteTransferProduct extends Model
      */
     public function destinationStore()
     {
-        return $this->belongsTo(Store::class, 'destination_store_id');
+        return $this->belongsTo(Store::class, 'store_id');
     }
 
     /**
@@ -64,7 +64,7 @@ class IntersiteTransferProduct extends Model
      */
     public function sourceStore()
     {
-        return $this->belongsTo(Store::class, 'source_store_id');
+        return $this->belongsTo(Branch::class, 'source_branch_id');
     }
 
     /**

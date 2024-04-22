@@ -29,9 +29,9 @@ class StoreRequest extends FormRequest
         return [
 			'supplier_id' => 'required|numeric',
 			'invoice' => 'required|max:191',
-			'purchase_date' => 'required|date',
+			'purchase_date' => 'nullable|date',
 			'wbno' => 'nullable|max:191',
-			'status' => 'required',
+			'status' => 'nullable',
 			'waybill_no' => 'nullable|max:50',
 			'driver_name' => 'nullable|max:100',
 			'location_id' => 'nullable|max:100',

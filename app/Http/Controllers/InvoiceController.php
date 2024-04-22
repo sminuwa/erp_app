@@ -448,13 +448,20 @@ class InvoiceController extends Controller
             $total_discount = 0;
             foreach ($contents as $content) {
                 $total_discount += $content->attributes['discount'] * $content->quantity;
-                $store = StoreProduct::find($content->id);
-                $qtyAval = $store->qty_available;
+                $store = storeByCode($content->attributes['store']);
+                $store_product = StoreProduct::where('product_id', $content->id, $store->id)->first();
+                $store_product_id = 0;
+                if ($store_product == null) {
+                    $store_product_id = StoreProduct::insertGetId(['store_id' => $store->id, 'product_id' => $content->id]);
+                } else {
+                    $store_product_id = $store_product->id;
+                }
+                $qtyAval = $store->qty_available ?? 0;
                 //$store->qty_available = $qtyAval - $content->quantity;
                 $order_detail = new OrderDetail();
                 DB::table('order_invoice_details')->insert([
                     'order_id' => $order_id,
-                    'store_product_id' => $content->id,
+                    'store_product_id' => $store_product_id,
                     'quantity' => $content->quantity,
                     'original_quantity_sold' => $content->quantity,
                     'selling_price' => $content->attributes['selling_price'],

@@ -259,7 +259,7 @@ class CartController extends Controller
 
             }
             $prices = BranchProductPrice::where(['product_id' => $product_id, 'branch_id' => auth()->user()->branch->id])->first();
-            $selling_price = 0;
+            $selling_price = $cost_price;// Price for Order and Profoma but change below if it is sales invoice
             if ($prices) {
                 if ($customer->type == 'Retail')
                     $selling_price = str_replace(',', '', $prices->retail_selling_price);

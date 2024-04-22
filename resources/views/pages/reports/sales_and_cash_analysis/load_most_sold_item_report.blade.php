@@ -38,7 +38,7 @@
             <td style="text-align: right">{{ $sale->quantity }}</td>
             <td style="text-align: right">{{ number_format($sale->total_cost, 2, '.', ',') }}</td>
             <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>
-            <td style="text-align: right">{{ number_format($sale->total - intval($sale->total_cost), 2, '.', ',') }}</td>
+            <td style="text-align: right">{{ number_format(intval($sale->total) - intval($sale->total_cost), 2,) }}</td>
         </tr>
         @php
             $total_quantity += $sale->quantity;

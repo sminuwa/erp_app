@@ -40,7 +40,7 @@
             <td>{{ number_format($stock_card->quantity, 2) }}</td>
             <td>{{ number_format(intval($stock_card->cost), 2) }}</td>
             <td style="text-align: right">
-                {{ number_format(($stock_card->quantity) * $stock_card->cost, 2) }}
+                {{ number_format(($stock_card->quantity) * intval($stock_card->cost), 2) }}
             </td>
         </tr>
         @php

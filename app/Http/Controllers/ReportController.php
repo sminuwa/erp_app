@@ -3680,7 +3680,7 @@ class ReportController extends Controller
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
         if ($type != null && $type == "Customer") {
-            return GeneralAccountLedger::join('customers', 'customers.id', '=', 'general_account_ledgers.model_id')
+            $query = GeneralAccountLedger::join('customers', 'customers.id', '=', 'general_account_ledgers.model_id')
                 ->where('customers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '<=', $to_date)
                 ->where('model_name', 'Customer');
@@ -3689,7 +3689,7 @@ class ReportController extends Controller
             return $query;
         }
         if ($type != null && $type == "Supplier") {
-            return GeneralAccountLedger::join('suppliers', 'suppliers.id', '=', 'general_account_ledgers.model_id')
+            $query = GeneralAccountLedger::join('suppliers', 'suppliers.id', '=', 'general_account_ledgers.model_id')
                 ->where('general_account_ledgers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '<=', $to_date)
                 ->where('model_name', 'Supplier');

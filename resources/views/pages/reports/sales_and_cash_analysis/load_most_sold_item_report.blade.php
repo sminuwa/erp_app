@@ -38,12 +38,12 @@
             <td style="text-align: right">{{ $sale->quantity }}</td>
             <td style="text-align: right">{{ number_format($sale->total_cost, 2, '.', ',') }}</td>
             <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>
-            <td style="text-align: right">{{ number_format(intval($sale->total) - intval($sale->total_cost), 2,) }}</td>
+            <td style="text-align: right">{{ number_format($sale->total - $sale->total_cost, 2, '.', ',') }}</td>
         </tr>
         @php
             $total_quantity += $sale->quantity;
             $total_amount += $sale->total;
-            $total_cost += intval($sale->total_cost);
+            $total_cost += $sale->total_cost;
 
         @endphp
     @endforeach

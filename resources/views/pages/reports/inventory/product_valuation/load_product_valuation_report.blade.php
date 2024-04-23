@@ -21,7 +21,9 @@
     </caption>
     <thead>
         <tr>
+            @if($store_group != '')
             <th>STORE</th>
+            @endif
             <th>ITEM CODE</th>
             <th>ITEM NAME</th>
             <th>QTY</th>
@@ -34,7 +36,9 @@
     @endphp
     @foreach ($stock_cards as $stock_card)
         <tr>
+            @if($store_group != '')
             <td>{{ $stock_card->store->code ?? 'All'  }}</td>
+            @endif
             <td>{{ $stock_card->product->code ?? 'All' }}</td>
             <td>{{ $stock_card->product->name ?? 'All' }}</td>
             <td>{{ number_format($stock_card->quantity, 2) }}</td>
@@ -49,7 +53,7 @@
     @endforeach
     <tfoot>
         <tr>
-            <th colspan="2" style="text-align: right">TOTAL</th>
+            <th colspan="@if($store_group != '') 2 @else 1 @endif" style="text-align: right">TOTAL</th>
             <th style="text-align: right">
                 &#8358;{{ number_format($total_cost, 2, '.', ',') }}
             </th>

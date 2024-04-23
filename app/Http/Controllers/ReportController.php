@@ -2887,7 +2887,7 @@ class ReportController extends Controller
         if ($branch_id != "")
             $branch = Branch::find($branch_id);
 
-        return view('pages.reports.inventory.product_valuation.load_product_valuation_report', compact('stock_cards', 'date', 'branch_id', 'store_id', 'category_id', 'product_id', 'branch'));
+        return view('pages.reports.inventory.product_valuation.load_product_valuation_report', compact('stock_cards', 'date', 'branch_id', 'store_id', 'category_id', 'product_id', 'branch','store_group'));
     }
 
     public function printProductValuationReport(Request $request)

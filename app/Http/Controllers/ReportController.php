@@ -2814,13 +2814,14 @@ class ReportController extends Controller
 
     public function loadProductValuationReport(Request $request)
     {
-        //        return $request;
+
         $date = $request->date;
         $yesterday = date('Y-m-d', strtotime($date . '-1 days'));
         $product_id = $request->product_id;
         $category_id = $request->category_id;
         $branch_id = $request->branch_id;
         $store_id = $request->store_id;
+        $store_group = $request->store_group;
         $stock_cards = StockCard::selectRaw("
             store_id,
             product_id,
@@ -2847,6 +2848,9 @@ class ReportController extends Controller
         }
         if ($store_id != '') {
             $stock_cards->where('store_id', $store_id);
+        }
+        if ($store_group != '') {
+            $stock_cards->groupBy('store_id');
         }
         if ($category_id != '') {
             $product_ids = Product::where('category_id', $category_id)->get('id')->toArray();

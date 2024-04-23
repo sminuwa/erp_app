@@ -38,7 +38,6 @@
             <div class="container-fluid">
                 <form method="POST">
                     <div class="row">
-
                         <div class="form-group">
                             <label for="to_date">Date</label>
                             <input type="text" autocomplete="off"
@@ -61,6 +60,10 @@
                                 class="form-control select2-single ajax-stores {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
                                 name="store_id" id="store_id">
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="store_group">Group</label>
+                            <input type="checkbox" class="form-control" name="store_group" id="store_group" checked>
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp;
@@ -130,6 +133,8 @@
                 category_id = $('#category_id').val();
                 branch_id = $('#branch_id').val();
                 store_id = $('#store_id').val();
+                store_group = $('#store_group').val();
+                if ($('#store_group').is(":checked")) { store_group = 'group' } else { store_group = null }
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
@@ -140,7 +145,8 @@
                         product_id: product_id,
                         category_id: category_id,
                         branch_id: branch_id,
-                        store_id: store_id
+                        store_id: store_id,
+                        store_group: store_group
                     }
                 }).done(function(data) {
                     console.log(data)

@@ -2837,11 +2837,13 @@ class ReportController extends Controller
                 LIMIT 1
             ) as cost
             ")
-            ->groupBy('product_id')
-            ->where('date', '<=', $date)
+            ->groupBy('stock_cards.product_id')
+            ->where('stock_cards.date', '<=', $date)
             ->with('store', 'product')
+            ->join('products', 'products.id', 'stock_cards.product_id')
+            ->join('categories', 'categories.id', 'products.category_id')
             ->havingRaw("(credit - debit) > 0")
-            ->orderBy('created_at', 'desc');
+            ->orderBy('stock_cards.created_at', 'desc');
         if (!is_null($branch_id)) {
             $store_ids = Store::where('branch_id', $branch_id)->get('id')->toArray();
             $stock_cards->whereIn('store_id', $store_ids);
@@ -2856,6 +2858,10 @@ class ReportController extends Controller
             $product_ids = Product::where('category_id', $category_id)->get('id')->toArray();
             $stock_cards->whereIn('product_id', $product_ids);
         }
+        if ($category_id == '') {
+            $stock_cards->orderBy('categories.name', 'asc');
+        }
+
         if ($product_id != '') {
             $stock_cards->where('product_id', $product_id);
         }

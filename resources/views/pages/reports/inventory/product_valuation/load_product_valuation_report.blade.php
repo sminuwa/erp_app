@@ -24,6 +24,9 @@
             @if($store_group != '')
             <th>STORE</th>
             @endif
+            @if($category_id == '')
+            <th>CATEGORY</th>
+            @endif
             <th>ITEM CODE</th>
             <th>ITEM NAME</th>
             <th>QTY</th>
@@ -37,10 +40,13 @@
     @foreach ($stock_cards as $stock_card)
         <tr>
             @if($store_group != '')
-            <td>{{ $stock_card->store->code ?? 'All'  }}</td>
+            <td>{{ $stock_card->store->code ?? ''  }}</td>
             @endif
-            <td>{{ $stock_card->product->code ?? 'All' }}</td>
-            <td>{{ $stock_card->product->name ?? 'All' }}</td>
+            @if($category_id == '')
+            <td>{{ $stock_card->product->category->name ?? '' }}</td>
+            @endif
+            <td>{{ $stock_card->product->code ?? '' }}</td>
+            <td>{{ $stock_card->product->name ?? '' }}</td>
             <td>{{ number_format($stock_card->quantity, 2) }}</td>
             <td>{{ number_format(intval($stock_card->cost), 2) }}</td>
             <td style="text-align: right">
@@ -53,13 +59,14 @@
     @endforeach
     <tfoot>
         <tr>
-            <th colspan="@if($store_group != '') 2 @else 1 @endif" style="text-align: right">TOTAL</th>
+            <th colspan="
+                @if($store_group != '') 2 @else 1 @endif
+                @if($category_id == '') 2 @else 1 @endif
+            " style="text-align: right">TOTAL</th>
             <th style="text-align: right">
-                &#8358;{{ number_format($total_cost, 2, '.', ',') }}
+
             </th>
-            <th></th>
-            <th></th>
-            <th></th>
+            <th class="text-center" colspan="3">{{ number_format($total_cost, 2, '.', ',') }}</th>
         </tr>
     </tfoot>
 </table>

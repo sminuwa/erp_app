@@ -60,12 +60,8 @@
     <tfoot>
         <tr>
             <th colspan="
-                @if($store_group != '') 2 @else 1 @endif
-                @if($category_id == '') 2 @else 1 @endif
+                @if($store_group != '') 4 @else 3 @endif
             " style="text-align: right">TOTAL</th>
-            <th style="text-align: right">
-
-            </th>
             <th class="text-center" colspan="3">{{ number_format($total_cost, 2, '.', ',') }}</th>
         </tr>
     </tfoot>

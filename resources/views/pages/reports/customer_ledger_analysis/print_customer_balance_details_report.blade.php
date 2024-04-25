@@ -34,7 +34,7 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo.png) }}"
+                            <img src="{{ asset('assets/backend/img/logo.png') }}"
                                 style="width:100px;height:60px;" alt="Albabello Logo" class="img-circle elevation-3"
                                 style="opacity: .8">
                             <h3>

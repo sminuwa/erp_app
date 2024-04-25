@@ -15,11 +15,16 @@
     </caption>
     <thead>
         <tr>
+            <th colspan="4"></th>
+            <th colspan="2">BALANCE</th>
+        </tr>
+        <tr>
             <th>ACCOUNT NO</th>
             <th>CUSTOMER NAME</th>
             <th>TOTAL AMOUNT</th>
             <th>TOTAL PAID</th>
-            <th>DEBT</th>
+            <th>DR.</th>
+            <th>CR.</th>
         </tr>
     </thead>
     @php
@@ -31,13 +36,16 @@
         <tr>
             <td>{{ $sale->code }}</td>
             <td>{{ $sale->customer }}</td>
-            <td style="text-align: right">{{ number_format($sale->pay, 2, '.', ',') }}</td>
             <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>
+            <td style="text-align: right">{{ number_format($sale->pay, 2, '.', ',') }}</td>
             <td style="text-align: right">
                 @if ($sale->due < 0)
-                ({{ number_format(abs($sale->due), 2, '.', ',') }})
-                @else
-                    {{ number_format($sale->due, 2, '.', ',') }}
+                    {{ number_format(abs($sale->due), 2, '.', ',') }}
+                @endif
+            </td>
+            <td style="text-align: right">
+                @if ($sale->due > 0)
+                    ({{ number_format(abs($sale->due), 2, '.', ',') }})
                 @endif
             </td>
         </tr>
@@ -53,11 +61,15 @@
             <th></th>
             <th style="text-align: right">TOTAL</th>
             <th style="text-align: right">
-                {{ number_format($total_sold, 2, '.', ',') }}</th>
-            <th style="text-align: right">
                 {{ number_format($total_pay, 2, '.', ',') }}</th>
             <th style="text-align: right">
-                {{ number_format($total_due, 2, '.', ',') }}
+                {{ number_format($total_sold, 2, '.', ',') }}</th>
+            
+            <th style="text-align: right">
+                {{ $total_due < 0 ? number_format(abs($total_due), 2, '.', ',') : '' }}
+            </th>
+            <th style="text-align: right">
+                {{ $total_due > 0 ? number_format(abs($total_due), 2, '.', ',') : '' }}
             </th>
         </tr>
     </tfoot>

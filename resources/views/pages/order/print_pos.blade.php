@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <link href="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
+    <link href="{{ asset('assets/backend/img/logo.png) }}"
         rel="shortcut icon">
     <script>
         window.print()
@@ -150,8 +150,8 @@
 <body>
     <header>
         <img id="logo" class="media"
-            data-src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
-            src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
+            data-src="{{ asset('assets/backend/img/logo.png) }}"
+            src="{{ asset('assets/backend/img/logo.png) }}"
             style="height:60px;width:60px;" />
         {{ App\Models\User::UserBranchName()->long_name }}<br />
         <small>{{ optional($order)->branch->address }}</small><br />

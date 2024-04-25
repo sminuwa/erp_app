@@ -732,11 +732,14 @@ Route::middleware('auth')->group(function () {
     Route::group(
         ['prefix' => 'reports'],
         function () {
-            //Stock Transfer Report
-            Route::get('/stock/transfer', [ReportController::class, 'stockTransfer'])->name('stock.transfer.reports');
-            Route::get('/stock/transfer/load', [ReportController::class, 'loadStockTransferReport'])->name('ajax.load.stock.transfer.reports');
-            Route::get('/stock/transfer/print/{from_date}/{to_date}/{store_id}/{category_id}/{product_id}/{from_to}', [ReportController::class, 'printStockTransfer'])->name('ajax.print.stock.transfer.reports');
+            //INtersite Stock Transfer Report
+            Route::get('/intersite/transfer', [ReportController::class, 'intersiteTransfer'])->name('intersite.transfer.reports');
+            Route::get('/intersite/transfer/load', [ReportController::class, 'loadIntersiteTransferReport'])->name('ajax.load.intersite.transfer.reports');
+            Route::get('/intersite/transfer/print/{from_date}/{to_date}/{source_branch_id}/{destination_branch_id}/{category_id}/{product_id}', [ReportController::class, 'printIntersiteTransfer'])->name('ajax.print.intersite.transfer.reports');
 
+            Route::get('/interstore/transfer', [ReportController::class, 'interstoreTransfer'])->name('interstore.transfer.reports');
+            Route::get('/interstore/transfer/load', [ReportController::class, 'loadInterstoreTransferReport'])->name('ajax.load.interstore.transfer.reports');
+            Route::get('/interstore/transfer/print/{from_date}/{to_date}/{branch_id}/{source_store_id}/{destination_store_id}/{category_id}/{product_id}', [ReportController::class, 'printInterstoreTransfer'])->name('ajax.print.interstore.transfer.reports');
 
             //Current Stock Report
             Route::get('/sc/current-stock', [ReportController::class, 'generateCurrentStock'])->name('current.stock.report');

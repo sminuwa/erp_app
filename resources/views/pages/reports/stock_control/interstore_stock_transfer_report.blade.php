@@ -8,7 +8,6 @@
         caption {
             caption-side: top;
         }
-
     </style>
 @endpush
 
@@ -22,12 +21,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Stock Reports</h4>
+                        <h4>Interstore Stock Transfer Reports</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Stock Report</li>
+                            <li class="breadcrumb-item active">Stock Transfer</li>
                         </ol>
                     </div>
                 </div>
@@ -53,23 +52,31 @@
                                     name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
                             </div>
                             <div class="form-group">
-                                &nbsp;&nbsp; &nbsp;&nbsp;
-                                <input type="radio" name="from_to" value="from" class="form-control type" checked />
-                                &nbsp;&nbsp;Transfer From &nbsp;&nbsp; &nbsp;&nbsp;
-                                <input type="radio" name="from_to" value="to" class="form-control type" />
-                                &nbsp;&nbsp;Transfer To
+                                &nbsp;&nbsp;
+                                <label for="branch_id">Branch</label>
+                                <select
+                                    class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
+                                    name="branch_id" id="branch_id">
+
+                                </select>
                             </div>
 
                             <div class="form-group">
                                 &nbsp;&nbsp;
-                                <label for="store_id">Store</label>
-                                <select class="form-control {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
-                                    name="store_id" id="store_id">
-                                    <option value="all">All</option>
-                                    @foreach ($stores as $data)
-                                        <option value="{{ $data->id }}">{{ $data->name }}
-                                        </option>
-                                    @endforeach
+                                <label for="source_store_id">From Store</label>
+                                <select
+                                    class="form-control select2-single ajax-stores {{ $errors->has('source_store_id') ? ' is-invalid' : '' }}"
+                                    name="source_store_id" id="source_store_id">
+
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                &nbsp;&nbsp;
+                                <label for="destination_store_id">To Store</label>
+                                <select
+                                    class="form-control select2-single ajax-stores {{ $errors->has('destination_store_id') ? ' is-invalid' : '' }}"
+                                    name="destination_store_id" id="destination_store_id">
+
                                 </select>
                             </div>
                             <div class="form-group">
@@ -119,16 +126,6 @@
 @endsection
 
 @push('js')
-    <!-- DataTables -->
-    <!-- DataTables -->
-    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
-    <!-- SlimScroll -->
-    <script src="{{ asset('assets/backend/plugins/slimScroll/jquery.slimscroll.min.js') }}"></script>
-    <!-- FastClick -->
-    <script src="{{ asset('assets/backend/plugins/fastclick/fastclick.js') }}"></script>
-
-    <!-- Sweet Alert Js -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>
     <script type="text/javascript">
         $(function() {
             function formatMoney(n, c, d, t) {
@@ -162,19 +159,21 @@
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
                 product_id = $('#product_id').val();
-                store_id = $('#store_id').val();
+                branch_id = $('#branch_id').val();
+                source_store_id = $('#source_store_id').val();
+                destination_store_id = $('#destination_store_id').val();
                 category_id = $('#category_id').val();
-                from_to = $('input[name="from_to"]:checked').val()
                 $.ajax({
                     type: "GET",
-                    url: "{{ route('ajax.load.stock.transfer.reports') }}",
+                    url: "{{ route('ajax.load.interstore.transfer.reports') }}",
                     data: {
                         _token: "{{ csrf_token() }}",
                         from_date: from_date,
                         to_date: to_date,
                         product_id: product_id,
-                        store_id: store_id,
-                        from_to: from_to,
+                        branch_id: branch_id,
+                        source_store_id: source_store_id,
+                        destination_store_id: destination_store_id,
                         category_id: category_id
                     }
                 }).done(function(data) {
@@ -217,94 +216,8 @@
                                 colvis: 'Show/Hide columns'
                             }
                         },
-                        //buttons: ['excel', 'pdf', 'print'],
-                        "footerCallback": function(row, data, start, end, display) {
-                            var api = this.api();
-                            var json = api.ajax.json();
-                            // Remove the formatting to get integer data for summation
-                            var intVal = function(i) {
-                                return typeof i === 'string' ?
-                                    i.replace(/[\$,]/g, '') * 1 :
-                                    typeof i === 'number' ?
-                                    i : 0;
-                            };
-
-                            // Total over all pages
-
-                            if (api.column(3).data().length) {
-                                var total = api
-                                    .column(3)
-                                    .data()
-                                    .reduce(function(a, b) {
-                                        return intVal(a) + intVal(b);
-                                    })
-                            } else {
-                                total = 0
-                            };
-
-                            // Total over this page
-
-                            if (api.column(3).data().length) {
-                                var pageTotal = api
-                                    .column(3, {
-                                        page: 'current'
-                                    })
-                                    .data()
-                                    .reduce(function(a, b) {
-                                        return intVal(a) + intVal(b);
-                                    })
-                            } else {
-                                pageTotal = 0
-                            };
-
-                            // Update footer
-                            $(api.column(3).footer()).html(
-                                "Page Total: " + formatMoney(pageTotal) +
-                                "<br> (Grand Total: " +
-                                formatMoney(total) + ")"
-                            );
 
 
-                            //Another Column
-
-
-                            // Total over all pages
-
-                            if (api.column(4).data().length) {
-                                var total = api
-                                    .column(4)
-                                    .data()
-                                    .reduce(function(a, b) {
-                                        return intVal(a) + intVal(b);
-                                    })
-                            } else {
-                                total = 0
-                            };
-
-                            // Total over this page
-
-                            if (api.column(4).data().length) {
-                                var pageTotal = api
-                                    .column(4, {
-                                        page: 'current'
-                                    })
-                                    .data()
-                                    .reduce(function(a, b) {
-                                        return intVal(a) + intVal(b);
-                                    })
-                            } else {
-                                pageTotal = 0
-                            };
-
-                            // Update footer
-                            $(api.column(4).footer()).html(
-                                "Page Total: " + formatMoney(pageTotal) +
-                                "<br> (Grand Total: " +
-                                formatMoney(total) + ")"
-                            );
-
-
-                        }
                     });
                 });
             });

@@ -61,9 +61,10 @@
             <th></th>
             <th style="text-align: right">TOTAL</th>
             <th style="text-align: right">
-                {{ number_format($total_sold, 2, '.', ',') }}</th>
-            <th style="text-align: right">
                 {{ number_format($total_pay, 2, '.', ',') }}</th>
+            <th style="text-align: right">
+                {{ number_format($total_sold, 2, '.', ',') }}</th>
+            
             <th style="text-align: right">
                 {{ $total_due < 0 ? number_format(abs($total_due), 2, '.', ',') : '' }}
             </th>

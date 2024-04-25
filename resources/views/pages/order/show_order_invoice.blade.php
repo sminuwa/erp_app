@@ -141,8 +141,8 @@
                                                 <th>S.N</th>
                                                 <th>Code</th>
                                                 <th>Product Name</th>
-                                                <th>Store</th>
                                                 <th>Unit</th>
+                                                <th>Store</th>
                                                 <th>Quantity</th>
                                                 <th>Unit Cost</th>
                                                 <th>Subtotal</th>

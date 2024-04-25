@@ -142,8 +142,10 @@
                                 </h3>
                             </div>
                             <!-- /.card-header -->
-                            <div class="card-body cart-container">
+                            <div class="table-responsive">
+                                <div class="card-body cart-container">
 
+                                </div>
                             </div>
                             <div>
                                 <span class="text text-danger error_price"></span>
@@ -197,8 +199,9 @@
 
                         <div class="form-group">
                             <label for="qty">Quantity</label>
-                            <input type="number" step=".01" class="form-control {{ $errors->has('qty') ? ' is-invalid' : '' }}"
-                                name="qty" id="qty" placeholder="" required="required">
+                            <input type="number" step=".01"
+                                class="form-control {{ $errors->has('qty') ? ' is-invalid' : '' }}" name="qty"
+                                id="qty" placeholder="" required="required">
                             @if ($errors->has('qty'))
                                 <div class="invalid-feedback">
                                     <strong>{{ $errors->first('qty') }}</strong>
@@ -247,10 +250,6 @@
     <!-- Sweet Alert Js -->
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script>
-        /*$('.cart-container').addClass('d-none')
-                                                                            $('select[name=account_type]').change( () => {
-                                                                                $('.cart-container').removeClass('d-none')
-                                                                            })*/
         $(function() {
             $("#example1").DataTable({
                 'iDisplayLength': 100

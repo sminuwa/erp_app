@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Customer Total Debt Report - {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Intersite Stock Transfer - {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -34,18 +34,17 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo.png) }}"
-                                style="width:100px;height:60px;" alt="Albabello Logo" class="img-circle elevation-3"
+                            <img src="{{ asset('assets/backend/img/logo.png') }}"
+                                style="width:50px;height:50px;" alt="Albabello Logo" class="img-circle elevation-3"
                                 style="opacity: .8">
                             <h3>
                                 {{ App\Models\User::UserBranchName()->long_name }}
                             </h3>
-                            <h5 style="text-align: center;">Customer Total Debt Report
-                                {{-- From
-            {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }} --}}
-                                As at
-                                AND
-                                {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
+                            <h5 style="text-align: center;">INTERSITE STOCK TRANSFER REPORT
+                            </h5>
+                            <h5 style="text-align: center;">DATE BETWEEN
+                                {{ Carbon\Carbon::parse($from_date)->toFormattedDateString() }} AND
+                                {{ Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
                             </h5>
 
                         </div>
@@ -55,55 +54,43 @@
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
                             <table class="table table-bordered caption" id="example1" border="1" cellpadding="0"
-                                cellspacing="0" data-ordering="false">
+                                cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>ACCOUNT NO</th>
-                                        <th>CUSTOMER NAME</th>
-                                        <th>TOTAL AMOUNT</th>
-                                        <th>TOTAL PAID</th>
-                                        <th>DEBT</th>
+                                        <th>Date</th>
+                                        <th>Item Code</th>
+                                        <th>Item Name</th>
+                                        <th>From Branch</th>
+                                        <th>To Branch</th>
+                                        <th>Rerefence No</th>
+                                        <th>QTY</th>
+                                        <th>Cost Price</th>
+                                        <th>Total</th>
                                     </tr>
                                 </thead>
-                                @php
-                                    $total_sold = 0;
-                                    $total_pay = 0;
-                                    $total_due = 0;
-                                @endphp
-                                @foreach ($sales as $sale)
+                                @php $total =0; @endphp
+                                @foreach ($transfers as $transfer)
                                     <tr>
-                                        <td>{{ $sale->code }}</td>
-                                        <td>{{ $sale->customer }}</td>
-                                        <td style="text-align: right">{{ number_format($sale->pay, 2, '.', ',') }}</td>
-                                        <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}
+                                        <td>{{ Carbon\Carbon::parse($transfer->date)->toFormattedDateString() }}</td>
+                                        <td>{{ $transfer->product_code }}</td>
+                                        <td>{{ $transfer->product_name }}</td>
+                                        <td>{{ \App\Models\Branch::find($transfer->source_branch_id)->code }}</td>
+                                        <td>{{ \App\Models\Branch::find($transfer->destination_branch_id)->code }}</td>
+                                        <td>{{ $transfer->reference }}</td>
+                                        <td style="text-align: right">{{ $transfer->quantity }}</td>
+                                        <td style="text-align: right">{{ number_format($transfer->cost_price, 2) }}
                                         </td>
-                                        
+                                        @php $total += $transfer->cost_price * $transfer->quantity; @endphp
                                         <td style="text-align: right">
-                                            @if ($sale->due < 0)
-                                                ({{ number_format(abs($sale->due), 2, '.', ',') }})
-                                            @else
-                                                {{ number_format($sale->due, 2, '.', ',') }}
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    @php
-                                        $total_sold += $sale->total;
-                                        $total_pay += $sale->pay;
-                                        $total_due += $sale->due;
+                                            {{ number_format($transfer->cost_price * $transfer->quantity, 2) }}</td>
 
-                                    @endphp
+                                    </tr>
                                 @endforeach
                                 <tfoot>
                                     <tr>
-                                        <th></th>
-                                        <th style="text-align: right">TOTAL</th>
-                                        <th style="text-align: right">
-                                            &#8358;{{ number_format($total_sold, 2, '.', ',') }}</th>
-                                        <th style="text-align: right">
-                                            &#8358;{{ number_format($total_pay, 2, '.', ',') }}</th>
-                                        <th style="text-align: right">
-                                            &#8358;{{ number_format($total_due, 2, '.', ',') }}
-                                        </th>
+
+                                        <th colspan="8"> Total</th>
+                                        <th style="text-align: right">{{ number_format($total, 2) }}</th>
                                     </tr>
                                 </tfoot>
                             </table>

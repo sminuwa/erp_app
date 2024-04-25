@@ -365,10 +365,17 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="{{ route('stock.transfer.reports') }}"
-                                                class="nav-link {{ Request::is('reports/sc/stock/transfer*') ? 'active' : '' }}">
+                                            <a href="{{ route('intersite.transfer.reports') }}"
+                                                class="nav-link {{ Request::is('reports/sc/intersite/transfer*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
-                                                <p>Stock Transfer Reports</p>
+                                                <p>Intersite Transfer Reports</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('interstore.transfer.reports') }}"
+                                                class="nav-link {{ Request::is('reports/sc/interstore/transfer*') ? 'active' : '' }}">
+                                                <i class="ion-code-working"></i>
+                                                <p>Interstore Transfer Reports</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">

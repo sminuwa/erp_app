@@ -89,10 +89,10 @@
         <tr>
 
             <th colspan="5" style="text-align: right">Total</th>
-            <th style="text-align: right;">{{ number_format($debit_sum, 2) }}</th>
-            <th style="text-align: right;">{{ number_format($credit_sum, 2) }}</th>
-            <th style="text-align: right;">{{ $dif < 0 ? number_format($dif, 2) : '' }}</th>
-            <th style="text-align: right;">{{ $dif > 0 ? number_format($dif, 2) : '' }}</th>
+            <th style="text-align: right;">{{ number_format(abs($debit_sum), 2) }}</th>
+            <th style="text-align: right;">{{ number_format(abs($credit_sum), 2) }}</th>
+            <th style="text-align: right;">{{ $dif < 0 ? number_format(abs($dif), 2) : '' }}</th>
+            <th style="text-align: right;">{{ $dif > 0 ? number_format(abs($dif), 2) : '' }}</th>
         </tr>
         {{-- <tr>
             <th colspan="4" style="text-align: right">Balance C/F</th>

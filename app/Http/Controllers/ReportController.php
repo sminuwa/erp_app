@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Branch;
 use App\Models\ChartOfAccount;
 use App\Models\CreditNote;
-use App\Models\GeneralAccount;
 use App\Models\GeneralAccountLedger;
+use App\Models\IntersiteTransfer;
+use App\Models\InterstoreTransfer;
 use App\Models\OrderInvoice;
 use App\Models\ReturnDebit;
 use App\Models\StoreProductBatch;
@@ -14,26 +15,11 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Store;
 use App\Models\TransferProduct;
-use App\Models\BankAccount;
-use App\Models\BankTransaction;
-use App\Models\CashMovement;
 use App\Models\User;
-use App\Models\CustomerLedger;
-use App\Models\Expense;
-use App\Models\ExpenseItem;
 use Illuminate\Support\Facades\DB;
 use App\Models\Category;
 use App\Models\Order;
-use App\Models\LoanPayment;
-use App\Models\SupplierLedger;
 use App\Models\Loan;
-use Carbon\Carbon;
-use App\Models\Purchase;
-use App\Models\PurchaseProduct;
-use App\Models\StoreProduct;
-use App\Models\StockAdjustment;
-use BranchProductPrice;
-use App\Models\OrderDetail;
 use App\Models\StockCard;
 use App\Models\Customer;
 use App\Models\Supplier;
@@ -51,50 +37,56 @@ use App\Models\Company;
 
 class ReportController extends Controller
 {
-    public function stockTransfer()
+    public function intersiteTransfer()
     {
-        return view('pages.reports.stock_control.stock_transfer_report', [
-            'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('id')->get(),
+        return view('pages.reports.stock_control.intersite_stock_transfer_report', [
+            'branches' => Branch::orderBy('name')->get(),
             'products' => Product::orderBy('name')->get(),
             'categories' => Category::orderBy('name')->get(),
         ]);
     }
 
-    public function loadStockTransferReport(Request $request)
+    public function loadIntersiteTransferReport(Request $request)
     {
         //return $request->stock_in_out;
         $from_date = $request->from_date;
         $to_date = $request->to_date;
         $product_id = $request->product_id;
-        $store_id = $request->store_id;
-        $from_to = $request->from_to;
-        $transfer_to = $request->transfer_to;
+        $source_branch_id = $request->source_branch_id;
+        $destination_branch_id = $request->destination_branch_id;
         $category_id = $request->category_id;
-        if ($product_id == 'all') {
+        if ($product_id == 'all' || $product_id == '') {
             $product_id = '%';
 
         }
-        if ($category_id == 'all') {
+        if ($category_id == 'all' || $category_id == '') {
             $category_id = '%';
-
         }
-        if ($store_id == 'all') {
-            $store_id = '%';
-
+        if ($source_branch_id == 'all' || $source_branch_id == '') {
+            $source_branch_id = '%';
+        }
+        if ($destination_branch_id == 'all' || $destination_branch_id == '') {
+            $destination_branch_id = '%';
         }
 
-        $query = TransferProduct::select('nature', 'transfer_products.source_store_id', 'transfer_products.destination_store_id', 'products.name', 'transfer_products.updated_at', 'qty_available', 'qty_transfered', 'refno')
-            ->where('transfer_products.product_id', 'LIKE', $product_id)
+        $query = IntersiteTransfer::select(
+            'products.name AS product_name',
+            'products.code AS product_code',
+            'quantity',
+            'cost_price',
+            'reference',
+            'source_branch_id',
+            'destination_branch_id',
+        )
+            ->where('intersite_transfer_products.product_id', 'LIKE', $product_id)
             ->where('products.category_id', 'LIKE', $category_id)
-            ->where('transfer_products.nature', 'LIKE', 'Transfer')
-            ->where('stores.branch_id', 'LIKE', User::userBranchAction())
-            ->join('stores', 'stores.id', 'transfer_products.source_store_id')
-            ->join('products', 'products.id', 'transfer_products.product_id')
-            ->whereBetween('transfer_products.updated_at', [$from_date, $to_date]);
-        if ($from_to == "from")
-            $query->where('source_store_id', 'LIKE', $store_id);
-        if ($from_to == "to")
-            $query->where('destination_store_id', 'LIKE', $store_id);
+            ->where('source_branch_id', 'LIKE', $source_branch_id)
+            ->where('destination_branch_id', 'LIKE', $destination_branch_id)
+            ->join('intersite_transfer_products', 'intersite_transfer_products.intersite_transfer_id', 'intersite_transfers.id')
+            ->join('stores', 'stores.id', 'intersite_transfers.source_branch_id')
+            ->join('products', 'products.id', 'intersite_transfer_products.product_id')
+            ->whereBetween('intersite_transfers.date', [$from_date, $to_date]);
+
         $transfers = $query->get();
         if ($product_id == '%') {
             $product_id = 'all';
@@ -104,14 +96,19 @@ class ReportController extends Controller
             $category_id = 'all';
 
         }
-        if ($store_id == '%') {
-            $store_id = 'all';
+        if ($source_branch_id == '%') {
+            $source_branch_id = 'all';
 
         }
-        return view('pages.reports.stock_control.load_stock_transfer_report', compact('transfers', 'from_date', 'to_date', 'product_id', 'store_id', 'category_id', 'from_to'));
+        if ($destination_branch_id == '%') {
+            $destination_branch_id = 'all';
+
+        }
+
+        return view('pages.reports.stock_control.load_intersite_stock_transfer_report', compact('transfers', 'from_date', 'to_date', 'product_id', 'source_branch_id', 'destination_branch_id', 'category_id'));
     }
 
-    public function printStockTransfer($from_date, $to_date, $store_id, $category_id, $product_id, $from_to)
+    public function printIntersiteTransfer($from_date, $to_date, $source_branch_id, $destination_branch_id, $category_id, $product_id)
     {
         if ($product_id == 'all') {
             $product_id = '%';
@@ -121,28 +118,161 @@ class ReportController extends Controller
             $category_id = '%';
 
         }
-        if ($store_id == 'all') {
-            $store_id = '%';
+        if ($source_branch_id == 'all') {
+            $source_branch_id = '%';
+
+        }
+        if ($destination_branch_id == 'all') {
+            $destination_branch_id = '%';
 
         }
 
-        $query = TransferProduct::select('nature', 'transfer_products.source_store_id', 'transfer_products.destination_store_id', 'products.name', 'transfer_products.updated_at', 'qty_available', 'qty_transfered', 'refno')
-            ->where('transfer_products.product_id', 'LIKE', $product_id)
+        $query = IntersiteTransfer::select(
+            'products.name AS product_name',
+            'products.code AS product_code',
+            'quantity',
+            'cost_price',
+            'reference',
+            'source_branch_id',
+            'destination_branch_id',
+        )
+            ->where('intersite_transfer_products.product_id', 'LIKE', $product_id)
             ->where('products.category_id', 'LIKE', $category_id)
-            ->where('transfer_products.nature', 'LIKE', 'Transfer')
-            ->where('stores.branch_id', 'LIKE', User::userBranchAction())
-            ->join('stores', 'stores.id', 'transfer_products.source_store_id')
-            ->join('products', 'products.id', 'transfer_products.product_id')
-            ->whereBetween('transfer_products.updated_at', [$from_date, $to_date]);
-        if ($from_to == "from")
-            $query->where('source_store_id', 'LIKE', $store_id);
-        if ($from_to == "to")
-            $query->where('destination_store_id', 'LIKE', $store_id);
+            ->where('source_branch_id', 'LIKE', $source_branch_id)
+            ->where('destination_branch_id', 'LIKE', $destination_branch_id)
+            ->join('intersite_transfer_products', 'intersite_transfer_products.intersite_transfer_id', 'intersite_transfers.id')
+            ->join('stores', 'stores.id', 'intersite_transfers.source_branch_id')
+            ->join('products', 'products.id', 'intersite_transfer_products.product_id')
+            ->whereBetween('intersite_transfers.date', [$from_date, $to_date]);
         $transfers = $query->get();
         //$query2 = $query;
-        return view('pages.reports.stock_control.print_stock_transfer', compact('transfers', 'from_date', 'to_date'));
+        return view('pages.reports.stock_control.print_intersite_stock_transfer', compact('transfers', 'from_date', 'to_date'));
     }
 
+    public function interstoreTransfer()
+    {
+        return view('pages.reports.stock_control.interstore_stock_transfer_report', [
+            'branches' => Branch::orderBy('name')->get(),
+            'products' => Product::orderBy('name')->get(),
+            'categories' => Category::orderBy('name')->get(),
+        ]);
+    }
+
+    public function loadInterstoreTransferReport(Request $request)
+    {
+        //return $request->stock_in_out;
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
+        $product_id = $request->product_id;
+        $branch_id = $request->branch_id;
+        $source_store_id = $request->source_store_id;
+        $destination_store_id = $request->destination_store_id;
+        $category_id = $request->category_id;
+        if ($product_id == 'all' || $product_id == '') {
+            $product_id = '%';
+
+        }
+        if ($category_id == 'all' || $category_id == '') {
+            $category_id = '%';
+        }
+        if ($branch_id == 'all' || $branch_id == '') {
+            $branch_id = '%';
+        }
+        if ($source_store_id == 'all' || $source_store_id == '') {
+            $source_store_id = '%';
+        }
+        if ($destination_store_id == 'all' || $destination_store_id == '') {
+            $destination_store_id = '%';
+        }
+
+        $query = InterstoreTransfer::select(
+            'products.name AS product_name',
+            'products.code AS product_code',
+            'quantity',
+            'reference',
+            'source_store_id',
+            'destination_store_id',
+            'interstore_transfers.branch_id'
+        )
+            ->where('interstore_transfer_details.product_id', 'LIKE', $product_id)
+            ->where('products.category_id', 'LIKE', $category_id)
+            ->where('interstore_transfers.branch_id', 'LIKE', $branch_id)
+            ->where('source_store_id', 'LIKE', $destination_store_id)
+            ->where('destination_store_id', 'LIKE', $destination_store_id)
+            ->join('interstore_transfer_details', 'interstore_transfer_details.interstore_transfer_id', 'interstore_transfers.id')
+            ->join('stores', 'stores.id', 'interstore_transfer_details.source_store_id')
+            ->join('products', 'products.id', 'interstore_transfer_details.product_id')
+            ->whereBetween('interstore_transfers.date', [$from_date, $to_date]);
+
+        $transfers = $query->get();
+        if ($product_id == '%') {
+            $product_id = 'all';
+
+        }
+        if ($category_id == '%') {
+            $category_id = 'all';
+
+        }
+        if ($branch_id == '%') {
+            $branch_id = 'all';
+
+        }
+        if ($source_store_id == '%') {
+            $source_store_id = 'all';
+
+        }
+        if ($destination_store_id == '%') {
+            $destination_store_id = 'all';
+
+        }
+
+        return view('pages.reports.stock_control.load_interstore_stock_transfer_report', compact('transfers', 'from_date', 'to_date', 'product_id', 'branch_id','source_store_id', 'destination_store_id', 'category_id'));
+    }
+
+    public function printInterstoreTransfer($from_date, $to_date, $branch_id, $source_store_id, $destination_store_id, $category_id, $product_id)
+    {
+        if ($product_id == 'all') {
+            $product_id = '%';
+
+        }
+        if ($category_id == 'all') {
+            $category_id = '%';
+
+        }
+        
+        if ($branch_id == 'all') {
+            $branch_id = '%';
+
+        }
+        if ($source_store_id == 'all') {
+            $source_store_id = '%';
+
+        }
+        if ($destination_store_id == 'all') {
+            $destination_store_id = '%';
+
+        }
+
+        $query = InterstoreTransfer::select(
+            'products.name AS product_name',
+            'products.code AS product_code',
+            'quantity',
+            'reference',
+            'source_store_id',
+            'destination_store_id',
+        )
+            ->where('interstore_transfer_details.product_id', 'LIKE', $product_id)
+            ->where('products.category_id', 'LIKE', $category_id)
+            ->where('branch_id', 'LIKE', $branch_id)
+            ->where('source_store_id', 'LIKE', $destination_store_id)
+            ->where('destination_store_id', 'LIKE', $destination_store_id)
+            ->join('interstore_transfer_details', 'interstore_transfer_details.intersite_transfer_id', 'interstore_transfers.id')
+            ->join('stores', 'stores.id', 'interstore_transfers.source_branch_id')
+            ->join('products', 'products.id', 'interstore_transfer_details.product_id')
+            ->whereBetween('interstore_transfers.date', [$from_date, $to_date]);
+        //$query2 = $query;
+        return view('pages.reports.stock_control.print_intersite_stock_transfer', compact('transfers', 'from_date', 'to_date'));
+    }
 
     public function stockHistory()
     {
@@ -2893,7 +3023,7 @@ class ReportController extends Controller
         if ($branch_id != "")
             $branch = Branch::find($branch_id);
 
-        return view('pages.reports.inventory.product_valuation.load_product_valuation_report', compact('stock_cards', 'date', 'branch_id', 'store_id', 'category_id', 'product_id', 'branch','store_group'));
+        return view('pages.reports.inventory.product_valuation.load_product_valuation_report', compact('stock_cards', 'date', 'branch_id', 'store_id', 'category_id', 'product_id', 'branch', 'store_group'));
     }
 
     public function printProductValuationReport(Request $request)
@@ -3499,7 +3629,7 @@ class ReportController extends Controller
             $branch_id = 'all';
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.ap_ar.balance_sheet.load', compact('ledger1','ledger2','ledger3', 'branch', 'to_date', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1'));
+        return view('pages.reports.ap_ar.balance_sheet.load', compact('ledger1', 'ledger2', 'ledger3', 'branch', 'to_date', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1'));
     }
 
     public function printBalanceSheet($to, $branch_id)

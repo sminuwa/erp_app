@@ -34,7 +34,7 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
+                            <img src="{{ asset('assets/backend/img/logo.png') }}"
                                 style="width:50px;height:50px;" alt="Albabello Logo" class="img-circle elevation-3"
                                 style="opacity: .8">
                             <h3>
@@ -124,10 +124,10 @@
                                     <tr>
                             
                                         <th colspan="5" style="text-align: right">Total</th>
-                                        <th style="text-align: right;">{{ number_format($debit_sum, 2) }}</th>
-                                        <th style="text-align: right;">{{ number_format($credit_sum, 2) }}</th>
-                                        <th style="text-align: right;">{{ $dif < 0 ? number_format($dif, 2) : '' }}</th>
-                                        <th style="text-align: right;">{{ $dif > 0 ? number_format($dif, 2) : '' }}</th>
+                                        <th style="text-align: right;">{{ number_format(abs($debit_sum), 2) }}</th>
+                                        <th style="text-align: right;">{{ number_format(abs($credit_sum), 2) }}</th>
+                                        <th style="text-align: right;">{{ $dif < 0 ? number_format(abs($dif), 2) : '' }}</th>
+                                        <th style="text-align: right;">{{ $dif > 0 ? number_format(abs($dif), 2) : '' }}</th>
                                     </tr>
                                     {{-- <tr>
                                         <th colspan="4" style="text-align: right">Balance C/F</th>

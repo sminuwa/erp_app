@@ -113,7 +113,7 @@
                         <div class="form-group">
                             <label for="source_store_id">Source Store</label>
                             <select
-                                class="form-control select2-single {{ $errors->has('source_store_id') ? ' is-invalid' : '' }}"
+                                class="form-control select2-single ajax-stores {{ $errors->has('source_store_id') ? ' is-invalid' : '' }}"
                                 name="source_store_id" id="source_store_id" required="required">
                                 <option value="">Select...</option>
                                 @if (isset($stores))
@@ -133,7 +133,7 @@
                         <div class="form-group">
                             <label for="product_id">Product</label>
                             <select
-                                class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
+                                class="form-control select2-single  ajax-store-products  {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
                                 name="product_id" id="product_id" required="required">
                                 <option value="">Select...</option>
 

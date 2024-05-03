@@ -38,7 +38,7 @@
             <div class="container">
                 @can('intersite.index')
                     <a class="btn btn-secondary btn-sm" href="{{ route('intersite.index', $record->id) }}">
-                        <span class="fa fa-list"></span> Instersites
+                        <span class="fa fa-list"></span> Intersites
                     </a>
                 @endcan
                 @can('intersite.print')

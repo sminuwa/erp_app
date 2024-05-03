@@ -448,20 +448,20 @@ class InvoiceController extends Controller
             $total_discount = 0;
             foreach ($contents as $content) {
                 $total_discount += $content->attributes['discount'] * $content->quantity;
-                $store = storeByCode($content->attributes['store']);
-                $store_product = StoreProduct::where('product_id', $content->id, $store->id)->first();
-                $store_product_id = 0;
-                if ($store_product == null) {
-                    $store_product_id = StoreProduct::insertGetId(['store_id' => $store->id, 'product_id' => $content->id]);
-                } else {
-                    $store_product_id = $store_product->id;
-                }
+                //$store = storeByCode($content->attributes['store']);
+                $store = StoreProduct::where('id')->first();
+                // $store_product_id = 0;
+                // if ($store_product == null) {
+                //     $store_product_id = StoreProduct::insertGetId(['store_id' => $store->id, 'product_id' => $content->id]);
+                // } else {
+                //     $store_product_id = $store_product->id;
+                // }
                 $qtyAval = $store->qty_available ?? 0;
                 //$store->qty_available = $qtyAval - $content->quantity;
                 $order_detail = new OrderDetail();
                 DB::table('order_invoice_details')->insert([
                     'order_id' => $order_id,
-                    'store_product_id' => $store_product_id,
+                    'store_product_id' => $content->id,
                     'quantity' => $content->quantity,
                     'original_quantity_sold' => $content->quantity,
                     'selling_price' => $content->attributes['selling_price'],
@@ -794,16 +794,16 @@ class InvoiceController extends Controller
     public function linkOrderInvoice(Request $request, OrderInvoice $order)
     {
         $user_branch = User::userBranchAction();
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'retail_selling_price', 'cost_price')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.code AS store', 'qty_available', 'selling_price', 'retail_selling_price', 'cost_price', 'unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
-            ->join('products', 'products.id', 'store_products.product_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
+            ->join('products', 'products.id', 'store_products.product_id')
             ->join('branch_product_prices', function ($join) {
                 $join->on('branch_product_prices.product_id', '=', 'products.id')
                     ->on('branch_product_prices.branch_id', '=', 'branches.id');
 
             })
-            //->where('stores.branch_id', 'LIKE', $user_branch)
+
             ->where('branch_product_prices.status', 1)
             ->orderBy('products.name')->orderBy('stores.name')->get();
         //TODO:: remove limit here
@@ -871,7 +871,7 @@ class InvoiceController extends Controller
         foreach ($order->order_items()->get() as $item) {
             $selling_price = $item->selling_price;
             $cost_price = $item->cost_price;
-            $qty_available = $item->qty_available;
+            $qty_available = $item->avail_qty_before_sale;
             $store = $item->storeProduct->store->name;
             $qty = $item->quantity;
             $store_products = StoreProduct::find($item->store_product_id);

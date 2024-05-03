@@ -20,7 +20,8 @@
     ?>
     <thead>
         <tr>
-            <th colspan="{{ $type == 'Customer' ? 5 : 4 }}"></th>
+            <th colspan="{{ $type == 'Customer' ? 3 : 2 }}"></th>
+            <th style="text-align: center; align-content: center" colspan="2"></th>
             <th colspan="2" style="text-align: center; align-content: center">Balance</th>
         </tr>
         <tr>

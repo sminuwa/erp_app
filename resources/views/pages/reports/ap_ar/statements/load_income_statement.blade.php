@@ -46,6 +46,9 @@
             @php
                 $credit = number_format(abs($revenue->credit), 2);
                 $debit = number_format(abs($revenue->debit), 2);
+                $credit_sum += $revenue->credit;
+                $debit_sum += $revenue->debit;
+                $dif = $revenue->credit - $revenue->debit;
             @endphp
             <tr>
                 <td>{{ $revenue->number }}</td>
@@ -60,11 +63,6 @@
                         {{ $credit }}
                     @endif
                 </td>
-                <?php
-                $credit_sum += $revenue->credit;
-                $debit_sum += $revenue->debit;
-                $dif = $revenue->credit - $revenue->debit;
-                ?>
                 <td style="text-align: right">
                     @if($dif < 0)
                         @php $dr += $revenue->debit @endphp
@@ -73,7 +71,7 @@
                 </td>
                 <td style="text-align: right">
                     @if($dif > 0)
-                        @php $cr += $revenue->debit @endphp
+                        @php $cr += $revenue->credit @endphp
                         {{  number_format(abs($dif), 2) }}
                     @endif
                 </td>
@@ -131,7 +129,7 @@
                 </td>
                 <td style="text-align: right">
                     @if($dif > 0)
-                        @php $cr += $sale->debit @endphp
+                        @php $cr += $sale->credit @endphp
                         {{  number_format(abs($dif), 2) }}
                     @endif
                 </td>
@@ -203,7 +201,7 @@
                 </td>
                 <td style="text-align: right">
                     @if($dif > 0)
-                        @php $cr += $expense->debit @endphp
+                        @php $cr += $expense->credit @endphp
                         {{  number_format(abs($dif), 2) }}
                     @endif
                 </td>

@@ -19,7 +19,7 @@
             <th>DATE</th>
             <th>DOCUMENT NO</th>
             <th>AMOUNT</th>
-            <th>WAYBILL</th>
+            <th>ATC/WAYBILL</th>
             <th>SUPPLIER</th>
             <th>STATUS</th>
         </tr>
@@ -33,7 +33,7 @@
             <td>{{ $sale->reference }}</td>
             <td style="text-align: right">
                 &#8358;{{ number_format($sale->total, 2, '.', ',') }}</td>
-            <td>{{ $sale->wbno }}</td>
+            <td>{{ $sale->atc_no }}</td>
             <td>{{ $sale->supplier }}</td>
             <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
 

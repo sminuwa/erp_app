@@ -28,7 +28,7 @@
     </thead>
     <tbody>
         @php
-            $total_credit = $total_debit = 0;
+            $total_credit = $total_debit = $dr = $cr =  0;
         @endphp
         @foreach ($ledger1 as $ledger)
             @php
@@ -56,11 +56,13 @@
                 @endphp
                 <td style="text-align: right;">
                     @if ($diff < 0)
+                        @php $dr+=$diff @endphp
                         {{ number_format(abs($diff), 2) }}
                     @endif
                 </td>
                 <td style="text-align: right;">
                     @if ($diff > 0)
+                        @php $cr+=$diff @endphp
                         {{ number_format(abs($diff), 2) }}
                     @endif
                 </td>
@@ -92,11 +94,13 @@
             @endphp
             <td style="text-align: right">
                 @if ($diff < 0)
+                    @php $dr+=$diff @endphp
                     {{ number_format(abs($diff), 2) }}
                 @endif
             </td>
             <td style="text-align: right">
                 @if ($diff > 0)
+                    @php $cr+=$diff @endphp
                     {{ number_format($diff, 2) }}
                 @endif
             </td>
@@ -128,11 +132,13 @@
             @endphp
             <td style="text-align: right">
                 @if ($diff < 0)
+                    @php $dr+=$diff @endphp
                     {{ number_format(abs($diff), 2) }}
                 @endif
             </td>
             <td style="text-align: right">
                 @if ($diff > 0)
+                    @php $cr+=$diff @endphp
                     {{ number_format($diff, 2) }}
                 @endif
             </td>
@@ -145,9 +151,9 @@
             <th style="text-align: right;">{{ number_format($total_credit, 2) }}</th>
             <th style="text-align: right;">{{ number_format($total_debit, 2) }}</th>
             <th style="text-align: right;">
-                {{ $total_credit - $total_debit < 0 ? number_format(abs($total_credit - $total_debit), 2) : '' }}</th>
+                {{ number_format(abs($dr), 2) }}</th>
             <th style="text-align: right;">
-                {{ $total_credit - $total_debit > 0 ? number_format($total_credit - $total_debit, 2) : '' }}</th>
+                {{ number_format(abs($cr), 2) }}</th>
         </tr>
     </tfoot>
 </table>

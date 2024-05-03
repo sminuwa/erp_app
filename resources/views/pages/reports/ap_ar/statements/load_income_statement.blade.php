@@ -17,6 +17,8 @@
     $credit_sum = 0;
     $debit_sum = 0;
     $other_income = 0;
+    $dr = 0;
+    $cr = 0;
     ?>
     <thead>
         <tr>
@@ -50,18 +52,20 @@
                 <td>{{ $revenue->description }}</td>
                 <td style="text-align: right">
                     @if ($debit > 0.0)
+                        @php $dr += $revenue->debit @endphp
                         {{ $debit }}
                     @endif
                 </td>
                 <td style="text-align: right">
                     @if ($credit > 0.0)
+                        @php $cr += $revenue->credit @endphp
                         {{ $credit }}
                     @endif
                 </td>
                 <?php
                 $credit_sum += $revenue->credit;
                 $debit_sum += $revenue->debit;
-                $dif = $credit_sum - $debit_sum;
+                $dif = $revenue->credit - $revenue->debit;
                 ?>
                 <td style="text-align: right">
                     {{ $dif < 0 ? number_format(abs($dif), 2) : '' }}
@@ -74,12 +78,14 @@
         <tr>
             <th colspan="4" style="text-align: left">TOTAL REVENUE</th>
             @php $total_revenue = $credit_sum - $debit_sum;  @endphp
-            <th colspan="3" style="text-align: right;">{{ number_format(abs($total_revenue), 2) }}</th>
+            <th colspan="3" style="text-align: right;">{{ number_format(abs($cr), 2) }}</th>
         </tr>
         <?php
         $total_cost_of_sale = 0;
         $credit_sum = 0;
         $debit_sum = 0;
+        $dr = 0;
+        $cr = 0;
         ?>
         <tr>
             <th colspan="6">
@@ -108,7 +114,7 @@
                 <?php
                 $credit_sum += $sale->credit;
                 $debit_sum += $sale->debit;
-                $dif = $credit_sum - $debit_sum;
+                $dif = $sale->credit - $sale->debit;
                 ?>
                 <td style="text-align: right">
                     {{ $dif < 0 ? number_format(abs($dif), 2) : '' }}
@@ -148,6 +154,8 @@
         $total_expense = 0;
         $credit_sum = 0;
         $debit_sum = 0;
+        $dr = 0;
+        $cr = 0;
         ?>
         @foreach ($expenses as $expense)
             @php
@@ -170,7 +178,7 @@
                 <?php
                 $credit_sum += $expense->credit;
                 $debit_sum += $expense->debit;
-                $dif = $credit_sum - $debit_sum;
+                $dif = $expense->credit - $expense->debit;
                 ?>
                 <td style="text-align: right">
                     {{ $dif < 0 ? number_format(abs($dif), 2) : '' }}

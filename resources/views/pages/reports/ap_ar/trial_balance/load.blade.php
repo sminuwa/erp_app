@@ -124,7 +124,7 @@
                 @php
                     $total_credit += $ledger->credit;
                     $total_debit += $ledger->debit;
-                    $diff = $ledger->debit - $ledger->credit;
+                    $diff = $ledger->credit - $ledger->debit;
                 @endphp
                 <td style="text-align: right">
                     @if ($diff < 0)
@@ -160,7 +160,7 @@
                 @php
                     $total_credit += $ledger->credit;
                     $total_debit += $ledger->debit;
-                    $diff = $ledger->debit - $ledger->credit;
+                    $diff = $ledger->credit - $ledger->debit;
                 @endphp
                 <td style="text-align: right">
                     @if ($diff < 0)

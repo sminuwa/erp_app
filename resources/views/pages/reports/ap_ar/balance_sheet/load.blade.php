@@ -12,7 +12,8 @@
     </caption>
     <thead>
         <tr>
-            <th colspan="4"></th>
+            <th colspan="2"></th>
+            <th style="text-align: center; align-content: center" colspan="2"></th>
             <th style="text-align: center; align-content: center" colspan="2">Balance</th>
         </tr>
         <tr>

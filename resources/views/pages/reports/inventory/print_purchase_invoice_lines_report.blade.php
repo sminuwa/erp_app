@@ -64,7 +64,7 @@
                                         <th>QTY</th>
                                         <th>TOTAL COST</th>
                                         <th>STORE</th>
-                                        <th>WAYBILL</th>
+                                        <th>ATC/WAYBILL</th>
                                         <th>SUPPLIER</th>
                                     </tr>
                                 </thead>
@@ -83,7 +83,7 @@
                                             &#8358;{{ number_format($sale->unit_price * $sale->quantity, 2, '.', ',') }}
                                         </td>
                                         <td>{{ $sale->store }}</td>
-                                        <td>{{ $sale->wbno }}</td>
+                                        <td>{{ $sale->atc_no }}</td>
                                         <td>{{ $sale->supplier }}</td>
 
                                     </tr>

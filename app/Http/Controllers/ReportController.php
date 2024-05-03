@@ -239,7 +239,7 @@ class ReportController extends Controller
             $category_id = '%';
 
         }
-        
+
         if ($branch_id == 'all') {
             $branch_id = '%';
 
@@ -2303,7 +2303,7 @@ class ReportController extends Controller
 
 
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno','purchases.atc_no')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
             ->join('stores', 'stores.id', 'purchase_products.store_id')
@@ -2358,7 +2358,7 @@ class ReportController extends Controller
             $status = '%';
         }
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno','purchases.atc_no')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
             ->join('stores', 'stores.id', 'purchase_products.store_id')
@@ -2544,7 +2544,7 @@ class ReportController extends Controller
             $status = '%';
         }
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'purchases.reference', 'purchase_expenses.reference AS ref', 'stores.code AS store', 'description', 'purchase_expenses.name', 'purchases.purchase_date', 'wbno', 'amount', 'purchase_expenses.status')
+            ->select('suppliers.name AS supplier', 'purchases.reference', 'purchase_expenses.reference AS ref', 'stores.code AS store', 'description', 'purchase_expenses.name', 'purchases.purchase_date', 'wbno', 'amount', 'purchase_expenses.status', 'purchases.atc_no')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('purchase_expenses', 'purchase_expenses.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
@@ -2589,7 +2589,7 @@ class ReportController extends Controller
 
 
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno', DB::raw('SUM(quantity * unit_price) AS total'), 'purchases.status')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno', DB::raw('SUM(quantity * unit_price) AS total'), 'purchases.status', 'purchases.atc_no')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
             ->join('stores', 'stores.id', 'purchase_products.store_id')
@@ -2630,7 +2630,7 @@ class ReportController extends Controller
             $status = '%';
         }
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno', DB::raw('SUM(quantity * unit_price) AS total'), 'purchases.status')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno', DB::raw('SUM(quantity * unit_price) AS total'), 'purchases.status', 'purchases.atc_no')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
             ->join('stores', 'stores.id', 'purchase_products.store_id')

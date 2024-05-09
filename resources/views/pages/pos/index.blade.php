@@ -133,9 +133,9 @@
                                                     </select>
 
                                                     <div class="form-group">
-                                                        <span class="text text-danger ion-android-alert"
+                                                        <span class="text  ion-android-alert"
                                                             id="credit_balance"></span>: <span
-                                                            class="text text-danger ion-android-alert"
+                                                            class="text ion-android-alert"
                                                             id="customer_balance"></span>
                                                     </div>
                                                 </div>
@@ -642,8 +642,14 @@
                     customer_id: customer_id
                 }
             }).done(function(data) {
-                balance = formatMoney(data);
-                $("#customer_balance").html("<b>Balance: &#8358;</b>" + balance);
+                let $new_data = formatMoney(Math.abs(data));
+                if(data < 0){
+                    balance = `<span class="text-danger"><b>Balance: &#8358;</b>`+ $new_data +`</span>`;
+                }else
+                    balance = `<span class="text-success"><b>Balance: &#8358;</b>`+ $new_data +`</span>`;
+                // balance = formatMoney(Math.abs(data));
+
+                $("#customer_balance").html(balance);
             });
         });
 

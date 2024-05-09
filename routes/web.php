@@ -327,6 +327,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/invoice', [InvoiceController::class, 'final_invoice'])->name('invoice.create');
             Route::put('/invoice/update/{order}', [InvoiceController::class, 'updateInvoice'])->name('invoice.update');
             Route::get('/print/{customer_id}', [InvoiceController::class, 'print'])->name('invoice.print');
+            Route::get('/print-with-vat/{customer_id}', [InvoiceController::class, 'printWithVat'])->name('invoice.print-with-vat');
             Route::post('/invoice-final', [InvoiceController::class, 'final_invoice'])->name('invoice.final_invoice');
             Route::get('/show/{id}', [OrderController::class, 'show'])->name('orders.show');
             //            Route::delete('/delete/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');

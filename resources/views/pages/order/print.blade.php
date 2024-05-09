@@ -194,11 +194,18 @@
                                             &#8358;0.00
                                         </th>
                                     </tr>
+                                @elseif(isset($with_vat) && $with_vat == true)
+                                    <tr>
+                                        <th style="text-align: right">VAT := </th>
+                                        <th style="text-align: right;">
+                                            &#8358;{{ $vat = $total * .075 }}
+                                        </th>
+                                    </tr>
                                 @endif
                                 <tr>
                                     <th style="text-align: right">Total Amount := </th>
                                     <th style="text-align: right;">
-                                        &#8358;{{ number_format($total - $order->discount + $order->refund, 2, '.', ',') }}
+                                        &#8358;{{ number_format(($total - $order->discount + $order->refund)+($vat ?? 0), 2, '.', ',') }}
                                     </th>
                                 </tr>
 
@@ -211,6 +218,9 @@
                                 </tr>
                                 </tbody>
                             </table>
+                            <p style="line-height: 14px">Goods Received in good condition cannot be returned
+                                <br>Sales invalidated in goods not taken within two (2) days
+                            </p>
 
                             <table class="table table-condensed">
                                 <tr>

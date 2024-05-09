@@ -193,6 +193,12 @@
                                 }
                             },
                             {
+                                extend: 'pdfHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },
+                            {
                                 extend: 'print',
                                 exportOptions: {
                                     columns: ':visible'

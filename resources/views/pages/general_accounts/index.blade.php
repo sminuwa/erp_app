@@ -16,12 +16,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Manage General Accounts</h4>
+                        <h4>Manage General Ledger Accounts</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">General Accounts</li>
+                            <li class="breadcrumb-item active">General Ledger Accounts</li>
                         </ol>
                     </div>
                 </div>
@@ -32,12 +32,12 @@
         <section class="content">
             @can('general_accounts.create')
                 <a class="btn btn-secondary btn-sm" href="{{ route('general_accounts.create') }}">
-                    <span class="fa fa-plus-circle"> New General Account</span>
+                    <span class="fa fa-plus-circle"> New GL Account</span>
                 </a>
             @endcan
             @can('general_accounts.import.form')
                 <a class="btn btn-secondary btn-sm" href="{{ route('general_accounts.import.form') }}">
-                    <span class="fa fa-upload"> Upload General Account</span>
+                    <span class="fa fa-upload"> Upload GL Account</span>
                 </a>
             @endcan
             <br />

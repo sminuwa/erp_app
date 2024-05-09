@@ -51,7 +51,7 @@
                                             </option>
                                             <option value="Supplier">
                                                 Supplier
-                                            <option value="GeneralAccount">General Accounts
+                                            <option value="GeneralAccount">General Ledger Accounts
                                             </option>
                                         </select>
                                         @if ($errors->has('type'))
@@ -148,7 +148,7 @@
                         type: $(this).val()
                     }
                 }).done(function(msg) {
-                    
+
                     $("#payer_id").html(msg);
 
                 });

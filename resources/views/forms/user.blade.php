@@ -97,6 +97,6 @@
     <p class="text text-danger"><span class="ion-alert-circled"></span>The account will be created with default Password
         of 123456. Please advice the user to change afterward.</p>
     <div class="form-group text-right">
-        <button type="submit" class="btn btn-primary"><span class="ion-ios-locked"> </span> Craete</button>
+        <button type="submit" class="btn btn-primary"><span class="ion-ios-locked"> </span> Create</button>
     </div>
 </form>

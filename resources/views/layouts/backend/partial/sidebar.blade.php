@@ -316,7 +316,7 @@
                                 <li class="nav-item">
                                     <a href="{{ route('general_accounts.index') }}" class="nav-link ">
                                         <i class="ion-card"></i>
-                                        <p>Manage General Accounts</p>
+                                        <p>Manage GL Accounts</p>
                                     </a>
                                 </li>
                             @endcan

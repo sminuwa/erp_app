@@ -205,7 +205,7 @@
                                         <tr>
                                             <th>Store</th>
                                             <th>Code</th>
-                                            <th>Item</th>
+                                            <th>Name</th>
                                             <th>Unit</th>
                                             <th>QTY</th>
                                             {{-- <th>Price</th> --}}
@@ -249,7 +249,7 @@
                                                         value="{{ $store->cost_price }}">
 
                                                     <td>{{ ucwords($store->store) }}</td>
-                                                    <td>{{ $store->code }}</td>
+                                                    <td title="{{$store->information}}">{{ $store->code }}</td>
                                                     <td>{{ $store->name }}</td>
                                                     <td>{{ $store->unit }}</td>
                                                     <td align="center">{{ $store->qty_available }}</td>

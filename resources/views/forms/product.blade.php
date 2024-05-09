@@ -26,12 +26,22 @@
         @endif
     </div>
     <div class="form-group">
-        <label for="name">Item Name</label>
+        <label for="name">Product Name</label>
         <input type="text" class="form-control {{ $errors->has('name') ? ' is-invalid' : '' }}" name="name"
             id="name" value="{{ old('name', $model->name) }}" placeholder="" maxlength="191" required="required">
         @if ($errors->has('name'))
             <div class="invalid-feedback">
                 <strong>{{ $errors->first('name') }}</strong>
+            </div>
+        @endif
+    </div>
+    <div class="form-group">
+        <label for="name">Product Information</label>
+        <input type="text" class="form-control {{ $errors->has('information') ? ' is-invalid' : '' }}" name="information"
+               id="name" value="{{ old('information', $model->name) }}" placeholder="" maxlength="191"">
+        @if ($errors->has('information'))
+            <div class="invalid-feedback">
+                <strong>{{ $errors->first('information') }}</strong>
             </div>
         @endif
     </div>

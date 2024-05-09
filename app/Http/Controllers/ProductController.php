@@ -41,7 +41,8 @@ class ProductController extends Controller
      */
     public function index(Index $request)
     {
-        return view('pages.products.index', ['records' => Product::orderBy('name')->get()]);
+        //TODO::remove limit
+        return view('pages.products.index', ['records' => Product::orderBy('name')/*->limit(100)*/->get()]);
     } /**
       * Display the specified resource.
       *
@@ -78,7 +79,7 @@ class ProductController extends Controller
 
         //        $model = new Product;
 //        $model->fill($request->except(['shortcut']));
-        if ($model = Product::createRecord($request->company_id, $request->category_id, $request->name, $request->unit, $request->barcode, $request->expiry_status, $request->status)) {
+        if ($model = Product::createRecord($request->company_id, $request->category_id, $request->name,$request->information, $request->unit, $request->barcode, $request->expiry_status, $request->status)) {
             //            $model->addStoreProduct();
             $action = "Added a new product: " . $model->name;
             AuditLog::auditLog(Auth::id(), $action);

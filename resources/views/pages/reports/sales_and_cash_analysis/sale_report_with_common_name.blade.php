@@ -55,7 +55,7 @@
                             <label for="branch_id">Branch</label>
                             <select class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
                                 name="branch_id" id="branch_id" required>
-                               
+
                             </select>
                         </div>
                         <div class="form-group">
@@ -63,7 +63,7 @@
                             <label for="store_id">Store</label>
                             <select class="form-control select2-single ajax-stores {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
                                 name="store_id" id="store_id">
-                               
+
                             </select>
                         </div>
                         <div class="form-group">
@@ -71,7 +71,7 @@
                             <label for="category_id">Category</label>
                             <select class="form-control select2-single ajax-categories {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
                                 name="category_id" id="category_id">
-                               
+
                             </select>
                         </div>
                         <div class="form-group">
@@ -80,16 +80,16 @@
                             <select
                                 class="form-control select2-single ajax-products {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
                                 name="product_id" id="product_id">
-                                
+
                             </select>
                         </div>
                     </div>
                     <div class="row">
-                        
+
                         <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="customer_id">Customer</label>
-                            <input type="text" name="customer" id="customer" class="form-control" placeholder="Type the name"/> 
+                            <input type="text" name="customer" id="customer" class="form-control" placeholder="Type the name"/>
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
@@ -143,7 +143,7 @@
                 payment_mode = $('#payment_mode').val();
                 credit_walkedin = $('input[name="credit_walkedin"]:checked').val();
                 matching = $('input[name="matching"]:checked').val();
-                
+
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.customer.sale.reports') }}",
@@ -173,6 +173,11 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },{
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

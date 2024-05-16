@@ -58,7 +58,7 @@
                                 </select>
 
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="category_id1">From Category</label>
                                 <select class="form-control select2-single ajax-categories" name="category_id1" id="category_id1">
@@ -109,7 +109,7 @@
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
 
-            
+
 
             $('.type').on("change", function() {
                 type = $(this).val();
@@ -130,7 +130,7 @@
                 branch_id = $('#branch_id').val();
                 category_id1 = $('#category_id1').val();
                 category_id2 = $('#category_id2').val();
-               
+
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
@@ -158,6 +158,11 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },{
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

@@ -59,7 +59,7 @@
 
                             </select>
                         </div>
-                        
+
                         <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="status">Status</label>
@@ -69,7 +69,7 @@
                                 <option value="0">Pending</option>
                                 <option value="1">In Transit</option>
                                 <option value="2">Recieved</option>
-                                
+
                             </select>
                         </div>
                         <div class="form-group text-right">
@@ -142,6 +142,11 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },{
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

@@ -127,7 +127,7 @@
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
 
-            
+
 
             $('.type').on("change", function() {
                 type = $(this).val();
@@ -181,6 +181,11 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },{
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

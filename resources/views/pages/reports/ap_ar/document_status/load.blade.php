@@ -26,7 +26,7 @@
                 <th>Status</th>
             </tr>
         </thead>
-       
+
         <tbody>
             @foreach ($payments as $payment)
                 <tr>
@@ -72,7 +72,7 @@
                 <th>Actions</th>
             </tr>
         </thead>
-       
+
         <tbody>
             @foreach ($payments as $interbank)
                 <tr class="@if ($interbank->status == 0) bg-warning @endif">
@@ -158,10 +158,10 @@
                     </td>
                     <td>{{ $order->customer->name }}</td>
                     <td>{{ $order->reference }}</td>
-                    <td align="right">&#8358;{{ number_format($order->total, 2, '.', ',') }}
+                    <td align="right">{{ number_format($order->total, 2, '.', ',') }}
                     </td>
-                    <td align="right">&#8358;{{ number_format($order->pay, 2, '.', ',') }}</td>
-                    <td align="right">&#8358;{{ number_format($order->due, 2, '.', ',') }}
+                    <td align="right">{{ number_format($order->pay, 2, '.', ',') }}</td>
+                    <td align="right">{{ number_format($order->due, 2, '.', ',') }}
                     </td>
                     <td>{{ Carbon\Carbon::parse($order->due_date)->toFormattedDateString() }}
                     </td>

@@ -64,7 +64,7 @@
                                         <th>STATUS</th>
                                     </tr>
                                 </thead>
-                            
+
                                 @foreach ($sales as $sale)
                                     <tr>
                                         <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}</td>
@@ -72,7 +72,7 @@
                                         <td>{{ $sale->reference }}</td>
                                         <td>{{ $sale->customer->code }}</td>
                                         <td>{{ $sale->customer->name }}</td>
-                                        <td style="text-align: right">&#8358;{{ number_format($sale->amount, 2, '.', ',') }}</td>
+                                        <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}</td>
                                         <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
                                     </tr>
                                 @endforeach

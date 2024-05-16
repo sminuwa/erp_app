@@ -54,15 +54,15 @@
                                 <thead>
                                     <tr>
                                         <th>CODE</th>
-                                        <th>ITEM</th>
+                                        <th>PRODUCT</th>
                                         <th>STORE</th>
                                         <th>QTY</th>
-                                        <th>COST PRICE (&#8358;)</th>
-                                        <th>R PRICE (&#8358;)</th>
-                                        <th>W PRICE (&#8358;)</th>
-                                        <th>TOTAL COST (&#8358;)</th>
-                                        <th>TOTAL R (&#8358;)</th>
-                                        <th>TOTAL W (&#8358;)</th>
+                                        <th>COST PRICE ()</th>
+                                        <th>R PRICE ()</th>
+                                        <th>W PRICE ()</th>
+                                        <th>TOTAL COST ()</th>
+                                        <th>TOTAL R ()</th>
+                                        <th>TOTAL W ()</th>
                                         <th>R MARGIN</th>
                                         <th>W MARGIN</th>
                                     </tr>

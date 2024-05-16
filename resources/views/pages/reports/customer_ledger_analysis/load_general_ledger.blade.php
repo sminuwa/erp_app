@@ -9,9 +9,9 @@
         <h5 style="text-align: center;">{{ strtoupper($customer->name) }} LEDGER LISTING BETWEEN {{ $from_date }}
             AND
             {{ $to_date }}<br /> Runining Balance B/d Before this date {{ $from_date }} was = @if ($balance_b_d < 0)
-                &#8358;{{ number_format(abs($balance_b_d), 2) }}Dr.
+                {{ number_format(abs($balance_b_d), 2) }}Dr.
             @else
-                &#8358;{{ number_format($balance_b_d, 2) }}Cr.
+                {{ number_format($balance_b_d, 2) }}Cr.
             @endif
         </h5>
     </caption>
@@ -21,8 +21,8 @@
             <th>Description</th>
             <th>System/Invoice</th>+
             <th>Ref</th>
-            <th>Dr (&#8358;)</th>
-            <th>Cr (&#8358;)</th>
+            <th>Dr ()</th>
+            <th>Cr ()</th>
             <th>Running Balance</th>
         </tr>
     </thead>
@@ -37,7 +37,7 @@
             <td>{{ $ledger->ref }}</td>
             <td style="text-align: right"> {{ number_format($ledger->dr, 2) }}</td>
             <td style="text-align: right">{{ number_format($ledger->cr, 2) }}</td>
-            
+
             <td style="text-align: right">
                 <?php $sum_cr += $ledger->cr;
                 $sum_dr += $ledger->dr;
@@ -64,22 +64,22 @@
         <th></th>
         <th></th>
         <th></th>
-        <th style="text-align: right;">&#8358;{{ number_format($sum_dr, 2) }}</th>
-        <th style="text-align: right;">&#8358;{{ number_format($sum_cr, 2) }}</th>
+        <th style="text-align: right;">{{ number_format($sum_dr, 2) }}</th>
+        <th style="text-align: right;">{{ number_format($sum_cr, 2) }}</th>
         <th style="text-align: right">
             @if ($dif < 0)
-                &#8358;{{ number_format(abs($dif), 2) }}Dr.
+                {{ number_format(abs($dif), 2) }}Dr.
             @else
-                &#8358;{{ number_format($dif, 2) }}Cr.
+                {{ number_format($dif, 2) }}Cr.
             @endif
         </th>
     </tr>
     <tr>
         <td colspan="7">
             <h5 style="text-align: center;">{{ strtoupper($customer->name) }} Closing Running Balance: = @if ($dif < 0)
-                    &#8358;{{ number_format(abs($dif), 2) }}Dr.
+                    {{ number_format(abs($dif), 2) }}Dr.
                 @else
-                    &#8358;{{ number_format($dif, 2) }}Cr.
+                    {{ number_format($dif, 2) }}Cr.
                 @endif
             </h5>
         </td>

@@ -6,7 +6,7 @@
 </div>
 <table class="table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
-        <h5 style="text-align: center;">Sum of All Items Purchased
+        <h5 style="text-align: center;">Sum of All Product Purchased
             Between
             {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
             and

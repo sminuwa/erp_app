@@ -45,9 +45,9 @@
                                 AND
                                 {{ $to_date }}<br /> Runining Balance B/d Before this date {{ $from_date }}
                                 was = @if ($balance_b_d < 0)
-                                    &#8358;{{ number_format(abs($balance_b_d), 2) }}Dr.
+                                    {{ number_format(abs($balance_b_d), 2) }}Dr.
                                 @else
-                                    &#8358;{{ number_format($balance_b_d, 2) }}Cr.
+                                    {{ number_format($balance_b_d, 2) }}Cr.
                                 @endif
                             </h5>
 
@@ -87,7 +87,7 @@
                                         <tr>
                                             <td>{{ $loop->index + 1 }}</td>
                                             <td>{{ $ledger->date->toFormattedDateString() }}</td>
-                            
+
                                             <td>{{ $ledger->payer()->code ?? ($ledger->payer()->number ?? '') }}</td>
                                             <td>{{ transactionDecription($ledger->reference) != '' ? transactionDecription($ledger->reference) : $ledger->description }}
                                             </td>
@@ -102,7 +102,7 @@
                                                     {{ number_format(abs($credit), 2) }}
                                                 @endif
                                             </td>
-                            
+
                                             <?php $sum_cr += $ledger->credit;
                                             $sum_dr += $ledger->debit;
                                             $dif = $sum_cr - $sum_dr;
@@ -122,7 +122,7 @@
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                            
+
                                         <th colspan="5" style="text-align: right">Total</th>
                                         <th style="text-align: right;">{{ number_format(abs($debit_sum), 2) }}</th>
                                         <th style="text-align: right;">{{ number_format(abs($credit_sum), 2) }}</th>
@@ -131,7 +131,7 @@
                                     </tr>
                                     {{-- <tr>
                                         <th colspan="4" style="text-align: right">Balance C/F</th>
-                                       
+
                                     </tr> --}}
                                 </tfoot>
                             </table>

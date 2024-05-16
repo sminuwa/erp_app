@@ -56,7 +56,7 @@
                             <select
                                 class="form-control select2-single ajax-customers {{ $errors->has('customer_id') ? ' is-invalid' : '' }}"
                                 name="customer_id" id="customer_id">
-                                
+
                             </select>
                         </div>
                         <div class="form-group text-right  col-sm-2">
@@ -69,7 +69,7 @@
                         <img src="{{ asset('assets/backend/img/loader.png') }}" style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
                     </div>
                 </div>
-                
+
             </div><!-- /.container-fluid -->
         </section>
         <!-- /.content -->
@@ -122,6 +122,11 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },{
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

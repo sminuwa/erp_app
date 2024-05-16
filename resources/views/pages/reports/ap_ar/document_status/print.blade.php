@@ -207,11 +207,11 @@
                                                 <td>{{ $order->customer->name }}</td>
                                                 <td>{{ $order->reference }}</td>
                                                 <td align="right">
-                                                    &#8358;{{ number_format($order->total, 2, '.', ',') }}
+                                                    {{ number_format($order->total, 2, '.', ',') }}
                                                 </td>
-                                                <td align="right">&#8358;{{ number_format($order->pay, 2, '.', ',') }}
+                                                <td align="right">{{ number_format($order->pay, 2, '.', ',') }}
                                                 </td>
-                                                <td align="right">&#8358;{{ number_format($order->due, 2, '.', ',') }}
+                                                <td align="right">{{ number_format($order->due, 2, '.', ',') }}
                                                 </td>
                                                 <td>{{ Carbon\Carbon::parse($order->due_date)->toFormattedDateString() }}
                                                 </td>

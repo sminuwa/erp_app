@@ -585,7 +585,9 @@ class ReportController extends Controller
         }
 
         $stores = DB::table('stock_adjustments')
-            ->select('products.name', 'products.code', 'stores.name as store', 'quantity', 'date', 'reference', 'operation')
+            ->selectRaw("products.name, products.code, stores.name as store, quantity, date, reference, operation,
+                (SELECT name FROM users WHERE id = stock_adjustments.created_by LIMIT 1) as created_by,
+                (SELECT name FROM users WHERE id = stock_adjustments.posted_by LIMIT 1) as posted_by")
             ->join('stock_adjustment_details', 'stock_adjustment_details.stock_adjustment_id', 'stock_adjustments.id')
             ->join('products', 'products.id', '=', 'stock_adjustment_details.product_id')
             ->join('stores', 'stores.id', '=', 'stock_adjustment_details.store_id')

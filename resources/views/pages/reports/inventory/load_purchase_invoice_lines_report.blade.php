@@ -18,8 +18,8 @@
         <tr>
             <th>DATE</th>
             <th>DOCUMENT NO</th>
-            <th>ITEM</th>
-            <th>ITEM PRICE</th>
+            <th>PRODUCT</th>
+            <th>PRODUCT PRICE</th>
             <th>QTY</th>
             <th>TOTAL COST</th>
             <th>STORE</th>
@@ -52,7 +52,7 @@
         <tr>
             <th colspan="5" style="text-align: right">TOTAL</th>
             <th style="text-align: right">
-                &#8358;{{ number_format($total_cost, 2, '.', ',') }}
+                {{ number_format($total_cost, 2, '.', ',') }}
             </th>
             <th></th>
             <th></th>

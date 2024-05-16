@@ -55,8 +55,8 @@
                                 <thead>
                                 <tr>
                                     <th>STORE</th>
-                                    <th>ITEM CODE</th>
-                                    <th>ITEM NAME</th>
+                                    <th>PRODUCT CODE</th>
+                                    <th>PRODUCT NAME</th>
                                     <th>QTY</th>
                                     <th>COST PRICE</th>
                                     <th>TOTAL </th>
@@ -84,7 +84,7 @@
                                     <tr>
                                         <th colspan="5" style="text-align: right">TOTAL</th>
                                         <th style="text-align: right">
-                                            &#8358;{{ number_format($total_cost, 2, '.', ',') }}
+                                            {{ number_format($total_cost, 2, '.', ',') }}
                                         </th>
                                         <th></th>
                                         <th></th>

@@ -76,7 +76,7 @@
                                         <td>{{ $sale->code }}</td>
                                         <td>{{ $sale->customer }}</td>
                                         <td style="text-align: right">
-                                            &#8358;{{ number_format($sale->total, 2, '.', ',') }}</td>
+                                            {{ number_format($sale->total, 2, '.', ',') }}</td>
                                     </tr>
                                     @php
                                         $total_sold += $sale->total;
@@ -86,7 +86,7 @@
                                     <tr>
                                         <th style="text-align: right" colspan="2">TOTAL</th>
                                         <th style="text-align: right">
-                                            &#8358;{{ number_format($total_sold, 2, '.', ',') }}</th>
+                                            {{ number_format($total_sold, 2, '.', ',') }}</th>
                                     </tr>
                                 </tfoot>
                             </table>

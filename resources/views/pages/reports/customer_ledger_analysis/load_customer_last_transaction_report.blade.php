@@ -19,7 +19,7 @@
         <tr>
             <th>ACCOUNT NO</th>
             <th>CUSTOMER NAMES</th>
-            <th>LAST INVOICE</th>
+            <th>LAST DOCUMENT NO</th>
             <th>LAST DATE</th>
             <th>DR.</th>
             <th>CR.</th>

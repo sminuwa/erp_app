@@ -39,7 +39,7 @@
                             <h3>
                                 {{App\Models\User::UserBranchName()->long_name}}
                             </h3>
-                            <h5 style="text-align: center;">SUM OF PURCHASE OF ITEMS
+                            <h5 style="text-align: center;">SUM OF PURCHASE OF PRODUCTS
                                 MADE BETWEEN
                                 {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                                 AND

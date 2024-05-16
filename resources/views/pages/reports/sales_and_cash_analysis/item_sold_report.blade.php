@@ -21,7 +21,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Total Items Sold to Customers</h4>
+                        <h4>Total Products Sold to Customers</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -55,16 +55,16 @@
                             <label for="branch_id">Branch</label>
                             <select class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
                                 name="branch_id" id="branch_id">
-                                
+
                             </select>
                         </div>
-                        
+
                         <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="category_id">Category</label>
                             <select class="form-control select2-single ajax-categories {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
                                 name="category_id" id="category_id">
-                               
+
                             </select>
                         </div>
                         <div class="form-group">
@@ -73,21 +73,21 @@
                             <select
                                 class="form-control select2-single ajax-products {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
                                 name="product_id" id="product_id">
-                                
+
                             </select>
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="customer_id">Customer</label>
                             <select class="form-control select2-single ajax-customers" name="customer_id" id="customer_id">
-                                
+
                             </select>
                         </div>
                         <div class="form-group text-right  col-sm-2">
                             <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />
                         </div>
                     </div>
-                    
+
                 </form>
                 <div class="row">
                     <div class="col-sm-12 table-responsive" id="load">
@@ -154,6 +154,11 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },{
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

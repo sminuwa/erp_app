@@ -53,7 +53,7 @@
                     <div class="row">
                         <div class="col-12">
                             <div style="text-align: center;">
-                                <h3>STORE/ITEM:
+                                <h3>STORE/PRODUCT:
                                     {{ App\Models\Store::find($store_id)->name ?? 'All Stores' }}/{{ App\Models\Product::find($product_id)->name }}
                                 </h3>
                             </div>

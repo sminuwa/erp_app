@@ -174,6 +174,11 @@
                                 exportOptions: {
                                     columns: ':visible'
                                 }
+                            },{
+                                extend: 'pdfHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
                             },
                             {
                                 extend: 'print',

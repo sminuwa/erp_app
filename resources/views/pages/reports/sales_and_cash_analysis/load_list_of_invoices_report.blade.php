@@ -36,14 +36,14 @@
             <td>{{ $sale->reference }}</td>
             <td>{{ $sale->customer->code }}</td>
             <td>{{ $sale->customer->name }}</td>
-            <td style="text-align: right">&#8358;{{ number_format($sale->total, 2, '.', ',') }}</td>
+            <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>
             <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
         </tr>
     @endforeach
     <tfoot>
         <tr>
             <th style="text-align: right" colspan="4">Total</th>
-            <th style="text-align: right">&#8358;{{ number_format($total, 2, '.', ',') }}</th>
+            <th style="text-align: right">{{ number_format($total, 2, '.', ',') }}</th>
             <th></th>
         </tr>
     </tfoot>

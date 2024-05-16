@@ -65,7 +65,7 @@
                                         <th>Date</th>
                                         <th>Reference</th>
                                         <th>Code</th>
-                                        <th>Item</th>
+                                        <th>Product</th>
                                         <th>QTY</th>
 
                                         <th>Store</th>
@@ -77,7 +77,7 @@
                                         <th>Date</th>
                                         <th>Reference</th>
                                         <th>Code</th>
-                                        <th>Item</th>
+                                        <th>Product</th>
                                         <th>QTY</th>
 
                                         <th>Store</th>

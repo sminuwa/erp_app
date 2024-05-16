@@ -9,9 +9,9 @@
         <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
             ACCOUNT BALANCES AS AT {{ Carbon\carbon::parse($date)->toFormattedDateString() }}
             @if ($balance < 0)
-                &#8358;{{ number_format(abs($balance), 2) }}Dr.
+                {{ number_format(abs($balance), 2) }}Dr.
             @else
-                &#8358;{{ number_format($balance, 2) }}Cr.
+                {{ number_format($balance, 2) }}Cr.
             @endif
         </h5>
     </caption>

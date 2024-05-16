@@ -27,8 +27,8 @@
             @if($category_id == '')
             <th>CATEGORY</th>
             @endif
-            <th>ITEM CODE</th>
-            <th>ITEM NAME</th>
+            <th>PRODUCT CODE</th>
+            <th>PRODUCT NAME</th>
             <th>QTY</th>
             <th>COST PRICE</th>
             <th>TOTAL </th>

@@ -42,9 +42,9 @@
                             <h5 style="text-align: center;">{{ strtoupper($customer->name) }} ACOOUNT BALANCES AS AT
                                 {{ $from_date }}
                                 was = @if ($balance_b_d < 0)
-                                    &#8358;{{ number_format(abs($balance_b_d), 2) }}Dr.
+                                    {{ number_format(abs($balance_b_d), 2) }}Dr.
                                 @else
-                                    &#8358;{{ number_format($balance_b_d, 2) }}Cr.
+                                    {{ number_format($balance_b_d, 2) }}Cr.
                                 @endif
                             </h5>
 

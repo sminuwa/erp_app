@@ -45,7 +45,7 @@
                                     name="branch_id"
                                     id="branch_id">
                             </select>
-                           
+
                         </div>
                         <div class="form-group">
                             <label for="store_id">Store</label>
@@ -53,7 +53,7 @@
                                     name="store_id"
                                     id="store_id">
                             </select>
-                           
+
                         </div>
                         <div class="form-group">
                             <label for="category_id">Category</label>
@@ -61,16 +61,16 @@
                                     name="category_id"
                                     id="category_id">
                             </select>
-                           
+
                         </div>
-                       
+
                         <div class="form-group">
                             <label for="product_id">Product</label>
                             <select class="form-control select2-single ajax-products"
                                     name="product_id"
                                     id="product_id">
                             </select>
-                           
+
                         </div>
                         <div class="form-group text-right col-sm-4">
                             <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />
@@ -96,7 +96,7 @@
 @push('js')
     <script type="text/javascript">
         $(function() {
-            
+
             function formatMoney(n, c, d, t) {
                 var c = isNaN(c = Math.abs(c)) ? 2 : c,
                     d = d == undefined ? "." : d,
@@ -140,6 +140,11 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },{
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }
@@ -198,7 +203,7 @@
                                 pageTotal = 0
                             };
 
-                           
+
 
                             // Update footer
                             $(api.column(7).footer()).html(
@@ -207,7 +212,7 @@
                                 formatMoney(total) + ")"
                             );
 
-                            
+
 
 
 

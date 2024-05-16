@@ -18,11 +18,11 @@
     <thead>
         <tr>
             <th>CODE</th>
-            <th>ITEM</th>
+            <th>PRODUCT</th>
             <th>QUANTITY</th>
-            <th>TOTAL COST (&#8358;)</th>
-            <th>TOTAL SELLING PRICE (&#8358;)</th>
-            <th>MARGIN (&#8358;)</th>
+            <th>COST ()</th>
+            <th>SALES ()</th>
+            <th>MARGIN ()</th>
 
         </tr>
     </thead>
@@ -51,12 +51,12 @@
         <tr>
             <th style="text-align: right"  colspan="3">TOTAL</th>
             <th style="text-align: right">
-                &#8358;{{ number_format($total_cost, 0, '.', ',') }}</th>
+                {{ number_format($total_cost, 0, '.', ',') }}</th>
             <th style="text-align: right">
-                &#8358;{{ number_format($total_amount, 2, '.', ',') }}
+                {{ number_format($total_amount, 2, '.', ',') }}
             </th>
             <th style="text-align: right">
-                &#8358;{{ number_format($total_amount-$total_cost, 2, '.', ',') }}
+                {{ number_format($total_amount-$total_cost, 2, '.', ',') }}
             </th>
         </tr>
     </tfoot>

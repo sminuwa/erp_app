@@ -56,12 +56,12 @@
                                         <th>Reference</th>
                                         <th>Product</th>
                                         <th>Original QTY</th>
-                                        <th>Changed QTY</th>
+                                        <th>Returned QTY</th>
                                         <th>Original Unit Cost</th>
-                                        <th>Current Unit Cost</th>
+                                        <th>Returned Unit Cost</th>
                                         <th>Total Original Cost</th>
-                                        <th>Total Current Cost</th>
-                                        <th>Margin</th>
+                                        <th>Total Returned Cost</th>
+                                        <th>Balance</th>
 
                                     </tr>
                                 </thead>

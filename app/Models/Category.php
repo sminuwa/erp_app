@@ -35,8 +35,8 @@ class Category extends Model
         $cost = ChartOfAccount::where('class', 'C50')->first();
         $revenue = ChartOfAccount::where('class', 'R40')->first();
         if(($a = GeneralAccount::createRecord($asset->class,$code.' - '.$description)) &&
-            ($c = GeneralAccount::createRecord($cost->class,$code.' - '.$description)) &&
-            ($r = GeneralAccount::createRecord($revenue->class,$code.' - '.$description))){
+            ($c = GeneralAccount::createRecord($cost->class,'Cost of Sales of '.$description)) &&
+            ($r = GeneralAccount::createRecord($revenue->class,'Sales of '.$description))){
             $record = new self;
             $record->code = $code;
             $record->name = $description;

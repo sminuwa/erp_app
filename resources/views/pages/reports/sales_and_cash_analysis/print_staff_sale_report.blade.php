@@ -56,16 +56,17 @@
                                 cellspacing="0" data-ordering="false">
                                 <thead>
                                     <tr>
-                                        <th colspan="4" style="text-align: right">TOTAL CASH SALES: </th>
-                                        <th style="text-align: right">
-                                            &#8358;{{ number_format($total_cash, 2, '.', ',') }}</th>
+                                        <th colspan="6" style="text-align: right">TOTAL RECEIPTS: </th>
+                                        <th style="text-align: right">&#8358;{{ number_format($total_cash, 2, '.', ',') }}</th>
                                         <th></th>
                                         <th></th>
                                         <th></th>
                                     </tr>
-
+                            
                                     <tr>
                                         <th>DATE</th>
+                                        <th>NAME</th>
+                                        <th>ATC</th>
                                         <th>INVOICE</th>
                                         <th>CUST ACCOUNT</th>
                                         <th>ITEM</th>
@@ -76,24 +77,23 @@
                                     </tr>
                                 </thead>
                                 @php
-
+                            
                                     $total_sold_price = 0;
                                     $total_sold = 0;
                                 @endphp
                                 @foreach ($sales as $sale)
                                     <tr>
-                                        <td>{{ \Carbon\Carbon::parse($sale->order_date)->toFormattedDateString() }}
-                                        </td>
+                                        <td>{{ \Carbon\Carbon::parse($sale->order_date)->toFormattedDateString() }}</td>
+                                        <td>{{ $sale->name }}</td>
+                                        <td>{{ $sale->user }}</td>
                                         <td>{{ $sale->reference }}</td>
                                         <td>{{ $sale->customer }}</td>
                                         <td>{{ $sale->product }}</td>
                                         <td>{{ $sale->store }}</td>
                                         <td>{{ $sale->quantity }}</td>
+                                        <td style="text-align: right">&#8358;{{ number_format($sale->sold_price, 2, '.', ',') }}</td>
                                         <td style="text-align: right">
-                                            &#8358;{{ number_format($sale->sold_price, 2, '.', ',') }}</td>
-                                        <td style="text-align: right">
-                                            &#8358;{{ number_format($sale->sold_price * $sale->quantity, 2, '.', ',') }}
-                                        </td>
+                                            &#8358;{{ number_format($sale->sold_price * $sale->quantity, 2, '.', ',') }}</td>
                                     </tr>
                                     @php
                                         $total_sold_price += $sale->sold_price;
@@ -102,7 +102,7 @@
                                 @endforeach
                                 <tfoot>
                                     <tr>
-                                        <th colspan="6" style="text-align: right">TOTAL</th>
+                                        <th colspan="8" style="text-align: right">TOTAL</th>
                                         <th style="text-align: right">
                                             &#8358;{{ number_format($total_sold_price, 2, '.', ',') }}</th>
                                         <th style="text-align: right">

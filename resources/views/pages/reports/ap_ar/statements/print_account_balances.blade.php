@@ -42,9 +42,9 @@
                             <h5 style="text-align: center;">{{ strtoupper($customer->name) }} ACOOUNT BALANCES AS AT
                                 {{ $from_date }}
                                 was = @if ($balance_b_d < 0)
-                                    &#8358;({{ number_format(abs($balance_b_d), 2) }})
+                                    &#8358;{{ number_format(abs($balance_b_d), 2) }}Dr.
                                 @else
-                                    &#8358;{{ number_format($balance_b_d, 2) }}
+                                    &#8358;{{ number_format($balance_b_d, 2) }}Cr.
                                 @endif
                             </h5>
 
@@ -58,73 +58,79 @@
                                 cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>Date</th>
+                                        <th colspan="{{ $type == 'Customer' ? 5 : 4 }}"></th>
+                                        <th colspan="2" style="text-align: center; align-content: center">Balance</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Account No</th>
                                         <th>Description</th>
-                                        <th>System/Invoice</th>
-                                        <th>Ref</th>
-                                        <th>Cr (&#8358;)</th>
-                                        <th>Dr (&#8358;)</th>
-                                        <th>Running Balance</th>
+                                        @if ($type == 'Customer')
+                                            <th>RO</th>
+                                        @endif
+                                        <th style="text-align: center; align-content: center">Debit (Dr.)</th>
+                                        <th style="text-align: center; align-content: center">Credit (Cr.)</th>
+                                        <th>Dr.</th>
+                                        <th>Cr.</th>
                                     </tr>
                                 </thead>
-                                <?php $sum_cr = $sum_cr_b_d;
-                                $sum_dr = $sum_dr_b_d;
-                                $dif = 0; ?>
-                                @foreach ($ledgers as $ledger)
+                                <tbody>
+                                    @foreach ($ledgers as $ledger)
+                                        @php
+                                            $credit = number_format(abs($ledger->credit), 2);
+                                            $debit = number_format(abs($ledger->debit), 2);
+                                        @endphp
+                                        <tr>
+                                            <td>{{ $ledger->number }}</td>
+                                            <td>{{ $ledger->description }}</td>
+                                            @if ($type == 'Customer')
+                                                <td>{{ $ledger->name }}</td>
+                                            @endif
+                                            <td style="text-align: right">
+                                                @if ($debit > 0.0)
+                                                    {{ $debit }}
+                                                @endif
+                                            </td>
+                                            <td style="text-align: right">
+                                                @if ($credit > 0.0)
+                                                    {{ $credit }}
+                                                @endif
+                                            </td>
+                                                <?php $sum_cr = $ledger->credit;
+                                                $sum_dr = $ledger->debit;
+                                                $total_cr += $sum_cr;
+                                                $total_dr += $sum_dr;
+                                                $dif = $sum_cr - $sum_dr;
+                                                ?>
+                                            <td style="text-align: right">
+                                                @if ($dif < 0)
+                                                    {{ number_format(abs($dif), 2) }}
+                                                @endif
+                                            </td>
+                                            <td style="text-align: right">
+                                                @if ($dif > 0)
+                                                    {{ number_format($dif, 2) }}
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot>
                                     <tr>
-                                        <td>{{ $ledger->date->toFormattedDateString() }}</td>
-                                        <td>{{ $ledger->description }}</td>
-                                        <td>{{ $ledger->systemid }}</td>
-                                        <td>{{ $ledger->ref }}</td>
-                                        <td style="text-align: right"> &#8358;{{ number_format($ledger->cr, 2) }}</td>
-                                        <td style="text-align: right"> &#8358;{{ number_format($ledger->dr, 2) }}</td>
-                                        <td style="text-align: right">
-                                            <?php $sum_cr += $ledger->cr;
-                                            $sum_dr += $ledger->dr;
-                                            $dif = $sum_cr - $sum_dr;
-                                            $balance =
-                                                $ledger
-                                                    ->where('id', '<=', $ledger->id)
-                                                    ->where('customer_id', $customer->id)
-                                                    ->sum('cr') -
-                                                $ledger
-                                                    ->where('id', '<=', $ledger->id)
-                                                    ->where('customer_id', $customer->id)
-                                                    ->sum('dr'); ?>
-                                            @if ($dif < 0)
-                                                &#8358;({{ number_format(abs($dif), 2) }})
-                                            @else
-                                                &#8358;{{ number_format($dif, 2) }}
-                                            @endif
-                                        </td>
+                                        <th colspan="{{ $type == 'Customer' ? 3 : 2 }}" style="text-align: right">Total</th>
+                                        <th style="text-align: right;">{{ number_format($total_dr, 2) }}</th>
+                                        <th style="text-align: right;">{{ number_format($total_cr, 2) }}</th>
+                                        <th style="text-align: right;">
+                                            {{ $total_dr - $total_cr < 0 ? number_format(abs($total_dr - $total_cr), 2) : '' }}
+                                        </th>
+                                        <th style="text-align: right;">
+                                            {{ $total_dr - $total_cr > 0 ? number_format(abs($total_dr - $total_cr), 2) : '' }}
+                                        </th>
                                     </tr>
-                                @endforeach
-                                <tr>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th style="text-align: right;">&#8358;{{ number_format($sum_cr, 2) }}</th>
-                                    <th style="text-align: right;">&#8358;{{ number_format($sum_dr, 2) }}</th>
-                                    <th style="text-align: right">
-                                        @if ($dif < 0)
-                                            &#8358;({{ number_format(abs($dif), 2) }})
-                                        @else
-                                            &#8358;{{ number_format($dif, 2) }}
-                                        @endif
-                                    </th>
-                                </tr>
-                                <tr>
-                                    <td colspan="7">
-                                        <h5 style="text-align: center;">{{ strtoupper($customer->name) }} Closing
-                                            Running Balance: = @if ($dif < 0)
-                                                &#8358;({{ number_format(abs($dif), 2) }})
-                                            @else
-                                                &#8358;{{ number_format($dif, 2) }}
-                                            @endif
-                                        </h5>
-                                    </td>
-                                </tr>
+                                    {{-- <tr>
+                                        <th colspan="4" style="text-align: right">Balance C/F</th>
+                                        <th style="text-align: right;">{{ number_format($balance, 2) }}</th>
+                                    </tr> --}}
+                                </tfoot>
                             </table>
                         </div>
                         <!-- /.col -->

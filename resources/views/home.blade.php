@@ -676,8 +676,7 @@
                 @else
                     <div class="row">
                         <div class="col-2">
-                            <img alt="Photo" src="{{ asset('assets/backend/img/flour.png') }}"
-                                class="img-circle elevation-2" alt="Floour Dangote">
+                            
                         </div>
                         <div class="col-8">
                             <h1 style="text-shadow: 5px 5px #558ABB;font-weight:900;font-size:60px;">{{App\Models\User::UserBranchName()->long_name}}
@@ -724,8 +723,7 @@
                             </script>
                         </div>
                         <div class="col-2">
-                            <img alt="Photo" src="{{ asset('assets/backend/img/golden-penny.png') }}"
-                                class="img-circle elevation-2" alt="Golden Penny" style="width:250px;height:250px;">
+                            
                         </div>
 
                     </div>

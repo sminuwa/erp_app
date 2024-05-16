@@ -1,6 +1,6 @@
 @extends('layouts.backend.app')
 
-@section('title', 'Ledger')
+@section('title', 'Account Balances')
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
@@ -51,7 +51,7 @@
                                             </option>
                                             <option value="Supplier">
                                                 Supplier
-                                            <option value="GeneralAccount">General
+                                            <option value="GeneralAccount">General Ledger
                                                 Accounts
                                             </option>
                                         </select>
@@ -146,6 +146,12 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },
+                            {
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

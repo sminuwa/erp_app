@@ -10,6 +10,7 @@ $(document).ready(function () {
     ajerks('GET', '/misc/ajax/general-accounts', 'ajax-general-accounts')
     ajerks('GET', '/misc/ajax/companies', 'ajax-companies')
     ajerks('GET', '/misc/ajax/users', 'ajax-users')
+    ajerks('GET', '/misc/ajax/store-products', 'ajax-store-products')
 })
 
 let bodi = $('body');
@@ -27,6 +28,12 @@ bodi.on('change', '.ajax-categories', function () {
     $('.ajax-products').attr('category_id', $(this).val())
     ajerks('GET', '/misc/ajax/products', 'ajax-products')
 })
+
+bodi.on('change', '.ajax-stores', function () {
+    $('.ajax-store-products').attr('store_id', $(this).val())
+    ajerks('GET', '/misc/ajax/store-products', 'ajax-store-products')
+})
+
 
 bodi.on('change', '.ajax-companies', function () {
     $('.ajax-branches').attr('company_id', $(this).val())
@@ -52,6 +59,11 @@ function ajerks(method, url, cssClass) {
     if (element.attr('category_id') && element.attr('name') === 'product_id') {
         let category_id = element.attr('category_id')
         data = { category_id: category_id }
+    }
+    if (element.attr('store_id') && element.attr('name') === 'product_id') {
+        let store_id = element.attr('store_id')
+        data = { store_id: store_id } 
+       
     }
 
     $.ajax({

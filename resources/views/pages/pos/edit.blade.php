@@ -122,16 +122,20 @@
                                         </div>
 
                                     </div>
+                                    
                                     <div class="row">
                                         <div class="col-md-4">
-                                            <input type="number" step=".01" class="form-control" name="discount"
-                                                placeholder="Discount" id="discount" value="{{ $order->discount }}" />
+                                            <textarea class="form-control" name="description" placeholder="Description" id="description" required>{{$order->description}}</textarea>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <input type="number" class="form-control" name="discount" step=".01"
+                                                placeholder="Discount" id="discount" value="{{ $order->discount }}"/>
                                         </div>
 
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <input type="number" step=".01" class="form-control" placeholder="Refund"
-                                                    name="refund" id="refund" value="{{ $order->refund }}" />
+                                                <input type="number" step=".01" class="form-control"
+                                                    placeholder="Refund" name="refund" id="refund" value="{{ $order->refund }}" />
 
                                             </div>
                                         </div>
@@ -139,6 +143,13 @@
                                             <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create
                                                 Invoice</button>
                                         </div>
+                                        @if (old('customer_id'))
+                                            <div class="col-md-6">
+                                                <span style="color:red;">If the credit limit is exceeded, click here to
+                                                    refresh <i class="fa fa-refresh"
+                                                        onclick="window.location.reload()"></i></span>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </form>

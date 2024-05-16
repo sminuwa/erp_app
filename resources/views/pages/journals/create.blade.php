@@ -131,7 +131,7 @@
                                                         <option value="">Select...</option>
                                                         <option value="Customer">Customer</option>
                                                         <option value="Supplier">Supplier
-                                                        <option value="GeneralAccount">General Accounts
+                                                        <option value="GeneralAccount">General Ledger Accounts
                                                         </option>
                                                     </select>
                                                     <label class="floating-label">Account Type: @error('account_type')

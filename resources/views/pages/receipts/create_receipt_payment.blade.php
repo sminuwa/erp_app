@@ -54,7 +54,8 @@
                 <div class="row">
                     <div class="col-sm-12 mt-4">
                         {{--                        @include('pages.receipts.receipt_payment_form') --}}
-                        <form action="{{ isset($route) ? $route : route('receipt.payment.store') }}" method="POST">
+                        <form action="{{ isset($route) ? $route : route('receipt.payment.store') }}" method="POST"
+                            id="receipt_form">
                             {{ csrf_field() }}
                             <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
                             <input type="hidden" name="receipt_id" value="{{ isset($model) ? $model->id : '' }}" />
@@ -69,9 +70,9 @@
                                             <option value="Customer"
                                                 {{ 'Customer' == $model->model_name ? 'selected' : '' }}>Customer</option>
                                             <option value="Supplier"
-                                                {{ 'Suppplier' == $model->model_name ? 'selected' : '' }}>Suppplier
+                                                {{ 'Supplier' == $model->model_name ? 'selected' : '' }}>Supplier
                                             <option value="GeneralAccount"
-                                                {{ 'GeneralAccount' == $model->model_name ? 'selected' : '' }}>General
+                                                {{ 'GeneralAccount' == $model->model_name ? 'selected' : '' }}>General Ledger
                                                 Accounts
                                             </option>
                                         </select>
@@ -180,7 +181,7 @@
                             <div class="">
                                 <div class="col-md-8">
                                     <div class="form-group text-right ">
-                                        <input type="submit" class="btn btn-primary" value="Save" />
+                                        <input type="submit" class="btn btn-primary" value="Save" id="btn_save" />
                                     </div>
                                 </div>
                             </div>
@@ -193,60 +194,15 @@
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
-    <div class="modal fade" id="customer_ledgerform" style="display: none;" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Customer Ledger</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="get" action="{{ route('ajax.general.customer.ledger') }}" id="ledger_form"
-                        target="_BLANK">
-                        @csrf
-                        <div class="form-group">
-                            <label for="from_date">From Date</label>
-                            <input type="text" class="form-control datepicker" name="from_date" id="from_date"
-                                placeholder="" autocomplete="off">
-                        </div>
-                        <div class="form-group">
-                            <label for="to_date">To Date</label>
-                            <input type="text" class="form-control datepicker" name="to_date" id="to_date"
-                                placeholder="" autocomplete="off">
-                        </div>
-                        <div class="form-group">
-                            &nbsp;&nbsp;
-                            <label for="customer_id">Customer</label>
-                            <select class="form-control select2-single" name="customer_id" id="customer_id" required>
-                                {{-- <option value="all">All</option> --}}
-                                <option value="">Select...</option>
-                                @foreach (App\Models\Customer::where('type', 'credit')->where('branch_id', 'LIKE', App\Models\User::userBranchAction())->get() as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name }}-{{ $data->phone }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <input type="hidden" name="print" value="print" />
-                        <input type="hidden" name="modal" value="modal" />
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-dark" data-dismiss="modal"><i class="fa fa-times"></i>
-                                Close
-                            </button>
-                            <button type="submit" class="btn btn-info px-3"><i class="icon-trash"></i> Generate
-                            </button>
-                        </div>
-                        @method('post')
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 
 @push('js')
     <script>
+        $('#btn_save').click(function() {
+            $('#receipt_form').submi();
+            $(this).attr('disabled', 'disabled');
+        });
+
         function formatNumber(input) {
             // Remove non-numeric and non-decimal characters
             let value = input.value.replace(/[^\d.]/g, '');

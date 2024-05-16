@@ -18,7 +18,7 @@
                     <div class="col-sm-6 offset-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Proformers</li>
+                            <li class="breadcrumb-item active">Proforma</li>
                         </ol>
                     </div>
                 </div>
@@ -35,14 +35,14 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    Proformers
+                                    Proforma
                                 </h3>
                             </div>
                             <div class="row">
                                 <div class="col-sm-2">
                                     @can('proforma.index')
                                         <a href="{{ route('proforma.index') }}" class="btn btn-sm btn-secondary"
-                                            style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Proformer</a>
+                                            style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Proforma</a>
                                     @endcan
                                 </div>
                             </div>

@@ -71,7 +71,9 @@
                             <input type="radio" name="type" value="qty" class="form-control" />
                             &nbsp;&nbsp; &nbsp;Quantity &nbsp; &nbsp;&nbsp;
                             <input type="radio" name="type" value="amt" class="form-control" checked />
-                            &nbsp;&nbsp;Amount
+                            &nbsp;&nbsp;Amount&nbsp; &nbsp;&nbsp;
+                            <input type="radio" name="type" value="mgn" class="form-control" />
+                            &nbsp;&nbsp; &nbsp;Margin &nbsp; &nbsp;&nbsp;
                         </div>&nbsp;&nbsp;&nbsp;&nbsp;
                         <div class="form-group text-right">
                             <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />

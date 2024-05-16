@@ -327,6 +327,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/invoice', [InvoiceController::class, 'final_invoice'])->name('invoice.create');
             Route::put('/invoice/update/{order}', [InvoiceController::class, 'updateInvoice'])->name('invoice.update');
             Route::get('/print/{customer_id}', [InvoiceController::class, 'print'])->name('invoice.print');
+            Route::get('/print-with-vat/{customer_id}', [InvoiceController::class, 'printWithVat'])->name('invoice.print-with-vat');
             Route::post('/invoice-final', [InvoiceController::class, 'final_invoice'])->name('invoice.final_invoice');
             Route::get('/show/{id}', [OrderController::class, 'show'])->name('orders.show');
             //            Route::delete('/delete/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
@@ -732,11 +733,14 @@ Route::middleware('auth')->group(function () {
     Route::group(
         ['prefix' => 'reports'],
         function () {
-            //Stock Transfer Report
-            Route::get('/stock/transfer', [ReportController::class, 'stockTransfer'])->name('stock.transfer.reports');
-            Route::get('/stock/transfer/load', [ReportController::class, 'loadStockTransferReport'])->name('ajax.load.stock.transfer.reports');
-            Route::get('/stock/transfer/print/{from_date}/{to_date}/{store_id}/{category_id}/{product_id}/{from_to}', [ReportController::class, 'printStockTransfer'])->name('ajax.print.stock.transfer.reports');
+            //INtersite Stock Transfer Report
+            Route::get('/intersite/transfer', [ReportController::class, 'intersiteTransfer'])->name('intersite.transfer.reports');
+            Route::get('/intersite/transfer/load', [ReportController::class, 'loadIntersiteTransferReport'])->name('ajax.load.intersite.transfer.reports');
+            Route::get('/intersite/transfer/print/{from_date}/{to_date}/{source_branch_id}/{destination_branch_id}/{category_id}/{product_id}', [ReportController::class, 'printIntersiteTransfer'])->name('ajax.print.intersite.transfer.reports');
 
+            Route::get('/interstore/transfer', [ReportController::class, 'interstoreTransfer'])->name('interstore.transfer.reports');
+            Route::get('/interstore/transfer/load', [ReportController::class, 'loadInterstoreTransferReport'])->name('ajax.load.interstore.transfer.reports');
+            Route::get('/interstore/transfer/print/{from_date}/{to_date}/{branch_id}/{source_store_id}/{destination_store_id}/{category_id}/{product_id}', [ReportController::class, 'printInterstoreTransfer'])->name('ajax.print.interstore.transfer.reports');
 
             //Current Stock Report
             Route::get('/sc/current-stock', [ReportController::class, 'generateCurrentStock'])->name('current.stock.report');
@@ -918,6 +922,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/activity/load/logs', [ReportController::class, 'viewLogs'])->name('user.activity.logs');
             Route::get('/activity/load/logs/print/{from_date}/{to_date}/{user_id}', [ReportController::class, 'printLogs'])->name('user.activity.logs.print');
 
+             //Purchase Request  Report
+             Route::get('/product/valuation', [ReportController::class, 'productValuation'])->name('product.valuation.report');
+             Route::get('/product/valuation/load', [ReportController::class, 'loadProductValuationReport'])->name('ajax.product.valuation.report');
+             Route::post('/product/valuation/print/', [ReportController::class, 'printProductValuationReport'])->name('ajax.product.valuation.report.print');
             //User Ledger and Loans
 
             //Loan Balances

@@ -105,7 +105,7 @@
                                 @endphp
                                 {{ QrCode::size(70)->generate($order->total) }}<br />
                                 <span style="font-size:28px;margin-top:-5px">
-                                    Proformer Invoice
+                                    Proforma Invoice
                                 </span>
                             </div>
                         </div>
@@ -176,7 +176,9 @@
 
                                 </tbody>
                             </table>
+                            <p style="line-height: 14px">This price is invalid after 24 hours.
 
+                            </p>
                             <table class="table table-condensed">
                                 <tr>
                                     <td colspan="3" style='border-style:none;'>

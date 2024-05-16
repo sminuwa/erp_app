@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Daily Sales Report- {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Sales Report By Category- {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -56,7 +56,8 @@
                                     <tr>
                                         <th>CODE</th>
                                         <th>CATEGORY</th>
-                                        <th>QTY</th>
+                                        <th>QTY AVAILBLE</th>
+                                        <th>QTY SOLD</th>
                                         <th>AMOUNT(&#8358;)</th>
                                         <th>COST(&#8358;)</th>
                                         <th>MARGIN(&#8358;)</th>
@@ -73,11 +74,10 @@
                                     <tr>
                                         <td>{{ $sale->code }}</td>
                                         <td>{{ $sale->category }}</td>
-                                        <td>{{ $sale->quantity }}</td>
-                                        <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}
-                                        </td>
-                                        <td style="text-align: right">{{ number_format($sale->cost, 2, '.', ',') }}
-                                        </td>
+                                        <td style="text-align: right">{{ $sale->qty_available }}</td>
+                                        <td style="text-align: right">{{ $sale->quantity }}</td>
+                                        <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}</td>
+                                        <td style="text-align: right">{{ number_format($sale->cost, 2, '.', ',') }}</td>
                                         <td style="text-align: right">
                                             @php
                                                 $total_profit = $sale->amount - $sale->cost;
@@ -91,13 +91,12 @@
                                                 {{ number_format($total_profit, 2) }}
                                             @endif
                                         </td>
-                                        <td style="text-align: right">
-                                            {{ round(($total_profit / $sale->amount) * 100, 2) }}</td>
+                                        <td style="text-align: right">{{ round(($total_profit / $sale->amount) * 100, 2) }}</td>
                                     </tr>
                                 @endforeach
                                 <tfoot>
                                     <tr>
-                                        <th colspan="3" style="text-align: right">TOTAL</th>
+                                        <th colspan="4" style="text-align: right">TOTAL</th>
                                         <th style="text-align: right">
                                             &#8358;{{ number_format($total_amount, 2, '.', ',') }}</th>
                                         <th style="text-align: right">
@@ -109,7 +108,8 @@
                                                 &#8358;{{ number_format($grand_total_profit, 2) }}
                                             @endif
                                         </th>
-                                        <th></th>
+                                        <th style="text-align:right">
+                                            {{ $total_amount != 0 ? number_format(($grand_total_profit / $total_amount) * 100, 2) : 0 }}</th>
                                     </tr>
                                 </tfoot>
                             </table>

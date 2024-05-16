@@ -14,12 +14,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Add General Accounts</h4>
+                        <h4>Add GL Accounts</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('general_accounts.index') }}">General Accounts</a>
+                            <li class="breadcrumb-item"><a href="{{ route('general_accounts.index') }}">GL Accounts</a>
                             </li>
                             <li class="breadcrumb-item active">Create</li>
                         </ol>
@@ -32,18 +32,18 @@
         <section class="content">
             @can('general_accounts.create')
                 <a class="btn btn-secondary btn-sm" href="{{ route('general_accounts.create') }}">
-                    <span class="fa fa-plus-circle"> New G Account</span>
+                    <span class="fa fa-plus-circle"> New GL Account</span>
                 </a>
             @endcan
             @can('general_accounts.import.form')
                 <a class="btn btn-secondary btn-sm" href="{{ route('general_accounts.import.form') }}">
-                    <span class="fa fa-upload"> Upload G Accounts</span>
+                    <span class="fa fa-upload"> Upload GL Accounts</span>
                 </a>
             @endcan
 
             @can('general_accounts.index')
                 <a class="btn btn-secondary btn-sm" href="{{ route('general_accounts.index') }}">
-                    <span class="fa fa-list"> View Accounts</span>
+                    <span class="fa fa-list"> View GL Accounts</span>
                 </a>
             @endcan
             <br />

@@ -85,9 +85,6 @@
                         </div>
                         <div class="col-sm-3 invoice-col">
                             <div style="color:aliceblue;">
-                                {{--@php
-                                    $uc = substr($order->reference, 0, 6) . substr($order->reference, 6, 10) + 3000;
-                                @endphp--}}
                                 {{ QrCode::size(70)->generate($order->total) }}<br />
                                 <span style="font-size:28px;margin-top:-5px">
                                     {{ $order->payment_mode }} Sales
@@ -174,6 +171,10 @@
                                 </tr>
                                 </tbody>
                             </table>
+
+                            <p style="line-height: 14px">Goods Received in good condition cannot be returned
+                                <br>Sales invalidated in goods not taken within two (2) days
+                            </p>
 
                             <table class="table table-condensed">
                                 <tr>

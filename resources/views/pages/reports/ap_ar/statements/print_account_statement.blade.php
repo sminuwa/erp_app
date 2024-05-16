@@ -34,19 +34,20 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:50px;height:50px;"
-                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo.png') }}"
+                                style="width:50px;height:50px;" alt="Albabello Logo" class="img-circle elevation-3"
+                                style="opacity: .8">
                             <h3>
-                                {{App\Models\User::UserBranchName()->long_name}}
+                                {{ App\Models\User::UserBranchName()->long_name }}
                             </h3>
                             <h5 style="text-align: center;">{{ strtoupper($customer->name) }} LEDGER LISTING BETWEEN
                                 {{ $from_date }}
                                 AND
                                 {{ $to_date }}<br /> Runining Balance B/d Before this date {{ $from_date }}
                                 was = @if ($balance_b_d < 0)
-                                    &#8358;({{ number_format(abs($balance_b_d), 2) }})
+                                    &#8358;{{ number_format(abs($balance_b_d), 2) }}Dr.
                                 @else
-                                    &#8358;{{ number_format($balance_b_d, 2) }}
+                                    &#8358;{{ number_format($balance_b_d, 2) }}Cr.
                                 @endif
                             </h5>
 
@@ -56,54 +57,63 @@
 
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
-                            <table class="table table-bordered caption" id="example1" border="1" data-ordering="false" cellpadding="0"
-                                cellspacing="0">
+                            <table class="table table-bordered caption" id="example1" border="1"
+                                data-ordering="false" cellpadding="0" cellspacing="0">
                                 <thead>
+                                    <tr>
+                                        <th colspan="7"></th>
+                                        <th colspan="2" style="text-align: center; align-content: center">Balance</th>
+                                    </tr>
                                     <tr>
                                         <th rowspan="2" style="width: 5%;">S/N</th>
                                         <th rowspan="2">Date</th>
                                         <th rowspan="2">Account No</th>
                                         <th rowspan="2">Description</th>
                                         <th rowspan="2">Reference</th>
-                                        <th colspan="2" style="text-align: center; align-content: center">Balance</th>
                                     </tr>
                                     <tr>
-                                        <th style="text-align: center; align-content: center">Credit (Cr.)</th>
                                         <th style="text-align: center; align-content: center">Debit (Dr.)</th>
-                                        <th>Balance</th>
+                                        <th style="text-align: center; align-content: center">Credit (Cr.)</th>
+                                        <th>Dr.</th>
+                                        <th>Cr.</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($ledgers as $ledger)
                                         @php
-                                            $credit = number_format($ledger->credit, 2);
-                                            $debit = number_format($ledger->debit, 2);
+                                            $credit = $ledger->credit;
+                                            $debit = $ledger->debit;
                                         @endphp
                                         <tr>
                                             <td>{{ $loop->index + 1 }}</td>
                                             <td>{{ $ledger->date->toFormattedDateString() }}</td>
                             
-                                            <td>{{ $ledger->payer()->code ?? $ledger->payer()->number ?? '' }}</td>
-                                            <td>{{ $ledger->description }}</td>
+                                            <td>{{ $ledger->payer()->code ?? ($ledger->payer()->number ?? '') }}</td>
+                                            <td>{{ transactionDecription($ledger->reference) != '' ? transactionDecription($ledger->reference) : $ledger->description }}
+                                            </td>
                                             <td>{{ $ledger->reference }}</td>
                                             <td style="text-align: right">
-                                                @if ($credit > 0.0)
-                                                    {{ $credit }}
-                                                @endif
-                                            </td>
-                                            <td style="text-align: right">
                                                 @if ($debit > 0.0)
-                                                    {{ $debit }}
+                                                    {{ number_format(abs($debit), 2) }}
                                                 @endif
                                             </td>
                                             <td style="text-align: right">
-                                                <?php $sum_cr += $ledger->credit;
-                                                $sum_dr += $ledger->debit;
-                                                $dif = $sum_cr - $sum_dr;
-                                                ?>
+                                                @if ($credit > 0.0)
+                                                    {{ number_format(abs($credit), 2) }}
+                                                @endif
+                                            </td>
+                            
+                                            <?php $sum_cr += $ledger->credit;
+                                            $sum_dr += $ledger->debit;
+                                            $dif = $sum_cr - $sum_dr;
+                                            ?>
+                                            <td style="text-align: right">
                                                 @if ($dif < 0)
-                                                   ({{ number_format(abs($dif), 2) }})
-                                                @else
+                                                    {{ number_format(abs($dif), 2) }}
+                                                @endif
+                                            </td>
+                                            <td style="text-align: right">
+                                                @if ($dif > 0)
                                                     {{ number_format($dif, 2) }}
                                                 @endif
                                             </td>
@@ -114,15 +124,15 @@
                                     <tr>
                             
                                         <th colspan="5" style="text-align: right">Total</th>
-                                        <th style="text-align: right;">&#8358;{{ number_format($credit_sum, 2) }}</th>
-                                        <th style="text-align: right;">&#8358;{{ number_format($debit_sum, 2) }}</th>
-                                        <th></th>
+                                        <th style="text-align: right;">{{ number_format(abs($debit_sum), 2) }}</th>
+                                        <th style="text-align: right;">{{ number_format(abs($credit_sum), 2) }}</th>
+                                        <th style="text-align: right;">{{ $dif < 0 ? number_format(abs($dif), 2) : '' }}</th>
+                                        <th style="text-align: right;">{{ $dif > 0 ? number_format(abs($dif), 2) : '' }}</th>
                                     </tr>
-                                    <tr>
+                                    {{-- <tr>
                                         <th colspan="4" style="text-align: right">Balance C/F</th>
-                                        <th colspan="3" style="text-align: right;">&#8358;{{ number_format($dif, 2) }}</th>
-                                        <th></th>
-                                    </tr>
+                                       
+                                    </tr> --}}
                                 </tfoot>
                             </table>
                         </div>

@@ -84,6 +84,18 @@ class InvoiceController extends Controller
         $utility = new Utility();
         return view('pages.order.print', compact('order_details', 'order', 'company', 'utility'));
     }
+    public function printWithVat($order_id)
+    {
+        $order = Order::with('customer')->where('id', $order_id)->first();
+        //return $order;
+        $order_details = OrderDetail::with('storeProduct')->where(['order_id' => $order_id, 'status' => 1])->get();
+        //return $order_details;
+        //$company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('created_at')->first();
+        $company = Setting::find(1);
+        $utility = new Utility();
+        $with_vat = true;
+        return view('pages.order.print', compact('order_details', 'order', 'company', 'utility','with_vat'));
+    }
     public function print_proformer($order_id)
     {
         $order = Proformer::with('customer')->where('id', $order_id)->first();
@@ -122,8 +134,10 @@ class InvoiceController extends Controller
     public function final_invoice(Request $request)
     {
         //dd(\Cart::getContent());
+
         $invoice_id = $request->invoice_id;
         $description = $request->description;
+        $show_vat = 0;
         $inputs = $request->except('_token');
         $rules = [];
         $rules = [
@@ -141,9 +155,10 @@ class InvoiceController extends Controller
         }
 
         $customer_id = $request->input('customer_id');
-
+        if ($request->has('show_vat'))
+            $show_vat = 1;
         $total_sales = \Cart::getTotal();
-        
+
         //Check to make sure that the amount has not exceeded the credit limit set for the customer.
         if (Transaction::check_transaction_limit($customer_id, \Cart::getContent()) == false) {
             session()->flash('app_error', 'The amount has exceeded the customer credit limit');
@@ -195,11 +210,13 @@ class InvoiceController extends Controller
                 $invoice->refund = $refund;
                 $invoice->customer_id = $customer_id;
                 $invoice->invoice_no = $reference;
+                $invoice->show_vat = $show_vat;
 
             } else {
                 $invoice->order_invoice_id = $request->order_invoice_id ?? 0;
                 $invoice->discount = $discount;
                 $invoice->refund = $refund;
+                $invoice->show_vat = $show_vat;
             }
             $invoice->pay = $amount_paid;
             $invoice->due = $total - $amount_paid;
@@ -210,6 +227,7 @@ class InvoiceController extends Controller
             $invoice->total = $total;
             $invoice->description = $description;
             $invoice->status = 0;
+            $invoice->show_vat = $show_vat;
             if ($invoice->save()) {
                 OrderDetail::where('order_id', $invoice->id)->delete();
                 $contents = \Cart::getContent();
@@ -442,8 +460,15 @@ class InvoiceController extends Controller
             $total_discount = 0;
             foreach ($contents as $content) {
                 $total_discount += $content->attributes['discount'] * $content->quantity;
-                $store = StoreProduct::find($content->id);
-                $qtyAval = $store->qty_available;
+                //$store = storeByCode($content->attributes['store']);
+                $store = StoreProduct::where('id')->first();
+                // $store_product_id = 0;
+                // if ($store_product == null) {
+                //     $store_product_id = StoreProduct::insertGetId(['store_id' => $store->id, 'product_id' => $content->id]);
+                // } else {
+                //     $store_product_id = $store_product->id;
+                // }
+                $qtyAval = $store->qty_available ?? 0;
                 //$store->qty_available = $qtyAval - $content->quantity;
                 $order_detail = new OrderDetail();
                 DB::table('order_invoice_details')->insert([
@@ -781,16 +806,16 @@ class InvoiceController extends Controller
     public function linkOrderInvoice(Request $request, OrderInvoice $order)
     {
         $user_branch = User::userBranchAction();
-        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'retail_selling_price', 'cost_price')->distinct()
+        $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.code AS store', 'qty_available', 'selling_price', 'retail_selling_price', 'cost_price', 'unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')
-            ->join('products', 'products.id', 'store_products.product_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
+            ->join('products', 'products.id', 'store_products.product_id')
             ->join('branch_product_prices', function ($join) {
                 $join->on('branch_product_prices.product_id', '=', 'products.id')
                     ->on('branch_product_prices.branch_id', '=', 'branches.id');
 
             })
-            //->where('stores.branch_id', 'LIKE', $user_branch)
+
             ->where('branch_product_prices.status', 1)
             ->orderBy('products.name')->orderBy('stores.name')->get();
         //TODO:: remove limit here
@@ -858,7 +883,7 @@ class InvoiceController extends Controller
         foreach ($order->order_items()->get() as $item) {
             $selling_price = $item->selling_price;
             $cost_price = $item->cost_price;
-            $qty_available = $item->qty_available;
+            $qty_available = $item->avail_qty_before_sale;
             $store = $item->storeProduct->store->name;
             $qty = $item->quantity;
             $store_products = StoreProduct::find($item->store_product_id);

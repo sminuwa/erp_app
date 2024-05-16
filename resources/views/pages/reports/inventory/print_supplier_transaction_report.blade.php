@@ -66,7 +66,7 @@
                                         <th>TOTAL COST</th>
                                         <th>STORE</th>
                                         <th>STORE</th>
-                                        <th>SUPP NAME</th>
+                                        <th>SUPPLIER</th>
                                     </tr>
                                 </thead>
                                 @php

@@ -59,6 +59,12 @@
                                             <i class="fa fa-print" aria-hidden="true"></i> Print
                                         </a>
                                     @endcan
+                                    @can('invoice.print-with-vat')
+                                        <a href="{{ route('invoice.print', $order->id) }}"
+                                           target="_BLANK" class="btn btn-dark btn-sm">
+                                            <i class="fa fa-print" aria-hidden="true"></i> Print (VAT)
+                                        </a>
+                                    @endcan
                                     @can('pos.order_print')
                                         <a href="{{ route('pos.order_print', $order->id) }}" target="_BLANK"
                                             class="btn btn-dark btn-sm ">
@@ -193,6 +199,12 @@
                                                     <th style="text-align: right;">
                                                         &#8358;{{ number_format($order->refund, 2, '.', ',') }}
                                                     </th>
+                                                </tr>
+                                            @endif
+                                            @if ($order->show_vat == 1)
+                                                <tr>
+                                                    <th colspan="7" style="text-align: right">VAT: </th>
+                                                    <th class="line price" style="text-align: right;">&#8358;0.00</th>
                                                 </tr>
                                             @endif
                                             @if ($order->discount != 0 || $order->refund != 0)

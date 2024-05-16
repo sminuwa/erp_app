@@ -34,10 +34,11 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:100px;height:60px;"
-                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo.png') }}"
+                                style="width:100px;height:60px;" alt="Albabello Logo" class="img-circle elevation-3"
+                                style="opacity: .8">
                             <h3>
-                                {{App\Models\User::UserBranchName()->long_name}}
+                                {{ App\Models\User::UserBranchName()->long_name }}
                             </h3>
                             <h5 style="text-align: center;">Customer Payment Report
                                 From
@@ -64,7 +65,7 @@
                                         <th>PAY MODE</th>
                                         <th>ACC. NAME</th>
                                         <th>DATE POSTED</th>
-                            
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -95,11 +96,13 @@
                                                     &#8358;{{ number_format($balance, 2) }}
                                                 @endif
                                             </td>
-                                            <td style="text-align: right">&#8358;{{ number_format($sale->dr, 2, '.', ',') }}</td>
+                                            <td style="text-align: right">
+                                                &#8358;{{ number_format($sale->dr, 2, '.', ',') }}</td>
                                             <td>{{ $sale->teller_no }}</td>
                                             <td>{{ $sale->payment_mode }}</td>
                                             <td>{{ $sale->account_name }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -113,7 +116,8 @@
                                                 &#8358;{{ number_format($balance, 2) }}
                                             @endif
                                         </th>
-                                        <th style="text-align: right">&#8358;{{ number_format($total_pay, 2, '.', ',') }}</th>
+                                        <th style="text-align: right">
+                                            &#8358;{{ number_format($total_pay, 2, '.', ',') }}</th>
                                         <th colspan="4"></th>
                                     </tr>
                                 </tfoot>

@@ -2,7 +2,8 @@
 <html lang="en">
 
 <head>
-    <link href="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" rel="shortcut icon">
+    <link href="{{ asset('assets/backend/img/logo.png') }}"
+        rel="shortcut icon">
     <script>
         window.print()
     </script>
@@ -148,9 +149,11 @@
 
 <body>
     <header>
-        <img id="logo" class="media" data-src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}"
-            src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="height:60px;width:60px;" />
-        {{App\Models\User::UserBranchName()->long_name}}<br />
+        <img id="logo" class="media"
+            data-src="{{ asset('assets/backend/img/logo.png') }}"
+            src="{{ asset('assets/backend/img/logo.png') }}"
+            style="height:60px;width:60px;" />
+        {{ App\Models\User::UserBranchName()->long_name }}<br />
         <small>{{ optional($order)->branch->address }}</small><br />
         <small>{{ optional($order)->branch->phone }}</small><br />
     </header>
@@ -193,7 +196,7 @@
                     <td style="text-align:center">{{ $order_detail->quantity }}</td>
                     <td>{{ $order_detail->storeProduct->product->unit }}</td>
                     <td>{{ $order_detail->storeProduct->store->code }}</td>
-                    
+
                     <td style="text-align:right">&#8358;{{ number_format($order_detail->sold_price, 2) }}
                     </td>
                     <td style="text-align:right">
@@ -218,6 +221,12 @@
                     <td class="line price">{{ number_format($order->refund, 2) }}</td>
                 </tr>
             @endif
+            @if ($order->show_vat == 1)
+                <tr>
+                    <td colspan="6" class="sum-up line">VAT: </td>
+                    <td class="line price">0.00</td>
+                </tr>
+            @endif
             <tr>
                 <td colspan="6" class="sum-up line">Total Amount</td>
                 <td class="line price">{{ number_format($total - $order->discount + $order->refund, 2) }}</td>
@@ -238,12 +247,17 @@
             Date/Printed By : <span>{{ \Carbon\Carbon::parse(\Carbon\Carbon::now())->toDayDateTimeString() }}
                 {{ Auth::user()->name }}</span>
         </p>
+
+        <p style="line-height: 14px">Goods Received in good condition cannot be returned
+            <br>Sales invalidated in goods not taken within two (2) days
+        </p>
+
         <p style="text-align:center">
             Thank you for your patronage!
         </p>
     </section>
     <footer style="text-align:center">
-        <p>{{App\Models\User::UserBranchName()->short_name}}</p>
+        <p>{{ App\Models\User::UserBranchName()->short_name }}</p>
         <span data-lucide="inbox">{{ optional($company)->email }}</span>
         <span data-lucide="phone">{{ optional($company)->phone }}</span>
         </ul>

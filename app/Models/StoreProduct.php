@@ -37,4 +37,11 @@ class StoreProduct extends Model
     {
         return $this->belongsTo(Store::class);
     }
+    
+    public static function scopeForProducts($query, int $store_id = null)
+    {
+        if (is_null($store_id))
+            return $query;
+        return $query->where('store_id', $store_id);
+    }
 }

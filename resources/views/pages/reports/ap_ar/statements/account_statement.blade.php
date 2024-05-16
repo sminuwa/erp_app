@@ -1,6 +1,6 @@
 @extends('layouts.backend.app')
 
-@section('title', 'Ledger')
+@section('title', 'Account Statement')
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
@@ -51,7 +51,7 @@
                                             </option>
                                             <option value="Supplier">
                                                 Supplier
-                                            <option value="GeneralAccount">General Accounts
+                                            <option value="GeneralAccount">General Ledger Accounts
                                             </option>
                                         </select>
                                         @if ($errors->has('type'))
@@ -148,7 +148,7 @@
                         type: $(this).val()
                     }
                 }).done(function(msg) {
-                    
+
                     $("#payer_id").html(msg);
 
                 });
@@ -193,11 +193,17 @@
                                 }
                             },
                             {
+                                extend: 'pdfHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },
+                            {
                                 extend: 'print',
                                 exportOptions: {
                                     columns: ':visible'
                                 },
-                                messageTop: 'Sales Report',
+                                messageTop: 'Account Statement',
                                 orientation: 'landscape',
                                 pageSize: 'LEGAL'
                             },

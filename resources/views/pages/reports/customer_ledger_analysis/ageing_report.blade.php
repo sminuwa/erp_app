@@ -36,7 +36,7 @@
         <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
-                <form method="POST" >
+                <form method="POST">
                     <div class="row">
                         {{-- <div class="form-group">
                             <label for="from_date">From Date</label>
@@ -44,18 +44,35 @@
                                 class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
                                 name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="">
                         </div> --}}
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             <label for="to_date">End Date</label>
                             <input type="text" autocomplete="off"
                                 class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
                                 name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
+                        </div> --}}
+                        <div class="form-group">
+                            &nbsp;&nbsp;
+                            <label for="to_date">Age Time</label>
+                            <select class="form-control select2-single {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
+                                name="to_date" id="to_date">
+                                <option value="0">Select...</option>
+                                <option value="1">0-7 days</option>
+                                <option value="2">8 - 14 days</option>
+                                <option value="3">15 - 30 days</option>
+                                <option value="4">31 - 60 days</option>
+                                <option value="5">61 - 90 days</option>
+                                <option value="6">91 - 120 days</option>
+                                <option value="7">121 - 180 days</option>
+                                <option value="8">Above 180 days</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="branch_id">Branch</label>
-                            <select class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
+                            <select
+                                class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
                                 name="branch_id" id="branch_id">
-                                
+
                             </select>
                         </div>
                         <div class="form-group">
@@ -73,10 +90,11 @@
                 </form>
                 <div class="row">
                     <div class="col-sm-12 table-responsive" id="load">
-                        <img src="{{ asset('assets/backend/img/loader.png') }}" style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                        <img src="{{ asset('assets/backend/img/loader.png') }}"
+                            style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
                     </div>
                 </div>
-                
+
             </div><!-- /.container-fluid -->
         </section>
         <!-- /.content -->
@@ -100,9 +118,9 @@
             };
 
             $('#generate').on("click", function() {
-                
-                from_date = $('#from_date').val();
-                to_date = 'all';//$('#to_date').val();
+
+                from_date = 'all'; //$('#from_date').val();
+                to_date = $('#to_date').val();
                 branch_id = $('#branch_id').val();
                 customer_id = $('#customer_id').val();
                 $('#img-loader').show();

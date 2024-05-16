@@ -57,7 +57,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 ">
-                        <form action="{{ isset($route) ? $route : route('payment.store') }}" method="POST">
+                        <form action="{{ isset($route) ? $route : route('payment.store') }}" method="POST" id="payment_form">
                             {{ csrf_field() }}
                             <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
                             <input type="hidden" name="payment_id" value="{{ isset($model) ? $model->id : '' }}" />
@@ -74,7 +74,7 @@
                                             <option value="Supplier"
                                                 {{ 'Supplier' == $model->model_name ? 'selected' : '' }}>Supplier
                                             <option value="GeneralAccount"
-                                                {{ 'GeneralAccount' == $model->model_name ? 'selected' : '' }}>General
+                                                {{ 'GeneralAccount' == $model->model_name ? 'selected' : '' }}>General Ledger
                                                 Accounts
                                             </option>
                                         </select>
@@ -188,7 +188,7 @@
                             <div class="">
                                 <div class="col-md-8">
                                     <div class="form-group text-right ">
-                                        <input type="submit" class="btn btn-primary" value="Save" />
+                                        <input type="submit" class="btn btn-primary" value="Save" id="btn_save" />
                                     </div>
                                 </div>
                             </div>
@@ -206,6 +206,10 @@
 
 @push('js')
     <script>
+         $('#btn_save').click(function() {
+            $('#payment_form').submi();
+            $(this).attr('disabled', 'disabled');
+        });
         function formatNumber(input) {
             // Remove non-numeric and non-decimal characters
             let value = input.value.replace(/[^\d.]/g, '');

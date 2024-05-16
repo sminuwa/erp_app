@@ -20,7 +20,7 @@ use App\Models\User;
 class PosController extends Controller
 {
     public function index(Request $request)
-    {
+    { 
         if (!(strpos(url()->previous(), 'pos') || strpos(url()->previous(), 'proformer') || strpos(url()->previous(), 'order_invoice'))) //Clear the cart after leaving the POS page
         {
             //            \Cart::clear();
@@ -60,7 +60,7 @@ class PosController extends Controller
         $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name');
         $cart_products = \Cart::getContent();
         $categories = Category::orderBy('name', 'ASC')->get();
-        $store = Store::where('id', 'LIKE', $user_branch)->get();
+        $store = Store::where('branch_id', 'LIKE', $user_branch)->get();
         $debtor = new CustomerController();
         $receipt_no = ""; //$debtor->generateReceiptNo();
         if (request()->routeIs('proforma.index')) {

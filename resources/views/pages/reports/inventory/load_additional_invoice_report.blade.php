@@ -21,7 +21,7 @@
             <th>NAME</th>
             <th>DESCRIPTION</th>
             <th>WAYBILL</th>
-            <th>SUPP NAME</th>
+            <th>SUPPLIER</th>
             <th>AMOUNT</th>
             <th>STATUS</th>
         </tr>

@@ -23,7 +23,7 @@
             <th>QTY</th>
             <th>TOTAL COST</th>
             <th>WAYBILL</th>
-            <th>SUPP NAME</th>
+            <th>SUPPLIER</th>
             <th>STATUS</th>
         </tr>
     </thead>

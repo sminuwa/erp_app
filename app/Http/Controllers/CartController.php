@@ -237,16 +237,16 @@ class CartController extends Controller
         if ($type == 'order' || $type == 'proforma' || $type == 'invoice') {
             $customer = Customer::find($request->customer);
             //return $request;
-
+            $cost_price = str_replace(',', '', $request->cost_price);
             if ($type == 'proforma' || $type == 'order') {
                 $product_id = $request->product_id;
                 $product = Product::find($product_id);
                 $name = $product->name ?? '';
                 $code = $product->code ?? '';
                 $qty_available = 0;
-                $id = $request->product_id;
+                $id = StoreProduct::where(['product_id' => $request->product_id, 'store_id' => storeByCode($request->store)->id])->first()->id ?? 0;
                 $unit = $product->unit;
-                $cost_price = str_replace(',', '', $request->cost_price);
+
 
             } else {
                 $name = $request->name;
@@ -259,7 +259,7 @@ class CartController extends Controller
 
             }
             $prices = BranchProductPrice::where(['product_id' => $product_id, 'branch_id' => auth()->user()->branch->id])->first();
-            $selling_price = 0;
+            $selling_price = $cost_price;// Price for Order and Profoma but change below if it is sales invoice
             if ($prices) {
                 if ($customer->type == 'Retail')
                     $selling_price = str_replace(',', '', $prices->retail_selling_price);
@@ -540,8 +540,8 @@ class CartController extends Controller
                     'price' => str_replace(',', '', $cost_price),
                     'attributes' => array(
                         'cost_price' => $request->unit_price,
-                        'product_id' =>$request->product_id,
-                        'store_id' =>$request->store_id,
+                        'product_id' => $request->product_id,
+                        'store_id' => $request->store_id,
                         'code' => $request->code,
                         'store' => $request->store
                     ),

@@ -133,9 +133,9 @@
                                                     </select>
 
                                                     <div class="form-group">
-                                                        <span class="text text-danger ion-android-alert"
+                                                        <span class="text  ion-android-alert"
                                                             id="credit_balance"></span>: <span
-                                                            class="text text-danger ion-android-alert"
+                                                            class="text ion-android-alert"
                                                             id="customer_balance"></span>
                                                     </div>
                                                 </div>
@@ -205,7 +205,7 @@
                                         <tr>
                                             <th>Store</th>
                                             <th>Code</th>
-                                            <th>Item</th>
+                                            <th>Name</th>
                                             <th>Unit</th>
                                             <th>QTY</th>
                                             {{-- <th>Price</th> --}}
@@ -249,7 +249,7 @@
                                                         value="{{ $store->cost_price }}">
 
                                                     <td>{{ ucwords($store->store) }}</td>
-                                                    <td>{{ $store->code }}</td>
+                                                    <td title="{{$store->information}}">{{ $store->code }}</td>
                                                     <td>{{ $store->name }}</td>
                                                     <td>{{ $store->unit }}</td>
                                                     <td align="center">{{ $store->qty_available }}</td>
@@ -642,8 +642,14 @@
                     customer_id: customer_id
                 }
             }).done(function(data) {
-                balance = formatMoney(data);
-                $("#customer_balance").html("<b>Balance: &#8358;</b>" + balance);
+                let $new_data = formatMoney(Math.abs(data));
+                if(data < 0){
+                    balance = `<span class="text-danger"><b>Balance: &#8358;</b>`+ $new_data +`</span>`;
+                }else
+                    balance = `<span class="text-success"><b>Balance: &#8358;</b>`+ $new_data +`</span>`;
+                // balance = formatMoney(Math.abs(data));
+
+                $("#customer_balance").html(balance);
             });
         });
 

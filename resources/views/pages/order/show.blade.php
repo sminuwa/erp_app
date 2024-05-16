@@ -59,6 +59,12 @@
                                             <i class="fa fa-print" aria-hidden="true"></i> Print
                                         </a>
                                     @endcan
+                                    @can('invoice.print-with-vat')
+                                        <a href="{{ route('invoice.print', $order->id) }}"
+                                           target="_BLANK" class="btn btn-dark btn-sm">
+                                            <i class="fa fa-print" aria-hidden="true"></i> Print (VAT)
+                                        </a>
+                                    @endcan
                                     @can('pos.order_print')
                                         <a href="{{ route('pos.order_print', $order->id) }}" target="_BLANK"
                                             class="btn btn-dark btn-sm ">

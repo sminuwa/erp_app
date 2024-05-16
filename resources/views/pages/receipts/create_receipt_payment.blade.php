@@ -70,9 +70,9 @@
                                             <option value="Customer"
                                                 {{ 'Customer' == $model->model_name ? 'selected' : '' }}>Customer</option>
                                             <option value="Supplier"
-                                                {{ 'Suppplier' == $model->model_name ? 'selected' : '' }}>Suppplier
+                                                {{ 'Supplier' == $model->model_name ? 'selected' : '' }}>Supplier
                                             <option value="GeneralAccount"
-                                                {{ 'GeneralAccount' == $model->model_name ? 'selected' : '' }}>General
+                                                {{ 'GeneralAccount' == $model->model_name ? 'selected' : '' }}>General Ledger
                                                 Accounts
                                             </option>
                                         </select>

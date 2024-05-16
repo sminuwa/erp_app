@@ -112,7 +112,12 @@
                                         <th style="width:50%">Subtotal:</th>
                                         <td class="text-right">&#8358; {{ Cart::getSubTotal() }}</td>
                                     </tr>
-                                    
+
+                                    {{--<tr>
+                                        <th style="width:50%">VAT:</th>
+                                        <td class="text-right">&#8358; {{ Cart::getSubTotal() }}</td>
+                                    </tr>--}}
+
                                     <tr>
                                         <th>Total:</th>
                                         <td class="text-right">&#8358; {{ Cart::getTotal() }}

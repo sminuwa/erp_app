@@ -74,7 +74,7 @@
                                             <option value="Supplier"
                                                 {{ 'Supplier' == $model->model_name ? 'selected' : '' }}>Supplier
                                             <option value="GeneralAccount"
-                                                {{ 'GeneralAccount' == $model->model_name ? 'selected' : '' }}>General
+                                                {{ 'GeneralAccount' == $model->model_name ? 'selected' : '' }}>General Ledger
                                                 Accounts
                                             </option>
                                         </select>

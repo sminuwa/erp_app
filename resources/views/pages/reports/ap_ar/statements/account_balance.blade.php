@@ -51,7 +51,7 @@
                                             </option>
                                             <option value="Supplier">
                                                 Supplier
-                                            <option value="GeneralAccount">General
+                                            <option value="GeneralAccount">General Ledger
                                                 Accounts
                                             </option>
                                         </select>
@@ -146,6 +146,12 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },
+                            {
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

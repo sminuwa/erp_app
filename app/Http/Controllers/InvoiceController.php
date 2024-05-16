@@ -84,6 +84,18 @@ class InvoiceController extends Controller
         $utility = new Utility();
         return view('pages.order.print', compact('order_details', 'order', 'company', 'utility'));
     }
+    public function printWithVat($order_id)
+    {
+        $order = Order::with('customer')->where('id', $order_id)->first();
+        //return $order;
+        $order_details = OrderDetail::with('storeProduct')->where(['order_id' => $order_id, 'status' => 1])->get();
+        //return $order_details;
+        //$company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('created_at')->first();
+        $company = Setting::find(1);
+        $utility = new Utility();
+        $with_vat = true;
+        return view('pages.order.print', compact('order_details', 'order', 'company', 'utility','with_vat'));
+    }
     public function print_proformer($order_id)
     {
         $order = Proformer::with('customer')->where('id', $order_id)->first();

@@ -176,7 +176,9 @@
 
                                 </tbody>
                             </table>
+                            <p style="line-height: 14px">This price is invalid after 24 hours.
 
+                            </p>
                             <table class="table table-condensed">
                                 <tr>
                                     <td colspan="3" style='border-style:none;'>

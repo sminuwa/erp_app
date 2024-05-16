@@ -53,7 +53,7 @@
                                             <i class="fa fa-print" aria-hidden="true"></i> Print
                                         </a>
                                     @endcan
-                                    
+
                                 @endif
                                 @if ($returndebit->status == 0)
                                     @can('return.debit.edit')
@@ -88,7 +88,7 @@
 
                             <!-- info row -->
                             <div class="row invoice-info">
-                                
+
                                 <!-- /.col -->
                                 <div class="col-sm-4 invoice-col">
                                     Purchase:
@@ -97,7 +97,7 @@
                                         {{ $returndebit->supplier->address }}<br>
                                         {{ $returndebit->supplier->city }}<br>
                                         Phone: {{ $returndebit->supplier->phone }}<br>
-                                        
+
                                     </address>
                                 </div>
                                 <!-- /.col -->
@@ -124,12 +124,12 @@
                                                 <th>Reference</th>
                                                 <th>Product</th>
                                                 <th>Original QTY</th>
-                                                <th>Changed QTY</th>
+                                                <th>Returned QTY</th>
                                                 <th>Original Unit Cost</th>
-                                                <th>Current Unit Cost</th>
+                                                <th>Returned Unit Cost</th>
                                                 <th>Total Original Cost</th>
-                                                <th>Total Current Cost</th>
-                                                <th>Margin</th>
+                                                <th>Total Returned Cost</th>
+                                                <th>Balance</th>
 
                                             </tr>
                                         </thead>

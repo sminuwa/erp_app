@@ -59,8 +59,8 @@
                                     <tr>
                                         <th>DATE</th>
                                         <th>DOCUMENT NO</th>
-                                        <th>ITEM</th>
-                                        <th>ITEM PRICE</th>
+                                        <th>PRODUCT</th>
+                                        <th>PRODUCT PRICE</th>
                                         <th>QTY</th>
                                         <th>TOTAL COST</th>
                                         <th>STORE</th>
@@ -80,7 +80,7 @@
                                         <td style="text-align: right">{{ number_format($sale->unit_price, 2) }}</td>
                                         <td>{{ $sale->quantity }}</td>
                                         <td style="text-align: right">
-                                            &#8358;{{ number_format($sale->unit_price * $sale->quantity, 2, '.', ',') }}
+                                            {{ number_format($sale->unit_price * $sale->quantity, 2, '.', ',') }}
                                         </td>
                                         <td>{{ $sale->store }}</td>
                                         <td>{{ $sale->atc_no }}</td>
@@ -95,7 +95,7 @@
                                     <tr>
                                         <th colspan="5" style="text-align: right">TOTAL</th>
                                         <th style="text-align: right">
-                                            &#8358;{{ number_format($total_cost, 2, '.', ',') }}
+                                            {{ number_format($total_cost, 2, '.', ',') }}
                                         </th>
                                         <th></th>
                                         <th></th>

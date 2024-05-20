@@ -38,7 +38,7 @@
                                 style="width:100px;height:60px;" alt="Albabello Logo" class="img-circle elevation-3"
                                 style="opacity: .8">
                             <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>
-                            <h5 style="text-align: center;">TOTAL ITEMS SOLD TO CUSTOMERS
+                            <h5 style="text-align: center;">TOTAL PRODUCTS SOLD TO CUSTOMERS
                                 FROM
                                 {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                                 AND

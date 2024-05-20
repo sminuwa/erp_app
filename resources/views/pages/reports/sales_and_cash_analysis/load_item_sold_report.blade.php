@@ -7,7 +7,7 @@
 <table class="table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
         <h3 style="text-align: center;">{{$branch->name ?? 'All Branches'}}</h3>
-        <h5 style="text-align: center;">TOTAL ITEMS SOLD TO CUSTOMERS
+        <h5 style="text-align: center;">TOTAL PRODUCTS SOLD TO CUSTOMERS
             FROM
             {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
             AND
@@ -27,7 +27,7 @@
         </tr>
     </thead>
     @php
-        
+
         $total_qty = 0;
     @endphp
     @foreach ($sales as $sale)

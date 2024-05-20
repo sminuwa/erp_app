@@ -58,9 +58,9 @@
                                         <th>CATEGORY</th>
                                         <th>QTY AVAILBLE</th>
                                         <th>QTY SOLD</th>
-                                        <th>AMOUNT(&#8358;)</th>
-                                        <th>COST(&#8358;)</th>
-                                        <th>MARGIN(&#8358;)</th>
+                                        <th>AMOUNT()</th>
+                                        <th>COST()</th>
+                                        <th>MARGIN()</th>
                                         <th>MARGIN (%)</th>
                                     </tr>
                                 </thead>
@@ -98,14 +98,14 @@
                                     <tr>
                                         <th colspan="4" style="text-align: right">TOTAL</th>
                                         <th style="text-align: right">
-                                            &#8358;{{ number_format($total_amount, 2, '.', ',') }}</th>
+                                            {{ number_format($total_amount, 2, '.', ',') }}</th>
                                         <th style="text-align: right">
-                                            &#8358;{{ number_format($total_cost, 2, '.', ',') }}</th>
+                                            {{ number_format($total_cost, 2, '.', ',') }}</th>
                                         <th style="text-align: right">
                                             @if ($grand_total_profit < 0)
-                                                &#8358;({{ number_format(abs($grand_total_profit), 2, '.', ',') }})
+                                                ({{ number_format(abs($grand_total_profit), 2, '.', ',') }})
                                             @else
-                                                &#8358;{{ number_format($grand_total_profit, 2) }}
+                                                {{ number_format($grand_total_profit, 2) }}
                                             @endif
                                         </th>
                                         <th style="text-align:right">

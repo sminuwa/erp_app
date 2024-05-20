@@ -35,31 +35,31 @@
             <td>{{ \Carbon\Carbon::parse($sale->order_date)->toFormattedDateString() }}</td>
             <td>{{ $sale->invoice_no }}</td>
             <td>{{ $sale->customer }}</td>
-            <td style="text-align: right">&#8358;{{ number_format($sale->total, 2, '.', ',') }}</td>
-            <td style="text-align: right">&#8358;{{ number_format($sale->pay, 2, '.', ',') }}</td>
-            <td style="text-align: right">&#8358;{{ number_format($sale->discount, 2, '.', ',') }}</td>
-            <td style="text-align: right">&#8358;{{ number_format($sale->due, 2, '.', ',') }}</td>
+            <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>
+            <td style="text-align: right">{{ number_format($sale->pay, 2, '.', ',') }}</td>
+            <td style="text-align: right">{{ number_format($sale->discount, 2, '.', ',') }}</td>
+            <td style="text-align: right">{{ number_format($sale->due, 2, '.', ',') }}</td>
         </tr>
         @php
             $total_sold += $sale->total;
             $total_pay += $sale->pay;
             $total_discount += $sale->discount;
             $total_due += $sale->due;
-           
+
         @endphp
     @endforeach
     <tfoot>
         <tr>
             <th colspan="3" style="text-align: right">TOTAL</th>
             <th style="text-align: right">
-                &#8358;{{ number_format($total_sold, 2, '.', ',') }}</th>
+                {{ number_format($total_sold, 2, '.', ',') }}</th>
             <th style="text-align: right">
-                &#8358;{{ number_format($total_pay, 2, '.', ',') }}</th>
+                {{ number_format($total_pay, 2, '.', ',') }}</th>
             <th style="text-align: right">
-                &#8358;{{ number_format($total_discount, 2, '.', ',') }}
+                {{ number_format($total_discount, 2, '.', ',') }}
             </th>
             <th style="text-align: right">
-                &#8358;{{ number_format($total_due, 2, '.', ',') }}
+                {{ number_format($total_due, 2, '.', ',') }}
             </th>
         </tr>
     </tfoot>

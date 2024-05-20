@@ -124,7 +124,7 @@
                     alert("Please select a product")
                     return false;
                 }
-                
+
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
@@ -153,6 +153,11 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },{
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

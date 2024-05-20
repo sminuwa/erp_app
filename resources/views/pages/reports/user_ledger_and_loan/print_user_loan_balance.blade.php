@@ -60,7 +60,7 @@
                                     @foreach ($records as $record)
                                         <tr>
                                             <td> {{ $record->name }} </td>
-                                            <td style="text-align: right;"> &#8358;{{ number_format($record->balance, 2, '.', ',') }} </td>
+                                            <td style="text-align: right;"> {{ number_format($record->balance, 2, '.', ',') }} </td>
                                         </tr>
                                         @php
                                             $total_balance +=$record->balance;
@@ -70,7 +70,7 @@
                                 <tfoot>
                                     <tr>
                                         <td style="text-align: right;">Total</td>
-                                        <td style="text-align: right;">&#8358;{{ number_format($total_balance, 2, '.', ',') }}</td>
+                                        <td style="text-align: right;">{{ number_format($total_balance, 2, '.', ',') }}</td>
                                     </tr>
                                 </tfoot>
                             </table>

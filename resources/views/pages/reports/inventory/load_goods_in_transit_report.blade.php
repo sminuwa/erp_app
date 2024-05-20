@@ -56,7 +56,7 @@
         <tr>
             <th colspan="8" style="text-align: right">TOTAL</th>
             <th style="text-align: right">
-                &#8358;{{ number_format($total_cost, 2, '.', ',') }}
+                {{ number_format($total_cost, 2, '.', ',') }}
             </th>
             <th></th>
             <th></th>

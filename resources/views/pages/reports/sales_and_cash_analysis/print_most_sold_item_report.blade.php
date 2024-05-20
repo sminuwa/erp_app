@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Most Sold Items Report - {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Most Sold Products Report - {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -38,7 +38,7 @@
                                 style="width:100px;height:60px;" alt="Albabello Logo" class="img-circle elevation-3"
                                 style="opacity: .8">
                             <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>
-                            <h5 style="text-align: center;">{{ $number_limit }} Most Sold Items Report by
+                            <h5 style="text-align: center;">{{ $number_limit }} Most Sold Product Report by
                                 {{ $type == 'qty' ? 'Amount' : 'Quantity' }}
                                 Between
                                 {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
@@ -59,10 +59,10 @@
                                         <th>CODE</th>
                                         <th>ITEM</th>
                                         <th>QUANTITY</th>
-                                        <th>TOTAL COST (&#8358;)</th>
-                                        <th>TOTAL SELLING PRICE (&#8358;)</th>
-                                        <th>MARGIN (&#8358;)</th>
-                                    
+                                        <th>TOTAL COST ()</th>
+                                        <th>TOTAL SELLING PRICE ()</th>
+                                        <th>MARGIN ()</th>
+
                                     </tr>
                                 </thead>
                                 @php
@@ -83,19 +83,19 @@
                                         $total_quantity += $sale->quantity;
                                         $total_amount += $sale->total;
                                         $total_cost += $sale->total_cost;
-                            
+
                                     @endphp
                                 @endforeach
                                 <tfoot>
                                     <tr>
                                         <th style="text-align: right"  colspan="3">TOTAL</th>
                                         <th style="text-align: right">
-                                            &#8358;{{ number_format($total_cost, 0, '.', ',') }}</th>
+                                            {{ number_format($total_cost, 0, '.', ',') }}</th>
                                         <th style="text-align: right">
-                                            &#8358;{{ number_format($total_amount, 2, '.', ',') }}
+                                            {{ number_format($total_amount, 2, '.', ',') }}
                                         </th>
                                         <th style="text-align: right">
-                                            &#8358;{{ number_format($total_amount-$total_cost, 2, '.', ',') }}
+                                            {{ number_format($total_amount-$total_cost, 2, '.', ',') }}
                                         </th>
                                     </tr>
                                 </tfoot>

@@ -45,7 +45,7 @@
                                 <label for="branch_id">Branch</label>
                                 <select class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
                                     name="branch_id" id="branch_id" required>
-                                   
+
                                 </select>
                             </div>
                             <div class="form-group">
@@ -53,7 +53,7 @@
                                 <label for="store_id">Store</label>
                                 <select class="form-control select2-single ajax-stores {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
                                     name="store_id" id="store_id">
-                                   
+
                                 </select>
                             </div>
                             <div class="form-group">
@@ -61,7 +61,7 @@
                                 <label for="category_id">Category</label>
                                 <select class="form-control select2-single ajax-categories {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
                                     name="category_id" id="category_id">
-                                   
+
                                 </select>
                             </div>
                             <div class="form-group">
@@ -70,7 +70,7 @@
                                 <select
                                     class="form-control select2-single ajax-products {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
                                     name="product_id" id="product_id">
-                                    
+
                                 </select>
                             </div>
                             <div class="form-group text-right ">
@@ -95,7 +95,7 @@
 @endsection
 
 @push('js')
-   
+
     <script type="text/javascript">
         $(function() {
             function formatMoney(n, c, d, t) {
@@ -116,7 +116,7 @@
                 store_id = $('#store_id').val();
                 category_id = $('#category_id').val();
                 branch_id = $('#branch_id').val();
-                
+
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.store.ledger.reports') }}",
@@ -141,6 +141,11 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },{
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

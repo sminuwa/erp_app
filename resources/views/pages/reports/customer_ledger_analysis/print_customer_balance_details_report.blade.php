@@ -85,14 +85,14 @@
                                         </td>
                                         <td>{{ $sale->description }}</td>
                                         <td style="text-align: right">
-                                            &#8358;{{ number_format($sale->cr, 2, '.', ',') }}</td>
+                                            {{ number_format($sale->cr, 2, '.', ',') }}</td>
                                         <td style="text-align: right">
-                                            &#8358;{{ number_format($sale->dr, 2, '.', ',') }}</td>
+                                            {{ number_format($sale->dr, 2, '.', ',') }}</td>
                                         <td style="text-align: right">
                                             @if ($running_balance < 0)
-                                                &#8358;({{ number_format(abs($running_balance), 2) }})
+                                                ({{ number_format(abs($running_balance), 2) }})
                                             @else
-                                                &#8358;{{ number_format($running_balance, 2) }}
+                                                {{ number_format($running_balance, 2) }}
                                             @endif
                                         </td>
 
@@ -102,14 +102,14 @@
                                     <tr>
                                         <th style="text-align: right" colspan="3">TOTAL</th>
                                         <th style="text-align: right">
-                                            &#8358;{{ number_format($total_credit, 2, '.', ',') }}</th>
+                                            {{ number_format($total_credit, 2, '.', ',') }}</th>
                                         <th style="text-align: right">
-                                            &#8358;{{ number_format($total_debit, 2, '.', ',') }}</th>
+                                            {{ number_format($total_debit, 2, '.', ',') }}</th>
                                         <th style="text-align: right">
                                             @if ($running_balance < 0)
-                                                &#8358;({{ number_format(abs($running_balance), 2) }})
+                                                ({{ number_format(abs($running_balance), 2) }})
                                             @else
-                                                &#8358;{{ number_format($running_balance, 2) }}
+                                                {{ number_format($running_balance, 2) }}
                                             @endif
                                         </th>
                                     </tr>

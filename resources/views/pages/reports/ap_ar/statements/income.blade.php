@@ -68,7 +68,7 @@
 
                         </div>
                         <div class="form-group">
-                            <label for="from_month">From Month</label>
+                            <label for="from_month">From Period</label>
                             <select class="form-control select2-single" name="from_month" id="from_month">
                                 <option value="">Select...</option>
                                 <option value="1">January</option>
@@ -86,7 +86,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="to_month">To Month</label>
+                            <label for="to_month">To Period</label>
                             <select class="form-control select2-single" name="to_month" id="to_month">
                                 <option value="">Select...</option>
                                 <option value="1">January</option>
@@ -175,6 +175,11 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },{
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

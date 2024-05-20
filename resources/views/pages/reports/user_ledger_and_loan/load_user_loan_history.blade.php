@@ -30,8 +30,8 @@
         @foreach ($records as $record)
             <tr>
                 <td> {{ \Carbon\Carbon::parse($record->date)->toformattedDateString() }} </td>
-                <td style="text-align: right;"> &#8358;{{ number_format($record->amount_collected, 2, '.', ',') }} </td>
-                <td style="text-align: right;"> &#8358;{{ number_format($record->amount_paid, 2, '.', ',') }} </td>
+                <td style="text-align: right;"> {{ number_format($record->amount_collected, 2, '.', ',') }} </td>
+                <td style="text-align: right;"> {{ number_format($record->amount_paid, 2, '.', ',') }} </td>
                 <td> {{ $record->c_receipt_no }} </td>
                 <td> {{ $record->p_receipt_no }} </td>
                 <td> {{ \Carbon\Carbon::parse($record->due_date)->toformattedDateString() }} </td>
@@ -48,7 +48,7 @@
     <tfoot>
         <tr>
             <td style="text-align: right;">Total</td>
-            <td style="text-align: right;" colspan="6">&#8358;{{ number_format($total_balance, 2, '.', ',') }}</td>
+            <td style="text-align: right;" colspan="6">{{ number_format($total_balance, 2, '.', ',') }}</td>
         </tr>
     </tfoot>
 </table>

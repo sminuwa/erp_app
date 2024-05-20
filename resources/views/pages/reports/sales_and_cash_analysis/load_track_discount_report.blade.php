@@ -12,7 +12,7 @@
             AND
             {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
         </h5>
-        <h5>Discount Range: &#8358;{{ $lower }} - &#8358;{{ $upper }}</h5>
+        <h5>Discount Range: {{ $lower }} - {{ $upper }}</h5>
     </caption>
     <thead>
         <tr>
@@ -39,10 +39,10 @@
             <td>{{ $sale->invoice_no }}</td>
             <td>{{ $sale->item }}</td>
             <td>{{ $sale->quantity }}</td>
-            <td style="text-align: right">&#8358;{{ number_format($sale->selling_price, 2, '.', ',') }}</td>
-            <td style="text-align: right">&#8358;{{ number_format($sale->sold_price, 2, '.', ',') }}</td>
+            <td style="text-align: right">{{ number_format($sale->selling_price, 2, '.', ',') }}</td>
+            <td style="text-align: right">{{ number_format($sale->sold_price, 2, '.', ',') }}</td>
             <td style="text-align: right">
-                &#8358;{{ number_format($sale->sold_price - $sale->sold_price, 2, '.', ',') }}</td>
+                {{ number_format($sale->sold_price - $sale->sold_price, 2, '.', ',') }}</td>
             <td>{{ $sale->store }}</td>
             <td>{{ $sale->group }}</td>
             <td>{{ $sale->user }}</td>
@@ -51,7 +51,7 @@
             $total_selling += $sale->selling_price;
             $total_sold += $sale->sold_price;
             $total_discount += $sale->sold_price - $sale->sold_price;
-            
+
         @endphp
     @endforeach
     <tfoot>
@@ -60,10 +60,10 @@
             <th style="text-align: right">
                 {{ number_format($total_selling, 0, '.', ',') }}</th>
             <th style="text-align: right">
-                &#8358;{{ number_format($total_sold, 2, '.', ',') }}
+                {{ number_format($total_sold, 2, '.', ',') }}
             </th>
             <th style="text-align: right">
-                &#8358;{{ number_format($total_discount, 2, '.', ',') }}
+                {{ number_format($total_discount, 2, '.', ',') }}
             </th>
             <th colspan="3"></th>
         </tr>

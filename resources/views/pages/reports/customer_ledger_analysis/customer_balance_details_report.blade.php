@@ -73,7 +73,7 @@
                         <img src="{{ asset('assets/backend/img/loader.png') }}" style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
                     </div>
                 </div>
-                
+
             </div><!-- /.container-fluid -->
         </section>
         <!-- /.content -->
@@ -126,6 +126,11 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },{
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

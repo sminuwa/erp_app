@@ -81,11 +81,11 @@
                                         <td>{{ $sale->unit_price }}</td>
                                         <td>{{ $sale->quantity }}</td>
                                         <td style="text-align: right">
-                                            &#8358;{{ number_format($sale->unit_price * $sale->quantity, 2, '.', ',') }}</td>
+                                            {{ number_format($sale->unit_price * $sale->quantity, 2, '.', ',') }}</td>
                                         <td>{{ $sale->purchase_mode }}</td>
                                         <td>{{ $sale->store }}</td>
                                         <td>{{ $sale->supplier }}</td>
-                            
+
                                     </tr>
                                     @php
                                         $total_cost += $sale->unit_price * $sale->quantity;
@@ -95,7 +95,7 @@
                                     <tr>
                                         <th colspan="6" style="text-align: right">TOTAL</th>
                                         <th style="text-align: right">
-                                            &#8358;{{ number_format($total_cost, 2, '.', ',') }}
+                                            {{ number_format($total_cost, 2, '.', ',') }}
                                         </th>
                                         <th></th>
                                         <th></th>

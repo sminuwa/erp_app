@@ -92,7 +92,7 @@
                                 <tfoot>
                                     <tr>
                                         <th style="text-align: right" colspan="6">Total</th>
-                                        <th style="text-align: right">&#8358;{{ number_format($total, 2, '.', ',') }}
+                                        <th style="text-align: right">{{ number_format($total, 2, '.', ',') }}
                                         </th>
                                         <th></th>
                                     </tr>

@@ -251,7 +251,7 @@ function customerLastTransaction($customer_id)
 function transactionDecription($reference)
 {//This function is meant fo particularly the description of the transaction captured
     if (substr($reference, 0, 3) == "PAY")
-        return DB::table('payments')->where('reference', $reference)->first()->description ?? '';
+        return DB::table('payments')->where('receipt_no', $reference)->first()->description ?? '';
     if (substr($reference, 0, 3) == "RCT")
         return DB::table('receipts')->where('receipt_no', $reference)->first()->description ?? '';
     if (substr($reference, 0, 3) == "STK")

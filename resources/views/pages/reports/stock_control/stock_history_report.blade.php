@@ -63,8 +63,8 @@
                                         <option value="2">Intersite</option>
                                         <option value="3">Interstore</option>
                                         <option value="4">Stock Adjustment</option>
-                                        
-                                        <option value="6">Credit Note</option>    
+
+                                        <option value="6">Credit Note</option>
                                         <option value="7">Return & Debit</option>
                                     </select>
 
@@ -173,6 +173,11 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            }, {
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

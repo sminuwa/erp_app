@@ -57,12 +57,12 @@
                                 <thead>
                                     <tr>
                                         <th colspan="6" style="text-align: right">TOTAL RECEIPTS: </th>
-                                        <th style="text-align: right">&#8358;{{ number_format($total_cash, 2, '.', ',') }}</th>
+                                        <th style="text-align: right">{{ number_format($total_cash, 2, '.', ',') }}</th>
                                         <th></th>
                                         <th></th>
                                         <th></th>
                                     </tr>
-                            
+
                                     <tr>
                                         <th>DATE</th>
                                         <th>NAME</th>
@@ -77,7 +77,7 @@
                                     </tr>
                                 </thead>
                                 @php
-                            
+
                                     $total_sold_price = 0;
                                     $total_sold = 0;
                                 @endphp
@@ -91,9 +91,9 @@
                                         <td>{{ $sale->product }}</td>
                                         <td>{{ $sale->store }}</td>
                                         <td>{{ $sale->quantity }}</td>
-                                        <td style="text-align: right">&#8358;{{ number_format($sale->sold_price, 2, '.', ',') }}</td>
+                                        <td style="text-align: right">{{ number_format($sale->sold_price, 2, '.', ',') }}</td>
                                         <td style="text-align: right">
-                                            &#8358;{{ number_format($sale->sold_price * $sale->quantity, 2, '.', ',') }}</td>
+                                            {{ number_format($sale->sold_price * $sale->quantity, 2, '.', ',') }}</td>
                                     </tr>
                                     @php
                                         $total_sold_price += $sale->sold_price;
@@ -104,9 +104,9 @@
                                     <tr>
                                         <th colspan="8" style="text-align: right">TOTAL</th>
                                         <th style="text-align: right">
-                                            &#8358;{{ number_format($total_sold_price, 2, '.', ',') }}</th>
+                                            {{ number_format($total_sold_price, 2, '.', ',') }}</th>
                                         <th style="text-align: right">
-                                            &#8358;{{ number_format($total_sold, 2, '.', ',') }}
+                                            {{ number_format($total_sold, 2, '.', ',') }}
                                         </th>
                                     </tr>
                                 </tfoot>

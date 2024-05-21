@@ -21,12 +21,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Most Sold Items Report</h4>
+                        <h4>Most Sold Products Report</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Most Sold Item Report</li>
+                            <li class="breadcrumb-item active">Most Sold Product Report</li>
                         </ol>
                     </div>
                 </div>
@@ -65,7 +65,7 @@
                             <input type="number" step=".01" name="number_limit" id="number_limit" class="form-control"
                                 placeholder="Enter the number record to display" min="1" />
                         </div>
-                        
+
                         <div class="form-group">
                             By  &nbsp;&nbsp; &nbsp;
                             <input type="radio" name="type" value="qty" class="form-control" />
@@ -142,6 +142,11 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },{
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

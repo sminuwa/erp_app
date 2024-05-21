@@ -12,12 +12,14 @@
     <thead>
         <tr>
             <th>DATE</th>
-            <th>ITEM CODE</th>
-            <th>ITEM NAME</th>
+            <th>PRODUCT CODE</th>
+            <th>PRODUCT NAME</th>
             <th>QUANTITY</th>
             <th>TYPE</th>
             <th>STORE</th>
             <th>ADJUSTMENT NO</th>
+            <th>CREATED By</th>
+            <th>POSTED By</th>
 
         </tr>
     </thead>
@@ -30,6 +32,8 @@
             <td> {{ $store->operation }} </td>
             <td>{{ $store->store }} </td>
             <td> {{ $store->reference }} </td>
+            <td> {{ $store->created_by ?? null }} </td>
+            <td> {{ $store->posted_by ?? null }} </td>
         </tr>
     @endforeach
 </table>

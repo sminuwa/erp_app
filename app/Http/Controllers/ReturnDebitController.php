@@ -38,7 +38,7 @@ class ReturnDebitController extends Controller
         $purchases = Purchase::where('status', 1)
             ->where('branch_id', 'LIKE', $user_branch)
             ->whereNotIn('id', $purchase_ids)
-            ->orderBy('purchase_date', 'DESC')->take(50)->get();
+            ->orderBy('purchase_date', 'DESC')->get();
 
         $stores = StoreProduct::select('store_products.id', 'products.name', 'products.code', 'stores.name AS store', 'qty_available', 'selling_price', 'retail_selling_price', 'whole_selling_price', 'cost_price', 'unit')->distinct()
             ->join('stores', 'stores.id', 'store_products.store_id')

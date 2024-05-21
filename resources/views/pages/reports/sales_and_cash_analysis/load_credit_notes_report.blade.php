@@ -22,6 +22,8 @@
             <th>CUST ACCOUNT</th>
             <th>CUST NAME</th>
             <th>AMOUNT</th>
+            <th>CREATED BY</th>
+            <th>POSTED BY</th>
             <th>STATUS</th>
         </tr>
     </thead>
@@ -33,7 +35,9 @@
             <td>{{ $sale->reference }}</td>
             <td>{{ $sale->customer->code }}</td>
             <td>{{ $sale->customer->name }}</td>
-            <td style="text-align: right">&#8358;{{ number_format($sale->amount, 2, '.', ',') }}</td>
+            <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}</td>
+            <td>{{ $sale->createdBy->name ?? null }}</td>
+            <td>{{ $sale->postedBy->name ?? null }}</td>
             <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
         </tr>
     @endforeach

@@ -88,7 +88,7 @@
                                         @endif
                                     </div>
                                 </div>
-                               
+
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="from_date">From Date</label>
@@ -127,7 +127,7 @@
 @push('js')
     <script type="text/javascript">
         $(function() {
-           
+
             $('#statusForm').on('submit', function(e) {
                 e.preventDefault()
                 from_date = $('#from_date').val();
@@ -162,6 +162,11 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },{
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

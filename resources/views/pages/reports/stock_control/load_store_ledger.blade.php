@@ -12,12 +12,12 @@
     <thead>
         <tr>
             <th>CODE</th>
-            <th>ITEM NAME</th>
+            <th>PRODUCT NAME</th>
             <th>CATEGORY NAME</th>
             <th>STORE</th>
             <th>QUANTITY</th>
-            <th>COST PRICE(&#8358;)</th>
-            <th>TOTAL PRICE(&#8358;)</th>
+            <th>COST PRICE()</th>
+            <th>TOTAL PRICE()</th>
 
         </tr>
     </thead>

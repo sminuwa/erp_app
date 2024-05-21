@@ -52,14 +52,14 @@
                                     class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
                                     name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
                             </div>
-                            
+
 
                             <div class="form-group">
                                 &nbsp;&nbsp;
                                 <label for="source_branch_id">From Branch</label>
                                 <select class="form-control select2-single ajax-branches {{ $errors->has('source_branch_id') ? ' is-invalid' : '' }}"
                                     name="source_branch_id" id="source_branch_id">
-                                    
+
                                 </select>
                             </div>
                             <div class="form-group">
@@ -67,7 +67,7 @@
                                 <label for="destination_branch_id">To Branch</label>
                                 <select class="form-control select2-single ajax-branches {{ $errors->has('destination_branch_id') ? ' is-invalid' : '' }}"
                                     name="destination_branch_id" id="destination_branch_id">
-                                   
+
                                 </select>
                             </div>
                             <div class="form-group">
@@ -182,6 +182,11 @@
                                 exportOptions: {
                                     columns: ':visible'
                                 }
+                            },{
+                                extend: 'pdfHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
                             },
                             {
                                 extend: 'print',
@@ -205,8 +210,8 @@
                                 colvis: 'Show/Hide columns'
                             }
                         },
-                        
-                
+
+
                     });
                 });
             });

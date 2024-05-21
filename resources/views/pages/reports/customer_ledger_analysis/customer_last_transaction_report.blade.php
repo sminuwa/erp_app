@@ -43,7 +43,7 @@
                             <label for="branch_id">Branch</label>
                             <select class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
                                 name="branch_id" id="branch_id">
-                                
+
                             </select>
                         </div>
                         <div class="form-group">
@@ -64,7 +64,7 @@
                         <img src="{{ asset('assets/backend/img/loader.png') }}" style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
                     </div>
                 </div>
-                
+
             </div><!-- /.container-fluid -->
         </section>
         <!-- /.content -->
@@ -92,7 +92,7 @@
             $('#generate').on("click", function() {
                 branch_id = $('#branch_id').val();
                 customer_id = $('#customer_id').val();
-                
+
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
@@ -116,6 +116,11 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },{
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

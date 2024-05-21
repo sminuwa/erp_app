@@ -58,7 +58,7 @@
                                     <tr>
                                         <th>DATE</th>
                                         <th>INVOICE</th>
-                                        <th>ITEM</th>
+                                        <th>PRODUCT</th>
                                         <th>QTY B. PURCH</th>
                                         <th>QTY PURCH</th>
                                         <th>QTY A. PURCH</th>
@@ -89,7 +89,7 @@
                                         <td style="text-align: center">{{ number_format($qty_before + $sale->quantity, 0, '.', ',') }}</td>
                                         <td>{{ $sale->store }}</td>
                                         <td>{{ $sale->supplier }}</td>
-                            
+
                                     </tr>
                                     @php
                                         $total_qty += $sale->quantity;

@@ -59,7 +59,7 @@
 
                             </select>
                         </div>
-                        
+
                         <div class="form-group text-right">
                             <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />
                         </div>
@@ -126,6 +126,11 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },{
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

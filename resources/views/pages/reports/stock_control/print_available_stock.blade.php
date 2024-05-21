@@ -72,15 +72,15 @@
                                         @php
                                             $total_selling_price += $store->retail_selling_price;
                                             $total_cost_price += $store->cost_price;
-                                        
+
                                         @endphp
-                                        <td style="text-align: right;"> &#8358;{{ number_format($store->cost_price,2,'.',',') }}
+                                        <td style="text-align: right;"> {{ number_format($store->cost_price,2,'.',',') }}
                                         </td>
-                                        <td style="text-align: right;"> &#8358;{{ number_format($store->retail_selling_price,2,'.',',') }}
+                                        <td style="text-align: right;"> {{ number_format($store->retail_selling_price,2,'.',',') }}
                                         </td>
-                                        <td style="text-align: right;"> &#8358;{{ number_format($store->whole_selling_price,2,'.',',') }}
+                                        <td style="text-align: right;"> {{ number_format($store->whole_selling_price,2,'.',',') }}
                                         </td>
-                                        
+
                                         <td>{{ $store->store }} </td>
                                     </tr>
                                 @endforeach
@@ -89,9 +89,9 @@
                                     <tr>
                                         <th></th>
                                         <th></th>
-                                        <th style="text-align: right;">&#8358;{{number_format($total_cost_price,2,'.',',')}}</th>
-                                        <th style="text-align: right;">&#8358;{{number_format($total_selling_price,2,'.',',')}}</th>
-                                        
+                                        <th style="text-align: right;">{{number_format($total_cost_price,2,'.',',')}}</th>
+                                        <th style="text-align: right;">{{number_format($total_selling_price,2,'.',',')}}</th>
+
                                         <th></th>
                                     </tr>
                                 </tfoot> --}}

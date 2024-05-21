@@ -56,7 +56,7 @@
                                 <label for="branch_id">Branch</label>
                                 <select class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
                                     name="branch_id" id="branch_id">
-                                    
+
                                 </select>
                             </div>
                             <div class="form-group">
@@ -64,7 +64,7 @@
                                 <label for="store_id">Store</label>
                                 <select class="form-control select2-single ajax-stores {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
                                     name="store_id" id="store_id">
-                                    
+
                                 </select>
                             </div>
                             <div class="form-group">
@@ -72,7 +72,7 @@
                                 <label for="category_id">Category</label>
                                 <select class="form-control select2-single ajax-categories {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
                                     name="category_id" id="category_id">
-                                    
+
                                 </select>
                             </div>
                             <div class="form-group">
@@ -81,7 +81,7 @@
                                 <select
                                     class="form-control select2-single  ajax-products{{ $errors->has('product_id') ? ' is-invalid' : '' }}"
                                     name="product_id" id="product_id">
-                                    
+
                                 </select>
                             </div>
                             <div class="form-group text-right ">
@@ -119,7 +119,7 @@
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
 
-           
+
             $('#generate').on("click", function() {
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
@@ -153,6 +153,11 @@
                             },
                             {
                                 extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },{
+                                extend: 'pdfHtml5',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

@@ -23,11 +23,11 @@
             <th>REFERENCE</th>
             <th>ACCOUNT</th>
             <th>QTY</th>
-            <th>COST PRICE(&#8358;)</th>
-            <th>SOLD PRICE(&#8358;)</th>
-            <th>TOTAL COST(&#8358;)</th>
-            <th>TOTAL SALES(&#8358;)</th>
-            <th>MARGIN(&#8358;)</th>
+            <th>COST PRICE()</th>
+            <th>SOLD PRICE()</th>
+            <th>TOTAL COST()</th>
+            <th>TOTAL SALES()</th>
+            <th>MARGIN()</th>
             <th>MARGIN %</th>
         </tr>
     </thead>
@@ -121,22 +121,22 @@
     @endforeach
     <tfoot>
         <tr>
-            <th colspan="7" style="text-align: right">TOTALL</th>
+            <th colspan="7" style="text-align: right">TOTAL</th>
             <th style="text-align: right">
-                &#8358;{{ number_format($total_cost_price, 2, '.', ',') }}</th>
+                {{ number_format($total_cost_price, 2, '.', ',') }}</th>
             <th style="text-align: right">
-                &#8358;{{ number_format($total_sold_price, 2, '.', ',') }}</th>
+                {{ number_format($total_sold_price, 2, '.', ',') }}</th>
             <th style="text-align: right">
-                &#8358;{{ number_format($total_cost, 2, '.', ',') }}
+                {{ number_format($total_cost, 2, '.', ',') }}
             </th>
             <th style="text-align: right">
-                &#8358;{{ number_format($total_sold, 2, '.', ',') }}
+                {{ number_format($total_sold, 2, '.', ',') }}
             </th>
             <th style="text-align: right">
                 @if ($grand_total_profit < 0)
-                    &#8358;({{ number_format(abs($grand_total_profit), 2, '.', ',') }})
+                    ({{ number_format(abs($grand_total_profit), 2, '.', ',') }})
                 @else
-                    &#8358;{{ number_format($grand_total_profit, 2) }}
+                    {{ number_format($grand_total_profit, 2) }}
                 @endif
             </th>
             <th>

@@ -757,6 +757,50 @@
                         </ul>
                     </li>
                 @endcan
+{{--                @can('menu.accounting')--}}
+                    <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
+                            <i class="ion-android-list"></i>
+                            <p>
+                                Opening Balances
+                                <i class="right fa fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('payments.list') }}" class="nav-link ">
+                                    <i class="ion-card"></i>
+                                    <p>Inventory Valuation</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('payments.list') }}" class="nav-link ">
+                                    <i class="ion-card"></i>
+                                    <p>GL Accounts</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('payments.list') }}" class="nav-link ">
+                                    <i class="ion-card"></i>
+                                    <p>Customer Balances</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('payments.list') }}" class="nav-link ">
+                                    <i class="ion-card"></i>
+                                    <p>Customer Credit Limit</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('payments.list') }}" class="nav-link ">
+                                    <i class="ion-card"></i>
+                                    <p>Supplier Balances</p>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+{{--                @endcan--}}
 
             </ul>
         </nav>

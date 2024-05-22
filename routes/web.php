@@ -4,6 +4,7 @@ use App\Http\Controllers\AdditionalInvoiceController;
 use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\GeneralAccountController;
 use App\Http\Controllers\JournalController;
+use App\Http\Controllers\OpeningBalanceController;
 use App\Http\Controllers\ProductUnitMeasureController;
 use App\Http\Controllers\ProformaInvoiceController;
 use App\Http\Controllers\ReceiptController;
@@ -63,6 +64,16 @@ Route::get('/', function () {
 });
 
 Route::middleware('auth')->group(function () {
+
+
+    Route::prefix('opening-balance')->group(function(){
+        Route::prefix('customer')->group(function(){
+            Route::get('/ledger', [OpeningBalanceController::class,'customerLedger'])->name('opening-balance.customer.account');
+            Route::get('/limit', [OpeningBalanceController::class,'customerLimit'])->name('opening-balance.customer.limit');
+        });
+    });
+
+
     Route::group(['prefix' => 'transaction'], function () {
         Route::group(
             ['prefix' => 'stock_adjustment'],

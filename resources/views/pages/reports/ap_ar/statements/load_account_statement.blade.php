@@ -7,7 +7,7 @@
 <table class="table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
-            ACCOUNT STATEMENTS BETWEEN {{ Carbon\carbon::parse($from_date)->toFormattedDateString() }} AND
+            ACCOUNT STATEMENTS BETWEEN {{ Carbon\carbon::parse($from_date)->toFormattedDateString() }} TO
             {{ Carbon\carbon::parse($to_date)->toFormattedDateString() }}
             <br /> B/F = @if ($balance_b_d < 0)
                 {{ number_format(abs($balance_b_d), 2) }}Dr.

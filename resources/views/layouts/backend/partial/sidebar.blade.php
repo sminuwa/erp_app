@@ -758,8 +758,8 @@
                     </li>
                 @endcan
 {{--                @can('menu.accounting')--}}
-                    <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
+                    <li class="nav-item has-treeview {{ Request::is('opening-balance/*') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ Request::is('opening-balance/*') ? 'active' : '' }}">
                             <i class="ion-android-list"></i>
                             <p>
                                 Opening Balances

@@ -67,11 +67,11 @@ Route::middleware('auth')->group(function () {
 
 
     Route::prefix('opening-balance')->group(function(){
-            Route::get('/customer-balance', [OpeningBalanceController::class,'customerBalance'])->name('opening-balance.customer.balance');
-            Route::get('/limit', [OpeningBalanceController::class,'customerLimit'])->name('opening-balance.customer.limit');
-            Route::get('/inventory-valuation', [OpeningBalanceController::class,'inventoryValuation'])->name('opening-balance.inventory.valuation');
-            Route::get('/account-ledger', [OpeningBalanceController::class,'accountLedger'])->name('opening-balance.account.ledger');
-            Route::get('/supplier-balance', [OpeningBalanceController::class,'supplierBalance'])->name('opening-balance.supplier.balance');
+            Route::match(['GET','POST'],'/customer-balance', [OpeningBalanceController::class,'customerBalance'])->name('opening-balance.customer.balance');
+            Route::match(['GET','POST'],'/limit', [OpeningBalanceController::class,'customerLimit'])->name('opening-balance.customer.limit');
+            Route::match(['GET','POST'],'/inventory-valuation', [OpeningBalanceController::class,'inventoryValuation'])->name('opening-balance.inventory.valuation');
+            Route::match(['GET','POST'],'/account-ledger', [OpeningBalanceController::class,'accountLedger'])->name('opening-balance.account.ledger');
+            Route::match(['GET','POST'],'/supplier-balance', [OpeningBalanceController::class,'supplierBalance'])->name('opening-balance.supplier.balance');
     });
 
 

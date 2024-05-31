@@ -162,15 +162,16 @@ class OpeningBalanceController extends Controller
                         $records[$s][] = [
                             'store_id' => $st->id,
                             'product_id' => $pr->id,
-                            'quantity' => $branch_id,
+                            'quantity' => $value[$quantity],
                             'cost_price' => $value[$cost],
                         ];
                     }
                 }
             }
+
             $stock_adjustments = $stock_adjustment_details = $stock_references = [];
             foreach($records as $k => $val){
-                $reference = 'STK'.date('Ym').$k.$branch->code;
+                $reference = 'STK'.date('ymdHis').$k;
                 $records[$k] = [
                     'reference' =>$reference,
                     'details'=>$val
@@ -204,7 +205,6 @@ class OpeningBalanceController extends Controller
                     }
 
                 }
-
                 if(StockAdjustmentDetail::upsert($stock_adjustment_details,['stock_adjustment_id', 'store_id','product_id','quantity'])){
                     return view('pages.opening-balance.inventory-valuation', compact('records'));
                 }

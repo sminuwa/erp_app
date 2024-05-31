@@ -15,6 +15,104 @@ class OpeningBalanceController extends Controller
     public function customerBalance(Request $request){
         $method = $request->method();
         $user = auth()->user();
+        $user_id = $user->id;
+        $branch = $user->branch;
+        if($method == 'POST'){
+            $file = $request->file;
+            $date = $request->date;
+            $branch_id = $request->branch_id;
+            $rows = $this->getRecordFromExcel(Upload::class, $file);
+            $title = $rows[0];
+            $code = searchIndex($title, 'code'); // code/account number
+            $debit = searchIndex($title, 'debit'); //serial number
+            $credit = searchIndex($title, 'credit'); //serial number
+            $records = [];
+            $all_codes = [];
+            foreach ($rows as $key => $value) {
+                if ($key < 1)
+                    continue; // skip first and second row
+                $all_codes[]= $value[$code];
+                if (trim($value[$code]) == null)
+                    continue;
+            }
+            $customers = Customer::select('id', 'code')->whereIn('code',$all_codes)->get()->toArray();
+            foreach ($rows as $key => $value) {
+                if ($key < 1)
+                    continue; // skip first and second row
+                $customer = searchForId(trim($value[$code]), $customers);
+                if(!$customer)
+                    continue;
+                if (trim($value[$code]) == null)
+                    continue;
+                $records[] = [
+                    'model_id' => $customer->id,
+                    'model_name' => 'Customer',
+                    'branch_id' => $branch_id,
+                    'description' => 'OPENING BALANCE',
+                    'reference' => 'OPENINGBALANCE',
+                    'credit' => str_replace(',','',$value[$credit]),
+                    'debit' => str_replace(',','',$value[$debit]),
+                    'date' => $date,
+                    'user_id' => $user_id,
+                    'receipt_no' => 'OPENINGBALANCE',
+                ];
+            }
+            if(GeneralAccountLedger::upsert($records,['model_id', 'model_name', 'branch_id'])) {
+                return view('pages.opening-balance.customer-balance', compact('records'));
+            }
+            return back()->with('error', 'Something went wrong');
+        }
+
+        return view('pages.opening-balance.customer-balance');
+    }
+
+    public function customerLimit(Request $request){
+        $method = $request->method();
+        $user = auth()->user();
+        $branch = $user->branch;
+        if($method == 'POST'){
+            $file = $request->file;
+            $date = $request->date;
+            $branch_id = $request->branch_id;
+            $rows = $this->getRecordFromExcel(Upload::class, $file);
+            $title = $rows[0];
+            $code = searchIndex($title, 'code'); // code/account number
+            $limit = searchIndex($title, 'limit'); //serial number
+            $records = [];
+            $all_codes = [];
+            foreach ($rows as $key => $value) {
+                if ($key < 1)
+                    continue; // skip first and second row
+                $all_codes[]= $value[$code];
+            }
+            $customers = Customer::select('id', 'code')->whereIn('code',$all_codes)->get()->toArray();
+            foreach ($rows as $key => $value) {
+                if ($key < 1)
+                    continue; // skip first and second row
+                $customer = searchForId(trim($value[$code]), $customers);
+                if (!$customer)
+                    continue;
+                $records[] = [
+                    'id' => $customer->id,
+                    'credit_limit' => $value[$limit],
+                ];
+
+            }
+
+            return $records;
+
+            if(GeneralAccountLedger::upsert($records,['model_id', 'model_name', 'branch_id'])) {
+                return view('pages.opening-balance.customer-balance', compact('records'));
+            }
+            return back()->with('error', 'Something went wrong');
+        }
+
+        return view('pages.opening-balance.customer-limit');
+    }
+
+    public function inventoryValuation(Request $request){
+        $method = $request->method();
+        $user = auth()->user();
         $branch = $user->branch;
         if($method == 'POST'){
             $file = $request->file;
@@ -32,16 +130,17 @@ class OpeningBalanceController extends Controller
                     continue; // skip first and second row
                 $all_codes[]= $value[$code];
             }
-            $customers = Customer::whereIn('code',$all_codes)->get()->toArray();
+            $suppliers = Supplier::whereIn('code',$all_codes)->get()->toArray();
             foreach ($rows as $key => $value) {
                 if ($key < 1)
                     continue; // skip first and second row
-                $customer = searchForId(trim($value[$code]), $customers);
-                if(!$customer)
+
+                $supplier = searchForId(trim($value[$code]), $suppliers);
+                if (!$supplier)
                     continue;
                 $records[] = [
-                    'model_id' => $customer->id,
-                    'model_name' => 'Customer',
+                    'model_id' => $supplier->id,
+                    'model_name' => 'Supplier',
                     'branch_id' => $branch_id,
                     'description' => 'OPENING BALANCE',
                     'reference' => 'OPENINGBALANCE',
@@ -58,32 +157,6 @@ class OpeningBalanceController extends Controller
                 return view('pages.opening-balance.customer-balance', compact('records'));
             }
             return back()->with('error', 'Something went wrong');
-        }
-
-        return view('pages.opening-balance.customer-balance');
-    }
-
-    public function customerLimit(Request $request){
-        $method = $request->method();
-        if($method == 'POST'){
-            $file = $request->file;
-            $rows = $this->getRecordFromExcel(Upload::class, $file);
-            $title = $rows[1];
-            $sno = searchIndex($title, 'sno'); //serial number
-            return $rows;
-        }
-
-        return view('pages.opening-balance.customer-limit');
-    }
-
-    public function inventoryValuation(Request $request){
-        $method = $request->method();
-        if($method == 'POST'){
-            $file = $request->file;
-            $rows = $this->getRecordFromExcel(Upload::class, $file);
-            $title = $rows[1];
-            $sno = searchIndex($title, 'sno'); //serial number
-            return $rows;
         }
 
         return view('pages.opening-balance.inventory-valuation');
@@ -109,7 +182,7 @@ class OpeningBalanceController extends Controller
                     continue; // skip first and second row
                 $all_codes[]= $value[$code];
             }
-            $accounts = GeneralAccount::whereIn('number',$all_codes)->get()->toArray();
+            $accounts = GeneralAccount::select('id', 'number')->whereIn('number',$all_codes)->get()->toArray();
             foreach ($rows as $key => $value) {
                 if ($key < 1)
                     continue; // skip first and second row
@@ -160,7 +233,7 @@ class OpeningBalanceController extends Controller
                     continue; // skip first and second row
                 $all_codes[]= $value[$code];
             }
-            $suppliers = Supplier::whereIn('code',$all_codes)->get()->toArray();
+            $suppliers = Supplier::select('id', 'code')->whereIn('code',$all_codes)->get()->toArray();
             foreach ($rows as $key => $value) {
                 if ($key < 1)
                     continue; // skip first and second row

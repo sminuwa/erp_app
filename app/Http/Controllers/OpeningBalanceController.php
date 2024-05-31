@@ -28,6 +28,8 @@ class OpeningBalanceController extends Controller
             $credit = searchIndex($title, 'credit'); //serial number
             $records = [];
             $all_codes = [];
+            $all_credit = [];
+            $all_debit = [];
             foreach ($rows as $key => $value) {
                 if ($key < 1)
                     continue; // skip first and second row
@@ -44,6 +46,8 @@ class OpeningBalanceController extends Controller
                     continue;
                 if (trim($value[$code]) == null)
                     continue;
+                $all_credit[] = str_replace(',','',trim($value[$credit]));
+                $all_debit[] = str_replace(',','',trim($value[$debit]));
                 $records[] = [
                     'model_id' => $customer->id,
                     'model_name' => 'Customer',
@@ -57,6 +61,9 @@ class OpeningBalanceController extends Controller
                     'receipt_no' => 'OPENINGBALANCE',
                 ];
             }
+
+            /*$income = array_sum($all_credit) - array_sum($all_debit);
+            return $income;*/
             if(GeneralAccountLedger::upsert($records,['model_id', 'model_name', 'branch_id'])) {
                 return view('pages.opening-balance.customer-balance', compact('records'));
             }
@@ -99,10 +106,8 @@ class OpeningBalanceController extends Controller
 
             }
 
-            return $records;
-
-            if(GeneralAccountLedger::upsert($records,['model_id', 'model_name', 'branch_id'])) {
-                return view('pages.opening-balance.customer-balance', compact('records'));
+            if(Customer::upsert($records,['id'])) {
+                return view('pages.opening-balance.customer-limit', compact('records'));
             }
             return back()->with('error', 'Something went wrong');
         }
@@ -119,12 +124,13 @@ class OpeningBalanceController extends Controller
             $date = $request->date;
             $branch_id = $request->branch_id;
             $rows = $this->getRecordFromExcel(Upload::class, $file);
+            return $rows;
             $title = $rows[0];
             $code = searchIndex($title, 'code'); // code/account number
             $debit = searchIndex($title, 'debit'); //serial number
             $credit = searchIndex($title, 'credit'); //serial number
-            $records = [];
-            $all_codes = [];
+            $product_store = $stock_card =  [];
+            $all_codes = $all_products = $all_stores = [];
             foreach ($rows as $key => $value) {
                 if ($key < 1)
                     continue; // skip first and second row
@@ -144,8 +150,8 @@ class OpeningBalanceController extends Controller
                     'branch_id' => $branch_id,
                     'description' => 'OPENING BALANCE',
                     'reference' => 'OPENINGBALANCE',
-                    'credit' => $value[$credit],
-                    'debit' => $value[$debit],
+                    'credit' => str_replace(',','',$value[$credit]),
+                    'debit' => str_replace(',','',$value[$debit]),
                     'date' => $date,
                     'user_id' => $user->id,
                     'receipt_no' => 'OPENINGBALANCE',
@@ -154,7 +160,7 @@ class OpeningBalanceController extends Controller
             }
 
             if(GeneralAccountLedger::upsert($records,['model_id', 'model_name', 'branch_id'])) {
-                return view('pages.opening-balance.customer-balance', compact('records'));
+                return view('pages.opening-balance.inventory-valuation', compact('records'));
             }
             return back()->with('error', 'Something went wrong');
         }
@@ -195,8 +201,8 @@ class OpeningBalanceController extends Controller
                     'branch_id' => $branch_id,
                     'description' => 'OPENING BALANCE',
                     'reference' => 'OPENINGBALANCE',
-                    'credit' => $value[$credit],
-                    'debit' => $value[$debit],
+                    'credit' => str_replace(',','',$value[$credit]),
+                    'debit' => str_replace(',','',$value[$debit]),
                     'date' => $date,
                     'user_id' => $user->id,
                     'receipt_no' => 'OPENINGBALANCE',
@@ -205,7 +211,7 @@ class OpeningBalanceController extends Controller
             }
 
             if(GeneralAccountLedger::upsert($records,['model_id', 'model_name', 'branch_id'])) {
-                return view('pages.opening-balance.customer-balance', compact('records'));
+                return view('pages.opening-balance.account-ledger', compact('records'));
             }
             return back()->with('error', 'Something went wrong');
         }
@@ -237,7 +243,6 @@ class OpeningBalanceController extends Controller
             foreach ($rows as $key => $value) {
                 if ($key < 1)
                     continue; // skip first and second row
-
                 $supplier = searchForId(trim($value[$code]), $suppliers);
                 if (!$supplier)
                     continue;
@@ -247,8 +252,8 @@ class OpeningBalanceController extends Controller
                     'branch_id' => $branch_id,
                     'description' => 'OPENING BALANCE',
                     'reference' => 'OPENINGBALANCE',
-                    'credit' => $value[$credit],
-                    'debit' => $value[$debit],
+                    'credit' => str_replace(',','',$value[$credit]),
+                    'debit' => str_replace(',','',$value[$debit]),
                     'date' => $date,
                     'user_id' => $user->id,
                     'receipt_no' => 'OPENINGBALANCE',
@@ -257,7 +262,7 @@ class OpeningBalanceController extends Controller
             }
 
             if(GeneralAccountLedger::upsert($records,['model_id', 'model_name', 'branch_id'])) {
-                return view('pages.opening-balance.customer-balance', compact('records'));
+                return view('pages.opening-balance.supplier-balance', compact('records'));
             }
             return back()->with('error', 'Something went wrong');
         }

@@ -1,6 +1,6 @@
 @extends('layouts.backend.app')
 
-@section('title', 'Customer Limits')
+@section('title', 'Customer Limit')
 
 @push('css')
     <!-- DataTables -->
@@ -14,10 +14,10 @@
         <!-- Content Header (Page header) -->
         <!-- Content Header (Page header) -->
         <section class="content-header">
-            <div class="container-fluid">
+            <div class="container">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Import :: Customer Limits</h4>
+
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -32,20 +32,48 @@
 
         <!-- Main content -->
         <section class="content">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-sm-12 table-responsive">
-                        <form action="" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <input type="file" name="file" class="form-control">
-                            <button type="submit" class="btn btn-primary">Import</button>
-                        </form>
-                        @if (isset($count))
-                            <h4 class="text text-success">A total of {{ $count }} suppliers were successfully
-                                uploaded</h4>
-                        @endif
+            <div class="container">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Import :: Customer Limit</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-12 table-responsive">
+                                <form action="" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Date</label>
+                                                <input type="text" name="date" class="form-control datepicker">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Branch</label>
+                                                <select class="form-control select2-single ajax-branches" name="branch_id" id="branch_id"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>File</label>
+                                                <input type="file" name="file" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary">Import</button>
+                                </form>
+                                @if (isset($records))
+                                    <h4 class="text text-success mt-3">A total of {{ count($records) }} accounts were successfully
+                                        uploaded</h4>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
+
             </div><!-- /.container-fluid -->
         </section>
         <!-- /.content -->
@@ -56,21 +84,6 @@
 
 @push('js')
     <!-- DataTables -->
-    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-        $(function() {
-            $("#record1").DataTable({
-                'iDisplayLength': 100
-            });
-            $('#record2').DataTable({
-                "paging": true,
-                "lengthChange": false,
-                "searching": true,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false
-            });
-        });
-    </script>
+
+
 @endpush

@@ -757,6 +757,75 @@
                         </ul>
                     </li>
                 @endcan
+{{--                @can('menu.accounting')--}}
+                    <li class="nav-item has-treeview {{ Request::is('opening-balance/*') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ Request::is('opening-balance/*') ? 'active' : '' }}">
+                            <i class="ion-android-list"></i>
+                            <p>
+                                Opening Balances
+                                <i class="right fa fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('opening-balance.inventory.valuation') }}" class="nav-link ">
+                                    <i class="ion-card"></i>
+                                    <p>Inventory Valuation</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('opening-balance.account.ledger') }}" class="nav-link ">
+                                    <i class="ion-card"></i>
+                                    <p>GL Accounts</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('opening-balance.customer.balance') }}" class="nav-link ">
+                                    <i class="ion-card"></i>
+                                    <p>Customer Balances</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('opening-balance.customer.limit') }}" class="nav-link ">
+                                    <i class="ion-card"></i>
+                                    <p>Customer Credit Limit</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('opening-balance.supplier.balance') }}" class="nav-link ">
+                                    <i class="ion-card"></i>
+                                    <p>Supplier Balances</p>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+                <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
+                        <i class="ion-android-list"></i>
+                        <p>
+                            Backup & Restore
+                            <i class="right fa fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>Backup</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link ">
+                                <i class="ion-card"></i>
+                                <p>Restore</p>
+                            </a>
+                        </li>
+
+
+                    </ul>
+                </li>
+{{--                @endcan--}}
 
             </ul>
         </nav>

@@ -4,6 +4,7 @@ use App\Http\Controllers\AdditionalInvoiceController;
 use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\GeneralAccountController;
 use App\Http\Controllers\JournalController;
+use App\Http\Controllers\OpeningBalanceController;
 use App\Http\Controllers\ProductUnitMeasureController;
 use App\Http\Controllers\ProformaInvoiceController;
 use App\Http\Controllers\ReceiptController;
@@ -63,6 +64,17 @@ Route::get('/', function () {
 });
 
 Route::middleware('auth')->group(function () {
+
+
+    Route::prefix('opening-balance')->group(function(){
+            Route::match(['GET','POST'],'/customer-balance', [OpeningBalanceController::class,'customerBalance'])->name('opening-balance.customer.balance');
+            Route::match(['GET','POST'],'/limit', [OpeningBalanceController::class,'customerLimit'])->name('opening-balance.customer.limit');
+            Route::match(['GET','POST'],'/inventory-valuation', [OpeningBalanceController::class,'inventoryValuation'])->name('opening-balance.inventory.valuation');
+            Route::match(['GET','POST'],'/account-ledger', [OpeningBalanceController::class,'accountLedger'])->name('opening-balance.account.ledger');
+            Route::match(['GET','POST'],'/supplier-balance', [OpeningBalanceController::class,'supplierBalance'])->name('opening-balance.supplier.balance');
+    });
+
+
     Route::group(['prefix' => 'transaction'], function () {
         Route::group(
             ['prefix' => 'stock_adjustment'],

@@ -268,3 +268,39 @@ function storeByCode($code)
         ->first();
 
 }
+
+
+
+function searchIndex($array, $column_name){
+    foreach ($array as $key => $value) {
+        if (stripos($value, $column_name) !== false) {
+            return $key;
+        }
+    }
+    return null;
+}
+
+function searchForId($search_value, $array) {
+    // Iterating over main array
+    foreach ($array as $key1 => $val1) {
+        $temp_path = array();
+        // Adding current key to search path
+        array_push($temp_path, $key1);
+        // Check if this value is an array
+        // with atleast one element
+        if(is_array($val1) and count($val1)) {
+            // Iterating over the nested array
+            foreach ($val1 as $key2 => $val2) {
+                if(strtoupper($val2) == strtoupper($search_value)) {
+                    // Adding current key to search path
+                    array_push($temp_path, $key2);
+                    return (object)$array[$key1] = $val1;
+                }
+            }
+        }
+        elseif(strtoupper($val1) == strtoupper($search_value)) {
+            return (object)$array[$key1] = $val1;
+        }
+    }
+    return null;
+}

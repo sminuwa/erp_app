@@ -7,9 +7,15 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
 
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     //view::share('image',"MUUU");
+
+
+    public function getRecordFromExcel($class, $file){
+        return Excel::toArray(new $class, $file)[0];
+    }
 }

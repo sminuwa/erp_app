@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Imports\Upload;
+use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\GeneralAccount;
 use App\Models\GeneralAccountLedger;
@@ -127,6 +128,7 @@ class OpeningBalanceController extends Controller
             $file = $request->file;
             $date = $request->date;
             $branch_id = $request->branch_id;
+            $branch = Branch::find($branch_id);
             $rows = $this->getRecordFromExcel(Upload::class, $file);
             $title = $rows[0];
             $product = searchIndex($title, 'product'); // code/account number

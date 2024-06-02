@@ -280,4 +280,20 @@ class UserController extends Controller
         session()->flash('app_message', 'File imported and records updated/inserted successfully!');
         return view('pages.users.import', ['count' => $count]);
     }
+
+
+    public function resetPassword(Request $request, $user){
+        $model = User::find($request->user_id ?? $user);
+        if($request->method() == 'POST'){
+            if($model){
+                if($request->password != $request->confirm_password)
+                    return back()->with('error', 'Password didnt match.');
+                $model->password = bcrypt($request->password);
+                if($model->save())
+                    return back()->with('success', 'Password updated');
+            }
+            return back()->with('error', 'Something went wrong.');
+        }
+        return view('pages.users.reset-password', ['model' => $model]);
+    }
 }

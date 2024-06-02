@@ -757,7 +757,7 @@
                         </ul>
                     </li>
                 @endcan
-{{--                @can('menu.accounting')--}}
+                @can('menu.opening-balances')
                     <li class="nav-item has-treeview {{ Request::is('opening-balance/*') ? 'menu-open' : '' }}">
                         <a href="#" class="nav-link {{ Request::is('opening-balance/*') ? 'active' : '' }}">
                             <i class="ion-android-list"></i>
@@ -825,7 +825,7 @@
 
                     </ul>
                 </li>
-{{--                @endcan--}}
+                @endcan
 
             </ul>
         </nav>

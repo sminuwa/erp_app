@@ -800,6 +800,8 @@
 
                         </ul>
                     </li>
+                @endcan
+                @can('menu.backup')
                 <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
                         <i class="ion-android-list"></i>
@@ -826,7 +828,6 @@
                     </ul>
                 </li>
                 @endcan
-
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

@@ -138,7 +138,9 @@
                                             <tr>
                                                 <th>{{ $loop->iteration }}</th>
                                                 <td>{{ $product->store?->code . ' - ' . $product->store?->name }}</td>
-                                                <td>{{ $product->product?->code . ' - ' . $product->product?->name }}</td>
+                                                <td>{{ $product->product?->code . ' - ' . $product->product?->name }}
+                                                    {{ $product->product->category->code ?? 'NULL NULL' }}
+                                                </td>
                                                 <td>{{ $product->expiry_date ?? 'N/A' }}</td>
                                                 <td>{{ $product->quantity }}</td>
                                                 <td class="text-right">

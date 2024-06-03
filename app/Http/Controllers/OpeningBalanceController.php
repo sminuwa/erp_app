@@ -67,6 +67,8 @@ class OpeningBalanceController extends Controller
                 ];
             }
 
+            return $records;
+
             /*$income = array_sum($all_credit) - array_sum($all_debit);
             return $income;*/
             if(GeneralAccountLedger::upsert($records,['model_id', 'model_name', 'branch_id'])) {
@@ -150,6 +152,7 @@ class OpeningBalanceController extends Controller
                     $unique_stores[] = trim($value[$store]);
             }
 //            return $unique_stores;
+            $records = [];
             $products = Product::select('id','code')->whereIn('code',$all_products)->get()->toArray();
             $stores = Store::select('id','code')->whereIn('code',$unique_stores)->get()->toArray();
             foreach($unique_stores as $s){

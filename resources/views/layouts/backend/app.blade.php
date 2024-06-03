@@ -164,6 +164,7 @@
         $('.datepicker').datepicker({
             autoclose: true,
             todayHighlight: true,
+            // startDate: new Date(),
         });
         $('.datepicker2').datepicker({
             autoclose: true,

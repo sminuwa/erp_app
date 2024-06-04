@@ -244,11 +244,11 @@ class InvoiceController extends Controller
                     $store = StoreProduct::find($content->id);
                     $qtyAval = $store->qty_available;
                     //$store->qty_available = $qtyAval - $content->quantity;
-                    if ($content->quantity > $qtyAval) {
+                    if (Transaction::quantity_sold($content->id, $content->quantity, $content->attributes['unit'])  > $qtyAval) {
                         $is_out_of_stock = true;
                         $out_of_stock_products .= $store->product->code . ",";
                     }
-                    return $content->quantity;
+                    return Transaction::quantity_sold($content->id, $content->quantity, $content->attributes['unit']);
                     $order_detail = new OrderDetail();
                     DB::table('order_details')->insert([
                         'order_id' => $invoice->id,

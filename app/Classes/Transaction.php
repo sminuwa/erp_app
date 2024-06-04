@@ -1052,7 +1052,7 @@ class Transaction
         $credit_limit = $customer->credit_limit;
         $balance = $customer->runningBalance() - $total_sales;
 
-        return $credit_limit;
+        return $total_sales;
         if ($balance < 0 && $credit_limit <= 1) {
             return false;
         }

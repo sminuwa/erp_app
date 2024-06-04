@@ -67,8 +67,6 @@ class OpeningBalanceController extends Controller
                 ];
             }
 
-            return $records;
-
             /*$income = array_sum($all_credit) - array_sum($all_debit);
             return $income;*/
             if(GeneralAccountLedger::upsert($records,['model_id', 'model_name', 'branch_id'])) {
@@ -230,6 +228,7 @@ class OpeningBalanceController extends Controller
             $date = $request->date;
             $branch_id = $request->branch_id;
             $rows = $this->getRecordFromExcel(Upload::class, $file);
+//            return $rows;
             $title = $rows[0];
             $code = searchIndex($title, 'account'); // code/account number
             $debit = searchIndex($title, 'debit'); //serial number

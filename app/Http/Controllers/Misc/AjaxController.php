@@ -81,7 +81,7 @@ class AjaxController extends Controller
     }
     public function storeProducts(Request $request)
     {
-        $records = StoreProduct::scopeForProducts(StoreProduct::orderBy('store_id'), $request->store_id)->get();
+        $records = StoreProduct::with('product')->forProducts($request->store_id)->get();
         return view('misc.ajax.store-products', compact('records'));
     }
 }

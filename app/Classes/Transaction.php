@@ -1045,11 +1045,13 @@ class Transaction
             } else {
                 $quantity_sold = Transaction::quantity_sold($product->id, $cart->quantity, $unit);
                 $total_sales += $quantity_sold * $cart->price;
+//                $total_sales += $cart->quantity * $cart->price;
             }
         }
 
-        $credit_limit = Customer::find($customer_id)->credit_limit;
-        $balance = Customer::find($customer_id)->runningBalance() - $total_sales;
+        $customer = Customer::find($customer_id);
+        $credit_limit = $customer->credit_limit;
+        $balance = $customer->runningBalance() - $total_sales;
 
         if ($balance < 0 && $credit_limit <= 1) {
             return false;

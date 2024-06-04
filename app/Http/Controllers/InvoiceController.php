@@ -160,6 +160,9 @@ class InvoiceController extends Controller
         $total_sales = \Cart::getTotal();
 
         //Check to make sure that the amount has not exceeded the credit limit set for the customer.
+
+        /*session()->flash('app_error', Transaction::check_transaction_limit($customer_id, \Cart::getContent()));
+        return redirect()->back()->withInput();*/
         if (Transaction::check_transaction_limit($customer_id, \Cart::getContent()) == false) {
             session()->flash('app_error', 'The amount has exceeded the customer credit limit');
             return redirect()->back()->withInput();
@@ -241,10 +244,12 @@ class InvoiceController extends Controller
                     $store = StoreProduct::find($content->id);
                     $qtyAval = $store->qty_available;
                     //$store->qty_available = $qtyAval - $content->quantity;
-                    if ($content->quantity > $qtyAval) {
+                    $product = StoreProduct::find($content->id)->product;
+                    if (Transaction::quantity_sold($product->id, $content->quantity, $content->attributes['unit'])  > $qtyAval) {
                         $is_out_of_stock = true;
                         $out_of_stock_products .= $store->product->code . ",";
                     }
+//                    return Transaction::quantity_sold($product->id, $content->quantity, $content->attributes['unit']);
                     $order_detail = new OrderDetail();
                     DB::table('order_details')->insert([
                         'order_id' => $invoice->id,

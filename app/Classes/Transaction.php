@@ -1043,9 +1043,9 @@ class Transaction
             if ($product->unit == $unit) {
                 $total_sales += $cart->quantity * $cart->price;
             } else {
-//                $quantity_sold = Transaction::quantity_sold($product->id, $cart->quantity, $unit);
-//                $total_sales += $quantity_sold * $cart->price;
-                $total_sales += $cart->quantity * $cart->price;
+                $quantity_sold = Transaction::quantity_sold($product->id, $cart->quantity, $unit);
+                $total_sales += $quantity_sold * $cart->price;
+//                $total_sales += $cart->quantity * $cart->price;
             }
         }
 

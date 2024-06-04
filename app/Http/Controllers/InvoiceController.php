@@ -249,7 +249,7 @@ class InvoiceController extends Controller
                         $is_out_of_stock = true;
                         $out_of_stock_products .= $store->product->code . ",";
                     }
-                    return Transaction::quantity_sold($product->id, $content->quantity, $content->attributes['unit']);
+//                    return Transaction::quantity_sold($product->id, $content->quantity, $content->attributes['unit']);
                     $order_detail = new OrderDetail();
                     DB::table('order_details')->insert([
                         'order_id' => $invoice->id,

@@ -1046,6 +1046,7 @@ class Transaction
                 $quantity_sold = Transaction::quantity_sold($product->id, $cart->quantity, $unit);
                 $total_sales += $quantity_sold * $cart->price;
             }
+            return $cart->price;
         }
 
         $customer = Customer::find($customer_id);

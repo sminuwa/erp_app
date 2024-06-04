@@ -40,7 +40,7 @@ class AjaxController extends Controller
     public function products(Request $request)
     {
         $category_id = $request->category_id;
-        $records = Product::forCategory($category_id)->orderBy('code', 'asc')->get();
+        $records = Product::with('category')->forCategory($category_id)->orderBy('code', 'asc')->get();
         return view('misc.ajax.products', compact('records'));
     }
 
@@ -81,7 +81,7 @@ class AjaxController extends Controller
     }
     public function storeProducts(Request $request)
     {
-        $records = StoreProduct::with('product')->forProducts($request->store_id)->get();
+        $records = StoreProduct::with('product','store')->forProducts($request->store_id)->get();
         return view('misc.ajax.store-products', compact('records'));
     }
 }

@@ -1048,9 +1048,11 @@ class Transaction
             }
         }
 
-        $credit_limit = Customer::find($customer_id)->credit_limit;
-        $balance = Customer::find($customer_id)->runningBalance() - $total_sales;
+        $customer = Customer::find($customer_id);
+        $credit_limit = $customer->credit_limit;
+        $balance = $customer->runningBalance() - $total_sales;
 
+        return $balance;
         if ($balance < 0 && $credit_limit <= 1) {
             return false;
         }

@@ -44,6 +44,11 @@
                                     <span class="fa fa-pencil"> Edit</span>
                                 </a>
                             @endcan
+                            @can('users.reset-password')
+                                <a class="dropdown-item" href="{{ route('users.reset-password', $record->id) }}">
+                                    <span class="fa fa-pencil"> Reset Password</span>
+                                </a>
+                            @endcan
                             @can('users.destroy')
                                 <form onsubmit="return confirm('Are you sure you want to delete?')"
                                     action="{{ route('users.destroy', $record->id) }}" method="post"

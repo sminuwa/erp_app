@@ -66,7 +66,7 @@
                                     <button type="submit" class="btn btn-primary">Import</button>
                                 </form>
                                 @if (isset($records))
-                                    <h4 class="text text-success mt-3">A total of {{ count($records) }} accounts were successfully
+                                    <h4 class="text text-success mt-3">A total of {{ count($records,COUNT_RECURSIVE) }} accounts were successfully
                                         uploaded</h4>
                                 @endif
                             </div>

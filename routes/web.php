@@ -589,6 +589,7 @@ Route::middleware('auth')->group(function () {
                     Route::get('/edit/{user}', [UserController::class, 'edit'])->name('users.edit');
                     Route::put('/update/{user}', [UserController::class, 'update'])->name('users.update');
                     Route::delete('/delete/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+                    Route::match(['GET','POST'],'/reset-password/{user?}', [UserController::class, 'resetPassword'])->name('users.reset-password');
                     //Import Users
                     Route::get('/import/form', [UserController::class, 'importForm'])->name('users.import.form');
                     Route::post('/import', [UserController::class, 'import'])->name('users.import');

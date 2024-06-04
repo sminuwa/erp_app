@@ -194,7 +194,7 @@
                     <td>{{ $order_detail->storeProduct->product->code }}</td>
                     <td>{{ $order_detail->storeProduct->product->name }}</td>
                     <td style="text-align:center">{{ $order_detail->quantity }}</td>
-                    <td>{{ $order_detail->storeProduct->product->unit }}</td>
+                    <td>{{ $order_detail->unit ?? ''}}</td>
                     <td>{{ $order_detail->storeProduct->store->code }}</td>
 
                     <td style="text-align:right">&#8358;{{ number_format($order_detail->sold_price, 2) }}

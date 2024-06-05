@@ -212,7 +212,7 @@
                 @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
             @endforeach
             <tr>
-                <td colspan="6" class="sum-up line">SubTotal: </td>
+                <td colspan="4" class="sum-up line">SubTotal: </td>
                 <td class="line price">{{ number_format($total, 2) }}</td>
             </tr>
             @if ($order->discount != 0)

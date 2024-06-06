@@ -25,19 +25,19 @@
             <tbody>
                 <tr>
                     <th>Name</th>
-                    <td>{{ $record->name }}</td>
+                    <td>{{ $record->name ?? null }}</td>
                 </tr>
                 <tr>
                     <th>Email</th>
-                    <td>{{ $record->email }}</td>
+                    <td>{{ $record->email ?? null }}</td>
                 </tr>
                 <tr>
                     <th>Phone</th>
-                    <td>{{ $record->phone }}</td>
+                    <td>{{ $record->phone ?? null }}</td>
                 </tr>
                 <tr>
                     <th>Gender</th>
-                    <td>{{ $record->gender }}</td>
+                    <td>{{ $record->gender ?? null }}</td>
                 </tr>
                 <tr>
                     <th>Active</th>
@@ -45,11 +45,11 @@
                 </tr>
                 <tr>
                     <th>Branch</th>
-                    <td>{{ optional($record->branch)->name }}</td>
+                    <td>{{ optional($record->branch)->name ?? null }}</td>
                 </tr>
                 <tr>
                     <th>Role</th>
-                    <td>{{ is_null($record->getUserRole)?"":$record->getUserRole->role->name }}</td>
+                    <td>{{ is_null($record->getUserRole)?"":$record->getUserRole->role->name ?? null }}</td>
                 </tr>
             </tbody>
         </table>
@@ -67,7 +67,7 @@
                         @if (isset($roles))
                             @foreach ($roles as $data)
                                 <option value="{{ $data->id }}">
-                                    {{ $data->name }}</option>
+                                    {{ $data->name ?? null }}</option>
                             @endforeach
                         @endif
                     </select>

@@ -1,4 +1,4 @@
-{{-- <table class='table table-bordered' id="record1">
+ <table class='table table-bordered' id="record1">
     <thead>
         <tr>
             <td colspan="12" style="text-align: right;">Check All <input type="checkbox" id="checkAll" name="checkAll" />
@@ -31,7 +31,7 @@
             @endforeach
         </tr>
     </tbody>
-</table> --}}
+</table> {{--
 <script>
     $('#record2,#record3').DataTable({
         "paging": true,
@@ -52,7 +52,7 @@
             <th style="text-align: right;">
                 Check All <input type="checkbox" id="checkAll" name="checkAll" />
             </th>
-            
+
         </tr>
     </thead>
     <tbody>
@@ -75,4 +75,4 @@
         @endforeach
 
     </tbody>
-</table>
+</table>--}}

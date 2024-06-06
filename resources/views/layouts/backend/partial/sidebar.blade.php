@@ -680,6 +680,7 @@
                                             <i class="right fa fa-angle-left"></i>
                                         </p>
                                     </a>
+                                    @can('account.statement.report')
                                     <ul class="nav nav-treeview">
                                         <li class="nav-item">
                                             <a href="{{ route('account.statement.report') }}"
@@ -688,6 +689,8 @@
                                                 <p>Account Statements</p>
                                             </a>
                                         </li>
+                                    @endcan
+                                    @can('account.balance.report')
                                         <li class="nav-item">
                                             <a href="{{ route('account.balance.report') }}"
                                                 class="nav-link {{ Request::is('reports/ap_ar/account_balances*') ? 'active' : '' }}">
@@ -695,6 +698,8 @@
                                                 <p>Account Balances</p>
                                             </a>
                                         </li>
+                                        @endcan
+                                        @can('trial.balance.report')
                                         <li class="nav-item">
                                             <a href="{{ route('trial.balance.report') }}"
                                                 class="nav-link {{ Request::is('reports/ap_ar/trial_balance*') ? 'active' : '' }}">
@@ -702,6 +707,8 @@
                                                 <p>Trial Balance</p>
                                             </a>
                                         </li>
+                                        @endcan
+                                        @can('income.statement.report')
                                         <li class="nav-item">
                                             <a href="{{ route('income.statement.report') }}"
                                                 class="nav-link {{ Request::is('reports/ap_ar/income_statement*') ? 'active' : '' }}">
@@ -709,6 +716,8 @@
                                                 <p>Income Statement</p>
                                             </a>
                                         </li>
+                                        @endcan
+                                        @can('balance.sheet.report')
                                         <li class="nav-item">
                                             <a href="{{ route('balance.sheet.report') }}"
                                                 class="nav-link {{ Request::is('reports/ap_ar/balance_sheet*') ? 'active' : '' }}">
@@ -716,6 +725,8 @@
                                                 <p>Balance Sheet</p>
                                             </a>
                                         </li>
+                                        @endcan
+                                        @can('cash.flow.report')
                                         <li class="nav-item">
                                             <a href="{{ route('cash.flow.report') }}"
                                                 class="nav-link {{ Request::is('reports/ap_ar/cash_flow*') ? 'active' : '' }}">
@@ -723,6 +734,8 @@
                                                 <p>Cash Flow</p>
                                             </a>
                                         </li>
+                                        @endcan
+                                        @can('user.loan.history.report')
                                         <li class="nav-item">
                                             <a href="{{ route('user.loan.history.report') }}"
                                                 class="nav-link {{ Request::is('reports/pa/loan/history*') ? 'active' : '' }}">
@@ -730,6 +743,8 @@
                                                 <p>Financial Statistics</p>
                                             </a>
                                         </li>
+                                        @endcan
+                                        @can('remittance.report')
                                         <li class="nav-item">
                                             <a href="{{ route('remittance.report') }}"
                                                 class="nav-link {{ Request::is('reports/ap_ar/remittance*') ? 'active' : '' }}">
@@ -737,6 +752,8 @@
                                                 <p>User Daily Remittance</p>
                                             </a>
                                         </li>
+                                        @endcan
+                                        @can('document.status.report')
                                         <li class="nav-item">
                                             <a href="{{ route('document.status.report') }}"
                                                 class="nav-link {{ Request::is('reports/ap_ar/document_status*') ? 'active' : '' }}">
@@ -744,6 +761,8 @@
                                                 <p>Receipt/Payment/Interbank & Journal list</p>
                                             </a>
                                         </li>
+                                        @endcan
+                                        @can('customer.total.debt.reports')
                                         <li class="nav-item">
                                             <a href="{{ route('customer.total.debt.reports') }}"
                                                 class="nav-link {{ Request::is('reports/ca/customer/debt*') ? 'active' : '' }}">
@@ -751,6 +770,7 @@
                                                 <p>Customer Total Debts</p>
                                             </a>
                                         </li>
+                                        @endcan
                                     </ul>
                                 </li>
                             @endcan

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
+{{--<link rel="stylesheet" href="{{ asset('assets/backend/css/adminlte.min.css') }}">--}}
 <head>
     <link href="{{ asset('assets/backend/img/logo.png') }}"
         rel="shortcut icon">
@@ -15,7 +15,7 @@
         }
 
         @page {
-            size: 2.8in 11in;
+            size: 2.8in 11in !important;
             margin-top: 0cm;
             margin-left: 0cm;
             margin-right: 0cm;
@@ -56,6 +56,7 @@
 
         .items thead {
             text-align: center;
+            border:1px solid black
         }
 
         .center-align {
@@ -144,6 +145,13 @@
         footer {
             font-size: 12px;
         }
+
+        table{
+            border-spacing: 0;
+        }
+        /*table td, table th{
+            padding:5px 10px;
+        }*/
     </style>
 </head>
 
@@ -175,13 +183,13 @@
         </tbody>
     </table>
 
-    <table class="items">
+    <table class="<!--items--> table-bordered" border="1" border-spacing="0">
         <thead>
             <tr>
-                <th class="heading">Code</th>
-                <th class="heading">Item</th>
-                <th class="heading">Qty</th>
-                <th class="heading">Unit</th>
+                <th class="heading">Product</th>
+{{--                <th class="heading">Item</th>--}}
+                <th class="heading">Qty / Unit</th>
+{{--                <th class="heading">Unit</th>--}}
                 <th class="heading">Store</th>
                 <th class="heading">Unit Price</th>
                 <th class="heading">Sub Total</th>
@@ -191,10 +199,16 @@
         <tbody>
             @foreach ($order_details as $order_detail)
                 <tr>
-                    <td>{{ $order_detail->storeProduct->product->code }}</td>
-                    <td>{{ $order_detail->storeProduct->product->name }}</td>
-                    <td style="text-align:center">{{ $order_detail->quantity }}</td>
-                    <td>{{ $order_detail->unit ?? ''}}</td>
+                    <td>
+                        {{ $order_detail->storeProduct->product->code }}<br>
+                        {{ $order_detail->storeProduct->product->name }}
+                    </td>
+{{--                    <td>{{ $order_detail->storeProduct->product->name }}</td>--}}
+                    <td style="text-align:center">
+                        {{ $order_detail->quantity }}<br>
+                        {{ $order_detail->unit ?? ''}}
+                    </td>
+{{--                    <td>{{ $order_detail->unit ?? ''}}</td>--}}
                     <td>{{ $order_detail->storeProduct->store->code }}</td>
 
                     <td style="text-align:right">&#8358;{{ number_format($order_detail->sold_price, 2) }}
@@ -206,29 +220,29 @@
                 @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
             @endforeach
             <tr>
-                <td colspan="6" class="sum-up line">SubTotal: </td>
+                <td colspan="4" class="sum-up line">SubTotal: </td>
                 <td class="line price">{{ number_format($total, 2) }}</td>
             </tr>
             @if ($order->discount != 0)
                 <tr>
-                    <td colspan="6" class="sum-up line">Discount: </td>
+                    <td colspan="4" class="sum-up line">Discount: </td>
                     <td class="line price">{{ number_format($order->discount, 2) }}</td>
                 </tr>
             @endif
             @if ($order->refund != 0)
                 <tr>
-                    <td colspan="6" class="sum-up line">Refund: </td>
+                    <td colspan="4" class="sum-up line">Refund: </td>
                     <td class="line price">{{ number_format($order->refund, 2) }}</td>
                 </tr>
             @endif
             @if ($order->show_vat == 1)
                 <tr>
-                    <td colspan="6" class="sum-up line">VAT: </td>
+                    <td colspan="4" class="sum-up line">VAT: </td>
                     <td class="line price">0.00</td>
                 </tr>
             @endif
             <tr>
-                <td colspan="6" class="sum-up line">Total Amount</td>
+                <td colspan="4" class="sum-up line">Total Amount</td>
                 <td class="line price">{{ number_format($total - $order->discount + $order->refund, 2) }}</td>
             </tr>
             {{-- <tr>

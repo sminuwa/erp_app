@@ -49,7 +49,7 @@
                                 <form action="{{ isset($route) ? $route : route('interstore.store') }}" method="POST">
                                     <div class="form-group">
                                         <label for="date">Date</label>
-                                        <input type="text" name="date" class="form-control datepicker"
+                                        <input type="text" name="date" class="form-control datepicker" required
                                             value="{{ isset($model->date) ? $model->date : old('date', date('Y-m-d')) }}" />
                                     </div>
                                     {{ csrf_field() }}

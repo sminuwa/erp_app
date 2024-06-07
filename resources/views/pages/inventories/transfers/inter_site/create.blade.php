@@ -38,11 +38,11 @@
                             <div class="card-header">
                                 <i class="ion-android-cart"></i> Transfer Product Cart
                                 <div class="float-right">
-                                    @can('ajax.cart.add')
+
                                         <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
                                             class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
                                                 class="fa fa-plus"></i> Add Product </a>
-                                    @endcan
+
                                 </div>
                             </div>
                             <div class="card-body">

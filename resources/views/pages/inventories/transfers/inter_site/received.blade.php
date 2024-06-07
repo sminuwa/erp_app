@@ -90,11 +90,15 @@
                                                     <td> {{ $intersite->postedBy->name ?? '' }} </td>
                                                     <td> {{ $intersite->receivedBy->name ?? '' }}</td>
                                                     <td>
+                                                        @if($intersite->is_completed())
+                                                            <span class="badge badge-success">Completed</span>
+                                                        @else
                                                         {!! $intersite->status == 1
                                                             ? '<span class="badge badge-warning">In Transit</span>'
                                                             : ($intersite->status == 2
                                                                 ? '<span class="badge badge-warning">Pending Allocation</span>'
                                                                 : '') !!}
+                                                        @endif
                                                     </td>
                                                     <td>
                                                         <div class="dropdown">

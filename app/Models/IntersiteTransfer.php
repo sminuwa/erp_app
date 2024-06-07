@@ -107,6 +107,16 @@ class IntersiteTransfer extends Model
         return $this->hasMany(IntersiteTransferProduct::class);
     }
 
+    public function is_completed(){
+        $total = 0;
+        foreach($this->products as $product){
+            if(($product->quantity - $product->totalReceive()) == 0)
+                continue;
+            return false;
+        }
+        return true;
+    }
+
     public function receivedProducts()
     {
         return $this->hasMany(IntersiteTransferReceive::class);

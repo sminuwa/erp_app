@@ -268,11 +268,11 @@
                         <div class="form-group">
                             <label for="quantity">Quantity</label>
                             <input type="number" step=".01" class="form-control" name="quantity" id="quantity"
-                                placeholder="Quantity" required="required">
+                                placeholder="Quantity" required="required" readonly>
                         </div>
                         <input type="hidden" value="0" name="cost_price" id="cost_price" />
                         <div class="form-group text-right ">
-                            <button type="submit" class="btn btn-primary"><span class="ion-ios-cart-outline"></span>
+                            <button onclick="$(this).attr('readonly','readonly')" type="submit" class="btn btn-primary"><span class="ion-ios-cart-outline"></span>
                                 Add</button>
                         </div>
                     </form>

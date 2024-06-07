@@ -93,7 +93,7 @@
                                                         {!! $intersite->status == 1
                                                             ? '<span class="badge badge-warning">In Transit</span>'
                                                             : ($intersite->status == 2
-                                                                ? '<span class="badge badge-success">Received</span>'
+                                                                ? '<span class="badge badge-warning">Pending Allocation</span>'
                                                                 : '') !!}
                                                     </td>
                                                     <td>

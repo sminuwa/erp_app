@@ -31,7 +31,7 @@
         <select class="form-control {{ $errors->has('account_type') ? ' is-invalid' : '' }}" name="account_type" id="account_type" required>
             <option value="">Select...</option>
             <option value="Retail" {{old('account_type', $model->account_type)}} {{ $model->type =="Retail" ? 'selected':'' }}>Retail</option>
-            <option value="Wholesale" {{old('account_type', $model->account_type)}} {{ $model->type =="Wholesale" ? 'selected':'' }}>Whole Sale</option>
+            <option value="Wholesale" {{old('account_type', $model->account_type)}} {{ $model->type =="Wholesale" ? 'selected':'' }}>Wholesale</option>
         </select>
         @if ($errors->has('account_type'))
             <div class="invalid-feedback">

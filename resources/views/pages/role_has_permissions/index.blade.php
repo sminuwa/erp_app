@@ -105,7 +105,7 @@
 @push('js')
     <!-- DataTables -->
     <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{{--    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>--}}
     <script type="text/javascript">
         $(function() {
             // $("#record1").DataTable({
@@ -136,9 +136,9 @@
                         role_id: role
                     }
                 }).done(function(data) {
-                   
+
                     $('#display').html(data);
-                    
+
                     $("#checkAll").click(function() {
                         $('input:checkbox').not(this).prop('checked', this.checked);
                     });

@@ -133,7 +133,7 @@
 @push('js')
     <!-- DataTables -->
     <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{{--    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>--}}
     <script type="text/javascript">
         $(function() {
             $(document).on("change", "#category_id", function(event) {

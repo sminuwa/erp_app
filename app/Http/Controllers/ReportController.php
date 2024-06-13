@@ -869,9 +869,9 @@ class ReportController extends Controller
             ->whereDate('order_date', '>=', $from_date)
             ->whereDate('order_date', '<=', $to_date);
         if ($category_id2 == '%' && $category_id1 != '%') {
-            $sales = $data->where('products.category_id', 'LIKE', $category_id1);
+            $data = $data->where('products.category_id', 'LIKE', $category_id1);
         } elseif ($category_id2 != '%') {
-            $sales = $data->where('products.category_id', '>=', $category_id1)
+            $data = $data->where('products.category_id', '>=', $category_id1)
                 ->where('products.category_id', '<=', $category_id2);
         }
         $sales = $data->groupBy('products.category_id')

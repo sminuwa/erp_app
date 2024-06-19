@@ -66,6 +66,10 @@ function currency_sign($currency = 'NG')
 }
 
 
+function spinner($width = 36, $height=36){
+    return '<img src="'.asset('commons/images/spinner_v1.svg').'" width="'.$width.'" height="'.$height.'"/>';
+}
+
 function ceiling($num, $nearest)
 {
     return ceil($num / $nearest) * $nearest;

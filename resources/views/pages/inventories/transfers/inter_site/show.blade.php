@@ -149,10 +149,10 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $total = 0; @endphp
+                                        @php $total = 0; $stores = \App\Models\Store::where('branch_id', auth()->user()->branch->id ?? 0)->get(); @endphp
                                         @foreach ($record->products as $product)
                                             <tr>
-                                                <th>{{ $loop->index + 1 }}</th>
+                                                <th>{{ $loop->iteration }}</th>
                                                 <td>{{ $product->product->code }}</td>
                                                 <td>{{ $product->product->name }}</td>
                                                 <td>{{ $product->quantity - $product->totalReceive() }}</td>
@@ -160,14 +160,20 @@
                                                 <td class="text-right">
                                                     @if ($product->quantity - $product->totalReceive() > 0)
                                                         @if ($product->intersite->status == 2 && $product->intersite->destination_branch_id == auth()->user()->branch->id)
-                                                            <a href="javascript:void(0)" data-toggle="modal"
+                                                            {{--<a href="javascript:void(0)" data-toggle="modal"
                                                                 data-target="#add_store_product_form"
                                                                 class="btn btn-sm btn-success add-product"
                                                                 data-product-id="{{ $product->product_id }}"
                                                                 data-store-id="{{ $product->store_id }}"
                                                                 data-quantity="{{ $product->quantity - $product->totalReceive() }}"
                                                                 data-cost="{{ $product->cost_price }}"><i
-                                                                    class="fa fa-plus"></i> Add Product </a>
+                                                                    class="fa fa-plus"></i> Add Product </a>--}}
+                                                            {{--<select class="form-control" name="store[]" required="required">
+                                                                <option value=""></option>
+                                                                @foreach($stores as $store)
+                                                                    <option value="{{ $store->id }}">{{ $store->code }} - {{ $store->name }}</option>
+                                                                @endforeach
+                                                            </select>--}}
                                                         @endif
                                                     @endif
                                                 </td>

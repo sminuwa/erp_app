@@ -85,7 +85,7 @@ class CustomerController extends Controller
         //                return $request;
         $model = new Customer;
         $model->fill($request->all());
-        $model->type = $request->account_type == 'R' ? 'Retail' : "Wholesale";
+        $model->type = ($request->account_type == 'R' ? 'Retail' : "Wholesale");
         $model->branch_id = $request->branch_id;
         $model->relation_officer = $request->relation_officer;
         if ($model->save()) {

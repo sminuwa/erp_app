@@ -1,4 +1,4 @@
-div@extends('layouts.backend.app')
+@extends('layouts.backend.app')
 
 @section('title', 'Customer')
 <meta name="csrf-token" content="{{ csrf_token() }}" />

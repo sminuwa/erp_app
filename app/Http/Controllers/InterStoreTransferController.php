@@ -101,6 +101,10 @@ class InterStoreTransferController extends Controller
                             'destination_store_id' => $item->attributes['destination_store_id'],
                             'expiry_date' => $item->attributes['expiry_date'] ?? '',
                         ];
+                        if($item->attributes['source_store_id'] == $item->attributes['destination_store_id']) {
+                            session()->flash('app_error', 'Source store and destination store are the same.');
+                            return back();
+                        }
                         $detail = new InterstoreTransferDetail();
                         $detail->interstore_transfer_id = $interstore->id;
                         $detail->product_id = $item->attributes['product_id'];

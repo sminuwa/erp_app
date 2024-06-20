@@ -49,12 +49,16 @@ class CreditNoteDetail extends Model
 
 
     public function store_product(){
-        return $this->hasOne(StoreProduct::class,'id', 'store_product_id');
+        return $this->hasOne(StoreProduct::class,'id', 'store_product_id')->with('product','store');
     }
 
     public function storeProduct()
     {
-        return $this->belongsTo(StoreProduct::class);
+        return $this->belongsTo(StoreProduct::class)->with('product','store');
+    }
+
+    public function credit_note(){
+        return $this->hasMany(CreditNote::class, 'credit_note_id');
     }
 
 }

@@ -44,7 +44,7 @@ class CreditNote extends Model
 
     public function credit_note_items()
     {
-        return $this->hasMany(CreditNoteDetail::class, 'credit_note_id');
+        return $this->hasMany(CreditNoteDetail::class, 'credit_note_id')->with('storeProduct');
     }
 
     public function createdBy()

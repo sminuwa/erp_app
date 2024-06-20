@@ -154,7 +154,7 @@
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $order_detail->storeProduct->product->code }}</td>
                                                     <td>{{ $order_detail->storeProduct->product->name }}</td>
-                                                    <td>{{ $order_detail->storeProduct->product->unit }}</td>
+                                                    <td>{{ $order_detail->unit }}</td>
                                                     <td>{{ $order_detail->storeProduct->store->code }}</td>
                                                     <td align="center">{{ $order_detail->quantity }}</td>
                                                     <td align="right">{{ number_format($order_detail->sold_price, 2) }}

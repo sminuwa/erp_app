@@ -3,6 +3,7 @@
 namespace App\Classes;
 
 use App\Models\BranchProductPrice;
+use App\Models\ProductUnitMeasure;
 use App\Models\ProductValuation;
 use App\Models\Purchase;
 use App\Models\PurchaseExpense;
@@ -549,6 +550,7 @@ class CostPrice
 
     public static function newCostPrice(array $products, $batch_no, $branch_id, $date, $type = TRANSACTION_TYPE_OPENING_BALANCE, $operation = 'in')
     {
+
         /*
          * branch id of the destination store
          * array of product list as follows
@@ -624,6 +626,21 @@ class CostPrice
 
         foreach ($products as $key => $p) {
             //          return isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0;
+            if($type == TRANSACTION_TYPE_CREDIT_NOTE){
+                $qty = $products[$key]['quantity'];
+                $prs = $products[$key]['price'];
+                $unit_of_measure = ProductUnitMeasure::where(['product_id' => $products[$key]['product_id'], 'code' => $products[$key]['unit']])->first();
+                if (!$unit_of_measure == null){
+                    if ($unit_of_measure->type == 'division')
+                        $qty = ($qty * $unit_of_measure->value);
+                    if ($unit_of_measure->type == 'multiple')
+                        $qty = ($qty / $unit_of_measure->value);
+                }
+                $total_new_cost = ($qty * $prs);
+            }else{
+                $total_new_cost = ($products[$key]['quantity'] * $products[$key]['price']);
+            }
+
             $records[$key] = [
                 'qty_available' => $prices[$key]['qty_available'] ?? 0,
                 'existing_quantity' => isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0,
@@ -631,13 +648,12 @@ class CostPrice
                 'existing_cost' => isset($existing_cost[$key]['cost_price']) ? $existing_cost[$key]['cost_price'] : 0,
                 'new_cost' => $products[$key]['price'],
                 'total_existing_cost' => isset($existing_cost[$key]['total_existing_cost']) ? $existing_cost[$key]['total_existing_cost'] : 0,
-                'total_new_cost' => ($products[$key]['quantity'] * $products[$key]['price']),
+                'total_new_cost' => $total_new_cost,
                 'quantity' => (($p['quantity']) + (isset($existing_cost[$key]['quantity']) ? $existing_cost[$key]['quantity'] : 0)),
                 'expiry_date' => $products[$key]['expiry_date'],
                 'store_id' => $products[$key]['store_id'],
             ];
         }
-//        return $records;
         $store_products = $product_costs = $batch = $stock_card_param = $valuation_param = [];
         if ($operation == 'in') {
             foreach ($records as $key => $record) {
@@ -672,6 +688,7 @@ class CostPrice
                     'expiry_date' => $record['expiry_date'],
                 ];
             }
+//            return $store_products;
             /*return $product_costs;*/
             DB::beginTransaction();
             if (

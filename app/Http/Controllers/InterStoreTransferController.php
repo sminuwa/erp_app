@@ -65,7 +65,8 @@ class InterStoreTransferController extends Controller
             ->join('store_products', 'store_products.product_id', 'products.id')
             ->where('qty_available', '>', 0)->get();
         $categories = Category::all(['id', 'name']);
-        $stores = Store::where('branch_id', 'LIKE', User::userBranchAction())->get();
+        $stores = Store::where('branch_id', User::userBranchAction())->get();
+//        return $stores;
         $cartItems = \Cart::session('_token')->getContent(); //\Cart::getContent();
 
         return view('pages.inventories.transfers.inter_store.create', [

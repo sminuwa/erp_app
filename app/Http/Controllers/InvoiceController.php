@@ -238,6 +238,10 @@ class InvoiceController extends Controller
                 $products = [];
                 $total_discount = 0;
                 $store_products = [];
+                if(count($contents) < 1){
+                    session()->flash('app_error', 'There is no product selected.');
+                    return redirect()->back()->withInput();
+                }
                 foreach ($contents as $content) {
                     //dd($content->quantity);
                     $total_discount += $content->attributes['discount'] * $content->quantity;

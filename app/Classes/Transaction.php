@@ -758,6 +758,7 @@ class Transaction
         //Customer (Debit) based on unit sale price
         //unit cost price
         //unit sale price
+
         try {
             $store_product_ids = $quantities = $sold_prices = [];
             foreach ($store_product as $key => $value) {
@@ -791,6 +792,7 @@ class Transaction
             //            return $records;
             $asset_account = $cost_account = $revenue_account = $customer_ledger = [];
             $customer_value = $branch_id = 0;
+
             foreach ($records as $record) {
                 // total value based on cost price
                 // total value based on sale price

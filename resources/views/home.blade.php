@@ -178,7 +178,7 @@
 
         <!-- Main content -->
         <section class="content">
-            
+
             <div class="container-fluid">
                 @hasanyrole('Super-admin|Admin')
                     <div class="row">
@@ -192,13 +192,13 @@
                                         {{ number_format($today->sum('total'), 2, '.', ',') }}</span>
 
                                     @php
-                                        
+
                                         if ($yesterday->sum('total') != 0) {
                                             $percentage = (($today->sum('total') - $yesterday->sum('total')) / $yesterday->sum('total')) * 100;
                                         } else {
                                             $percentage = 0;
                                         }
-                                        
+
                                     @endphp
 
                                     <div class="progress">
@@ -226,13 +226,13 @@
                                     <span class="info-box-number"> &#8358;
                                         {{ number_format($month->sum('total'), 2, '.', ',') }}</span>
                                     @php
-                                        
+
                                         if ($previous_month->sum('total') != 0) {
                                             $percentage = (($month->sum('total') - $previous_month->sum('total')) / $previous_month->sum('total')) * 100;
                                         } else {
                                             $percentage = 0;
                                         }
-                                        
+
                                     @endphp
 
                                     <div class="progress">
@@ -259,7 +259,7 @@
                                     <span class="info-box-number">&#8358;
                                         {{ number_format($year->sum('total'), 2, '.', ',') }}</span>
                                     @php
-                                        
+
                                         if ($previous_year->sum('total') != 0) {
                                             $percentage = (($year->sum('total') - $previous_year->sum('total')) / $previous_year->sum('total')) * 100;
                                         } else {
@@ -305,13 +305,13 @@
                                     <span class="info-box-number">&#8358;
                                         {{ number_format($today->sum('pay'), 2, '.', ',') }}</span>
                                     @php
-                                        
+
                                         if ($yesterday->sum('pay') != 0) {
                                             $percentage = (($today->sum('pay') - $yesterday->sum('pay')) / $yesterday->sum('pay')) * 100;
                                         } else {
                                             $percentage = 0;
                                         }
-                                        
+
                                     @endphp
 
                                     <div class="progress">
@@ -344,7 +344,7 @@
                                         } else {
                                             $percentage = 0;
                                         }
-                                        
+
                                     @endphp
 
                                     <div class="progress">
@@ -372,13 +372,13 @@
                                     <span class="info-box-number">&#8358;
                                         {{ number_format($year->sum('pay'), 2, '.', ',') }}</span>
                                     @php
-                                        
+
                                         if ($previous_year->sum('pay') != 0) {
                                             $percentage = (($year->sum('pay') - $previous_year->sum('pay')) / $previous_year->sum('pay')) * 100;
                                         } else {
                                             $percentage = 0;
                                         }
-                                        
+
                                     @endphp
 
                                     <div class="progress">
@@ -420,13 +420,13 @@
                                     <span class="info-box-number">&#8358;
                                         {{ number_format($today_due->sum('due'), 2, '.', ',') }}</span>
                                     @php
-                                        
+
                                         if ($yesterday_due->sum('due') != 0) {
                                             $percentage = (($today_due->sum('due') - $yesterday_due->sum('due')) / $yesterday_due->sum('due')) * 100;
                                         } else {
                                             $percentage = 0;
                                         }
-                                        
+
                                     @endphp
 
                                     <div class="progress">
@@ -454,13 +454,13 @@
                                     <span
                                         class="info-box-number">&#8358;{{ number_format($month_due->sum('due'), 2, '.', ',') }}</span>
                                     @php
-                                        
+
                                         if ($previous_month_due->sum('due') != 0) {
                                             $percentage = (($month_due->sum('due') - $previous_month_due->sum('due')) / $previous_month_due->sum('due')) * 100;
                                         } else {
                                             $percentage = 0;
                                         }
-                                        
+
                                     @endphp
 
                                     <div class="progress">
@@ -536,7 +536,7 @@
                                         {{ number_format($today_expenses->sum('amount'), 2, '.', ',') }}</span>
 
                                     @php
-                                        
+
                                         if ($yesterday_expenses->sum('amount') != 0) {
                                             $percentage = (($today_expenses->sum('amount') - $yesterday_expenses->sum('amount')) / $yesterday_expenses->sum('amount')) * 100;
                                         } else {
@@ -574,7 +574,7 @@
                                         } else {
                                             $percentage = 0;
                                         }
-                                        
+
                                     @endphp
 
                                     <div class="progress">
@@ -676,7 +676,7 @@
                 @else
                     <div class="row">
                         <div class="col-2">
-                            
+
                         </div>
                         <div class="col-8">
                             <h1 style="text-shadow: 5px 5px #558ABB;font-weight:900;font-size:60px;">{{App\Models\User::UserBranchName()->long_name}}
@@ -723,7 +723,7 @@
                             </script>
                         </div>
                         <div class="col-2">
-                            
+
                         </div>
 
                     </div>
@@ -738,7 +738,7 @@
 @endsection
 
 @push('js')
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{{--    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>--}}
     <script type="text/javascript">
         google.charts.load('current', {
             'packages': ['bar']

@@ -62,9 +62,11 @@ class CreditNoteController extends Controller
     public function store(Request $request)
     {
         //        return "To call your function";
+//        return $request;
         $order_id = $request->order_id;
         $comment = $request->comment;
-        $order = Order::find($order_id);
+        $order = Order::with('order_items')->find($order_id);
+//        return $order;
         $credit_note_id = $request->credit_note_id;
         $reference = CreditNote::generateNewNumber();
         $credit_note = CreditNote::find($credit_note_id);
@@ -93,6 +95,7 @@ class CreditNoteController extends Controller
                     $credit_note_detail = new CreditNoteDetail();
                     $credit_note_detail->credit_note_id = $credit_note->id;
                     $credit_note_detail->store_product_id = $content->id;
+                    $credit_note_detail->unit = $content->attributes['unit'];
                     $credit_note_detail->quantity = $content->quantity;
                     $credit_note_detail->original_quantity_sold = $content->quantity;
                     $credit_note_detail->selling_price = $content->attributes['selling_price'];
@@ -119,6 +122,7 @@ class CreditNoteController extends Controller
     }
     public function post(CreditNote $credit_note)
     {
+        $credit_note = CreditNote::with('credit_note_items')->find($credit_note->id);
         if($credit_note->status == 0) {
             $credit_note->status = 1;
             $credit_note->posted_by = auth()->id();
@@ -127,18 +131,22 @@ class CreditNoteController extends Controller
             if ($credit_note->save()) {
                 $products = $new_cost_price = [];
                 foreach ($items as $item) {
+                    $new_quantity = Transaction::quantity_sold($item->storeProduct->product->id, $item->quantity, $item->unit);
                     $products[$item->store_product_id] = [
                         'quantity' => $item->quantity,
                         'cost_price' => $item->cost_price,
                         'sold_price' => $item->sold_price
                     ];
                     $new_cost_price[$item->store_product->product_id] = [
-                        'quantity' => $item->quantity,
+                        'quantity' => $new_quantity,
+                        'unit'=>$item->unit,
+                        'product_id'=>$item->storeProduct->product->id,
                         'price' => $item->cost_price,
                         'store_id' => $item->store_product->store_id,
                         'expiry_date' => ''
                     ];
                 }
+
                 if (
                     Transaction::credit_note(
                         $products,
@@ -173,8 +181,10 @@ class CreditNoteController extends Controller
     }
     public function show($id)
     {
-        $order = CreditNote::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
-        $order_details = CreditNoteDetail::with('storeProduct')->where(['credit_note_id' => $id, 'status' => 1])->get();
+        $order = CreditNote::with('customer','credit_note_items')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
+//        $order_details = CreditNoteDetail::with('storeProduct')->where(['credit_note_id' => $id, 'status' => 1])->get();
+        $order_details = $order->credit_note_items;
+
         //return $order_details;
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         return view('pages.inventories.credit_notes.show', compact('order_details', 'order', 'company'));

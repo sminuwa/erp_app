@@ -801,6 +801,7 @@ class ReportController extends Controller
     }
     public function loadCategorySaleReport(Request $request)
     {
+
         $from_date = $request->from_date;
         $to_date = $request->to_date;
         $branch_id = $request->branch_id;
@@ -853,9 +854,9 @@ class ReportController extends Controller
                 DB::raw('SUM(order_details.total) as amount'),
                 DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
                 DB::raw('(SELECT SUM(store_products.qty_available) FROM store_products
-                    JOIN stores ON store_products.store_id = stores.id
+                    JOIN stores s ON store_products.store_id = s.id
                     JOIN products ON store_products.product_id = products.id
-                    WHERE stores.branch_id LIKE ' . $branch_id . '
+                    WHERE s.branch_id LIKE stores.branch_id
                         AND products.category_id = categories.id) as qty_available')
             )
             ->join('order_details', 'orders.id', '=', 'order_details.order_id')
@@ -868,9 +869,9 @@ class ReportController extends Controller
             ->whereDate('order_date', '>=', $from_date)
             ->whereDate('order_date', '<=', $to_date);
         if ($category_id2 == '%' && $category_id1 != '%') {
-            $sales = $data->where('products.category_id', 'LIKE', $category_id1);
+            $data = $data->where('products.category_id', 'LIKE', $category_id1);
         } elseif ($category_id2 != '%') {
-            $sales = $data->where('products.category_id', '>=', $category_id1)
+            $data = $data->where('products.category_id', '>=', $category_id1)
                 ->where('products.category_id', '<=', $category_id2);
         }
         $sales = $data->groupBy('products.category_id')

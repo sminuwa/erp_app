@@ -37,12 +37,14 @@
     <ul class="navbar-nav ml-auto">
         <a href="{{ route('chatify') }}" title="Chat System" target="_BLANK"
             class="fa fa-wechat text text-info float-md-right">Chat</a> &nbsp;&nbsp;&nbsp;
-        @if (Auth::user()->hasRole('Super-admin'))
+        @can('setting.change-branch')
+{{--        @if (Auth::user()->hasRole('Super-admin'))--}}
             <a href="javascript:void(0)" data-toggle="modal" title="Switch Branch" data-target="#swtich_branch"
                 class="fa fa-adjust text text-danger float-md-right">Switch Branch</a> &nbsp;&nbsp;&nbsp;
             <a href="javascript:void(0)" data-toggle="modal" title="Available Stock" data-target="#avail_stock"
                 class="fa fa-camera-retro text text-info float-md-right">Stock</a>
-        @endif
+{{--        @endif--}}
+        @endcan
         <!-- Profile Dropdown Menu -->
         <li class="dropdown notification-list">
             <a class="nav-link dropdown-toggle arrow-none waves-light waves-effect" data-toggle="dropdown"

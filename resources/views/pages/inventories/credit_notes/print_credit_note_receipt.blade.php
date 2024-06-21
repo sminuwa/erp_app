@@ -76,7 +76,7 @@
                                         <td  align="right">
                                             &#8358; {{ number_format($payment->amount, 2) }}</td>
                                     </tr>
-        
+
                                     <tr>
                                         <td class="text-right text-danger" colspan="3">
                                             <p>
@@ -115,7 +115,7 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $order_detail->store_product->product->code ?? "" }}</td>
                                             <td>{{ $order_detail->store_product->product->name ?? "" }}</td>
-                                            <td>{{ $order_detail->store_product->product->unit ?? "" }}</td>
+                                            <td>{{ $order_detail->unit ?? "" }}</td>
                                             <td>{{ $order_detail->store_product->store->code ?? "" }}</td>
                                             <td align="center">{{ $order_detail->quantity }}</td>
                                             <td align="right">{{ number_format($order_detail->sold_price, 2) }}

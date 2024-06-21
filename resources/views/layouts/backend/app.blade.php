@@ -60,7 +60,16 @@
         }
 
 
+        /*.spinner-container {
+            display: grid;
+            place-items: center;
+            height: 100vh; !* Adjust as needed *!
+        }
 
+        .spinner-container img {
+            max-width: 100%; !* Ensure the image doesn't overflow the container *!
+            height: auto; !* Maintain the aspect ratio *!
+        }*/
     </style>
 
     @stack('css')
@@ -181,7 +190,21 @@
 
     <script>
 
-
+        function ajax_loading(url, type, result_div, data ){
+            $.ajax({
+                url: url,
+                type : type,
+                data : data,
+                beforeSend: function(){
+                    $('.'+result_div).html('<?php echo spinner(); ?>')
+                },
+                success: function(response){
+                    //TODO::remove console
+                    console.log(response)
+                    $('.'+result_div).html(response)
+                }
+            })
+        }
 
     </script>
 

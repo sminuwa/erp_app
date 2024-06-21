@@ -38,23 +38,14 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class CustomerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @param  Index  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function index(Index $request)
     {
         $user_branch = User::userBranchAction();
-        return view('pages.customers.index', ['records' => Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('created_at', 'desc')->get()]);
-    } /**
-      * Display the specified resource.
-      *
-      * @param  Show  $request
-      * @param  Customer  $customer
-      * @return \Illuminate\Http\Response
-      */
+        $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('created_at', 'desc')->limit(10)->get();
+        return view('pages.customers.index', compact('customers'));
+    }
+
     public function show(Show $request, Customer $customer)
     { //dd($customer->ledgers()->get());
         return view('pages.customers.show', [
@@ -85,7 +76,7 @@ class CustomerController extends Controller
         //                return $request;
         $model = new Customer;
         $model->fill($request->all());
-        $model->type = $request->account_type == 'R' ? 'Retail' : "Wholesale";
+        $model->type = ($request->account_type == 'R' ? 'Retail' : "Wholesale");
         $model->branch_id = $request->branch_id;
         $model->relation_officer = $request->relation_officer;
         if ($model->save()) {

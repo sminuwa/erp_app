@@ -65,7 +65,8 @@ class InterStoreTransferController extends Controller
             ->join('store_products', 'store_products.product_id', 'products.id')
             ->where('qty_available', '>', 0)->get();
         $categories = Category::all(['id', 'name']);
-        $stores = Store::where('branch_id', 'LIKE', User::userBranchAction())->get();
+        $stores = Store::where('branch_id', User::userBranchAction())->get();
+//        return $stores;
         $cartItems = \Cart::session('_token')->getContent(); //\Cart::getContent();
 
         return view('pages.inventories.transfers.inter_store.create', [
@@ -101,6 +102,10 @@ class InterStoreTransferController extends Controller
                             'destination_store_id' => $item->attributes['destination_store_id'],
                             'expiry_date' => $item->attributes['expiry_date'] ?? '',
                         ];
+                        if($item->attributes['source_store_id'] == $item->attributes['destination_store_id']) {
+                            session()->flash('app_error', 'Source store and destination store are the same.');
+                            return back();
+                        }
                         $detail = new InterstoreTransferDetail();
                         $detail->interstore_transfer_id = $interstore->id;
                         $detail->product_id = $item->attributes['product_id'];

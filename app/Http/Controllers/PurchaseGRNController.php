@@ -115,7 +115,12 @@ class PurchaseGRNController extends Controller
             $purchase->status = 0;
             if ($purchase->save()) {
                 PurchaseProduct::where('purchase_id', $purchase->id)->delete();
-                foreach (\Cart::getContent() as $cart) {
+                $items = \Cart::getContent();
+                if(count($items) < 1) {
+                    session()->flash('app_error', 'There is no product selected.');
+                    return redirect()->back()->withInput();
+                }
+                foreach ($items as $cart) {
                     $product = new PurchaseProduct();
                     $cart_attributes = $cart->attributes;
                     $product->purchase_id = $purchase->id;

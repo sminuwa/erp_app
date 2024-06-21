@@ -91,7 +91,11 @@ class InterStoreTransferController extends Controller
             DB::beginTransaction();
             if($interstore->save()) {
                 $items = \Cart::getContent();
-                if (count($items) > 0) {
+                if (count($items) < 1){
+                    DB::rollBack();
+                    session()->flash('app_error', 'There is no product selected.');
+                    return redirect()->back()->withInput();
+                }
                     //$transfer_id = $this->getNextTransferID();
                     $new_cost_price = [];
                     foreach ($items as $item) {
@@ -127,7 +131,7 @@ class InterStoreTransferController extends Controller
                         session()->flash('app_message', 'Transfer created successfully');
                         DB::commit();
                     }
-                }
+
             }
 
         } catch (\Exception $ex) {

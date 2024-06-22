@@ -130,43 +130,66 @@ class InterSiteTransferController extends Controller
 
     public function addToStore(Request $request)
     {
-        $user = auth()->user();
-        $intersite_transfer_id = $request->intersite_transfer_id;
-        $source_store_id = $request->source_store_id;
-        $product_id = $request->product_id;
-        $store_id = $request->store_id;
-        $quantity = $request->quantity;
-        $intersite = IntersiteTransfer::find($intersite_transfer_id);
-        $record = IntersiteTransferProduct::where(['intersite_transfer_id' => $intersite_transfer_id, 'store_id' => $source_store_id, 'product_id' => $product_id])->first();
-        $cost_price = $record->cost_price;
-        $total_quantity = $record->quantity;
-        DB::beginTransaction();
-        $new_cost_price = [];
+        try {
+            $user = auth()->user();
+            $intersite_transfer_id = $request->intersite_transfer_id;
+            $store_id = $request->store_id;
+            $intersite = IntersiteTransfer::find($intersite_transfer_id);
+            $products = $intersite->products;
+            DB::beginTransaction();
+            foreach ($products as $product) {
+//            $record = IntersiteTransferProduct::where(['intersite_transfer_id' => $intersite_transfer_id, 'store_id' => $product->store_id, 'product_id' => $product->product_id])->first();
+                $new_cost_price = [];
+                $receive = IntersiteTransferReceive::where(
+                    [
+                        'intersite_transfer_id' => $intersite_transfer_id,
+                        'store_id' => $store_id,
+                        'product_id' => $product->product_id,
+                        'quantity'=>$product->quantity
+                    ])->first();
+                if(!$receive)
+                    $receive = new IntersiteTransferReceive();
+                $receive->intersite_transfer_id = $intersite->id;
+                $receive->source_store_id = $product->store_id;
+                $receive->product_id = $product->product_id;
+                $receive->store_id = $store_id;
+                $receive->quantity = $product->quantity;
+                $receive->cost_price = $product->cost_price;
+                $receive->status = 1;
+                $receive->save();
+                $new_cost_price[$product->product_id] = [
+                    'quantity' => $product->quantity,
+                    'price' => $product->cost_price,
+                    'store_id' => $store_id,
+                    'expiry_date' => '',
+                ];
 
-        $receive = new IntersiteTransferReceive();
-        $receive->intersite_transfer_id = $intersite->id;
-        $receive->source_store_id = $record->store_id;
-        $receive->product_id = $record->product_id;
-        $receive->store_id = $store_id;
-        $receive->quantity = $quantity;
-        $receive->cost_price = $cost_price;
-        $receive->status = 1;
-        $receive->save();
-        $new_cost_price[$product_id] = [
-            'quantity' => $quantity,
-            'price' => $cost_price,
-            'store_id' => $store_id,
-            'expiry_date' => '',
-        ];
-
-        /*return CostPrice::newCostPrice(
-            $new_cost_price,
-            $intersite->reference,
-            $user->branch->id,
-            $intersite->date,
-            TRANSACTION_TYPE_INTERSITE
-        );*/
-        if (
+                /*return CostPrice::newCostPrice(
+                    $new_cost_price,
+                    $intersite->reference,
+                    $user->branch->id,
+                    $intersite->date,
+                    TRANSACTION_TYPE_INTERSITE
+                );*/
+                CostPrice::newCostPrice(
+                    $new_cost_price,
+                    $intersite->reference,
+                    $user->branch->id,
+                    $intersite->date,
+                    TRANSACTION_TYPE_INTERSITE
+                );
+            }
+            $action = "Added products to store from intersite with reference : " . $intersite->reference;
+            AuditLog::auditLog(Auth::id(), $action);
+            DB::commit();
+            session()->flash('app_message', 'Product added to store successfully.');
+            return back();
+        }catch (\Exception $e){
+            DB::rollback();
+            session()->flash('app_error', 'Allocation failed. ' . $e->getMessage());
+            return back();
+        }
+        /*if (
             CostPrice::newCostPrice(
                 $new_cost_price,
                 $intersite->reference,
@@ -181,7 +204,7 @@ class InterSiteTransferController extends Controller
         } else
             DB::rollback();
         session()->flash('app_message', 'Product added to store successfully.');
-        return back();
+        return back();*/
     }
 
     public function create(Create $request)
@@ -401,9 +424,9 @@ class InterSiteTransferController extends Controller
         return "TR" . date('y') . '' . date('m') . str_pad(($no), 4, "0", STR_PAD_LEFT);
     }
     public function printStockTransfer(IntersiteTransfer $intersite)
-    { 
+    {
         $this->authorize('intersite.print');
-        
+
         return view('pages.inventories.transfers.inter_site.print')->with(['intersite'=>$intersite]);
     }
 

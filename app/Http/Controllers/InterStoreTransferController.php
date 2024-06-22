@@ -65,7 +65,8 @@ class InterStoreTransferController extends Controller
             ->join('store_products', 'store_products.product_id', 'products.id')
             ->where('qty_available', '>', 0)->get();
         $categories = Category::all(['id', 'name']);
-        $stores = Store::where('branch_id', 'LIKE', User::userBranchAction())->get();
+        $stores = Store::where('branch_id', User::userBranchAction())->get();
+//        return $stores;
         $cartItems = \Cart::session('_token')->getContent(); //\Cart::getContent();
 
         return view('pages.inventories.transfers.inter_store.create', [
@@ -90,7 +91,11 @@ class InterStoreTransferController extends Controller
             DB::beginTransaction();
             if($interstore->save()) {
                 $items = \Cart::getContent();
-                if (count($items) > 0) {
+                if (count($items) < 1){
+                    DB::rollBack();
+                    session()->flash('app_error', 'There is no product selected.');
+                    return redirect()->back()->withInput();
+                }
                     //$transfer_id = $this->getNextTransferID();
                     $new_cost_price = [];
                     foreach ($items as $item) {
@@ -126,7 +131,7 @@ class InterStoreTransferController extends Controller
                         session()->flash('app_message', 'Transfer created successfully');
                         DB::commit();
                     }
-                }
+
             }
 
         } catch (\Exception $ex) {

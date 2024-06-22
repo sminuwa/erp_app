@@ -133,7 +133,7 @@ class CartController extends Controller
         if ($type == 'interstore') {
             $product = Product::find($request->product_id);
             $add = \Cart::add([
-                'id' => generateRandomString(),
+                'id' => $request->source_store_id.$request->product_id,
                 'name' => $product->name,
                 'price' => 0,
                 'quantity' => $request->qty_transfered,
@@ -149,7 +149,7 @@ class CartController extends Controller
             $product = Product::find($request->product_id);
             $cost_price = BranchProductPrice::where(['product_id' => $request->product_id, 'branch_id' => auth()->user()->branch->id])->first();
             $add = \Cart::add([
-                'id' => generateRandomString(),
+                'id' => $request->store_id.$request->product_id,
                 'name' => $product->name,
                 'price' => str_replace(',', '', $cost_price->cost_price) ?? 1,
                 'quantity' => $request->quantity,
@@ -221,7 +221,7 @@ class CartController extends Controller
             }
 
             $add = \Cart::add([
-                'id' => generateRandomString(),
+                'id' => $request->store_id.$request->product_id,
                 'name' => $product->name,
                 'price' => $cost_price, //This is not applicable here
                 'quantity' => abs($request->quantity),

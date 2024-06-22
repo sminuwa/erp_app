@@ -69,4 +69,7 @@ class Order extends Model
     {
         return $this->hasMany(CreditNote::class, 'order_id');
     }
+
+    /*public function scope*/
+
 }

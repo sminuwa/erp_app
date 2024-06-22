@@ -135,6 +135,11 @@
                         <div class="card">
                             <div class="card-header">
                                 Request Products
+                                <div class="float-right">
+                                    <a href="javascript:void(0)" data-toggle="modal"
+                                    data-target="#add_store_product_form"
+                                    class="btn btn-sm btn-success add-product"> Allocation </a>
+                                </div>
                             </div>
                             <div class="card-body table-responsive">
                                 <table class="table table-bordered" id="record1">
@@ -145,7 +150,7 @@
                                             <th>Description</th>
                                             <th>Quantity</th>
                                             <th>Received</th>
-                                            <th></th>
+{{--                                            <th></th>--}}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -157,26 +162,26 @@
                                                 <td>{{ $product->product->name }}</td>
                                                 <td>{{ $product->quantity - $product->totalReceive() }}</td>
                                                 <td>{{ $product->totalReceive() }}</td>
-                                                <td class="text-right">
+                                                {{--<td class="text-right">
                                                     @if ($product->quantity - $product->totalReceive() > 0)
                                                         @if ($product->intersite->status == 2 && $product->intersite->destination_branch_id == auth()->user()->branch->id)
-                                                            {{--<a href="javascript:void(0)" data-toggle="modal"
+                                                            --}}{{--<a href="javascript:void(0)" data-toggle="modal"
                                                                 data-target="#add_store_product_form"
                                                                 class="btn btn-sm btn-success add-product"
                                                                 data-product-id="{{ $product->product_id }}"
                                                                 data-store-id="{{ $product->store_id }}"
                                                                 data-quantity="{{ $product->quantity - $product->totalReceive() }}"
                                                                 data-cost="{{ $product->cost_price }}"><i
-                                                                    class="fa fa-plus"></i> Add Product </a>--}}
-                                                            {{--<select class="form-control" name="store[]" required="required">
+                                                                    class="fa fa-plus"></i> Add Product </a>--}}{{--
+                                                            --}}{{--<select class="form-control" name="store[]" required="required">
                                                                 <option value=""></option>
                                                                 @foreach($stores as $store)
                                                                     <option value="{{ $store->id }}">{{ $store->code }} - {{ $store->name }}</option>
                                                                 @endforeach
-                                                            </select>--}}
+                                                            </select>--}}{{--
                                                         @endif
                                                     @endif
-                                                </td>
+                                                </td>--}}
                                                 @php $total += $product->cost_price * $product->quantity_requested; @endphp
                                             </tr>
                                         @endforeach
@@ -243,7 +248,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add product to store</h5>
+                    <h5 class="modal-title">Intersite Allocation</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -271,15 +276,15 @@
                             </select>
                         </div>
 
-                        <div class="form-group">
+                        {{--<div class="form-group">
                             <label for="quantity">Quantity</label>
                             <input type="number" step=".01" class="form-control" name="quantity" id="quantity"
                                 placeholder="Quantity" required="required" readonly>
-                        </div>
+                        </div>--}}
                         <input type="hidden" value="0" name="cost_price" id="cost_price" />
                         <div class="form-group text-right ">
                             <button onclick="$(this).attr('readonly','readonly')" type="submit" class="btn btn-primary"><span class="ion-ios-cart-outline"></span>
-                                Add</button>
+                                Allocate</button>
                         </div>
                     </form>
                 </div>

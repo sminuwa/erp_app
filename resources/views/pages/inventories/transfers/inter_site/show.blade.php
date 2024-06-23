@@ -151,7 +151,7 @@
                                             <th>Code</th>
                                             <th>Description</th>
                                             <th>Quantity</th>
-                                            <th>Received</th>
+{{--                                            <th>Received</th>--}}
 {{--                                            <th></th>--}}
                                         </tr>
                                     </thead>
@@ -162,8 +162,8 @@
                                                 <th>{{ $loop->iteration }}</th>
                                                 <td>{{ $product->product->code }}</td>
                                                 <td>{{ $product->product->name }}</td>
-                                                <td>{{ $product->quantity - $product->totalReceive() }}</td>
-                                                <td>{{ $product->totalReceive() }}</td>
+                                                <td>{{ $product->quantity }}</td>
+{{--                                                <td>{{ $product->totalReceive() }}</td>--}}
                                                 {{--<td class="text-right">
                                                     @if ($product->quantity - $product->totalReceive() > 0)
                                                         @if ($product->intersite->status == 2 && $product->intersite->destination_branch_id == auth()->user()->branch->id)
@@ -195,7 +195,7 @@
                                         <th></th>
                                         {{-- <th style="text-align: right">Total</th>
                                         <th style="text-align: right">&#8358;{{ number_format($total, 2) }}</th> --}}
-                                        <th></th>
+{{--                                        <th></th>--}}
                                     </tfoot>
                                 </table>
                             </div>

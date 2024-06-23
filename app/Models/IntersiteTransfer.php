@@ -109,12 +109,15 @@ class IntersiteTransfer extends Model
 
     public function is_completed() : bool{
         $total = 0;
-        foreach($this->products as $product){
-            if(($product->quantity - $product->totalReceive()) == 0)
-                continue;
-            return false;
-        }
-        return true;
+        if(IntersiteTransferProduct::where('intersite_transfer_id', $this->id)->sum('quantity') == IntersiteTransferReceive::where('intersite_transfer_id', $this->id)->sum('quantity'))
+            return true;
+            /*foreach($this->products as $product){
+                if(($product->quantity - $product->totalReceive()) == 0)
+                    continue;
+                return false;
+            }*/
+        return false;
+
     }
 
     public function receivedProducts()

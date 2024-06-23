@@ -135,7 +135,7 @@
                         <div class="card">
                             <div class="card-header">
                                 Request Products
-                                @if(!$record->is_completed)
+                                @if(!$record->is_completed())
                                 <div class="float-right">
                                     <a href="javascript:void(0)" data-toggle="modal"
                                     data-target="#add_store_product_form"

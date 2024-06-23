@@ -135,11 +135,13 @@
                         <div class="card">
                             <div class="card-header">
                                 Request Products
+                                @if(!$record->is_completed())
                                 <div class="float-right">
                                     <a href="javascript:void(0)" data-toggle="modal"
                                     data-target="#add_store_product_form"
                                     class="btn btn-sm btn-success add-product"> Allocation </a>
                                 </div>
+                                @endif
                             </div>
                             <div class="card-body table-responsive">
                                 <table class="table table-bordered" id="record1">
@@ -149,7 +151,7 @@
                                             <th>Code</th>
                                             <th>Description</th>
                                             <th>Quantity</th>
-                                            <th>Received</th>
+{{--                                            <th>Received</th>--}}
 {{--                                            <th></th>--}}
                                         </tr>
                                     </thead>
@@ -160,8 +162,8 @@
                                                 <th>{{ $loop->iteration }}</th>
                                                 <td>{{ $product->product->code }}</td>
                                                 <td>{{ $product->product->name }}</td>
-                                                <td>{{ $product->quantity - $product->totalReceive() }}</td>
-                                                <td>{{ $product->totalReceive() }}</td>
+                                                <td>{{ $product->quantity }}</td>
+{{--                                                <td>{{ $product->totalReceive() }}</td>--}}
                                                 {{--<td class="text-right">
                                                     @if ($product->quantity - $product->totalReceive() > 0)
                                                         @if ($product->intersite->status == 2 && $product->intersite->destination_branch_id == auth()->user()->branch->id)
@@ -193,7 +195,7 @@
                                         <th></th>
                                         {{-- <th style="text-align: right">Total</th>
                                         <th style="text-align: right">&#8358;{{ number_format($total, 2) }}</th> --}}
-                                        <th></th>
+{{--                                        <th></th>--}}
                                     </tfoot>
                                 </table>
                             </div>

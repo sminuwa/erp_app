@@ -4,7 +4,7 @@ namespace App\Http\Requests\PurchaseRequest;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Purchase;
-class Update extends FormRequest 
+class Update extends FormRequest
 {
 
     /**
@@ -12,7 +12,7 @@ class Update extends FormRequest
      *
      * @return bool
      */
-    public function authorize() 
+    public function authorize()
     {
         return $this->user()->can('purchases.request.update');
     }
@@ -22,12 +22,11 @@ class Update extends FormRequest
      *
      * @return array
      */
-    public function rules() 
+    public function rules()
     {
         return [
 			'supplier_id' => 'required|numeric',
 			'invoice' => 'required|max:191',
-			'purchase_date' => 'required|date',
 			'wbno' => 'nullable|max:191',
 			'status' => 'required',
 			'waybill_no' => 'nullable|max:50',
@@ -48,7 +47,7 @@ class Update extends FormRequest
     public function messages()
     {
         return [
-     
+
         ];
     }
 

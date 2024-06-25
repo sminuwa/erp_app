@@ -150,6 +150,7 @@
                                             <th>S/N</th>
                                             <th>Code</th>
                                             <th>Description</th>
+                                            <th>Store</th>
                                             <th>Quantity</th>
 {{--                                            <th>Received</th>--}}
 {{--                                            <th></th>--}}
@@ -162,6 +163,7 @@
                                                 <th>{{ $loop->iteration }}</th>
                                                 <td>{{ $product->product->code }}</td>
                                                 <td>{{ $product->product->name }}</td>
+                                                <td>{{ $product->store->name ?? '' }}</td>
                                                 <td>{{ $product->quantity }}</td>
 {{--                                                <td>{{ $product->totalReceive() }}</td>--}}
                                                 {{--<td class="text-right">
@@ -195,7 +197,7 @@
                                         <th></th>
                                         {{-- <th style="text-align: right">Total</th>
                                         <th style="text-align: right">&#8358;{{ number_format($total, 2) }}</th> --}}
-{{--                                        <th></th>--}}
+                                        <th></th>
                                     </tfoot>
                                 </table>
                             </div>

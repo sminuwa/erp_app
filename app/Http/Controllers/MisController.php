@@ -43,23 +43,24 @@ class MisController extends Controller
     public function loadAvailableProducts(Request $request)
     {
         $types = DB::table('products')
-            ->select('products.id', 'products.name')
+            ->select('products.id','products.code', 'products.name','store_products.qty_available')
             ->join('store_products', 'store_products.product_id', 'products.id')
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->where('stores.branch_id', 'LIKE', User::userBranchAction())
-            ->where('category_id', 'like', $request->query->get('category_id'))
+            ->where('category_id', 'like', $request->query->get('category_id') ?? '%')
             ->where('store_products.store_id', $request->query->get('store_id'))
             ->where('qty_available', '>', 0)
             ->orderBy('name', 'asc')
             ->get();
         $result = "";
         if ($types->count() > 0)
-            $result .= "<option value=''>Select....</option>";
+            $result .= "<option value=''>--select--</option>";
         foreach ($types as $type) {
-            $result .= "<option value='" . $type->id . "'>" . $type->name . "</option>";
+            $result .= "<option value='" . $type->id . "' data-value='".$type->qty_available ."'>" . $type->code." - " . $type->name." - ".$type->qty_available . "</option>";
         }
         return $result;
     }
+
     public function loadbranches(Request $request)
     {
         $types = DB::table('branches')
@@ -130,7 +131,7 @@ class MisController extends Controller
 
     }
     public function loadCustomers(Request $request)
-    { 
+    {
         $types = DB::table('customers')
             ->select('customers.id', 'customers.name', 'customers.code')
             ->where('type', '=', $request->type)

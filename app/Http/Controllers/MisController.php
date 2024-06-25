@@ -42,6 +42,11 @@ class MisController extends Controller
     }
     public function loadAvailableProducts(Request $request)
     {
+        $items = \Cart::getContent(); // generating existing product fromm the active cart
+        $product_ids = [];
+        foreach($items as $item){
+            $product_ids[] = $item->attributes['product_id'];
+        }
         $types = DB::table('products')
             ->select('products.id','products.code', 'products.name','store_products.qty_available')
             ->join('store_products', 'store_products.product_id', 'products.id')
@@ -50,6 +55,7 @@ class MisController extends Controller
             ->where('category_id', 'like', $request->query->get('category_id') ?? '%')
             ->where('store_products.store_id', $request->query->get('store_id'))
             ->where('qty_available', '>', 0)
+            ->whereNotIn('products.id',$product_ids)
             ->orderBy('name', 'asc')
             ->get();
         $result = "";

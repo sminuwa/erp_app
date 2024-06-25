@@ -260,6 +260,7 @@ class InterSiteTransferController extends Controller
             $intersite->date = $date;
             if ($intersite->save()) {
                 $items = \Cart::getContent();
+
                 if (count($items) < 1) {
                     session()->flash('app_error', 'There is no product in the cart.');
                     return back()->withInput();
@@ -277,15 +278,14 @@ class InterSiteTransferController extends Controller
                     $product->product_id = $product_id;
                     $product->quantity = $item->quantity;
                     $product->cost_price = $item->price;
-                    if($product->save()){
-                        $action = "Made intersite transfer of product from " . $user->branch->name . " to  branch" . Branch::find($destination_branch_id)->name;
-                        AuditLog::auditLog(Auth::id(), $action);
-                        session()->flash('app_message', 'Intersite transfer saved successfully');
-                        DB::commit();
-                        \Cart::clear();
-                        return redirect()->route('intersite.show',$intersite->id);
-                    }
+                    $product->save();
                 }
+                $action = "Made intersite transfer of product from " . $user->branch->name . " to  branch" . Branch::find($destination_branch_id)->name;
+                AuditLog::auditLog(Auth::id(), $action);
+                session()->flash('app_message', 'Intersite transfer saved successfully');
+                DB::commit();
+                \Cart::clear();
+                return redirect()->route('intersite.show',$intersite->id);
             } else {
                 DB::rollBack();
                 session()->flash('app_message', 'Something went wrong.');

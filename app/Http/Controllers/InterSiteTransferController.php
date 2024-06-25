@@ -65,20 +65,22 @@ class InterSiteTransferController extends Controller
     public function post(IntersiteTransfer $intersite)
     {
         if($intersite->status == 0){
+            DB::beginTransaction();
             $this->authorize('intersite.post');
             $user = auth()->user();
             $intersite->status = 1;
             $intersite->posted_by = $user->id;
-            DB::beginTransaction();
+
             if ($intersite->save()) {
                 $items = $intersite->products;
+                /*return $items;*/
                 foreach ($items as $item) {
                     StoreProduct::where(['store_id' => $item->store_id, 'product_id' => $item->product_id])->decrement('qty_available', $item->quantity);
                 }
                 if (Transaction::intersite_post($intersite->id)['status']) {
                     $action = "Posted intersite transfer of product from " . $user->branch->name . " to  branch" . Branch::find($intersite->destination_branch_id)->name;
                     AuditLog::auditLog(Auth::id(), $action);
-                    session()->flash('app_message', 'Intersite transfer saved successfully');
+                    session()->flash('app_message', 'Intersite transfer posted successfully');
                     DB::commit();
                 } else {
                     DB::rollBack();
@@ -257,26 +259,33 @@ class InterSiteTransferController extends Controller
             $intersite->description = $description;
             $intersite->date = $date;
             if ($intersite->save()) {
-                if (\Cart::getContent()->count() > 0) {
-                    IntersiteTransferProduct::where('intersite_transfer_id', $intersite->id)->delete();
-                    foreach (\Cart::getContent() as $product) {
-                        $attribute = $product->attributes;
-                        $store_id = $attribute['store_id'];
-                        $product_id = $attribute['product_id'];
-                        $item = new IntersiteTransferProduct();
-                        $item->intersite_transfer_id = $intersite->id;
-                        $item->store_id = $store_id;
-                        $item->product_id = $product_id;
-                        $item->quantity = $product->quantity;
-                        $item->cost_price = $product->price;
-                        $item->save();
+                $items = \Cart::getContent();
+                if (count($items) < 1) {
+                    session()->flash('app_error', 'There is no product in the cart.');
+                    return back()->withInput();
+                }
+                IntersiteTransferProduct::where('intersite_transfer_id', $intersite->id)->delete();
+                foreach ($items as $item) {
+                    $attribute = $item->attributes;
+                    $store_id = $attribute['store_id'];
+                    $product_id = $attribute['product_id'];
+                    $product = IntersiteTransferProduct::where(['intersite_transfer_id'=>$intersite->id,'store_id'=>$store_id, 'product_id'=>$product_id])->first();
+                    if(!$product)
+                        $product = new IntersiteTransferProduct();
+                    $product->intersite_transfer_id = $intersite->id;
+                    $product->store_id = $store_id;
+                    $product->product_id = $product_id;
+                    $product->quantity = $item->quantity;
+                    $product->cost_price = $item->price;
+                    if($product->save()){
+                        $action = "Made intersite transfer of product from " . $user->branch->name . " to  branch" . Branch::find($destination_branch_id)->name;
+                        AuditLog::auditLog(Auth::id(), $action);
+                        session()->flash('app_message', 'Intersite transfer saved successfully');
+                        DB::commit();
+                        \Cart::clear();
+                        return redirect()->route('intersite.show',$intersite->id);
                     }
                 }
-                $action = "Made intersite transfer of product from " . $user->branch->name . " to  branch" . Branch::find($destination_branch_id)->name;
-                AuditLog::auditLog(Auth::id(), $action);
-                session()->flash('app_message', 'Intersite transfer saved successfully');
-                DB::commit();
-                \Cart::clear();
             } else {
                 DB::rollBack();
                 session()->flash('app_message', 'Something went wrong.');

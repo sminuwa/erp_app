@@ -2,9 +2,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+
 /**
  @property bigint $store_id store id @property bigint $product_id product id @property int $qty_available qty available @property timestamp $created_at created at @property timestamp $updated_at updated at
- 
+
  */
 class StoreProduct extends Model
 
@@ -37,11 +39,16 @@ class StoreProduct extends Model
     {
         return $this->belongsTo(Store::class);
     }
-    
+
     public static function scopeForProducts($query, int $store_id = null)
     {
         if (is_null($store_id))
             return $query;
         return $query->where('store_id', $store_id);
     }
+
+    public function _decrement($store_id, $product_id, $quantity = 0){
+        DB::table('store_products')->update(['qty_available' => DB::raw('GREATEST(qty_available - 5, 0)')]);
+    }
+
 }

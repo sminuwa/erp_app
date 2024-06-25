@@ -146,19 +146,37 @@ class CartController extends Controller
             ]);
         }
         if ($type == 'intersite') {
+            $store_id = $request->store_id;
+            $product_id = $request->product_id;
+            $quantity = $request->quantity;
             $product = Product::find($request->product_id);
             $cost_price = BranchProductPrice::where(['product_id' => $request->product_id, 'branch_id' => auth()->user()->branch->id])->first();
+            $store_product = StoreProduct::where(['store_id'=> $store_id,'product_id'=>$product_id])->first();
+            if($store_product->qty_available < $quantity)
+                $quantity = $store_product->qty_available;
+
+            $items = \Cart::getContent();
+            foreach($items as $item){
+                $store_id = $item->attributes['store_id'];
+                $product_id = $item->attributes['product_id'];
+                $sp = StoreProduct::where(['store_id'=> $store_id,'product_id'=>$product_id])->first();
+                if(($item->quantity + $quantity) > $sp->qty_available){
+                    \Cart::remove($store_id.$product_id);
+                }
+            }
             $add = \Cart::add([
-                'id' => $request->store_id.$request->product_id,
+                'id' => $store_id.$product_id,
                 'name' => $product->name,
                 'price' => str_replace(',', '', $cost_price->cost_price) ?? 1,
-                'quantity' => $request->quantity,
+                'quantity' => $quantity,
                 'attributes' => array(
-                    'store_id' => $request->store_id,
-                    'product_id' => $request->product_id,
+                    'store_id' => $store_id,
+                    'product_id' => $product_id,
                     'code' => $product->code,
                 ),
             ]);
+
+
         }
         if ($type == 'grn') {
             $product = Product::find($request->product_id);
@@ -419,18 +437,33 @@ class CartController extends Controller
         }
         if ($type == 'intersite') {
             $product = Product::find($request->product_id);
+            $store_id = $request->store_id;
+            $product_id = $request->product_id;
+            $quantity = $request->quantity;
+            $store_product = StoreProduct::where(['store_id'=> $store_id,'product_id'=>$product_id])->first();
+            if($store_product->qty_available < $quantity)
+                $quantity = $store_product->qty_available;
+            $items = \Cart::getContent();
+            foreach($items as $item){
+                $store_id = $item->attributes['store_id'];
+                $product_id = $item->attributes['product_id'];
+                $sp = StoreProduct::where(['store_id'=> $store_id,'product_id'=>$product_id])->first();
+                if(($item->quantity + $quantity) > $sp->qty_available){
+                    \Cart::remove($store_id.$product_id);
+                }
+            }
             \Cart::update(
                 $request->id,
                 [
                     'quantity' => [
                         'relative' => false,
-                        'value' => $request->quantity
+                        'value' => $quantity
                     ],
                     'name' => $product->name,
                     'price' => str_replace(',', '', $request->cost_price), //This is not applicable here
                     'attributes' => array(
-                        'store_id' => $request->store_id,
-                        'product_id' => $request->product_id,
+                        'store_id' => $store_id,
+                        'product_id' => $product_id,
                         'code' => $request->code,
                     ),
                 ]

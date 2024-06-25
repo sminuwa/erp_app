@@ -135,12 +135,14 @@
                         <div class="card">
                             <div class="card-header">
                                 Request Products
-                                @if(!$record->is_completed())
-                                <div class="float-right">
-                                    <a href="javascript:void(0)" data-toggle="modal"
-                                    data-target="#add_store_product_form"
-                                    class="btn btn-sm btn-success add-product"> Allocation </a>
-                                </div>
+                                @if ($record->status == 2 && $record->destination_branch_id == auth()->user()->branch->id)
+                                    @if(!$record->is_completed())
+                                    <div class="float-right">
+                                        <a href="javascript:void(0)" data-toggle="modal"
+                                        data-target="#add_store_product_form"
+                                        class="btn btn-sm btn-success add-product"> Allocation </a>
+                                    </div>
+                                    @endif
                                 @endif
                             </div>
                             <div class="card-body table-responsive">

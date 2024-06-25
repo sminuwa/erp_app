@@ -154,11 +154,10 @@ class CartController extends Controller
             $store_product = StoreProduct::where(['store_id'=> $store_id,'product_id'=>$product_id])->first();
             if($store_product->qty_available < $quantity)
                 $quantity = $store_product->qty_available;
-
             $items = \Cart::getContent();
             foreach($items as $item){
-                $store_id = $item->attributes['store_id'];
-                $product_id = $item->attributes['product_id'];
+//                $store_id = $item->attributes['store_id'];
+//                $product_id = $item->attributes['product_id'];
                 $sp = StoreProduct::where(['store_id'=> $store_id,'product_id'=>$product_id])->first();
                 if(($item->quantity + $quantity) > $sp->qty_available){
                     \Cart::remove($store_id.$product_id);
@@ -176,6 +175,7 @@ class CartController extends Controller
                 ),
             ]);
 
+//            return \Cart::getContent();
 
         }
         if ($type == 'grn') {
@@ -445,8 +445,8 @@ class CartController extends Controller
                 $quantity = $store_product->qty_available;
             $items = \Cart::getContent();
             foreach($items as $item){
-                $store_id = $item->attributes['store_id'];
-                $product_id = $item->attributes['product_id'];
+//                $store_id = $item->attributes['store_id'];
+//                $product_id = $item->attributes['product_id'];
                 $sp = StoreProduct::where(['store_id'=> $store_id,'product_id'=>$product_id])->first();
                 if(($item->quantity + $quantity) > $sp->qty_available){
                     \Cart::remove($store_id.$product_id);

@@ -73,7 +73,7 @@ class CustomerController extends Controller
       */
     public function store(Store $request)
     {
-        //                return $request;
+//        return $request;
         $model = new Customer;
         $model->fill($request->all());
         $model->type = ($request->account_type == 'R' ? 'Retail' : "Wholesale");
@@ -114,8 +114,11 @@ class CustomerController extends Controller
       */
     public function update(Update $request, Customer $customer)
     { //return $request;
-        $customer->fill($request->all());
 
+        $customer->fill($request->all());
+        $customer->type = ($request->account_type == 'R' ? 'Retail' : "Wholesale");
+        $customer->branch_id = $request->branch_id;
+        $customer->relation_officer = $request->relation_officer;
         if ($customer->save()) {
             $action = "Updated a credit customer : " . $customer->name;
             AuditLog::auditLog(Auth::id(), $action);

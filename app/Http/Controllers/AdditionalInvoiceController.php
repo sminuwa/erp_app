@@ -31,6 +31,7 @@ class AdditionalInvoiceController extends Controller
     }
 
     public function store(Request $request){
+        return $request;
         $invoice_id = $request->invoice_id;
         $invoice_id = $request->invoice_id;
         $date = $request->date;

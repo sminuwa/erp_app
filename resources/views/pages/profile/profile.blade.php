@@ -197,7 +197,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-5">
                                     <div class="form-group">
-                                        <label for="oldpwd">New Password</label>
+                                        <label for="npwd">New Password</label>
                                         <input type="password" class="form-control" name="npwd" id="npwd"
                                             placeholder="New Password" />
                                     </div>
@@ -206,7 +206,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-5">
                                     <div class="form-group">
-                                        <label for="oldpwd">Re-type New Password</label>
+                                        <label for="npwd_confirmation">Re-type New Password</label>
                                         <input type="password" class="form-control" name="npwd_confirmation"
                                             id="npwd_confirmation" placeholder="Re-type New Password" />
                                     </div>

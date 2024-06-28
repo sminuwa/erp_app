@@ -34,10 +34,8 @@ class ProfileController extends Controller
     public function changePassword(Request $request)
     {
 
-        $this->validate(request(), [
-            'oldpwd' => 'required',
-            'npwd' => 'required|min:6|confirmed',
-        ], ['oldpwd.required' => "The old password is required", 'npwd.required' => "New password is required", 'npwd.confirmed' => "The new password confirmation does not match"]);
+        if($request->npwd != $request->npwd_confirmation)
+            return back()->with('app_error', 'Password didnt match.');
         $user = User::find(Auth::id());
         $hashedPassword = $user->password;
         if (Hash::check($request->oldpwd, Auth::user()->password)) {
@@ -46,7 +44,7 @@ class ProfileController extends Controller
             session()->flash('app_message', 'Your password has been changed.');
             return redirect()->back();
         }
-        session()->flash('app_message', 'Your password has been changed.');
+        session()->flash('app_message', 'Password cannot be changed.');
         return redirect()->back();
 
     }
@@ -98,7 +96,7 @@ class ProfileController extends Controller
     }
     public function switchBranch(Request $request, User $user)
     {
-    
+
         $user->branch_id = $request->branch;
         $user->save();
         session()->flash('app_message', 'Branch successfully switched');

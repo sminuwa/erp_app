@@ -49,13 +49,12 @@
                             </select>
                         </div>
                         <div class="c-cell">
-                            {{--<input  type="text" name="sold_price" id="price{{ $product->id }}"
+                            <input readonly="readonly"  type="text" name="sold_price" id="price{{ $product->id }}"
                                 class="form-control price" style="min-width:65px;"
                                 @if ($type == 'invoice') onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))" @endif
                                 value="{{ $product->price }}" data-val="{{ $product->attributes['selling_price'] }}"
                                 min="1" data-value="p{{ $product->id }}">
-                            <span style="color: red;" id="valid_price{{ $product->id }}"></span>--}}
-                            {{ $product->price }}
+                            <span style="color: red;" id="valid_price{{ $product->id }}"></span>
                         </div>
                         <div class="c-cell">
                             <input type="text" name="quantity" id="quantity{{ $product->id }}"

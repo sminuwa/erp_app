@@ -1,16 +1,14 @@
 
 <form action="{{ isset($route) ? $route : route('customers.store') }}" method="POST">
     {{ csrf_field() }}
-    <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
+{{--    <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />--}}
     <div class="form-group">
         <label for="code">Branch</label>
-        <select class="form-control ajax-branches  {{ $errors->has('account_type') ? ' is-invalid' : '' }}"
+        <select class="form-control ajax-branches  {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
                 name="branch_id" id="branch_id"
                 selected_item="{{ $model->branch_id }}"
-                required>
-            <
-        </select>
-        @if ($errors->has('account_type'))
+                required></select>
+        @if ($errors->has('branch_id'))
             <div class="invalid-feedback">
                 <strong>{{ $errors->first('branch_id') }}</strong>
             </div>
@@ -87,16 +85,16 @@
     <div class="form-group">
         <?php $officers = App\Models\User::orderBy('user_code', 'asc')->get(); ?>
         <label for="code">Relation Officer</label>
-        <select class="form-control ajax-users{{ $errors->has('relation_officer') ? ' is-invalid' : '' }}"
+        <select class="form-control ajax-users {{ $errors->has('relation_officer') ? ' is-invalid' : '' }}"
                 name="relation_officer" id="relation_officer"
                 required>
             @foreach($officers as $officer)
                 <option value="{{$officer->id}}" {{ $model->relation_officer == $officer->id ? 'selected' :'' }}>{{ $officer->user_code }} - {{ $officer->name }}</option>
             @endforeach
         </select>
-        @if ($errors->has('account_type'))
+        @if ($errors->has('relation_officer'))
             <div class="invalid-feedback">
-                <strong>{{ $errors->first('branch_id') }}</strong>
+                <strong>{{ $errors->first('relation_officer') }}</strong>
             </div>
         @endif
     </div>

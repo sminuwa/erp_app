@@ -422,7 +422,7 @@ Route::middleware('auth')->group(function () {
                     Route::get('/show/{customer}', [CustomerController::class, 'show'])->name('customers.show');
                     Route::post('/store', [CustomerController::class, 'store'])->name('customers.store');
                     Route::get('/edit/{customer}', [CustomerController::class, 'edit'])->name('customers.edit');
-                    Route::put('/update/{customer}', [CustomerController::class, 'update'])->name('customers.update');
+                    Route::post('/update/{customer}', [CustomerController::class, 'update'])->name('customers.update');
                     Route::delete('/delete/{customer}', [CustomerController::class, 'destroy'])->name('customers.destroy');
 
                     //Import Customers

@@ -46,8 +46,7 @@
                             <div class="card-body">
                                 <form action="{{ route('purchase.additional-invoice.store') }}" method="post">
                                     @csrf
-                                    <input type="hidden" name="invoice_id"
-                                        value="{{ isset($invoice) ? $invoice->id : '' }}">
+                                    <input type="hidden" name="invoice_id" value="{{ isset($invoice) ? $invoice->id : '' }}">
                                     <div class="row">
                                         <div class="col-md-4">
 

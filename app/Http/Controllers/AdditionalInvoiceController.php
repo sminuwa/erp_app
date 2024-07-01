@@ -32,7 +32,6 @@ class AdditionalInvoiceController extends Controller
 
     public function store(Request $request){
         $invoice_id = $request->invoice_id;
-        $invoice_id = $request->invoice_id;
         $date = $request->date;
         $purchase_id = $request->purchase_id;
         $supplier_id = $request->supplier_id;
@@ -44,10 +43,9 @@ class AdditionalInvoiceController extends Controller
             $invoice->reference = PurchaseExpense::generateNewNumber();
             $invoice->created_by = auth()->id();
             $invoice->supplier_id = $supplier_id;
-            $invoice->purchase_id = $purchase_id;
-        }else{
 
         }
+        $invoice->purchase_id = $purchase_id;
         $invoice->date = $date;
         $invoice->amount = $amount;
         $invoice->description = $description;

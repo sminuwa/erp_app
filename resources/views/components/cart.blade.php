@@ -49,7 +49,7 @@
                             </select>
                         </div>
                         <div class="c-cell">
-                            <input type="text" name="sold_price" id="price{{ $product->id }}"
+                            <input readonly="readonly"  type="text" name="sold_price" id="price{{ $product->id }}"
                                 class="form-control price" style="min-width:65px;"
                                 @if ($type == 'invoice') onchange="validate(this.value,this.getAttribute('data-val'),this.getAttribute('id'))" @endif
                                 value="{{ $product->price }}" data-val="{{ $product->attributes['selling_price'] }}"
@@ -66,8 +66,7 @@
                         </div>
                         <div class="c-cell">
 
-                            <span
-                                class="subtotal{{ $product->id }}">{{ number_format(floatVal(str_replace(',', '', $product->price)) * $product->quantity, 2) }}</span>
+                            <span class="subtotal{{ $product->id }}">{{ number_format(floatVal(str_replace(',', '', $product->price)) * $product->quantity, 2) }}</span>
                         </div>
                         <div class="c-cell">
                             <a url="{{ route('ajax.cart.delete', $product->id) }}"
@@ -360,6 +359,7 @@
             <div class="c-thead">
                 <div class="c-tr">
                     <div class="c-h-cell">S.N</div>
+                    <div class="c-h-cell">Branch</div>
                     <div class="c-h-cell">Account</div>
                     <div class="c-h-cell">Credit</div>
                     <div class="c-h-cell">Debit</div>
@@ -381,12 +381,14 @@
                             <input type="hidden" name="journal_id" value="{{ $journal->id }}">
                         @endisset
                         <input type="hidden" name="f{{ $item->id }}" value="{{ $item->id }}">
+                        <input type="hidden" name="branch_id" value="{{ $item->attributes['branch_id'] }}">
                         <input type="hidden" name="id" value="{{ $item->id }}">
                         <input type="hidden" name="payer_id" value="{{ $attr->payer_id }}">
                         <input type="hidden" name="account_type" value="{{ $attr->account_type }}">
                         <input type="hidden" name="credit" value="{{ $attr->credit }}">
                         <input type="hidden" name="debit" value="{{ $attr->debit }}">
                         <div class="c-cell">{{ $loop->iteration }}</div>
+                        <div class="c-cell text-left">{{ $attr->branch_code ?? null }} </div>
                         <div class="c-cell text-left">{{ $attr->code ?? null }} - {{ $item->name }}</div>
                         <div class="c-cell">
                             <span style="color: red;" id="valid_credit{{ $item->id }}"></span>

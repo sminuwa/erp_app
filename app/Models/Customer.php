@@ -19,7 +19,7 @@ class Customer extends Model
     /**
      * Mass assignable columns
      */
-    protected $fillable = ['name', 'code', 'email', 'phone', 'address', 'type', 'credit_limit', 'relation_officer'];
+    protected $fillable = ['name', 'code', 'email', 'branch_id','phone', 'address', 'type', 'credit_limit', 'relation_officer'];
 
     /**
      * Date time columns.

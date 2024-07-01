@@ -47,6 +47,7 @@ class JournalController extends Controller
                     $attr = $item->attributes;
                     $items[] = [
                         'journal_id' => $journal->id,
+                        'branch_id' => $attr->branch_id,
                         'account_type' => $attr->account_type,
                         'account_id' => $attr->payer_id,
                         'credit' => str_replace(',', '', $attr->credit),
@@ -100,6 +101,7 @@ class JournalController extends Controller
                     $attr = $item->attributes;
                     $items[] = [
                         'journal_id' => $journal->id,
+                        'branch_id' => $attr->branch_id,
                         'account_type' => $attr->account_type,
                         'account_id' => $attr->payer_id,
                         'credit' => str_replace(',', '', $attr->credit),
@@ -141,6 +143,7 @@ class JournalController extends Controller
                 $credit += intval($item->credit);
                 $account_details[] = [
                     'account_id' => $item->account_id,
+                    'branch_id' => $item->branch_id,
                     'account_type' => $item->account_type,
                     'debit' => $item->debit,
                     'credit' => $item->credit,

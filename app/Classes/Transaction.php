@@ -968,7 +968,7 @@ class Transaction
             $general_account_ledgers[] = [
                 'model_id' => $account['account_id'],
                 'model_name' => $account['account_type'],
-                'branch_id' => $branch->id,
+                'branch_id' => $account['branch_id'] ?? $branch->id,
                 'description' => 'Journal on behalf of ' . $reference,
                 'reference' => $reference,
                 'credit' => $account['credit'],

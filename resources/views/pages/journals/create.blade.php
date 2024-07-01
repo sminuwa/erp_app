@@ -123,6 +123,19 @@
                             <div class="col-md-12">
                                 <table>
                                     <tr>
+                                        <td colspan="2">
+                                            <div class="col-12">
+                                                <div class="input-group mb-3">
+                                                    <select class="form-control ajax-branches select2-single" name="branch_id" id="branch_id"></select>
+                                                    <label class="floating-label">Branch: @error('branch_id')
+                                                        <br><span class="text-danger error">{{ $message }}</span>
+                                                        @enderror
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <td>
                                             <div class="col-12">
                                                 <div class="form-group">

@@ -109,4 +109,16 @@ class AdditionalInvoiceController extends Controller
     public function print(PurchaseExpense $invoice){
         return view('pages.inventories.expenses.print',compact('invoice'));
     }
+
+    public function delete(PurchaseExpense $invoice){
+
+        if($invoice->status != 0) {
+            session()->flash('app_error', 'This invoice has been posted and can not be deleted.');
+            return back();
+        }
+        if($invoice->delete()){
+            session()->flash('app_message', 'Deleted successfully.');
+        }
+        return redirect()->back();
+    }
 }

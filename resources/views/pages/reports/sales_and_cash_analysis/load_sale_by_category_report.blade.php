@@ -9,8 +9,8 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-12 mt-3">
-                <table class="table table-bordered caption" id="example1">
+            <div class="col-md-12 mt-3 table-responsive">
+                <table class="table table-bordered table-striped caption" id="example1">
                     <caption style="caption-size:top">
                         <h3 style="text-align: center;">{{ $branch == null ? 'All Branches' : $branch->name . "($branch->code)" }} </h3>
                         <h5 style="text-align: center;">Sale Transactions By Categoery
@@ -63,6 +63,8 @@
                             <td style="text-align: right">{{ round(($total_profit / $sale->amount) * 100, 2) }}</td>
                         </tr>
                     @endforeach
+                    </tbody>
+                    <tfoot>
                     <tr>
                         <th colspan="4" style="text-align: right">TOTAL</th>
                         <th style="text-align: right">
@@ -79,7 +81,8 @@
                         <th style="text-align:right">
                             {{ $total_amount != 0 ? number_format(($grand_total_profit / $total_amount) * 100, 2) : 0 }}</th>
                     </tr>
-                    </tbody>
+                    </tfoot>
+
                 </table>
             </div>
         </div>

@@ -397,7 +397,6 @@ class ReportController extends Controller
                 store_products.qty_available,
                 branch_product_prices.retail_selling_price,
                 branch_product_prices.whole_selling_price,
-
                 branch_product_prices.cost_price,
                 store_products.id"
             )
@@ -409,8 +408,8 @@ class ReportController extends Controller
             ->where('store_products.product_id', 'LIKE', $product_id)
             ->where('store_products.store_id', 'LIKE', $store_id)
             ->where('branch_product_prices.product_id', 'LIKE', $product_id)
-            ->where('stores.branch_id', $branch_id)
-            ->where('branch_product_prices.branch_id', $branch_id)
+            ->where('stores.branch_id', 'LIKE',$branch_id)
+            ->where('branch_product_prices.branch_id','LIKE', $branch_id)
             ->orderBy('products.name')
             ->get();
         if ($branch_id == "%")
@@ -487,7 +486,16 @@ class ReportController extends Controller
 
         }
         $stores = DB::table('store_products')
-            ->select('products.name', 'products.code', 'stores.code as store', 'store_products.qty_available', 'retail_selling_price', 'whole_selling_price', 'cost_price', 'store_products.id', 'categories.name AS category')
+            ->select(
+                'products.name',
+                'products.code',
+                'stores.code as store',
+                'store_products.qty_available',
+                'retail_selling_price',
+                'whole_selling_price',
+                'cost_price',
+                'store_products.id',
+                'categories.name AS category')
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
             ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
@@ -499,7 +507,7 @@ class ReportController extends Controller
             ->where('branch_product_prices.product_id', 'LIKE', $product_id)
             ->where('stores.branch_id', 'LIKE', $branch_id)
             ->groupBy('stores.branch_id')
-            ->groupBy('store_products.product_id')
+            ->groupBy('store_products.store_id','store_products.product_id')
             ->get();
         if ($category_id == "%")
             $category_id = "all";
@@ -801,9 +809,8 @@ class ReportController extends Controller
     }
     public function loadCategorySaleReport(Request $request)
     {
-
-        $from_date = $request->from_date;
-        $to_date = $request->to_date;
+        $from_date = date('Y-m-d',strtotime($request->from_date));
+        $to_date =  date('Y-m-d',strtotime($request->to_date));
         $branch_id = $request->branch_id;
         $category_id1 = $request->category_id1;
         $category_id2 = $request->category_id2;
@@ -853,11 +860,19 @@ class ReportController extends Controller
                 DB::raw('SUM(order_details.quantity) as quantity'),
                 DB::raw('SUM(order_details.total) as amount'),
                 DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
-                DB::raw('(SELECT SUM(store_products.qty_available) FROM store_products
+                $branch_id != '%' ? DB::raw('(SELECT SUM(store_products.qty_available) FROM store_products
                     JOIN stores s ON store_products.store_id = s.id
-                    JOIN products ON store_products.product_id = products.id
+                    JOIN products p ON store_products.product_id = p.id
                     WHERE s.branch_id LIKE stores.branch_id
-                        AND products.category_id = categories.id) as qty_available')
+                        AND p.category_id = categories.id) as qty_available')
+                    :
+                    DB::raw('
+                        (SELECT SUM(store_products.qty_available) FROM store_products
+                            JOIN products p ON store_products.product_id = p.id
+                            WHERE p.category_id = categories.id
+
+                        ) as qty_available'
+                    )
             )
             ->join('order_details', 'orders.id', '=', 'order_details.order_id')
             ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
@@ -866,8 +881,9 @@ class ReportController extends Controller
             ->join('categories', 'products.category_id', '=', 'categories.id')
             ->where('stores.branch_id', 'LIKE', $branch_id)
             ->where('order_details.status', '=', 1)
-            ->whereDate('order_date', '>=', $from_date)
-            ->whereDate('order_date', '<=', $to_date);
+//            ->whereDate('order_date', '>=', $from_date)
+//            ->whereDate('order_date', '>=', $from_date)
+            ->whereBetween('order_date', [$from_date,$to_date] );
         if ($category_id2 == '%' && $category_id1 != '%') {
             $data = $data->where('products.category_id', 'LIKE', $category_id1);
         } elseif ($category_id2 != '%') {
@@ -876,7 +892,6 @@ class ReportController extends Controller
         }
         $sales = $data->groupBy('products.category_id')
             ->orderBy('code', 'ASC')->get();
-
 
 
         if ($category_id1 == "%")

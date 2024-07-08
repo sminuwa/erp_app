@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Branch;
 use App\Models\BranchProductPrice;
 use App\Models\Customer;
 use App\Models\GeneralAccount;
@@ -307,11 +308,13 @@ class CartController extends Controller
         }
 
         if ($request->has('credit')) {
+            $branch_id = $request->branch_id;
             $payer_id = $request->payer_id;
             $account_type = $request->account_type;
             $credit = $request->credit;
             $debit = $request->debit;
             $request->description;
+            $branch = Branch::find($branch_id ?? auth()->user()->branch->id);
             $payer = null;
             $name = "";
             $code = "";
@@ -343,6 +346,8 @@ class CartController extends Controller
                     'code' => $code,
                     'account_type' => $account_type,
                     'payer_id' => $payer_id,
+                    'branch_id' => $branch->id,
+                    'branch_code' => $branch->code,
                 ),
             ]);
             $type = 'journal';
@@ -517,11 +522,14 @@ class CartController extends Controller
             );
         }
         if ($request->type == 'journal') {
+            $branch_id = $request->branch_id;
             $payer_id = $request->payer_id;
             $account_type = $request->account_type;
             $credit = $request->credit;
             $debit = $request->debit;
             $request->description;
+
+            $branch = Branch::find($branch_id ?? auth()->user()->branch->id);
             $payer = null;
             $name = "";
             $code = "";
@@ -553,6 +561,8 @@ class CartController extends Controller
                         'code' => $code,
                         'account_type' => $account_type,
                         'payer_id' => $payer_id,
+                        'branch_id' => $branch->id,
+                        'branch_code' => $branch->code,
                     ),
                 ]
             );

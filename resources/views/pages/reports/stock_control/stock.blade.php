@@ -126,6 +126,7 @@
                         product_id: product_id
                     }
                 }).done(function(data) {
+                    console.log(data)
                     $('#img-loader').hide();
                     $("#load").html(data);
                     $('#example1').DataTable({

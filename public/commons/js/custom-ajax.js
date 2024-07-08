@@ -40,7 +40,6 @@ bodi.on('change', '.ajax-companies', function () {
     ajerks('GET', '/misc/ajax/branches', 'ajax-branches')
 })
 
-
 function ajerks(method, url, cssClass) {
     let element = $('.' + cssClass);
     let data;
@@ -62,8 +61,8 @@ function ajerks(method, url, cssClass) {
     }
     if (element.attr('store_id') && element.attr('name') === 'product_id') {
         let store_id = element.attr('store_id')
-        data = { store_id: store_id } 
-       
+        data = { store_id: store_id }
+
     }
 
     $.ajax({

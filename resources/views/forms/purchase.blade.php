@@ -7,7 +7,7 @@
             <div class="card-body">
                 <h5 class="card-title"></h5>
 
-                <form action="{{ route('purchases.store') }}" method="POST">
+                <form action="{{ route('purchases.store') }}" method="POST" >
                     {{ csrf_field() }}
                     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
                     <input type="hidden" name="purchase_id" value="{{ isset($model->id) ? $model->id : '' }}" />

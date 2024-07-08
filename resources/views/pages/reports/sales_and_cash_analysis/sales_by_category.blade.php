@@ -18,10 +18,10 @@
         <!-- Content Header (Page header) -->
         <!-- Content Header (Page header) -->
         <section class="content-header">
-            <div class="container-fluid">
+            <div class="container">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Sales by Category</h4>
+
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -35,50 +35,69 @@
 
         <!-- Main content -->
         <section class="content">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <form method="POST" class="form-inline">
+            <div class="container">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Sales by Category</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <form method="POST">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="from_date">From Date</label>
+                                                <input type="text" autocomplete="off"
+                                                       class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
+                                                       name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="to_date">To Date</label>
+                                                <input type="text" autocomplete="off"
+                                                       class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
+                                                       name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="branch_id">Branch</label>
+                                                <select class="form-control select2-single ajax-branches" name="branch_id" id="branch_id">
+                                                </select>
 
-                            <div class="form-group">
-                                <label for="from_date">From Date</label>
-                                <input type="text" autocomplete="off"
-                                    class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
-                                    name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="">
-                            </div>
-                            <div class="form-group">
-                                <label for="to_date">To Date</label>
-                                <input type="text" autocomplete="off"
-                                    class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
-                                    name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
-                            </div>
-                            <div class="form-group">
-                                <label for="branch_id">Branch</label>
-                                <select class="form-control select2-single ajax-branches" name="branch_id" id="branch_id">
-                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="category_id1">From Category</label>
+                                                <select class="form-control select2-single ajax-categories" name="category_id1" id="category_id1">
+                                                </select>
 
-                            </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="category_id2">To Category</label>
+                                                <select class="form-control select2-single ajax-categories" name="category_id2" id="category_id2">
+                                                </select>
 
-                            <div class="form-group">
-                                <label for="category_id1">From Category</label>
-                                <select class="form-control select2-single ajax-categories" name="category_id1" id="category_id1">
-                                </select>
-
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group text-right ">
+                                                <input type="button" class="btn btn-primary" id="generate" name="generate"
+                                                       value="Generate" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
-                            <div class="form-group">
-                                <label for="category_id2">To Category</label>
-                                <select class="form-control select2-single ajax-categories" name="category_id2" id="category_id2">
-                                </select>
-
-                            </div>
-                            <div class="form-group text-right ">
-                                <input type="button" class="btn btn-primary" id="generate" name="generate"
-                                    value="Generate" />
-                            </div>
-
-                        </form>
+                        </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-sm-12 table-responsive" id="load">
                         <img src="{{ asset('assets/backend/img/loader.png') }}"

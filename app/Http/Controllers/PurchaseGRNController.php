@@ -107,7 +107,7 @@ class PurchaseGRNController extends Controller
             } else {
                 $purchase->updated_by = $request->updated_by;
             }
-            $purchase->supplier_id = $request->supplier_id;
+            $purchase->supplier_id = $request->supplier_id ?? $purchase->supplier_id;
             $purchase->atc_no = $request->atc_no;
             $purchase->purchase_date = $purchase_date;
             $purchase->purchase_mode = 'Cash';

@@ -961,6 +961,9 @@ class Transaction
          * ]
          * Same as destination accounts
          * */
+
+        //getting the cross branch control account
+        $control_account = GeneralAccountControl::where('code', 'clearing')->first();
         $user = auth()->user();
         $branch = $user->branch;
         $general_account_ledgers = [];

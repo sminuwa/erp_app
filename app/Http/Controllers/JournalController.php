@@ -47,7 +47,7 @@ class JournalController extends Controller
                     $attr = $item->attributes;
                     $items[] = [
                         'journal_id' => $journal->id,
-                        'branch_id' => $attr->branch_id,
+                        'branch_id' => $attr->branch_id ?? auth()->user()->branch->id,
                         'account_type' => $attr->account_type,
                         'account_id' => $attr->payer_id,
                         'credit' => str_replace(',', '', $attr->credit),
@@ -101,7 +101,7 @@ class JournalController extends Controller
                     $attr = $item->attributes;
                     $items[] = [
                         'journal_id' => $journal->id,
-                        'branch_id' => $attr->branch_id,
+                        'branch_id' => $attr->branch_id ?? auth()->user()->branch->id,
                         'account_type' => $attr->account_type,
                         'account_id' => $attr->payer_id,
                         'credit' => str_replace(',', '', $attr->credit),

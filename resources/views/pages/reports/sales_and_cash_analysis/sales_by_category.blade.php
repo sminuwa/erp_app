@@ -170,11 +170,11 @@
                         lengthMenu: [25, 50, 75, 100],
                         pageLength: 100,
                         buttons: [{
-                                extend: 'copyHtml5',
-                                exportOptions: {
-                                    columns: ':visible'
-                                }
-                            },
+                            extend: 'copyHtml5',
+                            exportOptions: {
+                                columns: ':visible'
+                            }
+                        },
                             {
                                 extend: 'excelHtml5',
                                 exportOptions: {
@@ -191,7 +191,7 @@
                                 exportOptions: {
                                     columns: ':visible'
                                 },
-                                messageTop: 'Sales Report',
+                                messageTop: 'Staff Sales Report',
                                 orientation: 'landscape',
                                 pageSize: 'LEGAL'
                             },
@@ -220,7 +220,7 @@
                                 return typeof i === 'string' ?
                                     i.replace(/[\$,]/g, '') * 1 :
                                     typeof i === 'number' ?
-                                    i : 0;
+                                        i : 0;
                             };
 
                         }

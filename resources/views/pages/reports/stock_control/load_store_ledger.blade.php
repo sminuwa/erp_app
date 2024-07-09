@@ -7,7 +7,7 @@
 <table class="table table-bordered caption" id="example1">
     <caption style="caption-size:top">
         <h5 style="text-align: center;text-transform:uppercase">{{ $branch->name ?? 'All Branches' }}</h5>
-        <h5 style="text-align: center;">STORE LEDGER REPORT </h5>
+        <h5 style="text-align: center;">STORE QUANTITY REPORT </h5>
     </caption>
     <thead>
         <tr>

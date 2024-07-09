@@ -314,7 +314,7 @@ class CartController extends Controller
             $credit = $request->credit;
             $debit = $request->debit;
             $request->description;
-            $branch = Branch::find($branch_id);
+            $branch = Branch::find($branch_id ?? auth()->user()->branch->id);
             $payer = null;
             $name = "";
             $code = "";
@@ -529,7 +529,7 @@ class CartController extends Controller
             $debit = $request->debit;
             $request->description;
 
-            $branch = Branch::find($branch_id);
+            $branch = Branch::find($branch_id ?? auth()->user()->branch->id);
             $payer = null;
             $name = "";
             $code = "";

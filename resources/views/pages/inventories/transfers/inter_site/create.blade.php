@@ -187,10 +187,10 @@
 
                         <div class="form-group">
                             <label for="quantity">Qty</label>
-                            <input type="number" step=".01"
+                            <input type="number" step=".000001"
                                 class="form-control {{ $errors->has('quantity') ? ' is-invalid' : '' }}" name="quantity"
                                 id="quantity" value="{{ $model->quantity }}" placeholder="" required="required">
-                            @if ($errors->has('quantity'))
+                            @if($errors->has('quantity'))
                                 <div class="invalid-feedback">
                                     <strong>{{ $errors->first('quantity') }}</strong>
                                 </div>

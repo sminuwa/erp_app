@@ -263,7 +263,7 @@ class CartController extends Controller
                 $name = $product->name ?? '';
                 $code = $product->code ?? '';
                 $qty_available = 0;
-                $id = StoreProduct::where(['product_id' => $request->product_id, 'store_id' => storeByCode($request->store)->id])->first()->id ?? 0;
+                $id = $request->product_id;
                 $unit = $product->unit;
 
 
@@ -271,9 +271,9 @@ class CartController extends Controller
                 $name = $request->name;
                 $code = $request->code;
                 $qty_available = $request->qty_available;
-                $id = $request->id;
                 $store_product = StoreProduct::find($request->id);
                 $product_id = $store_product->product_id;
+                $id = $request->id;
                 $unit = $request->unit;
 
             }
@@ -287,7 +287,6 @@ class CartController extends Controller
                 $cost_price = str_replace(',', '', $prices->cost_price);
             }
             $qty = $request->qty;
-
 
             $store = $request->store;
             $add = \Cart::add([
@@ -335,7 +334,7 @@ class CartController extends Controller
             }
 
             $add = \Cart::add([
-                'id' => generateRandomString(),
+                'id' => $payer_id.$branch->id,
                 'name' => $name,
                 'price' => str_replace(',', '', $credit) ?? 1,
                 'quantity' => 1,

@@ -395,14 +395,21 @@ class ReportController extends Controller
                 products.code AS product_code,
                 stores.code as store_code,
                 store_products.qty_available,
-                branch_product_prices.retail_selling_price,
-                branch_product_prices.whole_selling_price,
-                branch_product_prices.cost_price,
+                (SELECT  bpp.retail_selling_price
+                    FROM branch_product_prices bpp
+                    WHERE bpp.branch_id = branches.id AND bpp.product_id = products.id LIMIT 1) as retail_selling_price,
+                (SELECT  bpp.whole_selling_price
+                    FROM branch_product_prices bpp
+                    WHERE bpp.branch_id = branches.id AND bpp.product_id = products.id LIMIT 1) as whole_selling_price,
+                (SELECT  bpp.cost_price
+                    FROM branch_product_prices bpp
+                    WHERE bpp.branch_id = branches.id AND bpp.product_id = products.id LIMIT 1) as cost_price,
                 store_products.id"
             )
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
             ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
+            ->join('branches', 'branches.id', 'branch_product_prices.branch_id')
             ->where('store_products.qty_available', '>', 0)
             ->where('products.category_id', 'LIKE', $category_id)
             ->where('store_products.product_id', 'LIKE', $product_id)
@@ -411,7 +418,7 @@ class ReportController extends Controller
             ->where('stores.branch_id', 'LIKE',$branch_id)
             ->where('branch_product_prices.branch_id','LIKE', $branch_id)
             ->orderBy('products.name')
-            ->groupBy('store_products.store_id','branch_product_prices.product_id')
+            ->groupBy('store_products.store_id','branch_product_prices.branch_id')
             ->get();
         if ($branch_id == "%")
             $branch_id = "all";

@@ -185,7 +185,7 @@
                         </div>
                         <div class="form-group">
                             <label for="qty_transfered">Qty</label>
-                            <input type="number"
+                            <input type="number" step="0.000000"
                                 class="form-control {{ $errors->has('qty_transfered') ? ' is-invalid' : '' }}"
                                 name="qty_transfered" id="qty_transfered" value="{{ $model->qty_transfered }}"
                                 placeholder="" required="required">

@@ -292,12 +292,12 @@ class CartController extends Controller
             $add = \Cart::add([
                 'id' => $id,
                 'name' => $name,
-                'price' => $type != 'invoice' ? $cost_price : $selling_price,
+                'price' => $type != 'invoice' ? $request->cost_price : $selling_price,
                 'quantity' => $qty == 0 ? 1 : $qty,
                 'attributes' => array(
                     'cost_price' => $cost_price,
                     'code' => $code,
-                    'selling_price' => $type != 'invoice' ? $cost_price : $selling_price,
+                    'selling_price' => $type != 'invoice' ? $request->cost_price : $selling_price,
                     'qty_available' => $qty_available,
                     'discount' => 0,
                     'store' => $store,

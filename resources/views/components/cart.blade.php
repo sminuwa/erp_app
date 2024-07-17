@@ -104,7 +104,7 @@
                         <div class="c-cell">{{ $loop->iteration }}</div>
                         <div class="c-cell" class="text-left">{{ $product->attributes['code'] }}</div>
                         <div class="c-cell" class="text-left">{{ $product->name }}</div>
-                        <div class="c-cell">{{ number_format($product->quantity, 0, '', ',') }}</div>
+                        <div class="c-cell">{{ $product->quantity }}</div>
                         <div class="c-cell">{{ \App\Models\Store::find($attr['source_store_id'])->name }}</div>
                         <div class="c-cell">{{ \App\Models\Store::find($attr['destination_store_id'])->name }}</div>
                         <div class="c-cell">

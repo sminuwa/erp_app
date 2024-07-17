@@ -418,7 +418,7 @@ class ReportController extends Controller
             ->where('stores.branch_id', 'LIKE',$branch_id)
             ->where('branch_product_prices.branch_id','LIKE', $branch_id)
             ->orderBy('products.name')
-            ->groupBy('store_products.store_id','branch_product_prices.branch_id')
+            ->groupBy('store_products.store_id', 'store_products.product_id')
             ->get();
         if ($branch_id == "%")
             $branch_id = "all";

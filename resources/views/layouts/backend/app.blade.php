@@ -107,6 +107,7 @@
     <!-- AdminLTE -->
     <script src="{{ asset('assets/backend/js/adminlte.js') }}"></script>
 {{--    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>--}}
+
     <script src="{{ asset('assets/backend/js/toastr.min.js') }}"></script>
     <script src="{{ asset('assets/backend/js/jquery-ui.js') }}"></script>
     <script src="{{ asset('assets/backend/js/select2.full.js') }}"></script>

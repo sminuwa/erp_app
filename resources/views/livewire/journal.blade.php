@@ -44,26 +44,32 @@
                                 <i class="fa fa-print" aria-hidden="true"></i> Print
                             </a>
                             @if($record->status == 0)
+                                @can('journal.post')
                                 <a href="{{ route('journal.post',$record->id) }}"
                                    onclick="return confirm('Are you sure you want to post this journal?');"
                                    class="dropdown-item">
                                     <i class="fa fa-check" aria-hidden="true"></i> Post
                                 </a>
+                                @endcan
                                 <a href="{{ route('journal.edit',$record->id) }}"
                                    class="dropdown-item">
                                     <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                 </a>
+                                    @can('journal.delete')
                                 <a href="{{ route('journal.delete',$record->id) }}"
                                    onclick="return confirm('Are you sure you want to delete this journal?');"
                                    class="dropdown-item">
                                     <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                 </a>
+                                    @endcan
                             @else
+                                @can('journal.reverse')
                                 <a href="{{ route('journal.reverse',$record->id) }}"
                                    onclick="return confirm('Are you sure you want reverse this transaction?')"
                                    class="dropdown-item">
                                     <i class="fa fa-reply" aria-hidden="true"></i> Reverse
                                 </a>
+                                @endcan
                             @endif
                         </div>
                     </div>

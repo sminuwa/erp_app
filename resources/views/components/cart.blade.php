@@ -154,7 +154,7 @@
                             <span style="color: red;" id="valid_price{{ $product->id }}"></span>
                             <input type="text" name="quantity" id="quantity{{ $product->id }}"
                                 class="form-control quantity" data-value="p{{ $product->id }}"
-                                style="min-width:58px;" value="{{ $product->quantity }}" min="1" required>
+                                style="min-width:58px;" value="{{ $product->quantity }}" min="0" required>
 
                         </div>
                         <div class="c-cell">{{ \App\Models\Store::find($attr['store_id'])->name }}</div>

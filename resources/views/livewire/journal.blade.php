@@ -55,11 +55,13 @@
                                    class="dropdown-item">
                                     <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                 </a>
+                                    @can('journal.delete')
                                 <a href="{{ route('journal.delete',$record->id) }}"
                                    onclick="return confirm('Are you sure you want to delete this journal?');"
                                    class="dropdown-item">
                                     <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                 </a>
+                                    @endcan
                             @else
                                 @can('journal.reverse')
                                 <a href="{{ route('journal.reverse',$record->id) }}"

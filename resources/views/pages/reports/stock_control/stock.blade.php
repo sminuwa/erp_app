@@ -135,17 +135,14 @@
                         pageLength: 100,
                         buttons: [{
                                 extend: 'copyHtml5',
-                                exportOptions: {
-                                    columns: ':visible'
-                                }
                             },
                             {
                                 extend: 'excelHtml5',
-                                exportOptions: {
-                                    columns: ':visible'
-                                }
                             },{
                                 extend: 'pdfHtml5',
+                                orientation: 'landscape',
+                                pageSize: 'LEGAL',
+                                text: 'Export as PDF',
                                 exportOptions: {
                                     columns: ':visible'
                                 }

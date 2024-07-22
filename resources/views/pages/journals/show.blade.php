@@ -78,6 +78,7 @@
                                             <table class="table">
                                                 <thead>
                                                     <tr>
+                                                        <th>Branch</th>
                                                         <th>Account</th>
                                                         <th>Debit</th>
                                                         <th>Credit</th>
@@ -91,6 +92,7 @@
                                                         <?php $total_credit += $journal_item->credit; ?>
                                                         <?php $total_debit += $journal_item->debit; ?>
                                                         <tr :wire:key="{{ $loop->index }}">
+                                                            <td>{{ $journal_item->branch->name ?? ($journal->branch->name ?? "") }}</td>
                                                             <td>
                                                                 {{ $journal_item->account()->code ?? $journal_item->account()->number }}
                                                                 -

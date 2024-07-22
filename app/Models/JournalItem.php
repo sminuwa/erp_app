@@ -45,6 +45,10 @@ class JournalItem extends Model
             return GeneralAccount::find($this->account_id);
     }
 
+    public function branch(){
+        return $this->belongsTo(Branch::class);
+    }
+
     public static function deleteItems($journal_id){
 
         if(self::where('journal_id', $journal_id)->delete()){

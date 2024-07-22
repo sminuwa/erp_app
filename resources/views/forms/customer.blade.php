@@ -83,6 +83,20 @@
         @endif
     </div>
     <div class="form-group">
+        <label for="code">Status</label>
+        <select class="form-control {{ $errors->has('status') ? ' is-invalid' : '' }}"
+                name="status" id="status"
+                required>
+            <option>Active</option>
+            <option>Inactive</option>
+        </select>
+        @if ($errors->has('status'))
+            <div class="invalid-feedback">
+                <strong>{{ $errors->first('status') }}</strong>
+            </div>
+        @endif
+    </div>
+    <div class="form-group">
         <?php $officers = App\Models\User::orderBy('user_code', 'asc')->get(); ?>
         <label for="code">Relation Officer</label>
         <select class="form-control ajax-users {{ $errors->has('relation_officer') ? ' is-invalid' : '' }}"
@@ -98,6 +112,7 @@
             </div>
         @endif
     </div>
+
     <div class="form-group text-right ">
 
         <input type="submit" class="btn btn-primary" value="Save" />

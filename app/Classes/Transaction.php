@@ -964,10 +964,17 @@ class Transaction
 
         //getting the cross branch control account
         $control_account = GeneralAccountControl::where('code', 'clearing')->first();
+//        return $control_account;
         $user = auth()->user();
         $branch = $user->branch;
         $general_account_ledgers = [];
+        $cd = [];
+        $cc = [];
         foreach ($accounts_details as $account) {
+            if(!isset($cc[$account['branch_id']]))
+                $cc[$account['branch_id']] = 0;
+            if(!isset($cd[$account['branch_id']]))
+                $cd[$account['branch_id']] = 0;
             $general_account_ledgers[] = [
                 'model_id' => $account['account_id'],
                 'model_name' => $account['account_type'],
@@ -976,6 +983,38 @@ class Transaction
                 'reference' => $reference,
                 'credit' => $account['credit'],
                 'debit' => $account['debit'],
+                'date' => $date,
+                'user_id' => $user->id,
+                'receipt_no' => $type . '_' . $reference
+            ];
+            $cc[$account['branch_id']] += $account['credit'];
+            $cd[$account['branch_id']] += $account['debit'];
+
+
+        }
+        foreach(array_filter($cc) as $key=>$c){
+            $general_account_ledgers[] = [
+                'model_id' => $control_account->general_account_id,
+                'model_name' => 'GeneralAccount',
+                'branch_id' => $key,
+                'description' => 'Journal on behalf of ' . $reference,
+                'reference' => $reference,
+                'credit' => 0,
+                'debit' => $c,
+                'date' => $date,
+                'user_id' => $user->id,
+                'receipt_no' => $type . '_' . $reference
+            ];
+        }
+        foreach(array_filter($cd) as $key2=>$d){
+            $general_account_ledgers[] = [
+                'model_id' => $control_account->general_account_id,
+                'model_name' => 'GeneralAccount',
+                'branch_id' => $key2,
+                'description' => 'Journal on behalf of ' . $reference,
+                'reference' => $reference,
+                'credit' => $d,
+                'debit' => 0,
                 'date' => $date,
                 'user_id' => $user->id,
                 'receipt_no' => $type . '_' . $reference

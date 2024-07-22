@@ -79,6 +79,7 @@ class CustomerController extends Controller
         $model->type = ($request->account_type == 'R' ? 'Retail' : "Wholesale");
         $model->branch_id = $request->branch_id;
         $model->relation_officer = $request->relation_officer;
+        $model->status = $request->status??1;
         if ($model->save()) {
             $model->code = Customer::generateNewCode($request->branch_id, $request->account_type);
             $model->save();
@@ -119,6 +120,7 @@ class CustomerController extends Controller
         $customer->type = ($request->account_type == 'R' ? 'Retail' : "Wholesale");
         $customer->branch_id = $request->branch_id;
         $customer->relation_officer = $request->relation_officer;
+        $customer->status = $request->status??1;
         if ($customer->save()) {
             $action = "Updated a credit customer : " . $customer->name;
             AuditLog::auditLog(Auth::id(), $action);

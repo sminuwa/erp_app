@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="{{ asset('assets/backend/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/backend/css/select2-bootstrap.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datepicker/datepicker3.css') }}">
-    <link href="{{ asset('assets/backend/DataTables/datatables.min.css') }}" rel="stylesheet">
+{{--    <link href="{{ asset('assets/backend/DataTables/datatables.min.css') }}" rel="stylesheet">--}}
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datepicker/jquery.datetimepicker.css') }}">
     <link rel="stylesheet" href="{{ asset('commons/css/custom-style.css') }}">
     <link rel="stylesheet" href="{{ asset('commons/css/custom-table.css') }}">
@@ -106,7 +106,7 @@
     <script src="{{ asset('assets/backend/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <!-- AdminLTE -->
     <script src="{{ asset('assets/backend/js/adminlte.js') }}"></script>
-{{--    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>--}}
+    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
 
     <script src="{{ asset('assets/backend/js/toastr.min.js') }}"></script>
     <script src="{{ asset('assets/backend/js/jquery-ui.js') }}"></script>
@@ -115,7 +115,7 @@
     {{--<script src="{{ asset('assets/backend/plugins/datepicker/datepicker-bootstrap.min.js') }}"></script> --}}
     <script src="{{ asset('assets/backend/plugins/datepicker/moment-with-locales.js') }}"></script>
     <script src="{{ asset('assets/backend/plugins/datepicker/jquery.datetimepicker.js') }}"></script>
-    <script src="{{ asset('assets/backend/DataTables/datatables.min.js') }}"></script>
+{{--    <script src="{{ asset('assets/backend/DataTables/datatables.min.js') }}"></script>--}}
 
     <script src="{{ asset('commons/js/custom-ajax.js') }}"></script>
 

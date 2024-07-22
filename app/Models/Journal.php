@@ -66,5 +66,8 @@ class Journal extends Model
         return $prefix . str_pad(1, $length, 0, STR_PAD_LEFT);
     }
 
+    public function branch(){
+        return $this->belongsTo(Branch::class);
+    }
 
 }

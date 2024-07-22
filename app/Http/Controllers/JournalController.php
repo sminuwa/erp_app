@@ -149,11 +149,11 @@ class JournalController extends Controller
                     'credit' => $item->credit,
                 ];
             }
+            return Transaction::journal($account_details, $journal->reference, $journal->date);
             if (($debit - $credit) != 0)
                 return back()->with('error', 'Cannot post journal. Make sure total debit and credit are equal.');
             //        return Transaction::journal($account_details,$journal->reference,$journal->date);
             if ($journal->save()) {
-
                 if (Transaction::journal($account_details, $journal->reference, $journal->date)) {
                     DB::commit();
                     return back()->with('success', 'Reversed successfully');

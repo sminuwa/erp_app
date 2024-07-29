@@ -11,9 +11,9 @@
     </caption>
     <thead>
         <tr>
-            <th>CODE</th>
-            <th>PRODUCT</th>
+            <th>BRANCH</th>
             <th>STORE</th>
+            <th>PRODUCT</th>
             <th>QTY</th>
             <th>COST PRICE ()</th>
             <th>R PRICE ()</th>
@@ -27,9 +27,9 @@
     </thead>
     @foreach ($stores as $store)
         <tr>
-            <td> {{ $store->product_code }} </td>
-            <td> {{ $store->name }} </td>
+            <td> {{ $store->branch_code }} </td>
             <td>{{ $store->store_code }} </td>
+            <td> {{ $store->product_code }} - {{ $store->name }} </td>
             <td> {{ $store->qty_available }} </td>
             @php $cost_price = str_replace(',', '', $store->cost_price); @endphp
             <td style="text-align: right;"> {{ number_format($cost_price, 2, '.', ',') }}</td>

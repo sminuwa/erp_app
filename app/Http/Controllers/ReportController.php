@@ -395,15 +395,27 @@ class ReportController extends Controller
                 products.code AS product_code,
                 stores.code as store_code,
                 store_products.qty_available,
+                (SELECT  bpp.branch_id
+                    FROM branch_product_prices bpp
+                    WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
+                    group by bpp.branch_id
+                    LIMIT 1) as branch_id,
+                    branches.id as branch_id2,
                 (SELECT  bpp.retail_selling_price
                     FROM branch_product_prices bpp
-                    WHERE bpp.branch_id = branches.id AND bpp.product_id = products.id LIMIT 1) as retail_selling_price,
+                    WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
+                    group by bpp.branch_id
+                    LIMIT 1) as retail_selling_price,
                 (SELECT  bpp.whole_selling_price
                     FROM branch_product_prices bpp
-                    WHERE bpp.branch_id = branches.id AND bpp.product_id = products.id LIMIT 1) as whole_selling_price,
+                    WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
+                    group by bpp.branch_id
+                    LIMIT 1) as whole_selling_price,
                 (SELECT  bpp.cost_price
                     FROM branch_product_prices bpp
-                    WHERE bpp.branch_id = branches.id AND bpp.product_id = products.id LIMIT 1) as cost_price,
+                    WHERE bpp.branch_id = stores.branch_id AND bpp.product_id = products.id
+                    group by bpp.branch_id
+                    LIMIT 1) as cost_price,
                 store_products.id"
             )
             ->join('products', 'products.id', '=', 'store_products.product_id')
@@ -418,7 +430,7 @@ class ReportController extends Controller
             ->where('stores.branch_id', 'LIKE',$branch_id)
             ->where('branch_product_prices.branch_id','LIKE', $branch_id)
             ->orderBy('products.name')
-            ->groupBy('store_products.store_id', 'store_products.product_id')
+            ->groupBy('store_products.store_id', 'branch_product_prices.product_id')
             ->get();
         if ($branch_id == "%")
             $branch_id = "all";

@@ -173,10 +173,14 @@
             $(this).parent().nextAll("select").prop("disabled", !this.checked);
         });
 
+        var date = new Date();
+        date.setDate( date.getDate() - 3 );
+            alert(date);
+
         $('.datepicker').datepicker({
             autoclose: true,
             todayHighlight: true,
-            startDate: new Date(),
+            startDate: date,
         });
         $('.datepicker2').datepicker({
             autoclose: true,

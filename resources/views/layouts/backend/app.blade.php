@@ -184,7 +184,7 @@
         });
         $('.datepicker2').datepicker({
             autoclose: true,
-            startDate: new Date(),
+            startDate: date,
             todayHighlight: true,
         });
 

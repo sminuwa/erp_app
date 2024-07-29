@@ -416,6 +416,10 @@ class ReportController extends Controller
                     WHERE bpp.branch_id = stores.branch_id AND bpp.product_id = products.id
                     group by bpp.branch_id
                     LIMIT 1) as cost_price,
+                (SELECT  b.code
+                    FROM branches b
+                    WHERE b.id = stores.branch_id
+                    LIMIT 1) as branch_code,
                 store_products.id"
             )
             ->join('products', 'products.id', '=', 'store_products.product_id')
@@ -484,6 +488,10 @@ class ReportController extends Controller
                     WHERE bpp.branch_id = stores.branch_id AND bpp.product_id = products.id
                     group by bpp.branch_id
                     LIMIT 1) as cost_price,
+                (SELECT  b.code
+                    FROM branches b
+                    WHERE b.id = stores.branch_id
+                    LIMIT 1) as branch_code,
                 store_products.id"
             )
             ->join('products', 'products.id', '=', 'store_products.product_id')
@@ -555,6 +563,10 @@ class ReportController extends Controller
                     WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
                     group by bpp.branch_id
                     LIMIT 1) as cost_price,
+               (SELECT  b.code
+                    FROM branches b
+                    WHERE b.id = stores.branch_id
+                    LIMIT 1) as branch_code,
                 store_products.id,
                 categories.name AS category")
             ->join('products', 'products.id', '=', 'store_products.product_id')
@@ -623,7 +635,12 @@ class ReportController extends Controller
                     WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
                     group by bpp.branch_id
                     LIMIT 1) as cost_price,
+                (SELECT  b.code
+                    FROM branches b
+                    WHERE b.id = stores.branch_id
+                    LIMIT 1) as branch_code,
                 store_products.id,
+                branches.code as branch_code,
                 categories.name AS category")
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')

@@ -52,7 +52,7 @@
                             @can('payment.search')
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <form action="{{ route('payment.search') }}" method="POST">
+                                        <form action="{{ route('interbank.search') }}" method="POST">
                                             @csrf
                                             <div class="input-group">
                                                 <input type="search" class="form-control rounded" required

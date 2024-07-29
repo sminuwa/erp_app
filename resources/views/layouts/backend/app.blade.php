@@ -175,7 +175,7 @@
 
         var date = new Date();
         date.setDate( date.getDate() - 3 );
-            alert(date);
+            
 
         $('.datepicker').datepicker({
             autoclose: true,

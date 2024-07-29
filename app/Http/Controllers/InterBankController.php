@@ -118,6 +118,15 @@ class InterBankController extends Controller
         return back();
     }
 
+    public function search(Request $request)
+    {
+        $search_value = $request->refno;
+        $interbanks = InterBank::select('inter_banks.*')
+            ->where('branch_id', 'LIKE', User::userBranchAction())
+            ->where('reference', 'LIKE', "%$search_value%")
+            ->orderBy('reference', 'DESC')->take(10)->get();
+        return view('pages.interbanks.list', ['interbanks' => $interbanks]);
+    }
     public function delete(InterBank $interbank)
     {
         $interbank->delete();

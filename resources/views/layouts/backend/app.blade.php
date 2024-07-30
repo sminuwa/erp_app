@@ -175,12 +175,12 @@
 
         var date = new Date();
         date.setDate( date.getDate() - 3 );
-            
+
 
         $('.datepicker').datepicker({
             autoclose: true,
             todayHighlight: true,
-            startDate: date,
+            // startDate: date,
         });
         $('.datepicker2').datepicker({
             autoclose: true,

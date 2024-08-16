@@ -15,12 +15,12 @@
             <th>STORE</th>
             <th>PRODUCT</th>
             <th>QTY</th>
-            <th>COST PRICE ()</th>
-            <th>R PRICE ()</th>
-            <th>W PRICE ()</th>
-            <th>TOTAL COST ()</th>
-            <th>TOTAL R ()</th>
-            <th>TOTAL W ()</th>
+            <th>COST PRICE</th>
+            <th>R PRICE</th>
+            <th>W PRICE</th>
+            <th>TOTAL COST</th>
+            <th>TOTAL R</th>
+            <th>TOTAL W</th>
             <th>R MARGIN</th>
             <th>W MARGIN</th>
         </tr>
@@ -32,7 +32,8 @@
             <td> {{ $store->product_code }} - {{ $store->name }} </td>
             <td> {{ $store->qty_available }} </td>
             @php $cost_price = str_replace(',', '', $store->cost_price); @endphp
-            <td style="text-align: right;"> {{ number_format($cost_price, 2, '.', ',') }}</td>
+            {{-- <td style="text-align: right;"> {{ number_format(intval($cost_price), 2, '.', ',') }}</td> --}}
+            <td style="text-align: right;"> {{ $cost_price }}</td>
             <td style="text-align: right;">
                 @php $retail_price = str_replace(',', '', $store->retail_selling_price); @endphp
                 {{ number_format($retail_price, 2, '.', ',') }}

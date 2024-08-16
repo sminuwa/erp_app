@@ -55,10 +55,10 @@
                 {{ number_format($total_w_price, 2, '.', ',') }}
             </td>
             <td style="text-align: right;">
-                {{ number_format($retail_price - $cost_price, 2, '.', ',') }}
+                {{-- {{ number_format($retail_price - $cost_price, 2, '.', ',') }} --}}
             </td>
             <td style="text-align: right;">
-                {{ number_format($whole_price - $cost_price, 2, '.', ',') }}
+                {{-- {{ number_format($whole_price - $cost_price, 2, '.', ',') }} --}}
             </td>
         </tr>
     @endforeach

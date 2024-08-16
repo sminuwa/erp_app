@@ -58,6 +58,10 @@ function in_array_r($needle, $haystack, $strict = true)
     return false;
 }
 
+function remove_non_numeric($string){
+    return preg_replace("/[^0-9]/", "", $string);
+}
+
 function currency_sign($currency = 'NG')
 {
     if ($currency == 'NG')

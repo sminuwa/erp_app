@@ -436,6 +436,8 @@ class ReportController extends Controller
             ->orderBy('products.name')
             ->groupBy('store_products.store_id', 'branch_product_prices.product_id')
             ->get();
+
+            
         if ($branch_id == "%")
             $branch_id = "all";
         if ($category_id == "%")

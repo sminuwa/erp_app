@@ -15,12 +15,12 @@
             <th>STORE</th>
             <th>PRODUCT</th>
             <th>QTY</th>
-            <th>COST PRICE</th>
-            <th>R PRICE</th>
-            <th>W PRICE</th>
-            <th>TOTAL COST</th>
-            <th>TOTAL R</th>
-            <th>TOTAL W</th>
+            <th>COST PRICE ()</th>
+            <th>R PRICE ()</th>
+            <th>W PRICE ()</th>
+            <th>TOTAL COST ()</th>
+            <th>TOTAL R ()</th>
+            <th>TOTAL W ()</th>
             <th>R MARGIN</th>
             <th>W MARGIN</th>
         </tr>
@@ -31,41 +31,33 @@
             <td>{{ $store->store_code }} </td>
             <td> {{ $store->product_code }} - {{ $store->name }} </td>
             <td> {{ $store->qty_available }} </td>
-            @php $cost_price = str_replace(',', '', $store->cost_price); @endphp
-            {{-- <td style="text-align: right;"> {{ number_format(intval($cost_price), 2, '.', ',') }}</td> --}}
-            <td style="text-align: right;"> {{ $cost_price }}</td>
+            @php $cost_price = remove_non_numeric($store->cost_price); @endphp
+            <td style="text-align: right;"> {{ number_format($cost_price, 2, '.', ',') }}</td>
             <td style="text-align: right;">
-                @php $retail_price = str_replace(',', '', $store->retail_selling_price); @endphp
-                {{-- {{ number_format($retail_price, 2, '.', ',') }} --}}
-                {{ $retail_price }}
+                @php $retail_price = remove_non_numeric($store->retail_selling_price); @endphp
+                {{ number_format($retail_price, 2, '.', ',') }}
             </td>
             <td style="text-align: right;">
-                @php $whole_price = str_replace(',', '', $store->whole_selling_price); @endphp
-                {{-- {{ number_format($whole_price, 2, '.', ',') }} --}}
-                {{ $whole_price }}
+                @php $whole_price = remove_non_numeric($store->whole_selling_price); @endphp
+                {{ number_format($whole_price, 2, '.', ',') }}
             </td>
             <td style="text-align: right;">
-                @php $total_cost = str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->cost_price); @endphp
-                {{-- {{ number_format($total_cost, 2, '.', ',') }} --}}
-                {{ $total_cost }}
+                @php $total_cost = remove_non_numeric($store->qty_available) * remove_non_numeric($store->cost_price); @endphp
+                {{ number_format($total_cost, 2, '.', ',') }}
             </td>
             <td style="text-align: right;">
-                @php $total_r_price = str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->retail_selling_price); @endphp
-                {{-- {{ number_format($total_r_price, 2, '.', ',') }} --}}
-                {{ $total_r_price }}
+                @php $total_r_price = remove_non_numeric($store->qty_available) * remove_non_numeric($store->retail_selling_price); @endphp
+                {{ number_format($total_r_price, 2, '.', ',') }}
             </td>
             <td style="text-align: right;">
-                @php $total_w_price = str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->whole_selling_price); @endphp
-                {{-- {{ number_format($total_w_price, 2, '.', ',') }} --}}
-                {{ $total_w_price }}
+                @php $total_w_price = remove_non_numeric($store->qty_available) * remove_non_numeric($store->whole_selling_price); @endphp
+                {{ number_format($total_w_price, 2, '.', ',') }}
             </td>
             <td style="text-align: right;">
-                {{-- {{ number_format($retail_price - $cost_price, 2, '.', ',') }} --}}
-                {{ $retail_price - $cost_price }}
+                {{ number_format($retail_price - $cost_price, 2, '.', ',') }}
             </td>
             <td style="text-align: right;">
-                {{-- {{ number_format($whole_price - $cost_price, 2, '.', ',') }} --}}
-                {{ $whole_price - $cost_price }}
+                {{ number_format($whole_price - $cost_price, 2, '.', ',') }}
             </td>
         </tr>
     @endforeach

@@ -36,7 +36,8 @@
             <td style="text-align: right;"> {{ $cost_price }}</td>
             <td style="text-align: right;">
                 @php $retail_price = str_replace(',', '', $store->retail_selling_price); @endphp
-                {{ number_format($retail_price, 2, '.', ',') }}
+                {{-- {{ number_format($retail_price, 2, '.', ',') }} --}}
+                {{ $retail_price }}
             </td>
             <td style="text-align: right;">
                 @php $whole_price = str_replace(',', '', $store->whole_selling_price); @endphp

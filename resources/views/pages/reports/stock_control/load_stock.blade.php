@@ -31,33 +31,33 @@
             <td>{{ $store->store_code }} </td>
             <td> {{ $store->product_code }} - {{ $store->name }} </td>
             <td> {{ $store->qty_available }} </td>
-            @php $cost_price = remove_non_numeric($store->cost_price); @endphp
-            <td style="text-align: right;"> {{ number_format($cost_price, 2, '.', ',') }}</td>
+            @php $cost_price = $store->cost_price; @endphp
+            <td style="text-align: right;"> {{ number_format($cost_price, 2) }}</td>
             <td style="text-align: right;">
                 @php $retail_price = remove_non_numeric($store->retail_selling_price); @endphp
-                {{ number_format($retail_price, 2, '.', ',') }}
+                {{ number_format($retail_price, 2) }}
             </td>
             <td style="text-align: right;">
                 @php $whole_price = remove_non_numeric($store->whole_selling_price); @endphp
-                {{ number_format($whole_price, 2, '.', ',') }}
+                {{ number_format($whole_price, 2) }}
             </td>
             <td style="text-align: right;">
                 @php $total_cost = remove_non_numeric($store->qty_available) * remove_non_numeric($store->cost_price); @endphp
-                {{ number_format($total_cost, 2, '.', ',') }}
+                {{ number_format($total_cost, 2) }}
             </td>
             <td style="text-align: right;">
                 @php $total_r_price = remove_non_numeric($store->qty_available) * remove_non_numeric($store->retail_selling_price); @endphp
-                {{ number_format($total_r_price, 2, '.', ',') }}
+                {{ number_format($total_r_price, 2) }}
             </td>
             <td style="text-align: right;">
                 @php $total_w_price = remove_non_numeric($store->qty_available) * remove_non_numeric($store->whole_selling_price); @endphp
-                {{ number_format($total_w_price, 2, '.', ',') }}
+                {{ number_format($total_w_price, 2) }}
             </td>
             <td style="text-align: right;">
-                {{ number_format($retail_price - $cost_price, 2, '.', ',') }}
+                {{ number_format($retail_price - $cost_price, 2) }}
             </td>
             <td style="text-align: right;">
-                {{ number_format($whole_price - $cost_price, 2, '.', ',') }}
+                {{ number_format($whole_price - $cost_price, 2) }}
             </td>
         </tr>
     @endforeach

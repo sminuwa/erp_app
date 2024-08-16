@@ -41,25 +41,31 @@
             </td>
             <td style="text-align: right;">
                 @php $whole_price = str_replace(',', '', $store->whole_selling_price); @endphp
-                {{ number_format($whole_price, 2, '.', ',') }}
+                {{-- {{ number_format($whole_price, 2, '.', ',') }} --}}
+                {{ $whole_price }}
             </td>
             <td style="text-align: right;">
                 @php $total_cost = str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->cost_price); @endphp
-                {{ number_format($total_cost, 2, '.', ',') }}
+                {{-- {{ number_format($total_cost, 2, '.', ',') }} --}}
+                {{ $total_cost }}
             </td>
             <td style="text-align: right;">
                 @php $total_r_price = str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->retail_selling_price); @endphp
-                {{ number_format($total_r_price, 2, '.', ',') }}
+                {{-- {{ number_format($total_r_price, 2, '.', ',') }} --}}
+                {{ $total_r_price }}
             </td>
             <td style="text-align: right;">
                 @php $total_w_price = str_replace(',', '', $store->qty_available) * str_replace(',', '', $store->whole_selling_price); @endphp
-                {{ number_format($total_w_price, 2, '.', ',') }}
+                {{-- {{ number_format($total_w_price, 2, '.', ',') }} --}}
+                {{ $total_w_price }}
             </td>
             <td style="text-align: right;">
                 {{-- {{ number_format($retail_price - $cost_price, 2, '.', ',') }} --}}
+                {{ $retail_price - $cost_price }}
             </td>
             <td style="text-align: right;">
                 {{-- {{ number_format($whole_price - $cost_price, 2, '.', ',') }} --}}
+                {{ $whole_price - $cost_price }}
             </td>
         </tr>
     @endforeach

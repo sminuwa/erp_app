@@ -59,7 +59,7 @@ function in_array_r($needle, $haystack, $strict = true)
 }
 
 function remove_non_numeric($string){
-    return preg_replace("/[^0-9]/", "", $string);
+    return intval(preg_replace("/[^0-9]/", "", $string));
 }
 
 function currency_sign($currency = 'NG')

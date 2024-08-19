@@ -389,7 +389,7 @@
                                             <a href="{{ route('store.ledger.reports') }}"
                                                 class="nav-link {{ Request::is('reports/sc/store-ledger/*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
-                                                <p>Store Ledger Reports</p>
+                                                <p>Store Quantity Reports</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">

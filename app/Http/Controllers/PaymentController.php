@@ -103,7 +103,7 @@ class PaymentController extends Controller
         $payment = Payment::find($payment_id);
         $user_branch = User::userBranchAction();
         $accounts = GeneralAccount::active()->whereIn('class', ['A11', 'A12', 'A13'])->orderBy('number')->get();
-        $customers = Customer::active()->whereIn('type', ['Retail', 'Wholesale'])->where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
+        $customers = Customer::active()->whereIn('type', ['Retail', 'Wholesale'])->where('branch_id', $user_branch)->orderBy('name')->get();
         $model = new GeneralAccountLedger;
         if ($payment)
             $model = $payment;

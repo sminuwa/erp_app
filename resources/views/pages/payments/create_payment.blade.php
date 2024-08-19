@@ -88,11 +88,11 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         @if (isset($model) && $model->model_name == 'Customer')
-                                            <?php $payers = \App\Models\Customer::orderBy('code', 'asc')->get(); ?>
+                                            <?php $payers = \App\Models\Customer::active()->orderBy('code', 'asc')->get(); ?>
                                         @elseif(isset($model) && $model->model_name == 'Supplier')
-                                            <?php $payers = \App\Models\Supplier::orderBy('code', 'asc')->get(); ?>
+                                            <?php $payers = \App\Models\Supplier::active()->orderBy('code', 'asc')->get(); ?>
                                         @else
-                                            <?php $payers = \App\Models\GeneralAccount::orderBy('number', 'asc')->get(); ?>
+                                            <?php $payers = \App\Models\GeneralAccount::active()->orderBy('number', 'asc')->get(); ?>
                                         @endif
                                         <label for="payer_id">Payable</label>
                                         <select
@@ -104,7 +104,8 @@
                                                     <option value="{{ $payer->id }}"
                                                         {{ $payer->id == $model->model_id ? 'selected' : '' }}>
                                                         {{ $payer->code ?? $payer->number }} -
-                                                        {{ $payer->name ?? $payer->description }}</option>
+                                                        {{ $payer->name ?? $payer->description }}
+                                                    </option>
                                                 @endforeach
                                             @endif
                                         </select>

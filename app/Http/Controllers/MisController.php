@@ -138,10 +138,10 @@ class MisController extends Controller
     }
     public function loadCustomers(Request $request)
     {
-        $types = DB::table('customers')
+        $types = Customer::active()
             ->select('customers.id', 'customers.name', 'customers.code')
             ->where('type', '=', $request->type)
-            ->where('branch_id', 'LIKE', User::userBranchAction())
+            ->where('branch_id', User::userBranchAction())
             ->orderBy('name', 'asc')
             ->get();
         return view('misc.ajax.customers', ['records' => $types]);

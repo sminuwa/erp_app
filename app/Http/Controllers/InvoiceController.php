@@ -828,7 +828,7 @@ class InvoiceController extends Controller
             ->where('branch_product_prices.status', 1)
             ->orderBy('products.name')->orderBy('stores.name')->get();
         //TODO:: remove limit here
-        $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name');
+        $customers = Customer::active()->where('branch_id', $user_branch)->orderBy('name');
         if (\Cart::getContent()->isEmpty())
             $this->loadOrderInvoiceToCart($order);
         $cart_products = \Cart::getContent();
@@ -853,7 +853,7 @@ class InvoiceController extends Controller
             ->orderBy('products.name')->orderBy('stores.name')->limit(100)->get();
         //TODO:: remove limit here
 
-        $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
+        $customers = Customer::actve()->where('branch_id', $user_branch)->orderBy('name')->get();
 
         if (\Cart::getContent()->isEmpty()) {
             foreach ($order->order_items()->get() as $item) {
@@ -1058,7 +1058,7 @@ class InvoiceController extends Controller
             ->orderBy('products.name')->orderBy('stores.name')->limit(100)->get();
         //TODO:: remove limit here
 
-        $customers = Customer::where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
+        $customers = Customer::active()->where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
         if (\Cart::getContent()->isEmpty()) {
             foreach ($order->order_items()->get() as $item) {
                 $selling_price = $item->selling_price;

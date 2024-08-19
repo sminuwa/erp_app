@@ -68,4 +68,8 @@ class GeneralAccount extends Model
         return false;
     }
 
+    public function scopeActive($query){
+        return $query->where('general_accounts.status', 1);
+    }
+
 }

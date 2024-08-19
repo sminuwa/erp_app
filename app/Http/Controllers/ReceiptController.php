@@ -118,7 +118,7 @@ class ReceiptController extends Controller
         $receipt = Receipt::find($receipt_id);
         //        return $receipt;
         $user_branch = User::userBranchAction();
-        $accounts = GeneralAccount::whereIn('class', ['A11', 'A12', 'A13'])->orderBy('number')->get();
+        $accounts = GeneralAccount::active()->whereIn('class', ['A11', 'A12', 'A13'])->orderBy('number')->get();
         $customers = Customer::whereIn('type', ['Retail', 'Wholesale'])->where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
         $model = new GeneralAccountLedger;
         if ($receipt)

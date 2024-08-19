@@ -24,7 +24,7 @@ class ReceiptController extends Controller
         $date = \Carbon\Carbon::today()->subDays(7);
         $user_branch = User::userBranchAction();
         $payments = Receipt::select('receipts.*')
-            ->where('branch_id', 'LIKE', $user_branch)
+            ->where('branch_id', $user_branch)
             ->where('created_at', '>=', $date)
             ->orderBy('status', 'ASC')->orderBy('receipt_no', 'DESC')
             //->where('date', '>', Carbon::now()->subDays(7))
@@ -36,7 +36,7 @@ class ReceiptController extends Controller
     {
         $search_value = $request->refno;
         $payments = Receipt::select('receipts.*')
-            ->where('branch_id', 'LIKE', User::userBranchAction())
+            ->where('branch_id', User::userBranchAction())
             ->where('receipt_no', 'LIKE', "%$search_value%")
             ->orderBy('receipt_no', 'DESC')->take(10)->get();
         return view('pages.receipts.receipt_payment', ['payments' => $payments]);
@@ -44,7 +44,7 @@ class ReceiptController extends Controller
     public function show(Receipt $receipt)
     {
 
-        $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
+        $company = Setting::where('branch_id', User::userBranchAction())->latest()->first();
         return view('pages.receipts.preview', compact('receipt', 'company'));
     }
     public function payReciept(Request $request)

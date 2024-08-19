@@ -4,34 +4,34 @@
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
-<table class="table table-bordered caption" id="example1">
+<table class="display table table-bordered caption" id="example1">
     <caption style="caption-size:top">
         <h5 style="text-align: center;text-transform:uppercase">{{ $branch->name ?? 'All Branches' }}</h5>
         <h5 style="text-align: center;">STORE QUANTITY REPORT </h5>
     </caption>
     <thead>
         <tr>
-            <th>CODE</th>
+            <th>BRANCH</th>
+            <th>STORE</th>
             <th>PRODUCT NAME</th>
             <th>CATEGORY NAME</th>
-            <th>STORE</th>
             <th>QUANTITY</th>
-            <th>COST PRICE()</th>
-            <th>TOTAL PRICE()</th>
+            <th>COST PRICE</th>
+            <th>TOTAL PRICE</th>
 
         </tr>
     </thead>
     @foreach ($stores as $store)
         <tr>
-            <td> {{ $store->code }} </td>
-            <td> {{ $store->name }} </td>
-            <td> {{ $store->category }} </td>
+            <td> {{ $store->branch_code }} </td>
             <td>{{ $store->store }} </td>
+            <td>{{ $store->code }} - {{ $store->name }} </td>
+            <td> {{ $store->category }} </td>
             <td> {{ $store->qty_available }} </td>
             <td style="text-align: right;">
-               {{ number_format(str_replace(',', '', $store->cost_price), 2, '.', ',') }} </td>
+               {{ number_format(remove_non_numeric($store->cost_price), 2) }} </td>
             <td style="text-align: right;">
-                {{ number_format(str_replace(',', '', $store->cost_price * $store->qty_available), 2, '.', ',') }} </td>
+                {{ number_format(remove_non_numeric($store->cost_price) * remove_non_numeric($store->qty_available), 2) }} </td>
         </tr>
     @endforeach
     <tfoot>

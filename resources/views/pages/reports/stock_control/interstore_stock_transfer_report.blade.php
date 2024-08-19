@@ -178,52 +178,7 @@
                     }
                 }).done(function(data) {
                     $("#load").html(data);
-                    $('#example1').DataTable({
-                        dom: 'Bfrtip',
-                        lengthMenu: [25, 50, 75, 100],
-                        pageLength: 100,
-                        buttons: [{
-                                extend: 'copyHtml5',
-                                exportOptions: {
-                                    columns: ':visible'
-                                }
-                            },
-                            {
-                                extend: 'excelHtml5',
-                                exportOptions: {
-                                    columns: ':visible'
-                                }
-                            },{
-                                extend: 'pdfHtml5',
-                                exportOptions: {
-                                    columns: ':visible'
-                                }
-                            },
-                            {
-                                extend: 'print',
-                                messageTop: 'Stock Transfer',
-                                orientation: 'landscape',
-                                pageSize: 'LEGAL'
-                            },
-                            {
-                                extend: 'colvis',
-                                columns: ':not(.noVis)',
-                                collectionLayout: 'fixed two-column',
-                                postfixButtons: [{
-                                    extend: 'colvisGroup',
-                                    text: 'Show all',
-                                    show: ':hidden'
-                                }]
-                            }
-                        ],
-                        language: {
-                            buttons: {
-                                colvis: 'Show/Hide columns'
-                            }
-                        },
-
-
-                    });
+                    loadDataTable()
                 });
             });
         });

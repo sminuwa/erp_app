@@ -6,7 +6,7 @@
 </div> --}}
 
 @if ($type == 'Payment' || $type == 'Receipt')
-    <table id="example1" class="table table-bordered table-striped text-left table-responsive-xl">
+    <table id="example1" class="display table table-bordered table-striped text-left table-responsive-xl">
         <caption style="caption-size:top">
             <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
                 AP-AR STATUS BETWEEN {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}

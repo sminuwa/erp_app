@@ -4,7 +4,8 @@
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
-<table class="table table-bordered caption" id="example1">
+<div class="table-responsive">
+<table class="display table table-bordered caption" id="example1">
     <caption style="caption-size:top">
         <h3 style="text-align: center;">{{ $branch == null ? 'All Branches' : $branch->name . "($branch->code)" }} </h3>
         <h5 style="text-align: center;">CURRENT STOCK REPORT </h5>
@@ -76,3 +77,4 @@
         <th></th>
     </tfoot>
 </table>
+</div>

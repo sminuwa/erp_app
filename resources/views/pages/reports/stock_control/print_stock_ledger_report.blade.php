@@ -57,7 +57,7 @@
                                     {{ App\Models\Store::find($store_id)->name ?? 'All Stores' }}/{{ App\Models\Product::find($product_id)->name }}
                                 </h3>
                             </div>
-                            <table class="table table-bordered caption" id="example1" data-ordering="false">
+                            <table class="display table table-bordered caption" id="example1" data-ordering="false">
                                 <thead>
                                     <tr>
                                         <th>Date</th>

@@ -5,7 +5,7 @@
     </div>
 </div>
 
-<table class="table table-bordered caption" id="example1" data-ordering="false">
+<table class="display table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
             INCOME STATEMENT FROM {{ $from_month == 'all' ? 'January' : monthName($from_month) }} AND

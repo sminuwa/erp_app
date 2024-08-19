@@ -18,7 +18,7 @@
         <!-- Content Header (Page header) -->
         <!-- Content Header (Page header) -->
         <section class="content-header">
-            <div class="container-fluid">
+            <div class="container">
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <h4>Current Stock Report</h4>
@@ -36,55 +36,68 @@
 
         <!-- Main content -->
         <section class="content">
-            <div class="container-fluid">
+            <div class="container">
                 <form method="POST">
                     <div class="row">
-                        <div class="form-group">
-                            <label for="branch_id">Branch</label>
-                            <select class="form-control select2-single ajax-branches"
-                                    name="branch_id"
-                                    id="branch_id">
-                            </select>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="branch_id">Branch</label>
+                                <select class="form-control select2-single ajax-branches"
+                                        name="branch_id"
+                                        id="branch_id">
+                                </select>
 
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="store_id">Store</label>
-                            <select class="form-control select2-single ajax-stores"
-                                    name="store_id"
-                                    id="store_id">
-                            </select>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="store_id">Store</label>
+                                <select class="form-control select2-single ajax-stores"
+                                        name="store_id"
+                                        id="store_id">
+                                </select>
 
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="category_id">Category</label>
-                            <select class="form-control select2-single ajax-categories"
-                                    name="category_id"
-                                    id="category_id">
-                            </select>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="category_id">Category</label>
+                                <select class="form-control select2-single ajax-categories"
+                                        name="category_id"
+                                        id="category_id">
+                                </select>
 
+                            </div>
                         </div>
+                        <div class="col-md-4">
 
-                        <div class="form-group">
-                            <label for="product_id">Product</label>
-                            <select class="form-control select2-single ajax-products"
-                                    name="product_id"
-                                    id="product_id">
-                            </select>
+                            <div class="form-group">
+                                <label for="product_id">Product</label>
+                                <select class="form-control select2-single ajax-products"
+                                        name="product_id"
+                                        id="product_id">
+                                </select>
 
+                            </div>
                         </div>
-                        <div class="form-group text-right col-sm-4">
-                            <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />
+                        <div class="col-md-12">
+                            <div class="form-group text-right">
+                                <label for=""></label>
+                                <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />
+                            </div>
                         </div>
                     </div>
 
                 </form>
 
-            </div>
-            <div class="row">
-                <div class="col-sm-12 table-responsive" id="load">
-                    <img src="{{ asset('assets/backend/img/loader.png') }}" style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+
+                <div class="row">
+                    <div class="col-sm-12" id="load">
+                        <img src="{{ asset('assets/backend/img/loader.png') }}" style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                    </div>
                 </div>
             </div>
+            
     </div><!-- /.container-fluid -->
     </section>
     <!-- /.content -->
@@ -129,93 +142,7 @@
                     console.log(data)
                     $('#img-loader').hide();
                     $("#load").html(data);
-                    $('#example1').DataTable({
-                        dom: 'Bfrtip',
-                        lengthMenu: [25, 50, 75, 100],
-                        pageLength: 100,
-                        buttons: [{
-                                extend: 'copyHtml5',
-                            },
-                            {
-                                extend: 'excelHtml5',
-                            },{
-                                extend: 'pdfHtml5',
-                                orientation: 'landscape',
-                                pageSize: 'LEGAL',
-                                text: 'Export as PDF',
-                                exportOptions: {
-                                    columns: ':visible'
-                                }
-                            },
-                            {
-                                extend: 'colvis',
-                                columns: ':not(.noVis)',
-                                collectionLayout: 'fixed two-column',
-                                postfixButtons: [{
-                                    extend: 'colvisGroup',
-                                    text: 'Show all',
-                                    show: ':hidden'
-                                }]
-                            }
-                        ],
-                        language: {
-                            buttons: {
-                                colvis: 'Show/Hide columns'
-                            }
-                        },
-                        //buttons: ['excel', 'pdf', 'print'],
-                        "footerCallback": function(row, data, start, end, display) {
-                            var api = this.api();
-                            var json = api.ajax.json();
-                            // Remove the formatting to get integer data for summation
-                            var intVal = function(i) {
-                                return typeof i === 'string' ?
-                                    i.replace(/[\$,]/g, '') * 1 :
-                                    typeof i === 'number' ?
-                                    i : 0;
-                            };
-
-                            // Total over all pages Total Cost price
-
-                            if (api.column(7).data().length) {
-                                var total = api
-                                    .column(7)
-                                    .data()
-                                    .reduce(function(a, b) {
-                                        return intVal(a) + intVal(b);
-                                    })
-                            } else {
-                                total = 0
-                            };
-                            // Total over this page
-                            if (api.column(7).data().length) {
-                                var pageTotal = api
-                                    .column(7, {
-                                        page: 'current'
-                                    })
-                                    .data()
-                                    .reduce(function(a, b) {
-                                        return intVal(a) + intVal(b);
-                                    })
-                            } else {
-                                pageTotal = 0
-                            };
-
-
-
-                            // Update footer
-                            $(api.column(7).footer()).html(
-                                "Page Total: " + formatMoney(pageTotal) +
-                                "<br> (Grand Total: " +
-                                formatMoney(total) + ")"
-                            );
-
-
-
-
-
-                        }
-                    });
+                    loadDataTable()
                 });
             });
         });

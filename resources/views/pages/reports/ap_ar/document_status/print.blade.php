@@ -53,7 +53,7 @@
 
                             @if ($type == 'Payment' || $type == 'Receipt')
                                 <table id="example1"
-                                    class="table table-bordered table-striped text-left table-responsive-xl">
+                                    class="display table table-bordered table-striped text-left table-responsive-xl">
                                     <caption style="caption-size:top">
                                         <h5 style="text-align: center;">{{ strtoupper($branch->name) }} <br>
                                             AP-AR STATUS BETWEEN

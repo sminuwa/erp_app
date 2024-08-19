@@ -4,7 +4,7 @@
             class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
-<table class="table table-bordered caption" id="example1" data-ordering="false">
+<table class="display table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
             CASH FLOW BETWEEN {{ Carbon\Carbon::parse($from_date)->toFormattedDateString() }} and

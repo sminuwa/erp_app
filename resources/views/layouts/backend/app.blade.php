@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="{{ asset('assets/backend/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/backend/css/select2-bootstrap.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datepicker/datepicker3.css') }}">
-{{--    <link href="{{ asset('assets/backend/DataTables/datatables.min.css') }}" rel="stylesheet">--}}
+   <link href="{{ asset('assets/backend/DataTables/datatables.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datepicker/jquery.datetimepicker.css') }}">
     <link rel="stylesheet" href="{{ asset('commons/css/custom-style.css') }}">
     <link rel="stylesheet" href="{{ asset('commons/css/custom-table.css') }}">
@@ -106,7 +106,7 @@
     <script src="{{ asset('assets/backend/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <!-- AdminLTE -->
     <script src="{{ asset('assets/backend/js/adminlte.js') }}"></script>
-    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
+    {{-- <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script> --}}
 
     <script src="{{ asset('assets/backend/js/toastr.min.js') }}"></script>
     <script src="{{ asset('assets/backend/js/jquery-ui.js') }}"></script>
@@ -115,7 +115,7 @@
     {{--<script src="{{ asset('assets/backend/plugins/datepicker/datepicker-bootstrap.min.js') }}"></script> --}}
     <script src="{{ asset('assets/backend/plugins/datepicker/moment-with-locales.js') }}"></script>
     <script src="{{ asset('assets/backend/plugins/datepicker/jquery.datetimepicker.js') }}"></script>
-{{--    <script src="{{ asset('assets/backend/DataTables/datatables.min.js') }}"></script>--}}
+   <script src="{{ asset('assets/backend/DataTables/datatables.min.js') }}"></script>
 
     <script src="{{ asset('commons/js/custom-ajax.js') }}"></script>
 
@@ -213,6 +213,96 @@
             })
         }
 
+
+        function loadDataTable(){
+            $('.display').DataTable({
+                dom: 'Bfrtip',
+                lengthMenu: [25, 50, 75, 100],
+                pageLength: 100,
+                buttons: [{
+                        extend: 'copyHtml5',
+                    },
+                    {
+                        extend: 'excelHtml5',
+                    },{
+                        extend: 'pdfHtml5',
+                        orientation: 'landscape',
+                        pageSize: 'LEGAL',
+                        text: 'Export as PDF',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'colvis',
+                        columns: ':not(.noVis)',
+                        collectionLayout: 'fixed two-column',
+                        postfixButtons: [{
+                            extend: 'colvisGroup',
+                            text: 'Show all',
+                            show: ':hidden'
+                        }]
+                    }
+                ],
+                language: {
+                    buttons: {
+                        colvis: 'Show/Hide columns'
+                    }
+                },
+                //buttons: ['excel', 'pdf', 'print'],
+                "footerCallback": function(row, data, start, end, display) {
+                    var api = this.api();
+                    var json = api.ajax.json();
+                    // Remove the formatting to get integer data for summation
+                    var intVal = function(i) {
+                        return typeof i === 'string' ?
+                            i.replace(/[\$,]/g, '') * 1 :
+                            typeof i === 'number' ?
+                            i : 0;
+                    };
+
+                    // Total over all pages Total Cost price
+
+                    if (api.column(7).data().length) {
+                        var total = api
+                            .column(7)
+                            .data()
+                            .reduce(function(a, b) {
+                                return intVal(a) + intVal(b);
+                            })
+                    } else {
+                        total = 0
+                    };
+                    // Total over this page
+                    if (api.column(7).data().length) {
+                        var pageTotal = api
+                            .column(7, {
+                                page: 'current'
+                            })
+                            .data()
+                            .reduce(function(a, b) {
+                                return intVal(a) + intVal(b);
+                            })
+                    } else {
+                        pageTotal = 0
+                    };
+
+
+
+                    // Update footer
+                    $(api.column(7).footer()).html(
+                        "Page Total: " + formatMoney(pageTotal) +
+                        "<br> (Grand Total: " +
+                        formatMoney(total) + ")"
+                    );
+
+
+
+
+
+                }
+            });
+        }
     </script>
 
     @stack('js')

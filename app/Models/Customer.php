@@ -61,4 +61,8 @@ class Customer extends Model
     {
         return $this->belongsTo(User::class, 'relation_officer');
     }
+
+    public function scopeActive($query){
+        return $query->where('customers.status', 1);
+    }
 }

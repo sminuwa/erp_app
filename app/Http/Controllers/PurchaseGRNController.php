@@ -82,7 +82,7 @@ class PurchaseGRNController extends Controller
         return view('pages.inventories.purchases.grn.create', [
             'model' => new Purchase,
             'products' => Product::all(),
-            'suppliers' => Supplier::orderBy('name', 'asc')->get(),
+            'suppliers' => Supplier::active()->orderBy('name', 'asc')->get(),
             'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->get(),
             'categories' => Category::all(),
             'cart_products' => \Cart::getContent(),

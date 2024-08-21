@@ -220,9 +220,11 @@
                 "responsive": true,
                 lengthMenu: [25, 50, 75, 100],
                 pageLength: 100,
-                buttons: [{
+                buttons: [
+                    {
                         extend: 'copyHtml5',
                     },
+                    
                     {
                         extend: 'excelHtml5',
                     },{
@@ -250,7 +252,7 @@
                         colvis: 'Show/Hide columns'
                     }
                 },
-                //buttons: ['excel', 'pdf', 'print'],
+                // buttons: ['excel', 'pdf', 'print'],
                 "footerCallback": function(row, data, start, end, display) {
                     var api = this.api();
                     var json = api.ajax.json();

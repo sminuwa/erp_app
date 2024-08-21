@@ -54,7 +54,7 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="transfer_date">Date</label>
-                                                <input type="text" name="date" class="form-control datepicker"
+                                                <input type="text" name="date" class="form-control datepicker-entry"
                                                     value="{{ isset($intersite->date) ? $intersite->date : old('date', date('Y-m-d')) }}" />
                                             </div>
                                         </div>

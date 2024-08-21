@@ -48,7 +48,7 @@
             <div class="form-group">
                 <label for="payment_date">Payment Date</label>
                 <input type="text"
-                    class="form-control datepicker {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
+                    class="form-control datepicker-entry {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
                     name="payment_date" id="payment_date"
                     value="{{ old('payment_date', $model->payment_date) == '' ? date('Y-m-d') : old('payment_date', $model->payment_mode) }}"
                     required="required">

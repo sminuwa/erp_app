@@ -64,7 +64,7 @@
                                                 <label for="purchase_date">Purchase Date</label>
                                                 <div class="input-group">
                                                     <input type="text"
-                                                           class="form-control datepicker {{ $errors->has('purchase_date') ? ' is-invalid' : '' }}"
+                                                           class="form-control datepicker-entry {{ $errors->has('purchase_date') ? ' is-invalid' : '' }}"
                                                            name="purchase_date" id="purchase_date"
                                                            placeholder="" required="required">
                                                     <?php date_default_timezone_set('Africa/Lagos'); ?>

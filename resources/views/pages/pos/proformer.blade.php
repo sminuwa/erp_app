@@ -52,7 +52,7 @@
                                 </div>
                                 <div class="card-body">
 
-                                    <input type="hidden" name="order_date" class="form-control datepicker"
+                                    <input type="hidden" name="order_date" class="form-control datepicker-entry"
                                         value="{{ date('Y-m-d') }}" />
 
                                     <div class="row">

@@ -56,7 +56,7 @@
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
-                                        <input type="text" class="form-control datepicker" name="date" id="date"
+                                        <input type="text" class="form-control datepicker-entry" name="date" id="date"
                                             required>
                                         <label class="floating-label">Date: @error('journal_date')
                                                 <span class="text-danger error">{{ $message }}</span>

@@ -60,7 +60,7 @@
                                                 <label for="date">Date</label>
                                                 <div class="input-group">
                                                     <input type="text" autocomplete="off"
-                                                        class="form-control datepicker {{ $errors->has('date') ? ' is-invalid' : '' }}"
+                                                        class="form-control datepicker-entry {{ $errors->has('date') ? ' is-invalid' : '' }}"
                                                         name="date" id="date"
                                                         value="{{ old('date', $model->date) != null ? old('date', $model->date) : date('Y-m-d') }}"
                                                         placeholder="" required="required">
@@ -208,7 +208,7 @@
                         <div class="form-group">
                             <label for="quantity">Expiry Date</label>
                             <input type="text" autocomplete="off"
-                                class="form-control datepicker {{ $errors->has('expiry_date') ? ' is-invalid' : '' }}"
+                                class="form-control datepicker-entry {{ $errors->has('expiry_date') ? ' is-invalid' : '' }}"
                                 name="expiry_date" id="expiry_date" placeholder="Expiry Date (Optional)">
                             @if ($errors->has('expiry_date'))
                                 <div class="invalid-feedback">

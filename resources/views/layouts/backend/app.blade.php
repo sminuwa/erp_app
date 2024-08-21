@@ -177,11 +177,18 @@
         date.setDate( date.getDate() - 3 );
 
 
+        $('.datepicker-entry').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            startDate: date,
+        });
+
         $('.datepicker').datepicker({
             autoclose: true,
             todayHighlight: true,
             // startDate: date,
         });
+
         $('.datepicker2').datepicker({
             autoclose: true,
             startDate: date,

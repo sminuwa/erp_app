@@ -31,7 +31,7 @@
             <td> {{ $store->branch_code }} </td>
             <td>{{ $store->store_code }} </td>
             <td> {{ $store->product_code }} - {{ $store->name }} </td>
-            <td> {{ number_format($store->qty_available, 6) }} </td>
+            <td> {{ number_format(round($store->qty_available,6), 6) }} </td>
             @php $cost_price = $store->cost_price; @endphp
             <td style="text-align: right;"> {{ number_format($cost_price, 2) }}</td>
             <td style="text-align: right;">

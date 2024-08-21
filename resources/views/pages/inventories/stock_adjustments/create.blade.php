@@ -191,7 +191,7 @@
 
                         <div class="form-group">
                             <label for="quantity">Quantity</label>
-                            <input type="number" step=".01"
+                            <input type="text" pattern="^[0-9\.]*$"
                                 class="form-control {{ $errors->has('quantity') ? ' is-invalid' : '' }}" name="quantity"
                                 id="quantity" value="" placeholder="Quantity" required="required"
                                 min="1">

@@ -156,7 +156,7 @@
                                         <label for="date">Date</label>
                                         <div class="input-group">
                                             <input type="text" autocomplete="off"
-                                                class="form-control datepicker {{ $errors->has('date') ? ' is-invalid' : '' }}"
+                                                class="form-control datepicker-entry {{ $errors->has('date') ? ' is-invalid' : '' }}"
                                                 name="date" id="date"
                                                 value="{{ old('date', $model->date) != null ? old('date', $model->date) : date('Y-m-d') }}"
                                                 placeholder="" required="required">

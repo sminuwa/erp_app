@@ -46,7 +46,7 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Date</label>
-                                                <input type="text" name="date" class="form-control datepicker">
+                                                <input type="text" name="date" class="form-control datepicker-entry">
                                             </div>
                                         </div>
                                         <div class="col-md-4">

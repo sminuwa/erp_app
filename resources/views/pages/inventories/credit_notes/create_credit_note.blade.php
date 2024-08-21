@@ -51,7 +51,7 @@
 
                                         <div class="form-group">
                                             <label for="date">Date</label>
-                                            <input type="text" name="date" class="form-control date_ datepicker"
+                                            <input type="text" name="date" class="form-control date_ datepicker-entry"
                                                 value="{{ $order ? $order->order_date : date('Y-m-d') }}" required />
                                         </div>
 

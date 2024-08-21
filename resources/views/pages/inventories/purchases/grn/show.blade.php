@@ -143,7 +143,7 @@
                                                 <td>{{ $product->product->code }}</td>
                                                 <td>{{ $product->product->name }}</td>
                                                 <td>{{ $product->product->unit }}</td>
-                                                <td>{{ number_format($product->quantity, 0, '', ',') }}</td>
+                                                <td>{{ $product->quantity }}</td>
                                                 <td style="text-align: right">{{ number_format($product->unit_price, 2) }}
                                                 </td>
                                                 <td style="text-align: right">

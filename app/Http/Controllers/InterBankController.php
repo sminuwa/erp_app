@@ -32,7 +32,7 @@ class InterBankController extends Controller
     public function create(Request $request)
     {
         $user_branch = User::userBranchAction();
-        $accounts = GeneralAccount::whereIn('class', ['A11', 'A12', 'A13'])->orderBy('number')->get();
+        $accounts = GeneralAccount::active()->whereIn('class', ['A11', 'A12', 'A13'])->orderBy('number')->get();
         $model = new InterBank;
         return view('pages.interbanks.create', compact('accounts', 'model'));
     }

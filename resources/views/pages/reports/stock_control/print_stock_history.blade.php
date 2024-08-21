@@ -52,7 +52,7 @@
 
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
-                            <table class="table table-bordered caption" id="example1">
+                            <table class="display table table-bordered caption" id="example1">
                                 <caption style="caption-size:top">
                                     <h5 style="text-align: center;">Stock History
                                         Between

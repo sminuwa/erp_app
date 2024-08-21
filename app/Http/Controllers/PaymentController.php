@@ -24,7 +24,7 @@ class PaymentController extends Controller
     {
         $user_branch = User::userBranchAction();
         $payments = Payment::select('payments.*')
-            ->where('branch_id', 'LIKE', $user_branch)
+            ->where('branch_id', $user_branch)
             ->orderBy('status', 'ASC')->orderBy('id', 'DESC')
             //->where('date', '>', Carbon::now()->subDays(7))
             ->get();
@@ -34,15 +34,14 @@ class PaymentController extends Controller
     {
         $search_value = $request->refno;
         $payments = Payment::select('payments.*')
-            ->where('branch_id', 'LIKE', User::userBranchAction())
+            ->where('branch_id', User::userBranchAction())
             ->where('receipt_no', 'LIKE', "%$search_value%")
             ->orderBy('receipt_no', 'DESC')->take(10)->get();
         return view('pages.payments.payment', ['payments' => $payments]);
     }
     public function show(Payment $payment)
     {
-
-        $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
+        $company = Setting::where('branch_id', User::userBranchAction())->latest()->first();
         return view('pages.payments.preview', compact('payment', 'company'));
     }
     public function pay(Request $request)
@@ -103,8 +102,8 @@ class PaymentController extends Controller
         $payment_id = $request->payment_id;
         $payment = Payment::find($payment_id);
         $user_branch = User::userBranchAction();
-        $accounts = GeneralAccount::whereIn('class', ['A11', 'A12', 'A13'])->orderBy('number')->get();
-        $customers = Customer::whereIn('type', ['Retail', 'Wholesale'])->where('branch_id', 'LIKE', $user_branch)->orderBy('name')->get();
+        $accounts = GeneralAccount::active()->whereIn('class', ['A11', 'A12', 'A13'])->orderBy('number')->get();
+        $customers = Customer::active()->whereIn('type', ['Retail', 'Wholesale'])->where('branch_id', $user_branch)->orderBy('name')->get();
         $model = new GeneralAccountLedger;
         if ($payment)
             $model = $payment;

@@ -10,7 +10,7 @@
         </div>
         <div class="row">
             <div class="col-md-12 mt-3 table-responsive">
-                <table class="table table-bordered table-striped caption" id="example1">
+                <table class="display table table-bordered table-striped caption" id="example1">
                     <caption style="caption-size:top">
                         <h3 style="text-align: center;">{{ $branch == null ? 'All Branches' : $branch->name . "($branch->code)" }} </h3>
                         <h5 style="text-align: center;">Sale Transactions By Categoery

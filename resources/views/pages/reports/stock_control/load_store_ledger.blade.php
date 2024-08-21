@@ -4,7 +4,7 @@
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
-<table class="table table-bordered caption" id="example1">
+<table class="display table table-bordered caption" id="example1">
     <caption style="caption-size:top">
         <h5 style="text-align: center;text-transform:uppercase">{{ $branch->name ?? 'All Branches' }}</h5>
         <h5 style="text-align: center;">STORE QUANTITY REPORT </h5>
@@ -16,8 +16,8 @@
             <th>PRODUCT NAME</th>
             <th>CATEGORY NAME</th>
             <th>QUANTITY</th>
-            <th>COST PRICE()</th>
-            <th>TOTAL PRICE()</th>
+            <th>COST PRICE</th>
+            <th>TOTAL PRICE</th>
 
         </tr>
     </thead>

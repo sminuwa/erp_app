@@ -116,66 +116,7 @@
                 }).done(function (data) {
                     // console.log(data)
                     $("#load").html(data);
-                    $('#example1').DataTable({
-                        dom: 'Bfrtip',
-                        lengthMenu: [25, 50, 75, 100],
-                        pageLength: 100,
-                        buttons: [{
-                                extend: 'copyHtml5',
-                                exportOptions: {
-                                    columns: ':visible'
-                                }
-                            },
-                            {
-                                extend: 'excelHtml5',
-                                exportOptions: {
-                                    columns: ':visible'
-                                }
-                            },{
-                                extend: 'pdfHtml5',
-                                exportOptions: {
-                                    columns: ':visible'
-                                }
-                            },
-                            {
-                                extend: 'print',
-                                exportOptions: {
-                                    columns: ':visible'
-                                },
-                                messageTop: 'Sales Report',
-                                orientation: 'landscape',
-                                pageSize: 'LEGAL'
-                            },
-                            {
-                                extend: 'colvis',
-                                columns: ':not(.noVis)',
-                                collectionLayout: 'fixed two-column',
-                                postfixButtons: [{
-                                    extend: 'colvisGroup',
-                                    text: 'Show all',
-                                    show: ':hidden'
-                                }]
-                            }
-                        ],
-                        language: {
-                            buttons: {
-                                colvis: 'Show/Hide columns'
-                            }
-                        },
-                        //buttons: ['excel', 'pdf', 'print'],
-                        "footerCallback": function(row, data, start, end, display) {
-                            var api = this.api();
-                            var json = api.ajax.json();
-                            // Remove the formatting to get integer data for summation
-                            var intVal = function(i) {
-                                return typeof i === 'string' ?
-                                    i.replace(/[\$,]/g, '') * 1 :
-                                    typeof i === 'number' ?
-                                    i : 0;
-                            };
-
-                        }
-                    });
+                    loadDataTable()
                 });
             })
         });

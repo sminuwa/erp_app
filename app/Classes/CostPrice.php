@@ -711,7 +711,7 @@ class CostPrice
                     'store_id' => $record['store_id'],
                     'product_id' => $key,
                     'quantity' => $record['new_quantity'],
-                    'cost' => ($record['total_existing_cost'] + $record['total_new_cost']) / $record['quantity'],
+                    'cost' => ($record['total_existing_cost'] + $record['total_new_cost']) / ($record['quantity'] > 0 ? $record['quantity']: 1),
                     'operation' => $operation,
                 ];
                 if($type == TRANSACTION_TYPE_RETURN_DEBIT){

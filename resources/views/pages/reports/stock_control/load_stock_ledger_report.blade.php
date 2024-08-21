@@ -5,7 +5,7 @@
     </div>
 </div>
 {{-- <h3>{{ $product->item ?? '' }}</h3> --}}
-<table class="table table-bordered caption" id="example1" data-ordering="false">
+<table class="display table table-bordered caption" id="example1" data-ordering="false">
     <thead>
         <tr>
             <th>Date</th>

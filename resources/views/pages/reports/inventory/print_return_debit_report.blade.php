@@ -51,7 +51,7 @@
 
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
-                            <table class="table table-bordered caption" id="example1" border="1" cellpadding="0"
+                            <table class="display table table-bordered caption" id="example1" border="1" cellpadding="0"
                                 cellspacing="0" data-ordering="false">
                                 <thead>
                                     <tr>

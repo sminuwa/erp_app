@@ -39,7 +39,7 @@
                                 <label for="purchase_date">Purchase Date</label>
                                 <div class="input-group">
                                     <input type="text"
-                                        class="form-control datepicker {{ $errors->has('purchase_date') ? ' is-invalid' : '' }}"
+                                        class="form-control datepicker-entry {{ $errors->has('purchase_date') ? ' is-invalid' : '' }}"
                                         name="purchase_date" id="purchase_date"
                                         value="{{ $model->purchase_date == null ? date('Y-m-d') : old('purchase_date', $model->purchase_date->format('Y-m-d')) }}"
                                         placeholder="" required="required">

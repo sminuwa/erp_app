@@ -27,11 +27,11 @@
             <td>{{ $store->store }} </td>
             <td>{{ $store->code }} - {{ $store->name }} </td>
             <td> {{ $store->category }} </td>
-            <td> {{ $store->qty_available }} </td>
+            <td> {{ number_format(round($store->qty_available,6),6) }} </td>
             <td style="text-align: right;">
                {{ number_format(remove_non_numeric($store->cost_price), 2) }} </td>
             <td style="text-align: right;">
-                {{ number_format(remove_non_numeric($store->cost_price) * remove_non_numeric($store->qty_available), 2) }} </td>
+                {{ number_format(remove_non_numeric($store->cost_price) * remove_non_numeric(round($store->qty_available,6)), 2) }} </td>
         </tr>
     @endforeach
     <tfoot>

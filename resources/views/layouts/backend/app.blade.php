@@ -217,6 +217,7 @@
         function loadDataTable(){
             $('.display').DataTable({
                 dom: 'Bfrtip',
+                "responsive": true,
                 lengthMenu: [25, 50, 75, 100],
                 pageLength: 100,
                 buttons: [{

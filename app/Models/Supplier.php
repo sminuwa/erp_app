@@ -61,7 +61,7 @@ const ACCOUNT_TYPE_SAVINGS='Savings';
         return $this->belongsTo(Branch::class,'branch_id');
     }
 
-    public function scope($query){
+    public function scopeActive($query){
         return $query->where('suppliers.status', 1);
     }
 }

@@ -31,7 +31,7 @@
             <td> {{ $store->branch_code }} </td>
             <td>{{ $store->store_code }} </td>
             <td> {{ $store->product_code }} - {{ $store->name }} </td>
-            <td> {{ $store->qty_available }} </td>
+            <td> {{ number_format(round($store->qty_available,6), 6) }} </td>
             @php $cost_price = $store->cost_price; @endphp
             <td style="text-align: right;"> {{ number_format($cost_price, 2) }}</td>
             <td style="text-align: right;">
@@ -43,15 +43,15 @@
                 {{ number_format($whole_price, 2) }}
             </td>
             <td style="text-align: right;">
-                @php $total_cost = remove_non_numeric($store->qty_available) * remove_non_numeric($store->cost_price); @endphp
+                @php $total_cost = remove_non_numeric(round($store->qty_available,6)) * remove_non_numeric($store->cost_price); @endphp
                 {{ number_format($total_cost, 2) }}
             </td>
             <td style="text-align: right;">
-                @php $total_r_price = remove_non_numeric($store->qty_available) * remove_non_numeric($store->retail_selling_price); @endphp
+                @php $total_r_price = remove_non_numeric(round($store->qty_available,6)) * remove_non_numeric($store->retail_selling_price); @endphp
                 {{ number_format($total_r_price, 2) }}
             </td>
             <td style="text-align: right;">
-                @php $total_w_price = remove_non_numeric($store->qty_available) * remove_non_numeric($store->whole_selling_price); @endphp
+                @php $total_w_price = remove_non_numeric(round($store->qty_available,6)) * remove_non_numeric($store->whole_selling_price); @endphp
                 {{ number_format($total_w_price, 2) }}
             </td>
             <td style="text-align: right;">

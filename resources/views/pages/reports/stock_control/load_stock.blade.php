@@ -43,15 +43,15 @@
                 {{ number_format($whole_price, 2) }}
             </td>
             <td style="text-align: right;">
-                @php $total_cost = remove_non_numeric($store->qty_available) * remove_non_numeric($store->cost_price); @endphp
+                @php $total_cost = remove_non_numeric(round($store->qty_available,6)) * remove_non_numeric($store->cost_price); @endphp
                 {{ number_format($total_cost, 2) }}
             </td>
             <td style="text-align: right;">
-                @php $total_r_price = remove_non_numeric($store->qty_available) * remove_non_numeric($store->retail_selling_price); @endphp
+                @php $total_r_price = remove_non_numeric(round($store->qty_available,6)) * remove_non_numeric($store->retail_selling_price); @endphp
                 {{ number_format($total_r_price, 2) }}
             </td>
             <td style="text-align: right;">
-                @php $total_w_price = remove_non_numeric($store->qty_available) * remove_non_numeric($store->whole_selling_price); @endphp
+                @php $total_w_price = remove_non_numeric(round($store->qty_available,6)) * remove_non_numeric($store->whole_selling_price); @endphp
                 {{ number_format($total_w_price, 2) }}
             </td>
             <td style="text-align: right;">

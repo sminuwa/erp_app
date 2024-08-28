@@ -87,8 +87,8 @@
         <select class="form-control {{ $errors->has('status') ? ' is-invalid' : '' }}"
                 name="status" id="status"
                 required>
-            <option>Active</option>
-            <option>Inactive</option>
+            <option value="1" @if($model->status == 1) selected @endif>Active</option>
+            <option value="0" @if($model->status == 0) selected @endif>Inactive</option>
         </select>
         @if ($errors->has('status'))
             <div class="invalid-feedback">

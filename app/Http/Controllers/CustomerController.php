@@ -116,7 +116,7 @@ class CustomerController extends Controller
     public function update(Update $request, Customer $customer)
     { //return $request;
 
-        // return $request;
+        return $request;
         $customer->fill($request->all());
         $customer->type = ($request->account_type == 'R' ? 'Retail' : "Wholesale");
         $customer->branch_id = $request->branch_id;

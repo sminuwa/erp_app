@@ -117,7 +117,7 @@
                                                     @elseif($payment->model_name == 'Supplier')
                                                         {{ optional($payment->supplier)->name ?? '' }}{{ optional($payment->supplier)->name ?? '' }}
                                                     @endif --}}
-                                                    {{ $payment->payer()->code ? $payment->payer()->code . ' - ' . $payment->payer()->name : $payment->payer()->number . ' - ' . $payment->payer()->description }}
+                                                    {{ ($payment->payer()->code ?? null) ? ($payment->payer()->code??null) . ' - ' . $payment->payer()->name : $payment->payer()->number . ' - ' . $payment->payer()->description }}
                                                 </td>
                                                 <td>
                                                     {{ $payment->account()->code ? $payment->account()->code . ' - ' . $payment->account()->name : $payment->account()->number . ' - ' . $payment->account()->description }}

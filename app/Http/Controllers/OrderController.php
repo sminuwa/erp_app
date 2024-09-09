@@ -469,7 +469,10 @@ class OrderController extends Controller
     {
         \Cart::clear();
         $user = Auth::user();
-        $orders = Order::with('customer')->where('branch_id', User::userBranchAction());
+        $orders = Order::selectRaw("
+            orders.*,
+            (SELECT id FROM credit_notes WHERE credit_notes.order_id = orders.id LIMIT 1) as has_credit_note    
+        ")->with('customer')->where('branch_id', User::userBranchAction());
         if ($user->hasRole('Sales-Manager'))
             $orders = $orders->where('sold_by', Auth::id());
         //$orders = $orders->whereBetween('order_date', [date('Y-m-d', strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])

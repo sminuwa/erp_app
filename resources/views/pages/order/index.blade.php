@@ -81,6 +81,7 @@
                                             <th>Amount Paid</th>
                                             <th>Amount Due</th>
                                             <th>Due Date</th>
+                                            <th>Status</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -108,6 +109,7 @@
                                                 </td>
                                                 <td>{{ Carbon\Carbon::parse($order->due_date)->toFormattedDateString() }}
                                                 </td>
+                                                <td>@if($order->has_credit_note > 0) reversed @endif</td>
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button"
@@ -216,6 +218,7 @@
                                             <th style="text-align:right">
                                                 &#8358;{{ number_format($total_due, 2, '.', ',') }}</th>
                                             <th>Due Date</th>
+                                            <th>Status</th>
                                             <th>Actions</th>
                                         </tr>
                                     </tfoot>

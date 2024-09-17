@@ -1256,86 +1256,14 @@ class ReportController extends Controller
     {
         return view('pages.reports.sales_and_cash_analysis.sales_by_category');
     }
-    //     public function loadCategorySaleReport(Request $request)
-//     {
-//         $from_date = date('Y-m-d', strtotime($request->from_date));
-//         $to_date = date('Y-m-d', strtotime($request->to_date));
-//         $branch_id = $request->branch_id;
-//         $category_id1 = $request->category_id1;
-//         $category_id2 = $request->category_id2;
-
-    //         if ($branch_id == 'all' || $branch_id == '') {
-//             $branch_id = '%';
-//         }
-//         if ($category_id1 == 'all' || $category_id1 == '') {
-//             $category_id1 = '%';
-//         }
-//         if ($category_id2 == 'all' || $category_id2 == '') {
-//             $category_id2 = '%';
-//         }
-
-    //         $data = DB::table('orders')
-//             ->select(
-//                 'categories.name as category',
-//                 'categories.code as code',
-//                 DB::raw('SUM(order_details.quantity) as quantity'),
-//                 DB::raw('SUM(order_details.total) as amount'),
-//                 DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
-//                 $branch_id != '%' ? DB::raw('(SELECT SUM(store_products.qty_available) FROM store_products
-//                     JOIN stores s ON store_products.store_id = s.id
-//                     JOIN products p ON store_products.product_id = p.id
-//                     WHERE s.branch_id LIKE stores.branch_id
-//                         AND p.category_id = categories.id) as qty_available')
-//                 :
-//                 DB::raw('
-//                         (SELECT SUM(store_products.qty_available) FROM store_products
-//                             JOIN products p ON store_products.product_id = p.id
-//                             WHERE p.category_id = categories.id
-
-    //                         ) as qty_available'
-//                 )
-//             )
-//             ->join('order_details', 'orders.id', '=', 'order_details.order_id')
-//             ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
-//             ->join('stores', 'store_products.store_id', '=', 'stores.id')
-//             ->join('products', 'store_products.product_id', '=', 'products.id')
-//             ->join('categories', 'products.category_id', '=', 'categories.id')
-//             ->where('stores.branch_id', 'LIKE', $branch_id)
-//             ->where('order_details.status', '=', 1)
-//             //            ->whereDate('order_date', '>=', $from_date)
-// //            ->whereDate('order_date', '>=', $from_date)
-//             ->whereBetween('order_date', [$from_date, $to_date]);
-//         if ($category_id2 == '%' && $category_id1 != '%') {
-//             $data = $data->where('products.category_id', 'LIKE', $category_id1);
-//         } elseif ($category_id2 != '%') {
-//             $data = $data->where('products.category_id', '>=', $category_id1)
-//                 ->where('products.category_id', '<=', $category_id2);
-//         }
-//         $sales = $data->groupBy('products.category_id')
-//             ->orderBy('code', 'ASC')->get();
-
-
-    //         if ($category_id1 == "%")
-//             $category_id1 = "all";
-//         if ($category_id2 == "%")
-//             $category_id2 = "all";
-//         if ($branch_id == '%' || $branch_id == '')
-//             $branch_id = 'all';
-
-    //         $branch = null;
-//         if ($branch_id != 'all' && $branch_id != '')
-//             $branch = Branch::find($branch_id);
-
-    //         return view('pages.reports.sales_and_cash_analysis.load_sale_by_category_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'category_id1', 'category_id2', 'branch'));
-//     }
-
+   
     public function loadCategorySaleReport(Request $request)
     {
         $from_date = date('Y-m-d', strtotime($request->from_date));
         $to_date = date('Y-m-d', strtotime($request->to_date));
         $branch_id = $request->branch_id;
         $category_id1 = $request->category_id1;  // Now an array
-        $category_id2 = $request->category_id2;  // Now an array
+        //$category_id2 = $request->category_id2;  // Now an array
 
         // Handle 'all' for branch
         if ($branch_id == 'all' || $branch_id == '') {
@@ -1344,7 +1272,7 @@ class ReportController extends Controller
 
         // Check if any categories are selected, or treat as "all"
         $category_id1 = is_array($category_id1) ? $category_id1 : ['%'];  // Convert to array if not already
-        $category_id2 = is_array($category_id2) ? $category_id2 : ['%'];  // Convert to array if not already
+        //$category_id2 = is_array($category_id2) ? $category_id2 : ['%'];  // Convert to array if not already
 
         // Build the query
         $data = DB::table('orders')
@@ -1374,17 +1302,18 @@ class ReportController extends Controller
             ->join('categories', 'products.category_id', '=', 'categories.id')
             ->where('stores.branch_id', 'LIKE', $branch_id)
             ->where('order_details.status', '=', 1)  // assuming status 1 means confirmed sales
-            ->whereBetween('order_date', [$from_date, $to_date]);
+            ->whereBetween('order_date', [$from_date, $to_date])
+            ->whereIn('products.category_id', $category_id1);
 
         // Handle multiple category filters
-        if (in_array('%', $category_id2) && !in_array('%', $category_id1)) {
-            // If only category_id1 is selected, filter for those categories
-            $data = $data->whereIn('products.category_id', $category_id1);
-        } elseif (!in_array('%', $category_id2)) {
-            // If both category_id1 and category_id2 are selected, filter for both sets of categories
-            $allCategories = array_merge($category_id1, $category_id2);
-            $data = $data->whereIn('products.category_id', $allCategories);
-        }
+        // if (in_array('%', $category_id2) && !in_array('%', $category_id1)) {
+        //     // If only category_id1 is selected, filter for those categories
+        //     $data = $data->whereIn('products.category_id', $category_id1);
+        // } elseif (!in_array('%', $category_id2)) {
+        //     // If both category_id1 and category_id2 are selected, filter for both sets of categories
+        //     $allCategories = array_merge($category_id1, $category_id2);
+        //     $data = $data->whereIn('products.category_id', $allCategories);
+        // }
 
         // Group the results by category and sort by category code
         $sales = $data->groupBy('products.category_id')
@@ -1394,8 +1323,8 @@ class ReportController extends Controller
         // Reset 'all' to make it more readable in the UI
         if (in_array('%', $category_id1))
             $category_id1 = "all";
-        if (in_array('%', $category_id2))
-            $category_id2 = "all";
+        // if (in_array('%', $category_id2))
+        //     $category_id2 = "all";
         if ($branch_id == '%')
             $branch_id = 'all';
 
@@ -1406,76 +1335,10 @@ class ReportController extends Controller
         }
 
         // Return the view with the data
-        return view('pages.reports.sales_and_cash_analysis.load_sale_by_category_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'category_id1', 'category_id2', 'branch'));
+        return view('pages.reports.sales_and_cash_analysis.load_sale_by_category_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'category_id1', 'branch'));
     }
 
-    //     public function printCategorySaleReport($from_date, $to_date, $branch_id, $category_id1, $category_id2){
-//         $from_date = date('Y-m-d', strtotime($from_date));
-//         $to_date = date('Y-m-d', strtotime($to_date));
-
-    //         if ($branch_id == 'all' || $branch_id == '') {
-//             $branch_id = '%';
-//         }
-//         if ($category_id1 == 'all' || $category_id1 == '') {
-//             $category_id1 = '%';
-//         }
-//         if ($category_id2 == 'all' || $category_id2 == '') {
-//             $category_id2 = '%';
-//         }
-
-    //         $data = DB::table('orders')
-//             ->select(
-//                 'categories.name as category',
-//                 'categories.code as code',
-//                 DB::raw('SUM(order_details.quantity) as quantity'),
-//                 DB::raw('SUM(order_details.total) as amount'),
-//                 DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
-//                 $branch_id != '%' ? DB::raw('(SELECT SUM(store_products.qty_available) FROM store_products
-//                     JOIN stores s ON store_products.store_id = s.id
-//                     JOIN products p ON store_products.product_id = p.id
-//                     WHERE s.branch_id LIKE stores.branch_id
-//                         AND p.category_id = categories.id) as qty_available')
-//                 :
-//                 DB::raw('
-//                         (SELECT SUM(store_products.qty_available) FROM store_products
-//                             JOIN products p ON store_products.product_id = p.id
-//                             WHERE p.category_id = categories.id
-
-    //                         ) as qty_available'
-//                 )
-//             )
-//             ->join('order_details', 'orders.id', '=', 'order_details.order_id')
-//             ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
-//             ->join('stores', 'store_products.store_id', '=', 'stores.id')
-//             ->join('products', 'store_products.product_id', '=', 'products.id')
-//             ->join('categories', 'products.category_id', '=', 'categories.id')
-//             ->where('stores.branch_id', 'LIKE', $branch_id)
-//             ->where('order_details.status', '=', 1)
-//             //            ->whereDate('order_date', '>=', $from_date)
-// //            ->whereDate('order_date', '>=', $from_date)
-//             ->whereBetween('order_date', [$from_date, $to_date]);
-//         if ($category_id2 == '%' && $category_id1 != '%') {
-//             $data = $data->where('products.category_id', 'LIKE', $category_id1);
-//         } elseif ($category_id2 != '%') {
-//             $data = $data->where('products.category_id', '>=', $category_id1)
-//                 ->where('products.category_id', '<=', $category_id2);
-//         }
-//         $sales = $data->groupBy('products.category_id')
-//             ->orderBy('code', 'ASC')->get();
-
-
-    //         if ($category_id1 == "%")
-//             $category_id1 = "all";
-//         if ($category_id2 == "%")
-//             $category_id2 = "all";
-//         if ($branch_id == '%' || $branch_id == '')
-//             $branch_id = 'all';
-
-    //         $branch = null;
-//         if ($branch_id != 'all' && $branch_id != '')
-//             $branch = Branch::find($branch_id);
-//         return view('pages.reports.sales_and_cash_analysis.print_category_sale_report', compact('sales', 'from_date', 'to_date', 'branch'));
-//     }
+    
 
     public function printCategorySaleReport($from_date, $to_date, $branch_id, $category_id1, $category_id2)
     {
@@ -1488,7 +1351,7 @@ class ReportController extends Controller
 
         // Handle category_id1 and category_id2 as arrays
         $category_id1 = is_array($category_id1) && count($category_id1) > 0 ? $category_id1 : ['%'];
-        $category_id2 = is_array($category_id2) && count($category_id2) > 0 ? $category_id2 : ['%'];
+        //$category_id2 = is_array($category_id2) && count($category_id2) > 0 ? $category_id2 : ['%'];
 
         $data = DB::table('orders')
             ->select(
@@ -1524,17 +1387,17 @@ class ReportController extends Controller
             $data = $data->whereIn('products.category_id', $category_id1);
         }
 
-        if ($category_id2 != ['%']) {
-            $data = $data->whereIn('products.category_id', $category_id2);
-        }
+        // if ($category_id2 != ['%']) {
+        //     $data = $data->whereIn('products.category_id', $category_id2);
+        // }
 
         $sales = $data->groupBy('products.category_id')
             ->orderBy('code', 'ASC')->get();
 
         if ($category_id1 == ['%'])
             $category_id1 = "all";
-        if ($category_id2 == ['%'])
-            $category_id2 = "all";
+        // if ($category_id2 == ['%'])
+        //     $category_id2 = "all";
         if ($branch_id == '%' || $branch_id == '')
             $branch_id = 'all';
 

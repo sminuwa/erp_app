@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="text-right">
-                    <a href="{{ route('ajax.category.sales.report.print', [$from_date, $to_date, $branch_id, is_array($category_id1) ? implode(',', $category_id1) : $category_id1, is_array($category_id2) ? implode(',', $category_id2) : $category_id2]) }}"
+                    <a href="{{ route('ajax.category.sales.report.print', [$from_date, $to_date, $branch_id, is_array($category_id1) ? implode(',', $category_id1) : $category_id1]) }}"
                         target="_BLANK" class="btn-success btn btn-sm">Print</a>
                 </div>
             </div>

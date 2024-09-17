@@ -74,14 +74,14 @@
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <label for="category_id1">From Category</label>
+                                                <label for="category_id1">Category</label>
                                                 <select class="form-control select2-multiple ajax-categories"
                                                     name="category_id1[]" id="category_id1" multiple>
                                                 </select>
 
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        {{-- <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="category_id2">To Category</label>
                                                 <select class="form-control select2-multiple ajax-categories"
@@ -89,7 +89,7 @@
                                                 </select>
 
                                             </div>
-                                        </div>
+                                        </div> --}}
                                         <div class="col-md-12">
                                             <div class="form-group text-right ">
                                                 <input type="button" class="btn btn-primary" id="generate" name="generate"
@@ -179,7 +179,7 @@
                 let to_date = $('#to_date').val();
                 let branch_id = $('#branch_id').val();
                 let category_id1 = $('#category_id1').val(); // Now multiple
-                let category_id2 = $('#category_id2').val(); // Now multiple
+                //let category_id2 = $('#category_id2').val(); // Now multiple
 
                 $('#img-loader').show(); // Show loader
 
@@ -192,7 +192,7 @@
                         to_date: to_date,
                         branch_id: branch_id,
                         category_id1: category_id1, // Send multiple categories
-                        category_id2: category_id2 // Send multiple categories
+                        //category_id2: category_id2 // Send multiple categories
                     },
                     success: function(data) {
                         $('#img-loader').hide(); // Hide loader

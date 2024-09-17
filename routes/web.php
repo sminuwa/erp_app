@@ -736,7 +736,7 @@ Route::middleware('auth')->group(function () {
             //Category Sales Report
             Route::get('/sa/sales/category', [ReportController::class, 'categorySaleReport'])->name('sales.report.by.category');
             Route::get('/sa/sales/category/load', [ReportController::class, 'loadCategorySaleReport'])->name('ajax.category.sales.report');
-            Route::get('/sa/sales/category/print/{from_date}/{to_date}/{branch_id}/{category_id1}/{category_id2}', [ReportController::class, 'printCategorySaleReport'])->name('ajax.category.sales.report.print');
+            Route::get('/sa/sales/category/print/{from_date}/{to_date}/{branch_id}/{category_id1}', [ReportController::class, 'printCategorySaleReport'])->name('ajax.category.sales.report.print');
 
             //Staff Sales Report
             Route::get('/sa/sales/staff', [ReportController::class, 'staffSaleReport'])->name('staff.sales.report');

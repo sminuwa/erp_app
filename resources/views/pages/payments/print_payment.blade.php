@@ -115,9 +115,10 @@
                     <div class="receipt-header receipt-header-mid receipt-footer">
                         <div class="col-xs-10 col-sm-10 col-md-10 text-left">
                             <div class="receipt-right">
-                                <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
                                 <p><b>Created By :</b> {{ $payment->createdBy?->name }}</p>
-
+                                <p><b>Date Created :</b> {{ Carbon\Carbon::parse($payment->created_at)->toFormattedDateString() }}</p>
+                                <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
+                    
                                 <p><b>Signatire :</b> ______________________________________</p>
                                 <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For:
                                     ALBABELLO </span>

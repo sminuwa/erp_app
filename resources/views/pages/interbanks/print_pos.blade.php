@@ -239,7 +239,10 @@
     </table>
     <section>
         <p>
-            Date : <span>{{ \Carbon\Carbon::parse(\Carbon\Carbon::now())->toDayDateTimeString() }}</span>
+            Processed Date : <span>{{ Carbon\Carbon::parse($interbank->created_at)->toFormattedDateString() }}</span>
+        </p>
+        <p>
+            Created Date : <span>{{ \Carbon\Carbon::parse(\Carbon\Carbon::now())->toDayDateTimeString() }}</span>
         </p>
         <p><b>Created By :</b> {{ $interbank->createdBy?->name }}</p>
     </section>

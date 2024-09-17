@@ -77,6 +77,7 @@
                                             <th>Amount</th>
                                             <th>Description</th>
                                             <th>Created By</th>
+                                            <th>Date Created</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -89,6 +90,7 @@
                                             <th>Amount</th>
                                             <th>Description</th>
                                             <th>Created By</th>
+                                            <th>Date Created</th>
                                             <th>Actions</th>
                                         </tr>
                                     </tfoot>
@@ -100,11 +102,7 @@
                                                 </td>
                                                 <td>{{ $payment->receipt_no }}</td>
                                                 <td>
-                                                    {{-- @if ($payment->model_name == 'Customer')
-                                                    {{ optional($payment->customer)->code ?? '' }}-{{ optional($payment->customer)->name ?? '' }}
-                                                @elseif($payment->model_name == 'Supplier')
-                                                    {{ optional($payment->supplier)->name ?? '' }}{{ optional($payment->supplier)->name ?? '' }}
-                                                @endif --}}
+
                                                     {{ $payment->payer()->code ? $payment->payer()->code . ' - ' . $payment->payer()->name : $payment->payer()->number . ' - ' . $payment->payer()->description }}
                                                 </td>
                                                 <td>
@@ -114,6 +112,7 @@
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
                                                 <td>{{ $payment->description }}</td>
                                                 <td>{{ optional($payment->createdBy)->name }}</td>
+                                                <td>{{ Carbon\Carbon::parse($payment->created_at)->toFormattedDateString() }}
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button"

@@ -99,7 +99,7 @@
                     <div class="container">
                         <div class="col-xs-10 col-sm-10 col-md-10 text-left">
                             <div class="receipt-right">
-
+                                <p><b>Date Created :</b> {{ \Carbon\Carbon::parse($journal->created_at)->toFormattedDateString() }}</p>
                                 <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
                                 <p><b>Created By :</b> {{ $journal->createdBy->name ?? null }}</p>
                                 <p><b>Posted By :</b> {{ $journal->postedBy->name ?? null }}</p>

@@ -42,7 +42,7 @@ class OrderInvoice extends Model
     }
     public function branch()
     {
-        return $this->order_items()->first()->branch();
+        return $this->belongsTo(Branch::class);
     }
 
     public static function generateNewNumber($prefix = 'ODR', $length = 4)

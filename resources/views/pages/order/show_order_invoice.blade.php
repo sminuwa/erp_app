@@ -156,21 +156,21 @@
                                             @foreach ($order_details as $order_detail)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $order_detail->storeProduct->product->code ?? '' }}</td>
-                                                    <td>{{ $order_detail->storeProduct->product->name ?? '' }}</td>
-                                                    <td>{{ $order_detail->storeProduct->product->unit ?? '' }}</td>
-                                                    <td>{{ $order_detail->storeProduct->store->code ?? '' }}</td>
+                                                    <td>{{ $order_detail->product->code ?? '' }}</td>
+                                                    <td>{{ $order_detail->product->name ?? '' }}</td>
+                                                    <td>{{ $order_detail->unit ?? '' }}</td>
+                                                    <td>{{ $order_detail->store->code ?? '' }}</td>
                                                     <td align="center">{{ $order_detail->quantity }}</td>
-                                                    <td align="right">{{ number_format($order_detail->sold_price, 2) }}
+                                                    <td align="right">{{ number_format($order_detail->unit_cost, 2) }}
                                                     </td>
                                                     <td align="right">
-                                                        {{ number_format($order_detail->sold_price * $order_detail->quantity, 2) }}
+                                                        {{ number_format($order_detail->unit_cost * $order_detail->quantity, 2) }}
                                                     </td>
                                                 </tr>
-                                                @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
+                                                @php $total += ($order_detail->unit_cost * $order_detail->quantity);  @endphp
                                             @endforeach
                                             <tr>
-                                                <th colspan="4" align="right">Total</th>
+                                                <th colspan="7" style="text-align:right">Total</th>
                                                 <th style="text-align: right">{{ number_format($total, 2, '.', ',') }}</th>
 
                                             </tr>

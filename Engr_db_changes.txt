@@ -1,0 +1,5 @@
+
+ALTER TABLE `order_invoice_details` DROP COLUMN `original_quantity_sold`, DROP COLUMN `sold_price`, DROP COLUMN `total`, DROP COLUMN `selling_price`, DROP COLUMN `cost_price`, DROP COLUMN `avail_qty_before_sale`, CHANGE `store_product_id` `product_id` BIGINT(20) UNSIGNED NOT NULL, ADD COLUMN `store_id` BIGINT NULL AFTER `product_id`; 
+ALTER TABLE `order_invoice_details` ADD FOREIGN KEY (`store_id`) REFERENCES `stores`(`id`); 
+ALTER TABLE `order_invoice_details` CHANGE `store_id` `store_id` BIGINT(20) UNSIGNED NOT NULL, ADD FOREIGN KEY (`store_id`) REFERENCES `stores`(`id`); 
+ALTER TABLE `order_invoice_details` ADD COLUMN `unit_cost` DECIMAL(18,2) NOT NULL AFTER `quantity`; 

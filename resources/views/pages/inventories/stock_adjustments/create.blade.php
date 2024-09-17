@@ -168,13 +168,33 @@
                             @endif
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" style="display: block" id="in_product">
                             <label for="product_id">Product</label>
                             <select
                                 class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
                                 name="product_id" id="product_id" required="required">
                                 <option value="">Select...</option>
-                                @foreach ($products as $data)
+                                @foreach ($products_in as $data)
+                                    <option value="{{ $data->id }}">
+                                        {{ $data->code }} - {{ $data->name }}</option>
+                                @endforeach
+                            </select>
+                            <div class="input-group-prepend">
+                                <p class="text text-danger" id="available"></p>
+                            </div>
+                            @if ($errors->has('product_id'))
+                                <div class="invalid-feedback">
+                                    <strong>{{ $errors->first('product_id') }}</strong>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="form-group" style="display: none" id="out_product">
+                            <label for="product_id">Product</label>
+                            <select
+                                class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
+                                name="product_id" id="product_id" required="required">
+                                <option value="">Select...</option>
+                                @foreach ($products_out as $data)
                                     <option value="{{ $data->id }}">
                                         {{ $data->code }} - {{ $data->name }}</option>
                                 @endforeach
@@ -230,6 +250,27 @@
 @push('js')
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script type="text/javascript">
+        $(document).ready(function() {
+            // When the operation is changed
+            $('#operation').on('change', function() {
+                var selectedValue = $(this).val();
+
+                if (selectedValue === 'in') {
+                    // Show the "in" product div and hide the "out" product div
+                    $('#in_product').show();
+                    $('#out_product').hide();
+                } else if (selectedValue === 'out') {
+                    // Show the "out" product div and hide the "in" product div
+                    $('#in_product').hide();
+                    $('#out_product').show();
+                } else {
+                    // Hide both divs if no valid operation is selected
+                    $('#in_product').hide();
+                    $('#out_product').hide();
+                }
+            });
+        });
+
         function toggleTextField() {
             var selectedOption = $('#operation').val();
 

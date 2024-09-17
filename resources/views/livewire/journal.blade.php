@@ -3,21 +3,23 @@
     <table id="example1" class="table table-bordered table-striped text-left table-responsive-xl">
         <thead>
         <tr>
-            <th>Date</th>
+            <th>Processed Date</th>
             <th>Reference</th>
             <th>Description</th>
             <th>Status</th>
             <th>Created By</th>
+            <th>Date Created</th>
             <th>Actions</th>
         </tr>
         </thead>
         <tfoot>
         <tr>
-            <th>Date</th>
+            <th>Processed Date</th>
             <th>Reference</th>
             <th>Description</th>
             <th>Status</th>
             <th>Created By</th>
+            <th>Date Created</th>
             <th>Actions</th>
         </tr>
         </tfoot>
@@ -29,6 +31,7 @@
                 <td>{{ $record->description ?? null }}</td>
                 <td>{!!  $record->status == 0 ? '<span class="badge badge-danger">pending</span>' : '<span class="badge badge-success">posted</span>' !!}</td>
                 <td>{{ optional($record->createdBy)->name }}</td>
+                <td>{{ Carbon\Carbon::parse($record->created_at)->toFormattedDateString() }}</td>
                 <td align="center">
                     <div class="dropdown">
                         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

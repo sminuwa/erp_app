@@ -18,7 +18,7 @@
         <tr>
             <th style="width: 50%" colspan="4">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
             </th>
-            <th style="width: 50%;text-align:right" colspan="4">Pricessed By {{ auth()->user()->name }}</th>
+            <th style="width: 50%;text-align:right" colspan="4">Processed By {{ auth()->user()->name }}</th>
         </tr>
         <tr>
             <th>DATE</th>
@@ -43,7 +43,7 @@
                 <td>{{ \Carbon\Carbon::parse($sale->order_date)->toFormattedDateString() }}</td>
                 <td>{{ $sale->reference }}</td>
                 <td>{{ $sale->customer->code }}</td>
-                <td>{{ $item->storeProduct->product->code }}</td>
+                <td>{{ $item->product->code }}</td>
                 <td>{{ $item->quantity }}</td>
                 <td style="text-align: right">{{ number_format($item->sold_price, 2, '.', ',') }}</td>
                 <td style="text-align: right">{{ number_format($item->total, 2, '.', ',') }}</td>

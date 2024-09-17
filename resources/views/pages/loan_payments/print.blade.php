@@ -34,7 +34,7 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:30px;height:30px;"
+                            <img src="{{ asset('assets/backend/img/logo.png') }}" style="width:30px;height:30px;"
                                 alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
                             <h3>
                                 {{App\Models\User::UserBranchName()->long_name}}

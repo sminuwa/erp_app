@@ -137,18 +137,6 @@ Route::middleware('auth')->group(function () {
         );
 
         Route::group(
-            ['prefix' => 'payment_modes'],
-            function () {
-                Route::get('/index', [PaymentModeController::class, 'index'])->name('payment_modes.index');
-                Route::get('/create', [PaymentModeController::class, 'create'])->name('payment_modes.create');
-                Route::get('/show/{paymentmode}', [PaymentModeController::class, 'show'])->name('payment_modes.show');
-                Route::post('/store', [PaymentModeController::class, 'store'])->name('payment_modes.store');
-                Route::get('/edit/{paymentmode}', [PaymentModeController::class, 'edit'])->name('payment_modes.edit');
-                Route::put('/update/{paymentmode}', [PaymentModeController::class, 'update'])->name('payment_modes.update');
-                Route::delete('/delete/{paymentmode}', [PaymentModeController::class, 'destroy'])->name('payment_modes.destroy');
-            }
-        );
-        Route::group(
             ['prefix' => 'branches'],
             function () {
                 Route::get('/index', [BranchController::class, 'index'])->name('branches.index');
@@ -180,19 +168,6 @@ Route::middleware('auth')->group(function () {
                 Route::post('/import', [StoreController::class, 'import'])->name('stores.import');
             }
         );
-        Route::group(
-            ['prefix' => 'bank_accounts'],
-            function () {
-                Route::get('/index', [BankAccountController::class, 'index'])->name('bank_accounts.index');
-                Route::get('/create', [BankAccountController::class, 'create'])->name('bank_accounts.create');
-                Route::get('/show/{bankaccount}', [BankAccountController::class, 'show'])->name('bank_accounts.show');
-                Route::post('/store', [BankAccountController::class, 'store'])->name('bank_accounts.store');
-                Route::get('/edit/{bankaccount}', [BankAccountController::class, 'edit'])->name('bank_accounts.edit');
-                Route::put('/update/{bankaccount}', [BankAccountController::class, 'update'])->name('bank_accounts.update');
-                Route::delete('/delete/{bankaccount}', [BankAccountController::class, 'destroy'])->name('bank_accounts.destroy');
-            }
-        );
-
         Route::group(
             ['prefix' => 'products'],
             function () {
@@ -649,39 +624,6 @@ Route::middleware('auth')->group(function () {
             Route::post('branch/switch/{user}', 'switchBranch')->name('branch.swtich');
         }
     );
-
-    Route::group(['prefix' => 'cash'], function () {
-        Route::group(
-            ['prefix' => 'movement'],
-            function () {
-                Route::get('/index', [CashMovementController::class, 'index'])->name('cash_movements.index');
-                Route::get('/create', [CashMovementController::class, 'create'])->name('cash_movements.create');
-                Route::get('/show/{cashmovement}', [CashMovementController::class, 'show'])->name('cash_movements.show');
-                Route::post('/store', [CashMovementController::class, 'store'])->name('cash_movements.store');
-                Route::get('/edit/{cashmovement}', [CashMovementController::class, 'edit'])->name('cash_movements.edit');
-                Route::put('/update/{cashmovement}', [CashMovementController::class, 'update'])->name('cash_movements.update');
-                Route::delete('/delete/{cashmovement}', [CashMovementController::class, 'destroy'])->name('cash_movements.destroy');
-
-                Route::get('/deposit/create', [CashMovementController::class, 'createDeposit'])->name('deposits.create');
-                Route::get('/deposit/show/{deposit}', [CashMovementController::class, 'showDeposit'])->name('deposits.show');
-                Route::post('/deposit/store', [CashMovementController::class, 'storeDeposit'])->name('deposits.store');
-                Route::get('/deposit/edit/{deposit}', [CashMovementController::class, 'editDeposit'])->name('deposits.edit');
-                Route::put('/deposit/update/{deposit}', [CashMovementController::class, 'updateDeposit'])->name('deposits.update');
-                Route::delete('/deposit/delete/{deposit}', [CashMovementController::class, 'destroyDeposit'])->name('deposits.destroy');
-
-                Route::get('/withdraw/create', [CashMovementController::class, 'createWithdraw'])->name('withdraw.create');
-                Route::get('/withdraw/show/{withdraw}', [CashMovementController::class, 'showWithdraw'])->name('withdraw.show');
-                Route::post('/withdraw/store', [CashMovementController::class, 'storeWithdraw'])->name('withdraw.store');
-                Route::get('/withdraw/edit/{withdraw}', [CashMovementController::class, 'editWithdraw'])->name('withdraw.edit');
-                Route::put('/withdraw/update/{withdraw}', [CashMovementController::class, 'updateWithdraw'])->name('withdraw.update');
-                Route::delete('/withdraw/delete/{withdraw}', [CashMovementController::class, 'destroyWithdraw'])->name('withdraw.destroy');
-
-                Route::get('/print/{cashmovement}', [CashMovementController::class, 'print'])->name('cash_movements.print');
-
-                Route::post('/search', [CashMovementController::class, 'search'])->name('cash_movements.search');
-            }
-        );
-    });
 
     Route::group(['prefix' => 'loan'], function () {
         Route::group(

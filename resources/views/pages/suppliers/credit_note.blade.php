@@ -40,8 +40,6 @@
                                 <div class="col-sm-4">
                                     <a href="{{ route('suppliers.credit.note.create') }}" class="btn btn-sm btn-secondary"
                                         style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Credit Note</a>
-                                        <a href="{{ route('bank.ledger') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                                            class="ion-model-s"> </span> Bank Ledger</a>
                                 </div>
                             </div>
                             <div class="row">
@@ -156,7 +154,7 @@
                                                                         <div class="form-group">
                                                                             <label for="payment_date">Payment Date</label>
                                                                             <input type="text"
-                                                                                class="form-control datepicker {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
+                                                                                class="form-control datepicker-entry {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
                                                                                 name="payment_date" id="payment_date"
                                                                                 value="{{ old('payment_date', $payment->date) == '' ? date('Y-m-d') : old('payment_date', $payment->date) }}"
                                                                                 required="required">
@@ -280,12 +278,12 @@
                         @csrf
                         <div class="form-group">
                             <label for="from_date">From Date</label>
-                            <input type="text" class="form-control datepicker" name="from_date" id="from_date"
+                            <input type="text" class="form-control datepicker-entry" name="from_date" id="from_date"
                                 placeholder="" autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label for="to_date">To Date</label>
-                            <input type="text" class="form-control datepicker" name="to_date" id="to_date" placeholder=""
+                            <input type="text" class="form-control datepicker-entry" name="to_date" id="to_date" placeholder=""
                                 autocomplete="off">
                         </div>
                         <div class="form-group">

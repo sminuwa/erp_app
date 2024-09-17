@@ -39,7 +39,7 @@
                                 <label for="purchase_date">Purchase Date</label>
                                 <div class="input-group">
                                     <input type="text"
-                                        class="form-control datepicker {{ $errors->has('purchase_date') ? ' is-invalid' : '' }}"
+                                        class="form-control datepicker-entry {{ $errors->has('purchase_date') ? ' is-invalid' : '' }}"
                                         name="purchase_date" id="purchase_date"
                                         value="{{ $model->purchase_date == null ? date('Y-m-d') : old('purchase_date', $model->purchase_date->format('Y-m-d')) }}"
                                         placeholder="" required="required">
@@ -169,7 +169,7 @@
 
                     <div class="form-group">
                         <label for="qty_supplied">Quantity</label>
-                        <input type="number" step=".01"
+                        <input type="text" pattern="^[0-9\.]*$"
                             class="form-control {{ $errors->has('qty_supplied') ? ' is-invalid' : '' }}"
                             name="qty_supplied" id="qty_supplied" placeholder="" required="required">
                         @if ($errors->has('qty_supplied'))

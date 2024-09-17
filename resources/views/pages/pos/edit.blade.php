@@ -73,11 +73,11 @@
                                             @hasanyrole('Super-admin|Admin')
                                                 <div class="form-group">
                                                     <label for="order_date">Sale Date</label>
-                                                    <input type="text" name="order_date" class="form-control datepicker"
+                                                    <input type="text" name="order_date" class="form-control datepicker-entry"
                                                         value="{{ $order ? $order->order_date : date('Y-m-d') }}" />
                                                 </div>
                                             @else
-                                                <input type="hidden" name="order_date" class="form-control datepicker"
+                                                <input type="hidden" name="order_date" class="form-control datepicker-entry"
                                                     value="{{ date('Y-m-d') }}" />
                                             @endhasanyrole
                                         </div>
@@ -388,12 +388,12 @@
                         @csrf
                         <div class="form-group">
                             <label for="from_date">From Date</label>
-                            <input type="text" class="form-control datepicker" name="from_date" id="from_date"
+                            <input type="text" class="form-control datepicker-entry" name="from_date" id="from_date"
                                 placeholder="" autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label for="to_date">To Date</label>
-                            <input type="text" class="form-control datepicker" name="to_date" id="to_date"
+                            <input type="text" class="form-control datepicker-entry" name="to_date" id="to_date"
                                 placeholder="" autocomplete="off">
                         </div>
                         <div class="form-group">

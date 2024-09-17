@@ -41,13 +41,13 @@
                         <div class="form-group  col-sm-2">
                             <label for="from_date">From Date</label>
                             <input type="text" autocomplete="off"
-                                class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
+                                class="form-control datepicker-entry {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
                                 name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="">
                         </div>
                         <div class="form-group  col-sm-2">
                             <label for="to_date">To Date</label>
                             <input type="text" autocomplete="off"
-                                class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
+                                class="form-control datepicker-entry {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
                                 name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
                         </div>
                         <div class="form-group  col-sm-2">

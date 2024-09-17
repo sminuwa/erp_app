@@ -56,6 +56,11 @@
                                 cellspacing="0" data-ordering="false">
                                 <thead>
                                     <tr>
+                                        <th style="width: 50%">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+                                        </th>
+                                        <th style="width: 50%;text-align:right">Pricessed By {{ auth()->user()->name }}</th>
+                                    </tr>
+                                    <tr>
                                         <th>ITEM</th>
                                         <th>QTY PURCHASED</th>
                                     </tr>

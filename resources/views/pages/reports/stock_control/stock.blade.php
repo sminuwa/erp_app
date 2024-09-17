@@ -62,9 +62,9 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="category_id">Category</label>
-                                <select class="form-control select2-single ajax-categories"
-                                        name="category_id"
-                                        id="category_id">
+                                <select class="form-control select2-multiple ajax-categories"
+                                        name="category_id[]"
+                                        id="category_id" multiple>
                                 </select>
 
                             </div>

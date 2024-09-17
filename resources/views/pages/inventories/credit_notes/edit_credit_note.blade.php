@@ -50,7 +50,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="order_date">Date</label>
-                                            <input type="text" name="date" class="form-control datepicker"
+                                            <input type="text" name="date" class="form-control datepicker-entry"
                                                 value="{{ $credit_note ? $credit_note->date : date('Y-m-d') }}"
                                                 onchange="$('.date').val($(this).val())" required />
                                         </div>

@@ -16,6 +16,11 @@
     </caption>
     <thead>
         <tr>
+            <th style="width: 50%" colspan="7">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            </th>
+            <th style="width: 50%;text-align:right" colspan="6">Pricessed By {{ auth()->user()->name }}</th>
+        </tr>
+        <tr>
             <th>DATE</th>
             <th>CODE</th>
             <th>ITEM</th>

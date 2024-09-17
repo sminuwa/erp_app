@@ -21,7 +21,7 @@
                     <div class="receipt-header">
                         <div class="col-xs-6 col-sm-6 col-md-6">
                             <div class="receipt-left">
-                                <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}"
+                                <img src="{{ asset('assets/backend/img/logo.png') }}"
                                     style="width:71px;height:71px;border-radius: 43px;" alt="Albabello Logo"
                                     class="img-circle elevation-3 img-responsive" style="opacity: .8">
                                 <strong>{{App\Models\User::UserBranchName()->long_name}}</strong>

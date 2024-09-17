@@ -36,8 +36,6 @@
             </a>
             <a href="{{ route('suppliers.payments') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
                     class="fa fa-list"> </span> Supplier Payments</a>
-            <a href="{{ route('bank.ledger') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                    class="ion-model-s"> </span> Bank Ledger</a>
             <a href="javascript:void(0)" data-toggle="modal" data-target="#supplier_ledgerform"
                 class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;">Supplier Ledger </a>
             <div class="container-fluid">
@@ -66,12 +64,12 @@
                         @csrf
                         <div class="form-group">
                             <label for="from_date">From Date</label>
-                            <input type="text" class="form-control datepicker" name="from_date" id="from_date"
+                            <input type="text" class="form-control datepicker-entry" name="from_date" id="from_date"
                                 placeholder="" autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label for="to_date">To Date</label>
-                            <input type="text" class="form-control datepicker" name="to_date" id="to_date"
+                            <input type="text" class="form-control datepicker-entry" name="to_date" id="to_date"
                                 placeholder="" autocomplete="off">
                         </div>
                         <div class="form-group">

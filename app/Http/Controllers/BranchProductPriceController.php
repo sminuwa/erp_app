@@ -20,10 +20,11 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\AuditLog;
-use StoreProduct;
 use App\Models\User;
 use App\Imports\ProductPriceImport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Response;
 
 /**
  * Description of BranchProductPriceController
@@ -39,14 +40,15 @@ class BranchProductPriceController extends Controller
      * @param  Index  $request
      * @return \Illuminate\Http\Response
      */
-    public function index(Index $request)
+    public function index(Index $request): View|Response
     {
         $user_branch = User::userBranchAction();
-        $records = BranchProductPrice::select('branch_product_prices.*', 'branches.name AS branch_name','branches.code AS branch_code', 'products.name AS product_name','products.code AS product_code')
+        $records = BranchProductPrice::select('branch_product_prices.*', 'branches.name AS branch_name', 'branches.code AS branch_code', 'products.name AS product_name', 'products.code AS product_code')
             ->join('branches', 'branches.id', 'branch_product_prices.branch_id')
             ->join('products', 'products.id', 'branch_product_prices.product_id')
             ->where('branch_product_prices.branch_id', 'LIKE', $user_branch)
             ->where('branch_product_prices.retail_selling_price', '>', 0)
+            ->where('products.status',1)
             ->latest('products.name')
             ->get();
         return view('pages.branch_product_prices.index', ['records' => $records]);
@@ -57,7 +59,7 @@ class BranchProductPriceController extends Controller
       * @param  BranchProductPrice  $BranchProductPrice
       * @return \Illuminate\Http\Response
       */
-    public function show(Show $request, BranchProductPrice $BranchProductPrice)
+    public function show(Show $request, BranchProductPrice $BranchProductPrice): View|Response
     {
         return view('pages.branch_product_prices.show', [
             'record' => $BranchProductPrice,
@@ -69,13 +71,14 @@ class BranchProductPriceController extends Controller
       * @param  Create  $request
       * @return \Illuminate\Http\Response
       */
-    public function create(Create $request)
+    public function create(Create $request): View|Response
     {
         $user_branch = User::userBranchAction();
 
-        $products = Product::all(['id', 'name', 'code']);
+        $products = Product::where('status', 1)->get();
         $categories = Category::all(['id', 'name', 'code']);
-        $branches = Branch::select('id', 'name', 'code')->where('id', 'LIKE', $user_branch)->get();
+        $branches = Branch::select('id', 'name', 'code')->where('id', 'LIKE', $user_branch)
+            ->where('status', 1)->get();
         return view('pages.branch_product_prices.create', [
             'model' => new BranchProductPrice,
             'categories' => $categories,
@@ -127,13 +130,13 @@ class BranchProductPriceController extends Controller
       * @param  BranchProductPrice  $BranchProductPrice
       * @return \Illuminate\Http\Response
       */
-    public function edit(Edit $request, BranchProductPrice $BranchProductPrice)
+    public function edit(Edit $request, BranchProductPrice $BranchProductPrice): View|Response
     {
         $user_branch = User::userBranchAction();
-        $products = Product::all(['id', 'name']);
-        $stores = Store::select('id', 'name')->where('branch_id', 'LIKE', $user_branch)->get();
+        $products = Product::where('status', 1)->get();
+        $stores = Store::select('id', 'name')->where('branch_id', 'LIKE', $user_branch)->where('status', 1)->get();
         $categories = Category::all(['id', 'name']);
-        $branches = Branch::select('id', 'name')->where('id', 'LIKE', $user_branch)->get();
+        $branches = Branch::select('id', 'name')->where('id', 'LIKE', $user_branch)->where('status', 1)->get();
         return view('pages.branch_product_prices.edit', [
             'model' => $BranchProductPrice,
             'categories' => $categories,
@@ -207,11 +210,11 @@ class BranchProductPriceController extends Controller
 
         return redirect()->back();
     }
-    public function openingBalance(Create $request)
+    public function openingBalance(Create $request): View|Response
     {
         $this->authorize('stock_opening_balance.create');
-        $products = Product::all(['id', 'name']);
-        $stores = Store::where('branch_id', User::userBranchAction())->get();
+        $products = Product::where('status', 1);
+        $stores = Store::where('branch_id', User::userBranchAction())->where('status', 1)->get();
         $categories = Category::all(['id', 'name']);
         return view('pages.branch_product_prices.stock_opening_balance', [
             'model' => new BranchProductPrice,
@@ -260,14 +263,14 @@ class BranchProductPriceController extends Controller
         return redirect()->back();
 
     }
-    public function editCostPrice(Request $request)
+    public function editCostPrice(Request $request): View|Response
     {
         $this->authorize('store_product_cost_prices.edit');
         $user_branch = User::userBranchAction();
-        $products = Product::all(['id', 'name']);
-        $stores = Store::select('id', 'name')->where('branch_id', 'LIKE', $user_branch)->get();
+        $products = Product::where('status', 1);
+        $stores = Store::select('id', 'name')->where('branch_id', 'LIKE', $user_branch)->where('status', 1)->get();
         $categories = Category::all(['id', 'name']);
-        $branches = Branch::select('id', 'name')->where('id', 'LIKE', $user_branch)->get();
+        $branches = Branch::select('id', 'name')->where('id', 'LIKE', $user_branch)->where('status', 1)->get();
         return view('pages.branch_product_prices.cost_price', [
             'model' => new BranchProductPrice(),
             'categories' => $categories,
@@ -282,7 +285,7 @@ class BranchProductPriceController extends Controller
         $this->authorize('store_product_cost_prices.edit');
         $count = 0;
         if ($request->store_id == "all") {
-            $stores = Store::where('branch_id', User::userBranchAction())->get();
+            $stores = Store::where('branch_id', User::userBranchAction())->where('status',1)->get();
             foreach ($stores as $store) {
                 $status = BranchProductPrice::where([
                     'store_id' => $store->id,
@@ -321,7 +324,7 @@ class BranchProductPriceController extends Controller
         }
         return redirect()->back();
     }
-    public function importForm()
+    public function importForm(): View|Response
     {
         $this->authorize('price.import.form');
         return view('pages.branch_product_prices.import');

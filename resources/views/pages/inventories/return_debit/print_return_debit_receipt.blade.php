@@ -129,6 +129,19 @@
                                     </tr>
                                 </tbody>
                             </table>
+                            <table class="table">
+                                <tr>
+                                    <td style='border-style:none;'>
+                                        Posted By: {{ $payment->postedBy->name }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style='border-style:none;'>Printed On:
+                                        {{ \Carbon\Carbon::now()->toFormattedDateString() }}<br /><br>
+                                        Printed By: {{ Auth::user()->name }}
+                                    </td>
+                                </tr>
+                            </table>
                         </div>
                         <!-- /.col -->
                     </div>

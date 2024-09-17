@@ -49,7 +49,7 @@
                                 <form action="{{ isset($route) ? $route : route('interstore.store') }}" method="POST">
                                     <div class="form-group">
                                         <label for="date">Date</label>
-                                        <input type="text" name="date" class="form-control datepicker" required
+                                        <input type="text" name="date" class="form-control datepicker-entry" required
                                             value="{{ isset($model->date) ? $model->date : old('date', date('Y-m-d')) }}" />
                                     </div>
                                     {{ csrf_field() }}
@@ -185,7 +185,7 @@
                         </div>
                         <div class="form-group">
                             <label for="qty_transfered">Qty</label>
-                            <input type="number" step=".000001"
+                            <input type="text" pattern="^[0-9\.]*$"
                                 class="form-control {{ $errors->has('qty_transfered') ? ' is-invalid' : '' }}"
                                 name="qty_transfered" id="qty_transfered" value="{{ $model->qty_transfered }}"
                                 placeholder="" required="required">

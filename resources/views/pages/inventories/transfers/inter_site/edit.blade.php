@@ -143,7 +143,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="transfer_date">Date</label>
-                                        <input type="text" name="transfer_date" class="form-control datepicker"
+                                        <input type="text" name="transfer_date" class="form-control datepicker-entry"
                                             value="{{ isset($model->transfer_date) ? $model->transfer_date : old('transfer_date', date('Y-m-d')) }}" />
                                     </div>
                                     @if (isset($model))

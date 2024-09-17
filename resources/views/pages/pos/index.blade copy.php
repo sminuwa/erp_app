@@ -269,11 +269,11 @@
                                     @hasanyrole('Super-admin|Admin')
                                         <div class="form-group">
                                             <label for="order_date">Sale Date</label>
-                                            <input type="text" name="order_date" class="form-control datepicker"
+                                            <input type="text" name="order_date" class="form-control datepicker-entry"
                                                 value="{{ date('Y-m-d') }}" />
                                         </div>
                                     @else
-                                        <input type="hidden" name="order_date" class="form-control datepicker"
+                                        <input type="hidden" name="order_date" class="form-control datepicker-entry"
                                             value="{{ date('Y-m-d') }}" />
                                     @endhasanyrole
                                     <div class="form-group">
@@ -308,7 +308,7 @@
                                             <div class="form-group" id="display_due_date"
                                                 style="border: 1px solid rgba(64, 44, 45, 0.4)">
 
-                                                <input type="text" class="form-control datepicker" name="due_date"
+                                                <input type="text" class="form-control datepicker-entry" name="due_date"
                                                     id="due_date" placeholder="Due Date" value="{{ old('due_date') }}"
                                                     autocomplete="off" />
                                             </div>
@@ -448,12 +448,12 @@
                         @csrf
                         <div class="form-group">
                             <label for="from_date">From Date</label>
-                            <input type="text" class="form-control datepicker" name="from_date" id="from_date"
+                            <input type="text" class="form-control datepicker-entry" name="from_date" id="from_date"
                                 placeholder="" autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label for="to_date">To Date</label>
-                            <input type="text" class="form-control datepicker" name="to_date" id="to_date"
+                            <input type="text" class="form-control datepicker-entry" name="to_date" id="to_date"
                                 placeholder="" autocomplete="off">
                         </div>
                         <div class="form-group">
@@ -523,7 +523,7 @@
                                 <div class="form-group">
                                     <label for="payment_date">Payment Date</label>
                                     <input type="text"
-                                        class="form-control datepicker {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
+                                        class="form-control datepicker-entry {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
                                         name="payment_date" id="payment_date" value="{{ date('Y-m-d') }}"
                                         required="required">
                                     @if ($errors->has('payment_date'))

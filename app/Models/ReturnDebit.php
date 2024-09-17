@@ -41,7 +41,8 @@ class ReturnDebit extends Model
     {
         return $this->belongsTo(Supplier::class);
     }
-    public function purchase(){
+    public function purchase()
+    {
         return $this->belongsTo(Purchase::class);
     }
     public function branch()

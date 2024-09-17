@@ -170,6 +170,12 @@
                     </div>
                     <table class="table">
                         <tr>
+                            <td style='border-style:none;'>Created By:
+                                {{ $purchase->createdBy->name }}<br /><br>
+                                Posted By: {{ $purchase->postedBy->name }}
+                            </td>
+                        </tr>
+                        <tr>
                             <td style='border-style:none;'>Printed On:
                                 {{ \Carbon\Carbon::now()->toFormattedDateString() }}<br /><br><br>
                                 Printed By: {{ Auth::user()->name }}

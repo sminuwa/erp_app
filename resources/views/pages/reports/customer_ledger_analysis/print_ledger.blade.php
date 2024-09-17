@@ -61,12 +61,17 @@
                                 data-ordering="false" cellpadding="0" cellspacing="0">
                                 <thead>
                                     <tr>
+                                        <th style="width: 50%" colspan="4">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+                                        </th>
+                                        <th style="width: 50%;text-align:right" colspan="3">Pricessed By {{ auth()->user()->name }}</th>
+                                    </tr>
+                                    <tr>
                                         <th>Date</th>
                                         <th>Description</th>
                                         <th>System/Invoice</th>
                                         <th>Ref</th>
-                                        <th>Cr ()</th>
-                                        <th>Dr ()</th>
+                                        <th>Cr</th>
+                                        <th>Dr</th>
                                         <th>Running Balance</th>
                                     </tr>
                                 </thead>

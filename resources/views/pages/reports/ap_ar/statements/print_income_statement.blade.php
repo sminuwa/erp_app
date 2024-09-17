@@ -60,9 +60,10 @@
                                 ?>
                                 <thead>
                                     <tr>
-                            
+
                                         <th colspan="4"></th>
-                                        <th colspan="2" style="text-align: center; align-content: center">Balance</th>
+                                        <th colspan="2" style="text-align: center; align-content: center">Balance
+                                        </th>
                                     </tr>
                                     <tr>
                                         <th>Account No</th>
@@ -72,7 +73,7 @@
                                         <th style="text-align: center; align-content: center">Dr.</th>
                                         <th style="text-align: center; align-content: center">Cr.</th>
                                     </tr>
-                            
+
                                 </thead>
                                 <tbody>
                                     <tr>
@@ -114,7 +115,8 @@
                                     <tr>
                                         <th colspan="4" style="text-align: left">TOTAL REVENUE</th>
                                         @php $total_revenue = $credit_sum - $debit_sum;  @endphp
-                                        <th colspan="3" style="text-align: right;">{{ number_format(abs($total_revenue), 2) }}</th>
+                                        <th colspan="3" style="text-align: right;">
+                                            {{ number_format(abs($total_revenue), 2) }}</th>
                                     </tr>
                                     <?php
                                     $total_cost_of_sale = 0;
@@ -144,7 +146,7 @@
                                                     {{ $credit }}
                                                 @endif
                                             </td>
-                            
+
                                             <?php
                                             $credit_sum += $sale->credit;
                                             $debit_sum += $sale->debit;
@@ -161,8 +163,10 @@
                                     <tr>
                                         <th colspan="4" style="text-align: left">TOTAL COST</th>
                                         @php $total_cost = $credit_sum - $debit_sum;  @endphp
-                                        <th style="text-align: right;">{{ $total_cost < 0 ? number_format(abs($total_cost), 2) : '' }}</th>
-                                        <th style="text-align: right;">{{ $total_cost > 0 ? number_format(abs($total_cost), 2) : '' }}</th>
+                                        <th style="text-align: right;">
+                                            {{ $total_cost < 0 ? number_format(abs($total_cost), 2) : '' }}</th>
+                                        <th style="text-align: right;">
+                                            {{ $total_cost > 0 ? number_format(abs($total_cost), 2) : '' }}</th>
                                     </tr>
                                     <tr>
                                         <th colspan="4" style="text-align: left">GROSS MARGIN</th>
@@ -223,21 +227,35 @@
                                     <tr>
                                         <th colspan="4" style="text-align: left">TOTAL EXPENDITURE</th>
                                         @php $total_expense = $credit_sum - $debit_sum;  @endphp
-                                        <th style="text-align: right;">{{ $total_expense < 0 ? number_format(abs($total_expense), 2) : '' }}</th>
-                                        <th style="text-align: right;">{{ $total_expense > 0 ? number_format(abs($total_expense), 2) : '' }}</th>
+                                        <th style="text-align: right;">
+                                            {{ $total_expense < 0 ? number_format(abs($total_expense), 2) : '' }}</th>
+                                        <th style="text-align: right;">
+                                            {{ $total_expense > 0 ? number_format(abs($total_expense), 2) : '' }}</th>
                                     </tr>
                                     <tr>
                                         <th colspan="4" style="text-align: left">TAX DIVIDEND</th>
                                         <th style="text-align: right;">{{ number_format(0, 2) }}</th>
                                         <th style="text-align: right;">{{ number_format(0, 2) }}</th>
                                     </tr>
-                            
-                                    <tr>
+
+                                    {{-- <tr>
                                         <th colspan="4" style="text-align: left">NET MARGIN</th>
                                         @php $net_profit_loss = abs($gross_profit_loss) - abs($total_expense) + $other_income  @endphp
                                         <th style="text-align: right;">{{ $net_profit_loss < 0 ? number_format(abs($net_profit_loss), 2) : '' }}
                                         </th>
                                         <th style="text-align: right;">{{ $net_profit_loss > 0 ? number_format(abs($net_profit_loss), 2) : '' }}
+                                        </th>
+                                    </tr> --}}
+                                    <tr>
+                                        <th colspan="4" style="text-align: left">NET MARGIN</th>
+                                        @php
+                                            $net_profit_loss = $gross_profit_loss - $total_expense + $other_income;
+                                        @endphp
+                                        <th style="text-align: right;">
+                                            {{ $net_profit_loss < 0 ? number_format(abs($net_profit_loss), 2) : '' }}
+                                        </th>
+                                        <th style="text-align: right;">
+                                            {{ $net_profit_loss > 0 ? number_format(abs($net_profit_loss), 2) : '' }}
                                         </th>
                                     </tr>
                                 </tbody>

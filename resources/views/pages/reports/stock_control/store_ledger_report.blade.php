@@ -59,8 +59,8 @@
                             <div class="form-group">
                                 &nbsp;&nbsp;
                                 <label for="category_id">Category</label>
-                                <select class="form-control select2-single ajax-categories {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
-                                    name="category_id" id="category_id">
+                                <select class="form-control select2-multiple ajax-categories {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
+                                    name="category_id[]" id="category_id" multiple="multiple">
 
                                 </select>
                             </div>

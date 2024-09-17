@@ -3,18 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Models\OrderDetail;
-use App\Models\Product;
 use App\Models\Proformer;
-use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use App\Models\StoreProduct;
 use App\Models\Customer;
 use App\Models\Category;
 use App\Models\Store;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
 class PosController extends Controller
@@ -38,7 +32,8 @@ class PosController extends Controller
 
             })
 
-            ->where('branch_product_prices.status', 1);
+            ->where('branch_product_prices.status', 1)
+            ->where('products.status', 1);
         //            ->orderBy('products.code','asc')
         //->limit(100);
         //TODO:: remove limit here

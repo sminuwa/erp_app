@@ -221,13 +221,21 @@
             <th style="text-align: right;">{{ number_format(0, 2) }}</th>
         </tr>
 
-        <tr>
+        {{-- <tr>
             <th colspan="4" style="text-align: left">NET MARGIN</th>
             @php $net_profit_loss = abs($gross_profit_loss) - abs($total_expense) + $other_income  @endphp
             <th style="text-align: right;">{{ $net_profit_loss < 0 ? number_format(abs($net_profit_loss), 2) : '' }}
             </th>
             <th style="text-align: right;">{{ $net_profit_loss > 0 ? number_format(abs($net_profit_loss), 2) : '' }}
             </th>
+        </tr> --}}
+        <tr>
+            <th colspan="4" style="text-align: left">NET MARGIN</th>
+            @php 
+                $net_profit_loss = $gross_profit_loss - $total_expense + $other_income;
+            @endphp
+            <th style="text-align: right;">{{ $net_profit_loss < 0 ? number_format(abs($net_profit_loss), 2) : '' }}</th>
+            <th style="text-align: right;">{{ $net_profit_loss > 0 ? number_format(abs($net_profit_loss), 2) : '' }}</th>
         </tr>
     </tbody>
 </table>

@@ -247,7 +247,7 @@ class CreditNoteController extends Controller
         //$company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('created_at')->first();
         $company = Setting::find(1);
         $utility = new Utility();
-        return view('pages.inventories.credit_notes.print', compact('order_details', 'order', 'company', 'utility'));
+        return view('pages.inventories.credit_notes.print', compact('order_details', 'order', 'company', 'utility','credit_note'));
 
     }
     public function loadInvoices(Request $request)

@@ -34,7 +34,7 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:100px;height:60px;"
+                            <img src="{{ asset('assets/backend/img/logo.png') }}" style="width:100px;height:60px;"
                                 alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
                             <h3>
                                 {{App\Models\User::UserBranchName()->long_name}}
@@ -87,6 +87,20 @@
                                         <td></td>
                                     </tr>
                                 </tbody>
+                            </table>
+                            <table class="table">
+                                <tr>
+                                    <td style='border-style:none;'>Created By:
+                                        {{ $payment->createdBy->name }}<br /><br>
+                                        Posted By: {{ $payment->postedBy->name }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style='border-style:none;'>Printed On:
+                                        {{ \Carbon\Carbon::now()->toFormattedDateString() }}<br /><br><br>
+                                        Printed By: {{ Auth::user()->name }}
+                                    </td>
+                                </tr>
                             </table>
                         </div>
                         <!-- /.col -->

@@ -16,6 +16,11 @@
     </caption>
     <thead>
         <tr>
+            <th style="width: 50%" colspan="2">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            </th>
+            <th style="width: 50%;text-align:right" colspan="2">Pricessed By {{ auth()->user()->name }}</th>
+        </tr>
+        <tr>
             <th>EXPIRY DATE</th>
             <th>Batch No</th>
             <th>PRODUCT</th>

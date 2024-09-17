@@ -1,6 +1,6 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.print.store.ledger.reports', [$branch_id, $store_id, $category_id, $product_id]) }}"
+        <a href="{{ route('ajax.print.store.ledger.reports', [$branch_id, $store_id, is_array($category_id) ? implode(',', $category_id) : $category_id, $product_id]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
@@ -10,6 +10,11 @@
         <h5 style="text-align: center;">STORE QUANTITY REPORT </h5>
     </caption>
     <thead>
+        <tr>
+            <th style="width: 50%" colspan="4">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            </th>
+            <th style="width: 50%;text-align:right" colspan="3">Pricessed By {{ auth()->user()->name }}</th>
+        </tr>
         <tr>
             <th>BRANCH</th>
             <th>STORE</th>
@@ -27,11 +32,12 @@
             <td>{{ $store->store }} </td>
             <td>{{ $store->code }} - {{ $store->name }} </td>
             <td> {{ $store->category }} </td>
-            <td> {{ number_format(round($store->qty_available,6),6) }} </td>
+            <td> {{ number_format(round($store->qty_available, 6), 6) }} </td>
             <td style="text-align: right;">
-               {{ number_format(remove_non_numeric($store->cost_price), 2) }} </td>
+                {{ number_format(remove_non_numeric($store->cost_price), 2) }} </td>
             <td style="text-align: right;">
-                {{ number_format(remove_non_numeric($store->cost_price) * remove_non_numeric(round($store->qty_available,6)), 2) }} </td>
+                {{ number_format(remove_non_numeric($store->cost_price) * remove_non_numeric(round($store->qty_available, 6)), 2) }}
+            </td>
         </tr>
     @endforeach
     <tfoot>

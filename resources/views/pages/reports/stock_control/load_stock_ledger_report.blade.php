@@ -8,6 +8,11 @@
 <table class="display table table-bordered caption" id="example1" data-ordering="false">
     <thead>
         <tr>
+            <th style="width: 50%" colspan="4">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            </th>
+            <th style="width: 50%;text-align:right" colspan="4">Pricessed By {{ auth()->user()->name }}</th>
+        </tr>
+        <tr>
             <th>Date</th>
             <th>Reference</th>
             <th>Store</th>

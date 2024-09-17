@@ -4,7 +4,7 @@
             class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
-<table class="display table table-bordered caption" id="example1" data-ordering="true">
+{{-- <table class="display table table-bordered caption" id="example1" data-ordering="true">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
             BALANCE SHEET AS AT {{ Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
@@ -154,6 +154,111 @@
                 {{ number_format(abs($dr), 2) }}</th>
             <th style="text-align: right;">
                 {{ number_format(abs($cr), 2) }}</th>
+        </tr>
+    </tfoot>
+</table> --}}
+<table class="display table table-bordered caption" id="example1" data-ordering="true">
+    <caption style="caption-size:top">
+        <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
+            BALANCE SHEET AS AT {{ Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
+        </h5>
+    </caption>
+    <thead>
+        <tr>
+            <th>Account No</th>
+            <th>Description</th>
+            <th style="text-align: center;">Debit (Dr.)</th>
+            <th style="text-align: center;">Credit (Cr.)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Assets -->
+        <tr>
+            <th colspan="4">Assets</th>
+        </tr>
+        @php
+            $total_assets = 0;
+        @endphp
+        @foreach ($assets as $asset)
+            <tr>
+                <td>{{ $asset->number }}</td>
+                <td>{{ $asset->description }}</td>
+                <td style="text-align: right;">{{ number_format(abs($asset->debit - $asset->credit), 2) }}</td>
+                <td></td>
+            </tr>
+            @php
+                $total_assets += $asset->debit - $asset->credit;
+            @endphp
+        @endforeach
+        <tr>
+            <th colspan="2">Total Assets</th>
+            <th style="text-align: right;">{{ number_format(abs($total_assets), 2) }}</th>
+            <td></td>
+        </tr>
+
+        <!-- Liabilities -->
+        <tr>
+            <th colspan="4">Liabilities</th>
+        </tr>
+        @php
+            $total_liabilities = 0;
+        @endphp
+        @foreach ($liabilities as $liability)
+            <tr>
+                <td>{{ $liability->number }}</td>
+                <td>{{ $liability->description }}</td>
+                <td></td>
+                <td style="text-align: right;">{{ number_format(abs($liability->credit - $liability->debit), 2) }}</td>
+            </tr>
+            @php
+                $total_liabilities += $liability->credit - $liability->debit;
+            @endphp
+        @endforeach
+        <tr>
+            <th colspan="2">Total Liabilities</th>
+            <td></td>
+            <th style="text-align: right;">{{ number_format(abs($total_liabilities), 2) }}</th>
+        </tr>
+
+        <!-- Equity -->
+        <tr>
+            <th colspan="4">Equity</th>
+        </tr>
+        @php
+            $total_equity = 0;
+        @endphp
+        @foreach ($equity as $eq)
+            <tr>
+                <td>{{ $eq->number }}</td>
+                <td>{{ $eq->description }}</td>
+                <td></td>
+                <td style="text-align: right;">{{ number_format(abs($eq->credit - $eq->debit), 2) }}</td>
+            </tr>
+            @php
+                $total_equity += $eq->credit - $eq->debit;
+            @endphp
+        @endforeach
+        <!-- Retained Earnings -->
+        <tr>
+            <td>AC.xxxxxx</td>
+            <td>Retained Earnings</td>
+            <td></td>
+            <td style="text-align: right;">{{ number_format(abs($net_income), 2) }}</td>
+        </tr>
+        @php
+            $total_equity += $net_income;
+        @endphp
+        <tr>
+            <th colspan="2">Total Equity</th>
+            <td></td>
+            <th style="text-align: right;">{{ number_format(abs($total_equity), 2) }}</th>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="2">Total Liabilities and Equity</th>
+            <td></td>
+            <th style="text-align: right;">{{ number_format(abs($total_liabilities + $total_equity), 2) }}</th>
         </tr>
     </tfoot>
 </table>

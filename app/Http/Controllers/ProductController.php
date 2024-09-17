@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Imports\ProductImport;
 use App\Models\Company;
-use App\Models\DosageForm;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -17,14 +16,12 @@ use App\Http\Requests\Products\Store;
 use App\Http\Requests\Products\Edit;
 use App\Http\Requests\Products\Update;
 use App\Http\Requests\Products\Destroy;
-use GrahamCampbell\ResultType\Success;
 use App\Models\Category;
-use App\Models\BranchProductPrice;
 use Illuminate\Support\Facades\Auth;
 use App\Models\AuditLog;
 use Maatwebsite\Excel\Facades\Excel;
-
-
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Response;
 /**
  * Description of ProductController
  *
@@ -39,7 +36,7 @@ class ProductController extends Controller
      * @param  Index  $request
      * @return \Illuminate\Http\Response
      */
-    public function index(Index $request)
+    public function index(Index $request): View|Response
     {
         //TODO::remove limit
         return view('pages.products.index', ['records' => Product::orderBy('name')/*->limit(100)*/->get()]);
@@ -50,7 +47,7 @@ class ProductController extends Controller
       * @param  Product  $product
       * @return \Illuminate\Http\Response
       */
-    public function show(Show $request, Product $product)
+    public function show(Show $request, Product $product): View|Response
     {
         return view('pages.products.show', [
             'record' => $product,
@@ -62,7 +59,7 @@ class ProductController extends Controller
       * @param  Create  $request
       * @return \Illuminate\Http\Response
       */
-    public function create(Create $request)
+    public function create(Create $request): View|Response
     {
         $categories = Category::orderBy('name')->get();
         $companies = Company::orderBy('name')->get();
@@ -98,7 +95,7 @@ class ProductController extends Controller
       * @param  Product  $product
       * @return \Illuminate\Http\Response
       */
-    public function edit(Edit $request, Product $product)
+    public function edit(Edit $request, Product $product): View|Response
     {
         $companies = Company::orderBy('name')->get();
         return view('pages.products.edit', [

@@ -40,8 +40,6 @@
                                 <div class="col-sm-4">
                                     <a href="{{ route('suppliers.credit.note.create') }}" class="btn btn-sm btn-secondary"
                                         style="margin-left: 2px;"><span class="fa fa-plus-circle"> </span> New Credit Note</a>
-                                        <a href="{{ route('bank.ledger') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                                            class="ion-model-s"> </span> Bank Ledger</a>
                                 </div>
                             </div>
                             <div class="row">

@@ -86,7 +86,7 @@
                 </tr>
             @endforeach
         </tbody>
-        <tfoot>
+        {{-- <tfoot>
             <tr>
 
                 <th colspan="5" style="text-align: right">Total</th>
@@ -95,10 +95,15 @@
                 <th style="text-align: right;">{{ $dif < 0 ? number_format(abs($dif), 2) : '' }}</th>
                 <th style="text-align: right;">{{ $dif > 0 ? number_format(abs($dif), 2) : '' }}</th>
             </tr>
-            {{-- <tr>
-                <th colspan="4" style="text-align: right">Balance C/F</th>
-
-            </tr> --}}
+        </tfoot> --}}
+        <tfoot>
+            <tr>
+                <th colspan="5" style="text-align: right">Total</th>
+                <th style="text-align: right;">{{ number_format($sum_dr, 2) }}</th>
+                <th style="text-align: right;">{{ number_format($sum_cr, 2) }}</th>
+                <th style="text-align: right;">{{ $sum_cr - $sum_dr < 0 ? number_format(abs($sum_cr - $sum_dr), 2) : '' }}</th>
+                <th style="text-align: right;">{{ $sum_cr - $sum_dr > 0 ? number_format($sum_cr - $sum_dr, 2) : '' }}</th>
+            </tr>
         </tfoot>
     </table>
 </div>

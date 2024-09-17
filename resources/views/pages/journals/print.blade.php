@@ -96,7 +96,7 @@
                 </div>
 
                 <div class="row">
-                    <div class="receipt-header receipt-header-mid receipt-footer">
+                    <div class="container">
                         <div class="col-xs-10 col-sm-10 col-md-10 text-left">
                             <div class="receipt-right">
 

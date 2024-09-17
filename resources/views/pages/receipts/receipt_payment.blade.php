@@ -89,6 +89,7 @@
                                             <th>Amount</th>
                                             <th>Description</th>
                                             <th>Received BY</th>
+                                            <th>Date Created</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -101,6 +102,7 @@
                                             <th>Amount</th>
                                             <th>Description</th>
                                             <th>Received BY</th>
+                                            <th>Date Created</th>
                                             <th>Actions</th>
                                         </tr>
                                     </tfoot>
@@ -126,6 +128,8 @@
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
                                                 <td>{{ $payment->description }}</td>
                                                 <td>{{ optional($payment->createdBy)->name }}</td>
+                                                <td>{{ Carbon\Carbon::parse($payment->created_at)->toFormattedDateString() }}
+                                                </td>
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button"

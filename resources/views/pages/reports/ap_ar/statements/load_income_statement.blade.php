@@ -22,7 +22,6 @@
     ?>
     <thead>
         <tr>
-
             <th colspan="4"></th>
             <th colspan="2" style="text-align: center; align-content: center">Balance</th>
         </tr>
@@ -64,15 +63,15 @@
                     @endif
                 </td>
                 <td style="text-align: right">
-                    @if($dif < 0)
+                    @if ($dif < 0)
                         @php $dr += $revenue->debit @endphp
-                        {{  number_format(abs($dif), 2) }}
+                        {{ number_format(abs($dif), 2) }}
                     @endif
                 </td>
                 <td style="text-align: right">
-                    @if($dif > 0)
+                    @if ($dif > 0)
                         @php $cr += $revenue->credit @endphp
-                        {{  number_format(abs($dif), 2) }}
+                        {{ number_format(abs($dif), 2) }}
                     @endif
                 </td>
             </tr>
@@ -82,8 +81,16 @@
             @php $total_revenue = $credit_sum - $debit_sum;  @endphp
             <th style="text-align: right;">{{ number_format(abs($debit_sum), 2) }}</th>
             <th style="text-align: right;">{{ number_format(abs($credit_sum), 2) }}</th>
-            <th style="text-align: right;">{{ number_format(abs($dr), 2) }}</th>
-            <th style="text-align: right;">{{ number_format(abs($cr), 2) }}</th>
+            <th style="text-align: right;">
+                @if ($total_revenue < 0)
+                    {{ number_format(abs($total_revenue), 2) }}
+                @endif
+            </th>
+            <th style="text-align: right;">
+                @if ($total_revenue > 0)
+                    {{ number_format(abs($total_revenue), 2) }}
+                @endif
+            </th>
         </tr>
         <?php
         $total_cost_of_sale = 0;
@@ -122,15 +129,15 @@
                 $dif = $sale->credit - $sale->debit;
                 ?>
                 <td style="text-align: right">
-                    @if($dif < 0)
+                    @if ($dif < 0)
                         @php $dr += $sale->debit @endphp
-                        {{  number_format(abs($dif), 2) }}
+                        {{ number_format(abs($dif), 2) }}
                     @endif
                 </td>
                 <td style="text-align: right">
-                    @if($dif > 0)
+                    @if ($dif > 0)
                         @php $cr += $sale->credit @endphp
-                        {{  number_format(abs($dif), 2) }}
+                        {{ number_format(abs($dif), 2) }}
                     @endif
                 </td>
             </tr>
@@ -194,15 +201,15 @@
                 $dif = $expense->credit - $expense->debit;
                 ?>
                 <td style="text-align: right">
-                    @if($dif < 0)
+                    @if ($dif < 0)
                         @php $dr += $expense->debit @endphp
-                        {{  number_format(abs($dif), 2) }}
+                        {{ number_format(abs($dif), 2) }}
                     @endif
                 </td>
                 <td style="text-align: right">
-                    @if($dif > 0)
+                    @if ($dif > 0)
                         @php $cr += $expense->credit @endphp
-                        {{  number_format(abs($dif), 2) }}
+                        {{ number_format(abs($dif), 2) }}
                     @endif
                 </td>
             </tr>
@@ -212,8 +219,12 @@
             @php $total_expense = $credit_sum - $debit_sum;  @endphp
             <th style="text-align: right;">{{ number_format(abs($debit_sum), 2) }}</th>
             <th style="text-align: right;">{{ number_format(abs($credit_sum), 2) }}</th>
-            <th style="text-align: right;">{{ number_format(abs($dr), 2) }}</th>
-            <th style="text-align: right;">{{ number_format(abs($cr), 2) }}</th>
+            <th style="text-align: right;">
+                {{ $total_expense < 0 ? number_format(abs($total_expense), 2) : '' }}
+            </th>
+            <th style="text-align: right;">
+                {{ $total_expense > 0 ? number_format(abs($total_expense), 2) : '' }}
+            </th>
         </tr>
         <tr>
             <th colspan="4" style="text-align: left">TAX DIVIDEND</th>
@@ -231,11 +242,13 @@
         </tr> --}}
         <tr>
             <th colspan="4" style="text-align: left">NET MARGIN</th>
-            @php 
+            @php
                 $net_profit_loss = $gross_profit_loss - $total_expense + $other_income;
             @endphp
-            <th style="text-align: right;">{{ $net_profit_loss < 0 ? number_format(abs($net_profit_loss), 2) : '' }}</th>
-            <th style="text-align: right;">{{ $net_profit_loss > 0 ? number_format(abs($net_profit_loss), 2) : '' }}</th>
+            <th style="text-align: right;">{{ $net_profit_loss < 0 ? number_format(abs($net_profit_loss), 2) : '' }}
+            </th>
+            <th style="text-align: right;">{{ $net_profit_loss > 0 ? number_format(abs($net_profit_loss), 2) : '' }}
+            </th>
         </tr>
     </tbody>
 </table>

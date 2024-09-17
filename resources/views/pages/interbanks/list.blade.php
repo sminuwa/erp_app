@@ -70,13 +70,14 @@
                                     class="table table-bordered table-striped text-left table-responsive-xl">
                                     <thead>
                                         <tr>
-                                            <th>Date</th>
+                                            <th>Processed Date</th>
                                             <th>Receipt No</th>
                                             <th>Amount</th>
                                             <th>Description</th>
                                             <th>Source</th>
                                             <th>Destination</th>
                                             <th>Created By</th>
+                                            <th>Date Created</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -89,6 +90,7 @@
                                             <th>Source</th>
                                             <th>Destination</th>
                                             <th>Created By</th>
+                                            <th>Date Created</th>
                                             <th>Actions</th>
                                         </tr>
                                     </tfoot>
@@ -104,6 +106,8 @@
                                                 <td>{{ $interbank->source->description }}</td>
                                                 <td>{{ $interbank->destination->description }}</td>
                                                 <td>{{ optional($interbank->createdBy)->name }}</td>
+                                                <td>{{ Carbon\Carbon::parse($interbank->created_at)->toFormattedDateString() }}
+                                                </td>
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button"

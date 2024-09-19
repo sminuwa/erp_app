@@ -47,6 +47,7 @@ class DebitNoteController extends Controller
             })
             ->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('branch_product_prices.status', 1)
+            ->where('products.status', 1)
             ->where('store_products.qty_available', '>', 0)
             ->orderBy('products.name')->orderBy('stores.name')->get();
 
@@ -189,17 +190,7 @@ class DebitNoteController extends Controller
             'quantity' => 1,
             'attributes' => array('supplier_id' => $request->supplier_id)
         ]);
-        //dd(\Cart::getContent());
-        // if ($add) {
-        //     session()->flash('success', 'Purchase is added to Cart Successfully !');
-        //     //return redirect()->back();
-        //     return redirect()->route('suppliers.debit.note.create', Order::find($request->order));
-
-        // } else {
-
-        //     session()->flash('Purchase not added to cart');
-        //     return redirect()->back();
-        // }
+        
         $cart_products = \Cart::getContent();
         //dd($cart_products);
         $purchase = Purchase::find($purchase_id);

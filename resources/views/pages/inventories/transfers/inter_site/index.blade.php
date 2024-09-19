@@ -67,11 +67,12 @@
                                     <table class="table table-bordered table-striped" id="record1">
                                         <thead>
                                             <tr>
-                                                <th>Date</th>
+                                                <th>Processed Date</th>
                                                 <th>Reference</th>
                                                 <th>From</th>
                                                 <th>To</th>
                                                 <th>Created By</th>
+                                                <th>Date Created</th>
                                                 <th>Posted By</th>
                                                 <th>Received By</th>
                                                 <th>Status</th>
@@ -87,6 +88,7 @@
                                                     <td> {{ $intersite->destination->code . ' - ' . $intersite->destination->name }}
                                                     </td>
                                                     <td> {{ $intersite->createdBy->name ?? '' }} </td>
+                                                    <td> {{ $intersite->created_at->toDayDateTimeString() }} </td>
                                                     <td> {{ $intersite->postedBy->name ?? '' }} </td>
                                                     <td> {{ $intersite->receivedBy->name ?? '' }}</td>
                                                     <td>

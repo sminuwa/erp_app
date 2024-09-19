@@ -74,13 +74,13 @@
                                     data-ordering="false">
                                     <thead>
                                         <tr>
-                                            <th>Date</th>
+                                            <th>Processed Date</th>
                                             <th>Name</th>
                                             <th>Invoice No</th>
                                             <th>Total</th>
-                                            <th>Amount Paid</th>
-                                            <th>Amount Due</th>
-                                            <th>Due Date</th>
+                                            {{-- <th>Amount Paid</th> --}}
+                                            <th>Created By</th>
+                                            <th>Date Created</th>
                                             <th>Status</th>
                                             <th>Actions</th>
                                         </tr>
@@ -102,13 +102,13 @@
                                                 </td>
                                                 <td>{{ $order->customer->name }}</td>
                                                 <td>{{ $order->reference }}</td>
-                                                <td align="right">&#8358;{{ number_format($order->total, 2, '.', ',') }}
+                                                <td align="right">{{ number_format($order->total, 2, '.', ',') }}
                                                 </td>
-                                                <td align="right">&#8358;{{ number_format($order->pay, 2, '.', ',') }}</td>
-                                                <td align="right">&#8358;{{ number_format($order->due, 2, '.', ',') }}
+                                                {{-- <td align="right">&#8358;{{ number_format($order->pay, 2, '.', ',') }}</td> --}}
+                                                <td>{{ $order->createdBy->name ?? ''}}</td>
+                                                <td>{{ Carbon\Carbon::parse($order->created_at)->toFormattedDateString() }}
                                                 </td>
-                                                <td>{{ Carbon\Carbon::parse($order->due_date)->toFormattedDateString() }}
-                                                </td>
+                                                
                                                 <td>@if($order->has_credit_note > 0) reversed @endif</td>
                                                 <td align="center">
                                                     <div class="dropdown">

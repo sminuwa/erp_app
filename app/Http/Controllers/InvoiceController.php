@@ -95,7 +95,7 @@ class InvoiceController extends Controller
     {
         $order = Proformer::with('customer')->where('id', $order_id)->first();
         //return $order;
-        $order_details = ProformerDetail::with('storeProduct')->where(['order_id' => $order_id, 'status' => 1])->get();
+        $order_details = ProformerDetail::with('product')->where(['order_id' => $order_id, 'status' => 1])->get();
         //return $order_details;
         //$company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('created_at')->first();
         $company = Setting::find(1);
@@ -364,24 +364,21 @@ class InvoiceController extends Controller
             ]);
 
             $contents = \Cart::getContent();
+            //dd($contents);
             $products = [];
             $total_discount = 0;
             foreach ($contents as $content) {
                 $total_discount += $content->attributes['discount'] * $content->quantity;
-                $store = StoreProduct::find($content->id);
-                $qtyAval = $store->qty_available;
-                //$store->qty_available = $qtyAval - $content->quantity;
+                $product_id = $content->id;
+                $store = Store::where('code',$content->attributes['store'])->first();
+               
                 $order_detail = new OrderDetail();
                 DB::table('proformer_details')->insert([
                     'order_id' => $order_id,
-                    'store_product_id' => $content->id,
+                    'product_id' => $product_id,
+                    'store_id' => $store->id,
                     'quantity' => $content->quantity,
-                    'original_quantity_sold' => $content->quantity,
-                    'selling_price' => $content->attributes['selling_price'],
-                    'sold_price' => $content->price,
-                    'cost_price' => $content->attributes['cost_price'],
-                    'total' => $content->getPriceSum(),
-                    'avail_qty_before_sale' => $qtyAval,
+                    'unit_cost' => $content->price,
                     //get available product in stock before sale
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now()
@@ -842,7 +839,7 @@ class InvoiceController extends Controller
                 $qty_available = $item->qty_available;
                 $store = $item->store->name;
                 $qty = $item->quantity == 0 ? 1 : $item->quantity;
-                
+
                 $add = \Cart::add([
                     'id' => $item->id,
                     'name' => $item->product->name,
@@ -871,26 +868,27 @@ class InvoiceController extends Controller
     public function loadOrderInvoiceToCart(OrderInvoice $order)
     {
         foreach ($order->order_items()->get() as $item) {
-            $selling_price = $item->selling_price;
-            $cost_price = $item->cost_price;
-            $qty_available = $item->avail_qty_before_sale;
-            $store = $item->storeProduct->store->name;
+            $cost_price = $item->unit_cost;
+
+            $product_id = $item->product_id;
+            $store_id = $item->store_id;
+            $store = StoreProduct::where(['product_id' => $product_id, 'store_id' => $store_id])->first();
             $qty = $item->quantity;
-            $store_products = StoreProduct::find($item->store_product_id);
+            $store_products = StoreProduct::find($store->id);
             if ($store_products && $store_products->qty_available > 0) {
                 $add = \Cart::add([
-                    'id' => $item->store_product_id,
-                    'name' => $item->storeProduct->product->name,
-                    'price' => $item->sold_price,
+                    'id' => $store_products->id,
+                    'name' => $item->product->name,
+                    'price' => $item->unit_cost,
                     'quantity' => $qty <= $store_products->qty_available ? $qty : ceil($store_products->qty_available),
                     'attributes' => array(
                         'cost_price' => $cost_price,
-                        'code' => $item->storeProduct->product->code,
-                        'selling_price' => $selling_price,
-                        'qty_available' => $qty_available,
+                        'code' => $item->product->code,
+                        'selling_price' => $cost_price,
+                        'qty_available' => $store_products->qty_available,
                         'discount' => 0,
-                        'store' => $store,
-                        'unit' => $item->storeProduct->product->unit
+                        'store' => $item->store->code,
+                        'unit' => $item->unit
                     ),
                 ]);
             }
@@ -950,7 +948,7 @@ class InvoiceController extends Controller
             ]);
 
             $contents = \Cart::getContent();
-            
+
             $products = [];
             $total_discount = 0;
             DB::table('order_invoice_details')->where('order_id', $order->id)->delete();

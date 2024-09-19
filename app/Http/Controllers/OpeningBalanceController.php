@@ -151,7 +151,7 @@ class OpeningBalanceController extends Controller
             }
 //            return $unique_stores;
             $records = [];
-            $products = Product::select('id','code')->whereIn('code',$all_products)->get()->toArray();
+            $products = Product::select('id','code')->where('products.status', 1)->whereIn('code',$all_products)->get()->toArray();
             $stores = Store::select('id','code')->whereIn('code',$unique_stores)->get()->toArray();
             foreach($unique_stores as $s){
                 foreach ($rows as $key => $value) {

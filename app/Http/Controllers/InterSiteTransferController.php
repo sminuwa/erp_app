@@ -64,7 +64,7 @@ class InterSiteTransferController extends Controller
 
     public function post(IntersiteTransfer $intersite)
     {
-        if($intersite->status == 0){
+        if ($intersite->status == 0) {
             DB::beginTransaction();
             $this->authorize('intersite.post');
             $user = auth()->user();
@@ -140,16 +140,17 @@ class InterSiteTransferController extends Controller
             $products = $intersite->products;
             DB::beginTransaction();
             foreach ($products as $product) {
-//            $record = IntersiteTransferProduct::where(['intersite_transfer_id' => $intersite_transfer_id, 'store_id' => $product->store_id, 'product_id' => $product->product_id])->first();
+                //            $record = IntersiteTransferProduct::where(['intersite_transfer_id' => $intersite_transfer_id, 'store_id' => $product->store_id, 'product_id' => $product->product_id])->first();
                 $new_cost_price = [];
                 $receive = IntersiteTransferReceive::where(
                     [
                         'intersite_transfer_id' => $intersite_transfer_id,
                         'store_id' => $store_id,
                         'product_id' => $product->product_id,
-                        'quantity'=>$product->quantity
-                    ])->first();
-                if(!$receive)
+                        'quantity' => $product->quantity
+                    ]
+                )->first();
+                if (!$receive)
                     $receive = new IntersiteTransferReceive();
                 $receive->intersite_transfer_id = $intersite->id;
                 $receive->source_store_id = $product->store_id;
@@ -186,7 +187,7 @@ class InterSiteTransferController extends Controller
             DB::commit();
             session()->flash('app_message', 'Product added to store successfully.');
             return back();
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             DB::rollback();
             session()->flash('app_error', 'Allocation failed. ' . $e->getMessage());
             return back();
@@ -213,11 +214,12 @@ class InterSiteTransferController extends Controller
     {
         //\Cart::session('_token')->clear();
 
-        $products = Product::select('products.id', 'products.name', 'products.code','qty_available')
+        $products = Product::select('products.id', 'products.name', 'products.code', 'qty_available')
             ->join('store_products', 'store_products.product_id', 'products.id')
             ->join('stores', 'stores.id', 'store_products.store_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
             ->where('stores.branch_id', User::userBranchAction())
+            ->where('products.status', 1)
             ->where('qty_available', '>', 0)->get();
         $categories = Category::all(['id', 'name']);
         $stores = Store::where('branch_id', 'LIKE', User::userBranchAction())->get();
@@ -270,8 +272,8 @@ class InterSiteTransferController extends Controller
                     $attribute = $item->attributes;
                     $store_id = $attribute['store_id'];
                     $product_id = $attribute['product_id'];
-                    $product = IntersiteTransferProduct::where(['intersite_transfer_id'=>$intersite->id,'store_id'=>$store_id, 'product_id'=>$product_id])->first();
-                    if(!$product)
+                    $product = IntersiteTransferProduct::where(['intersite_transfer_id' => $intersite->id, 'store_id' => $store_id, 'product_id' => $product_id])->first();
+                    if (!$product)
                         $product = new IntersiteTransferProduct();
                     $product->intersite_transfer_id = $intersite->id;
                     $product->store_id = $store_id;
@@ -285,7 +287,7 @@ class InterSiteTransferController extends Controller
                 session()->flash('app_message', 'Intersite transfer saved successfully');
                 DB::commit();
                 \Cart::clear();
-                return redirect()->route('intersite.show',$intersite->id);
+                return redirect()->route('intersite.show', $intersite->id);
             } else {
                 DB::rollBack();
                 session()->flash('app_message', 'Something went wrong.');
@@ -302,7 +304,7 @@ class InterSiteTransferController extends Controller
     {
         //\Cart::session('_token')->clear();
         $items = $intersite->products;
-        $products = Product::all(['id', 'name', 'code']);
+        $products = Product::where('status', 1)->get();
         $categories = Category::all(['id', 'name', 'code']);
         $stores = Store::where('branch_id', 'LIKE', User::userBranchAction())->get();
         /*if(!\Cart::isEmpty()){
@@ -436,7 +438,7 @@ class InterSiteTransferController extends Controller
     {
         $this->authorize('intersite.print');
 
-        return view('pages.inventories.transfers.inter_site.print')->with(['intersite'=>$intersite]);
+        return view('pages.inventories.transfers.inter_site.print')->with(['intersite' => $intersite]);
     }
 
 }

@@ -23,12 +23,12 @@
                 <th>STORE</th>
                 <th>PRODUCT</th>
                 <th>QTY</th>
-                <th>COST PRICE ()</th>
-                <th>R PRICE ()</th>
-                <th>W PRICE ()</th>
-                <th>TOTAL COST ()</th>
-                <th>TOTAL R ()</th>
-                <th>TOTAL W ()</th>
+                <th>COST PRICE</th>
+                <th>R PRICE</th>
+                <th>W PRICE</th>
+                <th>TOTAL COST</th>
+                <th>TOTAL R</th>
+                <th>TOTAL W</th>
                 <th>R MARGIN</th>
                 <th>W MARGIN</th>
             </tr>

@@ -14,18 +14,20 @@
     </caption>
     <thead>
         <tr>
-            <th style="width: 50%" colspan="4">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            <th style="width: 50%" colspan="6">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
             </th>
             <th style="width: 50%;text-align:right" colspan="4">Processed By {{ auth()->user()->name }}</th>
         </tr>
         <tr>
-            <th>Date</th>
+            <th>Processed Date</th>
             <th>Item Code</th>
             <th>Item Name</th>
             <th>Branch</th>
             <th>From Store</th>
             <th>To Store</th>
             <th>Rerefence No</th>
+            <th>Created By</th>
+            <th>Date Created</th>
             <th>QTY</th>
         </tr>
     </thead>
@@ -39,6 +41,8 @@
             <td>{{ \App\Models\Store::find($transfer->source_store_id)->code }}</td>
             <td>{{ \App\Models\Store::find($transfer->destination_store_id)->code }}</td>
             <td>{{ $transfer->reference }}</td>
+            <td>{{ $transfer->created_by }}</td>
+            <td>{{ Carbon\Carbon::parse($transfer->created_at)->toFormattedDateString() }}</td>
             <td style="text-align: right">{{ $transfer->quantity }}</td>
         </tr>
     @endforeach

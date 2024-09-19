@@ -26,7 +26,7 @@ class AdditionalInvoiceController extends Controller
     public function create(){
 
         $purchases = Purchase::where('branch_id',User::userBranchAction())->orderBy('id','desc')->get();
-        $suppliers = Supplier::orderBy('code','asc')->get();
+        $suppliers = Supplier::active()->orderBy('code','asc')->get();
         return view('pages.inventories.expenses.create',compact('purchases', 'suppliers'));
     }
 
@@ -61,7 +61,7 @@ class AdditionalInvoiceController extends Controller
 
     public function edit(PurchaseExpense $invoice){
         $purchases = Purchase::orderBy('id','desc')->get();
-        $suppliers = Supplier::orderBy('code','asc')->get();
+        $suppliers = Supplier::active()->orderBy('code','asc')->get();
         return view('pages.inventories.expenses.create', compact('invoice','purchases', 'suppliers'));
     }
 

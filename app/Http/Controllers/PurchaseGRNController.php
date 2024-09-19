@@ -81,7 +81,7 @@ class PurchaseGRNController extends Controller
         //\Cart::clear();
         return view('pages.inventories.purchases.grn.create', [
             'model' => new Purchase,
-            'products' => Product::all(),
+            'products' => Product::where('status',1)->get(),
             'suppliers' => Supplier::active()->orderBy('name', 'asc')->get(),
             'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->get(),
             'categories' => Category::all(),
@@ -156,7 +156,7 @@ class PurchaseGRNController extends Controller
         $cart_products = \Cart::getContent();
         return view('pages.inventories.purchases.grn.edit', [
             'model' => $purchase,
-            'products' => Product::all(),
+            'products' => Product::where('status',1)->get(),
             'suppliers' => Supplier::orderBy('name')->get(),
             'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->get(),
             'categories' => Category::all(),
@@ -182,14 +182,7 @@ class PurchaseGRNController extends Controller
                 'destination_store_id' => $request->source_store_id,
                 'updated_by' => $request->updated_by,
             ]);
-            // $ledger = DB::table('supplier_ledgers')->where(['purchase_id' => $purchase->id])->select('cr', 'dr', 'payment_mode')->first();
-            // if (optional($ledger)->payment_mode == "Credit")
-            //     DB::table('suppliers')->where(['id' => $request->supplier_id])->decrement('opening_balance', $ledger->dr);
-            // DB::table('transfer_products')->where(['purchase_id' => $purchase->id])->delete();
-            // foreach ($purchase->purchasedProducts()->get() as $data) {
-            //     DB::table('store_products')->where(['store_id' => $request->source_store_id, 'product_id' => $data->product_id])->decrement('qty_available', $data->qty_supplied);
-            //     DB::table('stock_cards')->where(['store_id' => $request->source_store_id, 'product_id' => $data->product_id, 'refno' => $request->old_invoice])->delete();
-            // }
+            
             DB::table('purchase_products')->where(['purchase_id' => $purchase->id])->delete();
             DB::table('supplier_ledgers')->where(['purchase_id' => $purchase->id])->delete();
             //dd(\Cart::getContent());
@@ -209,70 +202,9 @@ class PurchaseGRNController extends Controller
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
                     ]);
-                    // DB::table('store_products')->where([
-                    //     'store_id' => $request->source_store_id,
-                    //     'product_id' => $product->id
-                    // ])->increment('qty_available', $product->quantity);
-
-                    /*BranchProductPrice::updateOrCreate(
-                    ['store_id' => $request->source_store_id,
-                    'product_id' => $product->id, 'selling_price' => $selling_price], ['cost_price' => $product->price, 'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(), 'updated_by' => Auth::id()]
-                    );*/
-                    // DB::table('transfer_products')->insert([
-                    //     'source_store_id' => $request->source_store_id,
-                    //     'purchase_id' => $purchase_id,
-                    //     'product_id' => $product->id,
-                    //     'destination_store_id' => $request->source_store_id,
-                    //     'qty_transfered' => $product->quantity,
-                    //     'qty_available' => $product->quantity,
-                    //     'transfered_by' => $request->updated_by,
-                    //     'status' => 'Completed',
-                    //     'nature' => 'Purchase',
-                    //     'stock_in_out' => 'in',
-                    //     'created_at' => Carbon::now(),
-                    //     'updated_at' => Carbon::now()
-                    // ]);
-                    // $amount += $product->price * $product->quantity;
-                    // DB::table('stock_cards')->insert([
-                    //     'store_id' => $request->source_store_id,
-                    //     'product_id' => $product->id,
-                    //     'cr' => $product->quantity,
-                    //     'dr' => 0,
-                    //     'refno' => $request->invoice,
-                    //     'type' => 'Purchase',
-                    //     'date' => $request->purchase_date,
-                    //     'user_id' => Auth::id(),
-                    //     'created_at' => Carbon::now(),
-                    //     'updated_at' => Carbon::now()
-                    // ]);
+                    
                 }
 
-                // if ($purchase->purchase_mode == "Credit" && $request->purchase_mode == "Cash") {
-                //     DB::table('suppliers')->where(['id' => $request->supplier_id])->decrement('opening_balance', $purchase->totalProductCost()->total);
-                // }
-                // if ($request->purchase_mode == "Cash") {
-                //     $cr = $amount;
-                //     $dr = $amount;
-                // }
-                // if ($request->purchase_mode == "Credit") {
-                //     $cr = $amount;
-                //     $dr = 0;
-                //     DB::table('suppliers')->where(['id' => $request->supplier_id])->increment('opening_balance', $dr);
-                // }
-
-                // DB::table('supplier_ledgers')->insert([
-                //     'supplier_id' => $request->supplier_id,
-                //     'purchase_id' => $purchase_id,
-                //     'description' => 'Purchase of products',
-                //     'Ref' => $request->invoice,
-                //     'cr' => $cr,
-                //     'dr' => $dr,
-                //     'payment_mode' => $request->purchase_mode,
-                //     'date' => Carbon::now(),
-                //     'created_at' => Carbon::now(),
-                //     'updated_at' => Carbon::now(),
-                // ]);
                 $action = "Modified a purchase with invoice $request->invoice from supplier: " . Supplier::find($request->supplier_id)->name;
                 AuditLog::auditLog(Auth::id(), $action);
                 DB::commit();

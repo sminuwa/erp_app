@@ -51,6 +51,7 @@ class ReturnDebitController extends Controller
             })
             ->where('stores.branch_id', 'LIKE', $user_branch)
             ->where('branch_product_prices.status', 1)
+            ->where('products.status', 1)
             //->where('store_products.qty_available', '>', 0)
             ->orderBy('products.name')->orderBy('stores.name')->get();
 

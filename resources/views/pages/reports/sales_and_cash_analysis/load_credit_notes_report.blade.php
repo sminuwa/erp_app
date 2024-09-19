@@ -21,13 +21,14 @@
             <th style="width: 50%;text-align:right" colspan="4">Processed By {{ auth()->user()->name }}</th>
         </tr>
         <tr>
-            <th>DATE</th>
+            <th>PROCESSED DATE</th>
             <th>INVOICE</th>
             <th>REFERENCE</th>
             <th>CUST ACCOUNT</th>
             <th>CUST NAME</th>
             <th>AMOUNT</th>
             <th>CREATED BY</th>
+            <th>DATE CREATED</th>
             <th>POSTED BY</th>
             <th>STATUS</th>
         </tr>
@@ -43,6 +44,7 @@
             <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}</td>
             <td>{{ $sale->createdBy->name ?? null }}</td>
             <td>{{ $sale->postedBy->name ?? null }}</td>
+            <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}</td>
             <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
         </tr>
     @endforeach

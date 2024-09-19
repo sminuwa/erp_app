@@ -16,14 +16,15 @@
             <th style="width: 50%;text-align:right" colspan="4">Processed By {{ auth()->user()->name }}</th>
         </tr>
         <tr>
-            <th>DATE</th>
+            <th>PROCESSED DATE</th>
             <th>PRODUCT CODE</th>
             <th>PRODUCT NAME</th>
             <th>QUANTITY</th>
             <th>TYPE</th>
             <th>STORE</th>
             <th>ADJUSTMENT NO</th>
-            <th>CREATED By</th>
+            <th>CREATED BY</th>
+            <th>DATE CREATED</th>
             <th>POSTED By</th>
 
         </tr>
@@ -39,6 +40,7 @@
             <td> {{ $store->reference }} </td>
             <td> {{ $store->created_by ?? null }} </td>
             <td> {{ $store->posted_by ?? null }} </td>
+            <td> {{ \Carbon\Carbon::parse($store->created_at)->toFormattedDateString() }} </td>
         </tr>
     @endforeach
 </table>

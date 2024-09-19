@@ -34,10 +34,11 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:100px;height:60px;"
-                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
+                                style="width:100px;height:60px;" alt="Albabello Logo" class="img-circle elevation-3"
+                                style="opacity: .8">
                             <h3>
-                                {{$branch->name ?? 'All Branches'}}
+                                {{ $branch->name ?? 'All Branches' }}
                             </h3>
                             <h5 style="text-align: center;">CREDIT NOTES
                                 BETWEEN
@@ -51,21 +52,26 @@
 
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
-                            <table class="display table table-bordered caption" id="example1" border="1" cellpadding="0"
-                                cellspacing="0" data-ordering="false">
+                            <table class="display table table-bordered caption" id="example1" border="1"
+                                cellpadding="0" cellspacing="0" data-ordering="false">
                                 <thead>
                                     <tr>
-                                        <th style="width: 50%" colspan="4">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+                                        <th style="width: 50%" colspan="4">Date Processed:
+                                            {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
                                         </th>
-                                        <th style="width: 50%;text-align:right" colspan="3">Processed By {{ auth()->user()->name }}</th>
+                                        <th style="width: 50%;text-align:right" colspan="3">Processed By
+                                            {{ auth()->user()->name }}</th>
                                     </tr>
                                     <tr>
-                                        <th>DATE</th>
+                                        <th>PROCESSED DATE</th>
                                         <th>INVOICE</th>
                                         <th>REFERENCE</th>
                                         <th>CUST ACCOUNT</th>
                                         <th>CUST NAME</th>
                                         <th>AMOUNT</th>
+                                        <th>CREATED BY</th>
+                                        <th>DATE CREATED</th>
+                                        <th>POSTED BY</th>
                                         <th>STATUS</th>
                                     </tr>
                                 </thead>
@@ -77,7 +83,12 @@
                                         <td>{{ $sale->reference }}</td>
                                         <td>{{ $sale->customer->code }}</td>
                                         <td>{{ $sale->customer->name }}</td>
-                                        <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}</td>
+                                        <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}
+                                        </td>
+                                        <td>{{ $sale->createdBy->name ?? null }}</td>
+                                        <td>{{ $sale->postedBy->name ?? null }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}
+                                        </td>
                                         <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
                                     </tr>
                                 @endforeach

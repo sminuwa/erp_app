@@ -55,7 +55,7 @@
                                         <td colspan="3">{{ $intersite->reference }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Date</th>
+                                        <th>Processed Date</th>
                                         <td>{{ Carbon\Carbon::parse($intersite->date)->toFormattedDateString() }}</td>
                                         <th>Truck No</th>
                                         <td>{{ $intersite->vehicle_no }}</td>
@@ -72,8 +72,8 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th>Created By</th>
-                                        <td>{{ $intersite->createdBy->name ?? '' }}</td>
+                                        <th>Created By/Date</th>
+                                        <td>{{ $intersite->createdBy->name ?? '' }}/{{ Carbon\Carbon::parse($intersite->created_at)->toFormattedDateString() }}</td>
                                         <th>Posted By</th>
                                         <td colspan="s">{{ $intersite->postedBy->name ?? '' }}</td>
                                     </tr>

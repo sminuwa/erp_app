@@ -16,18 +16,20 @@
     </caption>
     <thead>
         <tr>
-            <th style="width: 50%" colspan="4">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            <th style="width: 50%" colspan="5">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
             </th>
-            <th style="width: 50%;text-align:right" colspan="4">Processed By {{ auth()->user()->name }}</th>
+            <th style="width: 50%;text-align:right" colspan="5">Processed By {{ auth()->user()->name }}</th>
         </tr>
         <tr>
-            <th>DATE</th>
+            <th>PROCESSED DATE</th>
             <th>INVOICE</th>
             <th>NAME</th>
             <th>DESCRIPTION</th>
             <th>WAYBILL</th>
             <th>SUPPLIER</th>
             <th>AMOUNT</th>
+            <th>CREATED BY</th>
+            <th>DATE CREATED</th>
             <th>STATUS</th>
         </tr>
     </thead>
@@ -42,6 +44,8 @@
             <td>{{ $sale->description }}</td>
             <td>{{ $sale->wbno }}</td>
             <td>{{ $sale->supplier }}</td>
+            <td>{{ $sale->name }}</td>
+            <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}</td>
             <td style="text-align: right">
                 {{ number_format($sale->amount, 2, '.', ',') }}</td>
             <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>

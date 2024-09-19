@@ -34,9 +34,8 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo.png') }}"
-                                style="width:50px;height:50px;" alt="Albabello Logo" class="img-circle elevation-3"
-                                style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo.png') }}" style="width:50px;height:50px;"
+                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
                             <h3>
                                 {{ App\Models\User::UserBranchName()->long_name }}
                             </h3>
@@ -53,13 +52,15 @@
 
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
-                            <table class="display table table-bordered caption" id="example1" border="1" cellpadding="0"
-                                cellspacing="0">
+                            <table class="display table table-bordered caption" id="example1" border="1"
+                                cellpadding="0" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th style="width: 50%" colspan="5">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+                                        <th style="width: 50%" colspan="5">Date Processed:
+                                            {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
                                         </th>
-                                        <th style="width: 50%;text-align:right" colspan="4">Processed By {{ auth()->user()->name }}</th>
+                                        <th style="width: 50%;text-align:right" colspan="4">Processed By
+                                            {{ auth()->user()->name }}</th>
                                     </tr>
                                     <tr>
                                         <th>Date</th>
@@ -68,6 +69,8 @@
                                         <th>From Branch</th>
                                         <th>To Branch</th>
                                         <th>Rerefence No</th>
+                                        <th>Created By</th>
+                                        <th>Date Created</th>
                                         <th>QTY</th>
                                         <th>Cost Price</th>
                                         <th>Total</th>
@@ -82,6 +85,8 @@
                                         <td>{{ \App\Models\Branch::find($transfer->source_branch_id)->code }}</td>
                                         <td>{{ \App\Models\Branch::find($transfer->destination_branch_id)->code }}</td>
                                         <td>{{ $transfer->reference }}</td>
+                                        <td>{{ $transfer->created_by }}</td>
+                                        <td>{{ Carbon\Carbon::parse($transfer->created_at)->toFormattedDateString() }}</td>
                                         <td style="text-align: right">{{ $transfer->quantity }}</td>
                                         <td style="text-align: right">{{ number_format($transfer->cost_price, 2) }}
                                         </td>

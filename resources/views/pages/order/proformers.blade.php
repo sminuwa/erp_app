@@ -73,6 +73,8 @@
                                             <th>Description</th>
                                             <th>Name</th>
                                             <th>Total</th>
+                                            <th>Created By</th>
+                                            <th>Date Created</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -95,6 +97,9 @@
                                                 <td>{{ $order->description }}</td>
                                                 <td>{{ $order->customer->name }}</td>
                                                 <td align="right">&#8358;{{ number_format($order->total, 2, '.', ',') }}
+                                                </td>
+                                                <td>{{ $order->createdBy->name }}</td>
+                                                <td>{{ Carbon\Carbon::parse($order->created_at)->toFormattedDateString() }}
                                                 </td>
                                                 <td align="center">
                                                     <div class="dropdown">

@@ -54,6 +54,10 @@ class ReturnDebit extends Model
     {
         return $this->belongsTo(User::class, 'posted_by');
     }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
     protected $dates = [];
 
     public function returnItems()

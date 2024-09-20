@@ -85,7 +85,7 @@ class ReturnDebitController extends Controller
                 'amount' => $total,
                 'comment' => $comment,
                 'branch_id' => User::userBranchAction(),
-                'posted_by' => Auth::id(),
+                'created_by' => Auth::id(),
             ]);
 
             foreach ($items as $item) {

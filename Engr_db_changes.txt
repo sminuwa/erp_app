@@ -8,3 +8,5 @@ ALTER TABLE `order_invoice_details` ADD COLUMN `unit_cost` DECIMAL(18,2) NOT NUL
 ALTER TABLE `proformer_details` CHANGE `store_product_id` `product_id` BIGINT(20) UNSIGNED NOT NULL, ADD COLUMN `store_id` BIGINT(20) NOT NULL AFTER `product_id`; 
 ALTER TABLE `proformer_details` DROP COLUMN `original_quantity_sold`, DROP COLUMN `sold_price`, DROP COLUMN `total`, DROP COLUMN `selling_price`, DROP COLUMN `avail_qty_before_sale`, CHANGE `cost_price` `unit_cost` DECIMAL(18,2) DEFAULT 0.00 NOT NULL; 
 
+20th/09/2024
+ALTER TABLE `return_debits` ADD COLUMN `created_by` BIGINT(20) NOT NULL AFTER `date`; 

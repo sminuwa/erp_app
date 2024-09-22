@@ -1,7 +1,16 @@
 <form action="{{ isset($route) ? $route : route('suppliers.store') }}" method="POST">
     {{ csrf_field() }}
     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
-
+    <div class="form-group">
+        <label for="code">Code</label>
+        <input type="text" class="form-control {{ $errors->has('code') ? ' is-invalid' : '' }}" name="code"
+            id="code" value="{{ old('code', $model->code) }}" placeholder="" maxlength="191" required="required">
+        @if ($errors->has('code'))
+            <div class="invalid-feedback">
+                <strong>{{ $errors->first('code') }}</strong>
+            </div>
+        @endif
+    </div>
     <div class="form-group">
         <label for="name">Name</label>
         <input type="text" class="form-control {{ $errors->has('name') ? ' is-invalid' : '' }}" name="name"
@@ -135,6 +144,20 @@
             </div>
         @endif
     </div> --}}
+    <div class="form-group">
+        <label for="code">Status</label>
+        <select class="form-control {{ $errors->has('status') ? ' is-invalid' : '' }}"
+                name="status" id="status"
+                required>
+            <option value="1" @if($model->status == 1) selected @endif>Active</option>
+            <option value="0" @if($model->status == 0) selected @endif>Inactive</option>
+        </select>
+        @if ($errors->has('status'))
+            <div class="invalid-feedback">
+                <strong>{{ $errors->first('status') }}</strong>
+            </div>
+        @endif
+    </div>
     <div class="form-group text-right ">
         <input type="submit" class="btn btn-primary" value="Save" />
 

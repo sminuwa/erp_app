@@ -1077,7 +1077,7 @@ class Transaction
     public static function check_transaction_limit($customer_id, $cart_contents)
     {
         $total_sales = 0;
-
+        //dd($cart_contents);
         // This is to determine the total amount based on the selected unit, if different from base unit
         foreach ($cart_contents as $cart) {
             $store_product_id = $cart->id;

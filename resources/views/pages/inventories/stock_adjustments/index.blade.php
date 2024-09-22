@@ -47,6 +47,7 @@
                                             <th>Operation </th>
                                             <th>Description </th>
                                             <th>Created By </th>
+                                            <th>Date Created </th>
                                             <th>&nbsp;</th>
                                         </tr>
                                     </thead>
@@ -63,6 +64,7 @@
                                                 </td>
                                                 <td> {{ $record->description ?? null }} </td>
                                                 <td> {{ $record->createdBy->name ?? null }} </td>
+                                                <td> {{ \Carbon\Carbon::parse($record->created_at)->toFormattedDateString() }}
                                                 <td>
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button"

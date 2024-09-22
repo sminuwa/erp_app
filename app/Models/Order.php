@@ -29,6 +29,10 @@ class Order extends Model
     {
         return $this->belongsTo(Customer::class);
     }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class,'sold_by');
+    }
     public function sold()
     {
         return $this->belongsTo(User::class, 'sold_by', 'id');

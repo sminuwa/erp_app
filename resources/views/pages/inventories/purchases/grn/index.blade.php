@@ -64,6 +64,8 @@
                                     <th>Reference </th>
                                     <th>Purchase Date </th>
                                     <th>Amount (&#8358;) </th>
+                                    <th>Created By</th>
+                                    <th>Date Created </th>
                                     <th>Status </th>
                                     <th>&nbsp;</th>
                                 </tr>
@@ -77,6 +79,10 @@
                                         <td> {{ $record->purchase_date->toDayDateTimeString() }} </td>
                                         <td style="text-align: right">
                                             {{ number_format($record->totalProductCost()->total, 2) }} </td>
+                                            <td>
+                                                {{ $record->createdBy->name }}
+                                            </td>
+                                            <td> {{ $record->created_at->toDayDateTimeString() }} </td>
                                         <td> {{ $record->status == 1 ? 'Completed' : 'Pending' }} </td>
                                         <td>
                                             <div class="dropdown">

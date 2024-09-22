@@ -57,12 +57,14 @@ class StockAdjustmentController extends Controller
     public function create(Create $request)
     {
         $product_in = Product::select('products.id', 'products.name', 'code')
+            ->where('status', 1)
             ->orderBy('code', 'asc')
             ->get();
         $product_out = Product::select('products.id', 'products.name', 'code')
             ->join('store_products', 'store_products.product_id', 'products.id')
             ->orderBy('code', 'asc')
             ->where('qty_available', '>', 0)
+            ->where('products.status', 1)
             ->get();
         $stores = Store::where('branch_id', User::userBranchAction())->get();
         return view('pages.inventories.stock_adjustments.create', [
@@ -133,6 +135,7 @@ class StockAdjustmentController extends Controller
         $this->authorize('stock_adjustments.edit');
         $products = Product::select('products.id', 'products.name', 'code')
             ->join('store_products', 'store_products.product_id', 'products.id')
+            ->where('products.status', 1)
             ->orderBy('code', 'asc')
             ->get();
         $stores = Store::where('branch_id', User::userBranchAction())->get();

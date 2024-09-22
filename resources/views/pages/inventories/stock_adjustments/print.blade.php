@@ -168,8 +168,8 @@
                     </div>
                     <table class="table">
                         <tr>
-                            <td style='border-style:none;'>Created By:
-                                {{ $record->createdBy->name }}<br /><br>
+                            <td style='border-style:none;'>Created By/Date:
+                                {{ $record->createdBy->name }}/{{ \Carbon\Carbon::parse($record->created_at)->toFormattedDateString() }}<br /><br>
                                 Posted By: {{ $record->postedBy->name }}
                             </td>
                         </tr>

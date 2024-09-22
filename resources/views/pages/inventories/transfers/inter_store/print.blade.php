@@ -43,7 +43,7 @@
                     <div class="col-xs-5 col-sm-5 col-md-5">
                         <div class="receipt-right">
                             <p><b>Reference No: {{ $interstoreTransfer->reference }}</b></p>
-                            <p><b>Date: {{ $interstoreTransfer->date }}</b></p>
+                            <p><b>Processed Date: {{ $interstoreTransfer->date }}</b></p>
                         </div>
                     </div>
                 </div>
@@ -81,7 +81,7 @@
                     <div class="col-xs-10 col-sm-10 col-md-10 text-left">
                         <div class="receipt-right">
                             <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
-                            <p><b>Created By :</b> {{ $interstoreTransfer->createdBy->name ?? null }}</p>
+                            <p><b>Created By/Date:</b> {{ $interstoreTransfer->createdBy->name ?? null }}/ {{ Carbon\Carbon::parse($interstoreTransfer->created_at)->toFormattedDateString() }}</p>
                             {{--                                <p><b>Printed By :</b> {{ Auth::user()->name }}</p><br>--}}
 
                             <p><b>Signatire :</b> ______________________________________</p>

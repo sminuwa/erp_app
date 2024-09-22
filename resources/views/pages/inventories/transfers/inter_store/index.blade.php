@@ -68,6 +68,7 @@
                                                 <th>Date</th>
                                                 <th>Reference</th>
                                                 <th>Created By</th>
+                                                <th>Date Created</th>
                                                 <th>Status</th>
                                                 <th>&nbsp;</th>
                                             </tr>
@@ -79,6 +80,7 @@
                                                     <td> {{ $record->date }} </td>
                                                     <td> {{ $record->reference }} </td>
                                                     <td> {{ $record->createdBy->name ?? null }} </td>
+                                                    <td> {{ $record->created_at->toDayDateTimeString() }} </td>
                                                     <td> Completed </td>
                                                     <td>
                                                         @can('interstore.print')

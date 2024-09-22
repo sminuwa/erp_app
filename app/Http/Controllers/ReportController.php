@@ -77,6 +77,8 @@ class ReportController extends Controller
             'reference',
             'source_branch_id',
             'destination_branch_id',
+            'users.name AS created_by',
+            'intersite_transfers.created_at'
         )
             ->where('intersite_transfer_products.product_id', 'LIKE', $product_id)
             ->where('products.category_id', 'LIKE', $category_id)
@@ -85,6 +87,7 @@ class ReportController extends Controller
             ->join('intersite_transfer_products', 'intersite_transfer_products.intersite_transfer_id', 'intersite_transfers.id')
             ->join('stores', 'stores.id', 'intersite_transfers.source_branch_id')
             ->join('products', 'products.id', 'intersite_transfer_products.product_id')
+            ->join('users', 'users.id', 'intersite_transfers.created_by')
             ->whereBetween('intersite_transfers.date', [$from_date, $to_date]);
 
         $transfers = $query->get();
@@ -135,6 +138,8 @@ class ReportController extends Controller
             'reference',
             'source_branch_id',
             'destination_branch_id',
+            'users.name AS created_by',
+            'intersite_transfers.created_at'
         )
             ->where('intersite_transfer_products.product_id', 'LIKE', $product_id)
             ->where('products.category_id', 'LIKE', $category_id)
@@ -143,6 +148,7 @@ class ReportController extends Controller
             ->join('intersite_transfer_products', 'intersite_transfer_products.intersite_transfer_id', 'intersite_transfers.id')
             ->join('stores', 'stores.id', 'intersite_transfers.source_branch_id')
             ->join('products', 'products.id', 'intersite_transfer_products.product_id')
+            ->join('users', 'users.id', 'intersite_transfers.created_by')
             ->whereBetween('intersite_transfers.date', [$from_date, $to_date]);
         $transfers = $query->get();
         //$query2 = $query;
@@ -192,7 +198,9 @@ class ReportController extends Controller
             'reference',
             'source_store_id',
             'destination_store_id',
-            'interstore_transfers.branch_id'
+            'interstore_transfers.branch_id',
+            'interstore_transfers.created_at',
+            'users.name AS created_by'
         )
             ->where('interstore_transfer_details.product_id', 'LIKE', $product_id)
             ->where('products.category_id', 'LIKE', $category_id)
@@ -202,6 +210,7 @@ class ReportController extends Controller
             ->join('interstore_transfer_details', 'interstore_transfer_details.interstore_transfer_id', 'interstore_transfers.id')
             ->join('stores', 'stores.id', 'interstore_transfer_details.source_store_id')
             ->join('products', 'products.id', 'interstore_transfer_details.product_id')
+            ->join('users', 'users.id', 'interstore_transfers.created_by')
             ->whereBetween('interstore_transfers.date', [$from_date, $to_date]);
 
         $transfers = $query->get();
@@ -260,15 +269,19 @@ class ReportController extends Controller
             'reference',
             'source_store_id',
             'destination_store_id',
+            'interstore_transfers.branch_id',
+            'interstore_transfers.created_at',
+            'users.name AS created_by'
         )
             ->where('interstore_transfer_details.product_id', 'LIKE', $product_id)
             ->where('products.category_id', 'LIKE', $category_id)
-            ->where('branch_id', 'LIKE', $branch_id)
+            ->where('interstore_transfers.branch_id', 'LIKE', $branch_id)
             ->where('source_store_id', 'LIKE', $destination_store_id)
             ->where('destination_store_id', 'LIKE', $destination_store_id)
-            ->join('interstore_transfer_details', 'interstore_transfer_details.intersite_transfer_id', 'interstore_transfers.id')
-            ->join('stores', 'stores.id', 'interstore_transfers.source_branch_id')
+            ->join('interstore_transfer_details', 'interstore_transfer_details.interstore_transfer_id', 'interstore_transfers.id')
+            ->join('stores', 'stores.id', 'interstore_transfer_details.source_store_id')
             ->join('products', 'products.id', 'interstore_transfer_details.product_id')
+            ->join('users', 'users.id', 'interstore_transfers.created_by')
             ->whereBetween('interstore_transfers.date', [$from_date, $to_date]);
         //$query2 = $query;
         return view('pages.reports.stock_control.print_intersite_stock_transfer', compact('transfers', 'from_date', 'to_date'));
@@ -1256,7 +1269,7 @@ class ReportController extends Controller
     {
         return view('pages.reports.sales_and_cash_analysis.sales_by_category');
     }
-   
+
     public function loadCategorySaleReport(Request $request)
     {
         $from_date = date('Y-m-d', strtotime($request->from_date));
@@ -1338,7 +1351,7 @@ class ReportController extends Controller
         return view('pages.reports.sales_and_cash_analysis.load_sale_by_category_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'category_id1', 'branch'));
     }
 
-    
+
 
     public function printCategorySaleReport($from_date, $to_date, $branch_id, $category_id1, $category_id2)
     {
@@ -2979,11 +2992,12 @@ class ReportController extends Controller
         }
 
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'purchases.reference', 'purchase_expenses.reference AS ref', 'stores.code AS store', 'description', 'purchase_expenses.name', 'purchases.purchase_date', 'wbno', 'amount', 'purchase_expenses.status')
+            ->select('suppliers.name AS supplier', 'purchases.reference', 'purchase_expenses.reference AS ref', 'stores.code AS store', 'description', 'purchase_expenses.name', 'purchases.purchase_date', 'wbno', 'amount', 'purchase_expenses.status', 'purchases.created_at', 'users.name')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('purchase_expenses', 'purchase_expenses.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
             ->join('stores', 'stores.id', 'purchase_products.store_id')
+            ->join('users', 'users.id', 'purchases.created_by')
             ->where('purchases.supplier_id', 'LIKE', $supplier_id)
             ->where('purchases.status', 'LIKE', $status)
             ->where('purchases.branch_id', 'LIKE', $branch_id)
@@ -3015,11 +3029,12 @@ class ReportController extends Controller
             $status = '%';
         }
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'purchases.reference', 'purchase_expenses.reference AS ref', 'stores.code AS store', 'description', 'purchase_expenses.name', 'purchases.purchase_date', 'wbno', 'amount', 'purchase_expenses.status', 'purchases.atc_no')
+            ->select('suppliers.name AS supplier', 'purchases.reference', 'purchase_expenses.reference AS ref', 'stores.code AS store', 'description', 'purchase_expenses.name', 'purchases.purchase_date', 'wbno', 'amount', 'purchase_expenses.status', 'purchases.created_at', 'users.name')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('purchase_expenses', 'purchase_expenses.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
             ->join('stores', 'stores.id', 'purchase_products.store_id')
+            ->join('users', 'users.id', 'purchases.created_by')
             ->where('purchases.supplier_id', 'LIKE', $supplier_id)
             ->where('purchases.status', 'LIKE', $status)
             ->where('purchases.branch_id', 'LIKE', $branch_id)
@@ -3060,11 +3075,12 @@ class ReportController extends Controller
 
 
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno', DB::raw('SUM(quantity * unit_price) AS total'), 'purchases.status', 'purchases.atc_no')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno', DB::raw('SUM(quantity * unit_price) AS total'), 'purchases.status', 'purchases.atc_no', 'purchases.created_at', 'users.name')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
             ->join('stores', 'stores.id', 'purchase_products.store_id')
             ->join('products', 'products.id', 'purchase_products.product_id')
+            ->join('users', 'users.id', 'purchases.created_by')
             ->where('purchases.supplier_id', 'LIKE', $supplier_id)
             ->where('purchases.status', 'LIKE', $status)
             ->where('purchases.branch_id', 'LIKE', $branch_id)
@@ -3101,11 +3117,12 @@ class ReportController extends Controller
             $status = '%';
         }
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno', DB::raw('SUM(quantity * unit_price) AS total'), 'purchases.status', 'purchases.atc_no')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno', DB::raw('SUM(quantity * unit_price) AS total'), 'purchases.status', 'purchases.atc_no', 'purchases.created_at', 'users.name')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
             ->join('stores', 'stores.id', 'purchase_products.store_id')
             ->join('products', 'products.id', 'purchase_products.product_id')
+            ->join('users', 'users.id', 'purchases.created_by')
             ->where('purchases.supplier_id', 'LIKE', $supplier_id)
             ->where('purchases.status', 'LIKE', $status)
             ->where('purchases.branch_id', 'LIKE', $branch_id)
@@ -3154,10 +3171,11 @@ class ReportController extends Controller
 
 
         $sales = DB::table('purchase_requests')
-            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'purchase_product_requests.quantity', 'unit_price', 'purchase_requests.purchase_date', 'wbno', 'purchase_requests.status')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'purchase_product_requests.quantity', 'unit_price', 'purchase_requests.purchase_date', 'wbno', 'purchase_requests.status', 'purchase_requests.created_at', 'users.name')
             ->join('purchase_product_requests', 'purchase_product_requests.purchase_id', 'purchase_requests.id')
             ->join('suppliers', 'suppliers.id', 'purchase_requests.supplier_id')
             ->join('products', 'products.id', 'purchase_product_requests.product_id')
+            ->join('users', 'users.id', 'purchase_requests.updated_by')
             ->where('products.category_id', 'LIKE', $category_id)
             ->where('purchase_product_requests.product_id', 'LIKE', $product_id)
             ->where('purchase_requests.supplier_id', 'LIKE', $supplier_id)
@@ -3204,10 +3222,11 @@ class ReportController extends Controller
             $status = '%';
         }
         $sales = DB::table('purchase_requests')
-            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'purchase_product_requests.quantity', 'unit_price', 'purchase_requests.purchase_date', 'wbno', 'purchase_requests.status')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'purchase_product_requests.quantity', 'unit_price', 'purchase_requests.purchase_date', 'wbno', 'purchase_requests.status', 'purchase_requests.created_at', 'users.name')
             ->join('purchase_product_requests', 'purchase_product_requests.purchase_id', 'purchase_requests.id')
             ->join('suppliers', 'suppliers.id', 'purchase_requests.supplier_id')
             ->join('products', 'products.id', 'purchase_product_requests.product_id')
+            ->join('users', 'users.id', 'purchase_requests.updated_by')
             ->where('products.category_id', 'LIKE', $category_id)
             ->where('purchase_product_requests.product_id', 'LIKE', $product_id)
             ->where('purchase_requests.supplier_id', 'LIKE', $supplier_id)

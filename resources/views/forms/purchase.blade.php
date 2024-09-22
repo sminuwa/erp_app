@@ -146,23 +146,16 @@
                     <div class="form-group">
                         <label for="product_id">Product Name</label>
                         <select
-                            class="form-control select2-single ajax-products {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
+                            class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
                             name="product_id" id="product_id" required="required">
                             <option value="">Select...</option>
                             @if (isset($products))
-                                {{-- @if (old('category_id', $model->category_id))
-                                    @foreach (\App\Models\Product::where('category_id', old('category_id'))->get() as $data)
-                                        <option value="{{ $data->id }}"
-                                            {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>
-                                            {{ $data->name }}</option>
-                                    @endforeach
-                                @else --}}
+                                
                                 @foreach ($products as $data)
                                     <option value="{{ $data->id }}"
                                         {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>
                                         {{ $data->code }}-{{ $data->name }}</option>
                                 @endforeach
-                                {{-- @endif --}}
                             @endif
                         </select>
                     </div>

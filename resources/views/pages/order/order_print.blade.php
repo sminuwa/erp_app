@@ -94,7 +94,7 @@
                         <div class="col-sm-4">
                             <b>Invoice No:</b> {{ $order->reference }}<br>
                             <b>Date and Time: {{ \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</b><br>
-                            <b>Prepared By</b> <span class="ion-card"></span> {{ $order->sold->name }}<br />
+                            <b>Prepared By</b> <span class="ion-card"></span> {{ $order->sold->name ?? ''}}<br />
                             <b>Printed By <span class="ion-printer"></span>
                                 &nbsp;&nbsp;{{ Auth::user()->name }}</span><span>
                         </div>

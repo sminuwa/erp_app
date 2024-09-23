@@ -55,6 +55,7 @@ class MisController extends Controller
             ->where('category_id', 'like', $request->query->get('category_id') ?? '%')
             ->where('store_products.store_id', $request->query->get('store_id'))
             ->where('qty_available', '>', 0)
+            ->where('products.status', 1)
             ->whereNotIn('products.id', $product_ids)
             ->orderBy('name', 'asc')
             ->get();
@@ -204,6 +205,7 @@ class MisController extends Controller
             ->select('products.id', 'products.name')
             ->where('store_products.store_id', 'LIKE', $store_id)
             ->where('products.category_id', 'LIKE', $category_id)
+            ->where('products.status', 1)
             ->orderBy('name', 'asc')
             ->get();
         $result = "";

@@ -171,8 +171,8 @@
                                 </tbody>
                             </table>
 
-                            <p style="line-height: 14px">Goods Received in good condition cannot be returned
-                                <br>Sales invalidated in goods not taken within two (2) days
+                            <p style="line-height: 14px">Goods Received in good condition cannot be returned.
+                                <br>Sales invalidated if goods not taken within two (2) days
                             </p>
 
                             <table class="table table-condensed">

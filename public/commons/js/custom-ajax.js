@@ -4,6 +4,7 @@ $(document).ready(function () {
     ajerks('GET', '/misc/ajax/customers', 'ajax-customers')
     ajerks('GET', '/misc/ajax/suppliers', 'ajax-suppliers')
     ajerks('GET', '/misc/ajax/products', 'ajax-products')
+    ajerks('GET', '/misc/ajax/products/active', 'ajax-active-products')
     ajerks('GET', '/misc/ajax/stores', 'ajax-stores')
     ajerks('GET', '/misc/ajax/branches', 'ajax-branches')
     ajerks('GET', '/misc/ajax/chart-of-accounts', 'ajax-chart-of-accounts')

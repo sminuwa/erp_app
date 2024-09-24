@@ -302,33 +302,35 @@ class UserController extends Controller
     public function userSiteAccess(Request $request, User $user)
     {
         if ($request->isMethod('post')) {
-            // Delete existing access records for the user
+            // Delete existing branch access records for the user
             UserAccessSite::where('user_id', $user->id)->delete();
 
-            // Check if company IDs are provided in the request
-            if ($request->has('company_id') && is_array($request->company_id)) {
+            // Check if branch IDs are provided in the request
+            if ($request->has('branch_id') && is_array($request->branch_id)) {
                 $accessData = [];
 
-                // Prepare data for multiple upserts
-                foreach ($request->company_id as $companyId) {
+                // Prepare data for multiple upserts for branches
+                foreach ($request->branch_id as $branchId) {
                     $accessData[] = [
                         'user_id' => $user->id,
-                        'company_id' => $companyId,
+                        'branch_id' => $branchId,
                         'created_by' => auth()->user()->id,
                         'created_at' => now(),
                         'updated_at' => now()
                     ];
                 }
 
-                // Insert multiple company access records
+                // Insert multiple branch access records
                 UserAccessSite::insert($accessData);
             }
         }
 
-        // Get all companies ordered by name
+        // Get all companies and branches for the form
         $companies = Company::orderBy('name')->get();
+        $branches = Branch::orderBy('name')->get();  // Add logic to filter branches based on company, if needed
 
-        // Return view with the user and company data
-        return view('pages.users.user_access_site', compact('user', 'companies'));
+        // Return view with the user and branch data
+        return view('pages.users.user_access_site', compact('user', 'companies', 'branches'));
     }
+
 }

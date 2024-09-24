@@ -52,18 +52,18 @@
                                         <i class="fa fa-print" aria-hidden="true"></i> Print
                                     </a>
                                 @endcan
-                                @if ($order->status == 0)
+                                @if ($order->status == 1)
                                     @can('order.invoice.edit')
-                                        <a href="{{ route('order.invoice.edit', $order->id) }}" class="btn btn-primary btn-sm ">
+                                        <a href="{{ route('proformer.edit', $order->id) }}" class="btn btn-primary btn-sm ">
                                             <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                         </a>
                                     @endcan
-                                    @can('order.invoice.linking')
+                                    {{-- @can('order.invoice.linking')
                                         <a href="{{ route('order.invoice.linking', $order->id) }}" title="Linking"
                                             class="btn btn-success btn-sm ">
                                             <i class="fa fa-link" aria-hidden="true"></i> Create Invoice
                                         </a>
-                                    @endcan
+                                    @endcan --}}
                                     @can('order.invoice.close')
                                         <form action="{{ route('order.invoice.close', $order->id) }}" method="post"
                                             class="d-inline"
@@ -75,7 +75,7 @@
                                         </form>
                                     @endcan
                                     @can('order.invoice.destroy')
-                                        <form action="{{ route('order.invoice.destroy', $order->id) }}" method="post"
+                                        <form action="{{ route('proformer.destroy', $order->id) }}" method="post"
                                             class="d-inline"
                                             onsubmit="return confirm('Are you sure you want to delete this order?')">
                                             @csrf

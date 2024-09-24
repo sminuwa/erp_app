@@ -46,25 +46,34 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-6'>
-                        <form action="{{ route('user.site.access', $user) }}" method="POST">
+                        <form action="{{ route('user.site.access', $user) }}" method="POST"> 
                             @csrf
-                            <div class="form-group">
+                        
+                            {{-- <div class="form-group">
                                 <label for="company_id">Company</label>
-                                @foreach ($companies as $company)
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="company_id[]"
-                                            id="company_{{ $company->id }}" value="{{ $company->id }}"
-                                            {{ in_array($company->id, $user->companies->pluck('company_id')->toArray()) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="company_{{ $company->id }}">
-                                            {{ $company->name }}
-                                        </label>
-                                    </div>
-                                @endforeach
+                                <select class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}" name="company_id" id="company_id">
+                                </select>
+                            </div> --}}
+                        
+                            <div class="form-group">
+                                <label for="branch_id">Branch</label>
+                                <select class="form-control select2-multiple ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}" name="branch_id[]" id="branch_id" multiple>
+                                    <option value="">Select</option>
+                                    @if (isset($branches))
+                                        @foreach ($branches as $data)
+                                            <option value="{{ $data->id }}" {{ in_array($data->id, $user->branches->pluck('branch_id')->toArray()) ? 'selected' : '' }}>
+                                                {{ $data->name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
                             </div>
-                            <div style="text-align: center">
+                        
+                            <div style="text-align: right">
                                 <input type="submit" name="submit" class="btn btn-info" value="Save" />
                             </div>
                         </form>
+                        
                     </div>
                 </div>
             </div><!-- /.container-fluid -->

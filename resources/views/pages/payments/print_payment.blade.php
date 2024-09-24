@@ -117,8 +117,8 @@
                             <div class="receipt-right">
                                 <p><b>Created By :</b> {{ $payment->createdBy?->name }}</p>
                                 <p><b>Date Created :</b> {{ Carbon\Carbon::parse($payment->created_at)->toFormattedDateString() }}</p>
+                                <p><b>Printed By :</b> {{ Auth::user()->name }}</p>
                                 <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
-                    
                                 <p><b>Signatire :</b> ______________________________________</p>
                                 <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For:
                                     ALBABELLO </span>

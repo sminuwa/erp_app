@@ -142,7 +142,7 @@
                         <label for="branch_id">Branch</label>
                         <select class="form-control select2-single" name="branch" id="branch" required>
                             <option value="">Select...</option>
-                            @foreach (App\Models\Branch::whereIn('company_id', auth()->user()->companies->pluck('company_id')->toArray())->orderBy('name')->get() as $data)
+                            @foreach (App\Models\Branch::whereIn('id', auth()->user()->branches->pluck('branch_id')->toArray())->orderBy('name')->get() as $data)
                                 <option value="{{ $data->id }}">{{ $data->code }}-{{ $data->name }}
                                 </option>
                             @endforeach

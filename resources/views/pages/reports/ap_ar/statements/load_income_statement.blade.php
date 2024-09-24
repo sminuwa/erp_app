@@ -144,11 +144,17 @@
         @endforeach
         <tr>
             <th colspan="2" style="text-align: left">TOTAL COST</th>
-            @php $total_cost = $credit_sum - $debit_sum;  @endphp
+            @php $total_cost =  $credit_sum - $debit_sum;  @endphp
             <th style="text-align: right;">{{ number_format(abs($debit_sum), 2) }}</th>
             <th style="text-align: right;">{{ number_format(abs($credit_sum), 2) }}</th>
-            <th style="text-align: right;">{{ number_format(abs($dr), 2) }}</th>
-            <th style="text-align: right;">{{ number_format(abs($cr), 2) }}</th>
+            {{-- <th style="text-align: right;">{{ number_format(abs($dr), 2) }}</th>
+            <th style="text-align: right;">{{ number_format(abs($cr), 2) }}</th> --}}
+            <th style="text-align: right;">
+                {{ $total_cost < 0 ? number_format(abs($total_cost), 2) : '' }}
+            </th>
+            <th style="text-align: right;">
+                {{ $total_cost > 0 ? number_format(abs($total_cost), 2) : '' }}
+            </th>
         </tr>
         <tr>
             <th colspan="4" style="text-align: left">GROSS MARGIN</th>
@@ -243,7 +249,8 @@
         <tr>
             <th colspan="4" style="text-align: left">NET MARGIN</th>
             @php
-                $net_profit_loss = $gross_profit_loss - $total_expense + $other_income;
+
+                $net_profit_loss = $gross_profit_loss - abs($total_expense) + $other_income;
             @endphp
             <th style="text-align: right;">{{ $net_profit_loss < 0 ? number_format(abs($net_profit_loss), 2) : '' }}
             </th>

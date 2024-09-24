@@ -75,11 +75,13 @@
                                         <th>Created By/Date</th>
                                         <td>{{ $intersite->createdBy->name ?? '' }}/{{ Carbon\Carbon::parse($intersite->created_at)->toFormattedDateString() }}</td>
                                         <th>Posted By</th>
-                                        <td colspan="s">{{ $intersite->postedBy->name ?? '' }}</td>
+                                        <td>{{ $intersite->postedBy->name ?? '' }}</td>
                                     </tr>
                                     <tr>
                                         <th>Received By</th>
-                                        <td colspan="3">{{ $intersite->receivedBy->name ?? '' }}</td>
+                                        <td>{{ $intersite->receivedBy->name ?? '' }}</td>
+                                        <td>Printed By/Date</td>
+                                        <td>{{ auth()->user()->name }}/{{ Carbon\Carbon::now()->toFormattedDateString() }}</td>
                                     </tr>
                                 </tbody>
                             </table>

@@ -13,205 +13,210 @@
 </head>
 
 <body>
-<div class="col-md-12">
-    <div class="row">
+    <div class="col-md-12">
+        <div class="row">
 
-        <div class="receipt-main col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1 col-md-offset-3">
-            <div class="row">
-                <div class="receipt-header">
-                    <div class="col-xs-6 col-sm-6 col-md-6">
-                        <div class="receipt-left">
-                            <img src="{{ asset('assets/backend/img/logo.png') }}"
-                                 style="width:71px;height:71px;border-radius: 43px;" alt="Albabello Logo"
-                                 class="img-circle elevation-3 img-responsive" style="opacity: .8">
-                            <strong>{{App\Models\User::UserBranchName()->long_name}}</strong>
+            <div class="receipt-main col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1 col-md-offset-3">
+                <div class="row">
+                    <div class="receipt-header">
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="receipt-left">
+                                <img src="{{ asset('assets/backend/img/logo.png') }}"
+                                    style="width:71px;height:71px;border-radius: 43px;" alt="Albabello Logo"
+                                    class="img-circle elevation-3 img-responsive" style="opacity: .8">
+                                <strong>{{ App\Models\User::UserBranchName()->long_name }}</strong>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-xs-6 col-sm-6 col-md-6 text-right">
-                        <div class="receipt-right">
-                            <h5>AL-BABELLO</h5>
-                            <p>{{ $interstoreTransfer->customer->branch->address ?? null }} <i class="fa fa-location-arrow"></i></p>
-                            <p>{{ optional($interstoreTransfer->customer)->branch->email ?? null }}<i class="fa fa-envelope-o"></i></p>
-                            <p>{{ optional($interstoreTransfer->customer)->branch->phone ?? null }} <i class="fa fa-phone"></i></p>
+                        <div class="col-xs-6 col-sm-6 col-md-6 text-right">
+                            <div class="receipt-right">
+                                <h5>AL-BABELLO</h5>
+                                <p>{{ $interstoreTransfer->customer->branch->address ?? null }} <i
+                                        class="fa fa-location-arrow"></i></p>
+                                <p>{{ optional($interstoreTransfer->customer)->branch->email ?? null }}<i
+                                        class="fa fa-envelope-o"></i></p>
+                                <p>{{ optional($interstoreTransfer->customer)->branch->phone ?? null }} <i
+                                        class="fa fa-phone"></i></p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="row">
-                <div class="receipt-header receipt-header-mid">
-                    <div class="col-xs-5 col-sm-5 col-md-5">
-                        <div class="receipt-right">
-                            <p><b>Reference No: {{ $interstoreTransfer->reference }}</b></p>
-                            <p><b>Processed Date: {{ $interstoreTransfer->date }}</b></p>
+                <div class="row">
+                    <div class="receipt-header receipt-header-mid">
+                        <div class="col-xs-5 col-sm-5 col-md-5">
+                            <div class="receipt-right">
+                                <p><b>Reference No: {{ $interstoreTransfer->reference }}</b></p>
+                                <p><b>Processed Date: {{ $interstoreTransfer->date }}</b></p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div>
-                <h4 style="text-align: center;font-weight:700">INTERSTORE TRANSFER</h4>
-                <table class="table table-bordered table-striped">
-                    <thead>
-                    <tr>
-                        <th>S/N</th>
-                        <th>Product</th>
-                        <th>Source<br> Store</th>
-                        <th>Destination<br> Store</th>
-                        <th>Quantity</th>
-                        <th>Expiry Date</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($interstoreTransfer->products as $record)
+                <div>
+                    <h4 style="text-align: center;font-weight:700">INTERSTORE TRANSFER</h4>
+                    <table class="table table-bordered table-striped">
+                        <thead>
                             <tr>
-                                <th>{{ $loop->iteration }}</th>
-                                <th>{{ $record->product->code .' - '. $record->product->name }}</th>
-                                <th>{{ $record->source->code . ' - '. $record->source->name }}</th>
-                                <th>{{ $record->destination->code . ' - '. $record->destination->name }}</th>
-                                <th>{{ $record->quantity }}</th>
-                                <th>{{ $record->expiry_date }}</th>
+                                <th>S/N</th>
+                                <th>Product</th>
+                                <th>Source<br> Store</th>
+                                <th>Destination<br> Store</th>
+                                <th>Quantity</th>
+                                <th>Expiry Date</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            @foreach ($interstoreTransfer->products as $record)
+                                <tr>
+                                    <th>{{ $loop->iteration }}</th>
+                                    <th>{{ $record->product->code . ' - ' . $record->product->name }}</th>
+                                    <th>{{ $record->source->code . ' - ' . $record->source->name }}</th>
+                                    <th>{{ $record->destination->code . ' - ' . $record->destination->name }}</th>
+                                    <th>{{ $record->quantity }}</th>
+                                    <th>{{ $record->expiry_date }}</th>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
 
-            <div class="row">
-                <div class="receipt-header receipt-header-mid receipt-footer">
-                    <div class="col-xs-10 col-sm-10 col-md-10 text-left">
-                        <div class="receipt-right">
-                            <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
-                            <p><b>Created By/Date:</b> {{ $interstoreTransfer->createdBy->name ?? null }}/ {{ Carbon\Carbon::parse($interstoreTransfer->created_at)->toFormattedDateString() }}</p>
-                            {{--                                <p><b>Printed By :</b> {{ Auth::user()->name }}</p><br>--}}
+                <div class="row">
+                    <div class="receipt-header receipt-header-mid receipt-footer">
+                        <div class="col-xs-10 col-sm-10 col-md-10 text-left">
+                            <div class="receipt-right">
+                                <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
+                                <p><b>Created By/Date:</b> {{ $interstoreTransfer->createdBy->name ?? null }}/
+                                    {{ Carbon\Carbon::parse($interstoreTransfer->created_at)->toFormattedDateString() }}
+                                </p>
+                                <p><b>Printed By /Date:</b> {{ Auth::user()->name }}/ {{ Carbon\Carbon::now()->toFormattedDateString() }}</p><br>
 
-                            <p><b>Signatire :</b> ______________________________________</p>
-                            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For:
+                                <p><b>Signatire :</b> ______________________________________</p>
+                                <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For:
                                     ALBABELLO </span>
-                            <br /><br />
-                            <h5 style="color: rgb(140, 140, 140);text-align:center;">Thanks for Patronage!</h5>
+                                <br /><br />
+                                <h5 style="color: rgb(140, 140, 140);text-align:center;">Thanks for Patronage!</h5>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-xs-2 col-sm-2 col-md-2 text-right">
-                        <div class="receipt-left">
-                            @php
-                                $uc = $interstoreTransfer->reference;
-                            @endphp
-                            {{ QrCode::size(70)->generate($interstoreTransfer->reference) }}<br />
+                        <div class="col-xs-2 col-sm-2 col-md-2 text-right">
+                            <div class="receipt-left">
+                                @php
+                                    $uc = $interstoreTransfer->reference;
+                                @endphp
+                                {{ QrCode::size(70)->generate($interstoreTransfer->reference) }}<br />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
+            </div>
         </div>
     </div>
-</div>
 
-<style type="text/css">
-    body {
-        background: #eee;
-        margin-top: 20px;
-    }
+    <style type="text/css">
+        body {
+            background: #eee;
+            margin-top: 20px;
+        }
 
-    .text-danger strong {
-        color: #9f181c;
-    }
+        .text-danger strong {
+            color: #9f181c;
+        }
 
-    .receipt-main {
-        background: #ffffff none repeat scroll 0 0;
-        border-bottom: 1px solid;
-        border-top: 1px solid;
-        margin-top: 20px;
-        margin-bottom: 20px;
-        padding: 40px 30px !important;
-        position: relative;
-        box-shadow: 0 1px 21px #acacac;
-        color: #333333;
-        font-family: open sans;
-    }
+        .receipt-main {
+            background: #ffffff none repeat scroll 0 0;
+            border-bottom: 1px solid;
+            border-top: 1px solid;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding: 40px 30px !important;
+            position: relative;
+            box-shadow: 0 1px 21px #acacac;
+            color: #333333;
+            font-family: open sans;
+        }
 
-    .receipt-main p {
-        color: #333333;
-        font-family: open sans;
-        line-height: 1.42857;
-    }
+        .receipt-main p {
+            color: #333333;
+            font-family: open sans;
+            line-height: 1.42857;
+        }
 
-    .receipt-footer h1 {
-        font-size: 15px;
-        font-weight: 400 !important;
-        margin: 0 !important;
-    }
+        .receipt-footer h1 {
+            font-size: 15px;
+            font-weight: 400 !important;
+            margin: 0 !important;
+        }
 
-    .receipt-main::after {
-        background: #414143 none repeat scroll 0 0;
-        content: "";
-        height: 5px;
-        left: 0;
-        position: absolute;
-        right: 0;
-        top: -13px;
-    }
+        .receipt-main::after {
+            background: #414143 none repeat scroll 0 0;
+            content: "";
+            height: 5px;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: -13px;
+        }
 
-    .receipt-right h5 {
-        font-size: 16px;
-        font-weight: bold;
-        margin: 0 0 7px 0;
-    }
+        .receipt-right h5 {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 0 0 7px 0;
+        }
 
-    .receipt-right p {
-        font-size: 12px;
-        margin: 0px;
-    }
+        .receipt-right p {
+            font-size: 12px;
+            margin: 0px;
+        }
 
-    .receipt-right p i {
-        text-align: center;
-        width: 18px;
-    }
+        .receipt-right p i {
+            text-align: center;
+            width: 18px;
+        }
 
-    .receipt-main td {
-        padding: 9px 20px !important;
-    }
+        .receipt-main td {
+            padding: 9px 20px !important;
+        }
 
-    .receipt-main th {
-        padding: 13px 10px !important;
-    }
+        .receipt-main th {
+            padding: 13px 10px !important;
+        }
 
-    .receipt-main td {
-        font-size: 13px;
-        font-weight: initial !important;
-    }
+        .receipt-main td {
+            font-size: 13px;
+            font-weight: initial !important;
+        }
 
-    .receipt-main td p:last-child {
-        margin: 0;
-        padding: 0;
-    }
+        .receipt-main td p:last-child {
+            margin: 0;
+            padding: 0;
+        }
 
-    .receipt-main td h2 {
-        font-size: 14px;
-        font-weight: 600;
-        margin: 0;
-        text-transform: uppercase;
-    }
+        .receipt-main td h2 {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+            text-transform: uppercase;
+        }
 
-    .receipt-header-mid .receipt-left h1 {
-        font-weight: 100;
-        margin: 34px 0 0;
-        text-align: right;
-        text-transform: uppercase;
-    }
+        .receipt-header-mid .receipt-left h1 {
+            font-weight: 100;
+            margin: 34px 0 0;
+            text-align: right;
+            text-transform: uppercase;
+        }
 
-    .receipt-header-mid {
-        margin: 24px 0;
-        overflow: hidden;
-    }
+        .receipt-header-mid {
+            margin: 24px 0;
+            overflow: hidden;
+        }
 
-    #container {
-        background-color: #dcdcdc;
-    }
-</style>
+        #container {
+            background-color: #dcdcdc;
+        }
+    </style>
 
-<script type="text/javascript">
-    window.print();
-</script>
+    <script type="text/javascript">
+        window.print();
+    </script>
 </body>
 
 </html>

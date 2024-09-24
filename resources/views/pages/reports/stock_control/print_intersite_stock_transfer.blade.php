@@ -105,6 +105,20 @@
                                 </tfoot>
                             </table>
                         </div>
+                        <div class="row">
+                            <div class="receipt-header receipt-header-mid receipt-footer">
+                                <div class="col-xs-10 col-sm-10 col-md-10 text-left">
+                                    <div class="receipt-right">
+                                        
+                                        <p><b>Printed By :</b> {{ Auth::user()->name }}</p>
+                                        <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p><br>
+        
+                        
+                                    </div>
+                                </div>
+    
+                            </div>
+                        </div>
                         <!-- /.col -->
                     </div>
                     <!-- /.row -->

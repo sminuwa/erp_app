@@ -124,11 +124,11 @@
                                     @foreach ($order_details as $order_detail)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $order_detail->product->code ?? '' }}</td>
-                                        <td>{{ $order_detail->product->name ?? '' }}</td>
+                                        <td>{{ $order_detail->product->code ?? '' }} - {{ $order_detail->product->name ?? '' }}</td>
+                                        <td align="center">{{ $order_detail->quantity }}</td>
                                         <td>{{ $order_detail->unit ?? '' }}</td>
                                         <td>{{ $order_detail->store->code ?? '' }}</td>
-                                        <td align="center">{{ $order_detail->quantity }}</td>
+                                        
                                         <td align="right">{{ number_format($order_detail->unit_cost, 2) }}
                                         </td>
                                         <td align="right">
@@ -171,8 +171,8 @@
                                 </tbody>
                             </table>
 
-                            <p style="line-height: 14px">Goods Received in good condition cannot be returned
-                                <br>Sales invalidated in goods not taken within two (2) days
+                            <p style="line-height: 14px">Goods Received in good condition cannot be returned.
+                                <br>Sales invalidated if goods not taken within two (2) days
                             </p>
 
                             <table class="table table-condensed">

@@ -40,7 +40,15 @@ class AjaxController extends Controller
     public function products(Request $request)
     {
         $category_id = $request->category_id;
-        $records = Product::with('category')->forCategory($category_id)->orderBy('code', 'asc')->get();
+        $records = Product::with('category')->forCategory($category_id);
+
+        // Check if the URL contains '/active'
+        if ($request->is('*active*')) {
+            $records->where('status', 1);
+        }
+
+        $records = $records->orderBy('code', 'asc')->get();
+
         return view('misc.ajax.products', compact('records'));
     }
 
@@ -49,6 +57,11 @@ class AjaxController extends Controller
         $branch_id = $request->branch_id;
         $records = Store::forBranch($branch_id)->orderBy('code', 'asc')->get();
         return view('misc.ajax.stores', compact('records'));
+    }
+    public function relation_officers(Request $request)
+    {
+        $records = User::where('is_sale_representative', 1)->orderBy('user_code', 'asc')->get();
+        return view('misc.ajax.relation_officers', compact('records'));
     }
 
     public function branches(Request $request)
@@ -81,7 +94,7 @@ class AjaxController extends Controller
     }
     public function storeProducts(Request $request)
     {
-        $records = StoreProduct::with('product','store')->forProducts($request->store_id)->get();
+        $records = StoreProduct::with('product', 'store')->forProducts($request->store_id)->get();
         return view('misc.ajax.store-products', compact('records'));
     }
 }

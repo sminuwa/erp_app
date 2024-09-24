@@ -10,3 +10,30 @@ ALTER TABLE `proformer_details` DROP COLUMN `original_quantity_sold`, DROP COLUM
 
 20th/09/2024
 ALTER TABLE `return_debits` ADD COLUMN `created_by` BIGINT(20) NOT NULL AFTER `date`; 
+
+
+22th/09/2024
+
+CREATE TABLE `user_access_sites` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `company_id` bigint(20) unsigned NOT NULL,
+  `created_by` bigint(20) unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `company_id` (`company_id`),
+  KEY `created_by` (`created_by`),
+  CONSTRAINT `user_access_sites_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `user_access_sites_ibfk_2` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`),
+  CONSTRAINT `user_access_sites_ibfk_3` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+
+
+ALTER TABLE `user_access_sites` DROP FOREIGN KEY `user_access_sites_ibfk_2`; 
+ALTER TABLE `user_access_sites` ADD CONSTRAINT `user_access_sites_ibfk_2` FOREIGN KEY (`company_id`) REFERENCES `branches`(`id`); 
+ALTER TABLE `user_access_sites` ADD FOREIGN KEY (`branch_id`) REFERENCES `branches`(`id`);
+
+ALTER TABLE `users` CHANGE `id` `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (`id`); 
+LTER TABLE `order_invoice_details` ADD CONSTRAINT `order_invoice_details_ibfk_3` FOREIGN KEY (`order_id`) REFERENCES `order_invoices`(`id`); 

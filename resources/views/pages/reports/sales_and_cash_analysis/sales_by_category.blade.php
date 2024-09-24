@@ -65,6 +65,15 @@
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
+                                                <label for="company_id">Company</label>
+                                                <select class="form-control select2-single ajax-companies" name="company_id"
+                                                    id="company_id">
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
                                                 <label for="branch_id">Branch</label>
                                                 <select class="form-control select2-single ajax-branches" name="branch_id"
                                                     id="branch_id">
@@ -177,6 +186,7 @@
             $('#generate').on("click", function() {
                 let from_date = $('#from_date').val();
                 let to_date = $('#to_date').val();
+                let company_id = $('#company_id').val();
                 let branch_id = $('#branch_id').val();
                 let category_id1 = $('#category_id1').val(); // Now multiple
                 //let category_id2 = $('#category_id2').val(); // Now multiple
@@ -190,6 +200,7 @@
                         _token: "{{ csrf_token() }}",
                         from_date: from_date,
                         to_date: to_date,
+                        company_id: company_id,
                         branch_id: branch_id,
                         category_id1: category_id1, // Send multiple categories
                         //category_id2: category_id2 // Send multiple categories

@@ -803,6 +803,7 @@ class InvoiceController extends Controller
             })
 
             ->where('branch_product_prices.status', 1)
+            ->where('branches.id', $user_branch)
             ->orderBy('products.name')->orderBy('stores.name')->get();
         //TODO:: remove limit here
         $customers = Customer::active()->where('branch_id', $user_branch)->orderBy('name');
@@ -862,7 +863,7 @@ class InvoiceController extends Controller
         $cart_products = \Cart::getContent();
         //dd($cart_products);
         $categories = Category::orderBy('name', 'ASC')->get();
-        $store = Store::where('id', 'LIKE', $user_branch)->get();
+        $store = Store::where('branch_id', 'LIKE', $user_branch)->get();
         return view('pages.pos.order_invoice', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'order'));
     }
     public function loadOrderInvoiceToCart(OrderInvoice $order)
@@ -874,7 +875,7 @@ class InvoiceController extends Controller
             $store_id = $item->store_id;
             $store = StoreProduct::where(['product_id' => $product_id, 'store_id' => $store_id])->first();
             $qty = $item->quantity;
-            $store_products = StoreProduct::find($store->id);
+            $store_products = StoreProduct::find($store?->id);
             if ($store_products && $store_products->qty_available > 0) {
                 $add = \Cart::add([
                     'id' => $store_products->id,
@@ -931,7 +932,7 @@ class InvoiceController extends Controller
         //$due = $total - $pay;
         $order_id = $order->id;
         $amount_paid = 0;
-
+        //dd(\Cart::getContent());
         //$customer_id = $request->input('customer_id');
         DB::beginTransaction();
         try {
@@ -953,7 +954,7 @@ class InvoiceController extends Controller
             $total_discount = 0;
             DB::table('order_invoice_details')->where('order_id', $order->id)->delete();
             foreach ($contents as $content) {
-                $store_id = Store::where('name', $content->attributes['store'])->first()->id ?? 0;
+                $store_id = Store::where('code', $content->attributes['store'])->first()->id ?? 0;
                 DB::table('order_invoice_details')->insert([
                     'order_id' => $order_id,
                     'product_id' => $content->id,

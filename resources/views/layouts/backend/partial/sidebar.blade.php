@@ -457,6 +457,13 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
+                                            <a href="{{ route('relation_officer.report') }}"
+                                                class="nav-link {{ Request::is('reports/sa/sales/relation_officer*') ? 'active' : '' }}">
+                                                <i class="ion-code-working"></i>
+                                                <p>RO Sales Report</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
                                             <a href="{{ route('total.item.sold.report') }}"
                                                 class="nav-link {{ Request::is('reports/sa/sales/staff*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>

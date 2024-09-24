@@ -58,6 +58,11 @@ class AjaxController extends Controller
         $records = Store::forBranch($branch_id)->orderBy('code', 'asc')->get();
         return view('misc.ajax.stores', compact('records'));
     }
+    public function relation_officers(Request $request)
+    {
+        $records = User::where('is_sale_representative', 1)->orderBy('user_code', 'asc')->get();
+        return view('misc.ajax.relation_officers', compact('records'));
+    }
 
     public function branches(Request $request)
     {

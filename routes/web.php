@@ -595,7 +595,7 @@ Route::middleware('auth')->group(function () {
                     Route::get('/role/permission', [RoleHasPermissionController::class, 'index'])->name('role-permission');
                     Route::post('/role/permission/create', [RoleHasPermissionController::class, 'store'])->name('role-permission.store');
                     Route::get('/assign/permissions-to-roles', [RoleHasPermissionController::class, 'show'])->name('role-permission.show');
-                    //Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+                    Route::any('/user/site/access/{user}', [UserController::class, 'userSiteAccess'])->name('user.site.access');
                     Route::get('/user/{user}/{status}/', [UserController::class, 'changeAccountStatus'])->name('user.account.status');
                     Route::post('/user/assign-role/{user}', [UserController::class, 'storeUserRole'])->name('user.store.role');
                     Route::post('/user/assign-permission', [UserController::class, 'storeUserPermission'])->name('user.store.permission');
@@ -736,13 +736,18 @@ Route::middleware('auth')->group(function () {
             //Category Sales Report
             Route::get('/sa/sales/category', [ReportController::class, 'categorySaleReport'])->name('sales.report.by.category');
             Route::get('/sa/sales/category/load', [ReportController::class, 'loadCategorySaleReport'])->name('ajax.category.sales.report');
-            Route::get('/sa/sales/category/print/{from_date}/{to_date}/{branch_id}/{category_id1}', [ReportController::class, 'printCategorySaleReport'])->name('ajax.category.sales.report.print');
+            Route::get('/sa/sales/category/print/{from_date}/{to_date}/{company_id}/{branch_id}/{category_id1}', [ReportController::class, 'printCategorySaleReport'])->name('ajax.category.sales.report.print');
 
             //Staff Sales Report
             Route::get('/sa/sales/staff', [ReportController::class, 'staffSaleReport'])->name('staff.sales.report');
             Route::get('/sa/sales/staff/load', [ReportController::class, 'loadStaffSaleReport'])->name('ajax.staff.sales.report');
             Route::get('/sa/sales/staff/print/{from_date}/{to_date}/{branch_id}/{store_id}/{category_id}/{product_id}/{staff_id}', [ReportController::class, 'printStaffSaleReport'])->name('ajax.staff.sales.report.print');
 
+             //Staff Sales Report
+             Route::get('/sa/sales/relation_officer', [ReportController::class, 'staffRelationOfficerReport'])->name('relation_officer.report');
+             Route::get('/sa/sales/relation_officer/load', [ReportController::class, 'loadRelationOfficerReport'])->name('ajax.relation_officer.sales.report');
+             Route::get('/sa/sales/relation_officer/print/{from_date}/{to_date}/{branch_id}/{store_id}/{category_id}/{product_id}/{staff_id}', [ReportController::class, 'printRelationOfficerReport'])->name('ajax.relation_officer.report.print');
+ 
             //CUstoomer Sale with common names Report
             Route::get('/sa/sales/customer/sale/common-name', [ReportController::class, 'customerSaleReport'])->name('customer.sale.reports');
             Route::get('/sa/sales/customer/sale/common-name/load', [ReportController::class, 'loadCustomerSaleReport'])->name('ajax.load.customer.sale.reports');

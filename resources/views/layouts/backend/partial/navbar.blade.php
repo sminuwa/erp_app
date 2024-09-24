@@ -38,12 +38,12 @@
         <a href="{{ route('chatify') }}" title="Chat System" target="_BLANK"
             class="fa fa-wechat text text-info float-md-right">Chat</a> &nbsp;&nbsp;&nbsp;
         @can('setting.change-branch')
-{{--        @if (Auth::user()->hasRole('Super-admin'))--}}
+            {{--        @if (Auth::user()->hasRole('Super-admin')) --}}
             <a href="javascript:void(0)" data-toggle="modal" title="Switch Branch" data-target="#swtich_branch"
                 class="fa fa-adjust text text-danger float-md-right">Switch Branch</a> &nbsp;&nbsp;&nbsp;
             <a href="javascript:void(0)" data-toggle="modal" title="Available Stock" data-target="#avail_stock"
                 class="fa fa-camera-retro text text-info float-md-right">Stock</a>
-{{--        @endif--}}
+            {{--        @endif --}}
         @endcan
         <!-- Profile Dropdown Menu -->
         <li class="dropdown notification-list">
@@ -142,7 +142,7 @@
                         <label for="branch_id">Branch</label>
                         <select class="form-control select2-single" name="branch" id="branch" required>
                             <option value="">Select...</option>
-                            @foreach (App\Models\Branch::orderBy('name')->get() as $data)
+                            @foreach (App\Models\Branch::whereIn('company_id', auth()->user()->companies->pluck('company_id')->toArray())->orderBy('name')->get() as $data)
                                 <option value="{{ $data->id }}">{{ $data->code }}-{{ $data->name }}
                                 </option>
                             @endforeach

@@ -16,5 +16,7 @@ Route::prefix('ajax')->group(function(){
     Route::get('general-accounts', [AjaxController::class,'general_accounts'])->name('misc.ajax.general_accounts');
     Route::get('companies', [AjaxController::class,'companies'])->name('misc.ajax.companies');
     Route::get('users', [AjaxController::class,'users'])->name('misc.ajax.users');
+    Route::get('relation_officers', [AjaxController::class,'relation_officers'])->name('misc.relation-officers');
+    
     Route::get('store-products', [AjaxController::class,'storeProducts'])->name('misc.ajax.store.products');
 });

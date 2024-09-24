@@ -91,4 +91,8 @@ class User extends Authenticatable
             ->having(DB::raw('DATE(MAX(order_date))'), '<', DB::raw('DATE_ADD(DATE(NOW()), INTERVAL -14 DAY)'))->get();
         return $customers;
     }
+    public function companies()
+    {
+        return $this->hasMany(UserAccessSite::class);
+    }
 }

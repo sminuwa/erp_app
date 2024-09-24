@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Imports\UserImport;
+use App\Models\Company;
+use App\Models\UserAccessSite;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -282,18 +284,51 @@ class UserController extends Controller
     }
 
 
-    public function resetPassword(Request $request, $user){
+    public function resetPassword(Request $request, $user)
+    {
         $model = User::find($request->user_id ?? $user);
-        if($request->method() == 'POST'){
-            if($model){
-                if($request->password != $request->confirm_password)
+        if ($request->method() == 'POST') {
+            if ($model) {
+                if ($request->password != $request->confirm_password)
                     return back()->with('error', 'Password didnt match.');
                 $model->password = bcrypt($request->password);
-                if($model->save())
+                if ($model->save())
                     return back()->with('success', 'Password updated');
             }
             return back()->with('error', 'Something went wrong.');
         }
         return view('pages.users.reset-password', ['model' => $model]);
+    }
+    public function userSiteAccess(Request $request, User $user)
+    {
+        if ($request->isMethod('post')) {
+            // Delete existing access records for the user
+            UserAccessSite::where('user_id', $user->id)->delete();
+
+            // Check if company IDs are provided in the request
+            if ($request->has('company_id') && is_array($request->company_id)) {
+                $accessData = [];
+
+                // Prepare data for multiple upserts
+                foreach ($request->company_id as $companyId) {
+                    $accessData[] = [
+                        'user_id' => $user->id,
+                        'company_id' => $companyId,
+                        'created_by' => auth()->user()->id,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ];
+                }
+
+                // Insert multiple company access records
+                UserAccessSite::insert($accessData);
+            }
+        }
+
+        // Get all companies ordered by name
+        $companies = Company::orderBy('name')->get();
+
+        // Return view with the user and company data
+        return view('pages.users.user_access_site', compact('user', 'companies'));
     }
 }

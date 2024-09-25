@@ -9,15 +9,11 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-12 mt-3">
-                
+            <div class="col-md-12 mt-1">
                 <h5 style="text-align: center;">Sales By Category by Site
                     From {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                     To {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
                 </h5>
-                <p style="text-align: right;">Date Processed:
-                    {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}</p>
-                <p style="text-align: right;">Processed By: {{ auth()->user()->name }}</p>
             </div>
         </div>
 
@@ -26,13 +22,19 @@
             $grand_total_cost = 0;
             $grand_total_profit = 0;
         @endphp
-
-        @foreach ($salesByBranch as $branchId => $branchSales)
-            <div class="row">
-                <div class="col-md-12 mt-3 table-responsive">
-                    <h4>{{ $branchSales->first()->branch_name }} ({{ $branchSales->first()->branch_code }})</h4>
-                    <table class="display table table-bordered table-striped">
+        <table class="display table table-bordered table-striped">
+            @foreach ($salesByBranch as $branchId => $branchSales)
+                <div class="row">
+                    <div class="col-md-12 mt-3 table-responsive">
                         <thead>
+                            <tr>
+                                <td colspan="8">
+                                    <h4>{{ $branchSales->first()->branch_name }}
+                                        ({{ $branchSales->first()->branch_code }})
+                                    </h4>
+                                </td>
+                            </tr>
+
                             <tr>
                                 <th>CODE</th>
                                 <th>CATEGORY</th>
@@ -87,17 +89,17 @@
                                 </th>
                             </tr>
                         </tfoot>
-                    </table>
+
+                    </div>
                 </div>
-            </div>
 
-            @php
-                $grand_total_amount += $branch_total_amount;
-                $grand_total_cost += $branch_total_cost;
-                $grand_total_profit += $branch_total_profit;
-            @endphp
-        @endforeach
-
+                @php
+                    $grand_total_amount += $branch_total_amount;
+                    $grand_total_cost += $branch_total_cost;
+                    $grand_total_profit += $branch_total_profit;
+                @endphp
+            @endforeach
+        </table>
         <div class="row">
             <div class="col-md-12 mt-3 table-responsive">
                 <table class="display table table-bordered table-striped">

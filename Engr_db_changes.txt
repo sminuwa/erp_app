@@ -37,3 +37,6 @@ ALTER TABLE `user_access_sites` ADD FOREIGN KEY (`branch_id`) REFERENCES `branch
 
 ALTER TABLE `users` CHANGE `id` `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (`id`); 
 LTER TABLE `order_invoice_details` ADD CONSTRAINT `order_invoice_details_ibfk_3` FOREIGN KEY (`order_id`) REFERENCES `order_invoices`(`id`); 
+
+//25/09/2025
+ALTER TABLE `purchases` ADD COLUMN `purchase_request_id` BIGINT UNSIGNED NULL AFTER `purchase_mode`;

@@ -738,6 +738,11 @@ Route::middleware('auth')->group(function () {
             Route::get('/sa/sales/category/load', [ReportController::class, 'loadCategorySaleReport'])->name('ajax.category.sales.report');
             Route::get('/sa/sales/category/print/{from_date}/{to_date}/{company_id}/{branch_id}/{category_id1}', [ReportController::class, 'printCategorySaleReport'])->name('ajax.category.sales.report.print');
 
+             //Sales by Category by Site Report
+             Route::get('/site/sales/category', [ReportController::class, 'categorySaleBySiteReport'])->name('sales.report.by.category.site');
+             Route::get('/site/sales/category/load', [ReportController::class, 'loadCategorySaleBySiteReport'])->name('ajax.category.site.sales.report');
+             Route::get('/site/sales/category/print/{from_date}/{to_date}/{company_id}/{branch_id}/{category_id1}', [ReportController::class, 'printCategorySaleBySiteReport'])->name('ajax.category.site.sales.report.print');
+
             //Staff Sales Report
             Route::get('/sa/sales/staff', [ReportController::class, 'staffSaleReport'])->name('staff.sales.report');
             Route::get('/sa/sales/staff/load', [ReportController::class, 'loadStaffSaleReport'])->name('ajax.staff.sales.report');

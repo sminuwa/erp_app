@@ -7,10 +7,14 @@
             <div class="card-body">
                 <h5 class="card-title"></h5>
 
-                <form action="{{ route('purchases.store') }}" method="POST" >
+                <form action="{{ route('purchases.store') }}" method="POST">
                     {{ csrf_field() }}
                     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
-                    <input type="hidden" name="purchase_id" value="{{ isset($model->id) ? $model->id : '' }}" />
+                    @isset($purchase_request_id)
+                        <input type="hidden" name="purchase_request_id" value="{{ $purchase_request_id }}" />
+                    @else
+                        <input type="hidden" name="purchase_id" value="{{ isset($model->id) ? $model->id : '' }}" />
+                    @endisset
 
                     <div class="row">
                         <div class="col-md-12">
@@ -150,7 +154,7 @@
                             name="product_id" id="product_id" required="required">
                             <option value="">Select...</option>
                             @if (isset($products))
-                                
+
                                 @foreach ($products as $data)
                                     <option value="{{ $data->id }}"
                                         {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>

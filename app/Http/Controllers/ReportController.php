@@ -1415,7 +1415,7 @@ class ReportController extends Controller
 
         if ($category_id1 == ['%'])
             $category_id1 = "all";
-        
+
         if ($branch_id == '%' || $branch_id == '')
             $branch_id = 'all';
 
@@ -1424,6 +1424,185 @@ class ReportController extends Controller
             $branch = Branch::find($branch_id);
 
         return view('pages.reports.sales_and_cash_analysis.print_category_sale_report', compact('sales', 'from_date', 'to_date', 'branch'));
+    }
+    public function categorySaleBySiteReport()
+    {
+        return view('pages.reports.sales_and_cash_analysis.sales_by_category_by_site');
+    }
+
+    public function loadCategorySaleBySiteReport(Request $request)
+    {
+        $from_date = date('Y-m-d', strtotime($request->from_date));
+        $to_date = date('Y-m-d', strtotime($request->to_date));
+        $company_id = $request->company_id;
+        $branch_id = $request->branch_id;
+        $category_id1 = $request->category_id1;  // Now an array
+
+        // Handle 'all' for company and branch
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
+        // if ($branch_id == 'all' || $branch_id == '') {
+        //     $branch_id = '%';  // wildcard for all branches
+        // }
+
+        // Check if any categories are selected, or treat as "all"
+        $category_id1 = is_array($category_id1) ? $category_id1 : ['%'];  // Convert to array if not already
+        $branch_id = is_array($branch_id) ? $branch_id : ['%'];  // Convert to array if not already
+
+        // Build the query
+        $data = DB::table('orders')
+            ->select(
+                'branches.id as branch_id',
+                'branches.name as branch_name',
+                'branches.code as branch_code',
+                'categories.name as category',
+                'categories.code as code',
+                DB::raw('SUM(order_details.quantity) as quantity'),
+                DB::raw('SUM(order_details.total) as amount'),
+                DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
+                DB::raw('(SELECT SUM(store_products.qty_available) 
+                FROM store_products
+                JOIN products p ON store_products.product_id = p.id
+                WHERE store_products.store_id IN (SELECT id FROM stores WHERE branch_id = branches.id)
+                AND p.category_id = categories.id) as qty_available')
+            )
+            ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+            ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
+            ->join('stores', 'store_products.store_id', '=', 'stores.id')
+            ->join('branches', 'stores.branch_id', '=', 'branches.id')
+            ->join('companies', 'branches.company_id', '=', 'companies.id')
+            ->join('products', 'store_products.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->where('branches.company_id', 'LIKE', $company_id)
+            ->where('order_details.status', '=', 1)
+            ->whereBetween('order_date', [$from_date, $to_date]);
+
+        if (!in_array('%', $category_id1)) {
+            $data = $data->whereIn('products.category_id', $category_id1);
+        }
+        if (!in_array('%', $branch_id)) {
+            $data = $data->whereIn('stores.branch_id', $branch_id);
+        }
+
+        $sales = $data->groupBy('branches.id', 'products.category_id')
+            ->orderBy('branches.name', 'ASC')
+            ->orderBy('categories.code', 'ASC')
+            ->get();
+
+        // Group sales by branch
+        $salesByBranch = $sales->groupBy('branch_id');
+
+        // Reset 'all' to make it more readable in the UI
+        if (in_array('%', $category_id1)) {
+            $category_id1 = "all";
+        }
+        if (in_array('%', $branch_id)) {
+            $branch_id = "all";
+        }
+        if ($company_id == '%') {
+            $company_id = 'all';
+        }
+
+        // Fetch branch info if a specific branch is selected
+        $branch = null;
+        if ($branch_id != 'all') {
+            $branch = Branch::find($branch_id);
+        }
+        $company = null;
+        if ($company_id != 'all') {
+            $company = Branch::find($company_id);
+        }
+
+        // Return the view with the data
+        return view(
+            'pages.reports.sales_and_cash_analysis.load_sale_by_category_by_site_report',
+            compact('salesByBranch', 'from_date', 'to_date', 'branch_id', 'category_id1', 'branch', 'company', 'company_id')
+        );
+    }
+
+    public function printCategorySaleBySiteReport($from_date, $to_date, $company_id, $branch_id, $category_id1)
+    {
+        $from_date = date('Y-m-d', strtotime($from_date));
+        $to_date = date('Y-m-d', strtotime($to_date));
+
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
+
+        if ($branch_id == 'all' || $branch_id == '') {
+            $branch_id = '%';
+        }
+
+
+        // Handle category_id1 and category_id2 as arrays
+        $category_id1 = is_array($category_id1) && count($category_id1) > 0 ? $category_id1 : ['%'];
+        $branch_id = is_array($branch_id) ? $branch_id : ['%'];  // Convert to array if not already
+
+        $data = DB::table('orders')
+            ->select(
+                'branches.id as branch_id',
+                'branches.name as branch_name',
+                'branches.code as branch_code',
+                'categories.name as category',
+                'categories.code as code',
+                DB::raw('SUM(order_details.quantity) as quantity'),
+                DB::raw('SUM(order_details.total) as amount'),
+                DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
+                DB::raw('(SELECT SUM(store_products.qty_available) 
+                FROM store_products
+                JOIN products p ON store_products.product_id = p.id
+                WHERE store_products.store_id IN (SELECT id FROM stores WHERE branch_id = branches.id)
+                AND p.category_id = categories.id) as qty_available')
+            )
+            ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+            ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
+            ->join('stores', 'store_products.store_id', '=', 'stores.id')
+            ->join('branches', 'stores.branch_id', '=', 'branches.id')
+            ->join('companies', 'branches.company_id', '=', 'companies.id')
+            ->join('products', 'store_products.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->where('branches.company_id', 'LIKE', $company_id)
+            ->where('order_details.status', '=', 1)
+            ->whereBetween('order_date', [$from_date, $to_date]);
+
+        if (!in_array('%', $category_id1)) {
+            $data = $data->whereIn('products.category_id', $category_id1);
+        }
+        if (!in_array('%', $branch_id)) {
+            $data = $data->whereIn('stores.branch_id', $branch_id);
+        }
+
+        $sales = $data->groupBy('branches.id', 'products.category_id')
+            ->orderBy('branches.name', 'ASC')
+            ->orderBy('categories.code', 'ASC')
+            ->get();
+
+        // Group sales by branch
+        $salesByBranch = $sales->groupBy('branch_id');
+
+        // Reset 'all' to make it more readable in the UI
+        if (in_array('%', $category_id1)) {
+            $category_id1 = "all";
+        }
+        if (in_array('%', $branch_id)) {
+            $branch_id = "all";
+        }
+        if ($company_id == '%') {
+            $company_id = 'all';
+        }
+
+        // Fetch branch info if a specific branch is selected
+        $branch = null;
+        if ($branch_id != 'all') {
+            $branch = Branch::find($branch_id);
+        }
+        $company = null;
+        if ($company_id != 'all') {
+            $company = Branch::find($company_id);
+        }
+
+        return view('pages.reports.sales_and_cash_analysis.print_category_sale_site_report', compact('salesByBranch', 'from_date', 'to_date', 'branch', 'company'));
     }
 
     public function staffSaleReport()

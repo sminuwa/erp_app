@@ -1,6 +1,6 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.customer.last.transaction.report.print', [$branch_id, $customer_id]) }}" target="_BLANK"
+        <a href="{{ route('ajax.customer.last.transaction.report.print', [$company_id,$branch_id, $customer_id]) }}" target="_BLANK"
             class="btn-success btn btn-sm">Print</a>
     </div>
 </div>

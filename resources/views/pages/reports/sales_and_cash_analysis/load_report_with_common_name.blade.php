@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-sm-12">
-        <a href="{{ route('ajax.customer.sale.report.print', [$from_date, $to_date, $branch_id,$store_id, $category_id, $product_id, $customer,$matching]) }}"
+        <a href="{{ route('ajax.customer.sale.report.print', [$from_date, $to_date, $company_id,$branch_id,$store_id, $category_id, $product_id, $customer,$matching]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>

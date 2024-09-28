@@ -40,6 +40,14 @@
                     <div class="row">
                         <div class="form-group">
                             &nbsp;&nbsp;
+                            <label for="company_id">Company</label>
+                            <select class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
+                                name="company_id" id="company_id" required>
+
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            &nbsp;&nbsp;
                             <label for="branch_id">Branch</label>
                             <select
                                 class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
@@ -71,6 +79,7 @@
     <script type="text/javascript">
         $(function() {
             $('#generate').on("click", function() {
+                company_id = $('#company_id').val();
                 branch_id = $('#branch_id').val();
                 $('#img-loader').show();
                 $.ajax({
@@ -78,6 +87,7 @@
                     url: "{{ route('ajax.load.customer.exceeded_credit_limit.reports') }}",
                     data: {
                         _token: "{{ csrf_token() }}",
+                        company_id: company_id,
                         branch_id: branch_id
                     }
                 }).done(function(data) {

@@ -1,6 +1,6 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.print.interstore.transfer.reports', [$from_date, $to_date, $branch_id, $source_store_id, $destination_store_id, $category_id, $product_id]) }}"
+        <a href="{{ route('ajax.print.interstore.transfer.reports', [$from_date, $to_date, $company_id,$branch_id, $source_store_id, $destination_store_id, $category_id, $product_id]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>

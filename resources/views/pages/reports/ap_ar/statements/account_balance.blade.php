@@ -123,6 +123,7 @@
             $('#generate').on("click", function() {
                 date = $('#date').val();
                 account_type = $('#type').val();
+                company_id = $('#company_id').val();
                 branch_id = $('#branch_id').val();
                 company_id = $('#branch_id').val();
                 if (account_type == "") {
@@ -137,6 +138,7 @@
                         _token: "{{ csrf_token() }}",
                         date: date,
                         account_type: account_type,
+                        company_id:company_id,
                         branch_id: branch_id,
                     }
                 }).done(function(data) {

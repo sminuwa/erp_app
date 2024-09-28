@@ -52,6 +52,14 @@
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp;
+                            <label for="company_id">Company</label>
+                            <select class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
+                                name="company_id" id="company_id" required>
+
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            &nbsp;&nbsp;
                             <label for="branch_id">Branch</label>
                             <select
                                 class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
@@ -140,6 +148,7 @@
                 product_id = $('#product_id').val();
                 category_id = $('#category_id').val();
                 supplier_id = $('#supplier_id').val();
+                company_id = $('#company_id').val();
                 branch_id = $('#branch_id').val();
                 status = $('#status').val();
                 $('#img-loader').show();
@@ -153,6 +162,7 @@
                         product_id: product_id,
                         category_id: category_id,
                         supplier_id: supplier_id,
+                        company_id: company_id,
                         branch_id: branch_id,
                         status: status
                     }

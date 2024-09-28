@@ -1,6 +1,6 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.stock.ledger.report.print', [$from_date, $to_date, $branch_id, $store_id, $product_id]) }}"
+        <a href="{{ route('ajax.stock.ledger.report.print', [$from_date, $to_date, $company_id,$branch_id, $store_id, $product_id]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>

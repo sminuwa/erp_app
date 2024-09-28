@@ -54,7 +54,14 @@
                                     placeholder="">
                             </div>
 
+                            <div class="form-group">
+                                &nbsp;&nbsp;
+                                <label for="company_id">Company</label>
+                                <select class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
+                                    name="company_id" id="company_id" required>
 
+                                </select>
+                            </div>
                             <div class="form-group">
                                 <label for="branch_id">Branch</label>
                                 <select class="form-control select2-single ajax-branches" name="branch_id" id="branch_id">
@@ -113,6 +120,7 @@
             $('#generate').on("click", function() {
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
+                company_id = $('#company_id').val();
                 branch_id = $('#branch_id').val();
                 store_id = $('#store_id').val();
                 product_id = $('#product_id').val();
@@ -133,6 +141,7 @@
                         _token: "{{ csrf_token() }}",
                         from_date: from_date,
                         to_date: to_date,
+                        company_id: company_id,
                         branch_id: branch_id,
                         store_id: store_id,
                         product_id: product_id

@@ -52,7 +52,7 @@
                                         <i class="fa fa-print" aria-hidden="true"></i> Print
                                     </a>
                                 @endcan
-                                @if ($order->status == 1)
+                                @if ($order->status == 0)
                                     @can('order.invoice.edit')
                                         <a href="{{ route('proformer.edit', $order->id) }}" class="btn btn-primary btn-sm ">
                                             <i class="fa fa-edit" aria-hidden="true"></i> Edit
@@ -65,7 +65,7 @@
                                         </a>
                                     @endcan --}}
                                     @can('order.invoice.close')
-                                        <form action="{{ route('order.invoice.close', $order->id) }}" method="post"
+                                        <form action="{{ route('proformer.close', $order->id) }}" method="post"
                                             class="d-inline"
                                             onsubmit="return confirm('Are you sure you want to close this order?')">
                                             @csrf

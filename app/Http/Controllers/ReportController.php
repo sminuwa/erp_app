@@ -4867,7 +4867,7 @@ class ReportController extends Controller
             $branch = Branch::find($branch_id);
         }
 
-        return view('pages.reports.ap_ar.balance_sheet.load', compact('assets', 'liabilities', 'equity', 'net_income', 'branch', 'to_date', 'branch_id'));
+        return view('pages.reports.ap_ar.balance_sheet.load', compact('assets', 'liabilities', 'equity', 'net_income', 'branch', 'to_date', 'company_id','branch_id'));
     }
     // public function printBalanceSheet($to, $branch_id)
     // {

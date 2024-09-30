@@ -731,7 +731,7 @@
                                             </a>
                                         </li>
                                         @endcan
-                                        @can('balance.sheet.report')
+                                        {{-- @can('balance.sheet.report') --}}
                                         <li class="nav-item">
                                             <a href="{{ route('balance.sheet.report') }}"
                                                 class="nav-link {{ Request::is('reports/ap_ar/balance_sheet*') ? 'active' : '' }}">
@@ -739,7 +739,7 @@
                                                 <p>Balance Sheet</p>
                                             </a>
                                         </li>
-                                        @endcan
+                                        {{-- @endcan --}}
                                         @can('cash.flow.report')
                                         <li class="nav-item">
                                             <a href="{{ route('cash.flow.report') }}"

@@ -42,16 +42,24 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         &nbsp;&nbsp;
+                                        <label for="company_id">Company</label>
+                                        <select
+                                            class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
+                                            name="company_id" id="company_id">
+                                            
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        &nbsp;&nbsp;
                                         <label for="branch_id">Branch</label>
                                         <select
-                                            class="form-control select2-single {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
+                                            class="form-control select2-single ajax-branches{{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
                                             name="branch_id" id="branch_id">
-                                            <option value="">Select...</option>
-{{--                                            <option value="all">All</option>--}}
-                                            @foreach ($branches as $data)
-                                                <option value="{{ $data->id }}">{{ $data->name }} - {{ $data->code }}
-                                                </option>
-                                            @endforeach
+                                           
+                                           
                                         </select>
                                     </div>
                                 </div>
@@ -82,14 +90,7 @@
 @endsection
 
 @push('js')
-    <!-- DataTables -->
-    <!-- DataTables -->
-    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
-    <!-- SlimScroll -->
-    <script src="{{ asset('assets/backend/plugins/slimScroll/jquery.slimscroll.min.js') }}"></script>
-    <!-- FastClick -->
-    <script src="{{ asset('assets/backend/plugins/fastclick/fastclick.js') }}"></script>
-
+   
     <!-- Sweet Alert Js -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>
     <script type="text/javascript">

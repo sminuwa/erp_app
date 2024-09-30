@@ -75,6 +75,7 @@
                                             <th>Total</th>
                                             <th>Created By</th>
                                             <th>Date Created</th>
+                                            <th>Status</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -101,6 +102,13 @@
                                                 <td>{{ $order->createdBy->name }}</td>
                                                 <td>{{ Carbon\Carbon::parse($order->created_at)->toFormattedDateString() }}
                                                 </td>
+                                                <td>
+                                                    {!! $order->status == 0
+                                                        ? '<span class="badge badge-warning">Pending</span>'
+                                                        : ($order->status == 1
+                                                            ? '<span class="badge badge-success">Close</span>'
+                                                            : '<span class="badge badge-success">Completed</span>') !!}
+                                                </td>
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button"
@@ -115,29 +123,34 @@
                                                                     <i class="fa fa-eye" aria-hidden="true"></i> View
                                                                 </a>
                                                             @endcan
-                                                            @can('proformer.edit')
-                                                                <a href="{{ route('proformer.edit', $order->id) }}"
-                                                                    class="dropdown-item">
-                                                                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                                                </a>
-                                                            @endcan
+                                                            @if ($order->status == 0)
+                                                                @can('proformer.edit')
+                                                                    <a href="{{ route('proformer.edit', $order->id) }}"
+                                                                        class="dropdown-item">
+                                                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                                                    </a>
+                                                                @endcan
+                                                            @endif
                                                             @can('proformer.print')
                                                                 <a href="{{ route('proformer.print', $order->id) }}"
                                                                     target="_BLANK" class="dropdown-item">
                                                                     <i class="fa fa-print" aria-hidden="true"></i> Print
                                                                 </a>
                                                             @endcan
-                                                            @can('proformer.delete')
-                                                                <form action="{{ route('proformer.delete', $order->id) }}"
-                                                                    method="post"
-                                                                    onsubmit="return confirm('Are you sure want to delete this proforma invoice?')">
-                                                                    @csrf
-                                                                    @method('POST')
-                                                                    <button class="dropdown-item" type="submit">
-                                                                        <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                                                    </button>
-                                                                </form>
-                                                            @endcan
+                                                            @if ($order->status == 0)
+                                                                @can('proformer.delete')
+                                                                    <form action="{{ route('proformer.delete', $order->id) }}"
+                                                                        method="post"
+                                                                        onsubmit="return confirm('Are you sure want to delete this proforma invoice?')">
+                                                                        @csrf
+                                                                        @method('POST')
+                                                                        <button class="dropdown-item" type="submit">
+                                                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                            Delete
+                                                                        </button>
+                                                                    </form>
+                                                                @endcan
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 </td>

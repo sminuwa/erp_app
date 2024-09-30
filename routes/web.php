@@ -328,15 +328,16 @@ Route::middleware('auth')->group(function () {
         //Proforma Invoice
         Route::group(['prefix' => 'proforma'], function () {
             Route::get('/create', [PosController::class, 'index'])->name('proforma.index');
-            Route::post('/proforma/create', [InvoiceController::class, 'final_proformer'])->name('proformer.create');
-            Route::get('/proforma/print/{order_id}', [InvoiceController::class, 'print_proformer'])->name('proformer.print');
-            Route::get('/proforma/edit/{order}', [InvoiceController::class, 'editProformer'])->name('proformer.edit');
-            Route::put('/proforma-invoice/update/{order}', [InvoiceController::class, 'UpdateProforma'])->name('proformer.update');
-            Route::delete('/proforma-invoice/delete/{order}', [OrderController::class, 'destroy_proformer'])->name('proformer.destroy');
-            Route::get('/proforma/show/{id}', [OrderController::class, 'proformer_show'])->name('proformer.show');
-            Route::get('/', [OrderController::class, 'proformer_list'])->name('proformer.list');
-            Route::post('/proforma/search', [OrderController::class, 'proformer_search'])->name('proformer.search');
+            Route::post('/proforma/create', [ProformaInvoiceController::class, 'final_proformer'])->name('proformer.create');
+            Route::get('/proforma/print/{order_id}', [ProformaInvoiceController::class, 'print_proformer'])->name('proformer.print');
+            Route::get('/proforma/edit/{order}', [ProformaInvoiceController::class, 'editProformer'])->name('proformer.edit');
+            Route::put('/proforma-invoice/update/{order}', [ProformaInvoiceController::class, 'UpdateProforma'])->name('proformer.update');
+            Route::delete('/proforma-invoice/delete/{order}', [ProformaInvoiceController::class, 'destroy_proformer'])->name('proformer.destroy');
+            Route::get('/proforma/show/{id}', [ProformaInvoiceController::class, 'proformer_show'])->name('proformer.show');
+            Route::get('/', [ProformaInvoiceController::class, 'proformer_list'])->name('proformer.list');
+            Route::post('/proforma/search', [ProformaInvoiceController::class, 'proformer_search'])->name('proformer.search');
             Route::post('/delete/{proforma}', [ProformaInvoiceController::class, 'delete'])->name('proformer.delete');
+            Route::post('/close/{proforma}', [ProformaInvoiceController::class, 'close'])->name('proformer.close');
 
         });
 

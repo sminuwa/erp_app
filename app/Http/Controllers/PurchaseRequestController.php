@@ -37,11 +37,11 @@ class PurchaseRequestController extends Controller
         $records = PurchaseRequest::select('purchase_requests.*')->orderBy('purchase_requests.id', 'DESC')
             ->with('supplier')
             ->where('branch_id', 'LIKE', User::userBranchAction())
-            ->take(10)->get();
+            ->take(100)->get();
         if (auth()->user()->hasAnyPermission(['access-all-purchase-requests'])) {
             $records = PurchaseRequest::select('purchase_requests.*')->orderBy('purchase_requests.id', 'DESC')
                 ->with('supplier')
-                ->take(10)->get();
+                ->take(100)->get();
         }
         //        access-all-purchase-requests
         return view('pages.inventories.purchases.request.index', ['records' => $records]);
@@ -380,12 +380,14 @@ class PurchaseRequestController extends Controller
     }
     public function link(Request $request, PurchaseRequest $purchase)
     {
+
         if (\Cart::getContent()->isEmpty())
             $this->loadToCart($purchase);
         $cart_products = \Cart::getContent(); //$purchase->purchasedProducts;
         //dd($cart_products);
         return view('pages.inventories.purchases.grn.create', [
             'model' => $purchase,
+            'purchase_request_id' => $purchase->id,
             'products' => Product::where('status', 1)->get(),
             'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->get(),
             'categories' => Category::all(),

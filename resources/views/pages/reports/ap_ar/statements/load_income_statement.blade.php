@@ -1,6 +1,6 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.income.statement.report.print', [$from_month, $to_month, $income_year, $branch_id, $category_id1, $category_id2]) }}"
+        <a href="{{ route('ajax.income.statement.report.print', [$from_month, $to_month, $income_year, $company_id, $branch_id, $category_id1, $category_id2]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>

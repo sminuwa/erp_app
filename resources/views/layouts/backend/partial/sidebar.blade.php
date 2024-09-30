@@ -435,6 +435,13 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
+                                            <a href="{{ route('sales.report.by.category.site') }}"
+                                                class="nav-link {{ Request::is('reports/site/sales/category*') ? 'active' : '' }}">
+                                                <i class="ion-code-working"></i>
+                                                <p>Sales by Category by Site</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
                                             <a href="{{ route('customer.sale.reports') }}"
                                                 class="nav-link {{ Request::is('reports/sa/sales/customer/sale/common-name*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>

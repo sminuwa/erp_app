@@ -6,6 +6,7 @@ use App\Classes\CostPrice;
 use App\Classes\Transaction;
 use App\Models\GeneralAccount;
 use App\Models\PurchaseExpense;
+use App\Models\PurchaseRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Purchase;
@@ -81,7 +82,7 @@ class PurchaseGRNController extends Controller
         //\Cart::clear();
         return view('pages.inventories.purchases.grn.create', [
             'model' => new Purchase,
-            'products' => Product::where('status',1)->get(),
+            'products' => Product::where('status', 1)->get(),
             'suppliers' => Supplier::active()->orderBy('name', 'asc')->get(),
             'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->get(),
             'categories' => Category::all(),
@@ -92,13 +93,19 @@ class PurchaseGRNController extends Controller
     }
     public function store(Request $request)
     {
+
         $this->authorize('purchases.create');
         DB::beginTransaction();
         try {
             $purchase_datetime = date('Y-m-d H:i:s', strtotime("$request->purchase_date $request->purchase_time"));
             $purchase_date = $request->purchase_date;
             $purchase_id = $request->purchase_id;
-            $purchase = Purchase::find($purchase_id);
+            $purchase_request_id = 0;
+            if ($request->has('purchase_request_id'))
+                $purchase_request_id = $request->purchase_request_id;
+            $purchase = null;
+            if (!$request->has('purchase_request_id'))//This is to check if the purchase GRN is not to be linked with request
+                $purchase = Purchase::find($purchase_id);
             if (!$purchase) {
                 $purchase = new Purchase();
                 $purchase->reference = Purchase::generateNewNumber();
@@ -113,10 +120,13 @@ class PurchaseGRNController extends Controller
             $purchase->purchase_mode = 'Cash';
             $purchase->truck_no = $request->truck_no;
             $purchase->status = 0;
+            if ($purchase_request_id > 0) {
+                $purchase->purchase_request_id = $purchase_request_id;
+            }
             if ($purchase->save()) {
                 PurchaseProduct::where('purchase_id', $purchase->id)->delete();
                 $items = \Cart::getContent();
-                if(count($items) < 1) {
+                if (count($items) < 1) {
                     session()->flash('app_error', 'There is no product selected.');
                     return redirect()->back()->withInput();
                 }
@@ -132,7 +142,13 @@ class PurchaseGRNController extends Controller
                     $product->status = 1;
                     $product->save();
                 }
-                /*Transaction::purchases($purchase->id, $purchase_date);*/
+                Transaction::purchases($purchase->id, $purchase_date);
+                if ($purchase_request_id > 0) {
+                    $purchase_request = PurchaseRequest::find($purchase_request_id);
+                    $purchase_request->status = 1;
+                    $purchase_request->updated_at = Carbon::now();
+                    $purchase_request->save();
+                }
                 $action = "Made a purchase with reference $request->reference from supplier: " . Supplier::find($request->supplier_id)?->name;
                 AuditLog::auditLog(Auth::id(), $action);
                 DB::commit();
@@ -156,7 +172,7 @@ class PurchaseGRNController extends Controller
         $cart_products = \Cart::getContent();
         return view('pages.inventories.purchases.grn.edit', [
             'model' => $purchase,
-            'products' => Product::where('status',1)->get(),
+            'products' => Product::where('status', 1)->get(),
             'suppliers' => Supplier::orderBy('name')->get(),
             'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->get(),
             'categories' => Category::all(),
@@ -182,7 +198,7 @@ class PurchaseGRNController extends Controller
                 'destination_store_id' => $request->source_store_id,
                 'updated_by' => $request->updated_by,
             ]);
-            
+
             DB::table('purchase_products')->where(['purchase_id' => $purchase->id])->delete();
             DB::table('supplier_ledgers')->where(['purchase_id' => $purchase->id])->delete();
             //dd(\Cart::getContent());
@@ -202,7 +218,7 @@ class PurchaseGRNController extends Controller
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
                     ]);
-                    
+
                 }
 
                 $action = "Modified a purchase with invoice $request->invoice from supplier: " . Supplier::find($request->supplier_id)->name;
@@ -409,7 +425,7 @@ class PurchaseGRNController extends Controller
     }
     public function post(Request $request, Purchase $purchase)
     {
-        if($purchase->status ==0) {
+        if ($purchase->status == 0) {
             $this->authorize('purchase.post');
             $items = $purchase->purchasedProducts;
             DB::beginTransaction();

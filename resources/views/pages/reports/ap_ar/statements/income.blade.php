@@ -40,6 +40,13 @@
                 <form method="POST">
                     <div class="row">
                         <div class="form-group">
+                            &nbsp;&nbsp;
+                            <label for="company_id">Company</label>
+                            <select class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
+                                name="company_id" id="company_id" required>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="branch_id">Branch</label>
                             <select class="form-control select2-single ajax-branches" name="branch_id" id="branch_id">
                             </select>
@@ -141,6 +148,7 @@
             };
 
             $('#generate').on("click", function() {
+                company_id = $('#company_id').val();
                 branch_id = $('#branch_id').val();
                 income_year = $('#income_year').val();
                 from_month = $('#from_month').val();
@@ -153,6 +161,7 @@
                     url: "{{ route('ajax.load.income.statement.report') }}",
                     data: {
                         _token: "{{ csrf_token() }}",
+                        company_id: company_id,
                         branch_id: branch_id,
                         from_month: from_month,
                         to_month: to_month,

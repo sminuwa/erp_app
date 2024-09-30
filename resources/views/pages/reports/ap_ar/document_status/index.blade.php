@@ -39,6 +39,15 @@
                     <div class="col-sm-12">
                         <form id="statusForm" method="POST">
                             <div class="row">
+                                <div class="form-group">
+                                    &nbsp;&nbsp;
+                                    <label for="company_id">Company</label>
+                                    <select
+                                        class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
+                                        name="company_id" id="company_id" required>
+
+                                    </select>
+                                </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         &nbsp;&nbsp;
@@ -132,6 +141,7 @@
                 e.preventDefault()
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
+                company_id = $('#company_id').val();
                 branch_id = $('#branch_id').val();
                 type = $('#type').val();
                 status = $('#status').val();
@@ -143,6 +153,7 @@
                         _token: "{{ csrf_token() }}",
                         from_date: from_date,
                         to_date: to_date,
+                        company_id: company_id,
                         branch_id: branch_id,
                         type: type,
                         status: status

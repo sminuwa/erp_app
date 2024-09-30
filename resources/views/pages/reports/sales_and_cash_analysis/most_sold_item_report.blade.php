@@ -52,6 +52,15 @@
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp;
+                            <label for="company_id">Company</label>
+                            <select
+                                class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
+                                name="company_id" id="company_id" required>
+
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            &nbsp;&nbsp;
                             <label for="branch_id">Branch</label>
                             <select
                                 class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
@@ -61,13 +70,13 @@
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp;
-                            <label for="number">Number</label>
+                            <label for="number">Number of Limit</label>
                             <input type="number" step=".01" name="number_limit" id="number_limit" class="form-control"
                                 placeholder="Enter the number record to display" min="1" />
                         </div>
 
                         <div class="form-group">
-                            By  &nbsp;&nbsp; &nbsp;
+                            By &nbsp;&nbsp; &nbsp;
                             <input type="radio" name="type" value="qty" class="form-control" />
                             &nbsp;&nbsp; &nbsp;Quantity &nbsp; &nbsp;&nbsp;
                             <input type="radio" name="type" value="amt" class="form-control" checked />
@@ -116,7 +125,12 @@
                 to_date = $('#to_date').val();
                 number_limit = $('#number_limit').val();
                 type = $('input[name="type"]:checked').val();
+                company_id = $('#company_id').val();
                 branch_id = $('#branch_id').val();
+                if (!number_limit > 0) {
+                    alert("Please enter a number of limit")
+                    return false;
+                }
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
@@ -126,7 +140,9 @@
                         from_date: from_date,
                         to_date: to_date,
                         number_limit: number_limit,
-                        type: type
+                        type: type,
+                        company_id: company_id,
+                        branch_id: branch_id
                     }
                 }).done(function(data) {
                     $("#load").html(data);

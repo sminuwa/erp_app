@@ -82,11 +82,14 @@
                                         <td>{{ Carbon\Carbon::parse($transfer->date)->toFormattedDateString() }}</td>
                                         <td>{{ $transfer->product_code }}</td>
                                         <td>{{ $transfer->product_name }}</td>
-                                        <td>{{ \App\Models\Branch::find($transfer->source_branch_id)->code }}</td>
-                                        <td>{{ \App\Models\Branch::find($transfer->destination_branch_id)->code }}</td>
+                                        <td>{{ \App\Models\Branch::find($transfer->source_branch_id)->code ?? '' }}
+                                        </td>
+                                        <td>{{ \App\Models\Branch::find($transfer->destination_branch_id)->code ?? '' }}
+                                        </td>
                                         <td>{{ $transfer->reference }}</td>
                                         <td>{{ $transfer->created_by }}</td>
-                                        <td>{{ Carbon\Carbon::parse($transfer->created_at)->toFormattedDateString() }}</td>
+                                        <td>{{ Carbon\Carbon::parse($transfer->created_at)->toFormattedDateString() }}
+                                        </td>
                                         <td style="text-align: right">{{ $transfer->quantity }}</td>
                                         <td style="text-align: right">{{ number_format($transfer->cost_price, 2) }}
                                         </td>
@@ -109,14 +112,15 @@
                             <div class="receipt-header receipt-header-mid receipt-footer">
                                 <div class="col-xs-10 col-sm-10 col-md-10 text-left">
                                     <div class="receipt-right">
-                                        
+
                                         <p><b>Printed By :</b> {{ Auth::user()->name }}</p>
-                                        <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p><br>
-        
-                        
+                                        <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
+                                        <br>
+
+
                                     </div>
                                 </div>
-    
+
                             </div>
                         </div>
                         <!-- /.col -->

@@ -40,3 +40,4 @@ LTER TABLE `order_invoice_details` ADD CONSTRAINT `order_invoice_details_ibfk_3`
 
 //25/09/2025
 ALTER TABLE `purchases` ADD COLUMN `purchase_request_id` BIGINT UNSIGNED NULL AFTER `purchase_mode`;
+

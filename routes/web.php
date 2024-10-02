@@ -752,7 +752,7 @@ Route::middleware('auth')->group(function () {
              //Staff Sales Report
              Route::get('/sa/sales/relation_officer', [ReportController::class, 'staffRelationOfficerReport'])->name('relation_officer.report');
              Route::get('/sa/sales/relation_officer/load', [ReportController::class, 'loadRelationOfficerReport'])->name('ajax.relation_officer.sales.report');
-             Route::get('/sa/sales/relation_officer/print/{from_date}/{to_date}/{company_id}/{branch_id}/{store_id}/{category_id}/{product_id}/{staff_id}', [ReportController::class, 'printRelationOfficerReport'])->name('ajax.relation_officer.report.print');
+             Route::get('/sa/sales/relation_officer/print/{from_date}/{to_date}/{company_id}/{branch_id}/{category_id}/{staff_id}', [ReportController::class, 'printRelationOfficerReport'])->name('ajax.relation_officer.report.print');
  
             //CUstoomer Sale with common names Report
             Route::get('/sa/sales/customer/sale/common-name', [ReportController::class, 'customerSaleReport'])->name('customer.sale.reports');

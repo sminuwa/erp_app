@@ -103,13 +103,6 @@
 @endsection
 
 @push('js')
-    <!-- DataTables -->
-    <!-- DataTables -->
-    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
-    <!-- SlimScroll -->
-    <script src="{{ asset('assets/backend/plugins/slimScroll/jquery.slimscroll.min.js') }}"></script>
-    <!-- FastClick -->
-    <script src="{{ asset('assets/backend/plugins/fastclick/fastclick.js') }}"></script>
 
     <!-- Sweet Alert Js -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>

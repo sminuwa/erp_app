@@ -116,7 +116,7 @@ class ProformaInvoiceController extends Controller
                 'total' => $total,
                 'invoice_no' => $invoice,
                 'sold_by' => Auth::id(),
-                'status' => 1,
+                'status' => 0,
                 'description' => $request->description,
                 'branch_id' => User::userBranchAction(),
                 'created_at' => Carbon::now(),

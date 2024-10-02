@@ -1,13 +1,13 @@
 <div class="card">
     <div class="card-body">
-        <div class="row">
+        {{-- <div class="row">
             <div class="col-md-12">
                 <div class="text-right">
                     <a href="{{ route('ajax.relation_officer.report.print', [$from_date, $to_date, $company_id, is_array($branch_id) ? implode(',', $branch_id) : $branch_id, is_array($category_id1) ? implode(',', $category_id1) : $category_id1,is_array($user_id) ? implode(',', $user_id) : $user_id]) }}"
                         target="_BLANK" class="btn-success btn btn-sm">Print</a>
                 </div>
             </div>
-        </div>
+        </div> --}}
         <div class="row">
             <div class="col-md-12 mt-1">
                 <h5 style="text-align: center;">Sales By Relation Officer

@@ -1958,41 +1958,79 @@ class ReportController extends Controller
     {
         if ($company_id == 'all' || $company_id == '')
             $company_id = '%';
-        if ($branch_id == 'all') {
-            $product_id = '%';
-        }
-        if ($product_id == 'all') {
-            $product_id = '%';
-        }
-        if ($category_id == 'all') {
-            $category_id = '%';
-        }
-        if ($store_id == 'all' || $store_id == 'ALL') {
-            $store_id = '%';
-        }
-        if ($staff_id == 'all') {
-            $staff_id = '%';
-        }
+
+            if (count($staff_id) > 1) {
+                $user_id = array_filter($staff_id, function ($value) {
+                    return $value !== '%';
+                });
+            }
+            
+    
+            // Remove any '%' values from the array if it's not the only value
+            if (count($branch_id) > 1) {
+                $branch_id = array_filter($branch_id, function ($value) {
+                    return $value !== '%';
+                });
+            }
+            
+            // Remove any '%' values from the array if it's not the only value
+            if (count($category_id) > 1) {
+                $category_id = array_filter($category_id, function ($value) {
+                    return $value !== '%';
+                });
+            }
 
 
-        $sales = DB::table('orders')
-            ->select('customers.code AS customer', 'orders.reference', 'products.name AS product', 'stores.code AS store', 'order_details.quantity', 'sold_price', 'cost_price', 'users.user_code AS user', 'users.name AS name', 'order_date')
-            ->join('order_details', 'order_details.order_id', 'orders.id')
-            ->join('store_products', 'store_products.id', 'order_details.store_product_id')
+        $data = DB::table('orders')
+            ->select(
+                'branches.id as branch_id',
+                'branches.name as branch_name',
+                'branches.code as branch_code',
+                'categories.name as category',
+                'categories.code as code',
+                'users.user_code as ro_code',
+                'users.name as user_name',
+                DB::raw('SUM(order_details.quantity) as quantity'),
+                DB::raw('SUM(order_details.total) as amount'),
+                DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
+                DB::raw('(SELECT SUM(store_products.qty_available) 
+                FROM store_products
+                JOIN products p ON store_products.product_id = p.id
+                WHERE store_products.store_id IN (SELECT id FROM stores WHERE branch_id = branches.id)
+                AND p.category_id = categories.id) as qty_available')
+            )
+            ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+            ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
+            ->join('stores', 'store_products.store_id', '=', 'stores.id')
+            ->join('branches', 'stores.branch_id', '=', 'branches.id')
+            ->join('companies', 'branches.company_id', '=', 'companies.id')
+            ->join('products', 'store_products.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
             ->join('customers', 'customers.id', 'orders.customer_id')
-            ->join('stores', 'stores.id', 'store_products.store_id')
-            ->join('products', 'products.id', 'store_products.product_id')
-            ->where('products.category_id', 'LIKE', $category_id)
-            ->where('store_products.product_id', 'LIKE', $product_id)
-            ->where('store_products.store_id', 'LIKE', $store_id)
-            ->where('customers.relation_officer', 'LIKE', $staff_id)
-            ->where('order_details.status', 1)
-            ->where('orders.status', 1)
-            ->where('stores.branch_id', 'LIKE', $branch_id)
             ->join('users', 'users.id', 'customers.relation_officer')
-            ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
-            ->orderBy('order_date')
+            ->where('branches.company_id', 'LIKE', $company_id)
+            ->where('order_details.status', '=', 1)
+            ->whereBetween('order_date', [$from_date, $to_date]);
+
+        if (!in_array('%', $category_id)) {
+            $data = $data->whereIn('products.category_id', $category_id);
+        }
+        if (!in_array('%', $branch_id)) {
+            $data = $data->whereIn('stores.branch_id', $branch_id);
+        }
+        if (!in_array('%', $staff_id)) {
+            $data = $data->whereIn('customers.relation_officer', $staff_id);
+        }
+
+
+        $sales = $data->groupBy('branches.id', 'products.category_id')
+            ->orderBy('branches.name', 'ASC')
+            ->orderBy('categories.code', 'ASC')
             ->get();
+
+        // Group sales by branch
+        $salesByBranch = $sales->groupBy('branch_id');
+
         $total_cash = Order::where('sold_by', 'LIKE', $staff_id)->where('status', 1)->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])->sum('total');
         $user = User::find($staff_id);
         $company = null;

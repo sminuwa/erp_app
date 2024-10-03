@@ -1853,8 +1853,8 @@ class ReportController extends Controller
                 return $value !== '%';
             });
         }
-       
-        
+
+
         $from_date = date('Y-m-d', strtotime($request->from_date));
         $to_date = date('Y-m-d', strtotime($request->to_date));
         $company_id = $request->company_id;
@@ -1865,7 +1865,7 @@ class ReportController extends Controller
         if ($company_id == 'all' || $company_id == '' || $company_id == null) {
             $company_id = '%';
         }
-        
+
         // Check if any categories are selected, or treat as "all"
         // $category_id1 = is_array($category_id1) ? $category_id1 : ['%'];  // Convert to array if not already
         // $branch_id = is_array($branch_id) ? $branch_id : ['%'];  // Convert to array if not already
@@ -1912,15 +1912,17 @@ class ReportController extends Controller
         if (!in_array('%', $user_id)) {
             $data = $data->whereIn('customers.relation_officer', $user_id);
         }
+        
 
-
-        $sales = $data->groupBy('branches.id', 'products.category_id')
+        $salesByBranch = $data->groupBy('products.category_id')
             ->orderBy('branches.name', 'ASC')
             ->orderBy('categories.code', 'ASC')
             ->get();
 
-        // Group sales by branch
-        $salesByBranch = $sales->groupBy('branch_id');
+            //$salesByBranch = $data->get();
+
+        // // Group sales by branch
+        // $salesByBranch = $sales->groupBy('branch_id');
 
         // Reset 'all' to make it more readable in the UI
         if (in_array('%', $category_id1)) {
@@ -1958,26 +1960,26 @@ class ReportController extends Controller
         if ($company_id == 'all' || $company_id == '')
             $company_id = '%';
 
-            if (count($staff_id) > 1) {
-                $user_id = array_filter($staff_id, function ($value) {
-                    return $value !== '%';
-                });
-            }
-            
-    
-            // Remove any '%' values from the array if it's not the only value
-            if (count($branch_id) > 1) {
-                $branch_id = array_filter($branch_id, function ($value) {
-                    return $value !== '%';
-                });
-            }
-            
-            // Remove any '%' values from the array if it's not the only value
-            if (count($category_id) > 1) {
-                $category_id = array_filter($category_id, function ($value) {
-                    return $value !== '%';
-                });
-            }
+        if (count($staff_id) > 1) {
+            $user_id = array_filter($staff_id, function ($value) {
+                return $value !== '%';
+            });
+        }
+
+
+        // Remove any '%' values from the array if it's not the only value
+        if (count($branch_id) > 1) {
+            $branch_id = array_filter($branch_id, function ($value) {
+                return $value !== '%';
+            });
+        }
+
+        // Remove any '%' values from the array if it's not the only value
+        if (count($category_id) > 1) {
+            $category_id = array_filter($category_id, function ($value) {
+                return $value !== '%';
+            });
+        }
 
 
         $data = DB::table('orders')

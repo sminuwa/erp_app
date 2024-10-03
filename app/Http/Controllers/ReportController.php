@@ -1837,14 +1837,14 @@ class ReportController extends Controller
                 return $value !== '%';
             });
         }
-        $branch_id = $request->input('branch_id', ['%']);
+        // $branch_id = $request->input('branch_id', ['%']);
 
-        // Remove any '%' values from the array if it's not the only value
-        if (count($branch_id) > 1) {
-            $branch_id = array_filter($branch_id, function ($value) {
-                return $value !== '%';
-            });
-        }
+        // // Remove any '%' values from the array if it's not the only value
+        // if (count($branch_id) > 1) {
+        //     $branch_id = array_filter($branch_id, function ($value) {
+        //         return $value !== '%';
+        //     });
+        // }
         $category_id1 = $request->input('category_id1', ['%']);
 
         // Remove any '%' values from the array if it's not the only value
@@ -1906,9 +1906,9 @@ class ReportController extends Controller
         if (!in_array('%', $category_id1)) {
             $data = $data->whereIn('products.category_id', $category_id1);
         }
-        if (!in_array('%', $branch_id)) {
-            $data = $data->whereIn('stores.branch_id', $branch_id);
-        }
+        // if (!in_array('%', $branch_id)) {
+        //     $data = $data->whereIn('stores.branch_id', $branch_id);
+        // }
         if (!in_array('%', $user_id)) {
             $data = $data->whereIn('customers.relation_officer', $user_id);
         }
@@ -1926,9 +1926,9 @@ class ReportController extends Controller
         if (in_array('%', $category_id1)) {
             $category_id1 = "all";
         }
-        if (in_array('%', $branch_id)) {
-            $branch_id = "all";
-        }
+        // if (in_array('%', $branch_id)) {
+        //     $branch_id = "all";
+        // }
         if (in_array('%', $user_id)) {
             $user_id = "all";
         }
@@ -1937,19 +1937,18 @@ class ReportController extends Controller
         }
 
         // Fetch branch info if a specific branch is selected
-        $branch = null;
-        if ($branch_id != 'all') {
-            $branch = Branch::find($branch_id);
-        }
+        // $branch = null;
+        // if ($branch_id != 'all') {
+        //     $branch = Branch::find($branch_id);
+        // }
         $company = null;
         if ($company_id != 'all') {
             $company = Company::find($company_id);
         }
-
         // Return the view with the data
         return view(
             'pages.reports.sales_and_cash_analysis.load_relation_officer_report',
-            compact('salesByBranch', 'from_date', 'to_date', 'branch_id', 'category_id1', 'user_id', 'branch', 'company', 'company_id')
+            compact('salesByBranch', 'from_date', 'to_date', 'category_id1', 'user_id', 'company', 'company_id')
         );
 
     }

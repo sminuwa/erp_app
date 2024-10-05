@@ -1,0 +1,88 @@
+@extends('layouts.backend.app')
+@section('title', 'Manage User')
+
+@push('css')
+@endpush
+
+@section('content')
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h4> User Site Access Level</h4>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+                            <li class="breadcrumb-item active">Manage User Site Access</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            @can('users.create')
+                <a class="btn btn-secondary btn-sm" href="{{ route('users.create') }}">
+                    <span class="fa fa-plus-circle">New User</span>
+                </a>
+            @endcan
+            @can('users.import.form')
+                <a class="btn btn-secondary btn-sm" href="{{ route('users.import.form') }}">
+                    <span class="fa fa-upload"> Upload Users</span>
+                </a>
+            @endcan
+            @can('users.index')
+                <a class="btn btn-secondary btn-sm" href="{{ route('users.index') }}">
+                    <span class="fa fa-list"> View Users</span>
+                </a>
+            @endcan
+            <div class="container-fluid">
+                <div class="row">
+                    <div class='col-md-6'>
+                        <form action="{{ route('user.site.access', $user) }}" method="POST"> 
+                            @csrf
+                        
+                            {{-- <div class="form-group">
+                                <label for="company_id">Company</label>
+                                <select class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}" name="company_id" id="company_id">
+                                </select>
+                            </div> --}}
+                        
+                            <div class="form-group">
+                                <label for="branch_id">Branch</label>
+                                <select class="form-control select2-multiple ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}" name="branch_id[]" id="branch_id" multiple>
+                                    <option value="">Select</option>
+                                    @if (isset($branches))
+                                        @foreach ($branches as $data)
+                                            <option value="{{ $data->id }}" {{ in_array($data->id, $user->branches->pluck('branch_id')->toArray()) ? 'selected' : '' }}>
+                                                {{ $data->name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                        
+                            <div style="text-align: right">
+                                <input type="submit" name="submit" class="btn btn-info" value="Save" />
+                            </div>
+                        </form>
+                        
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+@endsection
+@push('js')
+    <script type="text/javascript"></script>
+@endpush

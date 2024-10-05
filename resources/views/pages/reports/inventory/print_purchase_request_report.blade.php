@@ -57,7 +57,12 @@
                                 cellspacing="0" data-ordering="false">
                                 <thead>
                                     <tr>
-                                        <th>DATE</th>
+                                        <th style="width: 50%" colspan="5">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+                                        </th>
+                                        <th style="width: 50%;text-align:right" colspan="4">Processed By {{ auth()->user()->name }}</th>
+                                    </tr>
+                                    <tr>
+                                        <th>PROCESSED DATE</th>
                                         <th>INVOICE</th>
                                         <th>ITEM</th>
                                         <th>ITEM PRICE</th>
@@ -65,6 +70,8 @@
                                         <th>TOTAL COST</th>
                                         <th>WAYBILL</th>
                                         <th>SUPPLIER</th>
+                                        <th>CREATED BY</th>
+                                        <th>DATE CREATED</th>
                                         <th>STATUS</th>
                                     </tr>
                                 </thead>
@@ -82,8 +89,10 @@
                                             {{ number_format($sale->unit_price * $sale->quantity, 2, '.', ',') }}</td>
                                         <td>{{ $sale->wbno }}</td>
                                         <td>{{ $sale->supplier }}</td>
+                                        <td>{{ $sale->name }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}</td>
                                         <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
-
+                            
                                     </tr>
                                     @php
                                         $total_cost += $sale->unit_price * $sale->quantity;
@@ -95,6 +104,8 @@
                                         <th style="text-align: right">
                                             {{ number_format($total_cost, 2, '.', ',') }}
                                         </th>
+                                        <th></th>
+                                        <th></th>
                                         <th></th>
                                         <th></th>
                                         <th></th>

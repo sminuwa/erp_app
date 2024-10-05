@@ -1,12 +1,17 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.stock.ledger.report.print', [$from_date, $to_date, $branch_id, $store_id, $product_id]) }}"
+        <a href="{{ route('ajax.stock.ledger.report.print', [$from_date, $to_date, $company_id,$branch_id, $store_id, $product_id]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
 {{-- <h3>{{ $product->item ?? '' }}</h3> --}}
 <table class="display table table-bordered caption" id="example1" data-ordering="false">
     <thead>
+        <tr>
+            <th style="width: 50%" colspan="4">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            </th>
+            <th style="width: 50%;text-align:right" colspan="4">Processed By {{ auth()->user()->name }}</th>
+        </tr>
         <tr>
             <th>Date</th>
             <th>Reference</th>

@@ -46,9 +46,8 @@
                     <!-- title row -->
                     <div class="row">
                         <div class="col-11">
-                            <img src="{{ asset('assets/backend/img/logo' . '.png') }}"
-                                style="width:100px;height:60px;" alt="logo" class="img-circle elevation-3"
-                                style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo' . '.png') }}" style="width:100px;height:60px;"
+                                alt="logo" class="img-circle elevation-3" style="opacity: .8">
                             <span
                                 style="font-size:24px;">&nbsp;{{ App\Models\User::userBranchName()->long_name }}</span>
 
@@ -108,10 +107,10 @@
                             </div>
                         </div>
                         <div class="col-sm-4">
-                            <b>Reference:</b> {{ $order->reference ?? ''}}<br>
+                            <b>Reference:</b> {{ $order->reference ?? '' }}<br>
                             <b>Date and Time:
                                 {{ \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</b><br>
-                            <b>Prepared By</b> <span class="ion-card"></span> {{ $order->sold->name }}<br />
+                            <b>Prepared By</b> <span class="ion-card"></span> {{ $order->sold->name ?? '' }}<br />
                             <b>Printed By <span class="ion-printer"></span>
                                 &nbsp;&nbsp;{{ Auth::user()->name }}</span><span>
                         </div>

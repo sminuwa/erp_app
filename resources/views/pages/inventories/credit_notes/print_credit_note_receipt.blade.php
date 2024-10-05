@@ -40,6 +40,7 @@
                                 {{App\Models\User::UserBranchName()->long_name}}
                             </h3>
                             <h4>CREDIT NOTE</h4>
+                            <small class="float-right">Date: {{ $credit_note->createdBy->name }}</small>
                             <small class="float-right">View Date: {{ date('l, d-M-Y h:i:s A') }}</small><br/>
 
                         </div>

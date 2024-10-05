@@ -18,6 +18,7 @@
                     <p>Date: {{ $journal->date }}</p>
                     <p>Description: {{ $journal->description }}</p>
                     <p>Created By: {{ $journal->createdBy->name ?? null }}</p>
+                    <p>Date Created: {{ Carbon\Carbon::parse($journal->created_at)->toFormattedDateString() }}</p>
                     <p>Posted By: {{ $journal->postedBy->name ?? null }}</p>
                     <p>Modified By: {{ $journal->updatedBy->name ?? null }}</p>
                 </div>

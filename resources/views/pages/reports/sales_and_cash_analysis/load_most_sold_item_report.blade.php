@@ -1,6 +1,6 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.most.sold.item.print', [$from_date, $to_date, $branch_id, $type, $number_limit]) }}"
+        <a href="{{ route('ajax.most.sold.item.print', [$from_date, $to_date, $company_id,$branch_id, $type, $number_limit]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
@@ -17,12 +17,17 @@
     </caption>
     <thead>
         <tr>
+            <th style="width: 50%" colspan="3">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            </th>
+            <th style="width: 50%;text-align:right" colspan="3">Processed By {{ auth()->user()->name }}</th>
+        </tr>
+        <tr>
             <th>CODE</th>
             <th>PRODUCT</th>
             <th>QUANTITY</th>
-            <th>COST ()</th>
-            <th>SALES ()</th>
-            <th>MARGIN ()</th>
+            <th>COST</th>
+            <th>SALES</th>
+            <th>MARGIN</th>
 
         </tr>
     </thead>

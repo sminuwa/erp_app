@@ -121,6 +121,7 @@ class SupplierController extends Controller
       */
     public function update(Update $request, Supplier $supplier)
     {
+        //return $request;
         $supplier->fill($request->all());
 
         if ($supplier->save()) {

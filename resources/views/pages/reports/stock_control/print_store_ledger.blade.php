@@ -42,7 +42,7 @@
                             </h3>
                             <h5 style="text-align: center;">STORE LEDGER REPORT
                             </h5>
-                            <small class="float-right">View Date: {{ date('l, d-M-Y h:i:s A') }}</small>
+                            
 
                         </div>
                         <!-- /.col -->
@@ -53,6 +53,11 @@
                             <table class="display table table-bordered caption" id="example1" border="1" cellpadding="0"
                                 cellspacing="0">
                                 <thead>
+                                    <tr>
+                                        <th style="width: 50%" colspan="4">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+                                        </th>
+                                        <th style="width: 50%;text-align:right" colspan="3">Processed By {{ auth()->user()->name }}</th>
+                                    </tr>
                                     <tr>
                                         <th>CODE</th>
                                         <th>PRODUCT NAME</th>

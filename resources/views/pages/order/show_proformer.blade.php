@@ -54,18 +54,18 @@
                                 @endcan
                                 @if ($order->status == 0)
                                     @can('order.invoice.edit')
-                                        <a href="{{ route('order.invoice.edit', $order->id) }}" class="btn btn-primary btn-sm ">
+                                        <a href="{{ route('proformer.edit', $order->id) }}" class="btn btn-primary btn-sm ">
                                             <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                         </a>
                                     @endcan
-                                    @can('order.invoice.linking')
+                                    {{-- @can('order.invoice.linking')
                                         <a href="{{ route('order.invoice.linking', $order->id) }}" title="Linking"
                                             class="btn btn-success btn-sm ">
                                             <i class="fa fa-link" aria-hidden="true"></i> Create Invoice
                                         </a>
-                                    @endcan
+                                    @endcan --}}
                                     @can('order.invoice.close')
-                                        <form action="{{ route('order.invoice.close', $order->id) }}" method="post"
+                                        <form action="{{ route('proformer.close', $order->id) }}" method="post"
                                             class="d-inline"
                                             onsubmit="return confirm('Are you sure you want to close this order?')">
                                             @csrf
@@ -75,7 +75,7 @@
                                         </form>
                                     @endcan
                                     @can('order.invoice.destroy')
-                                        <form action="{{ route('order.invoice.destroy', $order->id) }}" method="post"
+                                        <form action="{{ route('proformer.destroy', $order->id) }}" method="post"
                                             class="d-inline"
                                             onsubmit="return confirm('Are you sure you want to delete this order?')">
                                             @csrf
@@ -150,18 +150,18 @@
                                             @foreach ($order_details as $order_detail)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $order_detail->storeProduct->product->code ?? '' }}</td>
-                                                    <td>{{ $order_detail->storeProduct->product->name ?? '' }}</td>
-                                                    <td>{{ $order_detail->storeProduct->product->unit ?? '' }}</td>
-                                                    <td>{{ $order_detail->storeProduct->store->code ?? '' }}</td>
+                                                    <td>{{ $order_detail->product->code ?? '' }}</td>
+                                                    <td>{{ $order_detail->product->name ?? '' }}</td>
+                                                    <td>{{ $order_detail->product->unit ?? '' }}</td>
+                                                    <td>{{ $order_detail->store->code ?? '' }}</td>
                                                     <td align="center">{{ $order_detail->quantity }}</td>
-                                                    <td align="right">{{ number_format($order_detail->sold_price, 2) }}
+                                                    <td align="right">{{ number_format($order_detail->unit_cost, 2) }}
                                                     </td>
                                                     <td align="right">
-                                                        {{ number_format($order_detail->sold_price * $order_detail->quantity, 2) }}
+                                                        {{ number_format($order_detail->unit_cost * $order_detail->quantity, 2) }}
                                                     </td>
                                                 </tr>
-                                                @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
+                                                @php $total += ($order_detail->unit_cost * $order_detail->quantity);  @endphp
                                             @endforeach
                                             <tr>
                                                 <th colspan="7" align="right">Total</th>

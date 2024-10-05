@@ -30,7 +30,7 @@ use App\Models\Receipt;
 use App\Models\InterBank;
 use App\Models\Journal;
 use App\Models\Company;
-
+use Carbon\Carbon;
 
 
 
@@ -77,6 +77,8 @@ class ReportController extends Controller
             'reference',
             'source_branch_id',
             'destination_branch_id',
+            'users.name AS created_by',
+            'intersite_transfers.created_at'
         )
             ->where('intersite_transfer_products.product_id', 'LIKE', $product_id)
             ->where('products.category_id', 'LIKE', $category_id)
@@ -85,6 +87,7 @@ class ReportController extends Controller
             ->join('intersite_transfer_products', 'intersite_transfer_products.intersite_transfer_id', 'intersite_transfers.id')
             ->join('stores', 'stores.id', 'intersite_transfers.source_branch_id')
             ->join('products', 'products.id', 'intersite_transfer_products.product_id')
+            ->join('users', 'users.id', 'intersite_transfers.created_by')
             ->whereBetween('intersite_transfers.date', [$from_date, $to_date]);
 
         $transfers = $query->get();
@@ -135,6 +138,8 @@ class ReportController extends Controller
             'reference',
             'source_branch_id',
             'destination_branch_id',
+            'users.name AS created_by',
+            'intersite_transfers.created_at'
         )
             ->where('intersite_transfer_products.product_id', 'LIKE', $product_id)
             ->where('products.category_id', 'LIKE', $category_id)
@@ -143,6 +148,7 @@ class ReportController extends Controller
             ->join('intersite_transfer_products', 'intersite_transfer_products.intersite_transfer_id', 'intersite_transfers.id')
             ->join('stores', 'stores.id', 'intersite_transfers.source_branch_id')
             ->join('products', 'products.id', 'intersite_transfer_products.product_id')
+            ->join('users', 'users.id', 'intersite_transfers.created_by')
             ->whereBetween('intersite_transfers.date', [$from_date, $to_date]);
         $transfers = $query->get();
         //$query2 = $query;
@@ -164,6 +170,7 @@ class ReportController extends Controller
         $from_date = $request->from_date;
         $to_date = $request->to_date;
         $product_id = $request->product_id;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $source_store_id = $request->source_store_id;
         $destination_store_id = $request->destination_store_id;
@@ -174,6 +181,9 @@ class ReportController extends Controller
         }
         if ($category_id == 'all' || $category_id == '') {
             $category_id = '%';
+        }
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
         }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
@@ -192,7 +202,9 @@ class ReportController extends Controller
             'reference',
             'source_store_id',
             'destination_store_id',
-            'interstore_transfers.branch_id'
+            'interstore_transfers.branch_id',
+            'interstore_transfers.created_at',
+            'users.name AS created_by'
         )
             ->where('interstore_transfer_details.product_id', 'LIKE', $product_id)
             ->where('products.category_id', 'LIKE', $category_id)
@@ -202,6 +214,7 @@ class ReportController extends Controller
             ->join('interstore_transfer_details', 'interstore_transfer_details.interstore_transfer_id', 'interstore_transfers.id')
             ->join('stores', 'stores.id', 'interstore_transfer_details.source_store_id')
             ->join('products', 'products.id', 'interstore_transfer_details.product_id')
+            ->join('users', 'users.id', 'interstore_transfers.created_by')
             ->whereBetween('interstore_transfers.date', [$from_date, $to_date]);
 
         $transfers = $query->get();
@@ -212,6 +225,9 @@ class ReportController extends Controller
         if ($category_id == '%') {
             $category_id = 'all';
 
+        }
+        if ($company_id == '%') {
+            $company_id = 'all';
         }
         if ($branch_id == '%') {
             $branch_id = 'all';
@@ -226,10 +242,10 @@ class ReportController extends Controller
 
         }
 
-        return view('pages.reports.stock_control.load_interstore_stock_transfer_report', compact('transfers', 'from_date', 'to_date', 'product_id', 'branch_id','source_store_id', 'destination_store_id', 'category_id'));
+        return view('pages.reports.stock_control.load_interstore_stock_transfer_report', compact('transfers', 'from_date', 'to_date', 'product_id', 'company_id', 'branch_id', 'source_store_id', 'destination_store_id', 'category_id'));
     }
 
-    public function printInterstoreTransfer($from_date, $to_date, $branch_id, $source_store_id, $destination_store_id, $category_id, $product_id)
+    public function printInterstoreTransfer($from_date, $to_date, $company_id, $branch_id, $source_store_id, $destination_store_id, $category_id, $product_id)
     {
         if ($product_id == 'all') {
             $product_id = '%';
@@ -237,6 +253,10 @@ class ReportController extends Controller
         }
         if ($category_id == 'all') {
             $category_id = '%';
+
+        }
+        if ($company_id == 'all') {
+            $company_id = '%';
 
         }
 
@@ -260,17 +280,21 @@ class ReportController extends Controller
             'reference',
             'source_store_id',
             'destination_store_id',
+            'interstore_transfers.branch_id',
+            'interstore_transfers.created_at',
+            'users.name AS created_by'
         )
             ->where('interstore_transfer_details.product_id', 'LIKE', $product_id)
             ->where('products.category_id', 'LIKE', $category_id)
-            ->where('branch_id', 'LIKE', $branch_id)
+            ->where('interstore_transfers.branch_id', 'LIKE', $branch_id)
             ->where('source_store_id', 'LIKE', $destination_store_id)
             ->where('destination_store_id', 'LIKE', $destination_store_id)
-            ->join('interstore_transfer_details', 'interstore_transfer_details.intersite_transfer_id', 'interstore_transfers.id')
-            ->join('stores', 'stores.id', 'interstore_transfers.source_branch_id')
+            ->join('interstore_transfer_details', 'interstore_transfer_details.interstore_transfer_id', 'interstore_transfers.id')
+            ->join('stores', 'stores.id', 'interstore_transfer_details.source_store_id')
             ->join('products', 'products.id', 'interstore_transfer_details.product_id')
+            ->join('users', 'users.id', 'interstore_transfers.created_by')
             ->whereBetween('interstore_transfers.date', [$from_date, $to_date]);
-        //$query2 = $query;
+        $transfers = $query->get();
         return view('pages.reports.stock_control.print_intersite_stock_transfer', compact('transfers', 'from_date', 'to_date'));
     }
 
@@ -285,12 +309,16 @@ class ReportController extends Controller
         $type = $request->type;
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $category_id = $request->category_id;
         $product_id = $request->product_id;
         $store_id = $request->store_id;
         if ($type == "all" || $type == "")
             $type = "%";
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == "all" || $branch_id == "")
             $branch_id = "%";
         if ($store_id == "all" || $store_id == "")
@@ -309,6 +337,7 @@ class ReportController extends Controller
             ->where('stores.branch_id', 'LIKE', $branch_id)
             ->where('stock_cards.store_id', 'LIKE', $store_id)
             ->where('stock_cards.type', 'LIKE', $type)
+            ->where('branches.company_id', 'LIKE', $company_id)
             ->whereBetween('date', [$from_date, $to_date])->get();
 
         if ($type == "%" || $type == "")
@@ -321,13 +350,17 @@ class ReportController extends Controller
             $category_id = "all";
         if ($product_id == "%" || $product_id == "")
             $product_id = "all";
+
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.stock_control.load_stock_history_report', compact('records', 'from_date', 'to_date', 'store_id', 'product_id', 'branch_id', 'category_id', 'branch', 'type'));
+        return view('pages.reports.stock_control.load_stock_history_report', compact('records', 'from_date', 'to_date', 'store_id', 'product_id', 'branch_id', 'category_id', 'branch', 'type', 'company_id', 'company'));
     }
 
-    public function printStockHistory($from_date, $to_date, $type, $branch_id, $store_id, $category_id, $product_id)
+    public function printStockHistory($from_date, $to_date, $type, $company_id, $branch_id, $store_id, $category_id, $product_id)
     {
         if ($product_id == 'all') {
             $product_id = '%';
@@ -335,6 +368,10 @@ class ReportController extends Controller
         }
         if ($category_id == 'all') {
             $category_id = '%';
+
+        }
+        if ($company_id == 'all') {
+            $company_id = '%';
 
         }
         if ($branch_id == 'all') {
@@ -359,6 +396,7 @@ class ReportController extends Controller
             ->where('stores.branch_id', 'LIKE', $branch_id)
             ->where('stock_cards.store_id', 'LIKE', $store_id)
             ->where('stock_cards.type', 'LIKE', $type)
+            ->where('branches.company_id', 'LIKE', $company_id)
             ->whereBetween('date', [$from_date, $to_date])->get();
 
         return view('pages.reports.stock_control.print_stock_history', compact('records', 'from_date', 'to_date'));
@@ -374,86 +412,279 @@ class ReportController extends Controller
         ]);
     }
 
+    // public function loadCurrentStock(Request $request)
+    // {
+    //     $branch_id = $request->branch_id;
+    //     $category_id = $request->category_id;
+    //     $product_id = $request->product_id;
+    //     $store_id = $request->store_id;
+    //     if ($branch_id == "all" || $branch_id == "")
+    //         $branch_id = "%";
+    //     if ($store_id == "all" || $store_id == "")
+    //         $store_id = "%";
+    //     if ($category_id == "all" || $category_id == "")
+    //         $category_id = "%";
+    //     if ($product_id == "all" || $product_id == "")
+    //         $product_id = "%";
+
+    //     $stores = DB::table('store_products')
+    //         ->selectRaw(
+    //             "products.name,
+    //             products.code AS product_code,
+    //             stores.code as store_code,
+    //             store_products.qty_available,
+    //             (SELECT  bpp.branch_id
+    //                 FROM branch_product_prices bpp
+    //                 WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
+    //                 group by bpp.branch_id
+    //                 LIMIT 1) as branch_id,
+    //                 branches.id as branch_id2,
+    //             (SELECT  bpp.retail_selling_price
+    //                 FROM branch_product_prices bpp
+    //                 WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
+    //                 group by bpp.branch_id
+    //                 LIMIT 1) as retail_selling_price,
+    //             (SELECT  bpp.whole_selling_price
+    //                 FROM branch_product_prices bpp
+    //                 WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
+    //                 group by bpp.branch_id
+    //                 LIMIT 1) as whole_selling_price,
+    //             (SELECT  bpp.cost_price
+    //                 FROM branch_product_prices bpp
+    //                 WHERE bpp.branch_id = stores.branch_id AND bpp.product_id = products.id
+    //                 group by bpp.branch_id
+    //                 LIMIT 1) as cost_price,
+    //             (SELECT  b.code
+    //                 FROM branches b
+    //                 WHERE b.id = stores.branch_id
+    //                 LIMIT 1) as branch_code,
+    //             store_products.id"
+    //         )
+    //         ->join('products', 'products.id', '=', 'store_products.product_id')
+    //         ->join('stores', 'stores.id', '=', 'store_products.store_id')
+    //         ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
+    //         ->join('branches', 'branches.id', 'branch_product_prices.branch_id')
+    //         ->where('store_products.qty_available', '>', 0)
+    //         ->where('products.category_id', 'LIKE', $category_id)
+    //         ->where('store_products.product_id', 'LIKE', $product_id)
+    //         ->where('store_products.store_id', 'LIKE', $store_id)
+    //         ->where('branch_product_prices.product_id', 'LIKE', $product_id)
+    //         ->where('stores.branch_id', 'LIKE', $branch_id)
+    //         ->where('branch_product_prices.branch_id', 'LIKE', $branch_id)
+    //         ->orderBy('products.name')
+    //         ->groupBy('store_products.store_id', 'branch_product_prices.product_id')
+    //         ->get();
+
+
+    //     if ($branch_id == "%")
+    //         $branch_id = "all";
+    //     if ($category_id == "%")
+    //         $category_id = "all";
+    //     if ($product_id == "%")
+    //         $product_id = "all";
+    //     if ($store_id == "%")
+    //         $store_id = "all";
+    //     $branch = null;
+    //     if ($branch_id != "all")
+    //         $branch = Branch::find($branch_id);
+    //     return view('pages.reports.stock_control.load_stock', ['stores' => $stores, 'branch_id' => $branch_id, 'store_id' => $store_id, 'product_id' => $product_id, 'category_id' => $category_id, 'branch' => $branch]);
+    // }
+
+
     public function loadCurrentStock(Request $request)
     {
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
-        $category_id = $request->category_id;
+        $category_ids = $request->category_id; // This is now an array for multiple selections
         $product_id = $request->product_id;
         $store_id = $request->store_id;
-        if ($branch_id == "all" || $branch_id == "")
+
+        // Handle "all" or empty selection for branch and store
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
+        if ($branch_id == "all" || $branch_id == "") {
             $branch_id = "%";
-        if ($store_id == "all" || $store_id == "")
+        }
+        if ($store_id == "all" || $store_id == "") {
             $store_id = "%";
-        if ($category_id == "all" || $category_id == "")
-            $category_id = "%";
-        if ($product_id == "all" || $product_id == "")
+        }
+
+        // Handle multiple categories, or default to "%"
+        if (empty($category_ids)) {
+            $category_ids = "%"; // No categories selected, match all
+        }
+
+        if ($product_id == "all" || $product_id == "") {
             $product_id = "%";
+        }
 
         $stores = DB::table('store_products')
             ->selectRaw(
                 "products.name,
-                products.code AS product_code,
-                stores.code as store_code,
-                store_products.qty_available,
-                (SELECT  bpp.branch_id
-                    FROM branch_product_prices bpp
-                    WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
-                    group by bpp.branch_id
-                    LIMIT 1) as branch_id,
-                    branches.id as branch_id2,
-                (SELECT  bpp.retail_selling_price
-                    FROM branch_product_prices bpp
-                    WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
-                    group by bpp.branch_id
-                    LIMIT 1) as retail_selling_price,
-                (SELECT  bpp.whole_selling_price
-                    FROM branch_product_prices bpp
-                    WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
-                    group by bpp.branch_id
-                    LIMIT 1) as whole_selling_price,
-                (SELECT  bpp.cost_price
-                    FROM branch_product_prices bpp
-                    WHERE bpp.branch_id = stores.branch_id AND bpp.product_id = products.id
-                    group by bpp.branch_id
-                    LIMIT 1) as cost_price,
-                (SELECT  b.code
-                    FROM branches b
-                    WHERE b.id = stores.branch_id
-                    LIMIT 1) as branch_code,
-                store_products.id"
+            products.code AS product_code,
+            stores.code as store_code,
+            store_products.qty_available,
+            (SELECT bpp.branch_id
+                FROM branch_product_prices bpp
+                WHERE bpp.branch_id = stores.branch_id AND bpp.product_id = products.id
+                group by bpp.branch_id
+                LIMIT 1) as branch_id,
+            branches.id as branch_id2,
+            (SELECT bpp.retail_selling_price
+                FROM branch_product_prices bpp
+                WHERE bpp.branch_id = stores.branch_id AND bpp.product_id = products.id
+                group by bpp.branch_id
+                LIMIT 1) as retail_selling_price,
+            (SELECT bpp.whole_selling_price
+                FROM branch_product_prices bpp
+                WHERE bpp.branch_id = stores.branch_id AND bpp.product_id = products.id
+                group by bpp.branch_id
+                LIMIT 1) as whole_selling_price,
+            (SELECT bpp.cost_price
+                FROM branch_product_prices bpp
+                WHERE bpp.branch_id = stores.branch_id AND bpp.product_id = products.id
+                group by bpp.branch_id
+                LIMIT 1) as cost_price,
+            (SELECT b.code
+                FROM branches b
+                WHERE b.id = stores.branch_id
+                LIMIT 1) as branch_code,
+            store_products.id"
             )
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
             ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
-            ->join('branches', 'branches.id', 'branch_product_prices.branch_id')
+            ->join('branches', 'branches.id', '=', 'branch_product_prices.branch_id')
             ->where('store_products.qty_available', '>', 0)
-            ->where('products.category_id', 'LIKE', $category_id)
+            ->where(function ($query) use ($category_ids) {
+                // Handle multiple category selection
+                if (is_array($category_ids)) {
+                    $query->whereIn('products.category_id', $category_ids);
+                } else {
+                    $query->where('products.category_id', 'LIKE', $category_ids);
+                }
+            })
             ->where('store_products.product_id', 'LIKE', $product_id)
             ->where('store_products.store_id', 'LIKE', $store_id)
             ->where('branch_product_prices.product_id', 'LIKE', $product_id)
-            ->where('stores.branch_id', 'LIKE',$branch_id)
-            ->where('branch_product_prices.branch_id','LIKE', $branch_id)
+            ->where('stores.branch_id', 'LIKE', $branch_id)
+            ->where('branch_product_prices.branch_id', 'LIKE', $branch_id)
+            ->where('branches.company_id', 'LIKE', $company_id)
             ->orderBy('products.name')
             ->groupBy('store_products.store_id', 'branch_product_prices.product_id')
             ->get();
 
-            
-        if ($branch_id == "%")
+        // Adjust return values for "all" or empty selections
+        if ($company_id == "%") {
+            $company_id = "all";
+        }
+        if ($branch_id == "%") {
             $branch_id = "all";
-        if ($category_id == "%")
-            $category_id = "all";
-        if ($product_id == "%")
+        }
+        if ($category_ids == "%") {
+            $category_ids = "all";
+        }
+        if ($product_id == "%") {
             $product_id = "all";
-        if ($store_id == "%")
+        }
+        if ($store_id == "%") {
             $store_id = "all";
+        }
+
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
+
+        // Fetch branch details if a specific branch is selected
         $branch = null;
-        if ($branch_id != "all")
+        if ($branch_id != "all") {
             $branch = Branch::find($branch_id);
-        return view('pages.reports.stock_control.load_stock', ['stores' => $stores, 'branch_id' => $branch_id, 'store_id' => $store_id, 'product_id' => $product_id, 'category_id' => $category_id, 'branch' => $branch]);
+        }
+        $company = null;
+        if ($company_id != "all") {
+            $company = Branch::find($company_id);
+        }
+
+        return view('pages.reports.stock_control.load_stock', [
+            'stores' => $stores,
+            'branch_id' => $branch_id,
+            'company_id' => $company_id,
+            'store_id' => $store_id,
+            'product_id' => $product_id,
+            'category_id' => $category_ids,
+            'branch' => $branch,
+            'company' => $company,
+        ]);
     }
 
-    public function printCurrentStock($branch_id, $store_id, $category_id, $product_id)
+    // public function printCurrentStock($branch_id, $store_id, $category_id, $product_id)
+    // {
+    //     if ($branch_id == "all" || $branch_id == "")
+    //         $branch_id = "%";
+    //     if ($store_id == "all" || $store_id == "")
+    //         $store_id = "%";
+    //     if ($category_id == "all" || $category_id == "")
+    //         $category_id = "%";
+    //     if ($product_id == "all" || $product_id == "")
+    //         $product_id = "%";
+
+    //     $stores = DB::table('store_products')
+    //         ->selectRaw(
+    //             "products.name,
+    //             products.code AS product_code,
+    //             stores.code as store_code,
+    //             store_products.qty_available,
+    //             (SELECT  bpp.branch_id
+    //                 FROM branch_product_prices bpp
+    //                 WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
+    //                 group by bpp.branch_id
+    //                 LIMIT 1) as branch_id,
+    //                 branches.id as branch_id2,
+    //             (SELECT  bpp.retail_selling_price
+    //                 FROM branch_product_prices bpp
+    //                 WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
+    //                 group by bpp.branch_id
+    //                 LIMIT 1) as retail_selling_price,
+    //             (SELECT  bpp.whole_selling_price
+    //                 FROM branch_product_prices bpp
+    //                 WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
+    //                 group by bpp.branch_id
+    //                 LIMIT 1) as whole_selling_price,
+    //             (SELECT  bpp.cost_price
+    //                 FROM branch_product_prices bpp
+    //                 WHERE bpp.branch_id = stores.branch_id AND bpp.product_id = products.id
+    //                 group by bpp.branch_id
+    //                 LIMIT 1) as cost_price,
+    //             (SELECT  b.code
+    //                 FROM branches b
+    //                 WHERE b.id = stores.branch_id
+    //                 LIMIT 1) as branch_code,
+    //             store_products.id"
+    //         )
+    //         ->join('products', 'products.id', '=', 'store_products.product_id')
+    //         ->join('stores', 'stores.id', '=', 'store_products.store_id')
+    //         ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
+    //         ->join('branches', 'branches.id', 'branch_product_prices.branch_id')
+    //         ->where('store_products.qty_available', '>', 0)
+    //         ->where('products.category_id', 'LIKE', $category_id)
+    //         ->where('store_products.product_id', 'LIKE', $product_id)
+    //         ->where('store_products.store_id', 'LIKE', $store_id)
+    //         ->where('branch_product_prices.product_id', 'LIKE', $product_id)
+    //         ->where('stores.branch_id', 'LIKE', $branch_id)
+    //         ->where('branch_product_prices.branch_id', 'LIKE', $branch_id)
+    //         ->orderBy('products.name')
+    //         ->groupBy('store_products.store_id', 'branch_product_prices.product_id')
+    //         ->get();
+    //     $branch = null;
+    //     if ($branch_id != "all")
+    //         $branch = Branch::find($branch_id);
+    //     return view('pages.reports.stock_control.print_current_stock', ['stores' => $stores, 'branch' => $branch]);
+    // }
+    public function printCurrentStock($company_id, $branch_id, $store_id, $category_id, $product_id)
     {
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == "all" || $branch_id == "")
             $branch_id = "%";
         if ($store_id == "all" || $store_id == "")
@@ -505,78 +736,165 @@ class ReportController extends Controller
             ->where('store_products.product_id', 'LIKE', $product_id)
             ->where('store_products.store_id', 'LIKE', $store_id)
             ->where('branch_product_prices.product_id', 'LIKE', $product_id)
-            ->where('stores.branch_id', 'LIKE',$branch_id)
-            ->where('branch_product_prices.branch_id','LIKE', $branch_id)
+            ->where('stores.branch_id', 'LIKE', $branch_id)
+            ->where('branch_product_prices.branch_id', 'LIKE', $branch_id)
+            ->where('branches.company_id', 'LIKE', $company_id)
             ->orderBy('products.name')
             ->groupBy('store_products.store_id', 'branch_product_prices.product_id')
             ->get();
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
         return view('pages.reports.stock_control.print_current_stock', ['stores' => $stores, 'branch' => $branch]);
     }
 
-
     public function storeLedger()
     {
         return view('pages.reports.stock_control.store_ledger_report');
     }
 
+    // public function loadStoreLedger(Request $request)
+    // {
+    //     $product_id = $request->product_id;
+    //     $store_id = $request->store_id;
+    //     $category_id = $request->category_id;
+    //     $branch_id = $request->branch_id;
+    //     if ($product_id == 'all' || $product_id == '') {
+    //         $product_id = '%';
+
+    //     }
+    //     if ($category_id == 'all' || $category_id == '') {
+    //         $category_id = '%';
+
+    //     }
+    //     if ($store_id == 'all' || $store_id == '') {
+    //         $store_id = '%';
+
+    //     }
+    //     if ($branch_id == 'all' || $branch_id == '') {
+    //         $branch_id = '%';
+
+    //     }
+
+    //     $stores = DB::table('store_products')
+    //         ->selectRaw("
+    //             products.name,
+    //             products.code,
+    //             stores.code as store,
+    //             store_products.qty_available,
+    //             (SELECT  bpp.retail_selling_price
+    //                 FROM branch_product_prices bpp
+    //                 WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
+    //                 group by bpp.branch_id
+    //                 LIMIT 1) as retail_selling_price,
+    //             (SELECT  bpp.whole_selling_price
+    //                 FROM branch_product_prices bpp
+    //                 WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
+    //                 group by bpp.branch_id
+    //                 LIMIT 1) as whole_selling_price,
+    //            (SELECT  bpp.cost_price
+    //                 FROM branch_product_prices bpp
+    //                 WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
+    //                 group by bpp.branch_id
+    //                 LIMIT 1) as cost_price,
+    //            (SELECT  b.code
+    //                 FROM branches b
+    //                 WHERE b.id = stores.branch_id
+    //                 LIMIT 1) as branch_code,
+    //             store_products.id,
+    //             categories.name AS category")
+    //         ->join('products', 'products.id', '=', 'store_products.product_id')
+    //         ->join('stores', 'stores.id', '=', 'store_products.store_id')
+    //         ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
+    //         ->join('categories', 'categories.id', 'products.category_id')
+    //         ->where('store_products.qty_available', '>', 0)
+    //         ->where('products.category_id', 'LIKE', $category_id)
+    //         ->where('store_products.product_id', 'LIKE', $product_id)
+    //         ->where('store_products.store_id', 'LIKE', $store_id)
+    //         ->where('branch_product_prices.product_id', 'LIKE', $product_id)
+    //         ->where('stores.branch_id', 'LIKE', $branch_id)
+    //         ->groupBy('stores.branch_id')
+    //         ->groupBy('store_products.store_id', 'branch_product_prices.product_id')
+    //         ->get();
+    //     if ($category_id == "%")
+    //         $category_id = "all";
+    //     if ($branch_id == "%")
+    //         $branch_id = "all";
+    //     if ($product_id == "%")
+    //         $product_id = "all";
+    //     if ($store_id == "%")
+    //         $store_id = "all";
+    //     $branch = null;
+    //     if ($branch_id != 'all')
+    //         $branch = Branch::find($branch_id);
+    //     return view('pages.reports.stock_control.load_store_ledger', ['stores' => $stores, 'branch_id' => $branch_id, 'branch' => $branch, 'product_id' => $product_id, 'category_id' => $category_id, 'store_id' => $store_id]);
+    // }
+
     public function loadStoreLedger(Request $request)
     {
         $product_id = $request->product_id;
         $store_id = $request->store_id;
-        $category_id = $request->category_id;
+        $category_ids = $request->category_id;  // Array of selected category IDs or "all"
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
+
+        if ($category_ids == 'all' || $category_ids == '') {
+            $category_ids = 'all';
+        }
+
         if ($product_id == 'all' || $product_id == '') {
             $product_id = '%';
-
-        }
-        if ($category_id == 'all' || $category_id == '') {
-            $category_id = '%';
-
         }
         if ($store_id == 'all' || $store_id == '') {
             $store_id = '%';
-
+        }
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
         }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
-
         }
+
+        // Begin query
         $stores = DB::table('store_products')
             ->selectRaw("
-                products.name,
-                products.code,
-                stores.code as store,
-                store_products.qty_available,
-                (SELECT  bpp.retail_selling_price
-                    FROM branch_product_prices bpp
-                    WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
-                    group by bpp.branch_id
-                    LIMIT 1) as retail_selling_price,
-                (SELECT  bpp.whole_selling_price
-                    FROM branch_product_prices bpp
-                    WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
-                    group by bpp.branch_id
-                    LIMIT 1) as whole_selling_price,
-               (SELECT  bpp.cost_price
-                    FROM branch_product_prices bpp
-                    WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
-                    group by bpp.branch_id
-                    LIMIT 1) as cost_price,
-               (SELECT  b.code
-                    FROM branches b
-                    WHERE b.id = stores.branch_id
-                    LIMIT 1) as branch_code,
-                store_products.id,
-                categories.name AS category")
+            products.name,
+            products.code,
+            stores.code as store,
+            store_products.qty_available,
+            (SELECT bpp.retail_selling_price
+                FROM branch_product_prices bpp
+                WHERE bpp.branch_id = stores.branch_id AND bpp.product_id = products.id
+                group by bpp.branch_id
+                LIMIT 1) as retail_selling_price,
+            (SELECT bpp.whole_selling_price
+                FROM branch_product_prices bpp
+                WHERE bpp.branch_id = stores.branch_id AND bpp.product_id = products.id
+                group by bpp.branch_id
+                LIMIT 1) as whole_selling_price,
+            (SELECT bpp.cost_price
+                FROM branch_product_prices bpp
+                WHERE bpp.branch_id = stores.branch_id AND bpp.product_id = products.id
+                group by bpp.branch_id
+                LIMIT 1) as cost_price,
+            (SELECT b.code
+                FROM branches b
+                WHERE b.id = stores.branch_id
+                LIMIT 1) as branch_code,
+            store_products.id,
+            categories.name AS category")
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
             ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
-            ->join('categories', 'categories.id', 'products.category_id')
+            ->join('categories', 'categories.id', '=', 'products.category_id')
             ->where('store_products.qty_available', '>', 0)
-            ->where('products.category_id', 'LIKE', $category_id)
+            // Category filter, only apply if category_id is not 'all'
+            ->when($category_ids != 'all', function ($query) use ($category_ids) {
+                return $query->whereIn('products.category_id', $category_ids);
+            })
             ->where('store_products.product_id', 'LIKE', $product_id)
             ->where('store_products.store_id', 'LIKE', $store_id)
             ->where('branch_product_prices.product_id', 'LIKE', $product_id)
@@ -584,83 +902,189 @@ class ReportController extends Controller
             ->groupBy('stores.branch_id')
             ->groupBy('store_products.store_id', 'branch_product_prices.product_id')
             ->get();
-        if ($category_id == "%")
-            $category_id = "all";
-        if ($branch_id == "%")
+
+        // Reset to "all" for display purposes if necessary
+        if ($category_ids == 'all') {
+            $category_ids = "all";
+        }
+        if ($branch_id == "%") {
             $branch_id = "all";
-        if ($product_id == "%")
+        }
+        if ($product_id == "%") {
             $product_id = "all";
-        if ($store_id == "%")
+        }
+        if ($store_id == "%") {
             $store_id = "all";
+        }
+
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
+        // Find the branch for display if a specific branch is selected
         $branch = null;
-        if ($branch_id != 'all')
+        if ($branch_id != 'all') {
             $branch = Branch::find($branch_id);
-        return view('pages.reports.stock_control.load_store_ledger', ['stores' => $stores, 'branch_id' => $branch_id, 'branch' => $branch, 'product_id' => $product_id, 'category_id' => $category_id, 'store_id' => $store_id]);
+        }
+
+        // Return view with data
+        return view('pages.reports.stock_control.load_store_ledger', [
+            'stores' => $stores,
+            'company_id' => $company_id,
+            'company' => $company,
+            'branch_id' => $branch_id,
+            'branch' => $branch,
+            'product_id' => $product_id,
+            'category_id' => $category_ids,
+            'store_id' => $store_id
+        ]);
     }
 
-    public function printstoreLedger($branch_id, $store_id, $category_id, $product_id)
+    // public function printstoreLedger($branch_id, $store_id, $category_id, $product_id)
+    // {
+
+    //     if ($product_id == 'all') {
+    //         $product_id = '%';
+
+    //     }
+    //     if ($branch_id == 'all') {
+    //         $branch_id = '%';
+    //     }
+    //     if ($category_id == 'all') {
+    //         $category_id = '%';
+
+    //     }
+    //     if ($store_id == 'all') {
+    //         $store_id = '%';
+
+    //     }
+    //     $stores = DB::table('store_products')
+    //         ->selectRaw("
+    //             products.name,
+    //             products.code,
+    //             stores.code as store,
+    //             store_products.qty_available,
+    //             (SELECT  bpp.retail_selling_price
+    //                 FROM branch_product_prices bpp
+    //                 WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
+    //                 group by bpp.branch_id
+    //                 LIMIT 1) as retail_selling_price,
+    //             (SELECT  bpp.whole_selling_price
+    //                 FROM branch_product_prices bpp
+    //                 WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
+    //                 group by bpp.branch_id
+    //                 LIMIT 1) as whole_selling_price,
+    //            (SELECT  bpp.cost_price
+    //                 FROM branch_product_prices bpp
+    //                 WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
+    //                 group by bpp.branch_id
+    //                 LIMIT 1) as cost_price,
+    //             (SELECT  b.code
+    //                 FROM branches b
+    //                 WHERE b.id = stores.branch_id
+    //                 LIMIT 1) as branch_code,
+    //             store_products.id,
+    //             branches.code as branch_code,
+    //             categories.name AS category")
+    //         ->join('products', 'products.id', '=', 'store_products.product_id')
+    //         ->join('stores', 'stores.id', '=', 'store_products.store_id')
+    //         ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
+    //         ->join('categories', 'categories.id', 'products.category_id')
+    //         ->where('store_products.qty_available', '>', 0)
+    //         ->where('products.category_id', 'LIKE', $category_id)
+    //         ->where('store_products.product_id', 'LIKE', $product_id)
+    //         ->where('store_products.store_id', 'LIKE', $store_id)
+    //         ->where('branch_product_prices.product_id', 'LIKE', $product_id)
+    //         ->where('stores.branch_id', 'LIKE', $branch_id)
+    //         ->groupBy('stores.branch_id')
+    //         ->groupBy('store_products.store_id', 'branch_product_prices.product_id')
+    //         ->get();
+    //     $branch = null;
+    //     if ($branch_id != 'all')
+    //         $branch = Branch::find($branch_id);
+    //     return view('pages.reports.stock_control.print_store_ledger', ['stores' => $stores, 'branch' => $branch,'category_id'=>$category_id]);
+    // }
+    public function printstoreLedger($company_id, $branch_id, $store_id, $category_ids, $product_id)
     {
-
-        if ($product_id == 'all') {
-            $product_id = '%';
-
-        }
+        // Handle "all" for branch, store, category, and product
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all') {
             $branch_id = '%';
         }
-        if ($category_id == 'all') {
-            $category_id = '%';
-
-        }
         if ($store_id == 'all') {
             $store_id = '%';
-
         }
+        if ($product_id == 'all') {
+            $product_id = '%';
+        }
+
+        // Convert comma-separated category IDs back to an array, handle 'all'
+        if ($category_ids == 'all' || empty($category_ids)) {
+            $category_ids = '%'; // Match all categories if 'all' is selected
+        } else {
+            $category_ids = explode(',', $category_ids); // Convert string back to array
+        }
+
+        // Build query
         $stores = DB::table('store_products')
             ->selectRaw("
-                products.name,
-                products.code,
-                stores.code as store,
-                store_products.qty_available,
-                (SELECT  bpp.retail_selling_price
-                    FROM branch_product_prices bpp
-                    WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
-                    group by bpp.branch_id
-                    LIMIT 1) as retail_selling_price,
-                (SELECT  bpp.whole_selling_price
-                    FROM branch_product_prices bpp
-                    WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
-                    group by bpp.branch_id
-                    LIMIT 1) as whole_selling_price,
-               (SELECT  bpp.cost_price
-                    FROM branch_product_prices bpp
-                    WHERE bpp.branch_id =  stores.branch_id AND bpp.product_id = products.id
-                    group by bpp.branch_id
-                    LIMIT 1) as cost_price,
-                (SELECT  b.code
-                    FROM branches b
-                    WHERE b.id = stores.branch_id
-                    LIMIT 1) as branch_code,
-                store_products.id,
-                branches.code as branch_code,
-                categories.name AS category")
+        products.name,
+        products.code,
+        stores.code as store,
+        store_products.qty_available,
+        (SELECT bpp.retail_selling_price
+            FROM branch_product_prices bpp
+            WHERE bpp.branch_id = stores.branch_id AND bpp.product_id = products.id
+            GROUP BY bpp.branch_id
+            LIMIT 1) as retail_selling_price,
+        (SELECT bpp.whole_selling_price
+            FROM branch_product_prices bpp
+            WHERE bpp.branch_id = stores.branch_id AND bpp.product_id = products.id
+            GROUP BY bpp.branch_id
+            LIMIT 1) as whole_selling_price,
+       (SELECT bpp.cost_price
+            FROM branch_product_prices bpp
+            WHERE bpp.branch_id = stores.branch_id AND bpp.product_id = products.id
+            GROUP BY bpp.branch_id
+            LIMIT 1) as cost_price,
+        branches.code as branch_code,  -- Make sure 'branches.code' exists
+        categories.name AS category"
+            )
             ->join('products', 'products.id', '=', 'store_products.product_id')
             ->join('stores', 'stores.id', '=', 'store_products.store_id')
             ->join('branch_product_prices', 'branch_product_prices.product_id', '=', 'products.id')
-            ->join('categories', 'categories.id', 'products.category_id')
+            ->join('categories', 'categories.id', '=', 'products.category_id')
+            ->join('branches', 'branches.id', '=', 'stores.branch_id')  // Ensure proper join on branches
             ->where('store_products.qty_available', '>', 0)
-            ->where('products.category_id', 'LIKE', $category_id)
+            ->where(function ($query) use ($category_ids) {
+                if (is_array($category_ids)) {
+                    $query->whereIn('products.category_id', $category_ids);  // Handle multiple categories
+                } else {
+                    $query->where('products.category_id', 'LIKE', $category_ids);  // Single category case
+                }
+            })
             ->where('store_products.product_id', 'LIKE', $product_id)
             ->where('store_products.store_id', 'LIKE', $store_id)
             ->where('branch_product_prices.product_id', 'LIKE', $product_id)
             ->where('stores.branch_id', 'LIKE', $branch_id)
-            ->groupBy('stores.branch_id')
-            ->groupBy('store_products.store_id', 'branch_product_prices.product_id')
+            ->where('branches.company_id', 'LIKE', $company_id)
+            ->groupBy('stores.branch_id', 'store_products.store_id', 'branch_product_prices.product_id')
             ->get();
+
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
+        // Fetch branch details if a specific branch is selected
         $branch = null;
-        if ($branch_id != 'all')
+        if ($branch_id != 'all') {
             $branch = Branch::find($branch_id);
-        return view('pages.reports.stock_control.print_store_ledger', ['stores' => $stores, 'branch' => $branch]);
+        }
+
+        return view('pages.reports.stock_control.print_store_ledger', [
+            'stores' => $stores,
+            'branch' => $branch,
+            'category_id' => $category_ids
+        ]);
     }
 
     public function stockAdjustment()
@@ -675,7 +1099,9 @@ class ReportController extends Controller
         $product_id = $request->product_id;
         $store_id = $request->store_id;
         $category_id = $request->category_id;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
+
         if ($product_id == 'all' || $product_id == '') {
             $product_id = '%';
 
@@ -688,13 +1114,16 @@ class ReportController extends Controller
             $store_id = '%';
 
         }
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
 
         }
 
         $stores = DB::table('stock_adjustments')
-            ->selectRaw("products.name, products.code, stores.name as store, quantity, date, reference, operation,
+            ->selectRaw("products.name, products.code, stores.name as store, quantity, date, reference, operation, stock_adjustments.created_at,
                 (SELECT name FROM users WHERE id = stock_adjustments.created_by LIMIT 1) as created_by,
                 (SELECT name FROM users WHERE id = stock_adjustments.posted_by LIMIT 1) as posted_by")
             ->join('stock_adjustment_details', 'stock_adjustment_details.stock_adjustment_id', 'stock_adjustments.id')
@@ -717,18 +1146,23 @@ class ReportController extends Controller
             $product_id = "all";
         if ($store_id == "%")
             $store_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != '%')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.stock_control.load_stock_adjustment', compact('stores', 'from_date', 'to_date', 'branch', 'branch_id', 'product_id', 'store_id', 'category_id'));
+        return view('pages.reports.stock_control.load_stock_adjustment', compact('stores', 'from_date', 'to_date', 'branch', 'company_id', 'branch_id', 'product_id', 'store_id', 'category_id'));
     }
 
-    public function printStockAdjustment($from_date, $to_date, $branch_id, $store_id, $category_id, $product_id)
+    public function printStockAdjustment($from_date, $to_date, $company_id, $branch_id, $store_id, $category_id, $product_id)
     {
         if ($product_id == 'all' || $product_id == '') {
             $product_id = '%';
 
         }
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
 
@@ -742,7 +1176,9 @@ class ReportController extends Controller
         }
 
         $stores = DB::table('stock_adjustments')
-            ->select('products.name', 'products.code', 'stores.name as store', 'quantity', 'date', 'reference', 'operation')
+            ->selectRaw("products.name, products.code, stores.name as store, quantity, date, reference, operation, stock_adjustments.created_at,
+                (SELECT name FROM users WHERE id = stock_adjustments.created_by LIMIT 1) as created_by,
+                (SELECT name FROM users WHERE id = stock_adjustments.posted_by LIMIT 1) as posted_by")
             ->join('stock_adjustment_details', 'stock_adjustment_details.stock_adjustment_id', 'stock_adjustments.id')
             ->join('products', 'products.id', '=', 'stock_adjustment_details.product_id')
             ->join('stores', 'stores.id', '=', 'stock_adjustment_details.store_id')
@@ -755,6 +1191,9 @@ class ReportController extends Controller
             ->orderBy('date', 'DESC')
             ->orderBy('reference', 'ASC')
             ->get();
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != '%')
             $branch = Branch::find($branch_id);
@@ -771,6 +1210,7 @@ class ReportController extends Controller
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $product_id = $request->product_id;
         $store_id = $request->store_id;
@@ -780,6 +1220,9 @@ class ReportController extends Controller
 
         if ($product_id == 'all' || $product_id == '') {
             $product_id = '%';
+        }
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
         }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
@@ -839,16 +1282,20 @@ class ReportController extends Controller
             $customer_id = "all";
         if ($type == "%")
             $type = "all";
-
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all' && $branch_id != '')
             $branch = Branch::find($branch_id);
 
-        return view('pages.reports.sales_and_cash_analysis.load_general_sale_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'product_id', 'store_id', 'category_id', 'customer_id', 'type', 'branch'));
+        return view('pages.reports.sales_and_cash_analysis.load_general_sale_report', compact('sales', 'from_date', 'to_date', 'company_id', 'branch_id', 'product_id', 'store_id', 'category_id', 'customer_id', 'type', 'branch'));
     }
 
-    public function printGeneralSaleReport($from_date, $to_date, $branch_id, $store_id, $category_id, $product_id, $customer_id, $type)
+    public function printGeneralSaleReport($from_date, $to_date, $company_id, $branch_id, $store_id, $category_id, $product_id, $customer_id, $type)
     {
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -898,6 +1345,9 @@ class ReportController extends Controller
             ->where(DB::raw("DATE(order_date)"), '<=', $to_date)
             ->orderBy('order_date')
             ->get();
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all' && $branch_id != '')
             $branch = Branch::find($branch_id);
@@ -908,24 +1358,27 @@ class ReportController extends Controller
     {
         return view('pages.reports.sales_and_cash_analysis.sales_by_category');
     }
+
     public function loadCategorySaleReport(Request $request)
     {
-        $from_date = date('Y-m-d',strtotime($request->from_date));
-        $to_date =  date('Y-m-d',strtotime($request->to_date));
+        $from_date = date('Y-m-d', strtotime($request->from_date));
+        $to_date = date('Y-m-d', strtotime($request->to_date));
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
-        $category_id1 = $request->category_id1;
-        $category_id2 = $request->category_id2;
+        $category_id1 = $request->category_id1;  // Now an array
 
+        // Handle 'all' for company and branch
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '') {
-            $branch_id = '%';
-        }
-        if ($category_id1 == 'all' || $category_id1 == '') {
-            $category_id1 = '%';
-        }
-        if ($category_id2 == 'all' || $category_id2 == '') {
-            $category_id2 = '%';
+            $branch_id = '%';  // wildcard for all branches
         }
 
+        // Check if any categories are selected, or treat as "all"
+        $category_id1 = is_array($category_id1) ? $category_id1 : ['%'];  // Convert to array if not already
+
+        // Build the query
         $data = DB::table('orders')
             ->select(
                 'categories.name as category',
@@ -933,67 +1386,82 @@ class ReportController extends Controller
                 DB::raw('SUM(order_details.quantity) as quantity'),
                 DB::raw('SUM(order_details.total) as amount'),
                 DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
-                $branch_id != '%' ? DB::raw('(SELECT SUM(store_products.qty_available) FROM store_products
-                    JOIN stores s ON store_products.store_id = s.id
-                    JOIN products p ON store_products.product_id = p.id
-                    WHERE s.branch_id LIKE stores.branch_id
-                        AND p.category_id = categories.id) as qty_available')
-                    :
-                    DB::raw('
-                        (SELECT SUM(store_products.qty_available) FROM store_products
-                            JOIN products p ON store_products.product_id = p.id
-                            WHERE p.category_id = categories.id
-
-                        ) as qty_available'
-                    )
+                // Calculate qty_available based on whether a branch filter is applied
+                $branch_id != '%' ? DB::raw('(SELECT SUM(store_products.qty_available) 
+                FROM store_products
+                JOIN stores s ON store_products.store_id = s.id
+                JOIN products p ON store_products.product_id = p.id
+                WHERE s.branch_id LIKE stores.branch_id
+                AND p.category_id = categories.id) as qty_available')
+                :
+                DB::raw('(SELECT SUM(store_products.qty_available) 
+                FROM store_products
+                JOIN products p ON store_products.product_id = p.id
+                WHERE p.category_id = categories.id) as qty_available')
             )
             ->join('order_details', 'orders.id', '=', 'order_details.order_id')
             ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
             ->join('stores', 'store_products.store_id', '=', 'stores.id')
+            ->join('branches', 'stores.branch_id', '=', 'branches.id')  // Link stores to branches
+            ->join('companies', 'branches.company_id', '=', 'companies.id')  // Link branches to companies
             ->join('products', 'store_products.product_id', '=', 'products.id')
             ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->where('branches.company_id', 'LIKE', $company_id)  // Filter by company_id
             ->where('stores.branch_id', 'LIKE', $branch_id)
-            ->where('order_details.status', '=', 1)
-//            ->whereDate('order_date', '>=', $from_date)
-//            ->whereDate('order_date', '>=', $from_date)
-            ->whereBetween('order_date', [$from_date,$to_date] );
-        if ($category_id2 == '%' && $category_id1 != '%') {
-            $data = $data->where('products.category_id', 'LIKE', $category_id1);
-        } elseif ($category_id2 != '%') {
-            $data = $data->where('products.category_id', '>=', $category_id1)
-                ->where('products.category_id', '<=', $category_id2);
-        }
+            ->where('order_details.status', '=', 1)  // assuming status 1 means confirmed sales
+            ->whereBetween('order_date', [$from_date, $to_date]);
+        if (!in_array('%', $category_id1))
+            $data = $data->whereIn('products.category_id', $category_id1);
+
+        // Group the results by category and sort by category code
         $sales = $data->groupBy('products.category_id')
-            ->orderBy('code', 'ASC')->get();
+            ->orderBy('code', 'ASC')
+            ->get();
 
-
-        if ($category_id1 == "%")
+        // Reset 'all' to make it more readable in the UI
+        if (in_array('%', $category_id1)) {
             $category_id1 = "all";
-        if ($category_id2 == "%")
-            $category_id2 = "all";
-        if ($branch_id == '%' || $branch_id == '')
+        }
+        if ($branch_id == '%') {
             $branch_id = 'all';
-
+        }
+        if ($company_id == '%') {
+            $company_id = 'all';
+        }
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
+        // Fetch branch info if a specific branch is selected
         $branch = null;
-        if ($branch_id != 'all' && $branch_id != '')
+        if ($branch_id != 'all') {
             $branch = Branch::find($branch_id);
+        }
+        $company = null;
+        if ($company_id != 'all') {
+            $company = Branch::find($company_id);
+        }
 
-        return view('pages.reports.sales_and_cash_analysis.load_sale_by_category_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'category_id1', 'category_id2', 'branch'));
+        // Return the view with the data
+        return view('pages.reports.sales_and_cash_analysis.load_sale_by_category_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'category_id1', 'branch', 'company', 'company_id'));
     }
-    public function printCategorySaleReport($from_date, $to_date, $branch_id, $category_id1, $category_id2)
+
+    public function printCategorySaleReport($from_date, $to_date, $company_id, $branch_id, $category_id1)
     {
-        $from_date = date('Y-m-d',strtotime($from_date));
-        $to_date =  date('Y-m-d',strtotime($to_date));
+        $from_date = date('Y-m-d', strtotime($from_date));
+        $to_date = date('Y-m-d', strtotime($to_date));
+
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
 
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
-        if ($category_id1 == 'all' || $category_id1 == '') {
-            $category_id1 = '%';
-        }
-        if ($category_id2 == 'all' || $category_id2 == '') {
-            $category_id2 = '%';
-        }
+
+
+        // Handle category_id1 and category_id2 as arrays
+        $category_id1 = is_array($category_id1) && count($category_id1) > 0 ? $category_id1 : ['%'];
+        //$category_id2 = is_array($category_id2) && count($category_id2) > 0 ? $category_id2 : ['%'];
 
         $data = DB::table('orders')
             ->select(
@@ -1002,52 +1470,234 @@ class ReportController extends Controller
                 DB::raw('SUM(order_details.quantity) as quantity'),
                 DB::raw('SUM(order_details.total) as amount'),
                 DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
-                $branch_id != '%' ? DB::raw('(SELECT SUM(store_products.qty_available) FROM store_products
-                    JOIN stores s ON store_products.store_id = s.id
-                    JOIN products p ON store_products.product_id = p.id
-                    WHERE s.branch_id LIKE stores.branch_id
-                        AND p.category_id = categories.id) as qty_available')
-                    :
-                    DB::raw('
-                        (SELECT SUM(store_products.qty_available) FROM store_products
-                            JOIN products p ON store_products.product_id = p.id
-                            WHERE p.category_id = categories.id
-
-                        ) as qty_available'
-                    )
+                // Calculate qty_available based on whether a branch filter is applied
+                $branch_id != '%' ? DB::raw('(SELECT SUM(store_products.qty_available) 
+            FROM store_products
+            JOIN stores s ON store_products.store_id = s.id
+            JOIN products p ON store_products.product_id = p.id
+            WHERE s.branch_id LIKE stores.branch_id
+            AND p.category_id = categories.id) as qty_available')
+                :
+                DB::raw('(SELECT SUM(store_products.qty_available) 
+            FROM store_products
+            JOIN products p ON store_products.product_id = p.id
+            WHERE p.category_id = categories.id) as qty_available')
             )
             ->join('order_details', 'orders.id', '=', 'order_details.order_id')
             ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
             ->join('stores', 'store_products.store_id', '=', 'stores.id')
+            ->join('branches', 'stores.branch_id', '=', 'branches.id')  // Link stores to branches
+            ->join('companies', 'branches.company_id', '=', 'companies.id')  // Link branches to companies
             ->join('products', 'store_products.product_id', '=', 'products.id')
             ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->where('branches.company_id', 'LIKE', $company_id)  // Filter by company_id
             ->where('stores.branch_id', 'LIKE', $branch_id)
-            ->where('order_details.status', '=', 1)
-//            ->whereDate('order_date', '>=', $from_date)
-//            ->whereDate('order_date', '>=', $from_date)
-            ->whereBetween('order_date', [$from_date,$to_date] );
-        if ($category_id2 == '%' && $category_id1 != '%') {
-            $data = $data->where('products.category_id', 'LIKE', $category_id1);
-        } elseif ($category_id2 != '%') {
-            $data = $data->where('products.category_id', '>=', $category_id1)
-                ->where('products.category_id', '<=', $category_id2);
+            ->where('order_details.status', '=', 1)  // assuming status 1 means confirmed sales
+            ->whereBetween('order_date', [$from_date, $to_date]);
+        // Check if category_id1 or category_id2 has values and apply filter
+        if ($category_id1 != ['%']) {
+            $data = $data->whereIn('products.category_id', $category_id1);
         }
+
+        // Group the results by category and sort by category code
         $sales = $data->groupBy('products.category_id')
-            ->orderBy('code', 'ASC')->get();
+            ->orderBy('code', 'ASC')
+            ->get();
 
-
-        if ($category_id1 == "%")
+        if ($category_id1 == ['%'])
             $category_id1 = "all";
-        if ($category_id2 == "%")
-            $category_id2 = "all";
+
         if ($branch_id == '%' || $branch_id == '')
             $branch_id = 'all';
-
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all' && $branch_id != '')
             $branch = Branch::find($branch_id);
+
         return view('pages.reports.sales_and_cash_analysis.print_category_sale_report', compact('sales', 'from_date', 'to_date', 'branch'));
     }
+    public function categorySaleBySiteReport()
+    {
+        return view('pages.reports.sales_and_cash_analysis.sales_by_category_by_site');
+    }
+
+    public function loadCategorySaleBySiteReport(Request $request)
+    {
+        $from_date = date('Y-m-d', strtotime($request->from_date));
+        $to_date = date('Y-m-d', strtotime($request->to_date));
+        $company_id = $request->company_id;
+        $branch_id = $request->branch_id;
+        $category_id1 = $request->category_id1;  // Now an array
+
+        // Handle 'all' for company and branch
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
+        // if ($branch_id == 'all' || $branch_id == '') {
+        //     $branch_id = '%';  // wildcard for all branches
+        // }
+
+        // Check if any categories are selected, or treat as "all"
+        $category_id1 = is_array($category_id1) ? $category_id1 : ['%'];  // Convert to array if not already
+        $branch_id = is_array($branch_id) ? $branch_id : ['%'];  // Convert to array if not already
+
+        // Build the query
+        $data = DB::table('orders')
+            ->select(
+                'branches.id as branch_id',
+                'branches.name as branch_name',
+                'branches.code as branch_code',
+                'categories.name as category',
+                'categories.code as code',
+                DB::raw('SUM(order_details.quantity) as quantity'),
+                DB::raw('SUM(order_details.total) as amount'),
+                DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
+                DB::raw('(SELECT SUM(store_products.qty_available) 
+                FROM store_products
+                JOIN products p ON store_products.product_id = p.id
+                WHERE store_products.store_id IN (SELECT id FROM stores WHERE branch_id = branches.id)
+                AND p.category_id = categories.id) as qty_available')
+            )
+            ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+            ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
+            ->join('stores', 'store_products.store_id', '=', 'stores.id')
+            ->join('branches', 'stores.branch_id', '=', 'branches.id')
+            ->join('companies', 'branches.company_id', '=', 'companies.id')
+            ->join('products', 'store_products.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->where('branches.company_id', 'LIKE', $company_id)
+            ->where('order_details.status', '=', 1)
+            ->whereBetween('order_date', [$from_date, $to_date]);
+
+        if (!in_array('%', $category_id1)) {
+            $data = $data->whereIn('products.category_id', $category_id1);
+        }
+        if (!in_array('%', $branch_id)) {
+            $data = $data->whereIn('stores.branch_id', $branch_id);
+        }
+
+        $sales = $data->groupBy('branches.id', 'products.category_id')
+            ->orderBy('branches.name', 'ASC')
+            ->orderBy('categories.code', 'ASC')
+            ->get();
+
+        // Group sales by branch
+        $salesByBranch = $sales->groupBy('branch_id');
+
+        // Reset 'all' to make it more readable in the UI
+        if (in_array('%', $category_id1)) {
+            $category_id1 = "all";
+        }
+        if (in_array('%', $branch_id)) {
+            $branch_id = "all";
+        }
+        if ($company_id == '%') {
+            $company_id = 'all';
+        }
+
+        // Fetch branch info if a specific branch is selected
+        $branch = null;
+        if ($branch_id != 'all') {
+            $branch = Branch::find($branch_id);
+        }
+        $company = null;
+        if ($company_id != 'all') {
+            $company = Company::find($company_id);
+        }
+
+        // Return the view with the data
+        return view(
+            'pages.reports.sales_and_cash_analysis.load_sale_by_category_by_site_report',
+            compact('salesByBranch', 'from_date', 'to_date', 'branch_id', 'category_id1', 'branch', 'company', 'company_id')
+        );
+    }
+
+    public function printCategorySaleBySiteReport($from_date, $to_date, $company_id, $branch_id, $category_id1)
+    {
+        $from_date = date('Y-m-d', strtotime($from_date));
+        $to_date = date('Y-m-d', strtotime($to_date));
+
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
+
+        if ($branch_id == 'all' || $branch_id == '') {
+            $branch_id = '%';
+        }
+
+
+        // Handle category_id1 and category_id2 as arrays
+        $category_id1 = is_array($category_id1) && count($category_id1) > 0 ? $category_id1 : ['%'];
+        $branch_id = is_array($branch_id) ? $branch_id : ['%'];  // Convert to array if not already
+
+        $data = DB::table('orders')
+            ->select(
+                'branches.id as branch_id',
+                'branches.name as branch_name',
+                'branches.code as branch_code',
+                'categories.name as category',
+                'categories.code as code',
+                DB::raw('SUM(order_details.quantity) as quantity'),
+                DB::raw('SUM(order_details.total) as amount'),
+                DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
+                DB::raw('(SELECT SUM(store_products.qty_available) 
+                FROM store_products
+                JOIN products p ON store_products.product_id = p.id
+                WHERE store_products.store_id IN (SELECT id FROM stores WHERE branch_id = branches.id)
+                AND p.category_id = categories.id) as qty_available')
+            )
+            ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+            ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
+            ->join('stores', 'store_products.store_id', '=', 'stores.id')
+            ->join('branches', 'stores.branch_id', '=', 'branches.id')
+            ->join('companies', 'branches.company_id', '=', 'companies.id')
+            ->join('products', 'store_products.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->where('branches.company_id', 'LIKE', $company_id)
+            ->where('order_details.status', '=', 1)
+            ->whereBetween('order_date', [$from_date, $to_date]);
+
+        if (!in_array('%', $category_id1)) {
+            $data = $data->whereIn('products.category_id', $category_id1);
+        }
+        if (!in_array('%', $branch_id)) {
+            $data = $data->whereIn('stores.branch_id', $branch_id);
+        }
+
+        $sales = $data->groupBy('branches.id', 'products.category_id')
+            ->orderBy('branches.name', 'ASC')
+            ->orderBy('categories.code', 'ASC')
+            ->get();
+
+        // Group sales by branch
+        $salesByBranch = $sales->groupBy('branch_id');
+
+        // Reset 'all' to make it more readable in the UI
+        if (in_array('%', $category_id1)) {
+            $category_id1 = "all";
+        }
+        if (in_array('%', $branch_id)) {
+            $branch_id = "all";
+        }
+        if ($company_id == '%') {
+            $company_id = 'all';
+        }
+
+        // Fetch branch info if a specific branch is selected
+        $branch = null;
+        if ($branch_id != 'all') {
+            $branch = Branch::find($branch_id);
+        }
+        $company = null;
+        if ($company_id != 'all') {
+            $company = Company::find($company_id);
+        }
+
+        return view('pages.reports.sales_and_cash_analysis.print_category_sale_site_report', compact('salesByBranch', 'from_date', 'to_date', 'branch', 'company'));
+    }
+
     public function staffSaleReport()
     {
         return view('pages.reports.sales_and_cash_analysis.staff_sale_report');
@@ -1059,12 +1709,16 @@ class ReportController extends Controller
         $to_date = $request->to_date;
         $product_id = $request->product_id;
         $store_id = $request->store_id;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $category_id = $request->category_id;
         $staff_id = $request->staff_id;
 
         if ($product_id == '') {
             $product_id = '%';
+        }
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
         }
         if ($branch_id == '') {
             $branch_id = '%';
@@ -1109,14 +1763,19 @@ class ReportController extends Controller
         if ($staff_id == "%")
             $staff_id = "all";
         $user = User::find($staff_id);
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.sales_and_cash_analysis.load_staff_sale_report', compact('sales', 'from_date', 'to_date', 'branch', 'branch_id', 'product_id', 'store_id', 'category_id', 'staff_id', 'total_cash', 'user'));
+        return view('pages.reports.sales_and_cash_analysis.load_staff_sale_report', compact('sales', 'from_date', 'to_date', 'branch', 'company_id', 'branch_id', 'product_id', 'store_id', 'category_id', 'staff_id', 'total_cash', 'user'));
     }
 
-    public function printStaffSaleReport($from_date, $to_date, $branch_id, $store_id, $category_id, $product_id, $staff_id)
+    public function printStaffSaleReport($from_date, $to_date, $company_id, $branch_id, $store_id, $category_id, $product_id, $staff_id)
     {
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all') {
             $product_id = '%';
         }
@@ -1154,10 +1813,234 @@ class ReportController extends Controller
             ->get();
         $total_cash = Order::where('sold_by', 'LIKE', $staff_id)->where('status', 1)->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])->sum('total');
         $user = User::find($staff_id);
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
         return view('pages.reports.sales_and_cash_analysis.print_staff_sale_report', compact('sales', 'from_date', 'to_date', 'branch', 'total_cash', 'user'));
+    }
+    public function staffRelationOfficerReport()
+    {
+        $relation_officers = User::where('is_sale_representative', 1)->orderBy('name')->get();
+        return view('pages.reports.sales_and_cash_analysis.relation_officer_report', compact('relation_officers'));
+    }
+
+    public function loadRelationOfficerReport(Request $request)
+    {
+        $user_id = $request->input('user_id', ['%']);
+
+        // Remove any '%' values from the array if it's not the only value
+        if (count($user_id) > 1) {
+            $user_id = array_filter($user_id, function ($value) {
+                return $value !== '%';
+            });
+        }
+        // $branch_id = $request->input('branch_id', ['%']);
+
+        // // Remove any '%' values from the array if it's not the only value
+        // if (count($branch_id) > 1) {
+        //     $branch_id = array_filter($branch_id, function ($value) {
+        //         return $value !== '%';
+        //     });
+        // }
+        $category_id1 = $request->input('category_id1', ['%']);
+
+        // Remove any '%' values from the array if it's not the only value
+        if (count($category_id1) > 1) {
+            $category_id1 = array_filter($category_id1, function ($value) {
+                return $value !== '%';
+            });
+        }
+
+
+        $from_date = date('Y-m-d', strtotime($request->from_date));
+        $to_date = date('Y-m-d', strtotime($request->to_date));
+        $company_id = $request->company_id;
+        // $branch_id = json_encode($request->branch_id);
+        // $category_id1 = json_encode($request->category_id1);  // Now an array
+        // $user_id = json_encode($request->user_id);
+        // Handle 'all' for company and branch
+        if ($company_id == 'all' || $company_id == '' || $company_id == null) {
+            $company_id = '%';
+        }
+
+        // Check if any categories are selected, or treat as "all"
+        // $category_id1 = is_array($category_id1) ? $category_id1 : ['%'];  // Convert to array if not already
+        // $branch_id = is_array($branch_id) ? $branch_id : ['%'];  // Convert to array if not already
+        // $user_id = is_array($user_id) ? $user_id : ['%'];  // Convert to array if not already
+
+        // Build the query
+        $data = DB::table('orders')
+            ->select(
+                'branches.id as branch_id',
+                'branches.name as branch_name',
+                'branches.code as branch_code',
+                'categories.name as category',
+                'categories.code as code',
+                'users.user_code as ro_code',
+                'users.name as user_name',
+                DB::raw('SUM(order_details.quantity) as quantity'),
+                DB::raw('SUM(order_details.total) as amount'),
+                DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
+                DB::raw('(SELECT SUM(store_products.qty_available) 
+                FROM store_products
+                JOIN products p ON store_products.product_id = p.id
+                WHERE store_products.store_id IN (SELECT id FROM stores WHERE branch_id = branches.id)
+                AND p.category_id = categories.id) as qty_available')
+            )
+            ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+            ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
+            ->join('stores', 'store_products.store_id', '=', 'stores.id')
+            ->join('branches', 'stores.branch_id', '=', 'branches.id')
+            ->join('companies', 'branches.company_id', '=', 'companies.id')
+            ->join('products', 'store_products.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->join('customers', 'customers.id', 'orders.customer_id')
+            ->join('users', 'users.id', 'customers.relation_officer')
+            ->where('branches.company_id', 'LIKE', $company_id)
+            ->where('order_details.status', '=', 1)
+            ->whereBetween('order_date', [$from_date, $to_date]);
+
+        if (!in_array('%', $category_id1)) {
+            $data = $data->whereIn('products.category_id', $category_id1);
+        }
+        // if (!in_array('%', $branch_id)) {
+        //     $data = $data->whereIn('stores.branch_id', $branch_id);
+        // }
+        if (!in_array('%', $user_id)) {
+            $data = $data->whereIn('customers.relation_officer', $user_id);
+        }
+        
+
+        $salesByBranch = $data->groupBy('products.category_id')
+            ->orderBy('branches.name', 'ASC')
+            ->orderBy('categories.code', 'ASC')
+            ->get();
+
+            //$salesByBranch = $data->get();
+
+        // // Group sales by branch
+        // $salesByBranch = $sales->groupBy('branch_id');
+
+        // Reset 'all' to make it more readable in the UI
+        if (in_array('%', $category_id1)) {
+            $category_id1 = "all";
+        }
+        // if (in_array('%', $branch_id)) {
+        //     $branch_id = "all";
+        // }
+        if (in_array('%', $user_id)) {
+            $user_id = "all";
+        }
+        if ($company_id == '%') {
+            $company_id = 'all';
+        }
+
+        // Fetch branch info if a specific branch is selected
+        // $branch = null;
+        // if ($branch_id != 'all') {
+        //     $branch = Branch::find($branch_id);
+        // }
+        $company = null;
+        if ($company_id != 'all') {
+            $company = Company::find($company_id);
+        }
+        // Return the view with the data
+        return view(
+            'pages.reports.sales_and_cash_analysis.load_relation_officer_report',
+            compact('salesByBranch', 'from_date', 'to_date', 'category_id1', 'user_id', 'company', 'company_id')
+        );
+
+    }
+
+    public function printRelationOfficerReport($from_date, $to_date, $company_id, $branch_id, $store_id, $category_id, $product_id, $staff_id)
+    {
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
+
+        if (count($staff_id) > 1) {
+            $user_id = array_filter($staff_id, function ($value) {
+                return $value !== '%';
+            });
+        }
+
+
+        // Remove any '%' values from the array if it's not the only value
+        if (count($branch_id) > 1) {
+            $branch_id = array_filter($branch_id, function ($value) {
+                return $value !== '%';
+            });
+        }
+
+        // Remove any '%' values from the array if it's not the only value
+        if (count($category_id) > 1) {
+            $category_id = array_filter($category_id, function ($value) {
+                return $value !== '%';
+            });
+        }
+
+
+        $data = DB::table('orders')
+            ->select(
+                'branches.id as branch_id',
+                'branches.name as branch_name',
+                'branches.code as branch_code',
+                'categories.name as category',
+                'categories.code as code',
+                'users.user_code as ro_code',
+                'users.name as user_name',
+                DB::raw('SUM(order_details.quantity) as quantity'),
+                DB::raw('SUM(order_details.total) as amount'),
+                DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
+                DB::raw('(SELECT SUM(store_products.qty_available) 
+                FROM store_products
+                JOIN products p ON store_products.product_id = p.id
+                WHERE store_products.store_id IN (SELECT id FROM stores WHERE branch_id = branches.id)
+                AND p.category_id = categories.id) as qty_available')
+            )
+            ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+            ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
+            ->join('stores', 'store_products.store_id', '=', 'stores.id')
+            ->join('branches', 'stores.branch_id', '=', 'branches.id')
+            ->join('companies', 'branches.company_id', '=', 'companies.id')
+            ->join('products', 'store_products.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->join('customers', 'customers.id', 'orders.customer_id')
+            ->join('users', 'users.id', 'customers.relation_officer')
+            ->where('branches.company_id', 'LIKE', $company_id)
+            ->where('order_details.status', '=', 1)
+            ->whereBetween('order_date', [$from_date, $to_date]);
+
+        if (!in_array('%', $category_id)) {
+            $data = $data->whereIn('products.category_id', $category_id);
+        }
+        if (!in_array('%', $branch_id)) {
+            $data = $data->whereIn('stores.branch_id', $branch_id);
+        }
+        if (!in_array('%', $staff_id)) {
+            $data = $data->whereIn('customers.relation_officer', $staff_id);
+        }
+
+
+        $sales = $data->groupBy('branches.id', 'products.category_id')
+            ->orderBy('branches.name', 'ASC')
+            ->orderBy('categories.code', 'ASC')
+            ->get();
+
+        // Group sales by branch
+        $salesByBranch = $sales->groupBy('branch_id');
+
+        $total_cash = Order::where('sold_by', 'LIKE', $staff_id)->where('status', 1)->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])->sum('total');
+        $user = User::find($staff_id);
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
+        $branch = null;
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.sales_and_cash_analysis.print_relation_officer_report', compact('sales', 'from_date', 'to_date', 'branch', 'total_cash', 'user'));
     }
 
     public function previousStockBalance()
@@ -1256,10 +2139,13 @@ class ReportController extends Controller
 
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $product_id = $request->product_id;
         $store_id = $request->store_id;
-
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == "all" || $branch_id == "")
             $branch_id = "%";
         if ($store_id == "all" || $store_id == "")
@@ -1286,6 +2172,7 @@ class ReportController extends Controller
             ->join('branches', 'branches.id', 'stores.branch_id')
             ->where('stock_cards.product_id', 'LIKE', $product_id)
             ->where('stores.branch_id', 'LIKE', $branch_id)
+            ->where('branches.company_id', 'LIKE', $company_id)
             ->where('stock_cards.store_id', 'LIKE', $store_id)
             ->whereBetween('stock_cards.date', [$from_date, $to_date])
             ->orderBy('stock_cards.date', 'DESC')
@@ -1304,6 +2191,9 @@ class ReportController extends Controller
             $store_id = "all";
         if ($product_id == "%" || $product_id == "")
             $product_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
@@ -1312,6 +2202,8 @@ class ReportController extends Controller
             'records' => $records,
             'from_date' => $from_date,
             'to_date' => $to_date,
+            'company_id' => $company_id,
+            'company' => $company,
             'branch_id' => $branch_id,
             'store_id' => $store_id,
             'product_id' => $product_id,
@@ -1319,9 +2211,11 @@ class ReportController extends Controller
         ]);
     }
 
-    public function printStockLedger($from_date, $to_date, $branch_id, $store_id, $product_id)
+    public function printStockLedger($from_date, $to_date, $company_id, $branch_id, $store_id, $product_id)
     {
 
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == "all" || $branch_id == "")
             $branch_id = "%";
         if ($store_id == "all" || $store_id == "")
@@ -1348,6 +2242,7 @@ class ReportController extends Controller
             ->join('branches', 'branches.id', 'stores.branch_id')
             ->where('stock_cards.product_id', 'LIKE', $product_id)
             ->where('stores.branch_id', 'LIKE', $branch_id)
+            ->where('branches.company_id', 'LIKE', $company_id)
             ->where('stock_cards.store_id', 'LIKE', $store_id)
             ->whereBetween('stock_cards.date', [$from_date, $to_date])
             ->orderBy('stock_cards.updated_at', 'DESC')
@@ -1364,6 +2259,9 @@ class ReportController extends Controller
             $store_id = "all";
         if ($product_id == "%" || $product_id == "")
             $product_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
@@ -1372,6 +2270,8 @@ class ReportController extends Controller
             'records' => $records,
             'from_date' => $from_date,
             'to_date' => $to_date,
+            'company_id' => $company_id,
+            'company' => $company,
             'branch_id' => $branch_id,
             'store_id' => $store_id,
             'product_id' => $product_id,
@@ -1389,6 +2289,7 @@ class ReportController extends Controller
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $product_id = $request->product_id;
         $store_id = $request->store_id;
@@ -1397,7 +2298,9 @@ class ReportController extends Controller
         $payment_mode = $request->payment_mode;
         $credit_walkedin = $request->credit_walkedin;
         $matching = $request->matching;
-
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -1439,16 +2342,21 @@ class ReportController extends Controller
             $product_id = "all";
         if ($store_id == "%")
             $store_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
 
-        return view('pages.reports.sales_and_cash_analysis.load_report_with_common_name', compact('sales', 'from_date', 'to_date', 'branch', 'branch_id', 'product_id', 'store_id', 'category_id', 'customer', 'matching'));
+        return view('pages.reports.sales_and_cash_analysis.load_report_with_common_name', compact('sales', 'from_date', 'to_date', 'branch', 'company_id', 'branch_id', 'product_id', 'store_id', 'category_id', 'customer', 'matching'));
     }
 
-    public function printCustomerSaleReport($from_date, $to_date, $branch_id, $store_id, $category_id, $product_id, $customer, $matching)
+    public function printCustomerSaleReport($from_date, $to_date, $company_id, $branch_id, $store_id, $category_id, $product_id, $customer, $matching)
     {
 
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all') {
             $branch_id = '%';
         }
@@ -1487,10 +2395,13 @@ class ReportController extends Controller
             $product_id = "all";
         if ($store_id == "%")
             $store_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.sales_and_cash_analysis.print_report_with_common_name', compact('sales', 'from_date', 'to_date', 'branch', 'product_id', 'store_id', 'category_id', 'customer'));
+        return view('pages.reports.sales_and_cash_analysis.print_report_with_common_name', compact('sales', 'from_date', 'to_date', 'company', 'branch', 'product_id', 'store_id', 'category_id', 'customer'));
     }
 
 
@@ -1505,8 +2416,11 @@ class ReportController extends Controller
         $to_date = $request->to_date;
         $number_limit = $request->number_limit;
         $type = $request->type;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
-
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == '' || $branch_id == 'all')
             $branch_id = '%';
 
@@ -1530,14 +2444,19 @@ class ReportController extends Controller
         $sales = $sales->groupBy('store_products.product_id')
             ->take($number_limit)
             ->get();
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.sales_and_cash_analysis.load_most_sold_item_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'branch', 'type', 'number_limit'));
+        return view('pages.reports.sales_and_cash_analysis.load_most_sold_item_report', compact('sales', 'from_date', 'to_date', 'company_id', 'branch_id', 'branch', 'type', 'number_limit'));
     }
 
-    public function printMostSoldItemReport($from_date, $to_date, $branch_id, $type, $number_limit)
+    public function printMostSoldItemReport($from_date, $to_date, $company_id, $branch_id, $type, $number_limit)
     {
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == '' || $branch_id == 'all')
             $branch_id = '%';
 
@@ -1560,6 +2479,9 @@ class ReportController extends Controller
         $sales = $sales->groupBy('store_products.product_id')
             ->take($number_limit)
             ->get();
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
@@ -1575,12 +2497,15 @@ class ReportController extends Controller
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $product_id = $request->product_id;
         $category_id = $request->category_id;
         $customer_id = $request->customer_id;
         $credit_walkedin = $request->credit_walkedin;
-
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -1621,15 +2546,20 @@ class ReportController extends Controller
             $customer_id = "all";
         if ($branch_id == "%")
             $branch_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
 
-        return view('pages.reports.sales_and_cash_analysis.load_item_sold_report', compact('sales', 'from_date', 'to_date', 'branch', 'branch_id', 'product_id', 'category_id', 'customer_id'));
+        return view('pages.reports.sales_and_cash_analysis.load_item_sold_report', compact('sales', 'from_date', 'to_date', 'branch', 'company_id', 'branch_id', 'product_id', 'category_id', 'customer_id'));
     }
 
-    public function printItemSoldReport($from_date, $to_date, $branch_id, $category_id, $product_id, $customer_id)
+    public function printItemSoldReport($from_date, $to_date, $company_id, $branch_id, $category_id, $product_id, $customer_id)
     {
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -1666,6 +2596,9 @@ class ReportController extends Controller
             $category_id = "all";
         if ($product_id == "%")
             $product_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "%")
             $branch = Branch::find($branch_id);
@@ -1869,10 +2802,14 @@ class ReportController extends Controller
         $from_date = $request->from_date;
         $to_date = $request->to_date;
         $customer_id = $request->customer_id;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
 
         if ($customer_id == 'all' || $customer_id == '') {
             $customer_id = '%';
+        }
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
         }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
@@ -1960,18 +2897,23 @@ class ReportController extends Controller
             $from_date = "all";
         if ($to_date == null)
             $to_date = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
-        return view('pages.reports.customer_ledger_analysis.load_ageing_report', compact('sales', 'from_date', 'branch', 'to_date', 'branch_id', 'customer_id'));
+        return view('pages.reports.customer_ledger_analysis.load_ageing_report', compact('sales', 'from_date', 'branch', 'to_date', 'company_id', 'branch_id', 'customer_id'));
     }
 
-    public function printAgeingReport($from_date, $to_date, $branch_id, $customer_id)
+    public function printAgeingReport($from_date, $to_date, $company_id, $branch_id, $customer_id)
     {
 
         if ($customer_id == 'all') {
             $customer_id = '%';
         }
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -2055,10 +2997,13 @@ class ReportController extends Controller
             $to_date = "all";
         if ($branch_id == "%")
             $branch_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
-        return view('pages.reports.customer_ledger_analysis.print_ageing_report', compact('sales', 'from_date', 'to_date', 'branch', 'branch_id', 'customer_id'));
+        return view('pages.reports.customer_ledger_analysis.print_ageing_report', compact('sales', 'from_date', 'to_date', 'branch', 'company_id', 'branch_id', 'customer_id'));
     }
 
     public function lastTransaction()
@@ -2068,11 +3013,15 @@ class ReportController extends Controller
 
     public function loadLastTransaction(Request $request)
     {
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $customer_id = $request->customer_id;
 
         if ($customer_id == 'all' || $customer_id == '') {
             $customer_id = '%';
+        }
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
         }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
@@ -2093,18 +3042,23 @@ class ReportController extends Controller
             $customer_id = "all";
         if ($branch_id == "%")
             $branch_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
-        return view('pages.reports.customer_ledger_analysis.load_customer_last_transaction_report', compact('sales', 'branch', 'branch_id', 'customer_id'));
+        return view('pages.reports.customer_ledger_analysis.load_customer_last_transaction_report', compact('sales', 'branch', 'company_id', 'branch_id', 'customer_id'));
     }
 
-    public function printLastTransaction($branch_id, $customer_id)
+    public function printLastTransaction($company_id, $branch_id, $customer_id)
     {
 
         if ($customer_id == 'all') {
             $customer_id = '%';
         }
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all') {
             $branch_id = '%';
         }
@@ -2121,6 +3075,9 @@ class ReportController extends Controller
             $customer_id = "all";
         if ($branch_id == "%")
             $branch_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
@@ -2137,9 +3094,12 @@ class ReportController extends Controller
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $status = $request->status;
-
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -2155,15 +3115,20 @@ class ReportController extends Controller
             $branch_id = "all";
         if ($status == "%")
             $status = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.sales_and_cash_analysis.load_credit_notes_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'status', 'branch'));
+        return view('pages.reports.sales_and_cash_analysis.load_credit_notes_report', compact('sales', 'from_date', 'to_date', 'company_id', 'branch_id', 'status', 'branch'));
     }
 
-    public function printCreditNoteReport($from_date, $to_date, $branch_id, $status)
+    public function printCreditNoteReport($from_date, $to_date, $company_id, $branch_id, $status)
     {
 
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -2177,6 +3142,9 @@ class ReportController extends Controller
             ->get();
         if ($branch_id == "%")
             $branch_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
@@ -2191,9 +3159,12 @@ class ReportController extends Controller
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $status = $request->status;
-
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -2209,10 +3180,13 @@ class ReportController extends Controller
             $branch_id = "all";
         if ($status == "%")
             $status = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.sales_and_cash_analysis.load_list_of_invoices_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'status', 'branch'));
+        return view('pages.reports.sales_and_cash_analysis.load_list_of_invoices_report', compact('sales', 'from_date', 'to_date', 'company_id', 'branch_id', 'status', 'branch'));
     }
     public function invoiceLinesReport()
     {
@@ -2223,9 +3197,12 @@ class ReportController extends Controller
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $status = $request->status;
-
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -2241,14 +3218,19 @@ class ReportController extends Controller
             $branch_id = "all";
         if ($status == "%")
             $status = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.sales_and_cash_analysis.load_invoice_lines_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'status', 'branch'));
+        return view('pages.reports.sales_and_cash_analysis.load_invoice_lines_report', compact('sales', 'from_date', 'to_date', 'company_id', 'branch_id', 'status', 'branch'));
     }
-    public function printInvoiceLinesReport($from_date, $to_date, $branch_id, $status)
+    public function printInvoiceLinesReport($from_date, $to_date, $company_id, $branch_id, $status)
     {
 
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -2262,6 +3244,9 @@ class ReportController extends Controller
             ->get();
         if ($branch_id == "%")
             $branch_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
@@ -2277,9 +3262,12 @@ class ReportController extends Controller
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $status = $request->status;
-
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -2295,15 +3283,20 @@ class ReportController extends Controller
             $branch_id = "all";
         if ($status == "%")
             $status = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.sales_and_cash_analysis.load_orders_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'status', 'branch'));
+        return view('pages.reports.sales_and_cash_analysis.load_orders_report', compact('sales', 'from_date', 'to_date', 'company_id', 'company_id', 'branch_id', 'status', 'branch'));
     }
 
-    public function printOrderReport($from_date, $to_date, $branch_id, $status)
+    public function printOrderReport($from_date, $to_date, $company_id, $branch_id, $status)
     {
 
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -2317,6 +3310,9 @@ class ReportController extends Controller
             ->get();
         if ($branch_id == "%")
             $branch_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
@@ -2331,9 +3327,12 @@ class ReportController extends Controller
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $status = $request->status;
-
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -2349,15 +3348,20 @@ class ReportController extends Controller
             $branch_id = "all";
         if ($status == "%")
             $status = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.sales_and_cash_analysis.load_order_lines_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'status', 'branch'));
+        return view('pages.reports.sales_and_cash_analysis.load_order_lines_report', compact('sales', 'from_date', 'to_date', 'company_id', 'branch_id', 'status', 'branch'));
     }
 
-    public function printOrderLinesReport($from_date, $to_date, $branch_id, $status)
+    public function printOrderLinesReport($from_date, $to_date, $company_id, $branch_id, $status)
     {
 
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -2371,6 +3375,9 @@ class ReportController extends Controller
             ->get();
         if ($branch_id == "%")
             $branch_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
@@ -2390,6 +3397,7 @@ class ReportController extends Controller
         $store_id = $request->store_id;
         $category_id = $request->category_id;
         $supplier_id = $request->supplier_id;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $status = $request->status;
 
@@ -2405,6 +3413,9 @@ class ReportController extends Controller
         if ($supplier_id == 'all' || $supplier_id == '') {
             $supplier_id = '%';
         }
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -2414,7 +3425,7 @@ class ReportController extends Controller
 
 
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno','purchases.atc_no')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno', 'purchases.atc_no')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
             ->join('stores', 'stores.id', 'purchase_products.store_id')
@@ -2441,14 +3452,17 @@ class ReportController extends Controller
             $supplier_id = "all";
         if ($branch_id == "%")
             $branch_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
 
-        return view('pages.reports.inventory.load_purchase_invoice_lines_report', compact('sales', 'from_date', 'to_date', 'product_id', 'store_id', 'category_id', 'supplier_id', 'branch_id', 'branch', 'status'));
+        return view('pages.reports.inventory.load_purchase_invoice_lines_report', compact('sales', 'from_date', 'to_date', 'product_id', 'store_id', 'category_id', 'supplier_id', 'company_id', 'branch_id', 'branch', 'status'));
     }
 
-    public function printPurchaseInvoiceLinesReport($from_date, $to_date, $branch_id, $store_id, $category_id, $product_id, $supplier_id, $status)
+    public function printPurchaseInvoiceLinesReport($from_date, $to_date, $company_id, $branch_id, $store_id, $category_id, $product_id, $supplier_id, $status)
     {
         if ($product_id == 'all') {
             $product_id = '%';
@@ -2462,6 +3476,8 @@ class ReportController extends Controller
         if ($supplier_id == 'all') {
             $supplier_id = '%';
         }
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all') {
             $branch_id = '%';
         }
@@ -2469,7 +3485,7 @@ class ReportController extends Controller
             $status = '%';
         }
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno','purchases.atc_no')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno', 'purchases.atc_no')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
             ->join('stores', 'stores.id', 'purchase_products.store_id')
@@ -2484,6 +3500,9 @@ class ReportController extends Controller
             ->where(DB::raw("DATE(purchase_date)"), '<=', $to_date)
             ->orderBy('purchase_date')
             ->get();
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
@@ -2499,9 +3518,12 @@ class ReportController extends Controller
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $status = $request->status;
-
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -2517,15 +3539,20 @@ class ReportController extends Controller
             $branch_id = "all";
         if ($status == "%")
             $status = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.inventory.load_return_debit_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'status', 'branch'));
+        return view('pages.reports.inventory.load_return_debit_report', compact('sales', 'from_date', 'to_date', 'company_id', 'branch_id', 'status', 'branch'));
     }
 
-    public function printReturnDebitReport($from_date, $to_date, $branch_id, $status)
+    public function printReturnDebitReport($from_date, $to_date, $company_id, $branch_id, $status)
     {
 
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -2539,6 +3566,9 @@ class ReportController extends Controller
             ->get();
         if ($branch_id == "%")
             $branch_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
@@ -2554,9 +3584,12 @@ class ReportController extends Controller
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
 
-
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -2567,15 +3600,20 @@ class ReportController extends Controller
             ->get();
         if ($branch_id == "%")
             $branch_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.inventory.load_expiry_date_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'branch'));
+        return view('pages.reports.inventory.load_expiry_date_report', compact('sales', 'from_date', 'to_date', 'company_id', 'branch_id', 'branch'));
     }
 
-    public function printExpiryReport($from_date, $to_date, $branch_id)
+    public function printExpiryReport($from_date, $to_date, $company_id, $branch_id)
     {
 
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -2587,6 +3625,9 @@ class ReportController extends Controller
             ->get();
         if ($branch_id == "%")
             $branch_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
@@ -2604,12 +3645,16 @@ class ReportController extends Controller
         $to_date = $request->to_date;
 
         $supplier_id = $request->supplier_id;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $status = $request->status;
 
 
         if ($supplier_id == 'all' || $supplier_id == '') {
             $supplier_id = '%';
+        }
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
         }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
@@ -2619,11 +3664,12 @@ class ReportController extends Controller
         }
 
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'purchases.reference', 'purchase_expenses.reference AS ref', 'stores.code AS store', 'description', 'purchase_expenses.name', 'purchases.purchase_date', 'wbno', 'amount', 'purchase_expenses.status')
+            ->select('suppliers.name AS supplier', 'purchases.reference', 'purchase_expenses.reference AS ref', 'stores.code AS store', 'description', 'purchase_expenses.name', 'purchases.purchase_date', 'wbno', 'amount', 'purchase_expenses.status', 'purchases.created_at', 'users.name')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('purchase_expenses', 'purchase_expenses.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
             ->join('stores', 'stores.id', 'purchase_products.store_id')
+            ->join('users', 'users.id', 'purchases.created_by')
             ->where('purchases.supplier_id', 'LIKE', $supplier_id)
             ->where('purchases.status', 'LIKE', $status)
             ->where('purchases.branch_id', 'LIKE', $branch_id)
@@ -2635,19 +3681,24 @@ class ReportController extends Controller
             $supplier_id = "all";
         if ($branch_id == "%")
             $branch_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
 
-        return view('pages.reports.inventory.load_additional_invoice_report', compact('sales', 'from_date', 'to_date', 'supplier_id', 'branch_id', 'branch', 'status'));
+        return view('pages.reports.inventory.load_additional_invoice_report', compact('sales', 'from_date', 'to_date', 'supplier_id', 'company_id', 'branch_id', 'branch', 'status'));
     }
 
-    public function printAdditionalInvoiceReport($from_date, $to_date, $branch_id, $supplier_id, $status)
+    public function printAdditionalInvoiceReport($from_date, $to_date, $company_id, $branch_id, $supplier_id, $status)
     {
 
         if ($supplier_id == 'all') {
             $supplier_id = '%';
         }
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all') {
             $branch_id = '%';
         }
@@ -2655,11 +3706,12 @@ class ReportController extends Controller
             $status = '%';
         }
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'purchases.reference', 'purchase_expenses.reference AS ref', 'stores.code AS store', 'description', 'purchase_expenses.name', 'purchases.purchase_date', 'wbno', 'amount', 'purchase_expenses.status', 'purchases.atc_no')
+            ->select('suppliers.name AS supplier', 'purchases.reference', 'purchase_expenses.reference AS ref', 'stores.code AS store', 'description', 'purchase_expenses.name', 'purchases.purchase_date', 'wbno', 'amount', 'purchase_expenses.status', 'purchases.created_at', 'users.name')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('purchase_expenses', 'purchase_expenses.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
             ->join('stores', 'stores.id', 'purchase_products.store_id')
+            ->join('users', 'users.id', 'purchases.created_by')
             ->where('purchases.supplier_id', 'LIKE', $supplier_id)
             ->where('purchases.status', 'LIKE', $status)
             ->where('purchases.branch_id', 'LIKE', $branch_id)
@@ -2667,6 +3719,9 @@ class ReportController extends Controller
             ->where(DB::raw("DATE(purchase_date)"), '<=', $to_date)
             ->orderBy('purchase_date')
             ->get();
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
@@ -2684,12 +3739,16 @@ class ReportController extends Controller
         $from_date = $request->from_date;
         $to_date = $request->to_date;
         $supplier_id = $request->supplier_id;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $status = $request->status;
 
 
         if ($supplier_id == 'all' || $supplier_id == '') {
             $supplier_id = '%';
+        }
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
         }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
@@ -2700,11 +3759,12 @@ class ReportController extends Controller
 
 
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno', DB::raw('SUM(quantity * unit_price) AS total'), 'purchases.status', 'purchases.atc_no')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno', DB::raw('SUM(quantity * unit_price) AS total'), 'purchases.status', 'purchases.atc_no', 'purchases.created_at', 'users.name')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
             ->join('stores', 'stores.id', 'purchase_products.store_id')
             ->join('products', 'products.id', 'purchase_products.product_id')
+            ->join('users', 'users.id', 'purchases.created_by')
             ->where('purchases.supplier_id', 'LIKE', $supplier_id)
             ->where('purchases.status', 'LIKE', $status)
             ->where('purchases.branch_id', 'LIKE', $branch_id)
@@ -2721,19 +3781,24 @@ class ReportController extends Controller
             $supplier_id = "all";
         if ($branch_id == "%")
             $branch_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
 
-        return view('pages.reports.inventory.load_purchase_invoice_report', compact('sales', 'from_date', 'to_date', 'supplier_id', 'branch_id', 'branch', 'status'));
+        return view('pages.reports.inventory.load_purchase_invoice_report', compact('sales', 'from_date', 'to_date', 'supplier_id', 'company_id', 'branch_id', 'branch', 'status'));
     }
 
-    public function printPurchaseInvoiceReport($from_date, $to_date, $branch_id, $supplier_id, $status)
+    public function printPurchaseInvoiceReport($from_date, $to_date, $company_id, $branch_id, $supplier_id, $status)
     {
 
         if ($supplier_id == 'all') {
             $supplier_id = '%';
         }
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all') {
             $branch_id = '%';
         }
@@ -2741,11 +3806,12 @@ class ReportController extends Controller
             $status = '%';
         }
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno', DB::raw('SUM(quantity * unit_price) AS total'), 'purchases.status', 'purchases.atc_no')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'stores.code AS store', 'purchase_products.quantity AS quantity', 'unit_price', 'purchases.purchase_date', 'wbno', DB::raw('SUM(quantity * unit_price) AS total'), 'purchases.status', 'purchases.atc_no', 'purchases.created_at', 'users.name')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
             ->join('stores', 'stores.id', 'purchase_products.store_id')
             ->join('products', 'products.id', 'purchase_products.product_id')
+            ->join('users', 'users.id', 'purchases.created_by')
             ->where('purchases.supplier_id', 'LIKE', $supplier_id)
             ->where('purchases.status', 'LIKE', $status)
             ->where('purchases.branch_id', 'LIKE', $branch_id)
@@ -2754,7 +3820,9 @@ class ReportController extends Controller
             ->orderBy('purchase_date')
             ->groupBy('purchase_products.purchase_id')
             ->get();
-
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
@@ -2772,6 +3840,7 @@ class ReportController extends Controller
         $product_id = $request->product_id;
         $category_id = $request->category_id;
         $supplier_id = $request->supplier_id;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $status = $request->status;
 
@@ -2785,6 +3854,9 @@ class ReportController extends Controller
         if ($supplier_id == 'all' || $supplier_id == '') {
             $supplier_id = '%';
         }
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -2794,10 +3866,11 @@ class ReportController extends Controller
 
 
         $sales = DB::table('purchase_requests')
-            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'purchase_product_requests.quantity', 'unit_price', 'purchase_requests.purchase_date', 'wbno', 'purchase_requests.status')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'purchase_product_requests.quantity', 'unit_price', 'purchase_requests.purchase_date', 'wbno', 'purchase_requests.status', 'purchase_requests.created_at', 'users.name')
             ->join('purchase_product_requests', 'purchase_product_requests.purchase_id', 'purchase_requests.id')
             ->join('suppliers', 'suppliers.id', 'purchase_requests.supplier_id')
             ->join('products', 'products.id', 'purchase_product_requests.product_id')
+            ->join('users', 'users.id', 'purchase_requests.updated_by')
             ->where('products.category_id', 'LIKE', $category_id)
             ->where('purchase_product_requests.product_id', 'LIKE', $product_id)
             ->where('purchase_requests.supplier_id', 'LIKE', $supplier_id)
@@ -2818,14 +3891,17 @@ class ReportController extends Controller
             $supplier_id = "all";
         if ($branch_id == "%")
             $branch_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
 
-        return view('pages.reports.inventory.load_purchase_request_report', compact('sales', 'from_date', 'to_date', 'supplier_id', 'branch_id', 'category_id', 'product_id', 'branch', 'status'));
+        return view('pages.reports.inventory.load_purchase_request_report', compact('sales', 'from_date', 'to_date', 'supplier_id', 'company_id', 'branch_id', 'category_id', 'product_id', 'branch', 'status'));
     }
 
-    public function printPurchaseRequestReport($from_date, $to_date, $branch_id, $category_id, $product_id, $supplier_id, $status)
+    public function printPurchaseRequestReport($from_date, $to_date, $company_id, $branch_id, $category_id, $product_id, $supplier_id, $status)
     {
         if ($product_id == 'all') {
             $product_id = '%';
@@ -2837,6 +3913,8 @@ class ReportController extends Controller
         if ($supplier_id == 'all') {
             $supplier_id = '%';
         }
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all') {
             $branch_id = '%';
         }
@@ -2844,10 +3922,11 @@ class ReportController extends Controller
             $status = '%';
         }
         $sales = DB::table('purchase_requests')
-            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'purchase_product_requests.quantity', 'unit_price', 'purchase_requests.purchase_date', 'wbno', 'purchase_requests.status')
+            ->select('suppliers.name AS supplier', 'reference', 'products.name AS product', 'purchase_product_requests.quantity', 'unit_price', 'purchase_requests.purchase_date', 'wbno', 'purchase_requests.status', 'purchase_requests.created_at', 'users.name')
             ->join('purchase_product_requests', 'purchase_product_requests.purchase_id', 'purchase_requests.id')
             ->join('suppliers', 'suppliers.id', 'purchase_requests.supplier_id')
             ->join('products', 'products.id', 'purchase_product_requests.product_id')
+            ->join('users', 'users.id', 'purchase_requests.updated_by')
             ->where('products.category_id', 'LIKE', $category_id)
             ->where('purchase_product_requests.product_id', 'LIKE', $product_id)
             ->where('purchase_requests.supplier_id', 'LIKE', $supplier_id)
@@ -2857,6 +3936,9 @@ class ReportController extends Controller
             ->where(DB::raw("DATE(purchase_date)"), '<=', $to_date)
             ->orderBy('purchase_date')
             ->get();
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
@@ -2871,11 +3953,13 @@ class ReportController extends Controller
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
-
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $status = $request->status;
 
-
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
@@ -2901,16 +3985,21 @@ class ReportController extends Controller
             $status = "all";
         if ($branch_id == "%")
             $branch_id = "all";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
 
-        return view('pages.reports.inventory.load_goods_in_transit_report', compact('sales', 'from_date', 'to_date', 'branch_id', 'branch', 'status'));
+        return view('pages.reports.inventory.load_goods_in_transit_report', compact('sales', 'from_date', 'to_date', 'company_id', 'branch_id', 'branch', 'status'));
     }
 
-    public function printGoodsInTransitReport($from_date, $to_date, $branch_id, $status)
+    public function printGoodsInTransitReport($from_date, $to_date, $company_id, $branch_id, $status)
     {
 
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all') {
             $branch_id = '%';
         }
@@ -2929,6 +4018,9 @@ class ReportController extends Controller
             ->where(DB::raw("DATE(date)"), '<=', $to_date)
             ->orderBy('date')
             ->get();
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
@@ -3060,6 +4152,7 @@ class ReportController extends Controller
         $yesterday = date('Y-m-d', strtotime($date . '-1 days'));
         $product_id = $request->product_id;
         $category_id = $request->category_id;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $store_id = $request->store_id;
         $store_group = $request->store_group;
@@ -3130,11 +4223,14 @@ class ReportController extends Controller
             $branch_id = "";
         if ($store_id == "%")
             $store_id = "";
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "")
             $branch = Branch::find($branch_id);
 
-        return view('pages.reports.inventory.product_valuation.load_product_valuation_report', compact('stock_cards', 'date', 'branch_id', 'store_id', 'category_id', 'product_id', 'branch', 'store_group'));
+        return view('pages.reports.inventory.product_valuation.load_product_valuation_report', compact('stock_cards', 'date', 'company_id', 'branch_id', 'store_id', 'category_id', 'product_id', 'branch', 'store_group'));
     }
 
     public function printProductValuationReport(Request $request)
@@ -3144,6 +4240,7 @@ class ReportController extends Controller
         $yesterday = date('Y-m-d', strtotime($date . '-1 days'));
         $product_id = $request->product_id;
         $category_id = $request->category_id;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $store_id = $request->store_id;
         $stock_cards = StockCard::selectRaw("
@@ -3181,7 +4278,9 @@ class ReportController extends Controller
             $stock_cards->where('product_id', $product_id);
         }
         $stock_cards = $stock_cards->get();
-
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != "")
             $branch = Branch::find($branch_id);
@@ -3396,11 +4495,15 @@ class ReportController extends Controller
         $payer_id = $request->payer_id;
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         if ($type == 'all')
             $type = '%';
         if ($payer_id == 'all')
             $payer_id = '%';
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all')
             $branch_id = '%';
 
@@ -3428,16 +4531,22 @@ class ReportController extends Controller
         $balance_b_d = $sum_cr_b_d - $sum_dr_b_d;
         $balance = $credit_sum - $debit_sum + $balance_b_d;
 
+        if ($company_id == '%') {
+            $company_id = 'all';
+        }
         if ($branch_id == '%')
             $branch_id = 'all';
         if ($payer_id == '%')
             $payer_id = 'all';
         if ($type == '%')
             $type = 'all';
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.ap_ar.statements.load_account_statement', compact('ledgers', 'branch', 'from_date', 'to_date', 'balance', 'branch_id', 'payer_id', 'type', 'credit_sum', 'debit_sum', 'sum_cr_b_d', 'sum_dr_b_d', 'balance_b_d'));
+        return view('pages.reports.ap_ar.statements.load_account_statement', compact('ledgers', 'branch', 'from_date', 'to_date', 'balance', 'company_id', 'branch_id', 'payer_id', 'type', 'credit_sum', 'debit_sum', 'sum_cr_b_d', 'sum_dr_b_d', 'balance_b_d'));
     }
     public function accountBalance(Request $request)
     {
@@ -3450,10 +4559,13 @@ class ReportController extends Controller
         $type = $request->account_type;
 
         $date = $request->date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         if ($type == 'all' || $type == '')
             $type = '%';
-
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
         if ($type == "GeneralAccount") {
@@ -3499,7 +4611,7 @@ class ReportController extends Controller
 
         if ($branch_id == '%' || $branch_id == '')
             $branch_id = 'all';
-        return view('pages.reports.ap_ar.statements.load_account_balances', compact('ledgers', 'branch', 'type', 'date', 'branch_id', 'balance', 'credit_sum', 'debit_sum'));
+        return view('pages.reports.ap_ar.statements.load_account_balances', compact('ledgers', 'branch', 'type', 'date', 'company_id', 'branch_id', 'balance', 'credit_sum', 'debit_sum'));
     }
     public function trialBalance()
     {
@@ -3511,6 +4623,7 @@ class ReportController extends Controller
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
 
         $query1 = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, 'GeneralAccount')
@@ -3588,15 +4701,20 @@ class ReportController extends Controller
         $balance4 = $credit_sum4 - $debit_sum4;
 
         $branch = null;
-
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == '' || $branch_id == '%')
             $branch_id = 'all';
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.ap_ar.trial_balance.load', compact('ledger1', 'ledger2', 'ledger3', 'ledger4', 'branch', 'from_date', 'to_date', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1', 'balance2', 'credit_sum2', 'debit_sum2', 'balance3', 'credit_sum3', 'debit_sum3', 'balance4', 'credit_sum4', 'debit_sum4'));
+        return view('pages.reports.ap_ar.trial_balance.load', compact('ledger1', 'ledger2', 'ledger3', 'ledger4', 'branch', 'from_date', 'to_date', 'company_id', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1', 'balance2', 'credit_sum2', 'debit_sum2', 'balance3', 'credit_sum3', 'debit_sum3', 'balance4', 'credit_sum4', 'debit_sum4'));
     }
 
-    public function printTrialBalance($from, $to, $branch_id)
+    public function printTrialBalance($from, $to, $company_id, $branch_id)
     {
         $query1 = $this->generalAccountLedgerBy($from, $to, $branch_id, 'GeneralAccount')
             ->whereIn(DB::raw('SUBSTR(general_accounts.number, 1, 1)'), ['R', 'C']);
@@ -3671,11 +4789,13 @@ class ReportController extends Controller
         $credit_sum4 = $ledger4->sum('credit');
         $debit_sum4 = $ledger4->sum('debit');
         $balance4 = $credit_sum4 - $debit_sum4;
-
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.ap_ar.trial_balance.print', compact('ledger1', 'ledger2', 'ledger3', 'ledger4', 'branch', 'from', 'to', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1', 'balance2', 'credit_sum2', 'debit_sum2', 'balance3', 'credit_sum3', 'debit_sum3', 'balance4', 'credit_sum4', 'debit_sum4'));
+        return view('pages.reports.ap_ar.trial_balance.print', compact('ledger1', 'ledger2', 'ledger3', 'ledger4', 'branch', 'from', 'to', 'company_id', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1', 'balance2', 'credit_sum2', 'debit_sum2', 'balance3', 'credit_sum3', 'debit_sum3', 'balance4', 'credit_sum4', 'debit_sum4'));
     }
     public function balanceSheet()
     {
@@ -3683,118 +4803,386 @@ class ReportController extends Controller
 
         return view('pages.reports.ap_ar.balance_sheet.index', compact('branches'));
     }
+    // public function loadBalanceSheet(Request $request)
+    // {
+    //     $to_date = $request->to_date;
+    //     $branch_id = $request->branch_id;
+
+    //     $query1 = $this->generalAccountLedgerBy(null, $to_date, $branch_id, 'GeneralAccount');
+    //     $ledger1 = $query1->select(
+    //         DB::raw('SUM(credit) AS credit'),
+    //         DB::raw('SUM(debit) AS debit'),
+    //         'number',
+    //         'general_accounts.description',
+    //         'general_account_ledgers.id'
+    //     )
+    //         ->whereNotIn('model_name', ['Customer', 'Supplier'])
+    //         ->orderBy('number')
+    //         ->groupBy('number')
+    //         ->get();
+    //     $ledger2 = DB::table('general_account_ledgers')
+    //         ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+    //         ->select(
+    //             DB::raw('SUM(general_account_ledgers.credit) AS credit'),
+    //             DB::raw('SUM(general_account_ledgers.debit) AS debit'),
+    //             'general_accounts.description',
+    //             'general_account_ledgers.id'
+    //         )
+    //         ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+    //         ->whereDate('general_account_ledgers.date', '<=', $to_date)
+    //         ->whereNotIn('general_account_ledgers.model_name', ['GeneralAccount', 'Supplier'])
+    //         ->groupBy('model_name')
+    //         ->get();
+    //     $ledger3 = DB::table('general_account_ledgers')
+    //         ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+    //         ->select(
+    //             DB::raw('SUM(general_account_ledgers.credit) AS credit'),
+    //             DB::raw('SUM(general_account_ledgers.debit) AS debit'),
+    //             'general_accounts.description',
+    //             'general_account_ledgers.id'
+    //         )
+    //         ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+    //         ->whereDate('general_account_ledgers.date', '<=', $to_date)
+    //         ->whereNotIn('general_account_ledgers.model_name', ['GeneralAccount', 'Customer'])
+    //         ->groupBy('model_name')
+    //         ->get();
+
+
+
+    //     $credit_sum1 = $query1->sum('credit');
+    //     $debit_sum1 = $query1->sum('debit');
+    //     $balance1 = $credit_sum1 - $debit_sum1;
+
+
+    //     $branch = null;
+
+    //     if ($branch_id == '' || $branch_id == '%')
+    //         $branch_id = 'all';
+    //     if ($branch_id != 'all')
+    //         $branch = Branch::find($branch_id);
+    //     return view('pages.reports.ap_ar.balance_sheet.load', compact('ledger1', 'ledger2', 'ledger3', 'branch', 'to_date', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1'));
+    // }
     public function loadBalanceSheet(Request $request)
     {
         $to_date = $request->to_date;
-        $branch_id = $request->branch_id;
+        $branch_id = $request->branch_id == '' ? 'all' : $request->branch_id;
+        $company_id = $request->company_id == '' ? 'all' : $request->company_id;
 
-        $query1 = $this->generalAccountLedgerBy(null, $to_date, $branch_id, 'GeneralAccount');
-        $ledger1 = $query1->select(
+        // Helper function to get account type
+        $getAccountType = function ($number) {
+            $firstDigit = substr($number, 0, 1);
+            if ($firstDigit == 'A')
+                return 'asset';
+            if ($firstDigit == 'L')
+                return 'liability';
+            if ($firstDigit == 'E')
+                return 'equity';
+            if ($firstDigit == 'R')
+                return 'revenue';
+            if ($firstDigit == 'C')
+                return 'expense';
+            return 'other';
+        };
+
+        // Fetch general accounts
+        $generalAccountsQuery = $this->generalAccountLedgerBy(null, $to_date, $branch_id, 'GeneralAccount');
+        $generalAccounts = $generalAccountsQuery->select(
             DB::raw('SUM(credit) AS credit'),
             DB::raw('SUM(debit) AS debit'),
             'number',
             'general_accounts.description',
             'general_account_ledgers.id'
         )
-            ->whereNotIn('model_name', ['Customer', 'Supplier'])
-            ->orderBy('number')
             ->groupBy('number')
+            ->orderBy('number')
             ->get();
-        $ledger2 = DB::table('general_account_ledgers')
-            ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
-            ->select(
-                DB::raw('SUM(general_account_ledgers.credit) AS credit'),
-                DB::raw('SUM(general_account_ledgers.debit) AS debit'),
-                'general_accounts.description',
-                'general_account_ledgers.id'
-            )
-            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
-            ->whereDate('general_account_ledgers.date', '<=', $to_date)
-            ->whereNotIn('general_account_ledgers.model_name', ['GeneralAccount', 'Supplier'])
-            ->groupBy('model_name')
-            ->get();
-        $ledger3 = DB::table('general_account_ledgers')
-            ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
-            ->select(
-                DB::raw('SUM(general_account_ledgers.credit) AS credit'),
-                DB::raw('SUM(general_account_ledgers.debit) AS debit'),
-                'general_accounts.description',
-                'general_account_ledgers.id'
-            )
-            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
-            ->whereDate('general_account_ledgers.date', '<=', $to_date)
-            ->whereNotIn('general_account_ledgers.model_name', ['GeneralAccount', 'Customer'])
+
+        // Fetch customer accounts
+        $customerAccountsQuery = $this->generalAccountLedgerBy(null, $to_date, $branch_id, 'Customer');
+        $customerAccounts = $customerAccountsQuery->select(
+            DB::raw('SUM(general_account_ledgers.credit) AS credit'),
+            DB::raw('SUM(general_account_ledgers.debit) AS debit'),
+            DB::raw("'A150001' AS number"),
+            DB::raw("'General Customer Control Account' AS description"),
+            'general_account_ledgers.id'
+        )
             ->groupBy('model_name')
             ->get();
 
+        // Fetch supplier accounts
+        $supplierAccountsQuery = $this->generalAccountLedgerBy(null, $to_date, $branch_id, 'Supplier');
+        $supplierAccounts = $supplierAccountsQuery->select(
+            DB::raw('SUM(general_account_ledgers.credit) AS credit'),
+            DB::raw('SUM(general_account_ledgers.debit) AS debit'),
+            DB::raw("'L220010' AS number"),
+            DB::raw("'Accounts Payable Control' AS description"),
+            'general_account_ledgers.id'
+        )
+            ->groupBy('model_name')
+            ->get();
 
+        // Combine all accounts
+        $allAccounts = $generalAccounts->concat($customerAccounts)->concat($supplierAccounts);
 
-        $credit_sum1 = $query1->sum('credit');
-        $debit_sum1 = $query1->sum('debit');
-        $balance1 = $credit_sum1 - $debit_sum1;
+        // Separate accounts into assets, liabilities, equity, revenues, and expenses
+        $assets = collect();
+        $liabilities = collect();
+        $equity = collect();
+        $revenues = collect();
+        $expenses = collect();
 
+        foreach ($allAccounts as $account) {
+            $type = $getAccountType($account->number);
+            switch ($type) {
+                case 'asset':
+                    $assets->push($account);
+                    break;
+                case 'liability':
+                    $liabilities->push($account);
+                    break;
+                case 'equity':
+                    $equity->push($account);
+                    break;
+                case 'revenue':
+                    $revenues->push($account);
+                    break;
+                case 'expense':
+                    $expenses->push($account);
+                    break;
+            }
+        }
 
+        // Calculate net income
+        $totalRevenue = $revenues->sum('credit') - $revenues->sum('debit');
+        $totalExpenses = $expenses->sum('debit') - $expenses->sum('credit');
+        $net_income = $totalRevenue - $totalExpenses;
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
-
-        if ($branch_id == '' || $branch_id == '%')
-            $branch_id = 'all';
-        if ($branch_id != 'all')
+        if ($branch_id != 'all') {
             $branch = Branch::find($branch_id);
-        return view('pages.reports.ap_ar.balance_sheet.load', compact('ledger1', 'ledger2', 'ledger3', 'branch', 'to_date', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1'));
+        }
+
+        // Assuming $to_date is a string in a format like '2024-09-30'
+        $date = Carbon::parse($to_date);
+
+        // Get the previous year
+        $previousYear = $date->year - 1;
+
+        // Last day of the previous year
+        $last_year_date = Carbon::create($previousYear, 12, 31)->format('Y-m-d');
+
+        // First day of the current year
+        $from_this_year_date = Carbon::create($date->year, 1, 1)->format('Y-m-d');
+        $last_day_of_previous_year = $date->copy()->subYear()->endOfYear()->format('Y-m-d');
+        $first_day_of_current_year = $date->copy()->startOfYear()->format('Y-m-d');
+
+        // Fetch total expenses from inception to 2023-12-31
+        // $retainedEarningsFromLastYear = GeneralAccountLedger::join('general_accounts', 'general_account_ledgers.model_id', 'general_accounts.id')
+        //     ->where('number', 'like', 'C%')
+        //     ->whereDate('date', '<=', $last_day_of_previous_year)
+        //     ->select(DB::raw('SUM(debit - credit) as total_expenses'))
+        //     ->first()->total_expenses;
+
+        $retainedEarningsFromLastYear_R = GeneralAccountLedger::join('general_accounts', 'general_account_ledgers.model_id', 'general_accounts.id')
+            ->where(function ($query) {
+                $query->where('number', 'like', 'R%'); // Revenues
+            })
+            ->whereDate('date', '<=', $last_day_of_previous_year)
+            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+            ->select(DB::raw('SUM(credit - debit) as retained_earnings'))
+            ->first()->retained_earnings;
+
+        $retainedEarningsFromLastYear_C = GeneralAccountLedger::join('general_accounts', 'general_account_ledgers.model_id', 'general_accounts.id')
+            ->where(function ($query) {
+                $query->where('number', 'like', 'C%');  // Expenses
+    
+            })
+            ->whereDate('date', '<=', $last_day_of_previous_year)
+            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+            ->select(DB::raw('SUM(credit - debit) as retained_earnings'))
+            ->first()->retained_earnings;
+        $retainedEarningsFromLastYear = abs($retainedEarningsFromLastYear_R) - abs($retainedEarningsFromLastYear_C);
+
+        // Fetch retained earnings from 2024-01-01 to the given date ($to_date)
+
+        $retainedEarningsFromSelectedYear_C = GeneralAccountLedger::join('general_accounts', 'general_account_ledgers.model_id', 'general_accounts.id')
+            ->where(function ($query) {
+                $query->where('number', 'like', 'C%');  // Expenses
+    
+            })
+            ->whereDate('date', '>=', $first_day_of_current_year)
+            ->whereDate('date', '<=', $to_date)
+            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+            ->select(DB::raw('SUM(credit - debit) as retained_earnings'))
+            ->first()->retained_earnings;
+
+        $retainedEarningsFromSelectedYear_R = GeneralAccountLedger::join('general_accounts', 'general_account_ledgers.model_id', 'general_accounts.id')
+            ->where(function ($query) {
+                $query->where('number', 'like', 'R%'); // Revenues
+            })
+            ->whereDate('date', '>=', $first_day_of_current_year)
+            ->whereDate('date', '<=', $to_date)
+            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+            ->select(DB::raw('SUM(credit - debit) as retained_earnings'))
+            ->first()->retained_earnings;
+        //return $retainedEarningsFromSelectedYear_R. ",".$retainedEarningsFromSelectedYear_C;
+        $retainedEarningsFromSelectedYear = abs($retainedEarningsFromSelectedYear_R) - abs($retainedEarningsFromSelectedYear_C);
+        return view('pages.reports.ap_ar.balance_sheet.load', compact('assets', 'liabilities', 'equity', 'net_income', 'branch', 'to_date', 'company_id', 'branch_id', 'retainedEarningsFromLastYear', 'retainedEarningsFromSelectedYear'));
     }
+    // public function printBalanceSheet($to, $branch_id)
+    // {
+    //     $query1 = $this->generalAccountLedgerBy(null, $to, $branch_id, 'GeneralAccount');
+    //     $query1 = $this->generalAccountLedgerBy(null, $to, $branch_id, 'GeneralAccount');
+    //     $ledger1 = $query1->select(
+    //         DB::raw('SUM(credit) AS credit'),
+    //         DB::raw('SUM(debit) AS debit'),
+    //         'number',
+    //         'general_accounts.description',
+    //         'general_account_ledgers.id'
+    //     )
+    //         ->whereNotIn('model_name', ['Customer', 'Supplier'])
+    //         ->orderBy('number')
+    //         ->groupBy('number')
+    //         ->get();
+    //     $ledger2 = DB::table('general_account_ledgers')
+    //         ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+    //         ->select(
+    //             DB::raw('SUM(general_account_ledgers.credit) AS credit'),
+    //             DB::raw('SUM(general_account_ledgers.debit) AS debit'),
+    //             'general_accounts.description',
+    //             'general_account_ledgers.id'
+    //         )
+    //         ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+    //         ->whereDate('general_account_ledgers.date', '<=', $to)
+    //         ->whereNotIn('general_account_ledgers.model_name', ['GeneralAccount', 'Supplier'])
+    //         ->groupBy('model_name')
+    //         ->get();
+    //     $ledger3 = DB::table('general_account_ledgers')
+    //         ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+    //         ->select(
+    //             DB::raw('SUM(general_account_ledgers.credit) AS credit'),
+    //             DB::raw('SUM(general_account_ledgers.debit) AS debit'),
+    //             'general_accounts.description',
+    //             'general_account_ledgers.id'
+    //         )
+    //         ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+    //         ->whereDate('general_account_ledgers.date', '<=', $to)
+    //         ->whereNotIn('general_account_ledgers.model_name', ['GeneralAccount', 'Customer'])
+    //         ->groupBy('model_name')
+    //         ->get();
 
-    public function printBalanceSheet($to, $branch_id)
+
+    //     $credit_sum1 = $query1->sum('credit');
+    //     $debit_sum1 = $query1->sum('debit');
+    //     $balance1 = $credit_sum1 - $debit_sum1;
+
+
+    //     $branch = null;
+    //     if ($branch_id != 'all')
+    //         $branch = Branch::find($branch_id);
+    //     return view('pages.reports.ap_ar.balance_sheet.print', compact('ledger1', 'branch', 'to', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1'));
+    // }
+    public function printBalanceSheet($to_date, $company_id, $branch_id)
     {
-        $query1 = $this->generalAccountLedgerBy(null, $to, $branch_id, 'GeneralAccount');
-        $query1 = $this->generalAccountLedgerBy(null, $to, $branch_id, 'GeneralAccount');
-        $ledger1 = $query1->select(
+        // Helper function to get account type
+        $getAccountType = function ($number) {
+            $firstDigit = substr($number, 0, 1);
+            if ($firstDigit == '1')
+                return 'asset';
+            if ($firstDigit == '2')
+                return 'liability';
+            if ($firstDigit == '3')
+                return 'equity';
+            if ($firstDigit == '4')
+                return 'revenue';
+            if ($firstDigit == '5')
+                return 'expense';
+            return 'other';
+        };
+
+        // Fetch general accounts
+        $generalAccountsQuery = $this->generalAccountLedgerBy(null, $to_date, $branch_id, 'GeneralAccount');
+        $generalAccounts = $generalAccountsQuery->select(
             DB::raw('SUM(credit) AS credit'),
             DB::raw('SUM(debit) AS debit'),
             'number',
             'general_accounts.description',
             'general_account_ledgers.id'
         )
-            ->whereNotIn('model_name', ['Customer', 'Supplier'])
-            ->orderBy('number')
             ->groupBy('number')
+            ->orderBy('number')
             ->get();
-        $ledger2 = DB::table('general_account_ledgers')
-            ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
-            ->select(
-                DB::raw('SUM(general_account_ledgers.credit) AS credit'),
-                DB::raw('SUM(general_account_ledgers.debit) AS debit'),
-                'general_accounts.description',
-                'general_account_ledgers.id'
-            )
-            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
-            ->whereDate('general_account_ledgers.date', '<=', $to)
-            ->whereNotIn('general_account_ledgers.model_name', ['GeneralAccount', 'Supplier'])
-            ->groupBy('model_name')
-            ->get();
-        $ledger3 = DB::table('general_account_ledgers')
-            ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
-            ->select(
-                DB::raw('SUM(general_account_ledgers.credit) AS credit'),
-                DB::raw('SUM(general_account_ledgers.debit) AS debit'),
-                'general_accounts.description',
-                'general_account_ledgers.id'
-            )
-            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
-            ->whereDate('general_account_ledgers.date', '<=', $to)
-            ->whereNotIn('general_account_ledgers.model_name', ['GeneralAccount', 'Customer'])
+
+        // Fetch customer accounts
+        $customerAccountsQuery = $this->generalAccountLedgerBy(null, $to_date, $branch_id, 'Customer');
+        $customerAccounts = $customerAccountsQuery->select(
+            DB::raw('SUM(general_account_ledgers.credit) AS credit'),
+            DB::raw('SUM(general_account_ledgers.debit) AS debit'),
+            DB::raw("'A150001' AS number"),
+            DB::raw("'General Customer Control Account' AS description"),
+            'general_account_ledgers.id'
+        )
             ->groupBy('model_name')
             ->get();
 
+        // Fetch supplier accounts
+        $supplierAccountsQuery = $this->generalAccountLedgerBy(null, $to_date, $branch_id, 'Supplier');
+        $supplierAccounts = $supplierAccountsQuery->select(
+            DB::raw('SUM(general_account_ledgers.credit) AS credit'),
+            DB::raw('SUM(general_account_ledgers.debit) AS debit'),
+            DB::raw("'L220010' AS number"),
+            DB::raw("'Accounts Payable Control' AS description"),
+            'general_account_ledgers.id'
+        )
+            ->groupBy('model_name')
+            ->get();
 
-        $credit_sum1 = $query1->sum('credit');
-        $debit_sum1 = $query1->sum('debit');
-        $balance1 = $credit_sum1 - $debit_sum1;
+        // Combine all accounts
+        $allAccounts = $generalAccounts->concat($customerAccounts)->concat($supplierAccounts);
 
+        // Separate accounts into assets, liabilities, equity, revenues, and expenses
+        $assets = collect();
+        $liabilities = collect();
+        $equity = collect();
+        $revenues = collect();
+        $expenses = collect();
 
+        foreach ($allAccounts as $account) {
+            $type = $getAccountType($account->number);
+            switch ($type) {
+                case 'asset':
+                    $assets->push($account);
+                    break;
+                case 'liability':
+                    $liabilities->push($account);
+                    break;
+                case 'equity':
+                    $equity->push($account);
+                    break;
+                case 'revenue':
+                    $revenues->push($account);
+                    break;
+                case 'expense':
+                    $expenses->push($account);
+                    break;
+            }
+        }
+
+        // Calculate net income
+        $totalRevenue = $revenues->sum('credit') - $revenues->sum('debit');
+        $totalExpenses = $expenses->sum('debit') - $expenses->sum('credit');
+        $net_income = $totalRevenue - $totalExpenses;
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
-        if ($branch_id != 'all')
+        if ($branch_id != 'all') {
             $branch = Branch::find($branch_id);
-        return view('pages.reports.ap_ar.balance_sheet.print', compact('ledger1', 'branch', 'to', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1'));
+        }
+
+        return view('pages.reports.ap_ar.balance_sheet.print', compact('assets', 'liabilities', 'equity', 'net_income', 'branch', 'to_date', 'branch_id'));
     }
 
     public function cashFlow()
@@ -3805,6 +5193,7 @@ class ReportController extends Controller
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $company_id = $request->company_id;
         if ($company_id == 'all' || $company_id == '')
@@ -3869,7 +5258,7 @@ class ReportController extends Controller
         return view('pages.reports.ap_ar.cash_flow.load', compact('total_generated', 'total_bank_transfer', 'total_at_hand', 'total_cash_in_bank', 'total_amount_expended', 'branch', 'company', 'from_date', 'to_date', 'branch_id', 'company_id'));
     }
 
-    public function printCashFlow($from_date, $to_date, $branch_id, $company_id)
+    public function printCashFlow($from_date, $to_date, $company_id, $branch_id)
     {
         $total_generated = $this->generalAccountLedgerBy($from_date, $to_date, $branch_id, 'GeneralAccount')
             ->join('branches', 'branches.id', 'general_account_ledgers.branch_id')
@@ -3932,7 +5321,7 @@ class ReportController extends Controller
             $branch_id = '%';
         if ($type != null && $type == "Customer") {
             $query = GeneralAccountLedger::join('customers', 'customers.id', '=', 'general_account_ledgers.model_id')
-                ->where('customers.branch_id', 'like', $branch_id)
+                ->where('general_account_ledgers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '<=', $to_date)
                 ->where('model_name', 'Customer');
             if ($from_date != null)
@@ -3963,6 +5352,7 @@ class ReportController extends Controller
             ->whereDate('date', '<=', $to_date);
 
     }
+
 
     private function generalAccountLedgerB4D($from_date, $branch_id, $type = null)
     {
@@ -3998,10 +5388,13 @@ class ReportController extends Controller
     }
     public function loadIncomeStatement(Request $request)
     {
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $category_id1 = $request->category_id1;
         $category_id2 = $request->category_id2;
-
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
         if ($category_id1 == 'all' || $category_id1 == '')
@@ -4059,7 +5452,9 @@ class ReportController extends Controller
                 ->where('categories.id', '<=', $category_id2);
         }
         $revenues = $revenues->get();
-
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
@@ -4068,6 +5463,7 @@ class ReportController extends Controller
 
         if ($to_month == '')
             $to_month = 'all';
+
         if ($branch_id == '' || $branch_id == '%')
             $branch_id = 'all';
         if ($category_id1 == '' || $category_id1 == '%')
@@ -4081,14 +5477,17 @@ class ReportController extends Controller
             'from_month' => $from_month,
             'to_month' => $to_month,
             'income_year' => $income_year,
+            'company_id' => $company_id,
             'branch' => $branch,
             'branch_id' => $branch_id,
             'category_id1' => $category_id1,
             'category_id2' => $category_id2
         ]);
     }
-    public function printIncomeStatement($from_month, $to_month, $income_year, $branch_id, $category_id1, $category_id2)
+    public function printIncomeStatement($from_month, $to_month, $income_year, $company_id, $branch_id, $category_id1, $category_id2)
     {
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all')
             $branch_id = '%';
         if ($category_id1 == 'all')
@@ -4145,7 +5544,9 @@ class ReportController extends Controller
         }
         $revenues = $revenues->get();
 
-
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
@@ -4182,11 +5583,15 @@ class ReportController extends Controller
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $payee_id = $request->payee_id;
         $user_id = $request->user_id;
         if ($user_id == 'all' || $user_id == '')
             $user_id = '%';
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
         if ($payee_id == 'all' || $payee_id == '')
@@ -4219,20 +5624,28 @@ class ReportController extends Controller
         $branch = Branch::find($branch_id);
         if ($user_id == '%')
             $user_id = 'all';
+        if ($company_id == '%') {
+            $company_id = 'all';
+        }
         if ($branch_id == '%')
             $branch_id = 'all';
         if ($payee_id == '%')
             $payee_id = 'all';
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.ap_ar.remittance.load', compact('ledgers', 'branch', 'from_date', 'to_date', 'balance', 'branch_id', 'payee_id', 'user_id', 'credit_sum', 'debit_sum'));
+        return view('pages.reports.ap_ar.remittance.load', compact('ledgers', 'branch', 'from_date', 'to_date', 'balance', 'company_id', 'branch_id', 'payee_id', 'user_id', 'credit_sum', 'debit_sum'));
     }
 
-    public function printRemittance($from, $to, $branch_id, $payee_id, $user_id)
+    public function printRemittance($from, $to, $company_id, $branch_id, $payee_id, $user_id)
     {
         if ($user_id == 'all' || $user_id == '')
             $user_id = '%';
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
         if ($payee_id == 'all' || $payee_id == '')
@@ -4261,7 +5674,9 @@ class ReportController extends Controller
         $credit_sum = $query->sum('credit');
         $debit_sum = $query->sum('debit');
         $balance = $credit_sum - $debit_sum;
-
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         if ($branch_id != '%')
             $branch = Branch::find($branch_id);
         return view('pages.reports.ap_ar.remittance.print', compact('ledgers', 'branch', 'from', 'to', 'balance', 'credit_sum', 'debit_sum'));
@@ -4274,11 +5689,15 @@ class ReportController extends Controller
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $type = $request->type;
         $status = $request->status;
         if ($status == 'all' || $status == '')
             $status = '%';
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
 
@@ -4313,10 +5732,13 @@ class ReportController extends Controller
 
         if ($status == '%')
             $status = 'all';
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all' || $branch_id != '%')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.ap_ar.document_status.load', compact('payments', 'branch', 'from_date', 'to_date', 'branch_id', 'type', 'status'));
+        return view('pages.reports.ap_ar.document_status.load', compact('payments', 'branch', 'from_date', 'to_date', 'company_id', 'branch_id', 'type', 'status'));
     }
     public function customerList(Request $request)
     {
@@ -4324,30 +5746,46 @@ class ReportController extends Controller
     }
     public function loadCustomerListReport(Request $request)
     {
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
         $customers = Customer::where('branch_id', 'LIKE', $branch_id)
             ->orderBy('code')
             ->orderBy('name')
             ->get();
+        if ($company_id == '%') {
+            $company_id = 'all';
+        }
         if ($branch_id == '%')
             $branch_id = 'all';
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.customer_ledger_analysis.load_customer_list_report', compact('customers', 'branch', 'branch_id'));
+        return view('pages.reports.customer_ledger_analysis.load_customer_list_report', compact('customers', 'branch', 'company_id', 'branch_id'));
     }
-    public function printCustomerListReport($branch_id)
+    public function printCustomerListReport($company_id, $branch_id)
     {
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
         $customers = Customer::where('branch_id', 'LIKE', $branch_id)
             ->orderBy('code')
             ->orderBy('name')
             ->get();
+
         if ($branch_id == '%')
             $branch_id = 'all';
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
@@ -4359,7 +5797,11 @@ class ReportController extends Controller
     }
     public function loadCustomerCreditLimitReport(Request $request)
     {
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
         $customers = Customer::where('branch_id', 'LIKE', $branch_id)
@@ -4367,15 +5809,23 @@ class ReportController extends Controller
             ->orderBy('code')
             ->orderBy('name')
             ->get();
+        if ($company_id == '%') {
+            $company_id = 'all';
+        }
         if ($branch_id == '%')
             $branch_id = 'all';
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        return view('pages.reports.customer_ledger_analysis.load_customer_with_credit_limit_report', compact('customers', 'branch', 'branch_id'));
+        return view('pages.reports.customer_ledger_analysis.load_customer_with_credit_limit_report', compact('customers', 'branch', 'company_id', 'branch_id'));
     }
-    public function printCustomerCreditLimitReport($branch_id)
+    public function printCustomerCreditLimitReport($company_id, $branch_id)
     {
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
         $customers = Customer::where('branch_id', 'LIKE', $branch_id)
@@ -4385,6 +5835,9 @@ class ReportController extends Controller
             ->get();
         if ($branch_id == '%')
             $branch_id = 'all';
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
@@ -4396,7 +5849,39 @@ class ReportController extends Controller
     }
     public function loadCustomerExceededCreditLimitReport(Request $request)
     {
+        $company_id = $request->company_id;
         $branch_id = $request->branch_id;
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
+        if ($branch_id == 'all' || $branch_id == '')
+            $branch_id = '%';
+        $customers = Customer::select(DB::raw("ABS(SUM(credit) - SUM(debit)) as balance"), 'customers.*')
+            ->where('customers.branch_id', 'LIKE', $branch_id)
+            ->where('credit_limit', '>', 0)
+            ->join('general_account_ledgers', 'general_account_ledgers.model_id', '=', 'customers.id')
+            ->groupBy('model_id')
+            ->havingRaw('ABS(SUM(credit) - SUM(debit)) > credit_limit')
+            ->orderBy('code')
+            ->orderBy('name')
+            ->get();
+        if ($company_id == '%') {
+            $company_id = 'all';
+        }
+        if ($branch_id == '%')
+            $branch_id = 'all';
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
+        $branch = null;
+        if ($branch_id != 'all')
+            $branch = Branch::find($branch_id);
+        return view('pages.reports.customer_ledger_analysis.load_customer_exceed_credit_limit_report', compact('customers', 'branch', 'company_id', 'branch_id'));
+    }
+    public function printCustomerExceededCreditLimitReport($company_id, $branch_id)
+    {
+        if ($company_id == 'all' || $company_id == '')
+            $company_id = '%';
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
         $customers = Customer::select(DB::raw("ABS(SUM(credit) - SUM(debit)) as balance"), 'customers.*')
@@ -4411,28 +5896,9 @@ class ReportController extends Controller
 
         if ($branch_id == '%')
             $branch_id = 'all';
-        $branch = null;
-        if ($branch_id != 'all')
-            $branch = Branch::find($branch_id);
-        return view('pages.reports.customer_ledger_analysis.load_customer_exceed_credit_limit_report', compact('customers', 'branch', 'branch_id'));
-    }
-    public function printCustomerExceededCreditLimitReport($branch_id)
-    {
-        if ($branch_id == 'all' || $branch_id == '')
-            $branch_id = '%';
-        if ($branch_id == 'all' || $branch_id == '')
-            $branch_id = '%';
-        $customers = Customer::select(DB::raw("ABS(SUM(credit) - SUM(debit)) as balance"), 'customers.*')
-            ->where('customers.branch_id', 'LIKE', $branch_id)
-            ->where('credit_limit', '>', 0)
-            ->join('general_account_ledgers', 'general_account_ledgers.model_id', '=', 'customers.id')
-            ->groupBy('model_id')
-            ->havingRaw('ABS(SUM(credit) - SUM(debit)) > credit_limit')
-            ->orderBy('code')
-            ->orderBy('name')
-            ->get();
-        if ($branch_id == '%')
-            $branch_id = 'all';
+        $company = null;
+        if ($company_id != 'all')
+            $company = Company::find($company_id);
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);

@@ -51,15 +51,24 @@
 
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
-                            <table class="display table table-bordered caption" id="example1" border="1" cellpadding="0"
-                                cellspacing="0" data-ordering="false">
+                            <table class="display table table-bordered caption" id="example1" border="1"
+                                cellpadding="0" cellspacing="0" data-ordering="false">
                                 <thead>
                                     <tr>
-                                        <th>DATE</th>
+                                        <th style="width: 50%" colspan="3">Date Processed:
+                                            {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+                                        </th>
+                                        <th style="width: 50%;text-align:right" colspan="3">Processed By
+                                            {{ auth()->user()->name }}</th>
+                                    </tr>
+                                    <tr>
+                                        <th>PROCESSED DATE</th>
                                         <th>REFERENCE</th>
                                         <th>SUPPLIEER</th>
                                         <th>INVOICE</th>
                                         <th>AMOUNT</th>
+                                        <th>CREATED BY</th>
+                                        <th>DATE CREATED</th>
                                         <th>STATUS</th>
                                     </tr>
                                 </thead>
@@ -69,7 +78,10 @@
                                         <td>{{ $sale->reference }}</td>
                                         <td>{{ $sale->supplier->code }}</td>
                                         <td>{{ $sale->invoice_no }}</td>
+                                        <td>{{ $sale->createdBy->name ?? '' }}</td>
                                         <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}
+                                        </td>
+                                        <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}
                                         </td>
                                         <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
                                     </tr>

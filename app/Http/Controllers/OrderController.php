@@ -72,50 +72,7 @@ class OrderController extends Controller
 
         return view('pages.order.index', compact('orders'));
     }
-    public function proformer_search(Request $request)
-    {
-        $search_value = $request->refno;
-
-        $orders = Proformer::with('customer')->select('orders.*', 'customers.name')->latest('order_date')->join(
-            'customers',
-            'customers.id',
-            'orders.customer_id'
-        );
-        if (Auth::user()->hasRole('Sales-Manager'))
-            $orders = $orders->where('sold_by', Auth::id());
-        $orders = $orders->where('proformers.branch_id', 'LIKE', User::userBranchAction())
-            ->where(
-                'proformers.branch_id',
-                'LIKE',
-                User::userBranchAction()
-            )->where(
-                'order_status',
-                'approved'
-            )
-            ->where(
-                function ($query) use ($search_value) {
-                    $query->where('reference', 'LIKE', "%$search_value%")
-                        ->orWhere(
-                            'invoice_no',
-                            'LIKE',
-                            "%$search_value%"
-                        )
-                        ->orWhere(
-                            'customers.name',
-                            'LIKE',
-                            "%$search_value%"
-                        )
-                        ->orWhere(
-                            'customers.phone',
-                            'LIKE',
-                            "%$search_value%"
-                        );
-                }
-            )->get(
-            );
-
-        return view('pages.order.proformers', compact('orders'));
-    }
+   
     public function order_invoice_search(Request $request)
     {
         $search_value = $request->refno;
@@ -182,28 +139,9 @@ class OrderController extends Controller
             DB::rollBack();
             throw $e;
         }
-        return redirect()->back();
+        return redirect()->route('order.invoice.index');
     }
-    public function destroy_proformer(Request $request, Order $order)
-    {
-
-        DB::beginTransaction();
-        try {
-
-            $invoice_no = $order->invoice_no;
-            DB::table('proformers')->where('id', $order->id)->delete();
-            DB::table('proformer_details')->where('order_id', $order->id)->delete();
-            session()->flash('app_message', 'Order deleted successfully');
-            $action = "Deleted order invoice  with invoice $invoice_no ";
-            AuditLog::auditLog(Auth::id(), $action);
-            DB::commit();
-        } catch (\Exception $e) {
-            session()->flash('app_error', 'Order could not be deleted!');
-            DB::rollBack();
-            throw $e;
-        }
-        return redirect()->back();
-    }
+   
     public function download($order_id)
     {
         $order = Order::with('customer')->where('id', $order_id)->first();
@@ -469,7 +407,10 @@ class OrderController extends Controller
     {
         \Cart::clear();
         $user = Auth::user();
-        $orders = Order::with('customer')->where('branch_id', User::userBranchAction());
+        $orders = Order::selectRaw("
+            orders.*,
+            (SELECT id FROM credit_notes WHERE credit_notes.order_id = orders.id LIMIT 1) as has_credit_note    
+        ")->with('customer')->where('branch_id', User::userBranchAction());
         if ($user->hasRole('Sales-Manager'))
             $orders = $orders->where('sold_by', Auth::id());
         //$orders = $orders->whereBetween('order_date', [date('Y-m-d', strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])
@@ -598,7 +539,7 @@ class OrderController extends Controller
     public function order_invoice_show($id)
     {
         $order = OrderInvoice::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
-        $order_details = OrderInvoiceDetail::with('storeProduct')->where(['order_id' => $id, 'status' => 1])->get();
+        $order_details = OrderInvoiceDetail::with('product')->where(['order_id' => $id, 'status' => 1])->get();
         //return $order_details;
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         return view('pages.order.show_order_invoice', compact('order_details', 'order', 'company'));
@@ -623,7 +564,7 @@ class OrderController extends Controller
     }
     public function orderInvoiceClose(Request $request, OrderInvoice $order)
     {
-        $order->status = 1;
+        $order->status = 1;//1 means close
         if ($order->save()) {
             return back()->with('success', 'Order closed successfully');
         }
@@ -631,24 +572,8 @@ class OrderController extends Controller
     }
 
     //proforma
-    public function proformer_list()
-    {
-        \Cart::clear();
-        $user = Auth::user();
-        $orders = Proformer::latest('order_date')->with('customer')->where('branch_id', 'LIKE', User::userBranchAction());
-        if ($user->hasRole('Sales-Manager'))
-            $orders = $orders->where('sold_by', Auth::id());
-        $orders = $orders->whereBetween('order_date', [date('Y-m-d', strtotime(Carbon::now()->subDays(7))), date('Y-m-d')])->orderBy('status', 'asc')->get();
-        return view('pages.order.proformers', compact('orders'));
-    }
-    public function proformer_show($id)
-    {
-        $order = Proformer::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
-        $order_details = ProformerDetail::with('storeProduct')->where(['order_id' => $id, 'status' => 1])->get();
-        //return $order_details;
-        $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
-        return view('pages.order.show_proformer', compact('order_details', 'order', 'company'));
-    }
+    
+   
 
     public function getAvailableQuantity(Request $request, StoreProduct $storeproduct)
     {

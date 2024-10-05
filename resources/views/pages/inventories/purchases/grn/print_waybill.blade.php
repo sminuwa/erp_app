@@ -34,7 +34,7 @@
                     <div class="row">
                         <div class="col-12">
                             <h4>
-                                <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:100px;height:60px;"
+                                <img src="{{ asset('assets/backend/img/logo.png') }}" style="width:100px;height:60px;"
                                     alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
                                 <small class="float-right">Date: {{ date('l, d-M-Y h:i:s A') }}</small>
                             </h4>
@@ -46,13 +46,12 @@
                         <div class="col-sm-8">
                             <address>
                                 <strong>{{ config('app.name') }}</strong><br>
-                                Address <span class="ion-ios-contact-outline"></span>: {{ $company->address }}
-                                {{ $company->city }} , {{ $company->country }}<br>
+                                Address <span class="ion-ios-contact-outline"></span>: {{ $company->address ?? null }}
+                                {{ $company->city ?? null }} , {{ $company->country ?? null }}<br>
                                 Phone <span class="ion-android-phone-portrait"></span>:
-                                {{ $company->mobile }}
-                                {{ $company->phone !== null ? ', 0' . $company->phone : '' }}
+                                {{ $company->mobile ?? null }}
                                 <br>
-                                Email <span class="ion-email"></span>: {{ $company->email }}
+                                Email <span class="ion-email"></span>: {{ $company->email ?? null}}
                             </address>
                         </div>
                         <div class="col-sm-4" style="text-align: right">
@@ -188,11 +187,17 @@
                             </div>
                             <table class="table">
                                 <tr>
-                                    <td style='border-style:none;'>
+                                    <td style='border-style:none;'>Created By:
+                                        {{ $purchase->createdBy->name }}<br /><br>
+                                        Posted By: {{ $purchase->postedBy->name }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style='border-style:none;'>Printed On:
+                                        {{ \Carbon\Carbon::now()->toFormattedDateString() }}<br /><br><br>
                                         Printed By: {{ Auth::user()->name }}
                                     </td>
                                 </tr>
-
                             </table>
                         </div>
                         <!-- /.col -->

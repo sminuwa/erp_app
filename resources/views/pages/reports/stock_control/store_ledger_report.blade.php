@@ -42,6 +42,14 @@
                         <form method="POST" class="form-inline">
                             <div class="form-group">
                                 &nbsp;&nbsp;
+                                <label for="company_id">Company</label>
+                                <select class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
+                                    name="company_id" id="company_id" required>
+
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                &nbsp;&nbsp;
                                 <label for="branch_id">Branch</label>
                                 <select class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
                                     name="branch_id" id="branch_id" required>
@@ -59,8 +67,8 @@
                             <div class="form-group">
                                 &nbsp;&nbsp;
                                 <label for="category_id">Category</label>
-                                <select class="form-control select2-single ajax-categories {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
-                                    name="category_id" id="category_id">
+                                <select class="form-control select2-multiple ajax-categories {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
+                                    name="category_id[]" id="category_id" multiple="multiple">
 
                                 </select>
                             </div>
@@ -115,6 +123,7 @@
                 product_id = $('#product_id').val();
                 store_id = $('#store_id').val();
                 category_id = $('#category_id').val();
+                company_id = $('#company_id').val();
                 branch_id = $('#branch_id').val();
 
                 $.ajax({
@@ -125,6 +134,7 @@
                         product_id: product_id,
                         store_id: store_id,
                         category_id: category_id,
+                        company_id: company_id,
                         branch_id: branch_id
                     }
                 }).done(function(data) {

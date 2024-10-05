@@ -34,7 +34,7 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:100px;height:60px;"
+                            <img src="{{ asset('assets/backend/img/logo.png') }}" style="width:100px;height:60px;"
                                 alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
                             <h3>
                                 {{App\Models\User::UserBranchName()->long_name}}
@@ -50,6 +50,11 @@
                         <div class="col-12 table-responsive">
                             <table class="display table table-bordered caption" id="example1" data-ordering="false">
                                 <thead>
+                                    <tr>
+                                        <th style="width: 50%" colspan="4">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+                                        </th>
+                                        <th style="width: 50%;text-align:right" colspan="3">Processed By {{ auth()->user()->name }}</th>
+                                    </tr>
                                     <tr>
                                         <th>DATE COLLECTED</th>
                                         <th>AMOUNT COLLECTED</th>

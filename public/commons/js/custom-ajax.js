@@ -4,12 +4,14 @@ $(document).ready(function () {
     ajerks('GET', '/misc/ajax/customers', 'ajax-customers')
     ajerks('GET', '/misc/ajax/suppliers', 'ajax-suppliers')
     ajerks('GET', '/misc/ajax/products', 'ajax-products')
+    ajerks('GET', '/misc/ajax/products/active', 'ajax-active-products')
     ajerks('GET', '/misc/ajax/stores', 'ajax-stores')
     ajerks('GET', '/misc/ajax/branches', 'ajax-branches')
     ajerks('GET', '/misc/ajax/chart-of-accounts', 'ajax-chart-of-accounts')
     ajerks('GET', '/misc/ajax/general-accounts', 'ajax-general-accounts')
     ajerks('GET', '/misc/ajax/companies', 'ajax-companies')
     ajerks('GET', '/misc/ajax/users', 'ajax-users')
+    ajerks('GET', '/misc/ajax/relation_officers', 'ajax-relation-officers')
     ajerks('GET', '/misc/ajax/store-products', 'ajax-store-products')
 })
 
@@ -22,6 +24,7 @@ bodi.on('change', '.ajax-branches', function () {
     ajerks('GET', '/misc/ajax/stores', 'ajax-stores')
     ajerks('GET', '/misc/ajax/customers', 'ajax-customers')
     ajerks('GET', '/misc/ajax/users', 'ajax-users')
+    ajerks('GET', '/misc/ajax/relation_officers', 'ajax-relation-officers')
 })
 
 bodi.on('change', '.ajax-categories', function () {

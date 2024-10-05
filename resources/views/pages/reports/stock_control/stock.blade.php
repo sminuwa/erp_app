@@ -41,10 +41,19 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
+                                &nbsp;&nbsp;
+                                <label for="company_id">Company</label>
+                                <select
+                                    class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
+                                    name="company_id" id="company_id" required>
+
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
                                 <label for="branch_id">Branch</label>
-                                <select class="form-control select2-single ajax-branches"
-                                        name="branch_id"
-                                        id="branch_id">
+                                <select class="form-control select2-single ajax-branches" name="branch_id" id="branch_id">
                                 </select>
 
                             </div>
@@ -52,9 +61,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="store_id">Store</label>
-                                <select class="form-control select2-single ajax-stores"
-                                        name="store_id"
-                                        id="store_id">
+                                <select class="form-control select2-single ajax-stores" name="store_id" id="store_id">
                                 </select>
 
                             </div>
@@ -62,9 +69,8 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="category_id">Category</label>
-                                <select class="form-control select2-single ajax-categories"
-                                        name="category_id"
-                                        id="category_id">
+                                <select class="form-control select2-multiple ajax-categories" name="category_id[]"
+                                    id="category_id" multiple>
                                 </select>
 
                             </div>
@@ -73,9 +79,7 @@
 
                             <div class="form-group">
                                 <label for="product_id">Product</label>
-                                <select class="form-control select2-single ajax-products"
-                                        name="product_id"
-                                        id="product_id">
+                                <select class="form-control select2-single ajax-products" name="product_id" id="product_id">
                                 </select>
 
                             </div>
@@ -83,7 +87,8 @@
                         <div class="col-md-12">
                             <div class="form-group text-right">
                                 <label for=""></label>
-                                <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />
+                                <input type="button" class="btn btn-primary" id="generate" name="generate"
+                                    value="Generate" />
                             </div>
                         </div>
                     </div>
@@ -93,11 +98,12 @@
 
                 <div class="row">
                     <div class="col-sm-12" id="load">
-                        <img src="{{ asset('assets/backend/img/loader.png') }}" style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                        <img src="{{ asset('assets/backend/img/loader.png') }}"
+                            style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
                     </div>
                 </div>
             </div>
-            
+
     </div><!-- /.container-fluid -->
     </section>
     <!-- /.content -->
@@ -123,16 +129,19 @@
 
             $('#generate').on("click", function() {
 
+                company_id = $('#company_id').val();
                 branch_id = $('#branch_id').val();
                 store_id = $('#store_id').val();
                 category_id = $('#category_id').val();
                 product_id = $('#product_id').val();
+
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.current.stock.report') }}",
                     data: {
                         _token: "{{ csrf_token() }}",
+                        company_id: company_id,
                         branch_id: branch_id,
                         store_id: store_id,
                         category_id: category_id,

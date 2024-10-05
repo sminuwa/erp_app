@@ -67,9 +67,11 @@
                                     <thead>
                                         <tr>
                                             <th>Name</th>
-                                            <th>Date</th>
+                                            <th>Processed Date</th>
                                             <th>Reference No</th>
                                             <th>Amount</th>
+                                            <th>Created By</th>
+                                            <th>Date Created</th>
                                             <th>Posted By</th>
                                             <th>Actions</th>
                                         </tr>
@@ -77,9 +79,11 @@
                                     <tfoot>
                                         <tr>
                                             <th>Name</th>
-                                            <th>Date</th>
+                                            <th>Processed Date</th>
                                             <th>Reference No</th>
                                             <th>Amount</th>
+                                            <th>Created By</th>
+                                            <th>Date Created</th>
                                             <th>Posted By</th>
                                             <th>Actions</th>
                                         </tr>
@@ -95,6 +99,10 @@
                                                 <td>{{ $payment->reference }}</td>
 
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
+                                                <td>{{ $payment->createdBy->name ?? '' }}</td>
+                                                
+                                                <td>{{ Carbon\Carbon::parse($payment->created_at)->toFormattedDateString() }}
+                                                </td>
                                                 <td>{{ $payment->postedBy->name ?? '' }}</td>
                                                 <td align="center">
                                                     <div class="dropdown">

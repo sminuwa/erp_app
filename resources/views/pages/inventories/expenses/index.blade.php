@@ -57,6 +57,7 @@
                                             <th>Account</th>
                                             <th>Amount</th>
                                             <th>Created By</th>
+                                            <th>Date Created</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -68,6 +69,7 @@
                                             <th>Account</th>
                                             <th>Amount</th>
                                             <th>Created By</th>
+                                            <th>Date Created</th>
                                             <th>Actions</th>
                                         </tr>
                                     </tfoot>
@@ -83,6 +85,7 @@
 
                                                 <td align="right">{{ number_format($invoice->amount, 2, '.', ',') }}</td>
                                                 <td>{{ $invoice->createdBy->name ?? '' }}</td>
+                                                <td>{{ Carbon\Carbon::parse($invoice->created_at)->toFormattedDateString() }}</td>
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button"

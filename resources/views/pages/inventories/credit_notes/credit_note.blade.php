@@ -66,21 +66,23 @@
                                     class="table table-bordered table-striped text-left table-responsive-xl">
                                     <thead>
                                         <tr>
-                                            <th>Date</th>
+                                            <th>Processed Date</th>
                                             <th>Name</th>
                                             <th>Reference</th>
                                             <th>Amount</th>
                                             <th>Created By</th>
+                                            <th>Date Created</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tfoot>
                                         <tr>
-                                            <th>Date</th>
+                                            <th>Processed Date</th>
                                             <th>Reference</th>
                                             <th>Name</th>
                                             <th>Amount</th>
                                             <th>Created By</th>
+                                            <th>Date Created</th>
                                             <th>Actions</th>
                                         </tr>
                                     </tfoot>
@@ -94,6 +96,7 @@
 
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
                                                 <td>{{ $payment->createdBy->name ?? '' }}</td>
+                                                <td>{{ Carbon\Carbon::parse($payment->created_at)->toFormattedDateString() }}
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button"

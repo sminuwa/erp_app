@@ -63,6 +63,13 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
+                                    <label for="company_id">Company</label>
+                                    <select class="form-control select2-single ajax-companies" name="company_id"
+                                        id="company_id">
+                                    </select>
+
+                                </div>
+                                <div class="form-group">
                                     <label for="branch_id">Branch</label>
                                     <select class="form-control select2-single ajax-branches" name="branch_id"
                                         id="branch_id">
@@ -116,7 +123,9 @@
             $('#generate').on("click", function() {
                 date = $('#date').val();
                 account_type = $('#type').val();
+                company_id = $('#company_id').val();
                 branch_id = $('#branch_id').val();
+                company_id = $('#branch_id').val();
                 if (account_type == "") {
                     alert("Please select account type!");
                     return false;
@@ -129,6 +138,7 @@
                         _token: "{{ csrf_token() }}",
                         date: date,
                         account_type: account_type,
+                        company_id:company_id,
                         branch_id: branch_id,
                     }
                 }).done(function(data) {

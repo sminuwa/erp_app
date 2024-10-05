@@ -39,9 +39,9 @@
                                 <i class="ion-android-cart"></i> Transfer Product Cart
                                 <div class="float-right">
 
-                                        <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
-                                            class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
-                                                class="fa fa-plus"></i> Add Product </a>
+                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
+                                        class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
+                                            class="fa fa-plus"></i> Add Product </a>
 
                                 </div>
                             </div>
@@ -157,23 +157,14 @@
                                 class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
                                 name="product_id" id="product_id" required="required">
                                 <option value="">Select...</option>
+                                @if (isset($products))
 
-                                @if (old('category_id', $model->category_id))
-                                    @foreach (\App\Models\Product::where('category_id', old('category_id'))->get() as $data)
+                                    @foreach ($products as $data)
                                         <option value="{{ $data->id }}"
                                             {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>
                                             {{ $data->code }}-{{ $data->name }}</option>
                                     @endforeach
-                                @else
-                                    @if (isset($products))
-                                        @foreach ($products as $data)
-                                            <option value="{{ $data->id }}" data-value="{{ $data->qty_available }}"
-                                                {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>
-                                                {{ $data->code }}-{{ $data->name }}</option>
-                                        @endforeach
-                                    @endif
                                 @endif
-
                             </select>
                             <div class="input-group-prepend">
                                 <p class="text text-danger" id="available"></p>
@@ -190,7 +181,7 @@
                             <input type="text" pattern="^[0-9\.]*$"
                                 class="form-control {{ $errors->has('quantity') ? ' is-invalid' : '' }}" name="quantity"
                                 id="quantity" value="{{ $model->quantity }}" placeholder="" required="required">
-                            @if($errors->has('quantity'))
+                            @if ($errors->has('quantity'))
                                 <div class="invalid-feedback">
                                     <strong>{{ $errors->first('quantity') }}</strong>
                                 </div>
@@ -245,19 +236,19 @@
 
         }
         $(function() {
-             $(document).on("change", "#store_id", function(event) {
-                 $("#product_id").html(" < option value = '' > Loading... < /option>");
-                 $.ajax({
-                     url: "{{ route('ajax.load.available.products') }}",
-                     type: 'GET',
-                     data: {
-                         store_id: $(this).val()
-                     }
-                 }).done(function(msg) {
-                     console.log(msg)
-                     $("#product_id").html(msg);
-                 });
-             });
+            $(document).on("change", "#store_id", function(event) {
+                $("#product_id").html(" < option value = '' > Loading... < /option>");
+                $.ajax({
+                    url: "{{ route('ajax.load.available.products') }}",
+                    type: 'GET',
+                    data: {
+                        store_id: $(this).val()
+                    }
+                }).done(function(msg) {
+                    console.log(msg)
+                    $("#product_id").html(msg);
+                });
+            });
 
             $(document).on("change", "#product_id,#source_store_id", function(event) {
                 $.ajax({

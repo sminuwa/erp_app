@@ -40,8 +40,7 @@
                 class="ion-model-s"> </span> Loan Collector</a>
             <a href="{{ route('loans.create') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
                     class="ion-jet"> </span> Grant Loan</a>
-            <a href="{{ route('bank.ledger') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                    class="ion-model-s"> </span> Bank Ledger</a>
+            
             <div class="container-fluid">
                 <div class="row">
                     <div class='col-md-8'>

@@ -21,7 +21,7 @@
                     <div class="receipt-header">
                         <div class="col-xs-6 col-sm-6 col-md-6">
                             <div class="receipt-left">
-                                <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}"
+                                <img src="{{ asset('assets/backend/img/logo.png') }}"
                                     style="width:71px;height:71px;border-radius: 43px;" alt="Albabello Logo"
                                     class="img-circle elevation-3 img-responsive" style="opacity: .8">
                                 <strong>{{App\Models\User::UserBranchName()->long_name}}</strong>
@@ -115,8 +115,12 @@
                     <div class="receipt-header receipt-header-mid receipt-footer">
                         <div class="col-xs-10 col-sm-10 col-md-10 text-left">
                             <div class="receipt-right">
-                                <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
-                                <p><b>Created By :</b> {{ $interbank->createdBy->name ?? null }}</p><br>
+                        
+                                <p><b>Date Created :</b> {{ Carbon\Carbon::parse($interbank->created_at)->toFormattedDateString() }}</p>
+                                <p><b>Created By :</b> {{ $interbank->createdBy->name ?? null }}</p>
+                                <p><b>Printed By :</b> {{ Auth::user()->name }}</p>
+                                <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p><br>
+                                
 
                                 <p><b>Signatire :</b> ______________________________________</p>
                                 <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For:

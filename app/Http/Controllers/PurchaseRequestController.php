@@ -37,13 +37,13 @@ class PurchaseRequestController extends Controller
         $records = PurchaseRequest::select('purchase_requests.*')->orderBy('purchase_requests.id', 'DESC')
             ->with('supplier')
             ->where('branch_id', 'LIKE', User::userBranchAction())
-            ->take(10)->get();
-        if(auth()->user()->hasAnyPermission(['access-all-purchase-requests'])) {
+            ->take(100)->get();
+        if (auth()->user()->hasAnyPermission(['access-all-purchase-requests'])) {
             $records = PurchaseRequest::select('purchase_requests.*')->orderBy('purchase_requests.id', 'DESC')
                 ->with('supplier')
-                ->take(10)->get();
+                ->take(100)->get();
         }
-//        access-all-purchase-requests
+        //        access-all-purchase-requests
         return view('pages.inventories.purchases.request.index', ['records' => $records]);
     }
     public function search(Request $request)
@@ -54,7 +54,7 @@ class PurchaseRequestController extends Controller
             ->join('suppliers', 'suppliers.id', 'purchase_requests.supplier_id')
             ->where('purchase_requests.branch_id', 'LIKE', User::userBranchAction())
             ->orderBy('id', 'DESC')->take(10)->get();
-        if(auth()->user()->hasAnyPermission(['access-all-purchase-requests'])) {
+        if (auth()->user()->hasAnyPermission(['access-all-purchase-requests'])) {
             $records = PurchaseRequest::select('purchase_requests.*')->where('invoice', 'LIKE', "%$search_value%")
                 ->join('suppliers', 'suppliers.id', 'purchase_requests.supplier_id')
                 ->orderBy('id', 'DESC')->take(10)->get();
@@ -77,8 +77,8 @@ class PurchaseRequestController extends Controller
         //dd(\Cart::getContent());
         return view('pages.inventories.purchases.request.create', [
             'model' => new PurchaseRequest,
-            'products' => Product::all(),
-            'suppliers' => Supplier::orderBy('name', 'asc')->get(),
+            'products' => Product::where('status', 1)->get(),
+            'suppliers' => Supplier::active()->orderBy('name', 'asc')->get(),
             'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->get(),
             'categories' => Category::all(),
             'cart_products' => \Cart::getContent(),
@@ -137,14 +137,14 @@ class PurchaseRequestController extends Controller
     }
     public function edit(Edit $request, PurchaseRequest $purchase)
     {
-//        return $purchase->purchasedProducts()->get()[0];
+        //        return $purchase->purchasedProducts()->get()[0];
         if (\Cart::getContent()->isEmpty())
             $this->loadToCart($purchase);
         $cart_products = $purchase->purchasedProducts;
         return view('pages.inventories.purchases.request.edit', [
             'model' => $purchase,
-            'products' => Product::all(),
-            'suppliers' => Supplier::orderBy('name')->get(),
+            'products' => Product::where('status', 1)->orderBy('code')->get(),
+            'suppliers' => Supplier::active()->orderBy('code')->get(),
             'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->get(),
             'categories' => Category::all(),
             'cart_products' => $cart_products,
@@ -297,9 +297,9 @@ class PurchaseRequestController extends Controller
                     'qty_available' => '',
                     'discount' => 0,
                     'store' => '',
-                    'unit'=>$data->product->unit,
-                    'store_id'=>'',
-                    'store_code'=>'',
+                    'unit' => $data->product->unit,
+                    'store_id' => '',
+                    'store_code' => '',
                 ),
 
             ]);
@@ -380,13 +380,15 @@ class PurchaseRequestController extends Controller
     }
     public function link(Request $request, PurchaseRequest $purchase)
     {
+
         if (\Cart::getContent()->isEmpty())
             $this->loadToCart($purchase);
         $cart_products = \Cart::getContent(); //$purchase->purchasedProducts;
         //dd($cart_products);
         return view('pages.inventories.purchases.grn.create', [
             'model' => $purchase,
-            'products' => Product::all(),
+            'purchase_request_id' => $purchase->id,
+            'products' => Product::where('status', 1)->get(),
             'stores' => Store::where('branch_id', 'LIKE', User::userBranchAction())->get(),
             'categories' => Category::all(),
             'cart_products' => $cart_products,

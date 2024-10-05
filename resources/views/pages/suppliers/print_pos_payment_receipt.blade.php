@@ -148,7 +148,7 @@
 
 <body>
     <header>
-        <img id="logo" class="media" data-src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}"
+        <img id="logo" class="media" data-src="{{ asset('assets/backend/img/logo.png') }}"
             src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="height:60px;width:60px;" />
         {{App\Models\User::UserBranchName()->long_name}}<br />
         <small>{{ optional($payment->supplier)->branch->address }}</small><br />

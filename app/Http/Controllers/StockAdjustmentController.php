@@ -42,8 +42,8 @@ class StockAdjustmentController extends Controller
         \Cart::clear();
         $user = auth()->user();
         $branch = $user->branch;
-        $records = StockAdjustment::where(['branch_id'=>$branch->id])->orderBy('reference', 'desc')->get();
-        return view('pages.inventories.stock_adjustments.index',compact('records'));
+        $records = StockAdjustment::where(['branch_id' => $branch->id])->orderBy('reference', 'desc')->get();
+        return view('pages.inventories.stock_adjustments.index', compact('records'));
     }
 
     public function show(Show $request, StockAdjustment $stockAdjustment)
@@ -56,21 +56,28 @@ class StockAdjustmentController extends Controller
 
     public function create(Create $request)
     {
-        $products = Product::select('products.id', 'products.name','code')
+        $product_in = Product::select('products.id', 'products.name', 'code')
+            ->where('status', 1)
+            ->orderBy('code', 'asc')
+            ->get();
+        $product_out = Product::select('products.id', 'products.name', 'code')
             ->join('store_products', 'store_products.product_id', 'products.id')
-            ->orderBy('code','asc')
+            ->orderBy('code', 'asc')
+            ->where('qty_available', '>', 0)
+            ->where('products.status', 1)
             ->get();
         $stores = Store::where('branch_id', User::userBranchAction())->get();
         return view('pages.inventories.stock_adjustments.create', [
             'model' => new StockAdjustment,
-            'products' => $products,
+            'products_in' => $product_in,
+            'products_out' => $product_out,
             'stores' => $stores,
         ]);
     }
 
     public function store(Request $request)
     {
-        $this->authorize('stock_adjustments.create') ;
+        $this->authorize('stock_adjustments.create');
         $user = auth()->user();
         $branch = $user->branch;
         $stock_adjustment_id = $request->stock_adjustment_id;
@@ -82,7 +89,7 @@ class StockAdjustmentController extends Controller
 
         DB::beginTransaction();
         try {
-            if(!$stock){
+            if (!$stock) {
                 $stock = new StockAdjustment();
                 $stock->reference = StockAdjustment::generateNewNumber();
                 $stock->created_by = auth()->id();
@@ -92,7 +99,7 @@ class StockAdjustmentController extends Controller
             $stock->operation = $operation;
             $stock->description = $description;
             $stock->date = $date;
-            if($stock->save()){
+            if ($stock->save()) {
                 if (count($items) > 0) {
                     StockAdjustmentDetail::where('stock_adjustment_id', $stock->id)->delete();
                     foreach ($items as $product) {
@@ -111,11 +118,10 @@ class StockAdjustmentController extends Controller
                 AuditLog::auditLog(Auth::id(), $action);
                 session()->flash('app_message', 'Stock Adjustment successfully');
                 DB::commit();
-            }else{
+            } else {
                 DB::rollBack();
             }
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             DB::rollBack();
             session()->flash('app_message', 'Something is wrong while transfering stock');
             throw $ex;
@@ -127,14 +133,15 @@ class StockAdjustmentController extends Controller
     public function edit(Request $request, StockAdjustment $stockAdjustment)
     {
         $this->authorize('stock_adjustments.edit');
-        $products = Product::select('products.id', 'products.name','code')
+        $products = Product::select('products.id', 'products.name', 'code')
             ->join('store_products', 'store_products.product_id', 'products.id')
-            ->orderBy('code','asc')
+            ->where('products.status', 1)
+            ->orderBy('code', 'asc')
             ->get();
         $stores = Store::where('branch_id', User::userBranchAction())->get();
         $items = $stockAdjustment->products;
 
-        if (\Cart::isEmpty()){
+        if (\Cart::isEmpty()) {
             foreach ($items as $item) {
                 $product = Product::find($item->product_id);
                 \Cart::add([
@@ -160,16 +167,17 @@ class StockAdjustmentController extends Controller
         ]);
     }
 
-    public function post(Request $request, StockAdjustment $stockAdjustment){
+    public function post(Request $request, StockAdjustment $stockAdjustment)
+    {
         $this->authorize('stock_adjustments.post');
         $method = $request->method();
-        if($method == 'POST'){
+        if ($method == 'POST') {
             $stockAdjustment->status = 1;
             $stockAdjustment->posted_by = auth()->id();
             $items = $stockAdjustment->products;
             DB::beginTransaction();
-//            return $stockAdjustment;
-            if($stockAdjustment->save()){
+            //            return $stockAdjustment;
+            if ($stockAdjustment->save()) {
 
                 $new_cost_price = [];
                 foreach ($items as $item) {
@@ -222,21 +230,22 @@ class StockAdjustmentController extends Controller
         return view('pages.inventories.stock_adjustments.print', compact('record'));
     }
 
-    public function delete(Request $request, StockAdjustment $stockAdjustment){
+    public function delete(Request $request, StockAdjustment $stockAdjustment)
+    {
         $this->authorize('stock_adjustments.delete');
         $method = $request->method();
         $stock_adjustment_id = $stockAdjustment->id;
-        if($method == 'POST'){
-            if($stockAdjustment->status == 0){
+        if ($method == 'POST') {
+            if ($stockAdjustment->status == 0) {
                 DB::beginTransaction();
-                if($stockAdjustment->delete()){
-                    StockAdjustmentDetail::where('stock_adjustment_id',$stock_adjustment_id)->delete();
+                if ($stockAdjustment->delete()) {
+                    StockAdjustmentDetail::where('stock_adjustment_id', $stock_adjustment_id)->delete();
                     session()->flash('app_message', 'Stock Adjustment record deleted successfully!');
                     DB::commit();
                 }
-            }else
+            } else
                 session()->flash('app_error', 'Stock Adjustment record cannot be deleted!');
-        }else{
+        } else {
             session()->flash('app_error', 'Invalid request methods.');
             DB::rollBack();
         }

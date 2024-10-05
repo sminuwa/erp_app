@@ -53,16 +53,21 @@
 
                                 <thead>
                                     <tr>
+                                        <th style="width: 50%" colspan="6">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+                                        </th>
+                                        <th style="width: 50%;text-align:right" colspan="6">Processed By {{ auth()->user()->name }}</th>
+                                    </tr>
+                                    <tr>
                                         <th>CODE</th>
                                         <th>PRODUCT</th>
                                         <th>STORE</th>
                                         <th>QTY</th>
-                                        <th>COST PRICE ()</th>
-                                        <th>R PRICE ()</th>
-                                        <th>W PRICE ()</th>
-                                        <th>TOTAL COST ()</th>
-                                        <th>TOTAL R ()</th>
-                                        <th>TOTAL W ()</th>
+                                        <th>COST PRICE</th>
+                                        <th>R PRICE</th>
+                                        <th>W PRICE</th>
+                                        <th>TOTAL COST</th>
+                                        <th>TOTAL R</th>
+                                        <th>TOTAL W</th>
                                         <th>R MARGIN</th>
                                         <th>W MARGIN</th>
                                     </tr>

@@ -110,7 +110,7 @@
                             <b>Invoice No:</b> {{ $order->reference }}<br>
                             <b>Date and Time:
                                 {{ \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</b><br>
-                            <b>Prepared By</b> <span class="ion-card"></span> {{ $order->sold->name }}<br />
+                            <b>Prepared By</b> <span class="ion-card"></span> {{ $order->sold->name ?? ''}}<br />
                             <b>Printed By <span class="ion-printer"></span>
                                 &nbsp;&nbsp;{{ Auth::user()->name }}</span><span>
                         </div>
@@ -218,8 +218,8 @@
                                 </tr>
                                 </tbody>
                             </table>
-                            <p style="line-height: 14px">Goods Received in good condition cannot be returned
-                                <br>Sales invalidated in goods not taken within two (2) days
+                            <p style="line-height: 14px">Goods Received in good condition cannot be returned.
+                                <br>Sales invalidated if goods not taken within two (2) days
                             </p>
 
                             <table class="table table-condensed">

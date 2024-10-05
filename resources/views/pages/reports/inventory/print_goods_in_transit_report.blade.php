@@ -57,6 +57,11 @@
                                 cellspacing="0" data-ordering="false">
                                 <thead>
                                     <tr>
+                                        <th style="width: 50%" colspan="6">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+                                        </th>
+                                        <th style="width: 50%;text-align:right" colspan="5">Processed By {{ auth()->user()->name }}</th>
+                                    </tr>
+                                    <tr>
                                         <th>DATE</th>
                                         <th>REFERENCE</th>
                                         <th>SOURCE</th>

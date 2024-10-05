@@ -44,9 +44,14 @@
                                     <span class="fa fa-pencil"> Edit</span>
                                 </a>
                             @endcan
+                            @can('users.edit')
+                                <a class="dropdown-item" href="{{ route('user.site.access', $record->id) }}">
+                                    <span class="fa fa-unlock"> Site Access</span>
+                                </a>
+                            @endcan
                             @can('users.reset-password')
                                 <a class="dropdown-item" href="{{ route('users.reset-password', $record->id) }}">
-                                    <span class="fa fa-pencil"> Reset Password</span>
+                                    <span class="fa fa-key"> Reset Password</span>
                                 </a>
                             @endcan
                             @can('users.destroy')

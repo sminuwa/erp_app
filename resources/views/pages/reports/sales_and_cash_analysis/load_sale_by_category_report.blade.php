@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="text-right">
-                    <a href="{{ route('ajax.category.sales.report.print', [$from_date, $to_date, $branch_id, $category_id1, $category_id2]) }}"
+                    <a href="{{ route('ajax.category.sales.report.print', [$from_date, $to_date, $company_id, $branch_id, is_array($category_id1) ? implode(',', $category_id1) : $category_id1]) }}"
                         target="_BLANK" class="btn-success btn btn-sm">Print</a>
                 </div>
             </div>
@@ -21,6 +21,11 @@
                         </h5>
                     </caption>
                     <thead>
+                        <tr>
+                            <th style="width: 50%" colspan="4">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+                            </th>
+                            <th style="width: 50%;text-align:right" colspan="4">Processed By {{ auth()->user()->name }}</th>
+                        </tr>
                         <tr>
                             <th>CODE</th>
                             <th>CATEGORY</th>

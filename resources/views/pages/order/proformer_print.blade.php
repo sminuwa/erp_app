@@ -113,7 +113,7 @@
                             <b>Invoice No:</b> {{ $order->invoice_no }}<br>
                             <b>Date and Time:
                                 {{ \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</b><br>
-                            <b>Prepared By</b> <span class="ion-card"></span> {{ $order->sold->name }}<br />
+                            <b>Prepared By</b> <span class="ion-card"></span> {{ $order->sold->name ?? ''}}<br />
                             <b>Printed By <span class="ion-printer"></span>
                                 &nbsp;&nbsp;{{ Auth::user()->name }}</span><span>
                         </div>
@@ -142,17 +142,17 @@
                                     @foreach ($order_details as $order_detail)
                                         <tr>
                                             <td align="center">{{ $order_detail->quantity }}</td>
-                                            <td>{{ $order_detail->storeProduct->store->code }}</td>
-                                            <td>{{ $order_detail->storeProduct->product->code }}</td>
-                                            <td>{{ $order_detail->storeProduct->product->name }}</td>
+                                            <td>{{ $order_detail->store->code }}</td>
+                                            <td>{{ $order_detail->product->code }}</td>
+                                            <td>{{ $order_detail->product->name }}</td>
                                             <td align="right">
-                                                &#8358;{{ number_format($order_detail->sold_price, 2) }}
+                                                &#8358;{{ number_format($order_detail->unit_cost, 2) }}
                                             </td>
                                             <td align="right">
-                                                &#8358;{{ number_format($order_detail->sold_price * $order_detail->quantity, 2) }}
+                                                &#8358;{{ number_format($order_detail->unit_cost * $order_detail->quantity, 2) }}
                                             </td>
                                         </tr>
-                                        @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
+                                        @php $total += ($order_detail->unit_cost * $order_detail->quantity);  @endphp
                                     @endforeach
                                 </tbody>
                             </table>

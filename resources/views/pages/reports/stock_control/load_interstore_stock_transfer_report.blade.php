@@ -1,6 +1,6 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.print.interstore.transfer.reports', [$from_date, $to_date, $branch_id, $source_store_id, $destination_store_id, $category_id, $product_id]) }}"
+        <a href="{{ route('ajax.print.interstore.transfer.reports', [$from_date, $to_date, $company_id,$branch_id, $source_store_id, $destination_store_id, $category_id, $product_id]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
@@ -14,13 +14,20 @@
     </caption>
     <thead>
         <tr>
-            <th>Date</th>
+            <th style="width: 50%" colspan="6">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            </th>
+            <th style="width: 50%;text-align:right" colspan="4">Processed By {{ auth()->user()->name }}</th>
+        </tr>
+        <tr>
+            <th>Processed Date</th>
             <th>Item Code</th>
             <th>Item Name</th>
             <th>Branch</th>
             <th>From Store</th>
             <th>To Store</th>
             <th>Rerefence No</th>
+            <th>Created By</th>
+            <th>Date Created</th>
             <th>QTY</th>
         </tr>
     </thead>
@@ -34,6 +41,8 @@
             <td>{{ \App\Models\Store::find($transfer->source_store_id)->code }}</td>
             <td>{{ \App\Models\Store::find($transfer->destination_store_id)->code }}</td>
             <td>{{ $transfer->reference }}</td>
+            <td>{{ $transfer->created_by }}</td>
+            <td>{{ Carbon\Carbon::parse($transfer->created_at)->toFormattedDateString() }}</td>
             <td style="text-align: right">{{ $transfer->quantity }}</td>
         </tr>
     @endforeach

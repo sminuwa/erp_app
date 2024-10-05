@@ -41,7 +41,8 @@ class ReturnDebit extends Model
     {
         return $this->belongsTo(Supplier::class);
     }
-    public function purchase(){
+    public function purchase()
+    {
         return $this->belongsTo(Purchase::class);
     }
     public function branch()
@@ -52,6 +53,10 @@ class ReturnDebit extends Model
     public function postedBy()
     {
         return $this->belongsTo(User::class, 'posted_by');
+    }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
     protected $dates = [];
 

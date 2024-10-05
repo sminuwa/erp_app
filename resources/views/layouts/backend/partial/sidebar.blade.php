@@ -435,6 +435,13 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
+                                            <a href="{{ route('sales.report.by.category.site') }}"
+                                                class="nav-link {{ Request::is('reports/site/sales/category*') ? 'active' : '' }}">
+                                                <i class="ion-code-working"></i>
+                                                <p>Sales by Category by Site</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
                                             <a href="{{ route('customer.sale.reports') }}"
                                                 class="nav-link {{ Request::is('reports/sa/sales/customer/sale/common-name*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
@@ -454,6 +461,13 @@
                                                 class="nav-link {{ Request::is('reports/sa/sales/staff*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
                                                 <p>Staff Sales Report</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('relation_officer.report') }}"
+                                                class="nav-link {{ Request::is('reports/sa/sales/relation_officer*') ? 'active' : '' }}">
+                                                <i class="ion-code-working"></i>
+                                                <p>RO Sales Report</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -717,7 +731,7 @@
                                             </a>
                                         </li>
                                         @endcan
-                                        @can('balance.sheet.report')
+                                        {{-- @can('balance.sheet.report') --}}
                                         <li class="nav-item">
                                             <a href="{{ route('balance.sheet.report') }}"
                                                 class="nav-link {{ Request::is('reports/ap_ar/balance_sheet*') ? 'active' : '' }}">
@@ -725,7 +739,7 @@
                                                 <p>Balance Sheet</p>
                                             </a>
                                         </li>
-                                        @endcan
+                                        {{-- @endcan --}}
                                         @can('cash.flow.report')
                                         <li class="nav-item">
                                             <a href="{{ route('cash.flow.report') }}"

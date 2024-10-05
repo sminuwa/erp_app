@@ -39,7 +39,7 @@ class InterStoreTransferController extends Controller
         \Cart::clear();
         $user = auth()->user();
         $branch = $user->branch;
-        $records = InterstoreTransfer::where(['branch_id'=>$branch->id])->orderBy('reference', 'desc')->get();
+        $records = InterstoreTransfer::where(['branch_id' => $branch->id])->orderBy('reference', 'desc')->get();
         return view('pages.inventories.transfers.inter_store.index', ['records' => $records]);
     }
 
@@ -63,10 +63,11 @@ class InterStoreTransferController extends Controller
     {
         $products = Product::select('products.id', 'products.name', 'products.code')
             ->join('store_products', 'store_products.product_id', 'products.id')
+            ->where('products.status', 1)
             ->where('qty_available', '>', 0)->get();
         $categories = Category::all(['id', 'name']);
         $stores = Store::where('branch_id', User::userBranchAction())->get();
-//        return $stores;
+        //        return $stores;
         $cartItems = \Cart::session('_token')->getContent(); //\Cart::getContent();
 
         return view('pages.inventories.transfers.inter_store.create', [
@@ -89,48 +90,49 @@ class InterStoreTransferController extends Controller
             $interstore->reference = InterstoreTransfer::generateNewNumber();
             $interstore->created_by = $user->id;
             DB::beginTransaction();
-            if($interstore->save()) {
+            if ($interstore->save()) {
                 $items = \Cart::getContent();
-                if (count($items) < 1){
+                if (count($items) < 1) {
                     DB::rollBack();
                     session()->flash('app_error', 'There is no product selected.');
                     return redirect()->back()->withInput();
                 }
-                    //$transfer_id = $this->getNextTransferID();
-                    $new_cost_price = [];
-                    foreach ($items as $item) {
-                        $new_cost_price[$item->attributes['product_id']] = [
-                            'quantity' => $item->quantity,
-                            'price' => $item->price,
-                            'source_store_id' => $item->attributes['source_store_id'],
-                            'destination_store_id' => $item->attributes['destination_store_id'],
-                            'expiry_date' => $item->attributes['expiry_date'] ?? '',
-                        ];
-                        if($item->attributes['source_store_id'] == $item->attributes['destination_store_id']) {
-                            session()->flash('app_error', 'Source store and destination store are the same.');
-                            return back();
-                        }
-                        $detail = new InterstoreTransferDetail();
-                        $detail->interstore_transfer_id = $interstore->id;
-                        $detail->product_id = $item->attributes['product_id'];
-                        $detail->source_store_id = $item->attributes['source_store_id'];
-                        $detail->destination_store_id = $item->attributes['destination_store_id'];
-                        $detail->quantity = $item->quantity;
-                        $detail->expiry_date = $item->attributes['expiry_date'] ?? '';
-                        $detail->save();
+                //$transfer_id = $this->getNextTransferID();
+                $new_cost_price = [];
+                foreach ($items as $item) {
+                    $new_cost_price[$item->attributes['product_id']] = [
+                        'quantity' => $item->quantity,
+                        'price' => $item->price,
+                        'source_store_id' => $item->attributes['source_store_id'],
+                        'destination_store_id' => $item->attributes['destination_store_id'],
+                        'expiry_date' => $item->attributes['expiry_date'] ?? '',
+                    ];
+                    if ($item->attributes['source_store_id'] == $item->attributes['destination_store_id']) {
+                        session()->flash('app_error', 'Source store and destination store are the same.');
+                        return back();
                     }
-                    if (
-                        CostPrice::interstore(
-                            $new_cost_price,
-                            $interstore->reference,
-                            $interstore->branch_id,
-                            $interstore->date)['status']
-                    ) {
-                        $action = "Created interstore transfer with reference : " . $interstore->reference;
-                        AuditLog::auditLog(Auth::id(), $action);
-                        session()->flash('app_message', 'Transfer created successfully');
-                        DB::commit();
-                    }
+                    $detail = new InterstoreTransferDetail();
+                    $detail->interstore_transfer_id = $interstore->id;
+                    $detail->product_id = $item->attributes['product_id'];
+                    $detail->source_store_id = $item->attributes['source_store_id'];
+                    $detail->destination_store_id = $item->attributes['destination_store_id'];
+                    $detail->quantity = $item->quantity;
+                    $detail->expiry_date = $item->attributes['expiry_date'] ?? '';
+                    $detail->save();
+                }
+                if (
+                    CostPrice::interstore(
+                        $new_cost_price,
+                        $interstore->reference,
+                        $interstore->branch_id,
+                        $interstore->date
+                    )['status']
+                ) {
+                    $action = "Created interstore transfer with reference : " . $interstore->reference;
+                    AuditLog::auditLog(Auth::id(), $action);
+                    session()->flash('app_message', 'Transfer created successfully');
+                    DB::commit();
+                }
 
             }
 
@@ -146,7 +148,7 @@ class InterStoreTransferController extends Controller
     public function edit(Edit $request, TransferProduct $transferproduct)
     {
         //\Cart::session('_token')->clear();
-        $products = Product::all(['id', 'name']);
+        $products = Product::where('status',1)->orderBy('code')->get();
         $categories = Category::all(['id', 'name']);
         $stores = Store::where('branch_id', 'LIKE', User::userBranchAction())->get();
         $this->loadToCart($transferproduct);

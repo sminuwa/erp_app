@@ -19,20 +19,17 @@ class ProformerDetail extends Model
      * Date time columns.
      */
     protected $dates = [];
-    public function storeProduct()
-    {
-        return $this->belongsTo(StoreProduct::class);
-    }
     public function product()
     {
-        return $this->storeProduct()->product();
+        return $this->belongsTo(Product::class);
     }
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
+
     public function order()
     {
         return $this->belongsTo(Proformer::class);
-    }
-    public function branch()
-    {
-        return $this->storeProduct()->select('branches.*')->join('stores','stores.id','store_products.store_id')->join('branches','branches.id','stores.branch_id');
     }
 }

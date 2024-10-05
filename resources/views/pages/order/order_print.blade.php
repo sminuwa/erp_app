@@ -33,7 +33,7 @@
                     <!-- title row -->
                     <div class="row">
                         <div class="col-11">
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:100px;height:60px;"
+                            <img src="{{ asset('assets/backend/img/logo.png') }}" style="width:100px;height:60px;"
                                 alt="logo" class="img-circle elevation-3" style="opacity: .8">
                             <span style="font-size:24px;">&nbsp;{{App\Models\User::userBranchName()->long_name}}</span>
 
@@ -94,7 +94,7 @@
                         <div class="col-sm-4">
                             <b>Invoice No:</b> {{ $order->reference }}<br>
                             <b>Date and Time: {{ \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</b><br>
-                            <b>Prepared By</b> <span class="ion-card"></span> {{ $order->sold->name }}<br />
+                            <b>Prepared By</b> <span class="ion-card"></span> {{ $order->sold->name ?? ''}}<br />
                             <b>Printed By <span class="ion-printer"></span>
                                 &nbsp;&nbsp;{{ Auth::user()->name }}</span><span>
                         </div>
@@ -122,22 +122,21 @@
                                         $total_discount = 0;
                                     @endphp
                                     @foreach ($order_details as $order_detail)
-                                        <tr>
-                                            <td>{{ $order_detail->storeProduct->product->code }}</td>
-                                            <td>{{ $order_detail->storeProduct->product->name }}</td>
-                                            <td align="center">{{ $order_detail->quantity }}</td>
-                                            <td align="center">{{ $order_detail->storeProduct->product->unit }}</td>
-                                            <td>{{ $order_detail->storeProduct->store->code }}</td>
-
-                                            <td align="right">
-                                                &#8358;{{ number_format($order_detail->sold_price, 2) }}
-                                            </td>
-                                            <td align="right">
-                                                &#8358;{{ number_format($order_detail->sold_price * $order_detail->quantity, 2) }}
-                                            </td>
-                                        </tr>
-                                        @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
-                                    @endforeach
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $order_detail->product->code ?? '' }} - {{ $order_detail->product->name ?? '' }}</td>
+                                        <td align="center">{{ $order_detail->quantity }}</td>
+                                        <td>{{ $order_detail->unit ?? '' }}</td>
+                                        <td>{{ $order_detail->store->code ?? '' }}</td>
+                                        
+                                        <td align="right">{{ number_format($order_detail->unit_cost, 2) }}
+                                        </td>
+                                        <td align="right">
+                                            {{ number_format($order_detail->unit_cost * $order_detail->quantity, 2) }}
+                                        </td>
+                                    </tr>
+                                    @php $total += ($order_detail->unit_cost * $order_detail->quantity);  @endphp
+                                @endforeach
                                 </tbody>
                             </table>
                             <table class="table table-bordered table-condensed">
@@ -172,8 +171,8 @@
                                 </tbody>
                             </table>
 
-                            <p style="line-height: 14px">Goods Received in good condition cannot be returned
-                                <br>Sales invalidated in goods not taken within two (2) days
+                            <p style="line-height: 14px">Goods Received in good condition cannot be returned.
+                                <br>Sales invalidated if goods not taken within two (2) days
                             </p>
 
                             <table class="table table-condensed">

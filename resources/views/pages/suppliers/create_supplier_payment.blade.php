@@ -35,8 +35,6 @@
             </a>
             <a href="{{ route('suppliers.payments') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
                     class="fa fa-list"> </span> Payments</a>
-            <a href="{{ route('bank.ledger') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
-                    class="ion-model-s"> </span> Bank Ledger</a>
             <a href="javascript:void(0)" data-toggle="modal" data-target="#supplier_ledgerform"
                 class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;">Supplier Ledger </a>
             @if (Session::get('prev_id') != null)

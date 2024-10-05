@@ -103,6 +103,8 @@
                                     <p><b>Refrence No: {{ $interbank->reference }}</b></p>
                                     <p><b>Payment Date:
                                             {{ \Carbon\Carbon::parse($interbank->date)->toFormattedDateString() }}</b></p>
+                                    <p><b>Date Created:
+                                            {{ \Carbon\Carbon::parse($interbank->created_at)->toFormattedDateString() }}</b></p>
                                     <b>Transfer Status:</b>
                                     {!! $interbank->status == 0
                                         ? '<span class="badge badge-warning">Pending</span>'

@@ -1,6 +1,6 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.staff.sales.report.print', [$from_date, $to_date, $branch_id, $store_id, $category_id, $product_id, $staff_id]) }}"
+        <a href="{{ route('ajax.staff.sales.report.print', [$from_date, $to_date, $company_id,$branch_id, $store_id, $category_id, $product_id, $staff_id]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
@@ -16,6 +16,11 @@
     </caption>
 
     <thead>
+        <tr>
+            <th style="width: 50%" colspan="5">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            </th>
+            <th style="width: 50%;text-align:right" colspan="5">Processed By {{ auth()->user()->name }}</th>
+        </tr>
         <tr>
             <th colspan="6" style="text-align: right">TOTAL RECEIPTS: </th>
             <th style="text-align: right">{{ number_format($total_cash, 2, '.', ',') }}</th>

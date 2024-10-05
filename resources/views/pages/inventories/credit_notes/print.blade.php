@@ -33,10 +33,9 @@
                 <!-- title row -->
                 <div class="row">
                     <div class="col-11">
-                        <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:100px;height:60px;"
+                        <img src="{{ asset('assets/backend/img/logo.png') }}" style="width:100px;height:60px;"
                              alt="logo" class="img-circle elevation-3" style="opacity: .8">
                         <span style="font-size:24px;">&nbsp;{{App\Models\User::userBranchName()->long_name}}</span>
-
                         <small class="float-right">Date: {{ date('l, d-M-Y h:i:s A') }}</small>
 
                     </div>
@@ -93,8 +92,9 @@
                     </div>
                     <div class="col-sm-4">
                         <b>Invoice No:</b> {{ $order->reference }}<br>
-                        <b>Date and Time: {{ \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</b><br>
+                        <b>Processed Date: {{ \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</b><br>
                         <b>Created By</b> <span class="ion-card"></span> {{ $order->createdBy->name }}<br />
+                        <b>Date Created: {{ \Carbon\Carbon::parse($order->created_at)->toFormattedDateString() }}</b><br>
                         <b>Printed By <span class="ion-printer"></span>
                             &nbsp;&nbsp;{{ Auth::user()->name }}</span><span>
                     </div>

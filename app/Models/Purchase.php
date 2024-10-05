@@ -50,6 +50,14 @@ class Purchase extends Model
     {
         return $this->belongsTo(User::class, 'updated_by', 'id');
     }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+    public function postedBy()
+    {
+        return $this->belongsTo(User::class, 'posted_by', 'id');
+    }
     public function totalProductCost()
     {
         return $this->purchasedProducts()->select(DB::raw('sum(quantity * unit_price) as total'))->first();
@@ -71,18 +79,20 @@ class Purchase extends Model
     }
 
 
-    public static function generateNewNumber($prefix = 'GRN', $length = 4){
-        $prefix = $prefix.date('ym').auth()->user()->branch->code;
-        $record = self::where('reference', 'like', '%'.$prefix.'%')->orderBy('reference', 'desc')->first();
-        if($record){
+    public static function generateNewNumber($prefix = 'GRN', $length = 4)
+    {
+        $prefix = $prefix . date('ym') . auth()->user()->branch->code;
+        $record = self::where('reference', 'like', '%' . $prefix . '%')->orderBy('reference', 'desc')->first();
+        if ($record) {
             $number = $record->reference;
-            $new = intval(substr($number,strlen($prefix)))+1;
-            return $prefix.str_pad($new, $length,0,STR_PAD_LEFT);
+            $new = intval(substr($number, strlen($prefix))) + 1;
+            return $prefix . str_pad($new, $length, 0, STR_PAD_LEFT);
         }
-        return $prefix.str_pad(1, $length,0,STR_PAD_LEFT);
+        return $prefix . str_pad(1, $length, 0, STR_PAD_LEFT);
     }
 
-    public function total_expense(){
+    public function total_expense()
+    {
         $total_grn = $this->totalProductCost();
         $total_expense = $this->totalExpenseCost();
         return (intval($total_grn->total) + intval($total_expense->total));

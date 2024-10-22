@@ -66,7 +66,13 @@ class AjaxController extends Controller
 
     public function branches(Request $request)
     {
-        $records = Branch::orderBy('code', 'asc')->get();
+        if ($request->has('company_id')) {
+            $company_id = $request->company_id;
+            $records = Branch::orderBy('code', 'asc')->forCompany($company_id)->get();
+        } else {
+            $records = Branch::orderBy('code', 'asc')->get();
+        }
+
         return view('misc.ajax.branches', compact('records'));
     }
 

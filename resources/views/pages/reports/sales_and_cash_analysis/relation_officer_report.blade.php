@@ -76,7 +76,7 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        {{-- <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="branch_id">Branch</label>
                                                 <select class="form-control select2-multiple ajax-branches" name="branch_id"
@@ -84,7 +84,7 @@
                                                 </select>
 
                                             </div>
-                                        </div>
+                                        </div> --}}
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="category_id1">Category</label>
@@ -151,7 +151,7 @@
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
                 company_id = $('#company_id').val();
-                branch_id = $('#branch_id').val();
+                branch_id = 1;//This is no longer needed $('#branch_id').val();
                 category_id = $('#category_id').val();
                 user_id = $('#user_id').val();
                 

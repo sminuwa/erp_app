@@ -23,17 +23,17 @@
             $grand_total_profit = 0;
         @endphp
         <table class="display table table-bordered table-striped">
-            @foreach ($salesByBranch as $branchId => $branchSales)
+            {{-- @foreach ($salesByBranch as $branchId => $branchSales) --}}
                 <div class="row">
                     <div class="col-md-12 mt-3 table-responsive">
                         <thead>
-                            <tr>
+                            {{-- <tr>
                                 <td colspan="9">
                                     <h4>{{ $branchSales->first()->branch_name }}
                                         ({{ $branchSales->first()->branch_code }})
                                     </h4>
                                 </td>
-                            </tr>
+                            </tr> --}}
 
                             <tr>
                                 <th>CODE</th>
@@ -53,7 +53,7 @@
                                 $branch_total_cost = 0;
                                 $branch_total_profit = 0;
                             @endphp
-                            @foreach ($branchSales as $sale)
+                            @foreach ($salesByBranch as $sale)
                                 <tr>
                                     <td>{{ $sale->code }}</td>
                                     <td>{{ $sale->category }}</td>
@@ -100,7 +100,7 @@
                     $grand_total_cost += $branch_total_cost;
                     $grand_total_profit += $branch_total_profit;
                 @endphp
-            @endforeach
+            {{-- @endforeach --}}
         </table>
         <div class="row">
             <div class="col-md-12 mt-3 table-responsive">

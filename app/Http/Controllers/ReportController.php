@@ -1837,14 +1837,14 @@ class ReportController extends Controller
                 return $value !== '%';
             });
         }
-        $branch_id = $request->input('branch_id', ['%']);
+        // $branch_id = $request->input('branch_id', ['%']);
 
-        // Remove any '%' values from the array if it's not the only value
-        if (count($branch_id) > 1) {
-            $branch_id = array_filter($branch_id, function ($value) {
-                return $value !== '%';
-            });
-        }
+        // // Remove any '%' values from the array if it's not the only value
+        // if (count($branch_id) > 1) {
+        //     $branch_id = array_filter($branch_id, function ($value) {
+        //         return $value !== '%';
+        //     });
+        // }
         $category_id1 = $request->input('category_id1', ['%']);
 
         // Remove any '%' values from the array if it's not the only value
@@ -1853,8 +1853,8 @@ class ReportController extends Controller
                 return $value !== '%';
             });
         }
-       
-        
+
+
         $from_date = date('Y-m-d', strtotime($request->from_date));
         $to_date = date('Y-m-d', strtotime($request->to_date));
         $company_id = $request->company_id;
@@ -1865,7 +1865,7 @@ class ReportController extends Controller
         if ($company_id == 'all' || $company_id == '' || $company_id == null) {
             $company_id = '%';
         }
-        
+
         // Check if any categories are selected, or treat as "all"
         // $category_id1 = is_array($category_id1) ? $category_id1 : ['%'];  // Convert to array if not already
         // $branch_id = is_array($branch_id) ? $branch_id : ['%'];  // Convert to array if not already
@@ -1906,29 +1906,31 @@ class ReportController extends Controller
         if (!in_array('%', $category_id1)) {
             $data = $data->whereIn('products.category_id', $category_id1);
         }
-        if (!in_array('%', $branch_id)) {
-            $data = $data->whereIn('stores.branch_id', $branch_id);
-        }
+        // if (!in_array('%', $branch_id)) {
+        //     $data = $data->whereIn('stores.branch_id', $branch_id);
+        // }
         if (!in_array('%', $user_id)) {
             $data = $data->whereIn('customers.relation_officer', $user_id);
         }
+        
 
-
-        $sales = $data->groupBy('branches.id', 'products.category_id')
+        $salesByBranch = $data->groupBy('products.category_id')
             ->orderBy('branches.name', 'ASC')
             ->orderBy('categories.code', 'ASC')
             ->get();
 
-        // Group sales by branch
-        $salesByBranch = $sales->groupBy('branch_id');
+            //$salesByBranch = $data->get();
+
+        // // Group sales by branch
+        // $salesByBranch = $sales->groupBy('branch_id');
 
         // Reset 'all' to make it more readable in the UI
         if (in_array('%', $category_id1)) {
             $category_id1 = "all";
         }
-        if (in_array('%', $branch_id)) {
-            $branch_id = "all";
-        }
+        // if (in_array('%', $branch_id)) {
+        //     $branch_id = "all";
+        // }
         if (in_array('%', $user_id)) {
             $user_id = "all";
         }
@@ -1937,19 +1939,18 @@ class ReportController extends Controller
         }
 
         // Fetch branch info if a specific branch is selected
-        $branch = null;
-        if ($branch_id != 'all') {
-            $branch = Branch::find($branch_id);
-        }
+        // $branch = null;
+        // if ($branch_id != 'all') {
+        //     $branch = Branch::find($branch_id);
+        // }
         $company = null;
         if ($company_id != 'all') {
             $company = Company::find($company_id);
         }
-
         // Return the view with the data
         return view(
             'pages.reports.sales_and_cash_analysis.load_relation_officer_report',
-            compact('salesByBranch', 'from_date', 'to_date', 'branch_id', 'category_id1', 'user_id', 'branch', 'company', 'company_id')
+            compact('salesByBranch', 'from_date', 'to_date', 'category_id1', 'user_id', 'company', 'company_id')
         );
 
     }
@@ -1959,26 +1960,26 @@ class ReportController extends Controller
         if ($company_id == 'all' || $company_id == '')
             $company_id = '%';
 
-            if (count($staff_id) > 1) {
-                $user_id = array_filter($staff_id, function ($value) {
-                    return $value !== '%';
-                });
-            }
-            
-    
-            // Remove any '%' values from the array if it's not the only value
-            if (count($branch_id) > 1) {
-                $branch_id = array_filter($branch_id, function ($value) {
-                    return $value !== '%';
-                });
-            }
-            
-            // Remove any '%' values from the array if it's not the only value
-            if (count($category_id) > 1) {
-                $category_id = array_filter($category_id, function ($value) {
-                    return $value !== '%';
-                });
-            }
+        if (count($staff_id) > 1) {
+            $user_id = array_filter($staff_id, function ($value) {
+                return $value !== '%';
+            });
+        }
+
+
+        // Remove any '%' values from the array if it's not the only value
+        if (count($branch_id) > 1) {
+            $branch_id = array_filter($branch_id, function ($value) {
+                return $value !== '%';
+            });
+        }
+
+        // Remove any '%' values from the array if it's not the only value
+        if (count($category_id) > 1) {
+            $category_id = array_filter($category_id, function ($value) {
+                return $value !== '%';
+            });
+        }
 
 
         $data = DB::table('orders')
@@ -4984,6 +4985,7 @@ class ReportController extends Controller
         //     ->select(DB::raw('SUM(debit - credit) as total_expenses'))
         //     ->first()->total_expenses;
 
+        
         $retainedEarningsFromLastYear_R = GeneralAccountLedger::join('general_accounts', 'general_account_ledgers.model_id', 'general_accounts.id')
             ->where(function ($query) {
                 $query->where('number', 'like', 'R%'); // Revenues

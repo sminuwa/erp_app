@@ -45,7 +45,7 @@
                                         <label for="company_id">Company</label>
                                         <select
                                             class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
-                                            name="company_id" id="company_id" required>
+                                            name="company_id" id="company_id">
 
                                         </select>
                                     </div>

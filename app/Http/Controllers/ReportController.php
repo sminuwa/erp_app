@@ -4985,6 +4985,7 @@ class ReportController extends Controller
         //     ->select(DB::raw('SUM(debit - credit) as total_expenses'))
         //     ->first()->total_expenses;
 
+        
         $retainedEarningsFromLastYear_R = GeneralAccountLedger::join('general_accounts', 'general_account_ledgers.model_id', 'general_accounts.id')
             ->where(function ($query) {
                 $query->where('number', 'like', 'R%'); // Revenues

@@ -67,6 +67,10 @@ function ajerks(method, url, cssClass) {
         data = { store_id: store_id }
 
     }
+    if (element.attr('company_id') && element.attr('name') === 'branch_id') {
+        let company_id = element.attr('company_id')
+        data = { company_id: company_id }
+    }
 
     $.ajax({
         url: url,

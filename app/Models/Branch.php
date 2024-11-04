@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
  */
 class Branch extends Model
-
 {
 
     /**
@@ -18,20 +17,27 @@ class Branch extends Model
     /**
      * Mass assignable columns
      */
-    protected $fillable = ['company_id','name', 'code', 'status'];
+    protected $fillable = ['company_id', 'name', 'code', 'status'];
 
     /**
      * Date time columns.
      */
     protected $dates = [];
 
-    public function stores(){
-        return $this->hasMany(Store::class,'branch_id','id');
+    public function stores()
+    {
+        return $this->hasMany(Store::class, 'branch_id', 'id');
     }
 
-    public function company(){
+    public function company()
+    {
         return $this->belongsTo(Company::class, 'company_id');
     }
-
+    public function scopeForCompany($query, int $company_id = null)
+    {
+        if (is_null($company_id))
+            return $query;
+        return $query->where('company_id', $company_id);
+    }
 
 }

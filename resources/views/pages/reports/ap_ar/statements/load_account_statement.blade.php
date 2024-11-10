@@ -5,7 +5,7 @@
     </div> --}}
 </div>
 <div class="table-responsive">
-    <table class="display table table-bordered caption">
+    <table class="display table table-bordered caption" id="example1">
         <caption style="caption-size:top">
             <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
                 ACCOUNT STATEMENTS BETWEEN {{ Carbon\carbon::parse($from_date)->toFormattedDateString() }} TO
@@ -26,18 +26,12 @@
         $sum_dr = $sum_dr_b_d;
         $dif = 0; ?>
         <thead>
-            {{-- <tr>
-                <th colspan="7"></th>
-                <th colspan="2" style="text-align: center; align-content: center">Balance</th>
-            </tr> --}}
             <tr>
                 <th rowspan="2" style="width: 5%;">S/N</th>
                 <th rowspan="2">Date</th>
                 <th rowspan="2">Account No</th>
                 <th rowspan="2">Description</th>
                 <th rowspan="2">Reference</th>
-            </tr>
-            <tr>
                 <th style="text-align: center; align-content: center">Debit (Dr.)</th>
                 <th style="text-align: center; align-content: center">Credit (Cr.)</th>
                 <th>Dr.</th>
@@ -53,10 +47,8 @@
                 <tr>
                     <td>{{ $loop->index + 1 }}</td>
                     <td>{{ $ledger->date->toFormattedDateString() }}</td>
-
                     <td>{{ $ledger->payer()->code ?? ($ledger->payer()->number ?? '') }}</td>
-                    <td>{{ transactionDecription($ledger->reference) != '' ? transactionDecription($ledger->reference) : $ledger->description }}
-                    </td>
+                    <td>{{ transactionDecription($ledger->reference) != '' ? transactionDecription($ledger->reference) : $ledger->description }}</td>
                     <td>{{ $ledger->reference }}</td>
                     <td style="text-align: right">
                         @if ($debit > 0.0)
@@ -86,16 +78,6 @@
                 </tr>
             @endforeach
         </tbody>
-        {{-- <tfoot>
-            <tr>
-
-                <th colspan="5" style="text-align: right">Total</th>
-                <th style="text-align: right;">{{ number_format(abs($debit_sum), 2) }}</th>
-                <th style="text-align: right;">{{ number_format(abs($credit_sum), 2) }}</th>
-                <th style="text-align: right;">{{ $dif < 0 ? number_format(abs($dif), 2) : '' }}</th>
-                <th style="text-align: right;">{{ $dif > 0 ? number_format(abs($dif), 2) : '' }}</th>
-            </tr>
-        </tfoot> --}}
         <tfoot>
             <tr>
                 <th colspan="5" style="text-align: right">Total</th>

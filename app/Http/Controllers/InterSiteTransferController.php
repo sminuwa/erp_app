@@ -24,6 +24,7 @@ use App\Models\Category;
 use App\Models\Store;
 use Illuminate\Support\Facades\DB;
 use App\Models\StoreProduct;
+use App\Models\StockCard;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\AuditLog;
@@ -75,7 +76,23 @@ class InterSiteTransferController extends Controller
                 $items = $intersite->products;
                 /*return $items;*/
                 foreach ($items as $item) {
-                    StoreProduct::where(['store_id' => $item->store_id, 'product_id' => $item->product_id])->decrement('qty_available', $item->quantity);
+                    $quantity_before = StoreProduct::where(['store_id' => $item->store_id, 'product_id' => $item->product_id])->first()->qty_available ?? 0;
+                    if(StoreProduct::where(['store_id' => $item->store_id, 'product_id' => $item->product_id])->decrement('qty_available', $item->quantity)){
+                        $quantity_after = StoreProduct::where(['store_id' => $item->store_id, 'product_id' => $item->product_id])->first()->qty_available ?? 0;
+                        $stock_card = new StockCard();
+                        $stock_card->store_id = $item->store_id;
+                        $stock_card->product_id = $item->product_id;
+                        $stock_card->cr = 0.00;
+                        $stock_card->dr = $item->quantity;
+                        $stock_card->qty_before = $quantity_before;
+                        $stock_card->qty_after = $quantity_after;
+                        $stock_card->cost = $item->cost_price;
+                        $stock_card->refno = $intersite->reference;
+                        $stock_card->type = TRANSACTION_TYPE_INTERSITE;
+                        $stock_card->date = $intersite->date;
+                        $stock_card->user_id = auth()->id();
+                        $stock_card->priority = 4;
+                    }
                 }
                 if (Transaction::intersite_post($intersite->id)['status']) {
                     $action = "Posted intersite transfer of product from " . $user->branch->name . " to  branch" . Branch::find($intersite->destination_branch_id)->name;

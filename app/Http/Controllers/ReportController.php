@@ -1872,6 +1872,53 @@ class ReportController extends Controller
         // $user_id = is_array($user_id) ? $user_id : ['%'];  // Convert to array if not already
 
         // Build the query
+        // $data = DB::table('orders')
+        //     ->select(
+        //         'branches.id as branch_id',
+        //         'branches.name as branch_name',
+        //         'branches.code as branch_code',
+        //         'categories.name as category',
+        //         'categories.code as code',
+        //         'users.user_code as ro_code',
+        //         'users.name as user_name',
+        //         DB::raw('SUM(order_details.quantity) as quantity'),
+        //         DB::raw('SUM(order_details.total) as amount'),
+        //         DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
+        //         DB::raw('(SELECT SUM(store_products.qty_available) 
+        //         FROM store_products
+        //         JOIN products p ON store_products.product_id = p.id
+        //         WHERE store_products.store_id IN (SELECT id FROM stores WHERE branch_id = branches.id)
+        //         AND p.category_id = categories.id) as qty_available')
+        //     )
+        //     ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+        //     ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
+        //     ->join('stores', 'store_products.store_id', '=', 'stores.id')
+        //     ->join('branches', 'stores.branch_id', '=', 'branches.id')
+        //     ->join('companies', 'branches.company_id', '=', 'companies.id')
+        //     ->join('products', 'store_products.product_id', '=', 'products.id')
+        //     ->join('categories', 'products.category_id', '=', 'categories.id')
+        //     ->join('customers', 'customers.id', 'orders.customer_id')
+        //     ->join('users', 'users.id', 'customers.relation_officer')
+        //     ->where('branches.company_id', 'LIKE', $company_id)
+        //     ->where('order_details.status', '=', 1)
+        //     ->whereBetween('order_date', [$from_date, $to_date]);
+
+        // if (!in_array('%', $category_id1)) {
+        //     $data = $data->whereIn('products.category_id', $category_id1);
+        // }
+        // // if (!in_array('%', $branch_id)) {
+        // //     $data = $data->whereIn('stores.branch_id', $branch_id);
+        // // }
+        // if (!in_array('%', $user_id)) {
+        //     $data = $data->whereIn('customers.relation_officer', $user_id);
+        // }
+
+
+        // $salesByBranch = $data->groupBy('products.category_id')
+        //     ->orderBy('branches.name', 'ASC')
+        //     ->orderBy('categories.code', 'ASC')
+        //     ->get();
+
         $data = DB::table('orders')
             ->select(
                 'branches.id as branch_id',
@@ -1880,15 +1927,16 @@ class ReportController extends Controller
                 'categories.name as category',
                 'categories.code as code',
                 'users.user_code as ro_code',
+                'users.id as ro_id',
                 'users.name as user_name',
                 DB::raw('SUM(order_details.quantity) as quantity'),
                 DB::raw('SUM(order_details.total) as amount'),
                 DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
                 DB::raw('(SELECT SUM(store_products.qty_available) 
-                FROM store_products
-                JOIN products p ON store_products.product_id = p.id
-                WHERE store_products.store_id IN (SELECT id FROM stores WHERE branch_id = branches.id)
-                AND p.category_id = categories.id) as qty_available')
+            FROM store_products
+            JOIN products p ON store_products.product_id = p.id
+            WHERE store_products.store_id IN (SELECT id FROM stores WHERE branch_id = branches.id)
+            AND p.category_id = categories.id) as qty_available')
             )
             ->join('order_details', 'orders.id', '=', 'order_details.order_id')
             ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
@@ -1906,20 +1954,18 @@ class ReportController extends Controller
         if (!in_array('%', $category_id1)) {
             $data = $data->whereIn('products.category_id', $category_id1);
         }
-        // if (!in_array('%', $branch_id)) {
-        //     $data = $data->whereIn('stores.branch_id', $branch_id);
-        // }
         if (!in_array('%', $user_id)) {
             $data = $data->whereIn('customers.relation_officer', $user_id);
         }
-        
 
-        $salesByBranch = $data->groupBy('products.category_id')
-            ->orderBy('branches.name', 'ASC')
+        $salesByOfficer = $data
+            ->groupBy('customers.relation_officer', 'products.category_id')
+            ->orderBy('users.name', 'ASC')
             ->orderBy('categories.code', 'ASC')
-            ->get();
+            ->get()
+            ->groupBy('ro_id');
 
-            //$salesByBranch = $data->get();
+        //$salesByBranch = $data->get();
 
         // // Group sales by branch
         // $salesByBranch = $sales->groupBy('branch_id');
@@ -1950,7 +1996,7 @@ class ReportController extends Controller
         // Return the view with the data
         return view(
             'pages.reports.sales_and_cash_analysis.load_relation_officer_report',
-            compact('salesByBranch', 'from_date', 'to_date', 'category_id1', 'user_id', 'company', 'company_id')
+            compact('salesByOfficer', 'from_date', 'to_date', 'category_id1', 'user_id', 'company', 'company_id')
         );
 
     }
@@ -4985,7 +5031,7 @@ class ReportController extends Controller
         //     ->select(DB::raw('SUM(debit - credit) as total_expenses'))
         //     ->first()->total_expenses;
 
-        
+
         $retainedEarningsFromLastYear_R = GeneralAccountLedger::join('general_accounts', 'general_account_ledgers.model_id', 'general_accounts.id')
             ->where(function ($query) {
                 $query->where('number', 'like', 'R%'); // Revenues

@@ -215,6 +215,8 @@ class ReportController extends Controller
             ->join('stores', 'stores.id', 'interstore_transfer_details.source_store_id')
             ->join('products', 'products.id', 'interstore_transfer_details.product_id')
             ->join('users', 'users.id', 'interstore_transfers.created_by')
+            ->join('branches', 'stores.branch_id', 'branches.id')
+            ->where('branches.company_id', 'LIKE', $company_id)
             ->whereBetween('interstore_transfers.date', [$from_date, $to_date]);
 
         $transfers = $query->get();
@@ -293,6 +295,8 @@ class ReportController extends Controller
             ->join('stores', 'stores.id', 'interstore_transfer_details.source_store_id')
             ->join('products', 'products.id', 'interstore_transfer_details.product_id')
             ->join('users', 'users.id', 'interstore_transfers.created_by')
+            ->join('branches', 'stores.branch_id', 'branches.id')
+            ->where('branches.company_id', 'LIKE', $company_id)
             ->whereBetween('interstore_transfers.date', [$from_date, $to_date]);
         $transfers = $query->get();
         return view('pages.reports.stock_control.print_intersite_stock_transfer', compact('transfers', 'from_date', 'to_date'));

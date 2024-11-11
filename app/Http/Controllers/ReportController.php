@@ -5038,6 +5038,7 @@ class ReportController extends Controller
             })
             ->whereDate('date', '<=', $last_day_of_previous_year)
             ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+            ->where('general_account_ledgers.model_name', 'GeneralAccount')
             ->select(DB::raw('SUM(credit - debit) as retained_earnings'))
             ->first()->retained_earnings;
 
@@ -5048,10 +5049,14 @@ class ReportController extends Controller
             })
             ->whereDate('date', '<=', $last_day_of_previous_year)
             ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+            ->where('general_account_ledgers.model_name', 'GeneralAccount')
             ->select(DB::raw('SUM(credit - debit) as retained_earnings'))
             ->first()->retained_earnings;
-        $retainedEarningsFromLastYear = abs($retainedEarningsFromLastYear_R) - abs($retainedEarningsFromLastYear_C);
-
+        $retainedEarningsFromLastYear = 0;
+        if ($retainedEarningsFromLastYear_R > 0 && $retainedEarningsFromLastYear_C > 0)
+            $retainedEarningsFromLastYear = $retainedEarningsFromLastYear_R + $retainedEarningsFromLastYear_C;
+        else
+            $retainedEarningsFromLastYear = abs($retainedEarningsFromLastYear_R) - abs($retainedEarningsFromLastYear_C);
         // Fetch retained earnings from 2024-01-01 to the given date ($to_date)
 
         $retainedEarningsFromSelectedYear_C = GeneralAccountLedger::join('general_accounts', 'general_account_ledgers.model_id', 'general_accounts.id')
@@ -5062,6 +5067,7 @@ class ReportController extends Controller
             ->whereDate('date', '>=', $first_day_of_current_year)
             ->whereDate('date', '<=', $to_date)
             ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+            ->where('general_account_ledgers.model_name', 'GeneralAccount')
             ->select(DB::raw('SUM(credit - debit) as retained_earnings'))
             ->first()->retained_earnings;
 
@@ -5072,10 +5078,15 @@ class ReportController extends Controller
             ->whereDate('date', '>=', $first_day_of_current_year)
             ->whereDate('date', '<=', $to_date)
             ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+            ->where('general_account_ledgers.model_name', 'GeneralAccount')
             ->select(DB::raw('SUM(credit - debit) as retained_earnings'))
             ->first()->retained_earnings;
-        //return $retainedEarningsFromSelectedYear_R. ",".$retainedEarningsFromSelectedYear_C;
-        $retainedEarningsFromSelectedYear = abs($retainedEarningsFromSelectedYear_R) - abs($retainedEarningsFromSelectedYear_C);
+            $retainedEarningsFromSelectedYear = 0;
+        if ($retainedEarningsFromSelectedYear_R > 0 && $retainedEarningsFromSelectedYear_C > 0)
+            $retainedEarningsFromSelectedYear = $retainedEarningsFromSelectedYear_R + $retainedEarningsFromSelectedYear_C;
+        else
+            $retainedEarningsFromSelectedYear = abs($retainedEarningsFromSelectedYear_R) - abs($retainedEarningsFromSelectedYear_C);
+        
         return view('pages.reports.ap_ar.balance_sheet.load', compact('assets', 'liabilities', 'equity', 'net_income', 'branch', 'to_date', 'company_id', 'branch_id', 'retainedEarningsFromLastYear', 'retainedEarningsFromSelectedYear'));
     }
     // public function printBalanceSheet($to, $branch_id)

@@ -158,7 +158,13 @@
         </tr>
         <tr>
             <th colspan="4" style="text-align: left">GROSS MARGIN</th>
-            @php $gross_profit_loss = $total_revenue - abs($total_cost)  @endphp
+            @php
+                if ($total_cost > 0) {
+                    $gross_profit_loss = $total_revenue + abs($total_cost);
+                } else {
+                    $gross_profit_loss = $total_revenue - abs($total_cost);
+                }
+            @endphp
             <th style="text-align: right;">
                 {{ $gross_profit_loss < 0 ? number_format(abs($gross_profit_loss), 2) : '' }}
             </th>
@@ -249,8 +255,11 @@
         <tr>
             <th colspan="4" style="text-align: left">NET MARGIN</th>
             @php
-
-                $net_profit_loss = $gross_profit_loss - abs($total_expense) + $other_income;
+                if ($total_expense > 0) {
+                    $net_profit_loss = $gross_profit_loss + abs($total_expense) + $other_income;
+                } else {
+                    $net_profit_loss = $gross_profit_loss - abs($total_expense) + $other_income;
+                }
             @endphp
             <th style="text-align: right;">{{ $net_profit_loss < 0 ? number_format(abs($net_profit_loss), 2) : '' }}
             </th>

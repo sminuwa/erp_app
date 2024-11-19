@@ -47,8 +47,8 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="col-12">
-                                @if (session()->has('message'))
-                                    <div class="alert alert-success">{{ session('message') }}</div>
+                                @if (session()->has('success'))
+                                    <div class="alert alert-success">{{ session('success') }}</div>
                                 @endif
                                 @if (session()->has('error'))
                                     <div class="alert alert-danger">{{ session('error') }}</div>

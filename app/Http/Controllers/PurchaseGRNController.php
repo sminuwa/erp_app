@@ -142,7 +142,7 @@ class PurchaseGRNController extends Controller
                     $product->status = 1;
                     $product->save();
                 }
-                Transaction::purchases($purchase->id, $purchase_date);
+                // Transaction::purchases($purchase->id, $purchase_date);
                 if ($purchase_request_id > 0) {
                     $purchase_request = PurchaseRequest::find($purchase_request_id);
                     $purchase_request->status = 1;

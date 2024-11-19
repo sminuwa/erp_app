@@ -193,6 +193,7 @@ class JournalController extends Controller
 
     public function edit(Journal $journal)
     {
+        // return $journal->items;
         foreach ($journal->items as $item) {
             \Cart::add([
                 'id' => $item->id,
@@ -206,6 +207,7 @@ class JournalController extends Controller
                     'code' => $item->account()->code ?? $item->account()->number,
                     'account_type' => $item->account_type,
                     'payer_id' => $item->account_id,
+                    'branch_id' => $journal->branch_id,
                 ),
             ]);
         }

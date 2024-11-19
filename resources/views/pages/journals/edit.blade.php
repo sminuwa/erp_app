@@ -3,6 +3,7 @@
 @section('title', 'Journal')
 
 @push('css')
+{{--    <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">--}}
 @endpush
 
 @section('content')
@@ -15,12 +16,14 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Edit Journal {{ $journal->reference }}</h4>
+                        <h4>New Journal </h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('journal.index') }}">Journals List</a></li>
+                            @can('journal.index')
+                                <li class="breadcrumb-item"><a href="{{ route('journal.index') }}">Journals List</a></li>
+                            @endcan
                             <li class="breadcrumb-item active">New Journal</li>
                         </ol>
                     </div>
@@ -30,64 +33,79 @@
 
         <!-- Main content -->
         <section class="content">
-            @can('journal.create')
-                <a href="{{ route('journal.create') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;">
-                    <span class="fa fa-plus-circle"> </span> New Journal
-                </a>
-            @endcan
-            @can('journal.index')
-                <a class="btn btn-secondary btn-sm" href="{{ route('journal.index') }}">
-                    <span class="fa fa-list"></span> Journals List
-                </a>
-            @endcan
-            <div class="container-fluid py-4">
-                <form action="{{ route('journal.update', $journal->id) }}" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <input type="text" class="form-control datepicker-entry" name="date" id="date"
-                                value="{{ $journal->date }}" required>
-                            <label class="floating-label">Date: @error('journal_date')
-                                    <span class="text-danger error">{{ $message }}</span>
-                                @enderror
-                            </label>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <textarea name="description" id="description" type="text" class="form-control" placeholder="Description">{{ $journal->description }}</textarea>
-                            <label class="floating-label">Description: @error('description')
-                                    <span class="text-danger error">{{ $message }}</span>
-                                @enderror
-                            </label>
-                        </div>
-                        <div class="col-md-2 mb-3">
-                            <button type="button" data-toggle="modal" data-target="#journal_modal"
-                                class="btn btn-primary float-right"><i class="fa fa-cart-plus"></i>
-                                Add
-                            </button>
-                        </div>
-
+            <div class="container-fluid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            Journal
+                        </h3>
                     </div>
-                    <div class="row">
-                        <div class="col-md-8 mb-7 text-right">
-                            <button type="submit" class="btn btn-primary float-right"><i class="fa fa-cart-plus"></i>
-                                Submit
-                            </button>
-                        </div>
+                    <div class="card-body table-responsive">
+                        @can('journal.create')
+                            <a href="{{ route('journal.create') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;">
+                                <span class="fa fa-plus-circle"> </span> New Journal
+                            </a>
+                        @endcan
+                        @can('journal.index')
+                            <a class="btn btn-secondary btn-sm" href="{{ route('journal.index') }}">
+                                <span class="fa fa-list"></span> Journals List
+                            </a>
+                        @endcan
+                        <div class="container-fluid py-4">
+                            <form action="{{ route('journal.store') }}" method="POST">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <input type="text" class="form-control datepicker-entry" name="date" id="date"
+                                            required>
+                                        <label class="floating-label">Date: @error('journal_date')
+                                                <span class="text-danger error">{{ $message }}</span>
+                                            @enderror
+                                        </label>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <textarea name="description" id="description" type="text" class="form-control" placeholder="Description"></textarea>
+                                        <label class="floating-label">Description: @error('description')
+                                                <span class="text-danger error">{{ $message }}</span>
+                                            @enderror
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2 mb-3">
+                                        <button id="add-modal" type="button"  data-toggle="modal" data-target="#journal_modal"
+                                            class="btn btn-primary float-right"><i class="fa fa-cart-plus"></i>
+                                            Add
+                                        </button>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-8 mb-7 text-right">
+                                        <button type="submit" class="btn btn-primary float-right"><i
+                                                class="fa fa-cart-plus"></i>
+                                            Submit
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </form>
+                            <div class="card-body table-responsive cart-container">
+
+                            </div>
+                        </div><!-- /.container-fluid -->
                     </div>
-
-                </form>
-                <div class="card-body table-responsive cart-container">
-
                 </div>
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
-    <div class="modal fade" id="journal_modal"  role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+
+
+    <div class="modal fade" id="journal_modal" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true" >
+
+        <div class="modal-dialog modal-lg" role="document" >
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">
@@ -103,21 +121,45 @@
                         <input type="hidden" name="type" id="type" value="{{ 'journal' }}" />
                         <div class="row">
                             <div class="col-md-12">
-
                                 <table>
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class="col-12">
+                                                <div class="input-group mb-3">
+                                                    @can('create-inter-branch-journal')
+                                                    <select class="form-control ajax-branches select2-single"
+                                                            name="branch_id"
+                                                            id="branch_id"
+                                                            selected_item="{{ auth()->user()->branch->id }}"
+                                                    ></select>
+                                                    {{--@else
+                                                        <select class="form-control ajax-branches select2-single"
+                                                                name="branch_id"
+                                                                id="branch_id"
+                                                                selected_item="{{ auth()->user()->branch->id }}" readonly="readonly"
+                                                        ></select>--}}
+                                                    @endcan
+                                                    <label class="floating-label">Branch: @error('branch_id')
+                                                        <br><span class="text-danger error">{{ $message }}</span>
+                                                        @enderror
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
                                     <tr>
                                         <td>
                                             <div class="col-12">
                                                 <div class="form-group">
                                                     <select name="account_type" id="account_type"
-                                                        class="form-control  type select2-single" required>
+                                                        class="form-control select2-single type" required>
                                                         <option value="">Select...</option>
                                                         <option value="Customer">Customer</option>
                                                         <option value="Supplier">Supplier
-                                                        <option value="GeneralAccount">General Accounts
+                                                        <option value="GeneralAccount">General Ledger Accounts
                                                         </option>
                                                     </select>
-                                                    <label class="floating-label">Account Type: @error('type')
+                                                    <label class="floating-label">Account Type: @error('account_type')
                                                             <span class="text-danger error">{{ $message }}</span>
                                                         @enderror
                                                     </label>
@@ -128,10 +170,10 @@
                                             <div class="col-12">
                                                 <div class="form-group">
                                                     <select name="payer_id" id="payer_id"
-                                                        class="form-control select2-single ajax-general-accounts" required>
+                                                        class="form-control ajax-general-accounts select2-single" required>
                                                         <option value="">Select...</option>
                                                     </select>
-                                                    <label class="floating-label">Account: @error('account')
+                                                    <label class="floating-label">Account: @error('payer_id')
                                                             <span class="text-danger error">{{ $message }}</span>
                                                         @enderror
                                                     </label>
@@ -196,7 +238,17 @@
 @endsection
 @push('js')
     <script src="{{ asset('assets/backend/js/select2.full.js') }}"></script>
+
     <script>
+
+        $('#add-modal').click(function(){
+            $(".select2-single, .select2-multiple").select2({
+                theme: "bootstrap",
+                maximumSelectionSize: 10,
+                containerCssClass: ':all:'
+            });
+        })
+
         function formatNumber(input) {
             // Remove non-numeric and non-decimal characters
             let value = input.value.replace(/[^\d.]/g, '');
@@ -243,20 +295,22 @@
         });
 
 
-        $(function() {
-            $('#account_type').on("change", function() {
-                $("#payer_id").html(" < option value = '' > Loading... < /option>");
-                $.ajax({
-                    url: "{{ route('ajax.load.payers') }}",
-                    type: 'GET',
-                    data: {
-                        type: $(this).val()
-                    }
-                }).done(function(msg) {
-                    $("#payer_id").html(msg);
-                });
+        // $(function() {
+        $(document).on('change', '#account_type', function() {
+            // $('#account_type').on("change", function() {
+            $("#payer_id").html(" < option value = '' > Loading... < /option>");
+            $.ajax({
+                url: "{{ route('ajax.load.payers') }}",
+                type: 'GET',
+                data: {
+                    type: $(this).val()
+                }
+            }).done(function(msg) {
+                $("#payer_id").html(msg);
             });
         });
+        // });
+
         // $(document).on('input', '.ajax-update-input', function() {
         //     let formId = $(this).attr('data-value').substring(1); //$(this).closest('form').attr('id');
 

@@ -1,9 +1,9 @@
-<div class="row">
+{{-- <div class="row">
     <div class="offset-10">
         <a href="{{ route('ajax.print.balance.sheet.report', [$to_date, $company_id, $branch_id]) }}" target="_BLANK"
             class="btn-success btn btn-sm">Print</a>
     </div>
-</div>
+</div> --}}
 {{-- <table class="display table table-bordered caption" id="example1" data-ordering="true">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
@@ -241,17 +241,21 @@
             <tr>
                 <td>{{ $eq->number }}</td>
                 <td>{{ $eq->description }}</td>
-                <td></td>
                 @php
 
                 @endphp
                 @if ($eq->number == 'E300004')
-                    @php $equity_value = abs($eq->credit - $eq->debit) + $retainedEarningsFromLastYear; @endphp
+                    {{-- @php $equity_value = abs($eq->credit - $eq->debit); @endphp --}}
+                    @php $equity_value = abs($eq->credit - $eq->debit) + abs($retainedEarningsFromLastYear); @endphp
                 @else
                     @php $equity_value = $eq->credit - $eq->debit; @endphp
                 @endif
                 <td style="text-align: right;">
-                    {{ number_format(abs($equity_value), 2) }}</td>
+                    {{ $equity_value < 0 ? number_format(abs($equity_value), 2):'' }}
+                </td>
+                <td style="text-align: right;">
+                    {{ $equity_value > 0 ? number_format(abs($equity_value), 2):'' }}
+                </td>
                 @php
                     $total_equity += $equity_value;
                 @endphp

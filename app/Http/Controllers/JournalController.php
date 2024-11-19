@@ -151,7 +151,7 @@ class JournalController extends Controller
             }
             
 //            return Transaction::journal($account_details, $journal->reference, $journal->date);
-            if (($debit - $credit) != 0)
+            if ((round($debit) - round($credit)) != 0)
                 return back()->with('error', 'Cannot post journal. Make sure total debit and credit are equal.');
             //        return Transaction::journal($account_details,$journal->reference,$journal->date);
             //return $debit - $credit;

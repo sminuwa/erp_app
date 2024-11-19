@@ -158,7 +158,7 @@ class JournalController extends Controller
             if ($journal->save()) {
                 if (Transaction::journal($account_details, $journal->reference, $journal->date)) {
                     DB::commit();
-                    return back()->with('success', 'Reversed successfully');
+                    return back()->with('success', 'posted successfully');
                 } else
                     DB::rollback();
                 return back()->with('error', 'Something went wrong.');

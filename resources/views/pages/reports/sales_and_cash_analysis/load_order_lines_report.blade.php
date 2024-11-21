@@ -1,7 +1,7 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.order.lines.report.print', [$from_date, $to_date, $company_id, $branch_id, $status]) }}"
-            target="_BLANK" class="btn-success btn btn-sm">Print</a>
+        <a href="{{ route('ajax.order.lines.report.print', [$from_date, $to_date, $company_id,$branch_id, $status]) }}" target="_BLANK"
+            class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
 <table class="display table table-bordered caption" id="example1" data-ordering="false">
@@ -16,8 +16,7 @@
     </caption>
     <thead>
         <tr>
-            <th style="width: 50%" colspan="4">Date Processed:
-                {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            <th style="width: 50%" colspan="4">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
             </th>
             <th style="width: 50%;text-align:right" colspan="4">Processed By {{ auth()->user()->name }}</th>
         </tr>
@@ -43,12 +42,12 @@
             <tr>
                 <td>{{ \Carbon\Carbon::parse($sale->order_date)->toFormattedDateString() }}</td>
                 <td>{{ $sale->reference }}</td>
-                <td>{{ $sale->customer->code ?? '' }}</td>
-                <td>{{ $item->product->code ?? '' }}</td>
+                <td>{{ $sale->customer->code }}</td>
+                <td>{{ $item->product->code }}</td>
                 <td>{{ $item->quantity }}</td>
                 <td style="text-align: right">{{ number_format($item->sold_price, 2, '.', ',') }}</td>
                 <td style="text-align: right">{{ number_format($item->total, 2, '.', ',') }}</td>
-                <td>{{ $sale->status == 1 ? 'Completed' : ($sale->status == 0 ? 'Pending' : 'Cancelled') }}</td>
+                <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
             </tr>
         @endforeach
     @endforeach

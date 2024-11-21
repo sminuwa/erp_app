@@ -225,8 +225,12 @@
         @endforeach
         <tr>
             <th colspan="2">Total Liabilities</th>
-            <td></td>
-            <th style="text-align: right;">{{ number_format(abs($total_liabilities), 2) }}</th>
+            <td style="text-align: right;">
+                {{ $total_liabilities > 0 ? number_format(abs($total_liabilities), 2) : '' }}
+            </td>
+            <th style="text-align: right;">
+                {{ $total_liabilities < 0 ? number_format(abs($total_liabilities), 2) : '' }}
+            </th>
         </tr>
 
         <!-- Equity -->
@@ -241,17 +245,19 @@
             <tr>
                 <td>{{ $eq->number }}</td>
                 <td>{{ $eq->description }}</td>
-                <td></td>
+
                 @php
 
                 @endphp
                 @if ($eq->number == 'E300004')
-                    @php $equity_value = abs($eq->credit - $eq->debit) + $retainedEarningsFromLastYear; @endphp
+                    @php $equity_value = abs($eq->credit - $eq->debit) - $retainedEarningsFromLastYear; @endphp
                 @else
                     @php $equity_value = $eq->credit - $eq->debit; @endphp
                 @endif
                 <td style="text-align: right;">
-                    {{ number_format(abs($equity_value), 2) }}</td>
+                    {{ $equity_value > 0 ? number_format(abs($equity_value), 2) : '' }}</td>
+                <td style="text-align: right;">
+                    {{ $equity_value < 0 ? number_format(abs($equity_value), 2) : '' }}</td>
                 @php
                     $total_equity += $equity_value;
                 @endphp
@@ -260,8 +266,8 @@
 
         <tr>
             <th colspan="2">Total Equity</th>
-            <td></td>
-            <th style="text-align: right;">{{ number_format(abs($total_equity), 2) }}</th>
+            <th style="text-align: right;">{{ $total_equity > 0 ? number_format(abs($total_equity), 2) : '' }}</th>
+            <th style="text-align: right;">{{ $total_equity < 0 ? number_format(abs($total_equity), 2) : '' }}</th>
         </tr>
         <!-- Retained Earnings -->
         {{-- <tr>
@@ -282,9 +288,11 @@
         </tr> --}}
         <tr>
             <th colspan="2">Net Profit/Loss for Current Year</th>
-            <td></td>
             <th style="text-align: right;">
-                {{ number_format(abs($retainedEarningsFromSelectedYear), 2) }}
+                {{ $retainedEarningsFromSelectedYear > 0 ? number_format(abs($retainedEarningsFromSelectedYear), 2):'' }}
+            </th>
+            <th style="text-align: right;">
+                {{ $retainedEarningsFromSelectedYear < 0 ? number_format(abs($retainedEarningsFromSelectedYear), 2):'' }}
             </th>
         </tr>
         <tr>

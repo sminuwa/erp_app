@@ -3194,7 +3194,7 @@ class ReportController extends Controller
             ->join('branches', 'branches.id', '=', 'credit_notes.branch_id')
             ->where('branches.company_id', 'LIKE', $company_id)
             ->whereBetween(DB::raw("DATE(date)"), [$from_date, $to_date])
-            ->where('status', 'LIKE', $status)
+            ->where('credit_notes.status', 'LIKE', $status)
             ->orderBy('date', 'DESC')
             ->get();
         if ($branch_id == "%")
@@ -3225,7 +3225,7 @@ class ReportController extends Controller
             ->join('branches', 'branches.id', '=', 'credit_notes.branch_id')
             ->where('branches.company_id', 'LIKE', $company_id)
             ->whereBetween(DB::raw("DATE(date)"), [$from_date, $to_date])
-            ->where('status', 'LIKE', $status)
+            ->where('credit_notes.status', 'LIKE', $status)
             ->orderBy('date', 'DESC')
             ->get();
         if ($branch_id == "%")
@@ -3263,7 +3263,7 @@ class ReportController extends Controller
             ->join('branches', 'branches.id', '=', 'orders.branch_id')
             ->where('branches.company_id', 'LIKE', $company_id)
             ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
-            ->where('status', 'LIKE', $status)
+            ->where('orders.status', 'LIKE', $status)
             ->orderBy('order_date', 'DESC')
             ->get();
         if ($branch_id == "%")
@@ -3303,7 +3303,7 @@ class ReportController extends Controller
             ->join('branches', 'branches.id', '=', 'orders.branch_id')
             ->where('branches.company_id', 'LIKE', $company_id)
             ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
-            ->where('status', 'LIKE', $status)
+            ->where('orders.status', 'LIKE', $status)
             ->orderBy('order_date', 'DESC')
             ->get();
         if ($branch_id == "%")
@@ -3333,7 +3333,7 @@ class ReportController extends Controller
             ->join('branches', 'branches.id', '=', 'orders.branch_id')
             ->where('branches.company_id', 'LIKE', $company_id)
             ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
-            ->where('status', 'LIKE', $status)
+            ->where('orders.status', 'LIKE', $status)
             ->orderBy('order_date', 'DESC')
             ->get();
         if ($branch_id == "%")
@@ -3372,7 +3372,7 @@ class ReportController extends Controller
             ->join('branches', 'branches.id', '=', 'order_invoices.branch_id')
             ->where('branches.company_id', 'LIKE', $company_id)
             ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
-            ->where('status', 'LIKE', $status)
+            ->where('order_invoices.status', 'LIKE', $status)
             ->orderBy('order_date', 'DESC')
             ->get();
         if ($branch_id == "%")
@@ -3403,7 +3403,7 @@ class ReportController extends Controller
             ->join('branches', 'branches.id', '=', 'order_invoices.branch_id')
             ->where('branches.company_id', 'LIKE', $company_id)
             ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
-            ->where('status', 'LIKE', $status)
+            ->where('order_invoices.status', 'LIKE', $status)
             ->orderBy('order_date', 'DESC')
             ->get();
         if ($branch_id == "%")
@@ -3441,7 +3441,7 @@ class ReportController extends Controller
             ->join('branches', 'branches.id', '=', 'order_invoices.branch_id')
             ->where('branches.company_id', 'LIKE', $company_id)
             ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
-            ->where('status', 'LIKE', $status)
+            ->where('order_invoices.status', 'LIKE', $status)
             ->orderBy('order_date', 'DESC')
             ->get();
         if ($branch_id == "%")
@@ -3472,7 +3472,7 @@ class ReportController extends Controller
             ->join('branches', 'branches.id', '=', 'order_invoices.branch_id')
             ->where('branches.company_id', 'LIKE', $company_id)
             ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
-            ->where('status', 'LIKE', $status)
+            ->where('order_invoices.status', 'LIKE', $status)
             ->orderBy('order_date', 'DESC')
             ->get();
         if ($branch_id == "%")
@@ -3640,7 +3640,7 @@ class ReportController extends Controller
             ->join('branches', 'branches.id', '=', 'return_debits.branch_id')
             ->where('branches.company_id', 'LIKE', $company_id)
             ->whereBetween(DB::raw("DATE(date)"), [$from_date, $to_date])
-            ->where('status', 'LIKE', $status)
+            ->where('return_debits.status', 'LIKE', $status)
             ->orderBy('date', 'DESC')
             ->get();
         if ($branch_id == "%")
@@ -3671,7 +3671,7 @@ class ReportController extends Controller
             ->join('branches', 'branches.id', '=', 'return_debits.branch_id')
             ->where('branches.company_id', 'LIKE', $company_id)
             ->whereBetween(DB::raw("DATE(date)"), [$from_date, $to_date])
-            ->where('status', 'LIKE', $status)
+            ->where('return_debits.status', 'LIKE', $status)
             ->orderBy('date', 'DESC')
             ->get();
         if ($branch_id == "%")

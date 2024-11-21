@@ -43,9 +43,9 @@
                 <td>{{ \Carbon\Carbon::parse($sale->order_date)->toFormattedDateString() }}</td>
                 <td>{{ $sale->reference }}</td>
                 <td>{{ $sale->customer->code }}</td>
-                <td>{{ $item->product->code }}</td>
+                <td>{{ $item->product->code ?? ''}}</td>
                 <td>{{ $item->quantity }}</td>
-                <td style="text-align: right">{{ number_format($item->sold_price, 2, '.', ',') }}</td>
+                <td style="text-align: right">{{ number_format($item->unit_cost, 2, '.', ',') }}</td>
                 <td style="text-align: right">{{ number_format($item->total, 2, '.', ',') }}</td>
                 <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
             </tr>

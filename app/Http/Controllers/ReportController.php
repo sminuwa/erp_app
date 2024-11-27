@@ -5086,7 +5086,7 @@ class ReportController extends Controller
         $totalRevenue = $revenues->sum('credit') - $revenues->sum('debit');
         $totalExpenses = $expenses->sum('debit') - $expenses->sum('credit');
         $net_income = $totalRevenue - $totalExpenses;
-       
+
 
         // Assuming $to_date is a string in a format like '2024-09-30'
         $date = Carbon::parse($to_date);
@@ -5134,8 +5134,11 @@ class ReportController extends Controller
             ->where('general_account_ledgers.model_name', 'GeneralAccount')
             ->select(DB::raw('SUM(credit - debit) as retained_earnings'))
             ->first()->retained_earnings;
-        $retainedEarningsFromLastYear = abs($retainedEarningsFromLastYear_R) - abs($retainedEarningsFromLastYear_C);
-
+        $retainedEarningsFromLastYear = 0;
+        if ($retainedEarningsFromLastYear_R > 0 && $retainedEarningsFromLastYear_C > 0)
+            $retainedEarningsFromLastYear = $retainedEarningsFromLastYear_R + $retainedEarningsFromLastYear_C;
+        else
+            $retainedEarningsFromLastYear = abs($retainedEarningsFromLastYear_R) - abs($retainedEarningsFromLastYear_C);
         // Fetch retained earnings from 2024-01-01 to the given date ($to_date)
 
         $retainedEarningsFromSelectedYear_C = GeneralAccountLedger::join('general_accounts', 'general_account_ledgers.model_id', 'general_accounts.id')
@@ -5170,13 +5173,13 @@ class ReportController extends Controller
             $retainedEarningsFromSelectedYear = $retainedEarningsFromSelectedYear_R + $retainedEarningsFromSelectedYear_C;
         else
             $retainedEarningsFromSelectedYear = abs($retainedEarningsFromSelectedYear_R) - abs($retainedEarningsFromSelectedYear_C);
-            $company = null;
-            if ($company_id != '%')
-                $company = Company::find($company_id);
-            $branch = null;
-            if ($branch_id != '%') {
-                $branch = Branch::find($branch_id);
-            }
+        $company = null;
+        if ($company_id != '%')
+            $company = Company::find($company_id);
+        $branch = null;
+        if ($branch_id != '%') {
+            $branch = Branch::find($branch_id);
+        }
         return view('pages.reports.ap_ar.balance_sheet.load', compact('assets', 'liabilities', 'equity', 'net_income', 'branch', 'to_date', 'company_id', 'branch_id', 'retainedEarningsFromLastYear', 'retainedEarningsFromSelectedYear'));
     }
     // public function printBalanceSheet($to, $branch_id)

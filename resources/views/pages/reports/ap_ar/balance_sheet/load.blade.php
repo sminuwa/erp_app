@@ -250,7 +250,7 @@
 
                 @endphp
                 @if ($eq->number == 'E300004')
-                    @php $equity_value = abs($eq->credit - $eq->debit) - $retainedEarningsFromLastYear; @endphp
+                    @php $equity_value = abs($eq->credit - $eq->debit) + $retainedEarningsFromLastYear; @endphp
                 @else
                     @php $equity_value = $eq->credit - $eq->debit; @endphp
                 @endif
@@ -289,10 +289,10 @@
         <tr>
             <th colspan="2">Net Profit/Loss for Current Year</th>
             <th style="text-align: right;">
-                {{ $retainedEarningsFromSelectedYear > 0 ? number_format(abs($retainedEarningsFromSelectedYear), 2):'' }}
+                {{ $retainedEarningsFromSelectedYear > 0 ? number_format(abs($retainedEarningsFromSelectedYear), 2) : '' }}
             </th>
             <th style="text-align: right;">
-                {{ $retainedEarningsFromSelectedYear < 0 ? number_format(abs($retainedEarningsFromSelectedYear), 2):'' }}
+                {{ $retainedEarningsFromSelectedYear < 0 ? number_format(abs($retainedEarningsFromSelectedYear), 2) : '' }}
             </th>
         </tr>
         <tr>
@@ -302,6 +302,5 @@
                 {{ number_format(abs($retainedEarningsFromSelectedYear) + abs($total_equity) + abs($total_liabilities), 2) }}
             </th>
         </tr>
-    </tfoot>
     </tfoot>
 </table>

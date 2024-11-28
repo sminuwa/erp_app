@@ -5978,7 +5978,7 @@ class ReportController extends Controller
             $query = Payment::where('branch_id', 'LIKE', $branch_id)
                 ->join('branches', 'payments.branch_id', 'branches.id')
                 ->where('branches.company_id', 'LIKE', $company_id)
-                ->where('status', 'LIKE', $status)->orderBy('date', "DESC")
+                ->where('payments.status', 'LIKE', $status)->orderBy('date', "DESC")
                 ->whereDate('date', '>=', $from_date)
                 ->whereDate('date', '<=', $to_date);
         if ($type == "Receipt")
@@ -5992,14 +5992,14 @@ class ReportController extends Controller
             $query = Journal::where('branch_id', 'LIKE', $branch_id)
                 ->join('branches', 'journals.branch_id', 'branches.id')
                 ->where('branches.company_id', 'LIKE', $company_id)
-                ->where('status', 'LIKE', $status)->orderBy('date', "DESC")
+                ->where('journals.status', 'LIKE', $status)->orderBy('date', "DESC")
                 ->whereDate('date', '>=', $from_date)
                 ->whereDate('date', '<=', $to_date);
         if ($type == "Interbank")
             $query = InterBank::where('branch_id', 'LIKE', $branch_id)
                 ->join('branches', 'inter_banks.branch_id', 'branches.id')
                 ->where('branches.company_id', 'LIKE', $company_id)
-                ->where('status', 'LIKE', $status)->orderBy('date', "DESC")
+                ->where('interbanks.status', 'LIKE', $status)->orderBy('date', "DESC")
                 ->whereDate('date', '>=', $from_date)
                 ->whereDate('date', '<=', $to_date);
 

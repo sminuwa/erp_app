@@ -5971,7 +5971,7 @@ class ReportController extends Controller
             $query = Order::where('branch_id', 'LIKE', $branch_id)
                 ->join('branches', 'orders.branch_id', 'branches.id')
                 ->where('branches.company_id', 'LIKE', $company_id)
-                ->where('invoices.status', 'LIKE', $status)->orderBy('order_date', "DESC")
+                ->where('orders.status', 'LIKE', $status)->orderBy('order_date', "DESC")
                 ->whereDate('order_date', '>=', $from_date)
                 ->whereDate('order_date', '<=', $to_date);
         if ($type == "Payment")

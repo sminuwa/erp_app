@@ -229,17 +229,15 @@ class CreditNoteController extends Controller
     public function searchCreditNote(Request $request)
     {
         $search_value = $request->refno;
-        
         $payments = Order::where('status', 1)
             ->where('reference', 'LIKE', "%$search_value%")
-            ->where('branch_id', '=', User::userBranchAction())
+            ->where('branch_id', 'LIKE', User::userBranchAction())
             ->whereNotIn('id', DB::table('credit_notes')->pluck('order_id')->toArray())
             ->orderBy('id', 'DESC')->get();
         return view('pages.suppliers.credit_note', ['payments' => $payments]);
     }
     public function printCreditnoteReceipt(CreditNote $credit_note)
     {
-
         $order = CreditNote::with('customer')->where('id', $credit_note->id)->first();
         //return $order;
         $order_details = CreditNoteDetail::with('storeProduct')->where(['credit_note_id' => $credit_note->id, 'status' => 1])->get();
@@ -248,7 +246,6 @@ class CreditNoteController extends Controller
         $company = Setting::find(1);
         $utility = new Utility();
         return view('pages.inventories.credit_notes.print', compact('order_details', 'order', 'company', 'utility','credit_note'));
-
     }
     public function loadInvoices(Request $request)
     {

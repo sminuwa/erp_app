@@ -229,10 +229,10 @@ class CreditNoteController extends Controller
     public function searchCreditNote(Request $request)
     {
         $search_value = $request->refno;
-
+        
         $payments = Order::where('status', 1)
             ->where('reference', 'LIKE', "%$search_value%")
-            ->where('branch_id', 'LIKE', User::userBranchAction())
+            ->where('branch_id', '=', User::userBranchAction())
             ->whereNotIn('id', DB::table('credit_notes')->pluck('order_id')->toArray())
             ->orderBy('id', 'DESC')->get();
         return view('pages.suppliers.credit_note', ['payments' => $payments]);

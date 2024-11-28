@@ -5981,29 +5981,32 @@ class ReportController extends Controller
                 ->where('branches.company_id', 'LIKE', $company_id)
                 ->where('payments.status', 'LIKE', $status)->orderBy('date', "DESC")
                 ->whereDate('date', '>=', $from_date)
-                ->whereDate('date', '<=', $to_date);
+                ->whereDate('date', '<=', $to_date)
+                ->select('payments.*');
         if ($type == "Receipt")
             $query = Receipt::where('branch_id', 'LIKE', $branch_id)
                 ->join('branches', 'receipts.branch_id', 'branches.id')
                 ->where('branches.company_id', 'LIKE', $company_id)
                 ->where('receipts.status', 'LIKE', $status)->orderBy('date', "DESC")
                 ->whereDate('date', '>=', $from_date)
-                ->whereDate('date', '<=', $to_date);
+                ->whereDate('date', '<=', $to_date)
+                ->select('receipts.*');
         if ($type == "Journal")
             $query = Journal::where('branch_id', 'LIKE', $branch_id)
                 ->join('branches', 'journals.branch_id', 'branches.id')
                 ->where('branches.company_id', 'LIKE', $company_id)
                 ->where('journals.status', 'LIKE', $status)->orderBy('date', "DESC")
                 ->whereDate('date', '>=', $from_date)
-                ->whereDate('date', '<=', $to_date);
+                ->whereDate('date', '<=', $to_date)
+                ->select('journals.*');
         if ($type == "Interbank")
             $query = InterBank::where('branch_id', 'LIKE', $branch_id)
                 ->join('branches', 'inter_banks.branch_id', 'branches.id')
                 ->where('branches.company_id', 'LIKE', $company_id)
                 ->where('inter_banks.status', 'LIKE', $status)->orderBy('date', "DESC")
                 ->whereDate('date', '>=', $from_date)
-                ->whereDate('date', '<=', $to_date);
-
+                ->whereDate('date', '<=', $to_date)
+                ->select('inter_banks.*');
         $payments = $query->get();
 
         if ($status == '%')

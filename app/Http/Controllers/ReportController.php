@@ -4642,9 +4642,9 @@ class ReportController extends Controller
             ->where('model_id', 'LIKE', $payer_id)
             ->orderBy('date')
             ->orderBy('general_account_ledgers.id');
-        $ledgers = $query->limit(10)->get();
+        $ledgers = $query->get();
 
-        return $ledgers;
+        // return $ledgers;
 
 
         // $credit_sum = $query->sum('credit');

@@ -232,7 +232,7 @@ class CreditNoteController extends Controller
         $payments = Order::where('status', 1)
             ->where('reference', 'LIKE', "%$search_value%")
             ->where('branch_id', 'LIKE', User::userBranchAction())
-            ->whereNotIn('id', DB::table('credit_notes')->select('invoice_no')->pluck('invoice_no')->toArray())
+            ->whereNotIn('invoice_no', DB::table('credit_notes')->select('invoice_no')->pluck('invoice_no')->toArray())
             ->orderBy('id', 'DESC')->get();
         return view('pages.suppliers.credit_note', ['payments' => $payments]);
     }

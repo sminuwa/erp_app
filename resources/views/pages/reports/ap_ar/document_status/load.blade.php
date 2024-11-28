@@ -167,7 +167,7 @@
                     </td>
                     <td>{{ $order->payment_mode }}</td>
                     <td>
-                        {{ $order->status == 1 ? 'Posted' : 'Pending' }} ({{ $order->status }})
+                        {{ $order->status == 1 ? 'Posted' : 'Pending' }}
                     </td>
 
                 </tr>

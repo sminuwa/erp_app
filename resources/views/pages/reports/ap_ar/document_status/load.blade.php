@@ -138,7 +138,7 @@
                 <th>Amount Due</th>
                 <th>Due Date</th>
                 <th>Payment Mode</th>
-                <th>Actions</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
@@ -167,7 +167,8 @@
                     </td>
                     <td>{{ $order->payment_mode }}</td>
                     <td>
-                        {{ $order->status == 1 ? 'Posted' : 'Pending' }}</td>
+                        {{ $order->status == 1 ? 'Posted' : 'Pending' }} ({{ $order->status }})
+                    </td>
 
                 </tr>
             @endforeach

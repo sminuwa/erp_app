@@ -4643,6 +4643,8 @@ class ReportController extends Controller
             ->orderBy('general_account_ledgers.id');
         $ledgers = $query->get();
 
+        return $ledgers;
+
 
         // $credit_sum = $query->sum('credit');
         // $debit_sum = $query->sum('debit');

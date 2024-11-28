@@ -5985,7 +5985,7 @@ class ReportController extends Controller
             $query = Receipt::where('branch_id', 'LIKE', $branch_id)
                 ->join('branches', 'receipts.branch_id', 'branches.id')
                 ->where('branches.company_id', 'LIKE', $company_id)
-                ->where('status', 'LIKE', $status)->orderBy('date', "DESC")
+                ->where('receipts.status', 'LIKE', $status)->orderBy('date', "DESC")
                 ->whereDate('date', '>=', $from_date)
                 ->whereDate('date', '<=', $to_date);
         if ($type == "Journal")

@@ -5999,7 +5999,7 @@ class ReportController extends Controller
             $query = InterBank::where('branch_id', 'LIKE', $branch_id)
                 ->join('branches', 'inter_banks.branch_id', 'branches.id')
                 ->where('branches.company_id', 'LIKE', $company_id)
-                ->where('interbanks.status', 'LIKE', $status)->orderBy('date', "DESC")
+                ->where('inter_banks.status', 'LIKE', $status)->orderBy('date', "DESC")
                 ->whereDate('date', '>=', $from_date)
                 ->whereDate('date', '<=', $to_date);
 

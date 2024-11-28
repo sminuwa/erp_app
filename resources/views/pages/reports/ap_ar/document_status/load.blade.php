@@ -9,7 +9,7 @@
     <table id="example1" class="display table table-bordered table-striped text-left table-responsive-xl">
         <caption style="caption-size:top">
             <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
-                AP-AR STATUS BETWEEN {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
+                DOCUMENT STATUS BETWEEN {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                 AND
                 {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
             </h5>
@@ -29,7 +29,7 @@
 
         <tbody>
             @foreach ($payments as $payment)
-                <tr>
+                <tr class="@if ($payment->status == 0) bg-warning @endif">
 
                     <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                     </td>
@@ -55,7 +55,7 @@
     <table id="example1" class="table table-bordered table-striped text-left table-responsive-xl">
         <caption style="caption-size:top">
             <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
-                AP-AR STATUS BETWEEN {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
+                DOCUMENT STATUS BETWEEN {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                 AND
                 {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
             </h5>
@@ -85,7 +85,7 @@
                     <td>{{ $interbank->source->description }}</td>
                     <td>{{ $interbank->destination->description }}</td>
                     <td>{{ optional($interbank->createdBy)->name }}</td>
-                    <td class="@if ($interbank->status == 0) bg-warning @endif">
+                    <td>
                         {{ $interbank->status == 1 ? 'Posted' : 'Pending' }}</td>
                 </tr>
             @endforeach
@@ -105,7 +105,7 @@
         </thead>
         <tbody>
             @foreach ($payments as $record)
-                <tr>
+                <tr class="@if ($record->status == 0) bg-warning @endif">
                     <td>{{ Carbon\Carbon::parse($record->date)->toFormattedDateString() }}</td>
                     <td>{{ $record->reference }}</td>
                     <td>{{ $record->description ?? null }}</td>
@@ -123,7 +123,7 @@
         data-ordering="false">
         <caption style="caption-size:top">
             <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
-                AP-AR STATUS BETWEEN {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
+                DOCUMENT STATUS BETWEEN {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                 AND
                 {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
             </h5>
@@ -167,7 +167,7 @@
                     </td>
                     <td>{{ $order->payment_mode }}</td>
                     <td>
-                        {{ $order->status == 1 ? 'Posted' : 'Pending' }} ({{ $order->status }})
+                        {{ $order->status == 1 ? 'Posted' : 'Pending' }}
                     </td>
 
                 </tr>

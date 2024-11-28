@@ -251,24 +251,54 @@
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script type="text/javascript">
         $(document).ready(function() {
+            $('.select2-single').select2({
+                placeholder: "Select...",
+                allowClear: true
+            });
             // When the operation is changed
             $('#operation').on('change', function() {
                 var selectedValue = $(this).val();
 
                 if (selectedValue === 'in') {
-                    // Show the "in" product div and hide the "out" product div
-                    $('#in_product').show();
-                    $('#out_product').hide();
+                    $('#in_product').show().find('#product_id').prop('required', true).prop('disabled',
+                        false);
+                    $('#out_product').hide().find('#product_id').prop('required', false).prop('disabled',
+                        true);
                 } else if (selectedValue === 'out') {
-                    // Show the "out" product div and hide the "in" product div
-                    $('#in_product').hide();
-                    $('#out_product').show();
+                    $('#out_product').show().find('#product_id').prop('required', true).prop('disabled',
+                        false);
+                    $('#in_product').hide().find('#product_id').prop('required', false).prop('disabled',
+                        true);
                 } else {
-                    // Hide both divs if no valid operation is selected
-                    $('#in_product').hide();
-                    $('#out_product').hide();
+                    $('#in_product, #out_product').hide().find('#product_id').prop('required', false).prop(
+                        'disabled', true);
                 }
             });
+
+            // Check validation before form submission
+            $('form').on('submit', function(e) {
+                $(this).find(':hidden').each(function() {
+                    $(this).prop('required', false);
+                });
+            });
+
+            // On product or store change, update available quantity
+            $(document).on("change", "#product_id,#store_id", function(event) {
+                $("#available_qty").val("");
+
+                $.ajax({
+                    url: "{{ route('ajax.load.quantity.available') }}",
+                    type: 'GET',
+                    data: {
+                        product_id: $("#product_id").val(),
+                        store_id: $("#store_id").val()
+                    }
+                }).done(function(msg) {
+                    if (msg == null || msg == 0) msg = 0;
+                    if (msg != 0) $("#available_qty").val(msg);
+                });
+            });
+
         });
 
         function toggleTextField() {
@@ -289,23 +319,23 @@
             toggleTextField();
 
 
-            $(document).on("change", "#product_id,#store_id", function(event) {
-                $("#available_qty").val("");
+            // $(document).on("change", "#product_id,#store_id", function(event) {
+            //     $("#available_qty").val("");
 
-                $.ajax({
-                    url: "{{ route('ajax.load.quantity.available') }}",
-                    type: 'GET',
-                    data: {
-                        product_id: $("#product_id").val(),
-                        store_id: $("#store_id").val()
-                    }
-                }).done(function(msg) {
-                    if (msg == null || msg == 0)
-                        msg = 0;
-                    if (msg != 0)
-                        $("#available_qty").val(msg);
-                });
-            });
+            //     $.ajax({
+            //         url: "{{ route('ajax.load.quantity.available') }}",
+            //         type: 'GET',
+            //         data: {
+            //             product_id: $("#product_id").val(),
+            //             store_id: $("#store_id").val()
+            //         }
+            //     }).done(function(msg) {
+            //         if (msg == null || msg == 0)
+            //             msg = 0;
+            //         if (msg != 0)
+            //             $("#available_qty").val(msg);
+            //     });
+            // });
         });
 
         function deleteItem(id) {

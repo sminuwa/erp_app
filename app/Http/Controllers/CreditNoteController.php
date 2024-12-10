@@ -251,13 +251,17 @@ class CreditNoteController extends Controller
     {
         $word_search = $request->search;
         if (strlen($word_search) > 0) {
+            $credit_notes = DB::table('credit_notes')->select('order_id')->pluck('order_id')->toArray();
             $orders = Order::where('status', 1)
-                ->where('invoice_no', 'LIKE', "%$word_search%")
-                ->where('branch_id', 'LIKE', User::userBranchAction())
-                ->orderBy('order_date', 'DESC')->get();
+            ->where('reference', 'LIKE', "%$word_search%")
+            ->where('branch_id', 'LIKE', User::userBranchAction())
+            ->whereNotIn('orders.id', $credit_notes)
+            ->orderBy('order_date', 'DESC')->get();
+            
         } else {
             $orders = Order::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('order_date', 'DESC')->take(20)->get();
         }
+        // return $orders;
         return view('pages.inventories.credit_notes.load_order_invoices', ['orders' => $orders]);
     }
     public function loadToCart(Request $request)

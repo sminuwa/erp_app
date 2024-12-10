@@ -197,6 +197,7 @@
                         search: searchText
                     },
                     success: function(response) {
+                        console.log(response)
                         if (response == null)
                             $('#table-body').html("");
                         $('#table-body').html(response);

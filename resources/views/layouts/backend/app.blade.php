@@ -180,7 +180,7 @@
         $('.datepicker-entry').datepicker({
             autoclose: true,
             todayHighlight: true,
-            startDate: date,
+            // startDate: date,
         });
 
         $('.datepicker').datepicker({

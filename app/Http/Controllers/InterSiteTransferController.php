@@ -195,7 +195,7 @@ class InterSiteTransferController extends Controller
                     $new_cost_price,
                     $intersite->reference,
                     $user->branch->id,
-                    $intersite->date,
+                    date('Y-m-d'),
                     TRANSACTION_TYPE_INTERSITE
                 );
             }

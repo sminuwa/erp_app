@@ -347,7 +347,8 @@ class Transaction
                 'reference' => 'R' . $intersite->reference,
                 'credit' => 0,
                 'debit' => $cat['amount'],
-                'date' => $intersite->date,
+                'date' =>date('Y-m-d'),
+                // 'date' => $intersite->date,
                 'user_id' => auth()->id(),
                 'receipt_no' => 'A' . 'R' . $intersite->reference
             ];
@@ -361,7 +362,8 @@ class Transaction
             'reference' => 'R' . $intersite->reference,
             'credit' => $amount,
             'debit' => 0,
-            'date' => $intersite->date,
+            'date' => date('Y-m-d'),
+            // 'date' => $intersite->date,
             'user_id' => auth()->id(),
             'receipt_no' => 'S' . 'R' . $intersite->reference
         ];

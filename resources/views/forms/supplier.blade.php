@@ -1,16 +1,7 @@
 <form action="{{ isset($route) ? $route : route('suppliers.store') }}" method="POST">
     {{ csrf_field() }}
     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
-    <div class="form-group">
-        <label for="code">Code</label>
-        <input type="text" class="form-control {{ $errors->has('code') ? ' is-invalid' : '' }}" name="code"
-            id="code" value="{{ old('code', $model->code) }}" placeholder="" maxlength="191" required="required">
-        @if ($errors->has('code'))
-            <div class="invalid-feedback">
-                <strong>{{ $errors->first('code') }}</strong>
-            </div>
-        @endif
-    </div>
+    
     <div class="form-group">
         <label for="name">Name</label>
         <input type="text" class="form-control {{ $errors->has('name') ? ' is-invalid' : '' }}" name="name"
@@ -32,7 +23,7 @@
             </div>
         @endif
     </div>
-    @if (!isset($model->code))
+    {{-- @if (!isset($model->code)) --}}
         <div class="form-group">
             <label for="code">Type</label>
             <input type="radio" class="type" name="type" class="type" value="TS" required="required"
@@ -46,8 +37,8 @@
                 </div>
             @endif
         </div>
-    @endif
-    @if (!isset($model->code))
+    {{-- @endif --}}
+    @if (isset($model->code))
         <div class="form-group">
             <label for="code">Supplier Code</label>
             <input type="text" class="form-control {{ $errors->has('code') ? ' is-invalid' : '' }}" name="code"

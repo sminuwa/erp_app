@@ -82,6 +82,7 @@ class SupplierController extends Controller
       */
     public function store(Store $request)
     {
+        return $request;
         $model = new Supplier;
         $model->fill($request->all());
 

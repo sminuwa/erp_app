@@ -138,6 +138,7 @@ class JournalController extends Controller
             $journal->posted_by = auth()->id();
             $account_details = [];
             $debit = $credit = 0;
+            return $journal->items;
             foreach ($journal->items as $item) {
                 $debit += intval($item->debit);
                 $credit += intval($item->credit);

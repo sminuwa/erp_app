@@ -69,9 +69,9 @@ class Supplier extends Model
         return $query->where('suppliers.status', 1);
     }
 
-    public static function generateNewCode($branch_id, $category, $length = 6)
+    public static function generateNewCode($type="MS", $length = 5)
     {
-        $prefix = Branch::find($branch_id)->code . $category;
+        $prefix = $type;
         $record = self::where('code', 'like', '%' . $prefix . '%')->orderBy('code', 'desc')->first();
         if ($record) {
             $code = $record->code;

@@ -37,7 +37,20 @@
             </div>
         @endif
     </div>
-
+    
+    <div class="form-group">
+        <label for="category">Customer Category</label>
+        <input type="radio" class="category" name="category" value="category" required="required"
+            {{ old('category', substr($model->category, 0, 2)) == 'staff' ? 'checked' : '' }} /> Staff
+        <input type="radio" class="category" name="category"  checked
+            {{ old('category', substr($model->category, 0, 2)) == 'non-staff' ? 'checked' : '' }} value="non-staff"
+            required="required" /> Non-staff
+        @if ($errors->has('category'))
+            <div class="invalid-feedback">
+                <strong>{{ $errors->first('category') }}</strong>
+            </div>
+        @endif
+    </div>
     <div class="form-group">
         <label for="email">Email</label>
         <input type="text" class="form-control {{ $errors->has('email') ? ' is-invalid' : '' }}" name="email"
@@ -119,3 +132,4 @@
 
     </div>
 </form>
+

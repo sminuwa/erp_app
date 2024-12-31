@@ -73,7 +73,7 @@ class CustomerController extends Controller
       */
     public function store(Store $request)
     {
-       return $request;
+    //    return $request;
         $model = new Customer;
         $model->fill($request->all());
         $model->type = ($request->account_type == 'R' ? 'Retail' : "Wholesale");
@@ -86,7 +86,6 @@ class CustomerController extends Controller
             }else{
                 $model->code = Customer::generateNewCode($request->branch_id, $request->account_type);
             }
-            
             $model->save();
             $action = "Added a new credit customer : " . $model->name;
             AuditLog::auditLog(Auth::id(), $action);

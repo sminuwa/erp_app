@@ -86,7 +86,6 @@ class CustomerController extends Controller
             }else{
                 $model->code = Customer::generateNewCode($request->branch_id, $request->account_type);
             }
-            
             $model->save();
             $action = "Added a new credit customer : " . $model->name;
             AuditLog::auditLog(Auth::id(), $action);

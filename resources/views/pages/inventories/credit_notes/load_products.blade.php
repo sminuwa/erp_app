@@ -55,7 +55,7 @@
                                         <span style="color: red;" id="valid_price{{ $product->id }}"></span>
                                         <input type="text" name="quantity" id="quantity{{ $product->id }}"
                                             class="form-control quantity" data-value="p{{ $product->id }}"
-                                            style="min-width:58px;" value="{{ $product->quantity }}" min="1"
+                                            style="min-width:58px;" value="{{ $product->quantity }}"
                                             max-qty="{{ $product->quantity }}" required>
                                     </td>
                                     <td>

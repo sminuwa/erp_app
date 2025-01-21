@@ -288,6 +288,7 @@ class CreditNoteController extends Controller
             ]);
         }
         $cart_products = \Cart::getContent();
+        return $cart_products;
         return view('pages.inventories.credit_notes.load_products', ['cart_products' => $cart_products, 'reference' => $reference, 'order' => $order]);
     }
     public function addToCart(Request $request)

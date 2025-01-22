@@ -228,10 +228,11 @@
                         reference: reference
                     },
                     success: function(response) {
+                        console.log(response)
                         $('#load').html(response);
                     },
                     error: function(error) {
-                        // console.log(error);
+                        console.log(error);
                     }
                 });
             });

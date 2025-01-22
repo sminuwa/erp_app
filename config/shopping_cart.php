@@ -8,13 +8,18 @@ return [
      *
      * the formatting of shopping cart values
      */
+
+    //  'format_numbers' => env('SHOPPING_FORMAT_VALUES', true),
+    // 'decimals' => env('SHOPPING_DECIMALS', 1000),
+
     'format_numbers' => env('SHOPPING_FORMAT_VALUES', false),
 
-    'decimals' => env('SHOPPING_DECIMALS', 2),
+    'decimals' => env('SHOPPING_DECIMALS', 1000),
 
     'dec_point' => env('SHOPPING_DEC_POINT', '.'),
 
     'thousands_sep' => env('SHOPPING_THOUSANDS_SEP', ','),
+
 
     /*
      * ---------------------------------------------------------------

@@ -288,7 +288,66 @@ Route::middleware('auth')->group(function () {
         Route::delete('/remove/{id}', [CartController::class, 'removeCart'])->name('cart.remove');
         Route::post('/clear', [CartController::class, 'clearAllCart'])->name('cart.clear');
     });
-
+<<<<<<< Tabnine <<<<<<<
+    /**//+
+     * Adds a product to the shopping cart.//+
+     *//+
+     * @param Request $request The incoming request.//+
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector//+
+     *///+
+    public function addToCart(Request $request)//+
+    {//+
+//+
+        // Validate the incoming request data.//+
+        $validated = $request->validate([//+
+            'id' => 'required',//+
+            'name' => 'required',//+
+            'code' => 'required',//+
+            'sold_price' => 'required',//+
+            'qty' => 'required',//+
+            'cost_price' => 'required'//+
+        ]);//+
+//+
+        // Extract the validated request data.//+
+        $qty = $request->qty;//+
+        $selling_price = $request->selling_price;//+
+        $cost_price = $request->cost_price;//+
+        $qty_available = $request->qty_available;//+
+        $store = $request->store;//+
+//+
+        // Add the product to the shopping cart.//+
+        $add = \Cart::add([//+
+            'id' => $request->id,//+
+            'name' => $request->name,//+
+            'price' => $request->sold_price,//+
+            'quantity' => $qty == 0 ? 1 : $qty,//+
+            'attributes' => array(//+
+                'cost_price' => $cost_price,//+
+                'code' => $request->code,//+
+                'selling_price' => $selling_price,//+
+                'qty_available' => $qty_available,//+
+                'discount' => 0,//+
+                'store' => $store//+
+            ),//+
+        ]);//+
+//+
+        // Check if the product was added to the cart successfully.//+
+        if ($add) {//+
+            // Display a success message.//+
+            session()->flash('success', 'Product is Added to Cart Successfully !');//+
+//+
+            // Redirect to the credit note creation page with the order ID.//+
+            return redirect()->route('customers.credit.note.create', Order::find($request->order));//+
+//+
+        } else {//+
+            // Display an error message.//+
+            session()->flash('Product not added to cart');//+
+//+
+            // Redirect back to the previous page.//+
+            return redirect()->back();//+
+        }//+
+    }//+
+>>>>>>> Tabnine >>>>>>>// {"conversationId":"de6ff3cc-4107-4e87-9f03-b194b3514bd6","source":"instruct"}
     Route::group(['prefix' => 'sales'], function () {
         //Orders
         Route::group(['prefix' => 'orders'], function () {

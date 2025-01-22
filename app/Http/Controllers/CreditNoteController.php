@@ -269,6 +269,7 @@ class CreditNoteController extends Controller
         $reference = $request->reference;
         $order = Order::where('reference', $reference)->first();
         $order_items = OrderDetail::where('order_id', $order->id)->where('status', 1)->get();
+        // return $order_items;
         \Cart::clear();
         foreach ($order_items as $data) {
             $qty = $data->quantity == 0 ? 1 : $data->quantity;
@@ -288,7 +289,7 @@ class CreditNoteController extends Controller
             ]);
         }
         $cart_products = \Cart::getContent();
-        return $cart_products;
+        // return $cart_products;
         return view('pages.inventories.credit_notes.load_products', ['cart_products' => $cart_products, 'reference' => $reference, 'order' => $order]);
     }
     public function addToCart(Request $request)

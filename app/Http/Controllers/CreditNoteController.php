@@ -15,6 +15,7 @@ use App\Models\Setting;
 use App\Models\StoreProduct;
 use App\Models\User;
 use App\Models\Utility;
+use Darryldecode\Cart\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -289,8 +290,9 @@ class CreditNoteController extends Controller
                 ),
             ]);
         }
-        return \Cart::getContent();
+        // Cart::getContent();
         $cart_products = \Cart::getContent();
+        return $cart_products;
         return view('pages.inventories.credit_notes.load_products', ['cart_products' => $cart_products, 'reference' => $reference, 'order' => $order]);
     }
     public function addToCart(Request $request)

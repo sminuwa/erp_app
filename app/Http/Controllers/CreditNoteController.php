@@ -269,10 +269,11 @@ class CreditNoteController extends Controller
         $reference = $request->reference;
         $order = Order::where('reference', $reference)->first();
         $order_items = OrderDetail::where('order_id', $order->id)->where('status', 1)->get();
-        return $order_items;
+        // return $order_items;
         \Cart::clear();
         foreach ($order_items as $data) {
             $qty = $data->quantity == 0 ? 1 : $data->quantity;
+            return $qty;
             \Cart::add([
                 'id' => $data->store_product_id,
                 'name' => $data->storeProduct->product->name ?? 'No name found',

@@ -273,7 +273,7 @@ class CreditNoteController extends Controller
         \Cart::clear();
         foreach ($order_items as $data) {
             $qty = $data->quantity == 0 ? 1 : $data->quantity;
-            return $qty;
+            // return $qty;
             \Cart::add([
                 'id' => $data->store_product_id,
                 'name' => $data->storeProduct->product->name ?? 'No name found',
@@ -289,6 +289,7 @@ class CreditNoteController extends Controller
                 ),
             ]);
         }
+        return \Cart::getContent();
         $cart_products = \Cart::getContent();
         return view('pages.inventories.credit_notes.load_products', ['cart_products' => $cart_products, 'reference' => $reference, 'order' => $order]);
     }

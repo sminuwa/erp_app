@@ -174,19 +174,19 @@
         });
 
         var date = new Date();
-        date.setDate( date.getDate() - 3 );
+        date.setDate( date.getDate() - 2 );
 
 
         $('.datepicker-entry').datepicker({
             autoclose: true,
             todayHighlight: true,
-            // startDate: date,
+            startDate: date,
         });
 
         $('.datepicker').datepicker({
             autoclose: true,
             todayHighlight: true,
-            startDate: date,
+            // startDate: date,
         });
 
         $('.datepicker2').datepicker({

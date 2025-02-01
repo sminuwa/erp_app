@@ -34,7 +34,7 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:100px;height:60px;"
+                            <img src="{{ asset('assets/backend/img/logo.png') }}" style="width:100px;height:60px;"
                                 alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
                             <h3 style="text-align: center;">
                                 {{$branch->name ?? 'All Branches'}}
@@ -72,37 +72,38 @@
                                     </tr>
                                 </thead>
                                 @php
-                                    $total_cost = 0;
+                                $total_cost = 0;
+                            @endphp
+                            @foreach ($sales as $sale)
+                                <tr>
+                                    <td>{{ \Carbon\Carbon::parse($sale->purchase_date)->toFormattedDateString() }}</td>
+                                    <td>{{ $sale->reference }}</td>
+                                    <td style="text-align: right">
+                                        {{ number_format($sale->actual_cost, 2, '.', ',') }}</td>
+                                    <td>{{ $sale->atc_no }}</td>
+                                    <td>{{ $sale->supplier }}</td>
+                                    <td>{{ $sale->created_by }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}</td>
+                                    <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
+                        
+                                </tr>
+                                @php
+                                    $total_cost += $sale->actual_cost;
                                 @endphp
-                                @foreach ($sales as $sale)
-                                    <tr>
-                                        <td>{{ \Carbon\Carbon::parse($sale->purchase_date)->toFormattedDateString() }}</td>
-                                        <td>{{ $sale->reference }}</td>
-                                        <td style="text-align: right">
-                                            {{ number_format($sale->total, 2, '.', ',') }}</td>
-                                        <td>{{ $sale->atc_no }}</td>
-                                        <td>{{ $sale->supplier }}</td>
-                                        <td>{{ $sale->name }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}</td>
-                                        <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
-                                    </tr>
-                                    @php
-                                        $total_cost += $sale->total;
-                                    @endphp
-                                @endforeach
-                                <tfoot>
-                                    <tr>
-                                        <th colspan="2" style="text-align: right">TOTAL</th>
-                                        <th style="text-align: right">
-                                            {{ number_format($total_cost, 2, '.', ',') }}
-                                        </th>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
-                                    </tr>
-                                </tfoot>
+                            @endforeach
+                            <tfoot>
+                                <tr>
+                                    <th colspan="2" style="text-align: right">TOTAL</th>
+                                    <th style="text-align: right">
+                                        {{ number_format($total_cost, 2, '.', ',') }}
+                                    </th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
                             </table>
                         </div>
                         <!-- /.col -->

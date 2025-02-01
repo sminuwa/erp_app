@@ -3,6 +3,7 @@ $(document).ready(function () {
     ajerks('GET', '/misc/ajax/categories', 'ajax-categories')
     ajerks('GET', '/misc/ajax/customers', 'ajax-customers')
     ajerks('GET', '/misc/ajax/suppliers', 'ajax-suppliers')
+    ajerks('GET', '/misc/ajax/transporters', 'ajax-transporters')
     ajerks('GET', '/misc/ajax/products', 'ajax-products')
     ajerks('GET', '/misc/ajax/products/active', 'ajax-active-products')
     ajerks('GET', '/misc/ajax/stores', 'ajax-stores')

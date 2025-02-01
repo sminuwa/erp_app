@@ -41,19 +41,20 @@
                         <div class="form-group">
                             <label for="from_date">From Date</label>
                             <input type="text" autocomplete="off"
-                                class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
+                                class="form-control datepicker3 {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
                                 name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="">
                         </div>
                         <div class="form-group">
                             <label for="to_date">To Date</label>
                             <input type="text" autocomplete="off"
-                                class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
+                                class="form-control datepicker3 {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
                                 name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="company_id">Company</label>
-                            <select class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
+                            <select
+                                class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
                                 name="company_id" id="company_id" required>
 
                             </select>
@@ -69,9 +70,9 @@
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp;
-                            <label for="supplier_id">Supplier/Transporter</label>
+                            <label for="supplier_id">Transporter</label>
                             <select
-                                class="form-control select2-single ajax-suppliers {{ $errors->has('supplier_id') ? ' is-invalid' : '' }}"
+                                class="form-control select2-single ajax-transporters {{ $errors->has('supplier_id') ? ' is-invalid' : '' }}"
                                 name="supplier_id" id="supplier_id">
 
                             </select>
@@ -110,6 +111,12 @@
     <!-- Sweet Alert Js -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>
     <script type="text/javascript">
+        $(document).ready(function() {
+            $('.datepicker3').datepicker({
+                minDate: null, // Allow any past date
+                dateFormat: 'yy-mm-dd' // Set your preferred date format
+            });
+        });
         $(function() {
             function formatMoney(n, c, d, t) {
                 var c = isNaN(c = Math.abs(c)) ? 0 : c,
@@ -121,9 +128,6 @@
                 return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ?
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
-
-
-
 
             $('#generate').on("click", function() {
                 from_date = $('#from_date').val();

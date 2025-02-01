@@ -6035,11 +6035,14 @@ class ReportController extends Controller
         }
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
-        $customers = Customer::where('branch_id', 'LIKE', $branch_id)
+        $customers = Customer::select('customers.*')
+            ->where('branch_id', 'LIKE', $branch_id)
             ->join('branches', 'customers.branch_id', 'branches.id')
+            ->join('companies', 'branches.company_id', 'companies.id')
             ->where('branches.company_id', 'LIKE', $company_id)
-            ->orderBy('code')
-            ->orderBy('name')
+            ->orderBy('companies.name')
+            ->orderBy('branches.code')
+            ->orderBy('branches.name')
             ->get();
         if ($company_id == '%') {
             $company_id = 'all';
@@ -6060,11 +6063,14 @@ class ReportController extends Controller
             $company_id = '%';
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
-        $customers = Customer::where('branch_id', 'LIKE', $branch_id)
+        $customers = Customer::select('customers.*')
+            ->where('branch_id', 'LIKE', $branch_id)
             ->join('branches', 'customers.branch_id', 'branches.id')
+            ->join('companies', 'branches.company_id', 'companies.id')
             ->where('branches.company_id', 'LIKE', $company_id)
-            ->orderBy('code')
-            ->orderBy('name')
+            ->orderBy('companies.name')
+            ->orderBy('branches.code')
+            ->orderBy('branches.name')
             ->get();
 
         if ($branch_id == '%')

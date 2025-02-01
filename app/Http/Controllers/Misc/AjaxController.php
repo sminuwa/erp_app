@@ -36,6 +36,11 @@ class AjaxController extends Controller
         $records = Supplier::orderBy('code', 'asc')->get();
         return view('misc.ajax.suppliers', compact('records'));
     }
+    public function transporters()
+    {
+        $records = Supplier::where('code', 'LIKE', 'T%')->orderBy('code', 'asc')->get();
+        return view('misc.ajax.suppliers', compact('records'));
+    }
 
     public function products(Request $request)
     {

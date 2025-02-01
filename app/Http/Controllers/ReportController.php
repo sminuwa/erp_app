@@ -3780,7 +3780,7 @@ class ReportController extends Controller
         }
 
         $sales = DB::table('purchases')
-            ->select('suppliers.name AS supplier', 'purchases.reference', 'purchase_expenses.reference AS ref', 'stores.code AS store', 'description', 'purchase_expenses.name', 'purchases.purchase_date', 'wbno', 'amount', 'purchase_expenses.status', 'purchases.created_at', 'users.name')
+            ->select('suppliers.name AS supplier', 'purchases.reference', 'purchase_expenses.reference AS ref', 'stores.code AS store', 'description', 'purchase_expenses.name AS expense', 'purchases.purchase_date', 'wbno', 'amount', 'purchase_expenses.status', 'purchases.created_at', 'users.name AS created_by')
             ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
             ->join('purchase_expenses', 'purchase_expenses.purchase_id', 'purchases.id')
             ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
@@ -3789,6 +3789,7 @@ class ReportController extends Controller
             ->join('branches', 'branches.id', '=', 'stores.branch_id')
             ->where('branches.company_id', 'LIKE', $company_id)
             ->where('purchases.supplier_id', 'LIKE', $supplier_id)
+            
             ->where('purchases.status', 'LIKE', $status)
             ->where('purchases.branch_id', 'LIKE', $branch_id)
             ->where(DB::raw("DATE(purchase_date)"), '>=', $from_date)

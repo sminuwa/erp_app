@@ -40,14 +40,14 @@
         <tr>
             <td>{{ \Carbon\Carbon::parse($sale->purchase_date)->toFormattedDateString() }}</td>
             <td>{{ $sale->reference }}</td>
-            <td>{{ $sale->name }}</td>
+            <td>{{ $sale->created_by }}</td>
             <td>{{ $sale->description }}</td>
             <td>{{ $sale->wbno }}</td>
             <td>{{ $sale->supplier }}</td>
-            <td>{{ $sale->name }}</td>
-            <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}</td>
             <td style="text-align: right">
                 {{ number_format($sale->amount, 2, '.', ',') }}</td>
+            <td>{{ $sale->created_by }}</td>
+            <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}</td>
             <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
 
 

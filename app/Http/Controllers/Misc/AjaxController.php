@@ -36,6 +36,7 @@ class AjaxController extends Controller
         $records = Supplier::orderBy('code', 'asc')->get();
         return view('misc.ajax.suppliers', compact('records'));
     }
+
     public function transporters()
     {
         $records = Supplier::where('code', 'LIKE', 'T%')->orderBy('code', 'asc')->get();
@@ -63,6 +64,7 @@ class AjaxController extends Controller
         $records = Store::forBranch($branch_id)->orderBy('code', 'asc')->get();
         return view('misc.ajax.stores', compact('records'));
     }
+
     public function relation_officers(Request $request)
     {
         $records = User::where('is_sale_representative', 1)->orderBy('user_code', 'asc')->get();
@@ -98,11 +100,13 @@ class AjaxController extends Controller
         $records = Company::orderBy('name', 'asc')->get();
         return view('misc.ajax.companies', compact('records'));
     }
+
     public function users()
     {
         $records = User::orderBy('user_code', 'asc')->get();
         return view('misc.ajax.users', compact('records'));
     }
+
     public function storeProducts(Request $request)
     {
         $records = StoreProduct::with('product', 'store')->forProducts($request->store_id)->get();

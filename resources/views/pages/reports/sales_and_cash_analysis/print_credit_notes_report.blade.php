@@ -56,10 +56,10 @@
                                 cellpadding="0" cellspacing="0" data-ordering="false">
                                 <thead>
                                     <tr>
-                                        <th style="width: 50%" colspan="4">Date Processed:
+                                        <th style="width: 50%" colspan="5">Date Processed:
                                             {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
                                         </th>
-                                        <th style="width: 50%;text-align:right" colspan="3">Processed By
+                                        <th style="width: 50%;text-align:right" colspan="5">Processed By
                                             {{ auth()->user()->name }}</th>
                                     </tr>
                                     <tr>
@@ -86,9 +86,10 @@
                                         <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}
                                         </td>
                                         <td>{{ $sale->createdBy->name ?? null }}</td>
-                                        <td>{{ $sale->postedBy->name ?? null }}</td>
                                         <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}
                                         </td>
+                                        <td>{{ $sale->postedBy->name ?? null }}</td>
+                                       
                                         <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
                                     </tr>
                                 @endforeach

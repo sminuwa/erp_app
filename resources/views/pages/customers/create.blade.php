@@ -137,12 +137,12 @@
                                     </div>
                                     <!-- In customer.blade.php -->
 
-                                    <div class="form-group">
+                                    {{-- <div class="form-group">
                                         <label for="name">Name</label>
                                         <input type="text" id="name" name="name" class="form-control"
                                             value="{{ old('name', $customer->name ?? '') }}"
                                             {{ isset($customer) ? 'disabled' : '' }} required>
-                                    </div>
+                                    </div> --}}
 
                                     <div class="form-group">
                                         <label for="gender">Gender</label>
@@ -283,9 +283,6 @@
     </div>
 @endsection
 @push('js')
-    <!-- DataTables -->
-    <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
-    {{--    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> --}}
     <script>
         $(document).ready(function() {
             $('input[name="category"]').on('change', function() {
@@ -310,8 +307,7 @@
                 } else {
                     $('.staff_number_field').html('');
                 }
-                // Log the value or perform any action
-                console.log("Selected Value: ", selectedValue);
+                
             });
         });
     </script>

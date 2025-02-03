@@ -7,7 +7,7 @@
 <table class="display table table-bordered caption" id="example1" data-ordering="false">
     <caption style="caption-size:top">
         <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>
-        <h5 style="text-align: center;">Purchase Invoice
+        <h5 style="text-align: center;">Invoice/GRN
             From
             {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
             AND

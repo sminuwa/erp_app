@@ -684,4 +684,5 @@ UPDATE `permissions` SET `description` = 'Create-inter-branch-journal' WHERE `na
 ALTER TABLE `customers`
 ADD COLUMN `gender` ENUM('Male', 'Female', 'Other') COLLATE utf8mb4_unicode_ci DEFAULT NULL AFTER `phone`,
 ADD COLUMN `business_type` VARCHAR(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL AFTER `photo`,
-ADD COLUMN `business_age` INT DEFAULT NULL AFTER `business_type`;
+ADD COLUMN `business_age` VARCHAR(12) DEFAULT NULL AFTER `business_type`;
+

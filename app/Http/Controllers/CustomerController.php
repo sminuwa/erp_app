@@ -122,7 +122,7 @@ class CustomerController extends Controller
     { //return $request;
 
         // return $request;
-        $customer->fill($request->all());
+        $customer->fill($request->except('name'));
         $customer->type = ($request->account_type == 'R' ? 'Retail' : "Wholesale");
         $customer->branch_id = $request->branch_id;
         $customer->relation_officer = $request->relation_officer;

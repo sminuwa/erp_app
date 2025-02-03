@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Purchase Invoice Report - {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Invoice/GRN Report - {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -39,7 +39,7 @@
                             <h3 style="text-align: center;">
                                 {{$branch->name ?? 'All Branches'}}
                             </h3>
-                            <h5 style="text-align: center;">Purchase Invoice Report
+                            <h5 style="text-align: center;">Invoice/GRN Report
                                 From
                                 {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                                 AND

@@ -25,6 +25,10 @@
                     <td>{{ $record->gender }}</td>
                 </tr>
                 <tr>
+                    <th>Account Type</th>
+                    <td>{{ $record->type }}</td>
+                </tr>
+                <tr>
                     <th>Business Type</th>
                     <td>{{ $record->business_type }}</td>
                 </tr>

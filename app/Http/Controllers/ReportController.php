@@ -2571,7 +2571,7 @@ class ReportController extends Controller
             $branch_id = '%';
 
         $sales = DB::table('orders')
-            ->select('products.name AS item', 'products.code AS code', DB::raw("SUM(order_details.quantity) AS quantity"), DB::raw("SUM(order_details.quantity * cost_price) AS total_cost"), DB::raw("SUM(order_details.total) AS total"), DB::raw("SUM(order_details.quantity * cost_price) - SUM(order_details.total) AS margin"))
+            ->select('products.name AS item', 'products.code AS code', 'order_details.unit as item_unit', DB::raw("SUM(order_details.quantity) AS quantity"), DB::raw("SUM(order_details.quantity * cost_price) AS total_cost"), DB::raw("SUM(order_details.total) AS total"), DB::raw("SUM(order_details.quantity * cost_price) - SUM(order_details.total) AS margin"))
             ->join('order_details', 'order_details.order_id', 'orders.id')
             ->join('store_products', 'store_products.id', 'order_details.store_product_id')
             ->join('customers', 'customers.id', 'orders.customer_id')

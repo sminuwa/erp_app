@@ -19,7 +19,7 @@
         <th style="width: 50%" colspan="7">Date
             Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
         </th>
-        <th style="width: 50%;text-align:right" colspan="6">Processed By {{ auth()->user()->name }}</th>
+        <th style="width: 50%;text-align:right" colspan="7">Processed By {{ auth()->user()->name }}</th>
     </tr>
     <tr>
         <th>DATE</th>
@@ -94,6 +94,7 @@
                         <td>{{ $note->reference }}</td>
                         <td>{{ $sale->customer }}</td>
                         <td>{{ $item->quantity }}</td>
+                        <td>{{ $sale->product_unit }}</td>
                         <td style="text-align: right">{{ number_format($item->cost_price, 2, '.', ',') }}</td>
                         <td style="text-align: right">-{{ number_format($item->sold_price, 2, '.', ',') }}</td>
                         <td style="text-align: right">
@@ -129,7 +130,7 @@
     @endforeach
     <tfoot>
     <tr>
-        <th colspan="7" style="text-align: right">TOTAL</th>
+        <th colspan="8" style="text-align: right">TOTAL</th>
         <th style="text-align: right">
             {{ number_format($total_cost_price, 2, '.', ',') }}</th>
         <th style="text-align: right">

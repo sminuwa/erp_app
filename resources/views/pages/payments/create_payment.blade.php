@@ -92,7 +92,7 @@
                                         @elseif(isset($model) && $model->model_name == 'Supplier')
                                             <?php $payers = \App\Models\Supplier::active()->orderBy('code', 'asc')->get(); ?>
                                         @else
-                                            <?php $payers = \App\Models\GeneralAccount::active()->orderBy('number', 'asc')->get(); ?>
+                                            <?php $payers = \App\Models\GeneralAccount::active()->whereNot('number', 'LIKE', 'R%')->orderBy('number', 'asc')->get(); ?>
                                         @endif
                                         <label for="payer_id">Payable</label>
                                         <select

@@ -846,7 +846,7 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="#" class="nav-link ">
+                            <a href="{{route('backup.index')}}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Backup</p>
                             </a>

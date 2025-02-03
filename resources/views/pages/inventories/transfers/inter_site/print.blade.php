@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
@@ -123,53 +123,14 @@
                                             <th></th>
                                             <th></th>
                                             <th></th>
-                                            {{-- <th style="text-align: right">Total</th>
-                                            <th style="text-align: right">&#8358;{{ number_format($total, 2) }}</th> --}}
+                                            
                                             <th></th>
                                         </tfoot>
                                     </table>
                                 </div>
                             </div>
                         </div>
-                        {{-- <div class="col-sm-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    Received Products
-                                </div>
-                                <div class="card-body table-responsive">
-                                    <table class="table table-bordered" id="record1">
-                                        <thead>
-                                            <tr>
-                                                <th>S/N</th>
-                                                <th>Product</th>
-                                                <th>Store</th>
-                                                <th>Quantity</th>
-
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @php $total = 0; @endphp
-                                            @foreach ($intersite->receivedProducts as $product)
-                                                <tr>
-                                                    <th>{{ $loop->iteration }}</th>
-                                                    <td>{{ $product->product->code }} - {{ $product->product->name }}
-                                                    </td>
-                                                    <td>{{ $product->store->code }} - {{ $product->store->name }}</td>
-                                                    <td>{{ $product->quantity }}</td>
-                                                    @php $total += $product->cost_price * $product->quantity_requested; @endphp
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                        <tfoot>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                        </tfoot>
-                                    </table>
-                                </div>
-                            </div>
-                        </div> --}}
+                        
                         <!-- /.col -->
                     </div>
                     <!-- /.row -->
@@ -196,5 +157,202 @@
 
 </body>
 
+
+</html> --}}
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
+    <title>Intersite Stock Transfer - {{ config('app.name', 'Inventory Management System') }}</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
+    <!-- IonIcons -->
+    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{{ asset('assets/backend/css/adminlte.min.css') }}">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+    <style>
+        /* Print-specific styles */
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+
+            body {
+                background: #fff;
+                font-size: 12px;
+                margin: 0;
+                padding: 0;
+            }
+
+            .container-fluid {
+                width: 100%;
+                max-width: 210mm;
+                margin: auto;
+            }
+
+            .invoice {
+                padding: 20px;
+                border: 1px solid #ddd;
+                background: #fff;
+                max-width: 210mm;
+                margin: auto;
+                box-shadow: none;
+            }
+
+            .table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .table th,
+            .table td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+
+            .table th {
+                background-color: #f8f9fa;
+                font-weight: bold;
+            }
+
+            .text-center {
+                text-align: center;
+            }
+
+            .signature-line {
+                margin-top: 30px;
+                text-align: left;
+                font-weight: bold;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <!-- Main content -->
+                <div class="invoice">
+                    <!-- Header -->
+                    <div class="row text-center">
+                        <div class="col-12">
+                            <img src="{{ asset('assets/backend/img/logo.png') }}" style="width:100px;height:60px;" alt="Albabello Logo">
+                            <h3>{{ App\Models\User::UserBranchName()->long_name }}</h3>
+                            <h4>INTERSITE STOCK TRANSFER</h4>
+                            <p><small>View Date: {{ date('l, d-M-Y h:i:s A') }}</small></p>
+                        </div>
+                    </div>
+
+                    <!-- Transfer Details -->
+                    <div class="row">
+                        <div class="col-12">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th>Reference</th>
+                                        <td colspan="3">{{ $intersite->reference }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Processed Date</th>
+                                        <td>{{ Carbon\Carbon::parse($intersite->date)->toFormattedDateString() }}</td>
+                                        <th>Truck No</th>
+                                        <td>{{ $intersite->vehicle_no }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Source</th>
+                                        <td>{{ $intersite->source->code ?? '' }} - {{ $intersite->source->name ?? '' }}</td>
+                                        <th>Destination</th>
+                                        <td>{{ $intersite->destination->code ?? '' }} - {{ $intersite->destination->name ?? '' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Created By/Date</th>
+                                        <td>{{ $intersite->createdBy->name ?? '' }} / {{ Carbon\Carbon::parse($intersite->created_at)->toFormattedDateString() }}</td>
+                                        <th>Posted By</th>
+                                        <td>{{ $intersite->postedBy->name ?? '' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Received By</th>
+                                        <td>{{ $intersite->receivedBy->name ?? '' }}</td>
+                                        <th>Printed By/Date</th>
+                                        <td>{{ auth()->user()->name }} / {{ Carbon\Carbon::now()->toFormattedDateString() }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Product Details -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Request Products</h5>
+                                </div>
+                                <div class="card-body table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>S/N</th>
+                                                <th>Code</th>
+                                                <th>Description</th>
+                                                <th>Store</th>
+                                                <th>Quantity</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @php $total = 0; @endphp
+                                            @foreach ($intersite->products as $product)
+                                                <tr>
+                                                    <th>{{ $loop->index + 1 }}</th>
+                                                    <td>{{ $product->product->code }}</td>
+                                                    <td>{{ $product->product->name }}</td>
+                                                    <td>{{ $product->store->name ?? '' }}</td>
+                                                    <td>{{ $product->quantity }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="row">
+                        <div class="col-6">
+                            <p><b>Date Created:</b> {{ Carbon\Carbon::parse($intersite->created_at)->toFormattedDateString() }}</p>
+                            <p><b>Printed On:</b> {{ Carbon\Carbon::now()->toFormattedDateString() }}</p>
+                            <p><b>Printed By:</b> {{ auth()->user()->name }}</p>
+                        </div>
+                        <div class="col-6 text-right">
+                            <p><b>Signature:</b> ______________________________</p>
+                            <p><b>For:</b> {{ App\Models\User::UserBranchName()->long_name }}</p>
+                        </div>
+                    </div>
+                </div><!-- /.invoice -->
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+
+    <script>
+        window.print();
+    </script>
+
+</body>
 
 </html>

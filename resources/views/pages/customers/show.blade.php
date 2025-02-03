@@ -36,37 +36,13 @@
         <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
+            
                 <div class="row">
-                    <div class="offset-6">
-                        <form method="POST" class="form-inline">
-                            <input type="hidden" name="customer_id" id="customer_id" value="{{ $record->id }}" />
-                            <div class="form-group">
-                                <label for="from_date">From Date</label>
-                                <input type="text"
-                                    class="form-control datepicker-entry {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
-                                    autocomplete="off" name="from_date" id="from_date" value="{{ old('from_date') }}"
-                                    placeholder="">
-                            </div>
-                            <div class="form-group">
-                                <label for="to_date">To Date</label>
-                                <input type="text"
-                                    class="form-control datepicker-entry {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
-                                    autocomplete="off" name="to_date" id="to_date" value="{{ old('to_date') }}"
-                                    placeholder="">
-                            </div>
-                            <div class="form-group text-right ">
-                                <input type="button" class="btn btn-primary" id="generate" name="generate"
-                                    value="Generate" />
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4">
+                    <div class="col-sm-8">
                         @include('cards.customer')
                     </div>
 
-                    <div class="col-sm-8 table-responsive" id="load">
+                    {{-- <div class="col-sm-8 table-responsive" id="load">
                         <table class="table table-bordered" id="example1" data-ordering="false" border="1"
                             cellpadding="0" cellspacing="0">
                             <thead>
@@ -139,7 +115,7 @@
                                 </tr>
                             </tfoot>
                         </table>
-                    </div>
+                    </div> --}}
                 </div>
             </div><!-- /.container-fluid -->
         </section>

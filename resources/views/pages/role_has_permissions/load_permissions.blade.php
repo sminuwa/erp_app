@@ -1,4 +1,4 @@
- <table class='table table-bordered' id="record1">
+ {{-- <table class='table table-bordered' id="record1">
     <thead>
         <tr>
             <td colspan="12" style="text-align: right;">Check All <input type="checkbox" id="checkAll" name="checkAll" />
@@ -13,7 +13,7 @@
             @endphp
             @foreach ($permissions as $permission)
                 <td>{{ $i = $loop->index + 1 }}</td>
-                <td>{{ $permission->name }}</td>
+                <td>{{ $permission->description }}</td>
                 @if (in_array($permission->id, $rolepermssions))
                     <td style="text-align: center;vertical-align: middle;"><input type="checkbox" checked
                             name="permissions[]" class="permissions" value="{{ $permission->id }}" />
@@ -31,48 +31,71 @@
             @endforeach
         </tr>
     </tbody>
-</table> {{--
-<script>
-    $('#record2,#record3').DataTable({
-        "paging": true,
-        "lengthChange": true,
-        "searching": true,
-        "ordering": true,
-        "info": true,
-        "autoWidth": false,
-        "pageLength":200,
-        "lengthMenu": [[50, 100, 150, 200, 250, 300,-1], [50, 100, 150, 200, 250, 300,"All"]],
-    });
-</script>
+</table>
+ --}}
+ @php
+     // Separate checked and unchecked permissions
+     $checkedPermissions = [];
+     $uncheckedPermissions = [];
 
-<table class='table table-bordered' id="record2">
-    <thead>
-        <tr>
-            <th colspan="2"></th>
-            <th style="text-align: right;">
-                Check All <input type="checkbox" id="checkAll" name="checkAll" />
-            </th>
+     foreach ($permissions as $permission) {
+         if (in_array($permission->id, $rolepermssions)) {
+             $checkedPermissions[] = $permission;
+         } else {
+             $uncheckedPermissions[] = $permission;
+         }
+     }
 
-        </tr>
-    </thead>
-    <tbody>
+     // Merge checked first, then unchecked
+     $sortedPermissions = array_merge($checkedPermissions, $uncheckedPermissions);
+ @endphp
 
-        @foreach ($permissions as $permission)
-            <tr>
-                <td>{{ $loop->index + 1 }}</td>
-                <td>{{ $permission->name }}</td>
-                @if (in_array($permission->id, $rolepermssions))
-                    <td style="text-align: center;vertical-align: middle;">
-                        <input type="checkbox" checked name="permissions[]" class="permissions"
-                            value="{{ $permission->id }}" />
-                    </td>
-                @else
-                    <td style="text-align: center;vertical-align: middle;">
-                        <input type="checkbox" name="permissions[]" class="permissions" value="{{ $permission->id }}" />
-                    </td>
-                @endif
-            </tr>
-        @endforeach
+ <table class='table table-bordered' id="record1">
+     <thead>
+         <tr>
+             <td colspan="12" style="text-align: right;">Check All <input type="checkbox" id="checkAll" name="checkAll" />
+             </td>
+         </tr>
+     </thead>
+     <tbody>
+         <tr>
+             @php $i = 0; @endphp
+             @foreach ($sortedPermissions as $permission)
+                 <td>{{ ++$i }}</td>
+                 <td>{{ $permission->description }}</td>
+                 <td style="text-align: center; vertical-align: middle;">
+                     <input type="checkbox" name="permissions[]" class="permissions" value="{{ $permission->id }}"
+                         {{ in_array($permission->id, $rolepermssions) ? 'checked' : '' }} />
+                 </td>
 
-    </tbody>
-</table>--}}
+                 @if ($i % 4 == 0)
+         </tr>
+         <tr>
+             @endif
+             @endforeach
+         </tr>
+     </tbody>
+ </table>
+
+ <script>
+     $(document).ready(function() {
+         $('#record1').DataTable({
+             "paging": true,
+             "lengthChange": true,
+             "searching": true,
+             "ordering": true,
+             "info": true,
+             "autoWidth": false,
+             "pageLength": 200,
+             "lengthMenu": [
+                 [50, 100, 150, 200, 250, 300, -1],
+                 [50, 100, 150, 200, 250, 300, "All"]
+             ],
+         });
+
+         // Select/Deselect All
+         $("#checkAll").on("change", function() {
+             $(".permissions").prop("checked", this.checked);
+         });
+     });
+ </script>

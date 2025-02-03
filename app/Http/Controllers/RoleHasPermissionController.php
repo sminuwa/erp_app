@@ -40,7 +40,7 @@ class RoleHasPermissionController extends Controller
 
         return $this->checkAccessView(Auth::user(), "role.create",
             view('pages.role_has_permissions.index', ['roles' => Role::all()]));*/
-       return view('pages.role_has_permissions.index', ['roles' => Role::orderBy('name')->get()]);
+        return view('pages.role_has_permissions.index', ['roles' => Role::orderBy('name')->get()]);
     }
 
     public function store(Request $request)
@@ -93,7 +93,7 @@ class RoleHasPermissionController extends Controller
     {
         $role = Role::find($request->role_id);
         $rolepermssions = $this->rolePermissionToArray($role);
-        $permissions = Permission::orderby('name')->get();
+        $permissions = Permission::where('active', 1)->orderby('description')->get();
         return view('pages.role_has_permissions.load_permissions', ['permissions' => $permissions, 'rolepermssions' => $rolepermssions]);
     }
 

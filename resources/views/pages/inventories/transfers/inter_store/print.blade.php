@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -215,6 +215,155 @@
     </style>
 
     <script type="text/javascript">
+        window.print();
+    </script>
+</body>
+
+</html> --}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Interstore Transfer - ALBABELLO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <style>
+        /* Print-specific styles */
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+
+            body {
+                background: #fff;
+                font-size: 12px;
+                margin: 0;
+                padding: 0;
+            }
+
+            .container {
+                width: 100%;
+                max-width: 210mm;
+                margin: auto;
+            }
+
+            .receipt-main {
+                padding: 20px;
+                border: 1px solid #ddd;
+                background: #fff;
+                max-width: 210mm;
+                margin: auto;
+                box-shadow: none;
+            }
+
+            .table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .table th,
+            .table td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+
+            .table th {
+                background-color: #f8f9fa;
+                font-weight: bold;
+            }
+
+            .text-center {
+                text-align: center;
+            }
+
+            .signature-line {
+                margin-top: 30px;
+                text-align: left;
+                font-weight: bold;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="receipt-main">
+            <div class="row">
+                <div class="col-xs-6">
+                    <img src="{{ asset('assets/backend/img/logo.png') }}" style="width:71px;height:71px;"
+                        alt="Albabello Logo">
+                    <strong>{{ App\Models\User::UserBranchName()->long_name }}</strong>
+                </div>
+                <div class="col-xs-6 text-right">
+                    <h5>AL-BABELLO</h5>
+                    <p>{{ $interstoreTransfer->customer->branch->address ?? 'N/A' }} <i
+                            class="fa fa-location-arrow"></i></p>
+                    <p>{{ optional($interstoreTransfer->customer)->branch->email ?? 'N/A' }} <i
+                            class="fa fa-envelope-o"></i></p>
+                    <p>{{ optional($interstoreTransfer->customer)->branch->phone ?? 'N/A' }} <i class="fa fa-phone"></i>
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-5">
+                    <p><b>Reference No:</b> {{ $interstoreTransfer->reference }}</p>
+                    <p><b>Processed Date:</b> {{ $interstoreTransfer->date }}</p>
+                </div>
+            </div>
+
+            <h4 class="text-center text-bold">INTERSTORE TRANSFER</h4>
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>Product</th>
+                        <th>Source Store</th>
+                        <th>Destination Store</th>
+                        <th>Quantity</th>
+                        <th>Expiry Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($interstoreTransfer->products as $record)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $record->product->code . ' - ' . $record->product->name }}</td>
+                            <td>{{ $record->source->code . ' - ' . $record->source->name }}</td>
+                            <td>{{ $record->destination->code . ' - ' . $record->destination->name }}</td>
+                            <td>{{ $record->quantity }}</td>
+                            <td>{{ $record->expiry_date }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+
+            <div class="row">
+                <div class="col-xs-10 text-left">
+                    <p><b>Printed On:</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
+                    <p><b>Created By/Date:</b> {{ $interstoreTransfer->createdBy->name ?? 'N/A' }} /
+                        {{ Carbon\Carbon::parse($interstoreTransfer->created_at)->toFormattedDateString() }}</p>
+                    <p><b>Printed By/Date:</b> {{ Auth::user()->name }} /
+                        {{ Carbon\Carbon::now()->toFormattedDateString() }}</p><br>
+
+                    <p><b>Signature:</b> ______________________________</p>
+                    <p><b>For:</b> ALBABELLO</p>
+                    <h5 class="text-center" style="color: rgb(140, 140, 140);">Thanks for Your Patronage!</h5>
+                </div>
+                <div class="col-xs-2 text-right">
+                    {{ QrCode::size(70)->generate($interstoreTransfer->reference) }}<br />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
         window.print();
     </script>
 </body>

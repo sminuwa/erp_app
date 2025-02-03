@@ -79,7 +79,7 @@
                                     <td>{{ \Carbon\Carbon::parse($sale->purchase_date)->toFormattedDateString() }}</td>
                                     <td>{{ $sale->reference }}</td>
                                     <td style="text-align: right">
-                                        {{ number_format($sale->actual_cost, 2, '.', ',') }}</td>
+                                        {{ number_format($sale->total, 2, '.', ',') }}</td>
                                     <td>{{ $sale->atc_no }}</td>
                                     <td>{{ $sale->supplier }}</td>
                                     <td>{{ $sale->created_by }}</td>
@@ -88,7 +88,7 @@
                         
                                 </tr>
                                 @php
-                                    $total_cost += $sale->actual_cost;
+                                    $total_cost += $sale->total;
                                 @endphp
                             @endforeach
                             <tfoot>

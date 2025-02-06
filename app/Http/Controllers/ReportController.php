@@ -1402,14 +1402,14 @@ class ReportController extends Controller
     //             DB::raw('SUM(order_details.total) as amount'),
     //             DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
     //             // Calculate qty_available based on whether a branch filter is applied
-    //             $branch_id != '%' ? DB::raw('(SELECT SUM(store_products.qty_available) 
+    //             $branch_id != '%' ? DB::raw('(SELECT SUM(store_products.qty_available)
     //             FROM store_products
     //             JOIN stores s ON store_products.store_id = s.id
     //             JOIN products p ON store_products.product_id = p.id
     //             WHERE s.branch_id LIKE stores.branch_id
     //             AND p.category_id = categories.id) as qty_available')
     //             :
-    //             DB::raw('(SELECT SUM(store_products.qty_available) 
+    //             DB::raw('(SELECT SUM(store_products.qty_available)
     //             FROM store_products
     //             JOIN products p ON store_products.product_id = p.id
     //             WHERE p.category_id = categories.id) as qty_available')
@@ -1683,7 +1683,7 @@ class ReportController extends Controller
     //             DB::raw('SUM(order_details.quantity) as quantity'),
     //             DB::raw('SUM(order_details.total) as amount'),
     //             DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
-    //             DB::raw('(SELECT SUM(store_products.qty_available) 
+    //             DB::raw('(SELECT SUM(store_products.qty_available)
     //             FROM store_products
     //             JOIN products p ON store_products.product_id = p.id
     //             WHERE store_products.store_id IN (SELECT id FROM stores WHERE branch_id = branches.id)
@@ -3738,23 +3738,31 @@ class ReportController extends Controller
         if ($status == 'all' || $status == '') {
             $status = '%';
         }
-        $sales = OrderInvoice::where('branch_id', 'LIKE', $branch_id)
+
+        $sales = OrderInvoice::with(['customer', 'order_items'])
             ->join('branches', 'branches.id', '=', 'order_invoices.branch_id')
+            ->select('order_invoices.*')
+            ->where('branch_id', 'LIKE', $branch_id)
             ->where('branches.company_id', 'LIKE', $company_id)
             ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
             ->where('order_invoices.status', 'LIKE', $status)
             ->orderBy('order_date', 'DESC')
             ->get();
+
         if ($branch_id == "%")
             $branch_id = "all";
+
         if ($status == "%")
             $status = "all";
+
         $company = null;
         if ($company_id != 'all')
             $company = Company::find($company_id);
+
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
+
         return view('pages.reports.sales_and_cash_analysis.load_order_lines_report', compact('sales', 'from_date', 'to_date', 'company_id', 'branch_id', 'status', 'branch'));
     }
 
@@ -4343,15 +4351,15 @@ class ReportController extends Controller
     //         ->where('purchases.branch_id', 'LIKE', $branch_id)
     //         ->whereBetween(DB::raw("DATE(purchases.purchase_date)"), [$from_date, $to_date])
     //         ->groupBy(
-    //             'purchases.reference', 
-    //             'suppliers.name', 
-    //             'stores.code', 
-    //             'purchases.purchase_date', 
-    //             'purchases.wbno', 
-    //             'purchases.status', 
-    //             'purchases.atc_no', 
-    //             'purchases.created_at', 
-    //             'users.name', 
+    //             'purchases.reference',
+    //             'suppliers.name',
+    //             'stores.code',
+    //             'purchases.purchase_date',
+    //             'purchases.wbno',
+    //             'purchases.status',
+    //             'purchases.atc_no',
+    //             'purchases.created_at',
+    //             'users.name',
     //             'branches.name'
     //         )
     //         ->orderBy('purchases.purchase_date')

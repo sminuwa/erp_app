@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
@@ -119,5 +119,171 @@
 
 </body>
 
+
+</html> --}}
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
+    <title>Credit Note - {{ config('app.name', 'Inventory Management System') }}</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
+    <!-- IonIcons -->
+    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{{ asset('assets/backend/css/adminlte.min.css') }}">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    
+    <style>
+        /* Print-specific styles */
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+
+            body {
+                background: #fff;
+                font-size: 12px;
+                margin: 0;
+                padding: 0;
+            }
+
+            .container-fluid {
+                width: 100%;
+                max-width: 210mm;
+                margin: auto;
+            }
+
+            .invoice {
+                padding: 20px;
+                border: 1px solid #ddd;
+                background: #fff;
+                max-width: 210mm;
+                margin: auto;
+                box-shadow: none;
+            }
+
+            .table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .table th,
+            .table td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+
+            .table th {
+                background-color: #f8f9fa;
+                font-weight: bold;
+            }
+
+            .text-center {
+                text-align: center;
+            }
+
+            .signature-line {
+                margin-top: 30px;
+                text-align: left;
+                font-weight: bold;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <!-- Main content -->
+                <div class="invoice">
+                    <!-- Header -->
+                    <div class="row text-center">
+                        <div class="col-12">
+                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}" 
+                                style="width:100px;height:60px;" alt="Albabello Logo">
+                            <h3>{{ App\Models\User::UserBranchName()->long_name }}</h3>
+                            <h4>CREDIT NOTE</h4>
+                            <small>View Date: {{ date('l, d-M-Y h:i:s A') }}</small><br/>
+                        </div>
+                    </div>
+
+                    <!-- Supplier Information -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h4>SUPPLIER NAME: <small>{{ $payment->supplier->name }}</small></h4>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="row">
+                        <div class="col-12 table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>DATE</th>
+                                        <th>RECEIPT NO</th>
+                                        <th>SUPPLIER NAME</th>
+                                        <th>AMOUNT</th>
+                                        <th>CHEQUE NO</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}</td>
+                                        <td>{{ $payment->teller_no }}</td>
+                                        <td>{{ $payment->supplier->name }}</td>
+                                        <td align="right">&#8358; {{ number_format($payment->dr, 2) }}</td>
+                                        <td>{{ $payment->Ref }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right text-danger" colspan="3">
+                                            <strong>TOTAL:</strong>
+                                        </td>
+                                        <td class="text-right text-danger">
+                                            <strong>&#8358;{{ number_format($payment->dr, 2) }}</strong>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="row">
+                        <div class="col-6">
+                            <p><b>Date Created:</b> {{ \Carbon\Carbon::parse($payment->created_at)->toFormattedDateString() }}</p>
+                            <p><b>Printed On:</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
+                            <p><b>Printed By:</b> {{ Auth::user()->name }}</p>
+                        </div>
+                        <div class="col-6 text-right">
+                            <p><b>Signature:</b> ______________________________</p>
+                            <p><b>For:</b> {{ App\Models\User::UserBranchName()->long_name }}</p>
+                        </div>
+                    </div>
+                </div><!-- /.invoice -->
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+
+    <script>
+        window.print();
+    </script>
+
+</body>
 
 </html>

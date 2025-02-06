@@ -4,7 +4,7 @@
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
-<table class="display table table-bordered caption" id="example1">
+<table class="display table table-bordered caption" id="example1" data-ordering="true">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">Intersite Stock Transfer Report
             From
@@ -14,7 +14,7 @@
     </caption>
     <thead>
         <tr>
-            <th style="width: 50%" colspan="6">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            <th style="width: 50%" colspan="7">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
             </th>
             <th style="width: 50%;text-align:right" colspan="5">Processed By {{ auth()->user()->name }}</th>
         </tr>
@@ -24,6 +24,7 @@
             <th>Item Name</th>
             <th>From Branch</th>
             <th>To Branch</th>
+            <th>Truck No</th>
             <th>Rerefence No</th>
             <th>Created By</th>
             <th>Date Created</th>
@@ -40,6 +41,7 @@
             <td>{{ $transfer->product_name }}</td>
             <td>{{ \App\Models\Branch::find($transfer->source_branch_id)->code }}</td>
             <td>{{ \App\Models\Branch::find($transfer->destination_branch_id)->code }}</td>
+            <td>{{ $transfer->vehicle_no }}</td>
             <td>{{ $transfer->reference }}</td>
             <td>{{ $transfer->created_by }}</td>
             <td>{{ Carbon\Carbon::parse($transfer->created_at)->toFormattedDateString() }}</td>
@@ -54,7 +56,7 @@
     <tfoot>
         <tr>
 
-            <th colspan="10"> Total</th>
+            <th colspan="11"> Total</th>
             <th style="text-align: right">{{ number_format($total, 2) }}</th>
         </tr>
     </tfoot>

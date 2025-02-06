@@ -1,7 +1,7 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.general.sales.report.print', [$from_date, $to_date, $company_id,$branch_id, $store_id, $category_id, $product_id, $customer_id, $type]) }}"
-           target="_BLANK" class="btn-success btn btn-sm">Print</a>
+        <a href="{{ route('ajax.general.sales.report.print', [$from_date, $to_date, $company_id, $branch_id, $store_id, $category_id, $product_id, $customer_id, $type]) }}"
+            target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
 <table class="display table table-bordered caption" id="example1" data-ordering="false">
@@ -15,28 +15,28 @@
         </h5>
     </caption>
     <thead>
-    <tr>
-        <th style="width: 50%" colspan="7">Date
-            Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
-        </th>
-        <th style="width: 50%;text-align:right" colspan="7">Processed By {{ auth()->user()->name }}</th>
-    </tr>
-    <tr>
-        <th>DATE</th>
-        <th>CODE</th>
-        <th>ITEM</th>
-        <th>STORE</th>
-        <th>REFERENCE</th>
-        <th>ACCOUNT</th>
-        <th>QTY</th>
-        <th>UNIT</th>
-        <th>COST PRICE()</th>
-        <th>SOLD PRICE()</th>
-        <th>TOTAL COST()</th>
-        <th>TOTAL SALES()</th>
-        <th>MARGIN()</th>
-        <th>MARGIN %</th>
-    </tr>
+        <tr>
+            <th style="width: 50%" colspan="7">Date
+                Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            </th>
+            <th style="width: 50%;text-align:right" colspan="7">Processed By {{ auth()->user()->name }}</th>
+        </tr>
+        <tr>
+            <th>TRANSACTION DATE</th>
+            <th>CODE</th>
+            <th>PRODUCT DESCRIPTION</th>
+            <th>STORE</th>
+            <th>REFERENCE</th>
+            <th>ACCOUNT</th>
+            <th>QTY</th>
+            <th>UNIT</th>
+            <th>COST PRICE()</th>
+            <th>SOLD PRICE()</th>
+            <th>TOTAL COST()</th>
+            <th>TOTAL SALES()</th>
+            <th>MARGIN()</th>
+            <th>MARGIN %</th>
+        </tr>
     </thead>
     @php
         $total_cost_price = 0;
@@ -65,7 +65,9 @@
                 {{ number_format(str_replace(',', '', $sale->sold_price) * $sale->quantity, 2, '.', ',') }}</td>
             <td style="text-align: right">
                 @php
-                    $total_profit = str_replace(',', '', $sale->sold_price) * $sale->quantity - str_replace(',', '', $sale->cost_price) * $sale->quantity;
+                    $total_profit =
+                        str_replace(',', '', $sale->sold_price) * $sale->quantity -
+                        str_replace(',', '', $sale->cost_price) * $sale->quantity;
                     $grand_total_profit += $total_profit;
 
                     $total_cost_price += str_replace(',', '', $sale->cost_price);
@@ -78,7 +80,7 @@
 
             </td>
             <td>
-                {{ number_format(($total_profit / (str_replace(',', '', $sale->sold_price) * $sale->quantity))*100,2)  }}
+                {{ $sale->sold_price > 0 && $sale->quantity > 0 ? number_format(($total_profit / (str_replace(',', '', $sale->sold_price) * $sale->quantity)) * 100, 2) : 0 }}
             </td>
         </tr>
         @php $credit_notes = App\Models\Order::find($sale->order_id)->creditNotes @endphp
@@ -105,7 +107,9 @@
                         </td>
                         <td style="text-align: right">
                             @php
-                                $total_profit_note = str_replace(',', '', $item->sold_price) * $item->quantity - str_replace(',', '', $item->cost_price) * $item->quantity;
+                                $total_profit_note =
+                                    str_replace(',', '', $item->sold_price) * $item->quantity -
+                                    str_replace(',', '', $item->cost_price) * $item->quantity;
                                 $grand_total_profit += $total_profit_note;
                             @endphp
                             @if ($total_profit < 0)
@@ -115,7 +119,7 @@
                             @endif
                         </td>
                         <td>
-                            {{ number_format(($total_profit_note / (str_replace(',', '', $item->sold_price) * $item->quantity))*100,2)  }}
+                            {{ number_format(($total_profit_note / (str_replace(',', '', $item->sold_price) * $item->quantity)) * 100, 2) }}
                         </td>
                     </tr>
                     @php
@@ -129,28 +133,28 @@
         @endif
     @endforeach
     <tfoot>
-    <tr>
-        <th colspan="8" style="text-align: right">TOTAL</th>
-        <th style="text-align: right">
-            {{ number_format($total_cost_price, 2, '.', ',') }}</th>
-        <th style="text-align: right">
-            {{ number_format($total_sold_price, 2, '.', ',') }}</th>
-        <th style="text-align: right">
-            {{ number_format($total_cost, 2, '.', ',') }}
-        </th>
-        <th style="text-align: right">
-            {{ number_format($total_sold, 2, '.', ',') }}
-        </th>
-        <th style="text-align: right">
-            @if ($grand_total_profit < 0)
-                ({{ number_format(abs($grand_total_profit), 2, '.', ',') }})
-            @else
-                {{ number_format($grand_total_profit, 2) }}
-            @endif
-        </th>
-        <th>
+        <tr>
+            <th colspan="8" style="text-align: right">TOTAL</th>
+            <th style="text-align: right">
+                {{ number_format($total_cost_price, 2, '.', ',') }}</th>
+            <th style="text-align: right">
+                {{ number_format($total_sold_price, 2, '.', ',') }}</th>
+            <th style="text-align: right">
+                {{ number_format($total_cost, 2, '.', ',') }}
+            </th>
+            <th style="text-align: right">
+                {{ number_format($total_sold, 2, '.', ',') }}
+            </th>
+            <th style="text-align: right">
+                @if ($grand_total_profit < 0)
+                    ({{ number_format(abs($grand_total_profit), 2, '.', ',') }})
+                @else
+                    {{ number_format($grand_total_profit, 2) }}
+                @endif
+            </th>
+            <th>
 
-        </th>
-    </tr>
+            </th>
+        </tr>
     </tfoot>
 </table>

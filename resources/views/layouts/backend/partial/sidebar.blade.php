@@ -623,14 +623,14 @@
                                             <a href="{{ route('purchase.invoice.report') }}"
                                                 class="nav-link {{ Request::is('reports/inventory/invoice*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
-                                                <p>Purchase Invoices</p>
+                                                <p>Invoice/GRN</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="{{ route('purchase.invoice.lines.report') }}"
                                                 class="nav-link {{ Request::is('reports/inventory/invoice/lines*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
-                                                <p>Purchase Invoices Lines</p>
+                                                <p>Invoices/GRN Lines</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -846,7 +846,7 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="#" class="nav-link ">
+                            <a href="{{route('backup.index')}}" class="nav-link ">
                                 <i class="ion-card"></i>
                                 <p>Backup</p>
                             </a>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -247,6 +247,171 @@
     </style>
 
     <script type="text/javascript">
+        window.print();
+    </script>
+</body>
+
+</html> --}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Payment Receipt - ALBABELLO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <style>
+        /* Print-specific styles */
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+
+            body {
+                background: #fff;
+                font-size: 12px;
+                margin: 0;
+                padding: 0;
+            }
+
+            .container {
+                width: 100%;
+                max-width: 210mm;
+                margin: auto;
+            }
+
+            .receipt-main {
+                padding: 20px;
+                border: 1px solid #ddd;
+                background: #fff;
+                max-width: 210mm;
+                margin: auto;
+                box-shadow: none;
+            }
+
+            .table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .table th,
+            .table td {
+                border: 1px solid #ddd;
+                padding: 5px;
+                text-align: left;
+            }
+
+            .table th {
+                background-color: #f8f9fa;
+                font-weight: bold;
+            }
+
+            .text-center {
+                text-align: center;
+            }
+
+            .signature-line {
+                margin-top: 30px;
+                text-align: left;
+                font-weight: bold;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="receipt-main">
+            <div class="row">
+                <div class="col-xs-6">
+                    <img src="{{ asset('assets/backend/img/logo.png') }}" style="width:100px;height:60px;"
+                        alt="Albabello Logo">
+                    <span style="font-size:20px;">&nbsp;{{ App\Models\User::UserBranchName()->long_name }}</span>
+                </div>
+                <div class="col-xs-6 text-right">
+                    <h5>AL-BABELLO</h5>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-7 text-left">
+                    <h5>Interbank Payment</h5>
+                </div>
+                <div class="col-xs-5 text-right">
+                    <p><b>Reference:</b> {{ $interbank->reference }}</p>
+                    <p><b>Payment Date:</b> {{ \Carbon\Carbon::parse($interbank->date)->toFormattedDateString() }}</p>
+                </div>
+            </div>
+
+            <h4 class="text-center text-bold">INTER-BANK TRANSACTION</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th width="40%">Source</th>
+                        <th width="40%">Destination</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            @if ($interbank->source_account() == null)
+                                Payment for {{ \Carbon\Carbon::parse($interbank->date)->toFormattedDateString() }}
+                            @else
+                                {{ $interbank->source_account()->number }} -
+                                {{ $interbank->source_account()->description }}
+                            @endif
+                        </td>
+                        <td>
+                            @if ($interbank->destination_account() == null)
+                                Payment for {{ \Carbon\Carbon::parse($interbank->date)->toFormattedDateString() }}
+                            @else
+                                {{ $interbank->destination_account()->number }} -
+                                {{ $interbank->destination_account()->description }}
+                            @endif
+                        </td>
+                        <td align="right">&#8358;{{ number_format($interbank->amount, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-right"><strong>Amount:</strong></td>
+                        <td align="right"><strong>&#8358;{{ number_format($interbank->amount, 2) }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="text-danger">
+                            <strong>Amount in words:</strong>
+                            @php
+                                $obj = new App\Models\Utility();
+                            @endphp
+                            <strong>{{ $obj->convertNumberToWords($interbank->amount) }} Naira</strong>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="row">
+                <div class="col-xs-10 text-left">
+                    <p><b>Date Created:</b> {{ Carbon\Carbon::parse($interbank->created_at)->toFormattedDateString() }}
+                    </p>
+                    <p><b>Created By:</b> {{ $interbank->createdBy->name ?? 'N/A' }}</p>
+                    <p><b>Printed By:</b> {{ Auth::user()->name }}</p>
+                    <p><b>Printed On:</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
+
+                    <p><b>Signature:</b> ______________________________________</p>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For:
+                        ALBABELLO</span>
+                </div>
+                <div class="col-xs-2 text-right">
+                    {{ QrCode::size(70)->generate("$interbank->dr\n$interbank->reference\n\n.") }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
         window.print();
     </script>
 </body>

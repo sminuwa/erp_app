@@ -78,8 +78,8 @@
                                     <tfoot>
                                         <tr>
                                             <th>Processed Date</th>
-                                            <th>Reference</th>
                                             <th>Name</th>
+                                            <th>Reference</th>
                                             <th>Amount</th>
                                             <th>Created By</th>
                                             <th>Date Created</th>
@@ -91,9 +91,8 @@
                                             <tr class="@if ($payment->status == 0) bg-warning @endif">
 
                                                 <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
-                                                <td>{{ $payment->reference }}</td>
                                                 <td>{{ $payment->customer->name ?? '' }}</td>
-
+                                                <td>{{ $payment->reference }}</td>
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
                                                 <td>{{ $payment->createdBy->name ?? '' }}</td>
                                                 <td>{{ Carbon\Carbon::parse($payment->created_at)->toFormattedDateString() }}

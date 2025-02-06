@@ -29,6 +29,7 @@ use App\Models\Setting;
 use App\Models\AuditLog;
 use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Http;
 
 /**
  * Description of CustomerController
@@ -73,17 +74,17 @@ class CustomerController extends Controller
       */
     public function store(Store $request)
     {
-    //    return $request;
+        //    return $request;
         $model = new Customer;
         $model->fill($request->all());
         $model->type = ($request->account_type == 'R' ? 'Retail' : "Wholesale");
         $model->branch_id = $request->branch_id;
         $model->relation_officer = $request->relation_officer;
-        $model->status = $request->status??1;
+        $model->status = $request->status ?? 1;
         if ($model->save()) {
-            if($request->category == 'staff') {
+            if ($request->category == 'staff') {
                 $model->code = $request->code;
-            }else{
+            } else {
                 $model->code = Customer::generateNewCode($request->branch_id, $request->account_type);
             }
             $model->save();
@@ -121,11 +122,11 @@ class CustomerController extends Controller
     { //return $request;
 
         // return $request;
-        $customer->fill($request->all());
+        $customer->fill($request->except('name'));
         $customer->type = ($request->account_type == 'R' ? 'Retail' : "Wholesale");
         $customer->branch_id = $request->branch_id;
         $customer->relation_officer = $request->relation_officer;
-        $customer->status = $request->status??1;
+        $customer->status = $request->status ?? 1;
         if ($customer->save()) {
             $action = "Updated a credit customer : " . $customer->name;
             AuditLog::auditLog(Auth::id(), $action);
@@ -549,6 +550,24 @@ class CustomerController extends Controller
         //dd($faileds);
         session()->flash('app_message', 'File imported and records updated/inserted successfully!');
         return view('pages.customers.import', ['count' => $count]);
+    }
+    public function verifyNIN($nin)
+    {
+        $response = Http::withHeaders([
+            'x-api-key' => 'your_api_key',
+        ])->post('https://api.nimc.gov.ng/verification', [
+                    'nin' => $nin,
+                    // Include other required parameters as per NIMC's API documentation
+                ]);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            // Process the verified data
+            return $data;
+        } else {
+            // Handle errors
+            return null;
+        }
     }
 }
 

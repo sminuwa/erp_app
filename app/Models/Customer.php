@@ -19,7 +19,20 @@ class Customer extends Model
     /**
      * Mass assignable columns
      */
-    protected $fillable = ['name', 'code', 'email', 'branch_id','phone', 'address', 'type', 'credit_limit', 'relation_officer'];
+    protected $fillable = [
+        'name',
+        'code',
+        'email',
+        'branch_id',
+        'phone',
+        'address',
+        'type',
+        'credit_limit',
+        'gender',
+        'business_type',
+        'business_age',
+        'relation_officer'
+    ];
 
     /**
      * Date time columns.
@@ -62,7 +75,8 @@ class Customer extends Model
         return $this->belongsTo(User::class, 'relation_officer');
     }
 
-    public function scopeActive($query){
+    public function scopeActive($query)
+    {
         return $query->where('customers.status', 1);
     }
 }

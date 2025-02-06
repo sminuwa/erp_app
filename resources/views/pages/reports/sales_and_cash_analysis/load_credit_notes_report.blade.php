@@ -43,8 +43,8 @@
             <td>{{ $sale->customer->name }}</td>
             <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}</td>
             <td>{{ $sale->createdBy->name ?? null }}</td>
-            <td>{{ $sale->postedBy->name ?? null }}</td>
             <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}</td>
+            <td>{{ $sale->postedBy->name ?? null }}</td>
             <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
         </tr>
     @endforeach

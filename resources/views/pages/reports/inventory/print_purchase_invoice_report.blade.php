@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Purchase Invoice Report - {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Invoice/GRN Report - {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -39,7 +39,7 @@
                             <h3 style="text-align: center;">
                                 {{$branch->name ?? 'All Branches'}}
                             </h3>
-                            <h5 style="text-align: center;">Purchase Invoice Report
+                            <h5 style="text-align: center;">Invoice/GRN Report
                                 From
                                 {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                                 AND
@@ -79,7 +79,7 @@
                                     <td>{{ \Carbon\Carbon::parse($sale->purchase_date)->toFormattedDateString() }}</td>
                                     <td>{{ $sale->reference }}</td>
                                     <td style="text-align: right">
-                                        {{ number_format($sale->actual_cost, 2, '.', ',') }}</td>
+                                        {{ number_format($sale->total, 2, '.', ',') }}</td>
                                     <td>{{ $sale->atc_no }}</td>
                                     <td>{{ $sale->supplier }}</td>
                                     <td>{{ $sale->created_by }}</td>
@@ -88,7 +88,7 @@
                         
                                 </tr>
                                 @php
-                                    $total_cost += $sale->actual_cost;
+                                    $total_cost += $sale->total;
                                 @endphp
                             @endforeach
                             <tfoot>

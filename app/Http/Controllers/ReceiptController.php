@@ -107,7 +107,7 @@ class ReceiptController extends Controller
         if ($type == "Supplier")
             $payers = Supplier::active()->orderBy('code')->orderBy('code')->get();
         if ($type == "GeneralAccount")
-            $payers = GeneralAccount::active()->orderBy('number')->orderBy('number')->get();
+            $payers = GeneralAccount::active()->whereNot('number', 'LIKE', 'R%')->orderBy('number')->orderBy('number')->get();
 
         return view('pages.receipts.load_data_payer', ['payers' => $payers]);
     }

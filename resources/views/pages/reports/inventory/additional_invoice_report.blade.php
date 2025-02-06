@@ -70,9 +70,9 @@
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp;
-                            <label for="supplier_id">Transporter</label>
+                            <label for="supplier_id">Suppliers/Transporter</label>
                             <select
-                                class="form-control select2-single ajax-transporters {{ $errors->has('supplier_id') ? ' is-invalid' : '' }}"
+                                class="form-control select2-single ajax-suppliers {{ $errors->has('supplier_id') ? ' is-invalid' : '' }}"
                                 name="supplier_id" id="supplier_id">
 
                             </select>

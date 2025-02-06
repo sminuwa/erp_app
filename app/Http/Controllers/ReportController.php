@@ -3366,32 +3366,38 @@ class ReportController extends Controller
         $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $status = $request->status;
-        if ($company_id == 'all' || $company_id == '') {
-            $company_id = '%';
-        }
-        if ($branch_id == 'all' || $branch_id == '') {
-            $branch_id = '%';
-        }
-        if ($status == 'all' || $status == '') {
-            $status = '%';
-        }
-        $sales = Order::where('branch_id', 'LIKE', $branch_id)
+        $where = [];
+        if ($company_id != '' && $company_id != '%')
+            $where[] = ['branches.company_id', $company_id];
+
+        if ($branch_id != '' && $branch_id != '%')
+            $where[] = ['orders.branch_id', $branch_id];
+
+        if ($status != '' && $status != '%')
+            $where[] = ['orders.status', $status];
+
+        $sales = Order::with(['customer', 'order_items'])
             ->join('branches', 'branches.id', '=', 'orders.branch_id')
-            ->where('branches.company_id', 'LIKE', $company_id)
+            ->select('orders.*')
             ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
-            ->where('orders.status', 'LIKE', $status)
+            ->where($where)
             ->orderBy('order_date', 'DESC')
             ->get();
+
         if ($branch_id == "%")
             $branch_id = "all";
+
         if ($status == "%")
             $status = "all";
+
         $company = null;
         if ($company_id != 'all')
             $company = Company::find($company_id);
+
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
+
         return view('pages.reports.sales_and_cash_analysis.load_invoice_lines_report', compact('sales', 'from_date', 'to_date', 'company_id', 'branch_id', 'status', 'branch'));
     }
 

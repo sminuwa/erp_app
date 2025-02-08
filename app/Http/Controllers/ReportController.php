@@ -3392,14 +3392,17 @@ class ReportController extends Controller
         if ($customer_id == 'all' || $customer_id == '') {
             $customer_id = '%';
         }
+
         if ($company_id == 'all' || $company_id == '') {
             $company_id = '%';
         }
+
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
-        $sales = DB::table('customers')
-            ->select('customers.name AS customer', DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'), 'customers.code', 'customers.id AS customer_id')
+
+        $sales = Customer::with('last_transaction')
+            ->select('customers.id', 'customers.name AS customer', DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'), 'customers.code')
             ->join('general_account_ledgers', 'general_account_ledgers.model_id', 'customers.id')
             ->join('branches', 'branches.id', '=', 'general_account_ledgers.branch_id')
             ->where('branches.company_id', 'LIKE', $company_id)
@@ -3408,19 +3411,23 @@ class ReportController extends Controller
             ->where('model_name', 'Customer')
             ->groupBy('general_account_ledgers.model_id')
             ->orderBy('general_account_ledgers.date')
+            ->limit(500)
             ->get();
-
 
         if ($customer_id == "%")
             $customer_id = "all";
+
         if ($branch_id == "%")
             $branch_id = "all";
+
         $company = null;
         if ($company_id != 'all')
             $company = Company::find($company_id);
+
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
+
         return view('pages.reports.customer_ledger_analysis.load_customer_last_transaction_report', compact('sales', 'branch', 'company_id', 'branch_id', 'customer_id'));
     }
 

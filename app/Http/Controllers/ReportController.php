@@ -3184,18 +3184,18 @@ class ReportController extends Controller
         if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%';
         }
-        $sales = DB::table('customers')
-            ->select(
-                DB::raw('SUM(general_account_ledgers.credit)-SUM(general_account_ledgers.debit) AS balance'),
-                'reference',
-                'description',
-                'date',
-                'customers.name',
-                'customers.code',
-                'model_id AS customer_id',
-                'users.name AS relation_officer',
-                DB::raw('DATEDIFF(NOW(), general_account_ledgers.date) AS age')
-            )
+
+        $sales = Customer::select(
+            DB::raw('SUM(general_account_ledgers.credit)-SUM(general_account_ledgers.debit) AS balance'),
+            'reference',
+            'description',
+            'date',
+            'customers.name',
+            'customers.code',
+            'model_id AS customer_id',
+            'users.name AS relation_officer',
+            DB::raw('DATEDIFF(NOW(), general_account_ledgers.date) AS age')
+        )
             ->join('general_account_ledgers', 'general_account_ledgers.model_id', '=', 'customers.id')
             ->leftJoin('users', 'users.id', '=', 'customers.relation_officer')
             ->join('branches', 'branches.id', '=', 'general_account_ledgers.branch_id')
@@ -3261,18 +3261,24 @@ class ReportController extends Controller
 
         if ($customer_id == "%")
             $customer_id = "all";
+
         if ($branch_id == "%")
             $branch_id = "all";
+
         if ($from_date == null)
             $from_date = "all";
+
         if ($to_date == null)
             $to_date = "all";
+
         $company = null;
         if ($company_id != 'all')
             $company = Company::find($company_id);
+
         $branch = null;
         if ($branch_id != "all")
             $branch = Branch::find($branch_id);
+
         return view('pages.reports.customer_ledger_analysis.load_ageing_report', compact('sales', 'from_date', 'branch', 'to_date', 'company_id', 'branch_id', 'customer_id'));
     }
 

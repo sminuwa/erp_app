@@ -41,7 +41,8 @@
                         <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="company_id">Company</label>
-                            <select class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
+                            <select
+                                class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
                                 name="company_id" id="company_id" required>
 
                             </select>
@@ -56,15 +57,17 @@
                             </select>
                         </div>
                         <div class="form-group text-right">
-                            <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />
+                            <input type="button" class="btn btn-primary" id="generate" name="generate"
+                                   value="Generate"/>
                         </div>
                     </div>
                 </form>
                 <div class="row">
-                    <div class="col-sm-12 table-responsive" id="load">
+                    <div class="col-sm-12 table-responsive">
                         <img src="{{ asset('assets/backend/img/loader.png') }}"
-                            style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                             style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
                     </div>
+                    <div id="load"></div>
                 </div>
 
             </div><!-- /.container-fluid -->
@@ -77,8 +80,8 @@
 
 @push('js')
     <script type="text/javascript">
-        $(function() {
-            $('#generate').on("click", function() {
+        $(function () {
+            $('#generate').on("click", function () {
                 company_id = $('#company_id').val();
                 branch_id = $('#branch_id').val();
                 $('#img-loader').show();
@@ -90,7 +93,8 @@
                         company_id: company_id,
                         branch_id: branch_id
                     }
-                }).done(function(data) {
+                }).done(function (data) {
+                    $('#img-loader').hide();
                     $("#load").html(data);
                     loadDataTable()
                 });

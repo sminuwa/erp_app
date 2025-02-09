@@ -6640,33 +6640,39 @@ class ReportController extends Controller
     {
         $company_id = $request->company_id;
         $branch_id = $request->branch_id;
-        if ($company_id == 'all' || $company_id == '') {
+
+        if ($company_id == 'all' || $company_id == '')
             $company_id = '%';
-        }
+
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
+
         $customers = Customer::select(DB::raw("ABS(SUM(credit) - SUM(debit)) as balance"), 'customers.*')
             ->join('branches', 'customers.branch_id', 'branches.id')
+            ->join('general_account_ledgers', 'general_account_ledgers.model_id', '=', 'customers.id')
             ->where('branches.company_id', 'LIKE', $company_id)
             ->where('customers.branch_id', 'LIKE', $branch_id)
             ->where('credit_limit', '>', 0)
-            ->join('general_account_ledgers', 'general_account_ledgers.model_id', '=', 'customers.id')
             ->groupBy('model_id')
             ->havingRaw('ABS(SUM(credit) - SUM(debit)) > credit_limit')
             ->orderBy('code')
             ->orderBy('name')
             ->get();
-        if ($company_id == '%') {
+
+        if ($company_id == '%')
             $company_id = 'all';
-        }
+
         if ($branch_id == '%')
             $branch_id = 'all';
+
         $company = null;
         if ($company_id != 'all')
             $company = Company::find($company_id);
+
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
+
         return view('pages.reports.customer_ledger_analysis.load_customer_exceed_credit_limit_report', compact('customers', 'branch', 'company_id', 'branch_id'));
     }
 

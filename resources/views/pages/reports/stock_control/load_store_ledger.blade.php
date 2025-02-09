@@ -1,7 +1,7 @@
 <div class="row">
     <div class="offset-10">
         <a href="{{ route('ajax.print.store.ledger.reports', [$company_id,$branch_id, $store_id, is_array($category_id) ? implode(',', $category_id) : $category_id, $product_id]) }}"
-            target="_BLANK" class="btn-success btn btn-sm">Print</a>
+           target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
 <table class="display table table-bordered caption" id="example1">
@@ -10,23 +10,28 @@
         <h5 style="text-align: center;">STORE QUANTITY REPORT </h5>
     </caption>
     <thead>
-        <tr>
-            <th style="width: 50%" colspan="4">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
-            </th>
-            <th style="width: 50%;text-align:right" colspan="3">Processed By {{ auth()->user()->name }}</th>
-        </tr>
-        <tr>
-            <th>BRANCH</th>
-            <th>STORE</th>
-            <th>PRODUCT NAME</th>
-            <th>CATEGORY NAME</th>
-            <th>QUANTITY</th>
-            <th>COST PRICE</th>
-            <th>TOTAL PRICE</th>
-
-        </tr>
+    <tr>
+        <th style="width: 50%" colspan="4">Date
+            Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+        </th>
+        <th style="width: 50%;text-align:right" colspan="3">Processed By {{ auth()->user()->name }}</th>
+    </tr>
+    <tr>
+        <th>BRANCH</th>
+        <th>STORE</th>
+        <th>PRODUCT NAME</th>
+        <th>CATEGORY NAME</th>
+        <th>QUANTITY</th>
+        <th>COST PRICE</th>
+        <th>TOTAL PRICE</th>
+    </tr>
     </thead>
+    @php $grantTotal=0.0;@endphp
     @foreach ($stores as $store)
+        @php
+            $total = remove_non_numeric($store->cost_price) * remove_non_numeric(round($store->qty_available, 6));
+            $grantTotal += $total;
+        @endphp
         <tr>
             <td> {{ $store->branch_code }} </td>
             <td>{{ $store->store }} </td>
@@ -36,17 +41,14 @@
             <td style="text-align: right;">
                 {{ number_format(remove_non_numeric($store->cost_price), 2) }} </td>
             <td style="text-align: right;">
-                {{ number_format(remove_non_numeric($store->cost_price) * remove_non_numeric(round($store->qty_available, 6)), 2) }}
+                {{ number_format($total, 2) }}
             </td>
         </tr>
     @endforeach
     <tfoot>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
+    <tr>
+        <th style="text-align: right" colspan="6">TOTAL</th>
+        <th>{{ currency_sign() . number_format($grantTotal,2) }}</th>
+    </tr>
     </tfoot>
 </table>

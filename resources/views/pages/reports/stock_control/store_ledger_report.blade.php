@@ -43,7 +43,8 @@
                             <div class="form-group">
                                 &nbsp;&nbsp;
                                 <label for="company_id">Company</label>
-                                <select class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
+                                <select
+                                    class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
                                     name="company_id" id="company_id" required>
 
                                 </select>
@@ -51,25 +52,25 @@
                             <div class="form-group">
                                 &nbsp;&nbsp;
                                 <label for="branch_id">Branch</label>
-                                <select class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
+                                <select
+                                    class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
                                     name="branch_id" id="branch_id" required>
-
                                 </select>
                             </div>
                             <div class="form-group">
                                 &nbsp;&nbsp;
                                 <label for="store_id">Store</label>
-                                <select class="form-control select2-single ajax-stores {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
+                                <select
+                                    class="form-control select2-single ajax-stores {{ $errors->has('store_id') ? ' is-invalid' : '' }}"
                                     name="store_id" id="store_id">
-
                                 </select>
                             </div>
                             <div class="form-group">
                                 &nbsp;&nbsp;
                                 <label for="category_id">Category</label>
-                                <select class="form-control select2-multiple ajax-categories {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
+                                <select
+                                    class="form-control select2-multiple ajax-categories {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
                                     name="category_id[]" id="category_id" multiple="multiple">
-
                                 </select>
                             </div>
                             <div class="form-group">
@@ -78,20 +79,23 @@
                                 <select
                                     class="form-control select2-single ajax-products {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
                                     name="product_id" id="product_id">
-
                                 </select>
                             </div>
                             <div class="form-group text-right ">
                                 <input type="button" class="btn btn-primary" id="generate" name="generate"
-                                    value="Generate" />
+                                       value="Generate"/>
                             </div>
 
                         </form>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-12 table-responsive" id="load">
-
+                    <div class="col-sm-12 table-responsive">
+                        <div class="col-sm-12 table-responsive">
+                            <img src="{{ asset('assets/backend/img/loader.png') }}"
+                                 style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                        </div>
+                        <div id="load"></div>
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
@@ -105,7 +109,7 @@
 @push('js')
 
     <script type="text/javascript">
-        $(function() {
+        $(function () {
             function formatMoney(n, c, d, t) {
                 var c = isNaN(c = Math.abs(c)) ? 0 : c,
                     d = d == undefined ? "." : d,
@@ -117,7 +121,7 @@
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
 
-            $('#generate').on("click", function() {
+            $('#generate').on("click", function () {
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
                 product_id = $('#product_id').val();
@@ -126,6 +130,7 @@
                 company_id = $('#company_id').val();
                 branch_id = $('#branch_id').val();
 
+                $('#img-loader').show();
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.store.ledger.reports') }}",
@@ -137,7 +142,8 @@
                         company_id: company_id,
                         branch_id: branch_id
                     }
-                }).done(function(data) {
+                }).done(function (data) {
+                    $('#img-loader').hide();
                     $("#load").html(data);
                     loadDataTable()
                 });

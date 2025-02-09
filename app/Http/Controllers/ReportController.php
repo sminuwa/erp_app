@@ -5166,26 +5166,30 @@ class ReportController extends Controller
     public function loadAccountBalance(Request $request)
     {
         $type = $request->account_type;
-
         $date = $request->date;
         $company_id = $request->company_id;
+
         $branch_id = $request->branch_id;
         if ($type == 'all' || $type == '')
             $type = '%';
-        if ($company_id == 'all' || $company_id == '') {
+
+        if ($company_id == 'all' || $company_id == '')
             $company_id = '%';
-        }
+
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
+
         if ($type == "GeneralAccount") {
             $query = GeneralAccountLedger::select(DB::raw('SUM(credit) AS credit'), DB::raw('SUM(debit) AS debit'), 'number', 'general_accounts.description', 'general_account_ledgers.id')
                 ->join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
                 ->where('general_account_ledgers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '<=', $date)
                 ->where('model_name', 'LIKE', 'GeneralAccount')
+                ->havingRaw('SUM(credit) <> SUM(debit)')
                 ->orderBy('number')
                 ->groupBy('model_id');
         }
+
         if ($type == "Customer") {
             $query = GeneralAccountLedger::select(DB::raw('SUM(credit) AS credit'), DB::raw('SUM(debit) AS debit'), 'code AS number', 'customers.name AS description', 'general_account_ledgers.id', 'users.name AS relation_officer')
                 ->join('customers', 'customers.id', '=', 'general_account_ledgers.model_id')
@@ -5193,6 +5197,7 @@ class ReportController extends Controller
                 ->where('general_account_ledgers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '<=', $date)
                 ->where('model_name', 'LIKE', 'Customer')
+                ->havingRaw('SUM(credit) <> SUM(debit)')
                 ->orderBy('code')
                 ->groupBy('model_id');
         }
@@ -5202,6 +5207,7 @@ class ReportController extends Controller
                 ->where('general_account_ledgers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '<=', $date)
                 ->where('model_name', 'LIKE', 'Supplier')
+                ->havingRaw('SUM(credit) <> SUM(debit)')
                 ->orderBy('code')
                 ->groupBy('model_id');
         }
@@ -5220,6 +5226,7 @@ class ReportController extends Controller
 
         if ($branch_id == '%' || $branch_id == '')
             $branch_id = 'all';
+
         return view('pages.reports.ap_ar.statements.load_account_balances', compact('ledgers', 'branch', 'type', 'date', 'company_id', 'branch_id', 'balance', 'credit_sum', 'debit_sum'));
     }
 

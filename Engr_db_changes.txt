@@ -683,6 +683,7 @@ UPDATE `permissions` SET `description` = 'Create-inter-branch-journal' WHERE `na
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 18/09/2024
 ALTER TABLE `proformer_details` CHANGE `store_product_id` `product_id` BIGINT(20) UNSIGNED NOT NULL, ADD COLUMN `store_id` BIGINT(20) NOT NULL AFTER `product_id`; 
 ALTER TABLE `proformer_details` DROP COLUMN `original_quantity_sold`, DROP COLUMN `sold_price`, DROP COLUMN `total`, DROP COLUMN `selling_price`, DROP COLUMN `avail_qty_before_sale`, CHANGE `cost_price` `unit_cost` DECIMAL(18,2) DEFAULT 0.00 NOT NULL; 
@@ -728,11 +729,16 @@ ALTER TABLE `purchases` ADD COLUMN `purchase_request_id` BIGINT UNSIGNED NULL AF
 =======
 =======
 >>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
+=======
+>>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
 ALTER TABLE `customers`
 ADD COLUMN `gender` ENUM('Male', 'Female', 'Other') COLLATE utf8mb4_unicode_ci DEFAULT NULL AFTER `phone`,
 ADD COLUMN `business_type` VARCHAR(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL AFTER `photo`,
 ADD COLUMN `business_age` VARCHAR(12) DEFAULT NULL AFTER `business_type`;
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
+=======
 >>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
 =======
 >>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029

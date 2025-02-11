@@ -40,7 +40,8 @@
     @foreach ($sales as $sale)
         <tr>
             <td>{{ \Carbon\Carbon::parse($sale->purchase_date)->toFormattedDateString() }}</td>
-            <td>{{ $sale->reference }}</td>
+            {{-- <td>{{ $sale->reference }}</td> --}}
+            <td><a href="{{ route('purchases.request.show',$sale->request_id) }}" target="_BLANK">{{ $sale->reference }}</a></td>
             <td>{{ $sale->product }}</td>
             <td style="text-align: right">{{ number_format($sale->unit_price, 2) }}</td>
             <td>{{ $sale->quantity }}</td>

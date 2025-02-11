@@ -38,7 +38,7 @@
         <tr>
             <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}</td>
             <td>{{ $sale->order->reference }}</td>
-            <td>{{ $sale->reference }}</td>
+            <td><a href="{{ route('credit.note.show',$sale->id) }}" target="_BLANK">{{ $sale->reference }}</a></td>
             <td>{{ $sale->customer->code }}</td>
             <td>{{ $sale->customer->name }}</td>
             <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}</td>

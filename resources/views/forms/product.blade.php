@@ -80,6 +80,7 @@
             <option value="TRK" {{ $model->unit == 'TRK' ? 'selected' : '' }}>TRK</option>
             <option value="TRP" {{ $model->unit == 'TRP' ? 'selected' : '' }}>TRP</option>
             <option value="Yrd" {{ $model->unit == 'Yrd' ? 'selected' : '' }}>Yrd</option>
+            <option value="PKT" {{ $model->unit == 'PKT' ? 'selected' : '' }}>PKT</option>
         </select>
         @if ($errors->has('unit'))
             <div class="invalid-feedback">

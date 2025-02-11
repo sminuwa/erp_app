@@ -24,7 +24,7 @@
     <style>
         @media print {
             @page {
-                size: A5;
+                size: A4;
                 margin: 10px;
             }
 

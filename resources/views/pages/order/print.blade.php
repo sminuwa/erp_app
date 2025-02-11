@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
@@ -24,7 +24,7 @@
     <style>
         @media print {
             @page {
-                size: A5;
+                size: A4;
                 margin: 10px;
             }
 
@@ -229,11 +229,7 @@
                                         Customer's Signature
                                     </td>
                                     <td style="border-style:none;text-align: center">
-                                        {{-- @php
-                                            $uc = substr($order->invoice_no, 0, 6) . substr($order->invoice_no, 6, 10) + 3000;
-                                        @endphp
-                                        {{ QrCode::size(100)->backgroundColor(255, 55, 0)->generate("$total\n$uc\n\n.") }} --}}
-                                    </td>
+                                   </td>
                                     <td colspan="4" style="text-align: right;border-style:none;"><span
                                             style='font-size:14px; border-style:none;'></span>
                                         Signature:
@@ -270,4 +266,208 @@
 </body>
 
 
+</html> --}}
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>Invoice - {{ config('app.name', 'Inventory Management System') }}</title>
+
+    <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="{{ asset('assets/backend/css/adminlte.min.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <link rel="icon" href="{{ asset('assets/backend/img/policymaker.ico') }}" type="image/x-icon" />
+
+    <style>
+        /* Print-specific styles */
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+
+            body {
+                background: #fff;
+                font-size: 12px;
+                margin: 0;
+                padding: 0;
+            }
+
+            .container-fluid {
+                width: 100%;
+                max-width: 210mm;
+                margin: auto;
+            }
+
+            .invoice {
+                padding: 15px;
+                border: 1px solid #ddd;
+                max-width: 210mm;
+                margin: auto;
+                background: #fff;
+            }
+
+            .table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .table th,
+            .table td {
+                border: 1px solid #ddd;
+                padding: 5px;
+                text-align: left;
+            }
+
+            .table th {
+                background-color: #f8f9fa;
+                font-weight: bold;
+            }
+
+            .text-center {
+                text-align: center;
+            }
+
+            .signature-line {
+                margin-top: 30px;
+                text-align: left;
+                font-weight: bold;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="invoice">
+                    <div class="row">
+                        <div class="col-11">
+                            <img src="{{ asset('assets/backend/img/logo.png') }}" style="width:100px;height:60px;" alt="logo">
+                            <span style="font-size:20px;">&nbsp;{{ App\Models\User::userBranchName()->long_name }}</span>
+                            <small class="float-right">Date: {{ date('l, d-M-Y h:i:s A') }}</small>
+                        </div>
+                    </div>
+
+                    <div class="row invoice-info">
+                        <div class="col-sm-4">
+                            <h5>HEAD OFFICE</h5>
+                            <address>
+                                {{ $company->address }}, {{ $company->city }} - {{ $company->zip_code }}, {{ $company->country }}<br>
+                                Phone: {{ $company->mobile }} {{ $company->phone !== null ? ', 0' . $company->phone : '' }}<br>
+                                Email: {{ $company->email }}
+                            </address>
+                        </div>
+
+                        <div class="col-sm-4 offset-3">
+                            <h5>BRANCH OFFICE</h5>
+                            <address>
+                                Address: {{ $order->branch?->address }}<br>
+                                Phone: {{ $order->branch->phone }}<br>
+                                Email: {{ $order->branch?->email }}
+                            </address>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <b>Customer Name:</b> {{ $order->customer->code }} - {{ $order->customer->name }}<br>
+                            <b>Address:</b> {{ $order->customer->address }}<br>
+                            <b>Phone:</b> {{ $order->customer->phone }}<br>
+                        </div>
+                        <div class="col-sm-3 text-center">
+                            {{ QrCode::size(70)->generate($order->total) }}<br>
+                            <span style="font-size:18px;">{{ $order->payment_mode }} Sales</span>
+                        </div>
+                        <div class="col-sm-4">
+                            <b>Invoice No:</b> {{ $order->reference }}<br>
+                            <b>Date:</b> {{ \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}<br>
+                            <b>Prepared By:</b> {{ $order->sold->name ?? '' }}<br>
+                            <b>Printed By:</b> {{ Auth::user()->name }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-11 table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>CODE</th>
+                                        <th>DESCRIPTION</th>
+                                        <th>QTY</th>
+                                        <th>UFM</th>
+                                        <th>STORE CODE</th>
+                                        <th>UNIT PRICE</th>
+                                        <th>TOTAL</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php $total = 0; @endphp
+                                    @foreach ($order_details as $order_detail)
+                                        <tr>
+                                            <td>{{ $order_detail->storeProduct->product->code }}</td>
+                                            <td>{{ $order_detail->storeProduct->product->name }}</td>
+                                            <td align="center">{{ $order_detail->quantity }}</td>
+                                            <td align="center">{{ $order_detail->unit }}</td>
+                                            <td>{{ $order_detail->storeProduct->store->code }}</td>
+                                            <td align="right">&#8358;{{ number_format($order_detail->sold_price, 2) }}</td>
+                                            <td align="right">&#8358;{{ number_format($order_detail->sold_price * $order_detail->quantity, 2) }}</td>
+                                        </tr>
+                                        @php $total += ($order_detail->sold_price * $order_detail->quantity); @endphp
+                                    @endforeach
+                                </tbody>
+                            </table>
+
+                            <table class="table">
+                                <tr>
+                                    <th>Sub Total:</th>
+                                    <td align="right">&#8358;{{ number_format($total, 2) }}</td>
+                                </tr>
+                                @if ($order->discount != 0)
+                                    <tr>
+                                        <th>Discount:</th>
+                                        <td align="right">&#8358;{{ number_format($order->discount, 2) }}</td>
+                                    </tr>
+                                @endif
+                                <tr>
+                                    <th>Total Amount:</th>
+                                    <td align="right">
+                                        &#8358;{{ number_format(($total - $order->discount), 2) }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">Amount in Words:
+                                        <span>{{ $utility->convertNumberToWords($total - $order->discount) }} Naira</span>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p>Goods received in good condition cannot be returned.<br>Sales invalidated if goods not taken within two (2) days.</p>
+
+                            <div class="signature-line">
+                                ___________________________<br>Customer's Signature
+                            </div>
+                            <div class="signature-line text-right">
+                                ___________________________<br>For: {{ App\Models\User::UserBranchName()->long_name }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.print();
+    </script>
+</body>
 </html>
+

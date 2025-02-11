@@ -15,6 +15,7 @@ use App\Models\Setting;
 use App\Models\StoreProduct;
 use App\Models\User;
 use App\Models\Utility;
+use Darryldecode\Cart\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -229,17 +230,15 @@ class CreditNoteController extends Controller
     public function searchCreditNote(Request $request)
     {
         $search_value = $request->refno;
-
         $payments = Order::where('status', 1)
             ->where('reference', 'LIKE', "%$search_value%")
             ->where('branch_id', 'LIKE', User::userBranchAction())
-            ->whereNotIn('id', DB::table('credit_notes')->pluck('order_id')->toArray())
+            ->whereNotIn('invoice_no', DB::table('credit_notes')->select('invoice_no')->pluck('invoice_no')->toArray())
             ->orderBy('id', 'DESC')->get();
         return view('pages.suppliers.credit_note', ['payments' => $payments]);
     }
     public function printCreditnoteReceipt(CreditNote $credit_note)
     {
-
         $order = CreditNote::with('customer')->where('id', $credit_note->id)->first();
         //return $order;
         $order_details = CreditNoteDetail::with('storeProduct')->where(['credit_note_id' => $credit_note->id, 'status' => 1])->get();
@@ -248,19 +247,22 @@ class CreditNoteController extends Controller
         $company = Setting::find(1);
         $utility = new Utility();
         return view('pages.inventories.credit_notes.print', compact('order_details', 'order', 'company', 'utility','credit_note'));
-
     }
     public function loadInvoices(Request $request)
     {
         $word_search = $request->search;
         if (strlen($word_search) > 0) {
+            $credit_notes = DB::table('credit_notes')->select('order_id')->pluck('order_id')->toArray();
             $orders = Order::where('status', 1)
-                ->where('invoice_no', 'LIKE', "%$word_search%")
-                ->where('branch_id', 'LIKE', User::userBranchAction())
-                ->orderBy('order_date', 'DESC')->get();
+            ->where('reference', 'LIKE', "%$word_search%")
+            ->where('branch_id', 'LIKE', User::userBranchAction())
+            ->whereNotIn('orders.id', $credit_notes)
+            ->orderBy('order_date', 'DESC')->get();
+            
         } else {
             $orders = Order::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('order_date', 'DESC')->take(20)->get();
         }
+        // return $orders;
         return view('pages.inventories.credit_notes.load_order_invoices', ['orders' => $orders]);
     }
     public function loadToCart(Request $request)
@@ -268,9 +270,11 @@ class CreditNoteController extends Controller
         $reference = $request->reference;
         $order = Order::where('reference', $reference)->first();
         $order_items = OrderDetail::where('order_id', $order->id)->where('status', 1)->get();
+        // return $order_items;
         \Cart::clear();
         foreach ($order_items as $data) {
             $qty = $data->quantity == 0 ? 1 : $data->quantity;
+            // return $qty;
             \Cart::add([
                 'id' => $data->store_product_id,
                 'name' => $data->storeProduct->product->name ?? 'No name found',
@@ -286,7 +290,9 @@ class CreditNoteController extends Controller
                 ),
             ]);
         }
+        // Cart::getContent();
         $cart_products = \Cart::getContent();
+        return $cart_products;
         return view('pages.inventories.credit_notes.load_products', ['cart_products' => $cart_products, 'reference' => $reference, 'order' => $order]);
     }
     public function addToCart(Request $request)

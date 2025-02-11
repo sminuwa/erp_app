@@ -78,9 +78,9 @@
                                         <td>{{ $sale->reference }}</td>
                                         <td>{{ $sale->supplier->code }}</td>
                                         <td>{{ $sale->invoice_no }}</td>
-                                        <td>{{ $sale->createdBy->name ?? '' }}</td>
                                         <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}
                                         </td>
+                                        <td>{{ $sale->createdBy->name ?? '' }}</td>
                                         <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}
                                         </td>
                                         <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>

@@ -1,7 +1,7 @@
 <div class="row">
     <div class="offset-10">
         <a href="{{ route('ajax.most.sold.item.print', [$from_date, $to_date, $company_id,$branch_id, $type, $number_limit]) }}"
-            target="_BLANK" class="btn-success btn btn-sm">Print</a>
+           target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
 <table class="display table table-bordered caption" id="example1" data-ordering="false">
@@ -16,20 +16,22 @@
         </h5>
     </caption>
     <thead>
-        <tr>
-            <th style="width: 50%" colspan="3">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
-            </th>
-            <th style="width: 50%;text-align:right" colspan="3">Processed By {{ auth()->user()->name }}</th>
-        </tr>
-        <tr>
-            <th>CODE</th>
-            <th>PRODUCT</th>
-            <th>QUANTITY</th>
-            <th>COST</th>
-            <th>SALES</th>
-            <th>MARGIN</th>
+    <tr>
+        <th style="width: 50%" colspan="3">Date
+            Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+        </th>
+        <th style="width: 50%;text-align:right" colspan="4">Processed By {{ auth()->user()->name }}</th>
+    </tr>
+    <tr>
+        <th>CODE</th>
+        <th>PRODUCT</th>
+        <th>QUANTITY</th>
+        <th>UNIT</th>
+        <th>COST</th>
+        <th>SALES</th>
+        <th>MARGIN</th>
 
-        </tr>
+    </tr>
     </thead>
     @php
         $total_quantity = 0;
@@ -41,6 +43,7 @@
             <td>{{ $sale->code }}</td>
             <td>{{ $sale->item }}</td>
             <td style="text-align: right">{{ $sale->quantity }}</td>
+            <td>{{ $sale->item_unit }}</td>
             <td style="text-align: right">{{ number_format($sale->total_cost, 2, '.', ',') }}</td>
             <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>
             <td style="text-align: right">{{ number_format($sale->total - $sale->total_cost, 2, '.', ',') }}</td>
@@ -53,16 +56,16 @@
         @endphp
     @endforeach
     <tfoot>
-        <tr>
-            <th style="text-align: right"  colspan="3">TOTAL</th>
-            <th style="text-align: right">
-                {{ number_format($total_cost, 0, '.', ',') }}</th>
-            <th style="text-align: right">
-                {{ number_format($total_amount, 2, '.', ',') }}
-            </th>
-            <th style="text-align: right">
-                {{ number_format($total_amount-$total_cost, 2, '.', ',') }}
-            </th>
-        </tr>
+    <tr>
+        <th style="text-align: right" colspan="4">TOTAL</th>
+        <th style="text-align: right">
+            {{ number_format($total_cost, 0, '.', ',') }}</th>
+        <th style="text-align: right">
+            {{ number_format($total_amount, 2, '.', ',') }}
+        </th>
+        <th style="text-align: right">
+            {{ number_format($total_amount-$total_cost, 2, '.', ',') }}
+        </th>
+    </tr>
     </tfoot>
 </table>

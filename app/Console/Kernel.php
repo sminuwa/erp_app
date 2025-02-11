@@ -19,20 +19,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->call(function () {
-            $datas = StoreProduct::all(['id', 'qty_available']);
-            foreach ($datas as $data) {
-                DB::table('store_product_balances')->updateOrInsert(['date'=>date('Y-m-d'),'store_product_id' => $data->id],[
-                    'date' => date('Y-m-d'),
-                    'qty' => $data->qty_available,
-                    'store_product_id' => $data->id,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ]);
-            }
-        })->daily();
+       
         $schedule->command('auth:clear-resets')->daily();
-        $schedule->command('database:backup')->daily();
+        //$schedule->command('database:backup')->daily();
+        $schedule->command('backup:run')->dailyAt('02:00'); 
     }
 
     /**

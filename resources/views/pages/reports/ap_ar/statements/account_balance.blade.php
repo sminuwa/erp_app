@@ -44,7 +44,7 @@
                                     <div class="form-group">
                                         <label for="type">Account Type</label>
                                         <select class="form-control {{ $errors->has('type') ? ' is-invalid' : '' }}"
-                                            name="type" id="type" required="required">
+                                                name="type" id="type" required="required">
                                             <option value="">Select...</option>
                                             <option value="Customer">
                                                 Customer
@@ -65,14 +65,13 @@
                                 <div class="form-group">
                                     <label for="company_id">Company</label>
                                     <select class="form-control select2-single ajax-companies" name="company_id"
-                                        id="company_id">
+                                            id="company_id">
                                     </select>
-
                                 </div>
                                 <div class="form-group">
                                     <label for="branch_id">Branch</label>
                                     <select class="form-control select2-single ajax-branches" name="branch_id"
-                                        id="branch_id">
+                                            id="branch_id">
                                     </select>
 
                                 </div>
@@ -80,8 +79,8 @@
                                     <div class="form-group">
                                         <label for="date">Date</label>
                                         <input type="text" autocomplete="off" name="date" id="date"
-                                            class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
-                                            value="{{ old('date') }}" placeholder="" required>
+                                               class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
+                                               value="{{ old('date') }}" placeholder="" required>
                                     </div>
                                 </div>
 
@@ -89,13 +88,19 @@
 
                             <div class="text-right form-group col-sm-12">
                                 <input type="button" class="btn btn-primary" id="generate" name="generate"
-                                    value="Generate" />
+                                       value="Generate"/>
                             </div>
                         </form>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-12 table-responsive" id="load"></div>
+                    <div class="col-sm-12 table-responsive">
+                        <div class="col-sm-12 table-responsive">
+                            <img src="{{ asset('assets/backend/img/loader.png') }}"
+                                 style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                        </div>
+                        <div id="load"></div>
+                    </div>
                 </div>
             </div><!-- /.container-fluid -->
         </section>
@@ -107,7 +112,7 @@
 
 @push('js')
     <script type="text/javascript">
-        $(function() {
+        $(function () {
             function formatMoney(n, c, d, t) {
                 var c = isNaN(c = Math.abs(c)) ? 2 : c,
                     d = d == undefined ? "." : d,
@@ -120,7 +125,7 @@
             };
 
 
-            $('#generate').on("click", function() {
+            $('#generate').on("click", function () {
                 date = $('#date').val();
                 account_type = $('#type').val();
                 company_id = $('#company_id').val();
@@ -131,6 +136,7 @@
                     return false;
                 }
 
+                $('#img-loader').show();
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.account.balance.report') }}",
@@ -138,11 +144,11 @@
                         _token: "{{ csrf_token() }}",
                         date: date,
                         account_type: account_type,
-                        company_id:company_id,
+                        company_id: company_id,
                         branch_id: branch_id,
                     }
-                }).done(function(data) {
-
+                }).done(function (data) {
+                    $('#img-loader').hide();
                     $("#load").html(data);
                     loadDataTable()
                 });

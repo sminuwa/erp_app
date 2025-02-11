@@ -68,4 +68,16 @@ class Supplier extends Model
     {
         return $query->where('suppliers.status', 1);
     }
+
+    public static function generateNewCode($type="MS", $length = 5)
+    {
+        $prefix = $type;
+        $record = self::where('code', 'like', '%' . $prefix . '%')->orderBy('code', 'desc')->first();
+        if ($record) {
+            $code = $record->code;
+            $new = intval(substr($code, strlen($prefix))) + 1;
+            return $prefix . str_pad($new, $length, 0, STR_PAD_LEFT);
+        }
+        return $prefix . str_pad(1, $length, 0, STR_PAD_LEFT);
+    }
 }

@@ -53,7 +53,8 @@
                         <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="company_id">Company</label>
-                            <select class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
+                            <select
+                                class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
                                 name="company_id" id="company_id" required>
 
                             </select>
@@ -69,7 +70,7 @@
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp;
-                            <label for="supplier_id">Supplier/Transporter</label>
+                            <label for="supplier_id">Suppliers/Transporter</label>
                             <select
                                 class="form-control select2-single ajax-suppliers {{ $errors->has('supplier_id') ? ' is-invalid' : '' }}"
                                 name="supplier_id" id="supplier_id">
@@ -110,6 +111,12 @@
     <!-- Sweet Alert Js -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>
     <script type="text/javascript">
+        $(document).ready(function() {
+            $('.datepicker3').datepicker({
+                minDate: null, // Allow any past date
+                dateFormat: 'yy-mm-dd' // Set your preferred date format
+            });
+        });
         $(function() {
             function formatMoney(n, c, d, t) {
                 var c = isNaN(c = Math.abs(c)) ? 0 : c,
@@ -121,9 +128,6 @@
                 return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ?
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
-
-
-
 
             $('#generate').on("click", function() {
                 from_date = $('#from_date').val();

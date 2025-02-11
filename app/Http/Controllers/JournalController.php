@@ -138,9 +138,10 @@ class JournalController extends Controller
             $journal->posted_by = auth()->id();
             $account_details = [];
             $debit = $credit = 0;
+            // return $journal->items;
             foreach ($journal->items as $item) {
-                $debit += intval($item->debit);
-                $credit += intval($item->credit);
+                $debit += $item->debit;
+                $credit += $item->credit;
                 $account_details[] = [
                     'account_id' => $item->account_id,
                     'branch_id' => $item->branch_id,
@@ -150,10 +151,11 @@ class JournalController extends Controller
                 ];
             }
             
-//            return Transaction::journal($account_details, $journal->reference, $journal->date);
-            if ((round($debit) == round($credit)))
+            //return Transaction::journal($account_details, $journal->reference, $journal->date);
+            // return $debit.' - '.$credit;
+            if ((round($debit) != round($credit)))
                 return back()->with('error', 'Cannot post journal. Make sure total debit and credit are equal.');
-            //        return Transaction::journal($account_details,$journal->reference,$journal->date);
+            //return Transaction::journal($account_details,$journal->reference,$journal->date);
             //return $debit - $credit;
             if ($journal->save()) {
                 if (Transaction::journal($account_details, $journal->reference, $journal->date)) {

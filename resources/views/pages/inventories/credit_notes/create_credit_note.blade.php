@@ -197,6 +197,7 @@
                         search: searchText
                     },
                     success: function(response) {
+                        console.log(response)
                         if (response == null)
                             $('#table-body').html("");
                         $('#table-body').html(response);
@@ -227,10 +228,11 @@
                         reference: reference
                     },
                     success: function(response) {
+                        console.log(response)
                         $('#load').html(response);
                     },
                     error: function(error) {
-                        // console.log(error);
+                        console.log(error);
                     }
                 });
             });

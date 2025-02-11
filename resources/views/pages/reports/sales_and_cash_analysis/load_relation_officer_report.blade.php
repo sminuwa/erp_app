@@ -15,36 +15,66 @@
             $grand_total_profit = 0;
         @endphp
 
-        @foreach ($salesByOfficer as $roId => $officerSales)
-            @php
-                $officer_total_amount = 0;
-                $officer_total_cost = 0;
-                $officer_total_profit = 0;
-            @endphp
-
-            <div class="row">
-                <div class="col-md-12 mt-3">
-                    <h4>{{ $officerSales->first()->ro_code }} - {{ $officerSales->first()->user_name }}</h4>
-                </div>
+        @if($is_summary)
+            <div class="col-md-12 table-responsive">
+                <table class="display table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Relation Officer</th>
+                        <th>Company</th>
+                        <th>Branch</th>
+                        <th>Quantity Sold</th>
+                        <th>Total Amount</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($salesByOfficer as $sales)
+                        @php $grand_total_amount+= $sales->total_amount; @endphp
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $sales->ro_code }} - {{ $sales->ro_name }}</td>
+                            <td>{{ $sales->company_name }}</td>
+                            <td>{{ $sales->branch_name }}</td>
+                            <td>{{ number_format($sales->total_quantity,2) }}</td>
+                            <td>{{ number_format($sales->total_amount,2) }}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
             </div>
+        @else
+            @foreach ($salesByOfficer as $roId => $officerSales)
+                @php
+                    $officer_total_amount = 0;
+                    $officer_total_cost = 0;
+                    $officer_total_profit = 0;
+                @endphp
 
-            <div class="row">
-                <div class="col-md-12 table-responsive">
-                    <table class="display table table-bordered table-striped">
-                        <thead>
+                <div class="row">
+                    <div class="col-md-12 mt-3">
+                        <h4>{{ $officerSales->first()->ro_code }} - {{ $officerSales->first()->user_name }}</h4>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 table-responsive">
+                        <table class="display table table-bordered table-striped">
+                            <thead>
                             <tr>
                                 <th>CODE</th>
                                 <th>CATEGORY</th>
                                 <th>BRANCH</th>
                                 <th>QTY AVAILABLE</th>
                                 <th>QTY SOLD</th>
+                                <th>UNIT</th>
                                 <th>AMOUNT</th>
                                 <th>COST</th>
                                 <th>MARGIN</th>
                                 <th>MARGIN (%)</th>
                             </tr>
-                        </thead>
-                        <tbody>
+                            </thead>
+                            <tbody>
                             @foreach ($officerSales as $sale)
                                 @php
                                     $profit = $sale->amount - $sale->cost;
@@ -58,6 +88,7 @@
                                     <td>{{ $sale->branch_code }}</td>
                                     <td style="text-align: right">{{ number_format($sale->qty_available, 6) }}</td>
                                     <td style="text-align: right">{{ number_format($sale->quantity, 6) }}</td>
+                                    <td style="text-align: right">{{ $sale->product_unit }}</td>
                                     <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}</td>
                                     <td style="text-align: right">{{ number_format($sale->cost, 2, '.', ',') }}</td>
                                     <td style="text-align: right">
@@ -68,8 +99,8 @@
                                     </td>
                                 </tr>
                             @endforeach
-                        </tbody>
-                        <tfoot>
+                            </tbody>
+                            <tfoot>
                             <tr>
                                 <th colspan="5" style="text-align: right">OFFICER TOTAL</th>
                                 <th style="text-align: right">{{ number_format($officer_total_amount, 2, '.', ',') }}</th>
@@ -81,33 +112,42 @@
                                     {{ $officer_total_amount != 0 ? number_format(($officer_total_profit / $officer_total_amount) * 100, 2) : 0 }}
                                 </th>
                             </tr>
-                        </tfoot>
-                    </table>
+                            </tfoot>
+                        </table>
+                    </div>
                 </div>
-            </div>
 
-            @php
-                $grand_total_amount += $officer_total_amount;
-                $grand_total_cost += $officer_total_cost;
-                $grand_total_profit += $officer_total_profit;
-            @endphp
-        @endforeach
+                @php
+                    $grand_total_amount += $officer_total_amount;
+                    $grand_total_cost += $officer_total_cost;
+                    $grand_total_profit += $officer_total_profit;
+                @endphp
+            @endforeach
+        @endif
 
         <div class="row">
             <div class="col-md-12 mt-3 table-responsive">
                 <table class="display table table-bordered table-striped">
                     <tfoot>
-                        <tr>
-                            <th colspan="5" style="text-align: right">GRAND TOTAL</th>
+                    <tr>
+                        <th colspan="5" style="text-align: right">GRAND TOTAL</th>
+                        @if(!$is_summary)
                             <th style="text-align: right">{{ number_format($grand_total_amount, 2, '.', ',') }}</th>
                             <th style="text-align: right">{{ number_format($grand_total_cost, 2, '.', ',') }}</th>
                             <th style="text-align: right">
                                 {{ $grand_total_profit < 0 ? '(' . number_format(abs($grand_total_profit), 2, '.', ',') . ')' : number_format($grand_total_profit, 2) }}
                             </th>
+                        @endif
+                        @if($is_summary)
+                            <th style="text-align: right">
+                                {{ number_format($grand_total_amount, 2) }}
+                            </th>
+                        @else
                             <th style="text-align: right">
                                 {{ $grand_total_amount != 0 ? number_format(($grand_total_profit / $grand_total_amount) * 100, 2) : 0 }}
                             </th>
-                        </tr>
+                        @endif
+                    </tr>
                     </tfoot>
                 </table>
             </div>

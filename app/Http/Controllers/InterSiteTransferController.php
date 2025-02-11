@@ -92,6 +92,7 @@ class InterSiteTransferController extends Controller
                         $stock_card->date = $intersite->date;
                         $stock_card->user_id = auth()->id();
                         $stock_card->priority = 4;
+                        $stock_card->save();
                     }
                 }
                 if (Transaction::intersite_post($intersite->id)['status']) {
@@ -195,7 +196,7 @@ class InterSiteTransferController extends Controller
                     $new_cost_price,
                     $intersite->reference,
                     $user->branch->id,
-                    $intersite->date,
+                    date('Y-m-d'),
                     TRANSACTION_TYPE_INTERSITE
                 );
             }

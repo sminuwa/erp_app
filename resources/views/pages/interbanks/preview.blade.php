@@ -38,9 +38,9 @@
                         <div class="row no-print">
                             <div class="col-md-12 text-right">
 
-                                <a href="javascript:history.back()" class="btn btn-warning btn-sm">
+                                {{-- <a href="javascript:history.back()" class="btn btn-warning btn-sm">
                                     <i class="fa fa-arrow-left"></i> Back
-                                </a>
+                                </a> --}}
                                 @can('create.interbank')
                                     <a href="{{ route('create.interbank') }}" class="btn btn-secondary btn-sm ">
                                         <i class="fa fa-plus-circle" aria-hidden="true"></i> New Transfer

@@ -109,7 +109,14 @@
                                                 <td>{{ Carbon\Carbon::parse($order->created_at)->toFormattedDateString() }}
                                                 </td>
                                                 
-                                                <td>@if($order->has_credit_note > 0) reversed @endif</td>
+                                                <td>@if($order->has_credit_note > 0) 
+                                                    Reversed
+                                                    @elseif($order->status==1)
+                                                        Completed
+                                                    @else
+                                                        Pending 
+                                                    @endif
+                                                </td>
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button"
@@ -214,10 +221,9 @@
                                             <th style="text-align:right">&#8358;{{ number_format($total, 2, '.', ',') }}
                                             </th>
                                             <th style="text-align:right">
-                                                &#8358;{{ number_format($total_pay, 2, '.', ',') }}</th>
-                                            <th style="text-align:right">
-                                                &#8358;{{ number_format($total_due, 2, '.', ',') }}</th>
-                                            <th>Due Date</th>
+                                                Created By
+                                            </th>
+                                            <th>Date</th>
                                             <th>Status</th>
                                             <th>Actions</th>
                                         </tr>

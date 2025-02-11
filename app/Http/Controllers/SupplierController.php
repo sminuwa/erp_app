@@ -80,9 +80,11 @@ class SupplierController extends Controller
       * @param  Store  $request
       * @return \Illuminate\Http\Response
       */
-    public function store(Store $request)
+    public function store(Request $request)
     {
+    
         $model = new Supplier;
+        $model->code = Supplier::generateNewCode($request->type);
         $model->fill($request->all());
 
         if ($model->save()) {

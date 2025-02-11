@@ -91,7 +91,7 @@
                                         @elseif(isset($model) && $model->model_name == 'Supplier')
                                             <?php $payers = \App\Models\Supplier::orderBy('code', 'asc')->get(); ?>
                                         @else
-                                            <?php $payers = \App\Models\GeneralAccount::orderBy('number', 'asc')->get(); ?>
+                                            <?php $payers = \App\Models\GeneralAccount::active()->orderBy('number', 'asc')->get(); ?>
                                         @endif
                                         <select
                                             class="form-control select2-single {{ $errors->has('payer_id') ? ' is-invalid' : '' }}"

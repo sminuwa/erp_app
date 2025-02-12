@@ -182,7 +182,8 @@ class CreditNoteController extends Controller
     }
     public function show($id)
     {
-        $order = CreditNote::with('customer','credit_note_items')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
+        $order = CreditNote::with('customer','credit_note_items')->where('id', $id)->first();
+        //$order = CreditNote::with('customer','credit_note_items')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
 //        $order_details = CreditNoteDetail::with('storeProduct')->where(['credit_note_id' => $id, 'status' => 1])->get();
         $order_details = $order->credit_note_items;
 

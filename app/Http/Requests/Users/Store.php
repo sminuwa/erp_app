@@ -33,6 +33,7 @@ class Store extends FormRequest
 			'user_code' => 'required|unique:users,user_code|max:15',
 			'branch_id' => 'required|numeric',
 			'status' => 'required|boolean',
+            'is_sale_representative' => 'required|boolean',
         ];
     }
 

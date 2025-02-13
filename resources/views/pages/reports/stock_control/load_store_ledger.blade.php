@@ -14,7 +14,7 @@
         <th style="width: 50%" colspan="4">Date
             Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
         </th>
-        <th style="width: 50%;text-align:right" colspan="3">Processed By {{ auth()->user()->name }}</th>
+        <th style="width: 50%;text-align:right" colspan="4">Processed By {{ auth()->user()->name }}</th>
     </tr>
     <tr>
         <th>BRANCH</th>
@@ -22,6 +22,7 @@
         <th>PRODUCT NAME</th>
         <th>CATEGORY NAME</th>
         <th>QUANTITY</th>
+        <th>UNIT</th>
         <th>COST PRICE</th>
         <th>TOTAL PRICE</th>
     </tr>
@@ -38,6 +39,7 @@
             <td>{{ $store->code }} - {{ $store->name }} </td>
             <td> {{ $store->category }} </td>
             <td> {{ number_format(round($store->qty_available, 6), 6) }} </td>
+            <td>{{ $store->product_unit }}</td>
             <td style="text-align: right;">
                 {{ number_format(remove_non_numeric($store->cost_price), 2) }} </td>
             <td style="text-align: right;">
@@ -47,7 +49,7 @@
     @endforeach
     <tfoot>
     <tr>
-        <th style="text-align: right" colspan="6">TOTAL</th>
+        <th style="text-align: right" colspan="7">TOTAL</th>
         <th>{{ currency_sign() . number_format($grantTotal,2) }}</th>
     </tr>
     </tfoot>

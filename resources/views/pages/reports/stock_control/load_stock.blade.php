@@ -1,7 +1,7 @@
 <div class="row">
     <div class="offset-10">
         <a href="{{ route('ajax.current.stock.report.print', [$company_id,$branch_id, $store_id, is_array($category_id) ? implode(',', $category_id) : $category_id, $product_id]) }}"
-            target="_BLANK" class="btn-success btn btn-sm">Print</a>
+           target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
 <div class="table-responsive">
@@ -12,26 +12,27 @@
             <h5 style="text-align: center;">CURRENT STOCK REPORT </h5>
         </caption>
         <thead>
-            <tr>
-                <th style="width: 50%" colspan="6">Date Processed:
-                    {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
-                </th>
-                <th style="width: 50%;text-align:right" colspan="6">Processed By {{ auth()->user()->name }}</th>
-            </tr>
-            <tr>
-                <th>BRANCH</th>
-                <th>STORE</th>
-                <th>PRODUCT</th>
-                <th>QTY</th>
-                <th>COST PRICE</th>
-                <th>R PRICE</th>
-                <th>W PRICE</th>
-                <th>TOTAL COST</th>
-                <th>TOTAL R</th>
-                <th>TOTAL W</th>
-                <th>R MARGIN</th>
-                <th>W MARGIN</th>
-            </tr>
+        <tr>
+            <th style="width: 50%" colspan="6">Date Processed:
+                {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            </th>
+            <th style="width: 50%;text-align:right" colspan="7">Processed By {{ auth()->user()->name }}</th>
+        </tr>
+        <tr>
+            <th>BRANCH</th>
+            <th>STORE</th>
+            <th>PRODUCT</th>
+            <th>QTY</th>
+            <th>UNIT</th>
+            <th>COST PRICE</th>
+            <th>R PRICE</th>
+            <th>W PRICE</th>
+            <th>TOTAL COST</th>
+            <th>TOTAL R</th>
+            <th>TOTAL W</th>
+            <th>R MARGIN</th>
+            <th>W MARGIN</th>
+        </tr>
         </thead>
         @foreach ($stores as $store)
             <tr>
@@ -39,6 +40,7 @@
                 <td>{{ $store->store_code }} </td>
                 <td> {{ $store->product_code }} - {{ $store->name }} </td>
                 <td> {{ number_format(round($store->qty_available, 6), 6) }} </td>
+                <td>{{ $store->product_unit }}</td>
                 @php $cost_price = $store->cost_price; @endphp
                 <td style="text-align: right;"> {{ number_format($cost_price, 2) }}</td>
                 <td style="text-align: right;">
@@ -70,6 +72,7 @@
             </tr>
         @endforeach
         <tfoot>
+        <tr>
             <th></th>
             <th></th>
             <th></th>
@@ -82,6 +85,8 @@
             <th></th>
             <th></th>
             <th></th>
+            <th></th>
+        </tr>
         </tfoot>
     </table>
 </div>

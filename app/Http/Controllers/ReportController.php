@@ -70,6 +70,7 @@ class ReportController extends Controller
         $query = IntersiteTransfer::select(
             'products.name AS product_name',
             'products.code AS product_code',
+            'products.unit AS product_unit',
             'quantity',
             'cost_price',
             'reference',
@@ -198,6 +199,7 @@ class ReportController extends Controller
         $query = InterstoreTransfer::select(
             'products.name AS product_name',
             'products.code AS product_code',
+            'products.unit AS product_unit',
             'quantity',
             'reference',
             'source_store_id',
@@ -332,7 +334,7 @@ class ReportController extends Controller
         if ($product_id == "all" || $product_id == "")
             $product_id = "%";
 
-        $records = StockCard::select('date', 'branch_id', 'cr', 'dr', 'products.name AS product_name', 'products.code AS product_code', 'branches.code AS branch_code', 'refno', 'stores.code AS store_code')
+        $records = StockCard::select('date', 'branch_id', 'cr', 'dr', 'products.name AS product_name', 'products.code AS product_code', 'products.unit AS product_unit', 'branches.code AS branch_code', 'refno', 'stores.code AS store_code')
             ->join('products', 'products.id', 'stock_cards.product_id')
             ->join('stores', 'stores.id', 'stock_cards.store_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
@@ -527,6 +529,7 @@ class ReportController extends Controller
             ->selectRaw(
                 "products.name,
             products.code AS product_code,
+            products.unit AS product_unit,
             stores.code as store_code,
             store_products.qty_available,
             (SELECT bpp.branch_id
@@ -867,6 +870,7 @@ class ReportController extends Controller
             ->selectRaw("
             products.name,
             products.code,
+            products.unit as product_unit,
             stores.code as store,
             store_products.qty_available,
             (SELECT bpp.retail_selling_price
@@ -1129,7 +1133,7 @@ class ReportController extends Controller
         }
 
         $stores = DB::table('stock_adjustments')
-            ->selectRaw("products.name, products.code, stores.name as store, quantity, date, reference, operation, stock_adjustments.created_at,
+            ->selectRaw("products.name, products.code, products.unit as product_unit, stores.name as store, quantity, date, reference, operation, stock_adjustments.created_at,
                 (SELECT name FROM users WHERE id = stock_adjustments.created_by LIMIT 1) as created_by,
                 (SELECT name FROM users WHERE id = stock_adjustments.posted_by LIMIT 1) as posted_by")
             ->join('stock_adjustment_details', 'stock_adjustment_details.stock_adjustment_id', 'stock_adjustments.id')
@@ -1503,6 +1507,7 @@ class ReportController extends Controller
             ->select(
                 'categories.name as category',
                 'categories.code as category_code',
+                'order_details.unit as product_unit',
                 DB::raw('SUM(order_details.quantity) as quantity'),
                 DB::raw('SUM(order_details.total) as amount'),
                 DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
@@ -1778,6 +1783,7 @@ class ReportController extends Controller
             ->select(
                 'categories.name as category',
                 'categories.code as category_code',
+                'order_details.unit as product_unit',
                 DB::raw('SUM(order_details.quantity) as quantity'),
                 DB::raw('SUM(order_details.total) as amount'),
                 DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
@@ -1964,7 +1970,7 @@ class ReportController extends Controller
             $staff_id = '%';
         }
         $sales = DB::table('orders')
-            ->select('customers.code AS customer', 'orders.reference', 'products.name AS product', 'stores.code AS store', 'order_details.quantity', 'sold_price', 'cost_price', 'users.user_code AS user', 'users.name AS name', 'order_date')
+            ->select('customers.code AS customer', 'orders.reference', 'products.name AS product', 'order_details.unit as product_unit', 'stores.code AS store', 'order_details.quantity', 'sold_price', 'cost_price', 'users.user_code AS user', 'users.name AS name', 'order_date')
             ->join('order_details', 'order_details.order_id', 'orders.id')
             ->join('store_products', 'store_products.id', 'order_details.store_product_id')
             ->join('customers', 'customers.id', 'orders.customer_id')
@@ -2519,6 +2525,7 @@ class ReportController extends Controller
             'dr',
             'products.name AS product_name',
             'products.code AS product_code',
+            'products.unit AS product_unit',
             'branches.code AS branch_code',
             'refno',
             'stores.code AS store_code',

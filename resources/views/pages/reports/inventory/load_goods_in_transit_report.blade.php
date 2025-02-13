@@ -40,7 +40,8 @@
     @foreach ($sales as $sale)
         <tr>
             <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}</td>
-            <td>{{ $sale->reference }}</td>
+            {{-- <td>{{ $sale->reference }}</td> --}}
+            <td><a href="{{ route('intersite.show',$sale->transfer_id) }}" target="_BLANK">{{ $sale->reference }}</a></td>
             <td>{{ $sale->source }}</td>
             <td>{{ $sale->destination }}</td>
             <td>{{ $sale->code }}</td>

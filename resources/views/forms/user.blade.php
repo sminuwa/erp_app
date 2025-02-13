@@ -76,7 +76,24 @@
             </div>
         @endif
     </div>
-
+    <div class="form-group">
+        <label for="is_sale_representative">RO</label>
+        <div class="form-control {{ $errors->has('is_sale_representative') ? ' is-invalid' : '' }}">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="is_sale_representative" id="is_sale_representative-yes" value="1" {{ old('is_sale_representative', $model->is_sale_representative) == 1 ? 'checked' : '' }}>
+                <label class="form-check-label" for="is_sale_representative-yes">Yes</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="is_sale_representative" id="is_sale_representative-no" value="0" {{ old('is_sale_representative', $model->is_sale_representative) == 0 ? 'checked' : '' }}>
+                <label class="form-check-label" for="is_sale_representative-no">No</label>
+            </div>
+        </div>
+        @if ($errors->has('is_sale_representative'))
+            <div class="invalid-feedback">
+                <strong>{{ $errors->first('is_sale_representative') }}</strong>
+            </div>
+        @endif
+    </div>
     <div class="form-group">
         <label for="status">Account Status</label>
         <select type="text" class="form-control {{ $errors->has('status') ? ' is-invalid' : '' }}" name="status"

@@ -39,7 +39,8 @@
     @foreach ($sales as $sale)
         <tr>
             <td>{{ \Carbon\Carbon::parse($sale->purchase_date)->toFormattedDateString() }}</td>
-            <td>{{ $sale->reference }}</td>
+            {{-- <td>{{ $sale->reference }}</td> --}}
+            <td><a href="{{ route('purchase.additional-invoice.print',$sale->purchase_id) }}" target="_BLANK">{{ $sale->reference }}</a></td>
             <td>{{ $sale->branch }}</td>
             <td>{{ $sale->description }}</td>
             <td>{{ $sale->wbno }}</td>

@@ -6,7 +6,6 @@ use Illuminate\Foundation\Http\FormRequest;
 use App\Models\User;
 
 class Update extends FormRequest
-
 {
 
     /**
@@ -34,6 +33,7 @@ class Update extends FormRequest
             'user_code' => "required|unique:users,user_code,{$this->user->id}|max:15",
             'branch_id' => 'required|numeric',
             'status' => 'required|boolean',
+            'is_sale_representative' => 'required|boolean',
         ];
     }
 

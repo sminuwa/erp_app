@@ -31,7 +31,7 @@ class User extends Authenticatable
     /**
      * Mass assignable columns
      */
-    protected $fillable = ['name', 'email', 'phone', 'gender', 'user_code', 'branch_id', 'status'];
+    protected $fillable = ['name', 'email', 'phone', 'gender', 'user_code', 'branch_id', 'status','is_sale_representative'];
 
     /**
      * Date time columns.

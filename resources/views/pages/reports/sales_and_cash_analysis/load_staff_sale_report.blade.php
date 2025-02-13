@@ -55,7 +55,7 @@
             <td>{{ \Carbon\Carbon::parse($sale->order_date)->toFormattedDateString() }}</td>
             <td>{{ $sale->name }}</td>
             <td>{{ $sale->user }}</td>
-            <td>{{ $sale->reference }}</td>
+            <td><a href="{{ route('orders.show',$sale->order_id) }}" target="_BLANK">{{ $sale->reference }}</a></td>
             <td>{{ $sale->customer }}</td>
             <td>{{ $sale->product }}</td>
             <td>{{ $sale->store }}</td>

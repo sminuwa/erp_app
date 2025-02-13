@@ -72,7 +72,7 @@ class OrderController extends Controller
 
         return view('pages.order.index', compact('orders'));
     }
-   
+
     public function order_invoice_search(Request $request)
     {
         $search_value = $request->refno;
@@ -120,7 +120,7 @@ class OrderController extends Controller
         return view('pages.order.view_orders', compact('order'));
     }
 
-   
+
     public function destroy_order_invoice(Request $request, Order $order)
     {
 
@@ -141,7 +141,7 @@ class OrderController extends Controller
         }
         return redirect()->route('order.invoice.index');
     }
-   
+
     public function download($order_id)
     {
         $order = Order::with('customer')->where('id', $order_id)->first();
@@ -419,7 +419,7 @@ class OrderController extends Controller
     }
     public function post(Order $invoice)
     {
-        if($invoice->status == 0) {
+        if ($invoice->status == 0) {
             $invoice->status = 1;
             $invoice->posted_by = auth()->id();
             $items = $invoice->order_items;
@@ -490,7 +490,8 @@ class OrderController extends Controller
     }
     public function show($id)
     {
-        $order = Order::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
+        //$order = Order::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
+        $order = Order::with('customer')->where('id', $id)->first();
         $order_details = OrderDetail::with('storeProduct')->where(['order_id' => $id, 'status' => 1])->get();
         //return $order_details;
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
@@ -538,7 +539,8 @@ class OrderController extends Controller
     }
     public function order_invoice_show($id)
     {
-        $order = OrderInvoice::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
+        //$order = OrderInvoice::with('customer')->where('branch_id', 'LIKE', User::userBranchAction())->where('id', $id)->first();
+        $order = OrderInvoice::with('customer')->where('order_invoices.id', $id)->first();
         $order_details = OrderInvoiceDetail::with('product')->where(['order_id' => $id, 'status' => 1])->get();
         //return $order_details;
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
@@ -572,8 +574,8 @@ class OrderController extends Controller
     }
 
     //proforma
-    
-   
+
+
 
     public function getAvailableQuantity(Request $request, StoreProduct $storeproduct)
     {

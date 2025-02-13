@@ -46,6 +46,7 @@
         <tr>
             <td>{{ Carbon\Carbon::parse($record->date)->toFormattedDateString() }}</td>
             <td>{{ $record->refno }}</td>
+            {{-- <td><a href="{{ route('orders.show',$record->id) }}" target="_BLANK">{{ $record->refno }}</a></td> --}}
             <td>{{ $record->product_code }}</td>
             <td>{{ $record->product_name }}</td>
             <td>

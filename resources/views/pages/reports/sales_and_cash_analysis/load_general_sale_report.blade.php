@@ -53,7 +53,7 @@
             <td>{{ $sale->product_code }}</td>
             <td>{{ $sale->product_name }}</td>
             <td>{{ $sale->store_code }}</td>
-            <td>{{ $sale->reference }}</td>
+            <td><a href="{{ route('orders.show',$sale->order_id) }}" target="_BLANK">{{ $sale->reference }}</a></td>
             <td>{{ $sale->customer }}</td>
             <td>{{ $sale->quantity }}</td>
             <td>{{ $sale->product_unit }}</td>
@@ -93,7 +93,7 @@
                         <td>{{ $item->storeProduct->product->code }}</td>
                         <td>{{ $item->storeProduct->product->name }}</td>
                         <td>{{ $item->storeProduct->store->code }}</td>
-                        <td>{{ $note->reference }}</td>
+                        <td><a href="{{ $note->reference }}" target="_BLANK">{{ $note->reference }}</a></td>
                         <td>{{ $sale->customer }}</td>
                         <td>{{ $item->quantity }}</td>
                         <td>{{ $sale->product_unit }}</td>

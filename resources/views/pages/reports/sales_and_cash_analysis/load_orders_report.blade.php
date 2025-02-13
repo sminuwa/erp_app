@@ -38,7 +38,8 @@
         @endphp
         <tr>
             <td>{{ \Carbon\Carbon::parse($sale->order_date)->toFormattedDateString() }}</td>
-            <td>{{ $sale->reference }}</td>
+            {{-- <td>{{ $sale->reference }}</td> --}}
+            <td><a href="{{ route('order.invoice.show',$sale->id) }}" target="_BLANK">{{ $sale->reference }}</a></td>
             <td>{{ $sale->customer->code }}</td>
             <td>{{ $sale->customer->name }}</td>
             <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>

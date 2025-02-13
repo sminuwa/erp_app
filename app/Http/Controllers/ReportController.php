@@ -6508,7 +6508,7 @@ class ReportController extends Controller
             'expenses' => $expenses,
             'from_month' => $from_date,
             'to_month' => $to_date,
-            'income_year' => $income_year,
+//            'income_year' => $income_year,
             'branch' => $branch,
             'branch_id' => $branch_id,
             'category_id1' => $category_id1,

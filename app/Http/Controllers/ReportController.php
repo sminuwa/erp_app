@@ -1611,8 +1611,8 @@ class ReportController extends Controller
             JOIN products p ON store_products.product_id = p.id
             WHERE s.branch_id LIKE stores.branch_id
             AND p.category_id = categories.id) as qty_available')
-                :
-                DB::raw('(SELECT SUM(store_products.qty_available)
+                    :
+                    DB::raw('(SELECT SUM(store_products.qty_available)
             FROM store_products
             JOIN products p ON store_products.product_id = p.id
             WHERE p.category_id = categories.id) as qty_available')
@@ -1971,7 +1971,7 @@ class ReportController extends Controller
             $staff_id = '%';
         }
         $sales = DB::table('orders')
-            ->select('customers.code AS customer', 'orders.reference', 'products.name AS product','order_details.unit as product_unit', 'stores.code AS store', 'order_details.quantity', 'sold_price', 'cost_price', 'users.user_code AS user', 'users.name AS name', 'order_date', 'orders.id as order_id')
+            ->select('customers.code AS customer', 'orders.reference', 'products.name AS product', 'order_details.unit as product_unit', 'stores.code AS store', 'order_details.quantity', 'sold_price', 'cost_price', 'users.user_code AS user', 'users.name AS name', 'order_date', 'orders.id as order_id')
             ->join('order_details', 'order_details.order_id', 'orders.id')
             ->join('store_products', 'store_products.id', 'order_details.store_product_id')
             ->join('customers', 'customers.id', 'orders.customer_id')
@@ -3721,6 +3721,7 @@ class ReportController extends Controller
             $branch = Branch::find($branch_id);
         return view('pages.reports.sales_and_cash_analysis.print_credit_notes_lines_report', compact('sales', 'from_date', 'to_date', 'branch'));
     }
+
     public function invoiceReport()
     {
 
@@ -6334,32 +6335,32 @@ class ReportController extends Controller
             $category_id1 = '%';
         if ($category_id2 == 'all' || $category_id2 == '')
             $category_id2 = '%';
-        $income_year = $request->income_year;
-        $from_month = $request->from_month;
-        $to_month = $request->to_month;
+//        $income_year = $request->income_year;
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
         $revenue_class = ['R40'];
         $cost_of_sale_class = ['C50'];
         $expense_class = ['C51', 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C58', 'C59', 'C60', 'C61', 'C62', 'C63'];
         $query = ChartOfAccount::select(DB::raw('SUM(credit) AS credit'), DB::raw('SUM(debit) AS debit'), 'number', 'general_accounts.description')
-            ->whereYear('date', $income_year)
             ->join('general_accounts', 'general_accounts.class', 'chart_of_accounts.class')
             ->join('general_account_ledgers', 'model_id', 'general_accounts.id')
             ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
+            ->whereBetween('date', [$from_date, $to_date])
             ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
             ->where('branches.company_id', 'LIKE', $company_id)
             ->where('model_name', 'GeneralAccount')->groupBy('number');
 
-        if ($from_month == '' || $to_month == '') {
-            $query->whereMonth('date', '<=', 12);
-        }
+//        if ($from_month == '' || $to_month == '') {
+//            $query->whereMonth('date', '<=', 12);
+//        }
 
-        if ($from_month != '') {
-            $query->whereMonth('date', '>=', $from_month);
-        }
+//        if ($from_month != '') {
+//            $query->whereMonth('date', '>=', $from_month);
+//        }
 
-        if ($to_month != '') {
-            $query->whereMonth('date', '<=', $to_month);
-        }
+//        if ($to_month != '') {
+//            $query->whereMonth('date', '<=', $to_month);
+//        }
 
         $query->orderBy('number');
 
@@ -6393,11 +6394,11 @@ class ReportController extends Controller
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        if ($from_month == '')
-            $from_month = 'all';
+//        if ($from_month == '')
+//            $from_month = 'all';
 
-        if ($to_month == '')
-            $to_month = 'all';
+//        if ($to_month == '')
+//            $to_month = 'all';
 
         if ($branch_id == '' || $branch_id == '%')
             $branch_id = 'all';
@@ -6409,9 +6410,11 @@ class ReportController extends Controller
             'revenues' => $revenues,
             'cost_of_sales' => $cost_of_sales,
             'expenses' => $expenses,
-            'from_month' => $from_month,
-            'to_month' => $to_month,
-            'income_year' => $income_year,
+            'from_date' => $from_date,
+            'to_date' => $to_date,
+//            'from_month' => $from_month,
+//            'to_month' => $to_month,
+//            'income_year' => $income_year,
             'company_id' => $company_id,
             'branch' => $branch,
             'branch_id' => $branch_id,
@@ -6420,7 +6423,7 @@ class ReportController extends Controller
         ]);
     }
 
-    public function printIncomeStatement($from_month, $to_month, $income_year, $company_id, $branch_id, $category_id1, $category_id2)
+    public function printIncomeStatement($from_date, $to_date, $company_id, $branch_id, $category_id1, $category_id2)
     {
         if ($company_id == 'all' || $company_id == '')
             $company_id = '%';
@@ -6434,26 +6437,26 @@ class ReportController extends Controller
         $cost_of_sale_class = ['C50'];
         $expense_class = ['C51', 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C58', 'C59', 'C60', 'C61', 'C62', 'C63'];
         $query = ChartOfAccount::select(DB::raw('SUM(credit) AS credit'), DB::raw('SUM(debit) AS debit'), 'number', 'general_accounts.description')
-            ->whereYear('date', $income_year)
             ->join('general_accounts', 'general_accounts.class', 'chart_of_accounts.class')
             ->join('general_account_ledgers', 'model_id', 'general_accounts.id')
             ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
+            ->whereBetween('date', [$from_date, $to_date])
             ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
             ->where('branches.company_id', 'LIKE', $company_id)
             ->where('model_name', 'GeneralAccount')
             ->groupBy('number');
 
-        if ($from_month == 'all' || $to_month == 'all') {
-            $query->whereMonth('date', '<=', 12);
-        }
-
-        if ($from_month != 'all') {
-            $query->whereMonth('date', '>=', $from_month);
-        }
-
-        if ($to_month != 'all') {
-            $query->whereMonth('date', '<=', $to_month);
-        }
+//        if ($from_date == 'all' || $to_date == 'all') {
+//            $query->whereMonth('date', '<=', 12);
+//        }
+//
+//        if ($from_date != 'all') {
+//            $query->whereMonth('date', '>=', $from_date);
+//        }
+//
+//        if ($to_date != 'all') {
+//            $query->whereMonth('date', '<=', $to_date);
+//        }
 
         $query->orderBy('number');
 
@@ -6488,11 +6491,11 @@ class ReportController extends Controller
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-        if ($from_month == '')
-            $from_month = 'all';
+        if ($from_date == '')
+            $from_date = 'all';
 
-        if ($to_month == '')
-            $to_month = 'all';
+        if ($to_date == '')
+            $to_date = 'all';
         if ($branch_id == '')
             $branch_id = 'all';
         if ($category_id1 == '')
@@ -6503,8 +6506,8 @@ class ReportController extends Controller
             'revenues' => $revenues,
             'cost_of_sales' => $cost_of_sales,
             'expenses' => $expenses,
-            'from_month' => $from_month,
-            'to_month' => $to_month,
+            'from_month' => $from_date,
+            'to_month' => $to_date,
             'income_year' => $income_year,
             'branch' => $branch,
             'branch_id' => $branch_id,
@@ -6959,6 +6962,7 @@ class ReportController extends Controller
             $branch = Branch::find($branch_id);
         return view('pages.reports.suppliers.print_supplier_list_report', compact('suppliers', 'branch', 'branch_id'));
     }
+
     public function productList(Request $request)
     {
         return view('pages.reports.inventory.products.product_list_report');

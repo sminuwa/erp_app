@@ -1752,49 +1752,43 @@ class ReportController extends Controller
 
     public function loadCategorySaleBySiteReport(Request $request)
     {
-        // Convert request dates to proper format
         $from_date = date('Y-m-d', strtotime($request->from_date));
         $to_date = date('Y-m-d', strtotime($request->to_date));
+        $company_id = $request->company_id;
+        $branch_id = $request->branch_id;
+        $category_id1 = $request->category_id1;
+
+        // Grouping flags
+        $group_by_category = $request->group_by_category == 1 ? true : false;
+        $group_by_product = $request->group_by_product == 1 ? true : false;
+
 
         // Handle 'all' selections
-        $company_id = $request->company_id === 'all' || empty($request->company_id) ? '%' : $request->company_id;
-        $branch_id = is_array($request->branch_id) ? $request->branch_id : ($request->branch_id === 'all' || empty($request->branch_id) ? ['%'] : [$request->branch_id]);
-        $category_id1 = is_array($request->category_id1) ? $request->category_id1 : ($request->category_id1 === 'all' || empty($request->category_id1) ? ['%'] : [$request->category_id1]);
-
-        // Check grouping options
-        $group_by_category = $request->group_by_category ?? 0;
-        $group_by_product = $request->group_by_product ?? 0;
-
-        // Determine grouping fields dynamically
-        $groupFields = [];
-        if ($group_by_category) {
-            $groupFields[] = 'categories.id';
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
         }
-        if ($group_by_product) {
-            $groupFields[] = 'products.id';
-        }
+        $category_id1 = is_array($category_id1) ? $category_id1 : ['%'];
+        $branch_id = is_array($branch_id) ? $branch_id : ['%'];
 
-        // Default to category grouping if neither checkbox is selected
-        if (empty($groupFields)) {
-            $groupFields[] = 'categories.id';
-        }
-
-        // Build the query
+        // Base Query
         $data = DB::table('orders')
             ->select(
-                'categories.name as category',
+                'branches.id as branch_id',
+                'branches.name as branch_name',
+                'branches.code as branch_code',
+                'categories.id as category_id',
+                'categories.name as category_name',
                 'categories.code as category_code',
-                'order_details.unit as product_unit',
+                'products.id as product_id',
+                'products.name as product_name',
+                'products.code as product_code',
                 DB::raw('SUM(order_details.quantity) as quantity'),
                 DB::raw('SUM(order_details.total) as amount'),
                 DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
-                DB::raw("
-                (SELECT SUM(sp.qty_available)
-                FROM store_products sp
-                JOIN products p ON sp.product_id = p.id
-                WHERE sp.store_id IN (SELECT id FROM stores WHERE branch_id = stores.branch_id)
-                AND p.category_id = categories.id
-            ) as qty_available")
+                DB::raw('(SELECT SUM(store_products.qty_available)
+                FROM store_products
+                WHERE store_products.store_id IN (SELECT id FROM stores WHERE branch_id = branches.id)
+                AND store_products.product_id = products.id) as qty_available')
             )
             ->join('order_details', 'orders.id', '=', 'order_details.order_id')
             ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
@@ -1805,51 +1799,42 @@ class ReportController extends Controller
             ->join('categories', 'products.category_id', '=', 'categories.id')
             ->where('branches.company_id', 'LIKE', $company_id)
             ->where('order_details.status', '=', 1)
-            ->whereBetween('orders.order_date', [$from_date, $to_date]);
+            ->whereBetween('order_date', [$from_date, $to_date]);
 
-        // Apply category and branch filters if not 'all'
+        // Apply category and branch filters
         if (!in_array('%', $category_id1)) {
-            $data->whereIn('products.category_id', $category_id1);
+            $data = $data->whereIn('products.category_id', $category_id1);
         }
         if (!in_array('%', $branch_id)) {
-            $data->whereIn('stores.branch_id', $branch_id);
+            $data = $data->whereIn('stores.branch_id', $branch_id);
         }
 
-        // Add product grouping if selected
+        // **Apply Correct Grouping**
+        // $groupByColumns = ['orders.branch_id']; // Default: Branch > Category > Product
+        $groupByColumns = ['branches.id', 'categories.id']; // Default: Branch > Category > Product
+
+        if ($group_by_category) {
+            $groupByColumns = ['orders.branch_id', 'products.category_id']; // Branch > Category
+        }
+
         if ($group_by_product) {
-            $data->addSelect(
-                'products.name as product_name',
-                'products.code as product_code'
-            );
+            $groupByColumns = ['orders.branch_id', 'store_products.product_id']; // Branch > Product
         }
 
-        // Apply dynamic grouping fields
-        $sales = $data->groupBy($groupFields)
-            ->orderBy('categories.name', 'ASC')
-            ->when($group_by_product, function ($query) {
-                return $query->orderBy('products.name', 'ASC');
-            })
-            ->get();
+        $data = $data->groupBy($groupByColumns)
+            ->orderBy('branches.name', 'ASC')
+            ->orderBy('categories.code', 'ASC')
+            ->orderBy('products.name', 'ASC');
 
-        // Reset 'all' for readability in UI
-        $category_id1 = in_array('%', $category_id1) ? "all" : $category_id1;
-        $branch_id = in_array('%', $branch_id) ? "all" : $branch_id;
-        $company_id = $company_id === '%' ? "all" : $company_id;
+        $sales = $data->get();
 
-        // Fetch additional company info if a specific one is selected
-        $company = $company_id !== 'all' ? Company::find($company_id) : null;
+        // Structure data properly for display
+        $salesByGroup = $sales->groupBy($group_by_category ? 'category_id' : ($group_by_product ? 'product_id' : 'branch_id'));
 
-        // Return view with data
-        return view('pages.reports.sales_and_cash_analysis.load_sale_by_category_by_site_report', compact(
-            'sales',
-            'from_date',
-            'to_date',
-            'category_id1',
-            'company',
-            'company_id',
-            'group_by_category',
-            'group_by_product'
-        ));
+        return view(
+            'pages.reports.sales_and_cash_analysis.load_sale_by_category_by_site_report',
+            compact('salesByGroup', 'from_date', 'to_date', 'branch_id', 'category_id1', 'group_by_category', 'group_by_product')
+        );
     }
 
     public function printCategorySaleBySiteReport($from_date, $to_date, $company_id, $branch_id, $category_id1)
@@ -6335,7 +6320,7 @@ class ReportController extends Controller
             $category_id1 = '%';
         if ($category_id2 == 'all' || $category_id2 == '')
             $category_id2 = '%';
-//        $income_year = $request->income_year;
+        //        $income_year = $request->income_year;
         $from_date = $request->from_date;
         $to_date = $request->to_date;
         $revenue_class = ['R40'];
@@ -6350,15 +6335,15 @@ class ReportController extends Controller
             ->where('branches.company_id', 'LIKE', $company_id)
             ->where('model_name', 'GeneralAccount')->groupBy('number');
 
-//        if ($from_month == '' || $to_month == '') {
+        //        if ($from_month == '' || $to_month == '') {
 //            $query->whereMonth('date', '<=', 12);
 //        }
 
-//        if ($from_month != '') {
+        //        if ($from_month != '') {
 //            $query->whereMonth('date', '>=', $from_month);
 //        }
 
-//        if ($to_month != '') {
+        //        if ($to_month != '') {
 //            $query->whereMonth('date', '<=', $to_month);
 //        }
 
@@ -6394,10 +6379,10 @@ class ReportController extends Controller
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
-//        if ($from_month == '')
+        //        if ($from_month == '')
 //            $from_month = 'all';
 
-//        if ($to_month == '')
+        //        if ($to_month == '')
 //            $to_month = 'all';
 
         if ($branch_id == '' || $branch_id == '%')
@@ -6412,7 +6397,7 @@ class ReportController extends Controller
             'expenses' => $expenses,
             'from_date' => $from_date,
             'to_date' => $to_date,
-//            'from_month' => $from_month,
+            //            'from_month' => $from_month,
 //            'to_month' => $to_month,
 //            'income_year' => $income_year,
             'company_id' => $company_id,
@@ -6446,7 +6431,7 @@ class ReportController extends Controller
             ->where('model_name', 'GeneralAccount')
             ->groupBy('number');
 
-//        if ($from_date == 'all' || $to_date == 'all') {
+        //        if ($from_date == 'all' || $to_date == 'all') {
 //            $query->whereMonth('date', '<=', 12);
 //        }
 //
@@ -6508,7 +6493,7 @@ class ReportController extends Controller
             'expenses' => $expenses,
             'from_month' => $from_date,
             'to_month' => $to_date,
-//            'income_year' => $income_year,
+            //            'income_year' => $income_year,
             'branch' => $branch,
             'branch_id' => $branch_id,
             'category_id1' => $category_id1,
@@ -7094,5 +7079,57 @@ class ReportController extends Controller
             $branch = Branch::find($branch_id);
         return view('pages.reports.ap_ar.general_ledger.print_general_ledger_list_report', compact('records', 'branch', 'branch_id'));
     }
+    public function showROCustomerReport()
+    {
+        return view('pages.reports.relation_officers.customer_list');
+    }
 
+    /**
+     * Load the Relation Officer Report Data
+     */
+    public function loadROCustomerReport(Request $request)
+    {
+        $from_date = date('Y-m-d', strtotime($request->from_date));
+        $to_date = date('Y-m-d', strtotime($request->to_date));
+        $branch_id = $request->branch_id;
+
+        if ($branch_id == 'all' || $branch_id == '') {
+            $branch_id = '%'; // Ensure 'all' branches are included
+        }
+
+        // Fetch Relation Officers and count customers
+        $relationOfficers = DB::table('users as ro')
+            ->select(
+                'ro.id as ro_id',
+                'ro.name as ro_name',
+                'ro.surname as ro_surname',
+                'ro.user_code as ro_code',
+                'ro.phone as ro_phone',
+                'ro.email as ro_email',
+                'branches.name as branch_name',
+                DB::raw('COUNT(customers.id) as total_customers'),
+                DB::raw("SUM(CASE WHEN customers.created_at BETWEEN '$from_date' AND '$to_date' THEN 1 ELSE 0 END) as new_customers")
+            )
+            ->join('branches', 'ro.branch_id', '=', 'branches.id')
+            ->leftJoin('customers', 'customers.relation_officer', '=', 'ro.id')
+            ->where('ro.is_sale_representative', 1)
+            ->where('ro.branch_id', 'LIKE', $branch_id)
+            ->groupBy('ro.id', 'ro.name', 'ro.surname', 'ro.user_code', 'ro.phone', 'ro.email', 'branches.name')
+            ->get();
+
+        // Fetch Customers Assigned to Each RO
+        $customers = DB::table('customers')
+            ->select('id', 'name', 'code', 'phone', 'email', 'relation_officer', 'created_at')
+            ->where('branch_id', 'LIKE', $branch_id)
+            ->get()
+            ->groupBy('relation_officer'); // Group by relation_officer (ro.id)
+
+        // Handle "all" branches scenario
+        $branch = null;
+        if ($branch_id != '%') {
+            $branch = Branch::find($branch_id);
+        }
+
+        return view('pages.reports.relation_officers.load_customers', compact('relationOfficers', 'customers', 'from_date', 'to_date', 'branch_id'));
+    }
 }

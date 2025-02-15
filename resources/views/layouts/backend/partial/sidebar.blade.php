@@ -149,7 +149,7 @@
                                 <li class="nav-item">
                                     <a href="{{ route('purchases.request.index') }}" class="nav-link ">
                                         <i class="ion-card"></i>
-                                        <p>Purchases (Request)</p>
+                                        <p>Purchase (Request)</p>
                                     </a>
                                 </li>
                             @endcan
@@ -157,7 +157,7 @@
                                 <li class="nav-item">
                                     <a href="{{ route('purchases.index') }}" class="nav-link ">
                                         <i class="ion-card"></i>
-                                        <p>Purchases (GRN)</p>
+                                        <p>Purchase Invoice/GRN</p>
                                     </a>
                                 </li>
                             @endcan
@@ -517,13 +517,7 @@
                                                 <p>Orders Lines</p>
                                             </a>
                                         </li>
-                                        {{-- <li class="nav-item">
-                                            <a href="{{ route('discount.granted.reports') }}"
-                                                class="nav-link {{ Request::is('reports//sa/discount-granted*') ? 'active' : '' }}">
-                                                <i class="ion-code-working"></i>
-                                                <p>Track Discount Granted</p>
-                                            </a>
-                                        </li> --}}
+                                        
                                     </ul>
                                 </li>
                             @endcan
@@ -582,6 +576,14 @@
                                                 <p>Best Performing Customers</p>
                                             </a>
                                         </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('relation.officer.with.customers') }}"
+                                                class="nav-link {{ Request::is('reports/sa/relation-officers*') ? 'active' : '' }}">
+                                                <i class="ion-code-working"></i>
+                                                <p>RO with Customers</p>
+                                            </a>
+                                        </li>
+                                        
                                     </ul>
                                 </li>
                             @endcan
@@ -681,7 +683,27 @@
                                                 <p>Additional Invoices</p>
                                             </a>
                                         </li>
-
+                                        <li class="nav-item">
+                                            <a href="{{ route('user_entries.report') }}"
+                                                class="nav-link {{ Request::is('reports/inventory/user_entries*') ? 'active' : '' }}">
+                                                <i class="ion-cash"></i>
+                                                <p>User Entries</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('backdated.report') }}"
+                                                class="nav-link {{ Request::is('reports/inventory/user_entries/backdated*') ? 'active' : '' }}">
+                                                <i class="ion-cash"></i>
+                                                <p>Backdated/Postdated Entries</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('slow.overstayed.report') }}"
+                                                class="nav-link {{ Request::is('reports/inventory/slow/overstay*') ? 'active' : '' }}">
+                                                <i class="ion-cash"></i>
+                                                <p>Slow and overstayed</p>
+                                            </a>
+                                        </li>
                                     </ul>
                                 </li>
                             @endcan

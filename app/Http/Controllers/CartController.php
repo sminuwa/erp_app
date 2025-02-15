@@ -134,7 +134,7 @@ class CartController extends Controller
         if ($type == 'interstore') {
             $product = Product::find($request->product_id);
             $add = \Cart::add([
-                'id' => $request->source_store_id.$request->product_id,
+                'id' => $request->source_store_id . $request->product_id,
                 'name' => $product->name,
                 'price' => 0,
                 'quantity' => $request->qty_transfered,
@@ -152,20 +152,20 @@ class CartController extends Controller
             $quantity = $request->quantity;
             $product = Product::find($request->product_id);
             $cost_price = BranchProductPrice::where(['product_id' => $request->product_id, 'branch_id' => auth()->user()->branch->id])->first();
-            $store_product = StoreProduct::where(['store_id'=> $store_id,'product_id'=>$product_id])->first();
-            if($store_product->qty_available < $quantity)
+            $store_product = StoreProduct::where(['store_id' => $store_id, 'product_id' => $product_id])->first();
+            if ($store_product->qty_available < $quantity)
                 $quantity = $store_product->qty_available;
             $items = \Cart::getContent();
-            foreach($items as $item){
+            foreach ($items as $item) {
 //                $store_id = $item->attributes['store_id'];
 //                $product_id = $item->attributes['product_id'];
-                $sp = StoreProduct::where(['store_id'=> $store_id,'product_id'=>$product_id])->first();
-                if(($item->quantity + $quantity) > $sp->qty_available){
-                    \Cart::remove($store_id.$product_id);
+                $sp = StoreProduct::where(['store_id' => $store_id, 'product_id' => $product_id])->first();
+                if (($item->quantity + $quantity) > $sp->qty_available) {
+                    \Cart::remove($store_id . $product_id);
                 }
             }
             $add = \Cart::add([
-                'id' => $store_id.$product_id,
+                'id' => $store_id . $product_id,
                 'name' => $product->name,
                 'price' => str_replace(',', '', $cost_price->cost_price) ?? 1,
                 'quantity' => $quantity,
@@ -240,7 +240,7 @@ class CartController extends Controller
             }
 
             $add = \Cart::add([
-                'id' => $request->store_id.$request->product_id,
+                'id' => $request->store_id . $request->product_id,
                 'name' => $product->name,
                 'price' => $cost_price, //This is not applicable here
                 'quantity' => abs($request->quantity),
@@ -265,8 +265,6 @@ class CartController extends Controller
                 $qty_available = 0;
                 $id = $request->product_id;
                 $unit = $product->unit;
-
-
             } else {
                 $name = $request->name;
                 $code = $request->code;
@@ -275,8 +273,8 @@ class CartController extends Controller
                 $product_id = $store_product->product_id;
                 $id = $request->id;
                 $unit = $request->unit;
-
             }
+
             $prices = BranchProductPrice::where(['product_id' => $product_id, 'branch_id' => auth()->user()->branch->id])->first();
             $selling_price = $cost_price;// Price for Order and Profoma but change below if it is sales invoice
             if ($prices) {
@@ -292,12 +290,12 @@ class CartController extends Controller
             $add = \Cart::add([
                 'id' => $id,
                 'name' => $name,
-                'price' => $type != 'invoice' ? $request->cost_price : $selling_price,
+                'price' => str_replace(',', '', $type != 'invoice' ? $request->cost_price : $selling_price),
                 'quantity' => $qty == 0 ? 1 : $qty,
                 'attributes' => array(
-                    'cost_price' => $cost_price,
+                    'cost_price' => str_replace(',', '', $cost_price),
                     'code' => $code,
-                    'selling_price' => $type != 'invoice' ? $request->cost_price : $selling_price,
+                    'selling_price' => str_replace(',', '', $type != 'invoice' ? $request->cost_price : $selling_price),
                     'qty_available' => $qty_available,
                     'discount' => 0,
                     'store' => $store,
@@ -334,7 +332,7 @@ class CartController extends Controller
             }
 
             $add = \Cart::add([
-                'id' => $payer_id.$branch->id,
+                'id' => $payer_id . $branch->id,
                 'name' => $name,
                 'price' => str_replace(',', '', $credit) ?? 1,
                 'quantity' => 1,
@@ -444,16 +442,16 @@ class CartController extends Controller
             $store_id = $request->store_id;
             $product_id = $request->product_id;
             $quantity = $request->quantity;
-            $store_product = StoreProduct::where(['store_id'=> $store_id,'product_id'=>$product_id])->first();
-            if($store_product->qty_available < $quantity)
+            $store_product = StoreProduct::where(['store_id' => $store_id, 'product_id' => $product_id])->first();
+            if ($store_product->qty_available < $quantity)
                 $quantity = $store_product->qty_available;
             $items = \Cart::getContent();
-            foreach($items as $item){
+            foreach ($items as $item) {
 //                $store_id = $item->attributes['store_id'];
 //                $product_id = $item->attributes['product_id'];
-                $sp = StoreProduct::where(['store_id'=> $store_id,'product_id'=>$product_id])->first();
-                if(($item->quantity + $quantity) > $sp->qty_available){
-                    \Cart::remove($store_id.$product_id);
+                $sp = StoreProduct::where(['store_id' => $store_id, 'product_id' => $product_id])->first();
+                if (($item->quantity + $quantity) > $sp->qty_available) {
+                    \Cart::remove($store_id . $product_id);
                 }
             }
             \Cart::update(

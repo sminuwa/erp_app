@@ -36,7 +36,6 @@ use Illuminate\Support\Facades\Http;
  *
  * @author Tuhin Bepari <digitaldreams40@gmail.com>
  */
-
 class CustomerController extends Controller
 {
 
@@ -53,12 +52,14 @@ class CustomerController extends Controller
             'record' => $customer,
         ]);
 
-    } /**
-      * Show the form for creating a new resource.
-      *
-      * @param  Create  $request
-      * @return \Illuminate\Http\Response
-      */
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @param Create $request
+     * @return \Illuminate\Http\Response
+     */
     public function create(Create $request)
     {
 
@@ -66,17 +67,19 @@ class CustomerController extends Controller
             'model' => new Customer,
 
         ]);
-    } /**
-      * Store a newly created resource in storage.
-      *
-      * @param  Store  $request
-      * @return \Illuminate\Http\Response
-      */
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param Store $request
+     * @return \Illuminate\Http\Response
+     */
     public function store(Store $request)
     {
-        //    return $request;
         $model = new Customer;
         $model->fill($request->all());
+        $model->credit_limit = str_replace(',', '', $request->credit_limit);
         $model->type = ($request->account_type == 'R' ? 'Retail' : "Wholesale");
         $model->branch_id = $request->branch_id;
         $model->relation_officer = $request->relation_officer;
@@ -98,26 +101,30 @@ class CustomerController extends Controller
             session()->flash('app_message', 'Something is wrong while saving Customer');
         }
         return redirect()->back();
-    } /**
-      * Show the form for editing the specified resource.
-      *
-      * @param  Edit  $request
-      * @param  Customer  $customer
-      * @return \Illuminate\Http\Response
-      */
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param Edit $request
+     * @param Customer $customer
+     * @return \Illuminate\Http\Response
+     */
     public function edit(Edit $request, Customer $customer)
     {
         $this->getOverDueInvoices($customer)->get();
         return view('pages.customers.edit', [
             'model' => $customer,
         ]);
-    } /**
-      * Update a existing resource in storage.
-      *
-      * @param  Update  $request
-      * @param  Customer  $customer
-      * @return \Illuminate\Http\Response
-      */
+    }
+
+    /**
+     * Update a existing resource in storage.
+     *
+     * @param Update $request
+     * @param Customer $customer
+     * @return \Illuminate\Http\Response
+     */
     public function update(Update $request, Customer $customer)
     { //return $request;
 
@@ -136,14 +143,16 @@ class CustomerController extends Controller
             session()->flash('app_error', 'Something is wrong while updating Customer');
         }
         return redirect()->back();
-    } /**
-      * Delete a  resource from  storage.
-      *
-      * @param  Destroy  $request
-      * @param  Customer  $customer
-      * @return \Illuminate\Http\Response
-      * @throws \Exception
-      */
+    }
+
+    /**
+     * Delete a  resource from  storage.
+     *
+     * @param Destroy $request
+     * @param Customer $customer
+     * @return \Illuminate\Http\Response
+     * @throws \Exception
+     */
     public function destroy(Destroy $request, Customer $customer)
     {
         if ($customer->ledgers()->count() == 0) {
@@ -159,12 +168,14 @@ class CustomerController extends Controller
         }
         return redirect()->back();
     }
+
     public function generateCustomerLedger()
     {
         return view('pages.customers.general_ledger', [
             'customers' => Customer::where('type', 'credit')->where('branch_id', 'LIKE', User::userBranchAction())->orderBy('name')->get()
         ]);
     }
+
     public function loadLedger(Request $request)
     {
         $from_date = $request->from_date;
@@ -178,6 +189,7 @@ class CustomerController extends Controller
 
         return view('pages.customers.load_ledger', compact('ledgers', 'customer', 'from_date', 'to_date', 'balance_b_d', 'sum_cr_b_d', 'sum_dr_b_d'));
     }
+
     public function printLedger($from_date, $to_date, $customer_id)
     {
         $customer = Customer::find($customer_id);
@@ -189,6 +201,7 @@ class CustomerController extends Controller
 
         return view('pages.customers.print_ledger', compact('ledgers', 'customer', 'from_date', 'to_date', 'balance_b_d', 'sum_cr_b_d', 'sum_dr_b_d'));
     }
+
     public function loadGeneralCustomerLedger(Request $request)
     {
         $from_date = $request->from_date;
@@ -249,6 +262,7 @@ class CustomerController extends Controller
         }
 
     }
+
     public function createOpeningBalance()
     {
         $user_branch = User::userBranchAction();
@@ -258,6 +272,7 @@ class CustomerController extends Controller
             'model' => null
         ]);
     }
+
     public function openingBalanceStore(Request $request)
     {
         $customer_id = $request->customer_id;
@@ -284,20 +299,23 @@ class CustomerController extends Controller
         session()->flash('app_message', 'Customer opening balance successfully defined');
         return redirect()->route('customers.index');
     }
+
     public function getCustomerBalance(Request $request)
     {
         $balance = Customer::find($request->customer_id)->runningBalance() ?? 0;
         return $balance;
     }
+
     public function getCustomerCreditLimit(Request $request)
     {
         return Customer::find($request->customer_id)->credit_limit ?? 0;
     }
+
     public function updateCreditLimit(Request $request)
     {
         if ($request->customer_id != null) {
             $customer_id = $request->customer_id;
-            $new_amount = $request->new_amount;
+            $new_amount = str_replace(',', '', $request->new_amount);
             $customer = Customer::find($customer_id);
             $customer->credit_limit = $new_amount;
             $customer->save();
@@ -315,6 +333,7 @@ class CustomerController extends Controller
     {
         return $customer->orders()->whereDate('due_date', '<=', 'CURDATE()')->where('due', '>', 0)->where('payment_mode', 'Credit')->orderBy('due_date', 'ASC');
     }
+
     public function unPaidInvoices(Customer $customer)
     {
         return $customer->orders()->where('due', '>', 0)->where('payment_mode', 'Credit')->orderBy('due_date', 'ASC');
@@ -326,6 +345,7 @@ class CustomerController extends Controller
         $model = new CustomerLedger();
         return view('pages.inventories.credit_notes.credit_note', ['payments' => $payments, 'model' => $model]);
     }
+
     public function createCreditNote(Order $order = null)
     {
         $user_branch = User::userBranchAction();
@@ -354,6 +374,7 @@ class CustomerController extends Controller
         $cart_products = \Cart::getContent();
         return view('pages.inventories.credit_notes.create_credit_note', compact('orders', 'model', 'cart_products', 'order', 'stores'));
     }
+
     public function payCreditNote(Request $request)
     {
         return "To call your function";
@@ -403,10 +424,12 @@ class CustomerController extends Controller
             ->orderBy('order_date', 'DESC')->get();
         return view('pages.suppliers.credit_note', ['payments' => $payments]);
     }
+
     public function printCreditnoteReceipt(CreditNote $credit_note)
     {
         return view('pages.inventories.credit_notes.print_credit_note_receipt', ['payment' => $credit_note, 'setting' => Setting::first()]);
     }
+
     public function loadInvoices(Request $request)
     {
         $word_search = $request->search;
@@ -420,6 +443,7 @@ class CustomerController extends Controller
         }
         return view('pages.inventories.credit_notes.load_order_invoices', ['orders' => $orders]);
     }
+
     public function loadToCart(Request $request)
     {
         $invoice_no = $request->invoice_no;
@@ -439,6 +463,7 @@ class CustomerController extends Controller
         $cart_products = \Cart::getContent();
         return view('pages.inventories.credit_notes.load_products', ['cart_products' => $cart_products, 'invoice_no' => $invoice_no, 'order' => $order]);
     }
+
     public function addToCart(Request $request)
     {
 
@@ -505,11 +530,13 @@ class CustomerController extends Controller
         return redirect()->route('customers.credit.note.create', Order::find($request->order));
         //return redirect()->back()->with('order',Order::find($request->order));
     }
+
     public function importForm()
     {
         $this->authorize('customers.import.form');
         return view('pages.customers.import');
     }
+
     public function import(Request $request)
     {
         $this->authorize('customers.import');
@@ -551,14 +578,15 @@ class CustomerController extends Controller
         session()->flash('app_message', 'File imported and records updated/inserted successfully!');
         return view('pages.customers.import', ['count' => $count]);
     }
+
     public function verifyNIN($nin)
     {
         $response = Http::withHeaders([
             'x-api-key' => 'your_api_key',
         ])->post('https://api.nimc.gov.ng/verification', [
-                    'nin' => $nin,
-                    // Include other required parameters as per NIMC's API documentation
-                ]);
+            'nin' => $nin,
+            // Include other required parameters as per NIMC's API documentation
+        ]);
 
         if ($response->successful()) {
             $data = $response->json();

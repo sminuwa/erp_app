@@ -54,15 +54,15 @@
 @push('js')
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script type="text/javascript">
-        $(function() {
-            $("#category_link,#product_link,#supplier_link").on('click', function() {
+        $(function () {
+            $("#category_link,#product_link,#supplier_link").on('click', function () {
                 $('<input>').attr({
                     type: 'hidden',
                     id: 'shortcut',
                     name: 'shortcut'
                 }).appendTo('form');
             });
-            $(document).on("change", "#category_id", function(event) {
+            $(document).on("change", "#category_id", function (event) {
                 $("#product_id").html(" < option value = '' > Loading... < /option>");
                 $.ajax({
                     url: "{{ route('ajax.loadproducts') }}",
@@ -70,7 +70,7 @@
                     data: {
                         category_id: $("#category_id").val()
                     }
-                }).done(function(msg) {
+                }).done(function (msg) {
                     $("#product_id").html("<option value=''>--select--</option>" + msg);
                 });
             });
@@ -106,6 +106,28 @@
                     )
                 }
             })
+        }
+
+        function formatNumber(input) {
+            // Remove non-numeric and non-decimal characters
+            let value = input.value.replace(/[^\d.]/g, '');
+
+            // Split the value into integer and decimal parts
+            const parts = value.split('.');
+            let integerPart = parts[0] ? parseFloat(parts[0]) : 0;
+            let decimalPart = parts[1] !== undefined ? '.' + parts[1] : '';
+
+            // Check if the integer part is not NaN
+            if (!isNaN(integerPart)) {
+                // Format the integer part with commas and dot as decimal separator
+                integerPart = integerPart.toLocaleString('en-US', {
+                    maximumFractionDigits: 2,
+                    useGrouping: true
+                });
+
+                // Set the formatted value back to the input
+                input.value = integerPart + decimalPart;
+            }
         }
     </script>
 @endpush

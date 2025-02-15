@@ -750,6 +750,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/sa/sales/relation_officer/load', [ReportController::class, 'loadRelationOfficerReport'])->name('ajax.relation_officer.sales.report');
             Route::get('/sa/sales/relation_officer/print/{from_date}/{to_date}/{company_id}/{branch_id}/{category_id}/{staff_id}', [ReportController::class, 'printRelationOfficerReport'])->name('ajax.relation_officer.report.print');
 
+            Route::get('/relation-officers', [ReportController::class, 'showROCustomerReport'])->name('relation.officer.with.customers');
+            Route::get('/ajax/load-ro-customer-report', [ReportController::class, 'loadROCustomerReport'])->name('ajax.load.ro.customer.report');
+
             //CUstoomer Sale with common names Report
             Route::get('/sa/sales/customer/sale/common-name', [ReportController::class, 'customerSaleReport'])->name('customer.sale.reports');
             Route::get('/sa/sales/customer/sale/common-name/load', [ReportController::class, 'loadCustomerSaleReport'])->name('ajax.load.customer.sale.reports');
@@ -890,6 +893,10 @@ Route::middleware('auth')->group(function () {
                 Route::get('/product/list/load', [ReportController::class, 'loadProducListReport'])->name('ajax.load.product.list.reports');
                 Route::get('/product/load/print/{company_id}/{branch_id}', [ReportController::class, 'printProductListReport'])->name('ajax.product.list.report.print');
 
+
+                Route::get('/slow/overstay/list', [ReportController::class, 'slowOverstayedReport'])->name('slow.overstayed.report');
+                Route::get('/slow/overstay/load', [ReportController::class, 'loadslowOverstayedReport'])->name('ajax.load.slow.overstayed.report');
+
             });
             //Total Purchases Report
             Route::get('/pa/total/puchases/item', [ReportController::class, 'totalPurchaseItemReport'])->name('total.purchase.item.report');
@@ -974,6 +981,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('/general/account/list', [ReportController::class, 'generalLedgerList'])->name('general.account.list.reports');
                 Route::get('/general/account/list/load', [ReportController::class, 'loadGeneralLedgerListReport'])->name('ajax.load.general.account.list.reports');
                 Route::get('/general/account/load/print/{company_id}/{branch_id}', [ReportController::class, 'printGeneralLedgerListReport'])->name('ajax.general.ledger.list.report.print');
+
 
             });
 
@@ -1165,6 +1173,16 @@ Route::middleware('auth')->group(function () {
             Route::post('/receive/{intersite}', [InterSiteTransferController::class, 'receive'])->name('intersite.receive');
             Route::post('/add-to-store', [InterSiteTransferController::class, 'addToStore'])->name('intersite.add-to-store');
         });
+        Route::group(['prefix' => 'user_entries'], function () {
+            //User Entries
+            Route::get('/list', [ReportController::class, 'userEntriesReport'])->name('user_entries.report');
+            Route::get('/load', [ReportController::class, 'loadUserEntriesReport'])->name('ajax.load.user_entries.report');
+
+            //Back Dated or Postdated Entries
+            Route::get('/backdated/post/list', [ReportController::class, 'backdatedEntriesReport'])->name('backdated.report');
+            Route::get('/backdated/post/load', [ReportController::class, 'loadBackdatedEntriesReport'])->name('ajax.load.backdated_postdated_report');
+        });
+
 
     });
 
@@ -1191,6 +1209,8 @@ Route::middleware('auth')->group(function () {
         Route::get('backup/create', [BackupController::class, 'createBackup'])->name('backup.create');
         Route::get('backup/download/{file}', [BackupController::class, 'downloadBackup'])->name('backup.download');
         Route::post('backup/restore', [BackupController::class, 'restoreDatabase'])->name('backup.restore');
+        Route::delete('backup/delete/{file}', [BackupController::class, 'deleteBackup'])->name('backup.delete');
+
     });
 
 

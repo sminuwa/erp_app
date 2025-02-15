@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\InterBank;
+use App\Models\InterstoreTransfer;
 use App\Models\Journal;
 use App\Models\Order;
 use App\Models\Payment;
@@ -337,6 +338,9 @@ function getReferenceId($reference)
     }
     if (strpos($reference, 'ITB') !== false) {
         return InterBank::where('reference', $reference)->first()->id ?? null;
+    }
+    if (strpos($reference, 'ITS') !== false) {
+        return InterstoreTransfer::where('reference', $reference)->first()->id ?? null;
     }
     
 }

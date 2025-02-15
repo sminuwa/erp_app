@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-use Spatie\DbDumper\Databases\MySql;
+use Illuminate\Support\Facades\File;
 
 class BackupController extends Controller
 {
@@ -21,68 +22,77 @@ class BackupController extends Controller
         return view('pages.backup_restore.list', compact('files'));
     }
 
+
+
     public function createBackup()
     {
         try {
-            // Create backup directory if it doesn't exist
+            ini_set('memory_limit', '2G');
             $backupDir = storage_path('app/backups');
-            if (!file_exists($backupDir)) {
-                mkdir($backupDir, 0755, true);
+            if (!File::exists($backupDir)) {
+                File::makeDirectory($backupDir, 0755, true);
             }
 
-            // Generate backup filename
+            // Generate file name
             $filename = 'backup_' . date('Y-m-d-His') . '.sql';
             $backupPath = $backupDir . DIRECTORY_SEPARATOR . $filename;
 
-            // Configure MySQL Dumper
-            $dumper = MySql::create()
-                ->setHost(config('database.connections.mysql.host'))
-                ->setDbName(config('database.connections.mysql.database'))
-                ->setUserName(config('database.connections.mysql.username'))
-                ->setPassword(config('database.connections.mysql.password'))
-                ->setDumpBinaryPath('C:\\wamp64\\bin\\mysql\\mysql5.7.36\\bin')
-                ->addExtraOption('--no-tablespaces');
+            // Get all table names
+            $tables = DB::select('SHOW TABLES');
+            $tables = array_map('current', json_decode(json_encode($tables), true));
 
-            // Execute the dump
-            $dumper->dumpToFile($backupPath);
+            $sql = "-- Database Backup for " . env('DB_DATABASE') . " \n-- Generated: " . now() . "\n\n";
 
-            // Log the success
-            Log::info('Backup created successfully', [
-                'path' => $backupPath,
-                'size' => filesize($backupPath)
-            ]);
+            foreach ($tables as $table) {
+                $sql .= "-- Dumping data for table: $table \n";
+                $rows = DB::select("SELECT * FROM $table");
 
-            if (request()->ajax()) {
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Backup completed successfully'
-                ]);
+                foreach ($rows as $row) {
+                    $values = array_map(fn($value) => $value === null ? 'NULL' : "'" . addslashes($value) . "'", (array) $row);
+                    $sql .= "INSERT INTO `$table` VALUES (" . implode(", ", $values) . ");\n";
+                }
+                $sql .= "\n";
             }
 
-            return redirect()->route('backup.index')->with('success', 'Backup created successfully');
+            File::put($backupPath, $sql);
 
+            Log::info('Backup created successfully', ['path' => $backupPath]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Backup completed successfully',
+                'reload' => true  // <-- Add a reload flag
+            ]);
+            
         } catch (\Exception $e) {
-            Log::error('Backup failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            if (request()->ajax()) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Backup failed: ' . $e->getMessage()
-                ], 500);
-            }
-
-            return redirect()->route('backup.index')->with('error', 'Backup failed: ' . $e->getMessage());
+            Log::error('Backup failed', ['error' => $e->getMessage()]);
+            return response()->json(['status' => 'error', 'message' => 'Backup failed: ' . $e->getMessage()], 500);
         }
     }
+
+
+
+    /**
+     * Handle Backup Failure
+     */
+    private function handleBackupFailure($e)
+    {
+        if (request()->ajax()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Backup failed: ' . $e->getMessage()
+            ], 500);
+        }
+
+        return redirect()->route('backup.index')->with('error', 'Backup failed: ' . $e->getMessage());
+    }
+
 
     public function downloadBackup($file)
     {
         try {
             $backupPath = storage_path("app/backups/{$file}");
-            
+
             if (!file_exists($backupPath)) {
                 return redirect()->route('backup.index')->with('error', 'Backup file not found');
             }
@@ -150,5 +160,16 @@ class BackupController extends Controller
             ]);
             return redirect()->route('backup.index')->with('error', 'Restore failed: ' . $e->getMessage());
         }
+    }
+    public function deleteBackup($file)
+    {
+        $filePath = storage_path('app/backups/' . $file);
+
+        if (File::exists($filePath)) {
+            File::delete($filePath);
+            return redirect()->route('backup.index')->with('success', 'Backup deleted successfully.');
+        }
+
+        return redirect()->route('backup.index')->with('error', 'File not found.');
     }
 }

@@ -1,7 +1,7 @@
 <div class="row">
     <div class="offset-10">
         <a href="{{ route('ajax.print.stock.adjustment.reports', [$from_date, $to_date, $company_id,$branch_id, $store_id, $category_id, $product_id]) }}"
-            target="_BLANK" class="btn-success btn btn-sm">Print</a>
+           target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
 <table class="display table table-bordered caption" id="example1">
@@ -10,24 +10,26 @@
         <h5 style="text-align: center;">STOCK ADJUSTMENT REPORT </h5>
     </caption>
     <thead>
-        <tr>
-            <th style="width: 50%" colspan="5">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
-            </th>
-            <th style="width: 50%;text-align:right" colspan="5">Processed By {{ auth()->user()->name }}</th>
-        </tr>
-        <tr>
-            <th>PROCESSED DATE</th>
-            <th>PRODUCT CODE</th>
-            <th>PRODUCT NAME</th>
-            <th>QUANTITY</th>
-            <th>TYPE</th>
-            <th>STORE</th>
-            <th>ADJUSTMENT NO</th>
-            <th>CREATED BY</th>
-            <th>DATE CREATED</th>
-            <th>POSTED By</th>
+    <tr>
+        <th style="width: 50%" colspan="5">Date
+            Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+        </th>
+        <th style="width: 50%;text-align:right" colspan="6">Processed By {{ auth()->user()->name }}</th>
+    </tr>
+    <tr>
+        <th>PROCESSED DATE</th>
+        <th>PRODUCT CODE</th>
+        <th>PRODUCT NAME</th>
+        <th>QUANTITY</th>
+        <th>UNIT</th>
+        <th>TYPE</th>
+        <th>STORE</th>
+        <th>ADJUSTMENT NO</th>
+        <th>CREATED BY</th>
+        <th>DATE CREATED</th>
+        <th>POSTED By</th>
 
-        </tr>
+    </tr>
     </thead>
     @foreach ($stores as $store)
         <tr>
@@ -35,6 +37,7 @@
             <td> {{ $store->code }} </td>
             <td> {{ $store->name }} </td>
             <td> {{ $store->operation == 'in'? $store->quantity:(-$store->quantity) }} </td>
+            <td> {{ $store->product_unit }} </td>
             <td> {{ $store->operation }} </td>
             <td>{{ $store->store }} </td>
             <td> {{ $store->reference }} </td>

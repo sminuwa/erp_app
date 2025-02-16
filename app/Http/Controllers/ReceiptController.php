@@ -41,12 +41,14 @@ class ReceiptController extends Controller
             ->orderBy('receipt_no', 'DESC')->take(10)->get();
         return view('pages.receipts.receipt_payment', ['payments' => $payments]);
     }
+
     public function show(Receipt $receipt)
     {
 
         $company = Setting::where('branch_id', User::userBranchAction())->latest()->first();
         return view('pages.receipts.preview', compact('receipt', 'company'));
     }
+
     public function payReciept(Request $request)
     {
         $receipt_id = $request->receipt_id;
@@ -81,12 +83,10 @@ class ReceiptController extends Controller
             $record->branch_id = $user_branch;
             $record->status = 0;
             if ($record->save()) {
-
                 $action = "Generated receipt of $amount for : " . $reference_no;
                 AuditLog::auditLog(auth()->id(), $action);
                 session()->flash('app_message', 'Receipt generated successfully');
                 DB::commit();
-
             }
             return redirect()->route('receipt.payment.show', $record->id);
 
@@ -97,8 +97,8 @@ class ReceiptController extends Controller
         }
 
         return redirect()->route('receipt.payment.show', $record->id);
-
     }
+
     public function loadPayers(Request $request)
     {
         $type = $request->get('type');

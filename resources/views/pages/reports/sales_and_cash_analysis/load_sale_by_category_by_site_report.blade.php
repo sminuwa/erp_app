@@ -129,53 +129,75 @@
             $grand_total_profit = 0;
         @endphp
 
-        <div class="row">
-            <div class="col-md-12 table-responsive">
-                <table class="display table table-bordered table-striped" data-ordering="true">
-                    <thead>
-                        <tr>
-                            @if ($group_by_category)
-                                <th>CATEGORY</th>
-                            @endif
-                            @if ($group_by_product)
-                                <th>PRODUCT</th>
-                            @endif
-                            <th>QTY AVAILABLE</th>
-                            <th>QTY SOLD</th>
-                            <th>AMOUNT</th>
-                            <th>COST</th>
-                            <th>PROFIT</th>
-                            <th>MARGIN (%)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($sales as $sale)
-                            @php
-                                $profit = $sale->amount - $sale->cost;
-                                $grand_total_amount += $sale->amount;
-                                $grand_total_cost += $sale->cost;
-                                $grand_total_profit += $profit;
-                            @endphp
-                            <tr>
-                                @if ($group_by_category)
-                                    <td>{{ $sale->category }}</td>
-                                @endif
-                                @if ($group_by_product)
-                                    <td>{{ $sale->product_name ?? '-' }}</td>
-                                @endif
-                                <td style="text-align: right">{{ number_format($sale->qty_available, 6) }}</td>
-                                <td style="text-align: right">{{ number_format($sale->quantity, 6) }}</td>
-                                <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}</td>
-                                <td style="text-align: right">{{ number_format($sale->cost, 2, '.', ',') }}</td>
-                                <td style="text-align: right">{{ number_format($profit, 2, '.', ',') }}</td>
-                                <td style="text-align: right">
-                                    {{ $sale->amount != 0 ? number_format(($profit / $sale->amount) * 100, 2) : 0 }}
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+@foreach ($salesByGroup as $groupKey => $groupSales)
+    <div class="row">
+        <div class="col-md-12 mt-3">
+            <h4>
+                @if ($group_by_category)
+                    Category: {{ $groupSales->first()->category_code }} - {{ $groupSales->first()->category_name }}
+                @elseif ($group_by_product)
+                    Product: {{ $groupSales->first()->product_code }} - {{ $groupSales->first()->product_name }}
+                @else
+                    Branch: {{ $groupSales->first()->branch_code }} - {{ $groupSales->first()->branch_name }}
+                @endif
+            </h4>
         </div>
     </div>
-</div>
+
+    <div class="row">
+        <div class="col-md-12 table-responsive">
+            <table class="display table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        @if (!$group_by_category && !$group_by_product)
+                            <th>Category Code</th>
+                            <th>Category Name</th>
+                        @endif
+                        @if ($group_by_category)
+                            <th>Branch Code</th>
+                            <th>Product Code</th>
+                            <th>Product Name</th>
+                        @endif
+                        @if ($group_by_product)
+                            <th>Branch Code</th>
+                        @endif
+                        <th>QTY Available</th>
+                        <th>QTY Sold</th>
+                        <th>Amount</th>
+                        <th>Cost</th>
+                        <th>Margin</th>
+                        <th>Margin (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($groupSales as $sale)
+                        <tr>
+                            @if (!$group_by_category && !$group_by_product)
+                                <td>{{ $sale->category_code }}</td>
+                                <td>{{ $sale->category_name }}</td>
+                            @endif
+                            @if ($group_by_category)
+                                <td>{{ $sale->branch_code }}</td>
+                                <td>{{ $sale->product_code }}</td>
+                                <td>{{ $sale->product_name }}</td>
+                            @endif
+                            @if ($group_by_product)
+                                <td>{{ $sale->branch_code }}</td>
+                            @endif
+                            <td style="text-align: right">{{ number_format($sale->qty_available, 6) }}</td>
+                            <td style="text-align: right">{{ number_format($sale->quantity, 6) }}</td>
+                            <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}</td>
+                            <td style="text-align: right">{{ number_format($sale->cost, 2, '.', ',') }}</td>
+                            <td style="text-align: right">{{ number_format($sale->amount - $sale->cost, 2) }}</td>
+                            <td style="text-align: right">
+                                {{ $sale->amount != 0 ? number_format((($sale->amount - $sale->cost) / $sale->amount) * 100, 2) : 0 }}
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+@endforeach
+
+

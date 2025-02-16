@@ -250,7 +250,7 @@
                                         @endif
                                     </div>
                                     <div class="form-group">
-                                        <?php $officers = App\Models\User::orderBy('user_code', 'asc')->get(); ?>
+                                        <?php $officers = App\Models\User::where('is_sale_representative', 1)->orderBy('user_code', 'asc')->get(); ?>
                                         <label for="code">Relation Officer</label>
                                         <select
                                             class="form-control ajax-users {{ $errors->has('relation_officer') ? ' is-invalid' : '' }}"
@@ -307,7 +307,7 @@
                 } else {
                     $('.staff_number_field').html('');
                 }
-                
+
             });
         });
     </script>

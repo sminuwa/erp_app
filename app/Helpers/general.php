@@ -1,5 +1,12 @@
 <?php
 
+use App\Models\InterBank;
+use App\Models\InterstoreTransfer;
+use App\Models\Journal;
+use App\Models\Order;
+use App\Models\Payment;
+use App\Models\Receipt;
+
 const TRANSACTION_TYPE_OPENING_BALANCE = 0;
 const TRANSACTION_TYPE_GRN = 1;
 const TRANSACTION_TYPE_INTERSITE = 2;
@@ -58,8 +65,9 @@ function in_array_r($needle, $haystack, $strict = true)
     return false;
 }
 
-function remove_non_numeric($string){
-    return (float)preg_replace("/[^\d.]+/", "", $string);
+function remove_non_numeric($string)
+{
+    return (float) preg_replace("/[^\d.]+/", "", $string);
 }
 
 function currency_sign($currency = 'NG')
@@ -70,8 +78,9 @@ function currency_sign($currency = 'NG')
 }
 
 
-function spinner($width = 36, $height=36){
-    return '<img src="'.asset('commons/images/spinner_v1.svg').'" width="'.$width.'" height="'.$height.'"/>';
+function spinner($width = 36, $height = 36)
+{
+    return '<img src="' . asset('commons/images/spinner_v1.svg') . '" width="' . $width . '" height="' . $height . '"/>';
 }
 
 function ceiling($num, $nearest)
@@ -279,7 +288,8 @@ function storeByCode($code)
 
 
 
-function searchIndex($array, $column_name){
+function searchIndex($array, $column_name)
+{
     foreach ($array as $key => $value) {
         if (stripos($value, $column_name) !== false) {
             return $key;
@@ -288,7 +298,8 @@ function searchIndex($array, $column_name){
     return null;
 }
 
-function searchForId($search_value, $array) {
+function searchForId($search_value, $array)
+{
     // Iterating over main array
     foreach ($array as $key1 => $val1) {
         $temp_path = array();
@@ -296,19 +307,40 @@ function searchForId($search_value, $array) {
         array_push($temp_path, $key1);
         // Check if this value is an array
         // with atleast one element
-        if(is_array($val1) and count($val1)) {
+        if (is_array($val1) and count($val1)) {
             // Iterating over the nested array
             foreach ($val1 as $key2 => $val2) {
-                if(strtoupper($val2) == strtoupper($search_value)) {
+                if (strtoupper($val2) == strtoupper($search_value)) {
                     // Adding current key to search path
                     array_push($temp_path, $key2);
-                    return (object)$array[$key1] = $val1;
+                    return (object) $array[$key1] = $val1;
                 }
             }
-        }
-        elseif(strtoupper($val1) == strtoupper($search_value)) {
-            return (object)$array[$key1] = $val1;
+        } elseif (strtoupper($val1) == strtoupper($search_value)) {
+            return (object) $array[$key1] = $val1;
         }
     }
     return null;
+}
+function getReferenceId($reference)
+{
+    if (strpos($reference, 'RCT') !== false) {
+        return Receipt::where('receipt_no', $reference)->first()->id ?? null;
+    }
+    if (strpos($reference, 'INV') !== false) {
+        return Order::where('reference', $reference)->first()->id ?? null;
+    }
+    if (strpos($reference, 'PAY') !== false) {
+        return Payment::where('receipt_no', $reference)->first()->id ?? null;
+    }
+    if (strpos($reference, 'JNL') !== false) {
+        return Journal::where('reference', $reference)->first()->id ?? null;
+    }
+    if (strpos($reference, 'ITB') !== false) {
+        return InterBank::where('reference', $reference)->first()->id ?? null;
+    }
+    if (strpos($reference, 'ITS') !== false) {
+        return InterstoreTransfer::where('reference', $reference)->first()->id ?? null;
+    }
+    
 }

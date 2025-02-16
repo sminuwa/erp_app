@@ -50,10 +50,10 @@
                     </div>
                 @endif
 
-                <a href="{{ route('backup.create') }}" class="btn btn-success">Create Backup</a>
+                <a href="{{ route('backup.create') }}" class="btn btn-sm btn-success">Create Backup</a>
 
-                <h5>Available Backups</h5>
-                <table class="table">
+                <h5 class="mt-2">Available Backups</h5>
+                <table class="table table-bordered">
                     <thead>
                         <tr>
                             <th>Filename</th>
@@ -63,13 +63,25 @@
                     <tbody>
                         @foreach ($files as $file)
                             <tr>
-                                <td>{{ basename($file) }}</td>
+                                <td>{{ basename($file) }} ({{ number_format(filesize($file) / 1048576, 2) }} MB)</td>
                                 <td>
                                     <a href="{{ route('backup.download', ['file' => basename($file)]) }}"
-                                        class="btn btn-primary">Download</a>
+                                        class="btn btn-sm btn-primary"><span class="fa fa-download"></span> Download</a>
+
+                                    <!-- Delete Button -->
+                                    <form action="{{ route('backup.delete', ['file' => basename($file)]) }}" method="POST"
+                                        style="display:inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Are you sure you want to delete this backup?');">
+                                            <span class="fa fa-remove"></span> Delete
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach
+
                     </tbody>
                 </table>
 
@@ -90,10 +102,12 @@
 @endsection
 
 @push('js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Add loading state to backup button
             const backupBtn = document.querySelector('a[href="{{ route('backup.create') }}"]');
+
             if (backupBtn) {
                 backupBtn.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -105,8 +119,8 @@
                     backupBtn.classList.add('disabled');
                     backupBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Backup...';
 
-                    // Make the backup request
                     fetch('{{ route('backup.create') }}', {
+                            method: 'GET',
                             headers: {
                                 'X-Requested-With': 'XMLHttpRequest'
                             }
@@ -114,32 +128,28 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.status === 'success') {
-                                // Show success message
-                                const alert = document.createElement('div');
-                                alert.className = 'alert alert-success';
-                                alert.textContent = data.message;
-                                document.querySelector('.container-fluid').insertBefore(alert, document
-                                    .querySelector('.table'));
-
-                                // Reload page after 2 seconds
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 2000);
+                                Swal.fire({
+                                    title: 'Backup Completed!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    timer: 2000, // Auto close after 2 seconds
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload(); // Reload page after alert closes
+                                });
                             } else {
                                 throw new Error(data.message);
                             }
                         })
                         .catch(error => {
-                            // Show error message
-                            const alert = document.createElement('div');
-                            alert.className = 'alert alert-danger';
-                            alert.textContent = error.message;
-                            document.querySelector('.container-fluid').insertBefore(alert, document
-                                .querySelector('.table'));
+                            Swal.fire({
+                                title: 'Error!',
+                                text: error.message,
+                                icon: 'error'
+                            });
 
-                            // Reset button
                             backupBtn.classList.remove('disabled');
-                            backupBtn.textContent = 'Create Backup';
+                            backupBtn.innerHTML = 'Create Backup';
                         });
                 });
             }

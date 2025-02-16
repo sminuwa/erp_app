@@ -105,7 +105,8 @@
                                         <div class="form-group">
                                             &nbsp;&nbsp;
                                             <label for="summary">Summary Report</label>
-                                            <input type="checkbox" class="form-control" name="is_summary" id="summary">
+                                            <input type="checkbox" checked class="form-control" name="is_summary"
+                                                   id="summary">
                                         </div>
                                         <div class="col-md-12">
                                             <div class="form-group text-right ">

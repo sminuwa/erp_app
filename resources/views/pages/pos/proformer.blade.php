@@ -30,7 +30,8 @@
         <section class="content">
             <div class="container">
                 @can('proformer.list')
-                    <a href="{{ route('proformer.list') }}" class="btn btn-sm btn-secondary" style="margin-left: 2px;"><span
+                    <a href="{{ route('proformer.list') }}" class="btn btn-sm btn-secondary"
+                       style="margin-left: 2px;"><span
                             class="fa fa-list"> </span> Proforma List</a>
                 @endcan
                 <div class="row">
@@ -53,22 +54,26 @@
                                 <div class="card-body">
 
                                     <input type="hidden" name="order_date" class="form-control datepicker-entry"
-                                        value="{{ date('Y-m-d') }}" />
+                                           value="{{ date('Y-m-d') }}"/>
 
                                     <div class="row">
-                                        <input type="hidden" class="form-control" name="customer_id" id="customer_val_id"
-                                            value="">
+                                        <input type="hidden" class="form-control" name="customer_id"
+                                               id="customer_val_id"
+                                               value="">
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Customer Type</label>
-                                                <select name="account_type" id="account_type" class="form-control" required>
+                                                <select name="account_type" id="account_type" class="form-control"
+                                                        required>
                                                     <option value="" disabled selected>Select...</option>
                                                     <option value="Retail"
                                                         {{ (isset($order) && $order->customer->type == 'Retail') || (session()->has('customer') && session('customer')->type == 'Retail') ? 'selected' : '' }}>
-                                                        Retail</option>
+                                                        Retail
+                                                    </option>
                                                     <option value="Wholesale"
                                                         {{ (isset($order) && $order->customer->type == 'Wholesale') || (session()->has('customer') && session('customer')->type == 'Wholesale') ? 'selected' : '' }}>
-                                                        WholeSale</option>
+                                                        WholeSale
+                                                    </option>
                                                 </select>
                                             </div>
                                         </div>
@@ -76,8 +81,9 @@
                                             <div class="form-group">
                                                 <label>Customer</label>
                                                 <div class="form-group">
-                                                    <select onchange="$('.customer').val($(this).val())" name="customer_id"
-                                                        id="customer_record" class="form-control select2-single">
+                                                    <select onchange="$('.customer').val($(this).val())"
+                                                            name="customer_id"
+                                                            id="customer_record" class="form-control select2-single">
                                                         @if (session()->has('customer'))
                                                             <option value="{{ session('customer')->id }}">
                                                                 {{ session('customer')->code }} -
@@ -85,7 +91,7 @@
                                                         @endif
                                                         @if (isset($order))
                                                             <option value="{{ $order->customer->id }}"
-                                                                @if (session()->has('customer') && session('customer')->id == $order->customer?->id) selected @endif>
+                                                                    @if (session()->has('customer') && session('customer')->id == $order->customer?->id) selected @endif>
                                                                 {{ $order->customer->code }} -
                                                                 {{ $order->customer->name }}</option>
                                                         @endif
@@ -93,15 +99,18 @@
 
                                                     <div class="form-group">
                                                         <span class="text text-danger ion-android-alert"
-                                                            id="credit_balance"></span>
+                                                              id="credit_balance"></span>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
-                                                    <textarea class="form-control" name="description" placeholder="Description" id="description"></textarea>
+                                                    <textarea class="form-control" name="description"
+                                                              placeholder="Description" id="description"></textarea>
                                                 </div>
                                                 @can('proformer.update')
                                                     <button type="submit" id="create_invoice"
-                                                        class="btn btn-sm btn-info float-md-right ml-3">Create Invoice</button>
+                                                            class="btn btn-sm btn-info float-md-right ml-3">Create
+                                                        Invoice
+                                                    </button>
                                                 @endcan
                                             </div>
                                         </div>
@@ -118,12 +127,12 @@
                                 <h3 class="card-title">Products</h3>
                                 @can('make.daily.sale')
                                     <input type="text" id="barcode" class="form-control" name="barcode"
-                                        placeholder="Scan barcode">
+                                           placeholder="Scan barcode">
                                 @endcannot
                             </div>
                             <div class="float-right">
                                 <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
-                                    class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
+                                   class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
                                         class="fa fa-plus"></i> Add Product </a>
                             </div>
                         </div>
@@ -171,8 +180,8 @@
                 <div class="modal-body">
                     <form action="{{ route('ajax.cart.add') }}" method="POST" class="addCartItemForm">
                         <input type="hidden" name="customer" class="customer"
-                            value="@if (session()->has('customer')) {{ session('customer')->id }} @endif">
-                        <input type="hidden" name="type" value="{{ 'order' }}" />
+                               value="@if (session()->has('customer')) {{ session('customer')->id }} @endif">
+                        <input type="hidden" name="type" value="{{ 'order' }}"/>
                         @csrf
 
                         <div class="form-group">
@@ -195,8 +204,9 @@
 
                         <div class="form-group">
                             <label for="qty">Quantity</label>
-                            <input type="number" step=".01" class="form-control {{ $errors->has('qty') ? ' is-invalid' : '' }}"
-                                name="qty" id="qty" placeholder="" required="required">
+                            <input type="number" step=".01"
+                                   class="form-control {{ $errors->has('qty') ? ' is-invalid' : '' }}"
+                                   name="qty" id="qty" placeholder="" required="required">
                             @if ($errors->has('qty'))
                                 <div class="invalid-feedback">
                                     <strong>{{ $errors->first('qty') }}</strong>
@@ -205,9 +215,9 @@
                         </div>
                         <div class="form-group">
                             <label for="cost_price">Cost Price</label>
-                            <input type="text"
-                                class="form-control {{ $errors->has('cost_price') ? ' is-invalid' : '' }}"
-                                name="cost_price" id="cost_price" placeholder="" required="required">
+                            <input type="text" oninput="formatNumber(this)"
+                                   class="form-control {{ $errors->has('cost_price') ? ' is-invalid' : '' }}"
+                                   name="cost_price" id="cost_price" placeholder="" required="required">
                             @if ($errors->has('cost_price'))
                                 <div class="invalid-feedback">
                                     <strong>{{ $errors->first('cost_price') }}</strong>
@@ -217,7 +227,7 @@
                         <div class="form-group">
                             <label for="store">Store</label>
                             <select class="form-control select2-single {{ $errors->has('store') ? ' is-invalid' : '' }}"
-                                name="store" id="store" required="required">
+                                    name="store" id="store" required="required">
                                 @if (isset($store))
                                     <option value="">Select...</option>
                                     @foreach ($store as $data)
@@ -229,8 +239,10 @@
                         </div>
                         @can('ajax.cart.add')
                             <div class="form-group text-right ">
-                                <button type="submit" class="btn btn-primary"><span class="ion-android-cart"> </span>Add to
-                                    Cart</button>
+                                <button type="submit" class="btn btn-primary"><span class="ion-android-cart"> </span>Add
+                                    to
+                                    Cart
+                                </button>
                             </div>
                         @endcan
                     </form>
@@ -240,9 +252,6 @@
     </div>
 @endsection
 
-
-
-
 @push('js')
     <!-- Sweet Alert Js -->
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
@@ -251,19 +260,19 @@
                                                                                                                                             $('select[name=account_type]').change( () => {
                                                                                                                                                 $('.cart-container').removeClass('d-none')
                                                                                                                                             })*/
-        $(function() {
+        $(function () {
             $("#example1").DataTable({
                 'iDisplayLength': 100
             });
 
-            $('#account_type').on("change", function() {
+            $('#account_type').on("change", function () {
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.customers') }}",
                     data: {
                         type: $(this).val()
                     }
-                }).done(function(data) {
+                }).done(function (data) {
                     $("#customer_record").html(data);
                 });
             });
@@ -287,7 +296,8 @@
                 $("#" + tagg_id).html("Selling QTY is more than the available quantity");
             }
         }
-        $('#customer_record').on("change", function() {
+
+        $('#customer_record').on("change", function () {
             customer_id = $(this).val();
 
             $.ajax({
@@ -296,7 +306,7 @@
                 data: {
                     customer_id: customer_id
                 }
-            }).done(function(data) {
+            }).done(function (data) {
                 balance = formatMoney(data);
                 $("#credit_balance").html("Credit limit: &#8358;" + balance);
                 $('#existing_amount').val(balance);
@@ -347,9 +357,9 @@
             })
         }
 
-        $(function() {
+        $(function () {
 
-            $(document).on('input', '.price', function() {
+            $(document).on('input', '.price', function () {
                 // Get the value of the text field
                 var priceValue = parseFloat($(this).val());
                 //alert(priceValue)
@@ -376,16 +386,15 @@
 
         });
 
-        var delay = (function() {
+        var delay = (function () {
             var timer = 0;
-            return function(callback, ms) {
+            return function (callback, ms) {
                 clearTimeout(timer);
                 timer = setTimeout(callback, ms);
             };
         })();
 
-
-        $('.quantity,.price').keyup(function() {
+        $('.quantity,.price').keyup(function () {
             id = $(this).attr('data-value');
             $("#valid_qty" + id.substr(1)).html("");
             // if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
@@ -395,14 +404,14 @@
             //     $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
             //     return false;
             // }
-            delay(function() {
+            delay(function () {
 
                 $.ajax({
                     url: $('#' + id).attr('action'),
                     type: $('#' + id).attr('method'),
                     //dataType: 'json',
                     data: $('#' + id).serialize(),
-                    success: function(data) {
+                    success: function (data) {
                         id = id.substr(1);
 
                         subtotal = $('#price' + id).val() * $('#quantity' + id).val();
@@ -410,7 +419,7 @@
                         $('#total').text(formatMoney(data));
                         $('#subtotal').text(formatMoney(data));
                     },
-                    error: function(xhr, err) {
+                    error: function (xhr, err) {
                         //$('#total').text(formatMoney(data));
                         //$('#subtotal').text(formatMoney(data));
                     }
@@ -434,12 +443,12 @@
                             barcode: code
                         },
                         dataType: 'html',
-                        success: function(response) {
+                        success: function (response) {
                             // update the cart items container with the new cart data
                             $('#load_cart').html(response);
                             $('#barcode').val("")
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             // display an error message
                             alert('An error occurred while adding the product to cart.');
                         }
@@ -458,5 +467,27 @@
                 }, 200); //200 works fine for me but you can adjust it
             }
         });
+
+        function formatNumber(input) {
+            // Remove non-numeric and non-decimal characters
+            let value = input.value.replace(/[^\d.]/g, '');
+
+            // Split the value into integer and decimal parts
+            const parts = value.split('.');
+            let integerPart = parts[0] ? parseFloat(parts[0]) : 0;
+            let decimalPart = parts[1] !== undefined ? '.' + parts[1] : '';
+
+            // Check if the integer part is not NaN
+            if (!isNaN(integerPart)) {
+                // Format the integer part with commas and dot as decimal separator
+                integerPart = integerPart.toLocaleString('en-US', {
+                    maximumFractionDigits: 2,
+                    useGrouping: true
+                });
+
+                // Set the formatted value back to the input
+                input.value = integerPart + decimalPart;
+            }
+        }
     </script>
 @endpush

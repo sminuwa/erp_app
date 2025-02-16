@@ -33,7 +33,20 @@
 
                     <td>{{ Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                     </td>
-                    <td>{{ $payment->receipt_no }}</td>
+                    <td>
+                        @if (strpos($payment->receipt_no, 'RCT') !== false)
+                            <a href="{{ route('receipt.payment.show', getReferenceId($payment->receipt_no)) }}"
+                                target="_BLANK">
+                                {{ $payment->receipt_no }}
+                            </a>
+                        @endif
+                        @if (strpos($payment->receipt_no, 'PAY') !== false)
+                            <a href="{{ route('payment.show', getReferenceId($payment->receipt_no)) }}" target="_BLANK">
+                                {{ $payment->receipt_no }}
+                            </a>
+                        @endif
+                        
+                    </td>
                     <td>
                         {{ $payment->payer()->code ? $payment->payer()->code . ' - ' . $payment->payer()->name : $payment->payer()->number . ' - ' . $payment->payer()->description }}
                     </td>
@@ -79,7 +92,14 @@
 
                     <td>{{ Carbon\Carbon::parse($interbank->date)->toFormattedDateString() }}
                     </td>
-                    <td>{{ $interbank->reference }}</td>
+                    <td>
+                        @if (strpos($interbank->reference, 'ITB') !== false)
+                        <a href="{{ route('interbank.show', getReferenceId($interbank->reference)) }}" target="_BLANK">
+                            {{ $interbank->reference }}
+                        </a>
+                    @endif
+                        
+                    </td>
                     <td align="right">{{ number_format($interbank->amount, 2, '.', ',') }}</td>
                     <td>{{ $interbank->description }}</td>
                     <td>{{ $interbank->source->description }}</td>
@@ -107,7 +127,14 @@
             @foreach ($payments as $record)
                 <tr class="@if ($record->status == 0) bg-warning @endif">
                     <td>{{ Carbon\Carbon::parse($record->date)->toFormattedDateString() }}</td>
-                    <td>{{ $record->reference }}</td>
+                    <td>
+                        @if (strpos($record->reference, 'JNL') !== false)
+                            <a href="{{ route('journal.show', getReferenceId($record->reference)) }}" target="_BLANK">
+                                {{ $record->reference }}
+                            </a>
+                        @endif
+
+                    </td>
                     <td>{{ $record->description ?? null }}</td>
                     <td>{{ optional($record->createdBy)->name }}</td>
                     <td>
@@ -157,7 +184,14 @@
                     <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}
                     </td>
                     <td>{{ $order->customer->name }}</td>
-                    <td>{{ $order->reference }}</td>
+                    <td>
+                        @if (strpos($order->reference, 'INV') !== false)
+                            <a href="{{ route('orders.show', getReferenceId($order->reference)) }}" target="_BLANK">
+                                {{ $order->reference }}
+                            </a>
+                        @endif
+
+                    </td>
                     <td align="right">{{ number_format($order->total, 2, '.', ',') }}
                     </td>
                     <td align="right">{{ number_format($order->pay, 2, '.', ',') }}</td>

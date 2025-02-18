@@ -4310,10 +4310,9 @@ class ReportController extends Controller
 
         $sales = DB::table('purchases')
             ->select(
-                'purchase_expenses.reference AS ref',
+                'purchase_expenses.reference',
                 'purchase_expenses.id AS purchase_id',
                 'suppliers.name AS supplier',
-                'purchases.reference',
                 'description',
                 'branches.code AS branch',
                 'purchases.purchase_date',
@@ -4326,7 +4325,7 @@ class ReportController extends Controller
             )
             ->join('purchase_products', 'purchase_products.purchase_id', '=', 'purchases.id')
             ->join('purchase_expenses', 'purchase_expenses.purchase_id', '=', 'purchases.id')
-            ->join('suppliers', 'suppliers.id', '=', 'purchases.supplier_id')
+            ->join('suppliers', 'suppliers.id', '=', 'purchase_expenses.supplier_id')
             ->join('users', 'users.id', '=', 'purchases.created_by')
             ->join('branches', 'branches.id', '=', 'purchases.branch_id')
             ->where('branches.company_id', 'LIKE', $company_id)
@@ -4338,7 +4337,6 @@ class ReportController extends Controller
             ->groupBy(
                 'purchase_expenses.reference',
                 'suppliers.name',
-                'purchases.reference',
                 'description',
                 'purchase_expenses.name',
                 'purchases.purchase_date',

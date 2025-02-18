@@ -16,7 +16,7 @@
     </caption>
     <thead>
         <tr>
-            <th style="width: 50%" colspan="5">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            <th style="width: 50%" colspan="4">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
             </th>
             <th style="width: 50%;text-align:right" colspan="5">Processed By {{ auth()->user()->name }}</th>
         </tr>
@@ -24,8 +24,7 @@
             <th>PROCESSED DATE</th>
             <th>INVOICE</th>
             <th>NAME</th>
-            <th>DESCRIPTION</th>
-            <th>WAYBILL</th>
+            <th>DESCRIPTION/WAYBILL</th>
             <th>TRANSPORTER</th>
             <th>AMOUNT</th>
             <th>CREATED BY</th>
@@ -43,7 +42,6 @@
             <td><a href="{{ route('purchase.additional-invoice.print',$sale->purchase_id) }}" target="_BLANK">{{ $sale->reference }}</a></td>
             <td>{{ $sale->branch }}</td>
             <td>{{ $sale->description }}</td>
-            <td>{{ $sale->wbno }}</td>
             <td>{{ $sale->code }}-{{ $sale->supplier }}</td>
             <td style="text-align: right">
                 {{ number_format($sale->amount, 2, '.', ',') }}</td>
@@ -60,7 +58,7 @@
     @endforeach
     <tfoot>
         <tr>
-            <th colspan="6" style="text-align: right">TOTAL</th>
+            <th colspan="5" style="text-align: right">TOTAL</th>
             <th style="text-align: right">
                 {{ number_format($total_cost, 2, '.', ',') }}
             </th>

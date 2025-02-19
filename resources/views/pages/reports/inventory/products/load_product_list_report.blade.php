@@ -6,7 +6,7 @@
 </div>
 <table class="display table table-bordered caption" id="example1" data-ordering="true">
     <caption style="caption-size:top">
-        <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>
+        <h3 style="text-align: center;">{{ $category->name ?? 'All Categories' }}</h3>
         <h5 style="text-align: center;">List of Products</h5>
     </caption>
     <thead>
@@ -16,9 +16,13 @@
                     <th>Branch</th>
                 @endif
             @endisset
-            <th>Code </th>
+            @isset($category_id)
+                @if ($category_id == 'all')
+                    <th>Category</th>
+                @endif
+            @endisset
+            <th>Item Description </th>
             <th>Brand Name </th>
-            <th>Category</th>
             <th>Barcode</th>
             <th>Status </th>
         </tr>
@@ -31,9 +35,13 @@
                         <td>{{ $record->branch_code }}</td>
                     @endif
                 @endisset
+                @isset($category_id)
+                    @if ($category_id == 'all')
+                        <td>{{ $record->category?->name }}</td>
+                    @endif
+                @endisset
                 <td> {{ $record->code }} </td>
                 <td> {{ $record->name }} </td>
-                <td> {{ $record->category?->name }} </td>
                 <td><span style="font-size: 10pt;">{{ $record->barcode }}</span>
                 </td>
                 <td> {{ $record->status == 1 ? 'Active' : 'Inactive' }} </td>

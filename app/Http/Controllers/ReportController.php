@@ -6937,8 +6937,9 @@ class ReportController extends Controller
             $branch_id = '%';
         $suppliers = Supplier::select('suppliers.*')
             ->where('branch_id', 'LIKE', $branch_id)
-            ->join('branches', 'suppliers.branch_id', 'branches.id')
-            ->join('companies', 'branches.company_id', 'companies.id')
+            ->orWhereNull('suppliers.branch_id')
+            ->leftJoin('branches', 'suppliers.branch_id', 'branches.id')
+            ->leftJoin('companies', 'branches.company_id', 'companies.id')
             ->where('branches.company_id', 'LIKE', $company_id)
             ->orderBy('companies.name')
             ->orderBy('branches.code')
@@ -6994,13 +6995,17 @@ class ReportController extends Controller
     {
         $company_id = $request->company_id;
         $branch_id = $request->branch_id;
+        $category_id = $request->category_id;
+
         if ($company_id == 'all' || $company_id == '') {
             $company_id = '%';
         }
-        if ($branch_id == 'all' || $branch_id == '')
+        if ($branch_id == 'all' || $branch_id == '' || $branch_id == null)
             $branch_id = '%';
+        if ($category_id == 'all' || $category_id == '')
+            $category_id = '%';
         $records = Product::select('products.*', 'branches.code AS branch_code')
-            ->where('branch_id', 'LIKE', $branch_id)
+            ->where('products.category_id', 'LIKE', $category_id)
             ->leftJoin('store_products', 'products.id', 'store_products.product_id')
             ->leftJoin('stores', 'stores.id', 'store_products.store_id')
             ->leftJoin('branches', 'stores.branch_id', 'branches.id')
@@ -7015,13 +7020,15 @@ class ReportController extends Controller
         }
         if ($branch_id == '%')
             $branch_id = 'all';
+        if ($category_id == '%')
+            $category_id = 'all';
         $company = null;
         if ($company_id != 'all')
             $company = Company::find($company_id);
-        $branch = null;
-        if ($branch_id != 'all')
-            $branch = Branch::find($branch_id);
-        return view('pages.reports.inventory.products.load_product_list_report', compact('records', 'branch', 'company_id', 'branch_id'));
+        $category = null;
+        if ($category_id != 'all')
+            $category = Category::find($category_id);
+        return view('pages.reports.inventory.products.load_product_list_report', compact('records', 'category', 'company_id', 'branch_id', 'category_id'));
     }
 
     public function printProductListReport($company_id, $branch_id)
@@ -7053,68 +7060,44 @@ class ReportController extends Controller
         return view('pages.reports.inventory.products.product_list_report', compact('records', 'branch', 'branch_id'));
     }
 
-    public function generalLedgerList(Request $request)
+    public function generalLedgerList(Request $request): View
     {
-        return view('pages.reports.ap_ar.general_ledger.general_ledger_list_report');
+        $classes = GeneralAccount::select('class')->distinct()->get();
+        return view('pages.reports.ap_ar.general_ledger.general_ledger_list_report', compact('classes'));
     }
 
     public function loadGeneralLedgerListReport(Request $request)
     {
-        $company_id = $request->company_id;
-        $branch_id = $request->branch_id;
-        if ($company_id == 'all' || $company_id == '') {
-            $company_id = '%';
-        }
-        if ($branch_id == 'all' || $branch_id == '')
-            $branch_id = '%';
-        $records = GeneralAccount::select('general_accounts.*', 'branches.code AS branch_code')
-            ->where('branch_id', 'LIKE', $branch_id)
-            ->leftJoin('branches', 'general_accounts.branch_id', 'branches.id')
-            ->leftJoin('companies', 'branches.company_id', 'companies.id')
-            // ->where('branches.company_id', 'LIKE', $company_id)
-            ->orderBy('companies.name')
-            ->orderBy('branches.code')
-            ->orderBy('branches.name')
+        $general_account_class = $request->general_account_id;
+
+        if ($general_account_class == 'all' || $general_account_class == '')
+            $general_account_class = '%';
+        $records = GeneralAccount::select('general_accounts.*')
+            ->where('class', 'LIKE', $general_account_class)
+            ->orderBy('number')
             ->get();
-        if ($company_id == '%') {
-            $company_id = 'all';
-        }
-        if ($branch_id == '%')
-            $branch_id = 'all';
-        $company = null;
-        if ($company_id != 'all')
-            $company = Company::find($company_id);
-        $branch = null;
-        if ($branch_id != 'all')
-            $branch = Branch::find($branch_id);
-        return view('pages.reports.ap_ar.general_ledger.load_general_ledger_list_report', compact('records', 'branch', 'company_id', 'branch_id'));
+
+        if ($general_account_class == '%')
+            $general_account_class = 'all';
+
+
+        if ($general_account_class != 'all')
+            $general_account = GeneralAccount::find($general_account_class);
+        return view('pages.reports.ap_ar.general_ledger.load_general_ledger_list_report', compact('records', 'general_account_class'));
     }
 
-    public function printGeneralLedgerListReport($company_id, $branch_id)
+    public function printGeneralLedgerListReport($general_account_class)
     {
-        if ($company_id == 'all' || $company_id == '')
-            $company_id = '%';
-        if ($branch_id == 'all' || $branch_id == '')
-            $branch_id = '%';
-        $records = GeneralAccount::select('general_accounts.*', 'branches.code AS branch_code')
-            ->where('branch_id', 'LIKE', $branch_id)
-            ->leftJoin('branches', 'general_accounts.branch_id', 'branches.id')
-            ->join('companies', 'branches.company_id', 'companies.id')
-            // ->where('branches.company_id', 'LIKE', $company_id)
-            ->orderBy('companies.name')
-            ->orderBy('branches.code')
-            ->orderBy('branches.name')
+        if ($general_account_class == 'all' || $general_account_class == '')
+            $general_account_class = '%';
+        $records = GeneralAccount::select('general_accounts.*')
+            ->where('class', 'LIKE', $general_account_class)
+            ->orderBy('number')
             ->get();
-
-        if ($branch_id == '%')
-            $branch_id = 'all';
-        $company = null;
-        if ($company_id != 'all')
-            $company = Company::find($company_id);
-        $branch = null;
-        if ($branch_id != 'all')
-            $branch = Branch::find($branch_id);
-        return view('pages.reports.ap_ar.general_ledger.print_general_ledger_list_report', compact('records', 'branch', 'branch_id'));
+        $general_account = null;
+        if ($general_account_class != 'all')
+            $general_account = GeneralAccount::find($general_account_class);
+        return view('pages.reports.ap_ar.general_ledger.print_general_ledger_list_report', compact('records', 'general_account'));
     }
     public function showROCustomerReport()
     {

@@ -46,7 +46,7 @@
                         <div class="col-12 table-responsive">
                             <table class="display table table-bordered caption" id="example1" data-ordering="true">
                                 <caption style="caption-size:top">
-                                    <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>
+                                    <h3 style="text-align: center;">{{ $general_account_class->name ?? 'All Classes' }}</h3>
                                     <h5 style="text-align: center;">List of General Ledgers</h5>
                                 </caption>
                                 <thead>
@@ -54,7 +54,6 @@
                                         <th>Class </th>
                                         <th>Number </th>
                                         <th>Description </th>
-                                        <th>Branch</th>
                                         <th>Is Control </th>
                                         <th>Status </th>
                                     </tr>
@@ -65,7 +64,6 @@
                                             <td> {{ $record->class }} </td>
                                             <td> {{ $record->number }} </td>
                                             <td> {{ $record->description }} </td>
-                                            <td> {{ $record->branch?->name }} </td>
                                             <td> {{ $record->is_control == 1 ? 'Yes' : 'No' }} </td>
                                             <td> {{ $record->status == 1 ? 'Active' : 'Not active' }} </td>
                                         </tr>

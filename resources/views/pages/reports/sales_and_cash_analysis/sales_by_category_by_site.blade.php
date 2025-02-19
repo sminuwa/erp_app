@@ -351,7 +351,8 @@
                         $("#load").html(data); // Load data into the report section
                         //loadDataTable(); // Initialize DataTable
                         $('#exportExcel').click(function() {
-                            window.location.href = "{{ route('export.by.site.excel') }}";
+                            window.location.href =
+                                "{{ route('export.by.site.excel') }}";
                         });
 
 
@@ -359,9 +360,42 @@
                             window.location.href = "{{ route('export.by.site.pdf') }}";
                         });
 
-                        $('#printReport').click(function() {
-                            alert("jjdjjd");
-                            window.print();
+                        $("#printReport").click(function() {
+                            var printContent = $(".card_pdf")
+                                .clone(); // Clone the content inside .card
+                            var printWindow = window.open("",
+                                "_blank"); // Open a new blank print window
+
+                            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Sales Report</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; font-size: 12px; margin: 10px; }
+                        .title { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                        th, td { border: 1px solid #000; padding: 8px; text-align: right; }
+                        th { background-color: #f4f4f4; font-weight: bold; text-align: center; }
+                        tr:nth-child(even) { background-color: #f9f9f9; }
+                        .totals-row { font-weight: bold; background-color: #e0e0e0; }
+                        .grand-total { font-weight: bold; background-color: #ddd; }
+                        @media print { 
+                            body { margin: 0; }
+                            button { display: none; } /* Hide buttons */
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${printContent.html()}  <!-- Insert Cloned Content -->
+                </body>
+                </html>
+            `);
+
+                            printWindow.document.close(); // Close document writing
+                            printWindow.focus();
+                            printWindow.print(); // Trigger print
+                            // printWindow
+                            //     .close(); // Close the print window after printing
                         });
                     }
                 });

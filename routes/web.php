@@ -982,7 +982,7 @@ Route::middleware('auth')->group(function () {
                 //General Account
                 Route::get('/general/account/list', [ReportController::class, 'generalLedgerList'])->name('general.account.list.reports');
                 Route::get('/general/account/list/load', [ReportController::class, 'loadGeneralLedgerListReport'])->name('ajax.load.general.account.list.reports');
-                Route::get('/general/account/load/print/{company_id}/{branch_id}', [ReportController::class, 'printGeneralLedgerListReport'])->name('ajax.general.ledger.list.report.print');
+                Route::get('/general/account/load/print/{general_account_class}', [ReportController::class, 'printGeneralLedgerListReport'])->name('ajax.general.ledger.list.report.print');
 
 
             });

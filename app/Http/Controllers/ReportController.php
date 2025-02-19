@@ -15,7 +15,7 @@ use App\Models\StoreProductBatch;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Store;
-use App\Models\TransferProduct;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Models\Category;
@@ -33,7 +33,9 @@ use App\Models\Journal;
 use App\Models\Company;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
-
+use App\Exports\SalesBySiteReportExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Contracts\View\View;
 
 class ReportController extends Controller
 {
@@ -1751,7 +1753,7 @@ class ReportController extends Controller
     // }
 
 
-    public function loadCategorySaleBySiteReport(Request $request)
+    public function loadCategorySaleBySiteReport(Request $request): View
     {
         $from_date = date('Y-m-d', strtotime($request->from_date));
         $to_date = date('Y-m-d', strtotime($request->to_date));
@@ -1831,11 +1833,47 @@ class ReportController extends Controller
 
         // Structure data properly for display
         $salesByGroup = $sales->groupBy($group_by_category ? 'category_id' : ($group_by_product ? 'product_id' : 'branch_id'));
-
+        session([
+            'salesByGroup' => $salesByGroup,
+            'from_date' => $from_date,
+            'to_date' => $to_date,
+            'group_by_category' => $request->has('group_by_category'),
+            'group_by_product' => $request->has('group_by_product')
+        ]);
         return view(
             'pages.reports.sales_and_cash_analysis.load_sale_by_category_by_site_report',
             compact('salesByGroup', 'from_date', 'to_date', 'branch_id', 'category_id1', 'group_by_category', 'group_by_product')
         );
+    }
+
+
+    public function exportBySiteExcel(Request $request)
+    {
+        $salesByGroup = session('salesByGroup'); // Retrieve data from session
+        $from_date = session('from_date');
+        $to_date = session('to_date');
+        $group_by_category = session('group_by_category');
+        $group_by_product = session('group_by_product');
+
+        return Excel::download(new SalesBySiteReportExport($salesByGroup, $from_date, $to_date, $group_by_category, $group_by_product), 'sales_report.xlsx');
+    }
+
+    public function exportBySitePDF(Request $request)
+    {
+        $salesByGroup = session('salesByGroup'); // Retrieve data from session
+        $from_date = session('from_date');
+        $to_date = session('to_date');
+        $group_by_category = session('group_by_category');
+        $group_by_product = session('group_by_product');
+
+        $pdf = Pdf::loadView('pages.reports.sales_and_cash_analysis.load_sale_by_category_by_site_report_pdf', compact('salesByGroup', 'from_date', 'to_date', 'group_by_category', 'group_by_product'))
+            ->setPaper('a4', 'landscape')  // Set to A4 and Landscape mode
+            ->setOptions([
+                'defaultFont' => 'Helvetica',
+                'isHtml5ParserEnabled' => true,
+                'isPhpEnabled' => true
+            ]);
+        return $pdf->download('sales_by_site_by_category_report.pdf');
     }
 
     public function printCategorySaleBySiteReport($from_date, $to_date, $company_id, $branch_id, $category_id1)
@@ -7366,7 +7404,8 @@ class ReportController extends Controller
         }
         return $route_name;
     }
-    public function userEntriesReport(){
+    public function userEntriesReport()
+    {
         return view('pages.reports.inventory.user_entries.user_entries_report');
     }
     public function loadUserEntriesReport(Request $request)
@@ -7496,7 +7535,7 @@ class ReportController extends Controller
         // Get final results
         $reports = $query->get();
         $route_name = $this->getRouteName($validated['type']);
-        return view('pages.reports.inventory.user_entries.load_user_entries_report', compact('reports','route_name'));
+        return view('pages.reports.inventory.user_entries.load_user_entries_report', compact('reports', 'route_name'));
     }
 
 }

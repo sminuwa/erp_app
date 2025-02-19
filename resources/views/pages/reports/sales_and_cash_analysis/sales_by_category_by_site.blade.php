@@ -245,7 +245,7 @@
                                                     placeholder="">
                                             </div>
                                         </div>
-                                        
+
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="company_id">Company</label>
@@ -255,7 +255,7 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="branch_id">Branch</label>
@@ -279,11 +279,13 @@
                                             <div class="form-group">
                                                 <label>Group By</label>
                                                 <div class="form-check">
-                                                    <input type="checkbox" class="form-check-input" id="group_by_category" name="group_by_category">
+                                                    <input type="checkbox" class="form-check-input" id="group_by_category"
+                                                        name="group_by_category">
                                                     <label class="form-check-label" for="group_by_category">Category</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input type="checkbox" class="form-check-input" id="group_by_product" name="group_by_product">
+                                                    <input type="checkbox" class="form-check-input" id="group_by_product"
+                                                        name="group_by_product">
                                                     <label class="form-check-label" for="group_by_product">Product</label>
                                                 </div>
                                             </div>
@@ -347,7 +349,20 @@
                     success: function(data) {
                         $('#img-loader').hide(); // Hide loader
                         $("#load").html(data); // Load data into the report section
-                        loadDataTable(); // Initialize DataTable
+                        //loadDataTable(); // Initialize DataTable
+                        $('#exportExcel').click(function() {
+                            window.location.href = "{{ route('export.by.site.excel') }}";
+                        });
+
+
+                        $('#exportPDF').click(function() {
+                            window.location.href = "{{ route('export.by.site.pdf') }}";
+                        });
+
+                        $('#printReport').click(function() {
+                            alert("jjdjjd");
+                            window.print();
+                        });
                     }
                 });
             });

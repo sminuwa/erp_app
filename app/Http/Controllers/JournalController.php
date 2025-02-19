@@ -150,7 +150,7 @@ class JournalController extends Controller
                     'credit' => $item->credit,
                 ];
             }
-            
+
             //return Transaction::journal($account_details, $journal->reference, $journal->date);
             // return $debit.' - '.$credit;
             if ((round($debit) != round($credit)))
@@ -188,9 +188,9 @@ class JournalController extends Controller
         }
     }
 
-    public function print(Journal $journal)
+    public function print(Journal $journal, $papersize = "A4")
     {
-        return view('pages.journals.print', ['journal' => $journal, 'setting' => Setting::first()]);
+        return view('pages.journals.print', ['journal' => $journal, 'setting' => Setting::first(), 'papersize' => $papersize]);
     }
 
     public function edit(Journal $journal)

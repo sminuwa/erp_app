@@ -105,16 +105,17 @@
                                                 <td align="right">{{ number_format($order->total, 2, '.', ',') }}
                                                 </td>
                                                 {{-- <td align="right">&#8358;{{ number_format($order->pay, 2, '.', ',') }}</td> --}}
-                                                <td>{{ $order->createdBy->name ?? ''}}</td>
+                                                <td>{{ $order->createdBy->name ?? '' }}</td>
                                                 <td>{{ Carbon\Carbon::parse($order->created_at)->toFormattedDateString() }}
                                                 </td>
-                                                
-                                                <td>@if($order->has_credit_note > 0) 
-                                                    Reversed
-                                                    @elseif($order->status==1)
+
+                                                <td>
+                                                    @if ($order->has_credit_note > 0)
+                                                        Reversed
+                                                    @elseif($order->status == 1)
                                                         Completed
                                                     @else
-                                                        Pending 
+                                                        Pending
                                                     @endif
                                                 </td>
                                                 <td align="center">
@@ -148,15 +149,20 @@
                                                                     </a>
                                                                 @endcan
                                                                 @can('invoice.print')
-                                                                    <a href="{{ route('invoice.print', $order->id) }}"
+                                                                    <a href="{{ route('invoice.print', [$order->id, 'A4']) }}"
                                                                         target="_BLANK" class="dropdown-item">
-                                                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                        <i class="fa fa-print" aria-hidden="true"></i> Print A4
+                                                                    </a>
+                                                                    <a href="{{ route('invoice.print', [$order->id, 'A5']) }}"
+                                                                        target="_BLANK" class="dropdown-item">
+                                                                        <i class="fa fa-print" aria-hidden="true"></i> Print A5
                                                                     </a>
                                                                 @endcan
                                                                 @can('invoice.print-with-vat')
                                                                     <a href="{{ route('invoice.print', $order->id) }}"
-                                                                       target="_BLANK" class="dropdown-item">
-                                                                        <i class="fa fa-print" aria-hidden="true"></i> Print (VAT)
+                                                                        target="_BLANK" class="dropdown-item">
+                                                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                        (VAT)
                                                                     </a>
                                                                 @endcan
                                                                 @can('pos.order_print')
@@ -180,7 +186,8 @@
                                                                         onsubmit="return confirm('Are you sure you want to post this invoice?')">
                                                                         @csrf
                                                                         <button type="submit" class="dropdown-item">
-                                                                            <i class="fa fa-check" aria-hidden="true"></i> Post
+                                                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                                                            Post
                                                                         </button>
                                                                     </form>
                                                                 @endcan

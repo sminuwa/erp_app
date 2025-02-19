@@ -48,9 +48,13 @@
                                 @endcan
                                 @if ($returndebit->status == 1)
                                     @can('return.debit.print')
-                                        <a href="{{ route('return.debit.print', $returndebit->id) }}" target="_BLANK"
+                                        <a href="{{ route('return.debit.print', [$returndebit->id,'A4']) }}" target="_BLANK"
                                             class="btn btn-dark btn-sm ">
-                                            <i class="fa fa-print" aria-hidden="true"></i> Print
+                                            <i class="fa fa-print" aria-hidden="true"></i> Print A4
+                                        </a>
+                                        <a href="{{ route('return.debit.print', [$returndebit->id,'A5']) }}" target="_BLANK"
+                                            class="btn btn-dark btn-sm ">
+                                            <i class="fa fa-print" aria-hidden="true"></i> Print A5
                                         </a>
                                     @endcan
 

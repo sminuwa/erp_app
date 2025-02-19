@@ -185,9 +185,9 @@ class ReceiptController extends Controller
         return redirect()->route('receipt.payments');
     }
 
-    public function printReceipt(Receipt $payment)
+    public function printReceipt(Receipt $payment, $papersize = "A4")
     {
-        return view('pages.receipts.print_payment_receipt', ['payment' => $payment, 'setting' => Setting::first()]);
+        return view('pages.receipts.print_payment_receipt', ['payment' => $payment, 'setting' => Setting::first(),'papersize'=>$papersize]);
     }
 
     public function printPoSPaymentReceipt(Receipt $payment)

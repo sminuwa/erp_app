@@ -132,9 +132,13 @@
                                                                 @endcan
                                                             @endif
                                                             @can('proformer.print')
-                                                                <a href="{{ route('proformer.print', $order->id) }}"
+                                                                <a href="{{ route('proformer.print', [$order->id, 'A4']) }}"
                                                                     target="_BLANK" class="dropdown-item">
-                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print A4
+                                                                </a>
+                                                                <a href="{{ route('proformer.print', [$order->id, 'A5']) }}"
+                                                                    target="_BLANK" class="dropdown-item">
+                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print A5
                                                                 </a>
                                                             @endcan
                                                             @if ($order->status == 0)

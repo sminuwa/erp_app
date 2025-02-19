@@ -100,40 +100,46 @@
 
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>
                                                 <td>{{ $payment->createdBy->name ?? '' }}</td>
-                                                
+
                                                 <td>{{ Carbon\Carbon::parse($payment->created_at)->toFormattedDateString() }}
                                                 </td>
                                                 <td>{{ $payment->postedBy->name ?? '' }}</td>
                                                 <td align="center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-default dropdown-toggle" type="button"
-                                                                id="dropdownMenuButton" data-toggle="dropdown"
-                                                                aria-haspopup="true" aria-expanded="false">
+                                                            id="dropdownMenuButton" data-toggle="dropdown"
+                                                            aria-haspopup="true" aria-expanded="false">
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                             @can('return.debit.show')
                                                                 <a href="{{ route('return.debit.show', $payment->id) }}"
-                                                                   class="dropdown-item">
+                                                                    class="dropdown-item">
                                                                     <i class="fa fa-eye" aria-hidden="true"></i> View
                                                                 </a>
                                                             @endcan
                                                             @can('return.debit.print')
-                                                                <a href="{{ route('return.debit.print', $payment->id) }}"
-                                                                   target="_BLANK" class="dropdown-item">
-                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                <a href="{{ route('return.debit.print', [$payment->id, 'A4']) }}"
+                                                                    target="_BLANK" class="dropdown-item">
+                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print A4
+                                                                </a>
+                                                                <a href="{{ route('return.debit.print', [$payment->id, 'A5']) }}"
+                                                                    target="_BLANK" class="dropdown-item">
+                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print A5
                                                                 </a>
                                                             @endcan
-                                                            @if($payment->status == 0)
+                                                            @if ($payment->status == 0)
                                                                 @can('return.debit.edit')
-                                                                <a href="{{ route('return.debit.edit', $payment->id) }}"
-                                                                   class="dropdown-item">
-                                                                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                                                </a>
+                                                                    <a href="{{ route('return.debit.edit', $payment->id) }}"
+                                                                        class="dropdown-item">
+                                                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                                                    </a>
                                                                 @endcan
                                                                 @can('return.debit.post')
-                                                                    <form action="{{ route('return.debit.post', $payment->id) }}" method="post"
-                                                                          onsubmit="return confirm('Are you sure you want to post this R&D?')">
+                                                                    <form
+                                                                        action="{{ route('return.debit.post', $payment->id) }}"
+                                                                        method="post"
+                                                                        onsubmit="return confirm('Are you sure you want to post this R&D?')">
                                                                         @csrf
                                                                         <button type="submit" class="dropdown-item ">
                                                                             <i class="fa fa-check" aria-hidden="true"></i> Post
@@ -142,12 +148,12 @@
                                                                 @endcan
                                                                 @can('return.debit.destroy')
                                                                     <button class="dropdown-item" type="button"
-                                                                            onclick="deleteItem({{ $payment->id }})">
+                                                                        onclick="deleteItem({{ $payment->id }})">
                                                                         <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                                                     </button>
                                                                     <form id="delete-form-{{ $payment->id }}"
-                                                                          action="{{ route('return.debit.destroy', $payment->id) }}"
-                                                                          method="post" style="display:none;">
+                                                                        action="{{ route('return.debit.destroy', $payment->id) }}"
+                                                                        method="post" style="display:none;">
                                                                         @csrf
                                                                         @method('DELETE')
                                                                     </form>

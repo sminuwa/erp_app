@@ -78,9 +78,13 @@
                                     @endcan
                                 @else
                                     @can('receipt.payment.print')
-                                        <a href="{{ route('receipt.payment.print', $receipt->id) }}" target="_BLANK"
+                                        <a href="{{ route('receipt.payment.print', [$receipt->id, 'A4']) }}" target="_BLANK"
                                             class="btn btn-dark btn-sm ">
-                                            <i class="fa fa-print" aria-hidden="true"></i> Print
+                                            <i class="fa fa-print" aria-hidden="true"></i> Print A4
+                                        </a>
+                                        <a href="{{ route('receipt.payment.print', [$receipt->id, 'A5']) }}" target="_BLANK"
+                                            class="btn btn-dark btn-sm ">
+                                            <i class="fa fa-print" aria-hidden="true"></i> Print A5
                                         </a>
                                     @endcan
                                     @can('receipt.payment.print.pos')

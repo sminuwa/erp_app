@@ -143,65 +143,7 @@
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
-    <style>
-        /* Print-specific styles */
-        @media print {
-            @page {
-                size: A4;
-                margin: 10mm;
-            }
-
-            body {
-                background: #fff;
-                font-size: 12px;
-                margin: 0;
-                padding: 0;
-            }
-
-            .container-fluid {
-                width: 100%;
-                max-width: 210mm;
-                margin: auto;
-            }
-
-            .invoice {
-                padding: 20px;
-                border: 1px solid #ddd;
-                background: #fff;
-                max-width: 210mm;
-                margin: auto;
-                box-shadow: none;
-            }
-
-            .table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-
-            .table th,
-            .table td {
-                border: 1px solid #ddd;
-                padding: 8px;
-                text-align: left;
-            }
-
-            .table th {
-                background-color: #f8f9fa;
-                font-weight: bold;
-            }
-
-            .text-center {
-                text-align: center;
-            }
-
-            .signature-line {
-                margin-top: 30px;
-                text-align: left;
-                font-weight: bold;
-            }
-        }
-    </style>
-
+    @include('pages.order.paper_size')
 </head>
 
 <body>
@@ -213,7 +155,7 @@
                     <!-- Header -->
                     <div class="row text-center">
                         <div class="col-12">
-                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}" 
+                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
                                 style="width:100px;height:60px;" alt="Albabello Logo">
                             <h3>{{ App\Models\User::UserBranchName()->long_name }}</h3>
                             <h4>CREDIT NOTE</h4>
@@ -225,7 +167,8 @@
                     <!-- Customer Information -->
                     <div class="row">
                         <div class="col-12">
-                            <h4>CUSTOMER NAME: <small>{{ $order->customer->code }} - {{ $order->customer->name }}</small></h4>
+                            <h4>CUSTOMER NAME: <small>{{ $order->customer->code }} -
+                                    {{ $order->customer->name }}</small></h4>
                         </div>
                     </div>
 
@@ -250,19 +193,23 @@
                                     @foreach ($order_details as $order_detail)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $order_detail->store_product->product->code ?? "N/A" }}</td>
-                                            <td>{{ $order_detail->store_product->product->name ?? "N/A" }}</td>
-                                            <td>{{ $order_detail->unit ?? "N/A" }}</td>
-                                            <td>{{ $order_detail->store_product->store->code ?? "N/A" }}</td>
+                                            <td>{{ $order_detail->store_product->product->code ?? 'N/A' }}</td>
+                                            <td>{{ $order_detail->store_product->product->name ?? 'N/A' }}</td>
+                                            <td>{{ $order_detail->unit ?? 'N/A' }}</td>
+                                            <td>{{ $order_detail->store_product->store->code ?? 'N/A' }}</td>
                                             <td align="center">{{ $order_detail->quantity }}</td>
-                                            <td align="right">&#8358;{{ number_format($order_detail->sold_price, 2) }}</td>
-                                            <td align="right">&#8358;{{ number_format($order_detail->sold_price * $order_detail->quantity, 2) }}</td>
+                                            <td align="right">&#8358;{{ number_format($order_detail->sold_price, 2) }}
+                                            </td>
+                                            <td align="right">
+                                                &#8358;{{ number_format($order_detail->sold_price * $order_detail->quantity, 2) }}
+                                            </td>
                                         </tr>
                                         @php $total += ($order_detail->sold_price * $order_detail->quantity); @endphp
                                     @endforeach
                                     <tr>
                                         <th colspan="7" align="right">Total</th>
-                                        <th style="text-align: right">&#8358;{{ number_format($total, 2, '.', ',') }}</th>
+                                        <th style="text-align: right">&#8358;{{ number_format($total, 2, '.', ',') }}
+                                        </th>
                                     </tr>
                                 </tbody>
                             </table>
@@ -272,7 +219,8 @@
                     <!-- Footer -->
                     <div class="row">
                         <div class="col-6">
-                            <p><b>Date Created:</b> {{ \Carbon\Carbon::parse($credit_note->created_at)->toFormattedDateString() }}</p>
+                            <p><b>Date Created:</b>
+                                {{ \Carbon\Carbon::parse($credit_note->created_at)->toFormattedDateString() }}</p>
                             <p><b>Printed On:</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
                             <p><b>Printed By:</b> {{ Auth::user()->name }}</p>
                         </div>
@@ -293,4 +241,3 @@
 </body>
 
 </html>
-

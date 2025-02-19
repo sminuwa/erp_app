@@ -384,9 +384,9 @@ class SupplierController extends Controller
         $accounts = BankAccount::where('branch_id', 'LIKE', User::userBranchAction());
         return view('pages.suppliers.supplier_payment', ['payments' => $payments, 'accounts' => $accounts]);
     }
-    public function printPaymentReceipt(SupplierLedger $payment)
+    public function printPaymentReceipt(SupplierLedger $payment, $papersize = "A4")
     {
-        return view('pages.suppliers.print_payment_receipt', ['payment' => $payment, 'setting' => Setting::first()]);
+        return view('pages.suppliers.print_payment_receipt', ['payment' => $payment, 'setting' => Setting::first(),'papersize'=>$papersize]);
     }
     public function printPoSPaymentReceipt(SupplierLedger $payment)
     {

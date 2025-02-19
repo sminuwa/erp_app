@@ -268,261 +268,7 @@
     <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <!-- Custom CSS for A4 Printing -->
-    <style>
-        @media print {
-            body {
-                width: 210mm;
-                height: 297mm;
-                margin: 0;
-                padding: 0;
-                background: #fff;
-                font-size: 12px;
-            }
-
-            .receipt-main {
-                width: 100%;
-                margin: 0;
-                padding: 20px;
-                box-shadow: none;
-                border: none;
-            }
-
-            .receipt-header,
-            .receipt-header-mid,
-            .receipt-footer {
-                margin: 0;
-                padding: 0;
-            }
-
-            .table {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-
-            .table th,
-            .table td {
-                padding: 8px;
-                font-size: 12px;
-            }
-
-            .receipt-right h5 {
-                font-size: 14px;
-            }
-
-            .receipt-right p {
-                font-size: 12px;
-            }
-
-            .receipt-footer h1 {
-                font-size: 12px;
-            }
-
-            .receipt-main::after {
-                display: none;
-            }
-
-            .col-xs-1,
-            .col-sm-1,
-            .col-md-1,
-            .col-xs-2,
-            .col-sm-2,
-            .col-md-2,
-            .col-xs-3,
-            .col-sm-3,
-            .col-md-3,
-            .col-xs-4,
-            .col-sm-4,
-            .col-md-4,
-            .col-xs-5,
-            .col-sm-5,
-            .col-md-5,
-            .col-xs-6,
-            .col-sm-6,
-            .col-md-6,
-            .col-xs-7,
-            .col-sm-7,
-            .col-md-7,
-            .col-xs-8,
-            .col-sm-8,
-            .col-md-8,
-            .col-xs-9,
-            .col-sm-9,
-            .col-md-9,
-            .col-xs-10,
-            .col-sm-10,
-            .col-md-10,
-            .col-xs-11,
-            .col-sm-11,
-            .col-md-11,
-            .col-xs-12,
-            .col-sm-12,
-            .col-md-12 {
-                float: left;
-                width: 100%;
-            }
-
-            .col-xs-offset-1,
-            .col-sm-offset-1,
-            .col-md-offset-1,
-            .col-xs-offset-2,
-            .col-sm-offset-2,
-            .col-md-offset-2,
-            .col-xs-offset-3,
-            .col-sm-offset-3,
-            .col-md-offset-3,
-            .col-xs-offset-4,
-            .col-sm-offset-4,
-            .col-md-offset-4,
-            .col-xs-offset-5,
-            .col-sm-offset-5,
-            .col-md-offset-5,
-            .col-xs-offset-6,
-            .col-sm-offset-6,
-            .col-md-offset-6,
-            .col-xs-offset-7,
-            .col-sm-offset-7,
-            .col-md-offset-7,
-            .col-xs-offset-8,
-            .col-sm-offset-8,
-            .col-md-offset-8,
-            .col-xs-offset-9,
-            .col-sm-offset-9,
-            .col-md-offset-9,
-            .col-xs-offset-10,
-            .col-sm-offset-10,
-            .col-md-offset-10,
-            .col-xs-offset-11,
-            .col-sm-offset-11,
-            .col-md-offset-11,
-            .col-xs-offset-12,
-            .col-sm-offset-12,
-            .col-md-offset-12 {
-                margin-left: 0;
-            }
-
-            .text-right {
-                text-align: right;
-            }
-
-            .text-left {
-                text-align: left;
-            }
-
-            .text-center {
-                text-align: center;
-            }
-
-            .receipt-main td,
-            .receipt-main th {
-                padding: 6px !important;
-            }
-
-            .receipt-footer {
-                margin-top: 20px;
-            }
-        }
-
-        body {
-            background: #eee;
-            margin-top: 20px;
-        }
-
-        .text-danger strong {
-            color: #9f181c;
-        }
-
-        .receipt-main {
-            background: #ffffff none repeat scroll 0 0;
-            border-bottom: 1px solid;
-            border-top: 1px solid;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            padding: 40px 30px !important;
-            position: relative;
-            box-shadow: 0 1px 21px #acacac;
-            color: #333333;
-            font-family: open sans;
-        }
-
-        .receipt-main p {
-            color: #333333;
-            font-family: open sans;
-            line-height: 1.42857;
-        }
-
-        .receipt-footer h1 {
-            font-size: 15px;
-            font-weight: 400 !important;
-            margin: 0 !important;
-        }
-
-        .receipt-main::after {
-            background: #414143 none repeat scroll 0 0;
-            content: "";
-            height: 5px;
-            left: 0;
-            position: absolute;
-            right: 0;
-            top: -13px;
-        }
-
-        .receipt-right h5 {
-            font-size: 16px;
-            font-weight: bold;
-            margin: 0 0 7px 0;
-        }
-
-        .receipt-right p {
-            font-size: 12px;
-            margin: 0px;
-        }
-
-        .receipt-right p i {
-            text-align: center;
-            width: 18px;
-        }
-
-        .receipt-main td {
-            padding: 9px 20px !important;
-        }
-
-        .receipt-main th {
-            padding: 13px 10px !important;
-        }
-
-        .receipt-main td {
-            font-size: 13px;
-            font-weight: initial !important;
-        }
-
-        .receipt-main td p:last-child {
-            margin: 0;
-            padding: 0;
-        }
-
-        .receipt-main td h2 {
-            font-size: 14px;
-            font-weight: 600;
-            margin: 0;
-            text-transform: uppercase;
-        }
-
-        .receipt-header-mid .receipt-left h1 {
-            font-weight: 100;
-            margin: 34px 0 0;
-            text-align: right;
-            text-transform: uppercase;
-        }
-
-        .receipt-header-mid {
-            margin: 24px 0;
-            overflow: hidden;
-        }
-
-        #container {
-            background-color: #dcdcdc;
-        }
-    </style>
+    @include('pages.order.paper_size')
 </head>
 
 <body>
@@ -536,13 +282,14 @@
                                 <img src="{{ asset('assets/backend/img/logo.png') }}"
                                     style="width:71px;height:71px;border-radius: 43px;" alt="Albabello Logo"
                                     class="img-circle elevation-3 img-responsive" style="opacity: .8">
-                                <strong>{{App\Models\User::UserBranchName()->long_name}}</strong>
+                                <strong>{{ App\Models\User::UserBranchName()->long_name }}</strong>
                             </div>
                         </div>
                         <div class="col-xs-6 col-sm-6 col-md-6 text-right">
                             <div class="receipt-right">
                                 <h5>AL-BABELLO</h5>
-                                <p>{{ optional($payment->customer)->branch->address }} <i class="fa fa-location-arrow"></i></p>
+                                <p>{{ optional($payment->customer)->branch->address }} <i
+                                        class="fa fa-location-arrow"></i></p>
                                 <p>{{ optional($payment->customer)->branch->email }}<i class="fa fa-envelope-o"></i></p>
                                 <p>{{ optional($payment->customer)->branch->phone }} <i class="fa fa-phone"></i></p>
                             </div>
@@ -555,7 +302,8 @@
                         <div class="col-xs-7 col-sm-7 col-md-7 text-left">
                             <div class="receipt-right">
                                 <h5>Payment From</h5>
-                                <p><b>{{ $payment->payer()->code ? $payment->payer()->code.' - '.$payment->payer()->name : ($payment->payer()->number.' - '.$payment->payer()->description) }} </b></p>
+                                <p><b>{{ $payment->payer()->code ? $payment->payer()->code . ' - ' . $payment->payer()->name : $payment->payer()->number . ' - ' . $payment->payer()->description }}
+                                    </b></p>
                                 <p><b>Mobile :</b> {{ $payment->customer->phone }}</p>
                                 <p><b>Address :</b> {{ $payment->customer->address }}</p>
                             </div>
@@ -581,10 +329,12 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>{{ $payment->account()->code ?? $payment->account()->number }} - {{ $payment->account()->name ?? $payment->account()->description }}</td>
+                                <td>{{ $payment->account()->code ?? $payment->account()->number }} -
+                                    {{ $payment->account()->name ?? $payment->account()->description }}</td>
                                 <td class="col-md-9">
                                     @if ($payment->description == null)
-                                    Payment for {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
+                                        Payment for
+                                        {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
                                     @else
                                         {{ $payment->description }}
                                     @endif
@@ -600,7 +350,8 @@
                                 </td>
                                 <td align="right">
                                     <p>
-                                        <strong><i class="fa fa-inr"></i>{{ number_format($payment->amount, 2) }}</strong>
+                                        <strong><i
+                                                class="fa fa-inr"></i>{{ number_format($payment->amount, 2) }}</strong>
                                     </p>
                                 </td>
                             </tr>
@@ -612,7 +363,7 @@
                                             $obj = new App\Models\Utility();
                                         @endphp
                                         <strong><i class="fa fa-inr"></i>
-                                            {{ $obj->convertNumberToWords($payment->amount+0.55) }}</strong>
+                                            {{ $obj->convertNumberToWords($payment->amount + 0.55) }}</strong>
                                     </p>
                                 </td>
                             </tr>
@@ -624,14 +375,16 @@
                     <div class="receipt-header receipt-header-mid receipt-footer">
                         <div class="col-xs-10 col-sm-10 col-md-10 text-left">
                             <div class="receipt-right">
-                                <p><b>Date Created :</b> {{ Carbon\Carbon::parse($payment->created_at)->toFormattedDateString() }}</p>
+                                <p><b>Date Created :</b>
+                                    {{ Carbon\Carbon::parse($payment->created_at)->toFormattedDateString() }}</p>
                                 <p><b>Created By :</b> {{ $payment->createdBy?->name }}</p>
                                 <p><b>Printed By :</b> {{ Auth::user()->name }}</p>
                                 <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
                                 <br>
-                                <br/>
+                                <br />
                                 <p><b>Signature :</b> ______________________________________</p>
-                                <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For: ALBABELLO </span>
+                                <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For:
+                                    ALBABELLO </span>
                                 <br /><br />
                                 <h5 style="color: rgb(140, 140, 140);text-align:center;">Thanks for Patronage!</h5>
                             </div>
@@ -654,4 +407,5 @@
         window.print();
     </script>
 </body>
+
 </html>

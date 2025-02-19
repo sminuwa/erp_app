@@ -82,8 +82,11 @@
                     @else
                     @endif
                     @can('purchase.print')
-                        <a class="btn btn-secondary btn-sm" href="{{ route('purchase.print', $record->id) }}" target="_blank">
-                            <span class="fa fa-print"></span> Print
+                        <a class="btn btn-secondary btn-sm" href="{{ route('purchase.print', [$record->id,'A4']) }}" target="_blank">
+                            <span class="fa fa-print"></span> Print A4
+                        </a>
+                        <a class="btn btn-secondary btn-sm" href="{{ route('purchase.print', [$record->id,'A5']) }}" target="_blank">
+                            <span class="fa fa-print"></span> Print A5
                         </a>
                     @endcan
                 </div>

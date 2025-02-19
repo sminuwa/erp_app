@@ -100,9 +100,14 @@
                                                     @endcan
                                                     @can('purchase.print')
                                                         <a class="dropdown-item"
-                                                            href="{{ route('purchase.print', $record->id) }}" title="Print GRN"
+                                                            href="{{ route('purchase.print', [$record->id,'A4']) }}" title="Print GRN"
                                                             target="_BLANK">
-                                                            <span class="fa fa-print"></span> Print
+                                                            <span class="fa fa-print"></span> Print A4
+                                                        </a>
+                                                        <a class="dropdown-item"
+                                                            href="{{ route('purchase.print', [$record->id,'A5']) }}" title="Print GRN"
+                                                            target="_BLANK">
+                                                            <span class="fa fa-print"></span> Print A5
                                                         </a>
                                                     @endcan
                                                     @if ($record->status == 0)

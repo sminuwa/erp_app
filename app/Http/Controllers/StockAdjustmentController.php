@@ -223,11 +223,11 @@ class StockAdjustmentController extends Controller
         return back();
     }
 
-    public function print(StockAdjustment $stockAdjustment)
+    public function print(StockAdjustment $stockAdjustment, $papersize)
     {
         $this->authorize('stock_adjustments.print');
         $record = $stockAdjustment;
-        return view('pages.inventories.stock_adjustments.print', compact('record'));
+        return view('pages.inventories.stock_adjustments.print', compact('record','papersize'));
     }
 
     public function delete(Request $request, StockAdjustment $stockAdjustment)

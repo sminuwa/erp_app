@@ -47,9 +47,13 @@
                                     </a>
                                 @endcan
                                 @can('proformer.print')
-                                    <a href="{{ route('proformer.print', $order->id) }}" target="_BLANK"
+                                    <a href="{{ route('proformer.print', [$order->id,'A4']) }}" target="_BLANK"
                                         class="btn btn-dark btn-sm ">
-                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print A4
+                                    </a>
+                                    <a href="{{ route('proformer.print', [$order->id,'A5']) }}" target="_BLANK"
+                                        class="btn btn-dark btn-sm ">
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print A5
                                     </a>
                                 @endcan
                                 @if ($order->status == 0)

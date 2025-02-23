@@ -681,13 +681,7 @@ UPDATE `permissions` SET `description` = 'Change-branch Setting' WHERE `name` = 
 UPDATE `permissions` SET `description` = 'Purchase.additional-invoice.delete' WHERE `name` = 'purchase.additional-invoice.delete';
 UPDATE `permissions` SET `description` = 'Create-inter-branch-journal' WHERE `name` = 'create-inter-branch-journal';
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 18/09/2024
 ALTER TABLE `proformer_details` CHANGE `store_product_id` `product_id` BIGINT(20) UNSIGNED NOT NULL, ADD COLUMN `store_id` BIGINT(20) NOT NULL AFTER `product_id`; 
 ALTER TABLE `proformer_details` DROP COLUMN `original_quantity_sold`, DROP COLUMN `sold_price`, DROP COLUMN `total`, DROP COLUMN `selling_price`, DROP COLUMN `avail_qty_before_sale`, CHANGE `cost_price` `unit_cost` DECIMAL(18,2) DEFAULT 0.00 NOT NULL; 
@@ -720,56 +714,16 @@ ALTER TABLE `user_access_sites` ADD CONSTRAINT `user_access_sites_ibfk_2` FOREIG
 ALTER TABLE `user_access_sites` ADD FOREIGN KEY (`branch_id`) REFERENCES `branches`(`id`);
 
 ALTER TABLE `users` CHANGE `id` `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (`id`); 
-<<<<<<< HEAD
+
 ALTER TABLE `order_invoice_details` ADD CONSTRAINT `order_invoice_details_ibfk_3` FOREIGN KEY (`order_id`) REFERENCES `order_invoices`(`id`); 
-=======
-LTER TABLE `order_invoice_details` ADD CONSTRAINT `order_invoice_details_ibfk_3` FOREIGN KEY (`order_id`) REFERENCES `order_invoices`(`id`); 
 
 //25/09/2025
 ALTER TABLE `purchases` ADD COLUMN `purchase_request_id` BIGINT UNSIGNED NULL AFTER `purchase_mode`;
-<<<<<<< HEAD
->>>>>>> 83194891a82bfb190e8bee6c3553accb1e342403
-=======
-=======
-=======
->>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
-=======
->>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
-=======
->>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
-=======
->>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
-=======
->>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
-=======
->>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
 ALTER TABLE `customers`
 ADD COLUMN `gender` ENUM('Male', 'Female', 'Other') COLLATE utf8mb4_unicode_ci DEFAULT NULL AFTER `phone`,
 ADD COLUMN `business_type` VARCHAR(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL AFTER `photo`,
 ADD COLUMN `business_age` VARCHAR(12) DEFAULT NULL AFTER `business_type`;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
-=======
->>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
-=======
->>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
-=======
->>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
-=======
->>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
-=======
->>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
-=======
->>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
 
-<<<<<<< HEAD
->>>>>>> 245a00ae53eb3f8f65af9e1ba78ba2516ba3a550
-=======
 CREATE TABLE `budgets` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `branch_id` bigint(20) DEFAULT NULL,
@@ -788,4 +742,4 @@ CREATE TABLE `budgets` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
 
 
->>>>>>> 4abc168fcb5bf8dfd5573457714b9fd997630659
+

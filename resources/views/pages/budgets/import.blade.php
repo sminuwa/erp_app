@@ -26,11 +26,16 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6">
+                    @can('budget.create')
                     <a class="btn btn-secondary btn-sm mb-3" href="{{ route('budgets.create') }}">
                         <span class="fa fa-plus-circle"></span> Add New Budget
                     </a>
-                    <a class="btn btn-secondary btn-sm mb-3" href="{{asset('upload_templates/budget.xlsx')}}">
+                    @endcan
+                    {{-- <a class="btn btn-secondary btn-sm mb-3" href="{{asset('upload_templates/budget.xlsx')}}">
                         <span class="fa fa-download"></span> Download Budget Template
+                    </a> --}}
+                    <a href="{{ route('budgets.generate_template') }}" class="btn btn-sm btn-success mb-3">
+                        <i class="fa fa-download"></i> Download Budget Template
                     </a>
                     <div class="card">
                         <div class="card-header">Upload Budget File</div>

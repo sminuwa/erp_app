@@ -1224,5 +1224,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/import/form', [BudgetController::class, 'importForm'])->name('budgets.import.form');
         Route::post('/import', [BudgetController::class, 'import'])->name('budgets.import');
         Route::delete('/delete', [BudgetController::class, 'destroy'])->name('budgets.destroy');
+        Route::get('/generate-template', [BudgetController::class, 'generate'])->name('budgets.generate_template');
     });
 });

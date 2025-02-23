@@ -55,7 +55,11 @@
                                 
                                 <div class="form-group">
                                     <label for="budget_year">Budget Year</label>
-                                    <input type="number" name="budget_year" class="form-control" value="{{ isset($budget) ? $budget->budget_year : old('budget_year') }}" required>
+                                    <select name="budget_year" class="form-control" required>
+                                        @for($i = date('Y'); $i <= date('Y') + 5; $i++)
+                                            <option value="{{ $i }}" {{ isset($budget) && $budget->budget_year == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                        @endfor
+                                    </select>
                                 </div>
                                 
                                 <div class="form-group">

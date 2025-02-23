@@ -701,6 +701,14 @@ CREATE TABLE `budgets` (
   PRIMARY KEY (`id`),
   KEY `branch_id` (`branch_id`),
   KEY `category_id` (`category_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
+INSERT INTO `permissions` (`name`, `description`) VALUES ('menu.budget', 'View budget menu'); 
+INSERT INTO `permissions` (`name`, `description`) VALUES ('budget.create', 'Create budget'); 
+INSERT INTO `permissions` (`name`, `description`) VALUES ('budget.import', 'Upload budget'); 
+INSERT INTO `permissions` (`name`, `description`) VALUES ('budget.edit', 'Edit budget'); 
+INSERT INTO `permissions` (`name`, `description`) VALUES ('budget.view', 'View budget'); 
+INSERT INTO `permissions` (`name`, `description`) VALUES ('budget.delete', 'Delete budget');
 
 

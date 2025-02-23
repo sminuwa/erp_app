@@ -351,12 +351,12 @@
                                     </a>
                                     <ul class="nav nav-treeview">
                                         <!--                                        <li class="nav-item">
-                                                                                                            <a href="{{-- {{ route('stock.balances.report') }} --}}"
-                                                                                                                class="nav-link {{-- {{ Request::is('reports/sc/stock/balances*') ? 'active' : '' }} --}}">
-                                                                                                                <i class="ion-code-working"></i>
-                                                                                                                <p>Previous Stock Balances</p>
-                                                                                                            </a>
-                                                                                                        </li>-->
+                                                                                                                    <a href="{{-- {{ route('stock.balances.report') }} --}}"
+                                                                                                                        class="nav-link {{-- {{ Request::is('reports/sc/stock/balances*') ? 'active' : '' }} --}}">
+                                                                                                                        <i class="ion-code-working"></i>
+                                                                                                                        <p>Previous Stock Balances</p>
+                                                                                                                    </a>
+                                                                                                                </li>-->
                                         <li class="nav-item">
                                             <a href="{{ route('current.stock.report') }}"
                                                 class="nav-link {{ Request::is('reports/sc/current-stock*') ? 'active' : '' }}">
@@ -517,7 +517,7 @@
                                                 <p>Orders Lines</p>
                                             </a>
                                         </li>
-                                        
+
                                     </ul>
                                 </li>
                             @endcan
@@ -583,13 +583,12 @@
                                                 <p>RO with Customers</p>
                                             </a>
                                         </li>
-                                        
+
                                     </ul>
                                 </li>
                             @endcan
                             @can('submenu.customer.report')
-                                <li
-                                    class="nav-item has-treeview {{ Request::is('reports/supplier*') ? 'menu-open' : '' }}">
+                                <li class="nav-item has-treeview {{ Request::is('reports/supplier*') ? 'menu-open' : '' }}">
                                     <a href="#"
                                         class="nav-link {{ Request::is('reports/supplier*') ? 'active' : '' }}">
                                         <i class="ion-ios-time"></i>
@@ -628,7 +627,7 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="{{route('product.list.reports')}}"
+                                            <a href="{{ route('product.list.reports') }}"
                                                 class="nav-link {{ Request::is('reports/inventory/product*') ? 'active' : '' }}">
                                                 <i class="ion-cash"></i>
                                                 <p>Product List</p>
@@ -850,7 +849,7 @@
                                                 </a>
                                             </li>
                                         @endcan
-                                        
+
                                     </ul>
                                 </li>
                             @endcan
@@ -898,6 +897,43 @@
                                 </a>
                             </li>
 
+                        </ul>
+                    </li>
+                @endcan
+                @can('menu.budget')
+                    <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">
+                            <i class="ion-android-list"></i>
+                            <p>
+                                Budgets
+                                <i class="right fa fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @can('budget.view')
+                                <li class="nav-item">
+                                    <a href="{{ route('budgets.index') }}" class="nav-link ">
+                                        <i class="ion-card"></i>
+                                        <p>View Budget</p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('budget.import')
+                                <li class="nav-item">
+                                    <a href="{{ route('budgets.import.form') }}" class="nav-link ">
+                                        <i class="ion-card"></i>
+                                        <p>Import</p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('budget.view')
+                                <li class="nav-item">
+                                    <a href="{{ route('budgets.create') }}" class="nav-link ">
+                                        <i class="ion-card"></i>
+                                        <p>New Budget</p>
+                                    </a>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
                 @endcan

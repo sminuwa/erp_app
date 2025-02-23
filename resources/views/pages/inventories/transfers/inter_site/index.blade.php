@@ -114,8 +114,12 @@
                                                                 @endcan
                                                                 @can('intersite.print')
                                                                     <a class="dropdown-item" title="Print" target="_BLANK"
-                                                                        href="{{ route('intersite.print', $intersite->id) }}">
-                                                                        <span class="fa fa-print"></span> Print
+                                                                        href="{{ route('intersite.print', [$intersite->id, 'A4']) }}">
+                                                                        <span class="fa fa-print"></span> Print A4
+                                                                    </a>
+                                                                    <a class="dropdown-item" title="Print" target="_BLANK"
+                                                                        href="{{ route('intersite.print', [$intersite->id, 'A5']) }}">
+                                                                        <span class="fa fa-print"></span> Print A5
                                                                     </a>
                                                                 @endcan
                                                                 @if ($intersite->status == 0)
@@ -171,7 +175,7 @@
 @push('js')
     <!-- DataTables -->
     <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
-{{--    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>--}}
+    {{--    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> --}}
     <script type="text/javascript">
         $(function() {
             $("#record1").DataTable({

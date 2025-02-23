@@ -77,8 +77,8 @@
 
                         <div class="form-group">
                             By &nbsp;&nbsp; &nbsp;
-                            {{-- <input type="radio" name="type" value="qty" class="form-control" />
-                            &nbsp;&nbsp; &nbsp;Quantity &nbsp; &nbsp;&nbsp; --}}
+                            <input type="radio" name="type" value="qty" class="form-control" />
+                            &nbsp;&nbsp; &nbsp;Quantity &nbsp; &nbsp;&nbsp;
                             <input type="radio" name="type" value="amt" class="form-control" checked />
                             &nbsp;&nbsp;Amount&nbsp; &nbsp;&nbsp;
                             <input type="radio" name="type" value="mgn" class="form-control" />

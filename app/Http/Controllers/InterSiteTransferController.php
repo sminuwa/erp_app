@@ -77,7 +77,7 @@ class InterSiteTransferController extends Controller
                 /*return $items;*/
                 foreach ($items as $item) {
                     $quantity_before = StoreProduct::where(['store_id' => $item->store_id, 'product_id' => $item->product_id])->first()->qty_available ?? 0;
-                    if(StoreProduct::where(['store_id' => $item->store_id, 'product_id' => $item->product_id])->decrement('qty_available', $item->quantity)){
+                    if (StoreProduct::where(['store_id' => $item->store_id, 'product_id' => $item->product_id])->decrement('qty_available', $item->quantity)) {
                         $quantity_after = StoreProduct::where(['store_id' => $item->store_id, 'product_id' => $item->product_id])->first()->qty_available ?? 0;
                         $stock_card = new StockCard();
                         $stock_card->store_id = $item->store_id;
@@ -452,11 +452,11 @@ class InterSiteTransferController extends Controller
         $no = $this->getNextTransferID();
         return "TR" . date('y') . '' . date('m') . str_pad(($no), 4, "0", STR_PAD_LEFT);
     }
-    public function printStockTransfer(IntersiteTransfer $intersite)
+    public function printStockTransfer(IntersiteTransfer $intersite, $papersize = "A4")
     {
         $this->authorize('intersite.print');
 
-        return view('pages.inventories.transfers.inter_site.print')->with(['intersite' => $intersite]);
+        return view('pages.inventories.transfers.inter_site.print')->with(['intersite' => $intersite, 'papersize' => $papersize]);
     }
 
 }

@@ -57,17 +57,17 @@
                             </select>
                         </div>
                         <div class="form-group text-right">
-                            <input type="button" class="btn btn-primary" id="generate" name="generate"
-                                   value="Generate"/>
+                            <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />
                         </div>
                     </div>
                 </form>
                 <div class="row">
                     <div class="col-sm-12 table-responsive">
                         <img src="{{ asset('assets/backend/img/loader.png') }}"
-                             style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                            style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                        <div id="load"></div>
                     </div>
-                    <div id="load"></div>
+
                 </div>
 
             </div><!-- /.container-fluid -->
@@ -80,8 +80,8 @@
 
 @push('js')
     <script type="text/javascript">
-        $(function () {
-            $('#generate').on("click", function () {
+        $(function() {
+            $('#generate').on("click", function() {
                 company_id = $('#company_id').val();
                 branch_id = $('#branch_id').val();
                 $('#img-loader').show();
@@ -93,7 +93,7 @@
                         company_id: company_id,
                         branch_id: branch_id
                     }
-                }).done(function (data) {
+                }).done(function(data) {
                     $('#img-loader').hide();
                     $("#load").html(data);
                     loadDataTable()

@@ -133,9 +133,9 @@ class InterBankController extends Controller
         return back();
     }
 
-    public function print(InterBank $interbank)
+    public function print(InterBank $interbank, $papersize = "A4")
     {
-        return view('pages.interbanks.print', ['interbank' => $interbank, 'setting' => Setting::first()]);
+        return view('pages.interbanks.print', ['interbank' => $interbank, 'setting' => Setting::first(),'papersize'=>$papersize]);
     }
     public function printPoS(InterBank $interbank)
     {

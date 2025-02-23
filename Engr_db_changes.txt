@@ -767,4 +767,25 @@ ADD COLUMN `business_age` VARCHAR(12) DEFAULT NULL AFTER `business_type`;
 =======
 >>>>>>> 54b5aa81992424f4204c60d4ad15b71c4c6cd029
 
+<<<<<<< HEAD
 >>>>>>> 245a00ae53eb3f8f65af9e1ba78ba2516ba3a550
+=======
+CREATE TABLE `budgets` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `branch_id` bigint(20) DEFAULT NULL,
+  `category_id` bigint(20) DEFAULT NULL,
+  `budget_year` year(4) NOT NULL,
+  `quarter` enum('Q1','Q2','Q3','Q4') NOT NULL,
+  `month1` decimal(10,2) DEFAULT NULL,
+  `month2` decimal(10,2) DEFAULT NULL,
+  `month3` decimal(10,2) DEFAULT NULL,
+  `total` decimal(10,2) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `branch_id` (`branch_id`),
+  KEY `category_id` (`category_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+
+>>>>>>> 4abc168fcb5bf8dfd5573457714b9fd997630659

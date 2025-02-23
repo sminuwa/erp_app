@@ -380,12 +380,12 @@ class OrderController extends Controller
 
         return view('pages.sales.index', compact('balance', 'orders'));
     }
-    public function printPayment($customerid)
+    public function printPayment($customerid, $papersize ="A4")
     {
 
         $customer = Customer::find($customerid);
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
-        return view('pages.customer.print', compact('dates', 'customer', 'company'));
+        return view('pages.customer.print', compact('dates', 'customer', 'company','papersize'));
     }
     public function transfer(Request $request)
     {

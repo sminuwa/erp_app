@@ -43,8 +43,12 @@
                         @endcan
                         @can('stock_adjustments.print')
                             <a class="btn btn-secondary btn-sm" target="_blank"
-                                href="{{ route('stock_adjustments.print', $record->id) }}">
-                                <span class="fa fa-print"></span> Print
+                                href="{{ route('stock_adjustments.print', [$record->id, 'A4']) }}">
+                                <span class="fa fa-print"></span> Print A4
+                            </a>
+                            <a class="btn btn-secondary btn-sm" target="_blank"
+                                href="{{ route('stock_adjustments.print', [$record->id, 'A4']) }}">
+                                <span class="fa fa-print"></span> Print A5
                             </a>
                         @endcan
                         @if ($record->status == 0)

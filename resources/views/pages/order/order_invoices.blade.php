@@ -68,7 +68,7 @@
                                 </div>
                                 <table id="example1"
                                     class="table table-bordered table-striped text-left table-responsive-xl"
-                                    data-ordering="false">
+                                    data-ordering="true">
                                     <thead>
                                         <tr>
                                             <th>#</th>
@@ -114,9 +114,13 @@
                                                                 </a>
                                                             @endcan
                                                             @can('invoice.order_print')
-                                                                <a href="{{ route('invoice.order_print', $order->id) }}"
+                                                                <a href="{{ route('invoice.order_print', [$order->id, 'A4']) }}"
                                                                     target="_BLANK" class="dropdown-item">
                                                                     <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                </a>
+                                                                <a href="{{ route('invoice.order_print', [$order->id, 'A5']) }}"
+                                                                    target="_BLANK" class="dropdown-item">
+                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print A5
                                                                 </a>
                                                             @endcan
                                                             @if ($order->status == 0)

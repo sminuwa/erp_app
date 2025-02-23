@@ -238,7 +238,7 @@ class CreditNoteController extends Controller
             ->orderBy('id', 'DESC')->get();
         return view('pages.suppliers.credit_note', ['payments' => $payments]);
     }
-    public function printCreditnoteReceipt(CreditNote $credit_note)
+    public function printCreditnoteReceipt(CreditNote $credit_note,$paperszie = "A4")
     {
         $order = CreditNote::with('customer')->where('id', $credit_note->id)->first();
         //return $order;
@@ -247,7 +247,7 @@ class CreditNoteController extends Controller
         //$company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('created_at')->first();
         $company = Setting::find(1);
         $utility = new Utility();
-        return view('pages.inventories.credit_notes.print', compact('order_details', 'order', 'company', 'utility','credit_note'));
+        return view('pages.inventories.credit_notes.print', compact('order_details', 'order', 'company', 'utility','credit_note','paperszie'));
     }
     public function loadInvoices(Request $request)
     {

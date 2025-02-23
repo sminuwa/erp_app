@@ -129,9 +129,14 @@
                                                             @endif
                                                             @can('purchases.request.print')
                                                                 <a class="dropdown-item"
-                                                                    href="{{ route('purchase.request.print', $record->id) }}"
+                                                                    href="{{ route('purchase.request.print', [$record->id, 'A4']) }}"
                                                                     title="Print Invoice" target="_BLANK">
-                                                                    <span class="fa fa-print"> Print</span>
+                                                                    <span class="fa fa-print"> Print A4</span>
+                                                                </a>
+                                                                <a class="dropdown-item"
+                                                                    href="{{ route('purchase.request.print', [$record->id, 'A5']) }}"
+                                                                    title="Print Invoice" target="_BLANK">
+                                                                    <span class="fa fa-print"> Print A5</span>
                                                                 </a>
                                                             @endcan
                                                             @can('purchases.request.destroy')
@@ -263,7 +268,7 @@
 @push('js')
     <!-- DataTables -->
     <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
-{{--    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>--}}
+    {{--    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> --}}
     <script type="text/javascript">
         $(function() {
             $("#record1").DataTable({

@@ -48,9 +48,12 @@
                                     @endcan
                                     @if (Session::get('prev_id') != null)
                                         @can('receipt.payment.print')
-                                            <a href="{{ route('receipt.payment.print', Session::get('prev_id')) }}"
+                                            <a href="{{ route('receipt.payment.print', [Session::get('prev_id'), 'A4']) }}"
                                                 target="_BLANK" class="btn btn-sm btn-primary" style="margin-left: 2px;"><span
-                                                    class="fa fa-print"> Print</span> </a>
+                                                    class="fa fa-print"> Print A4</span> </a>
+                                            <a href="{{ route('receipt.payment.print', [Session::get('prev_id'), 'A5']) }}"
+                                                target="_BLANK" class="btn btn-sm btn-primary" style="margin-left: 2px;"><span
+                                                    class="fa fa-print"> Print A5</span> </a>
                                         @endcan
                                         @can('receipt.payment.print.pos')
                                             <a href="{{ route('receipt.payment.print.pos', Session::get('prev_id')) }}"
@@ -119,10 +122,10 @@
                                                     @elseif($payment->model_name == 'Supplier')
                                                         {{ optional($payment->supplier)->name ?? '' }}{{ optional($payment->supplier)->name ?? '' }}
                                                     @endif --}}
-                                                    {{ ($payment->payer()->code ?? null) ? ($payment->payer()->code??null) . ' - ' . $payment->payer()->name : ($payment->payer()->number ?? null) . ' - ' . ($payment->payer()->description ??null) }}
+                                                    {{ $payment->payer()->code ?? null ? ($payment->payer()->code ?? null) . ' - ' . $payment->payer()->name : ($payment->payer()->number ?? null) . ' - ' . ($payment->payer()->description ?? null) }}
                                                 </td>
                                                 <td>
-                                                    {{ $payment->account()->code ? $payment->account()->code . ' - ' . ($payment->account()->name??null) : ($payment->account()->number??null) . ' - ' . ($payment->account()->description) }}
+                                                    {{ $payment->account()->code ? $payment->account()->code . ' - ' . ($payment->account()->name ?? null) : ($payment->account()->number ?? null) . ' - ' . $payment->account()->description }}
                                                 </td>
 
                                                 <td align="right">{{ number_format($payment->amount, 2, '.', ',') }}</td>

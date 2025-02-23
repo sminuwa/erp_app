@@ -85,7 +85,7 @@
                         @include('cards.supplier')
                     </div>
                     <div class="col-sm-8 table-responsive" id="load">
-                        <table class="table table-bordered" id="example1" data-ordering="false">
+                        <table class="table table-bordered" id="example1" data-ordering="true">
                             <thead>
                                 <tr>
                                     <th>Date</th>

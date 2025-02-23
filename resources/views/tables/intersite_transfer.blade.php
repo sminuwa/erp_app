@@ -43,8 +43,12 @@
                                 @if (App\Models\User::find($record->approved_by) != null)
                                     @can('intersite.print')
                                         <a class="btn btn-secondary btn-sm" title="Stock Tranfer Report" target="_BLANK"
-                                            href="{{ route('intersite.print', $record->transfer_id) }}">
-                                            <span class="fa fa-print"></span>
+                                            href="{{ route('intersite.print', [$record->transfer_id, 'A4']) }}">
+                                            <span class="fa fa-print"> Print A4</span>
+                                        </a>
+                                        <a class="btn btn-secondary btn-sm" title="Stock Tranfer Report" target="_BLANK"
+                                            href="{{ route('intersite.print', [$record->transfer_id, 'A5']) }}">
+                                            <span class="fa fa-print"> Print A5</span>
                                         </a>
                                     @endcan
                                 @endif

@@ -17,7 +17,7 @@
     </caption>
     <thead>
     <tr>
-        <th style="width: 50%" colspan="2">Date
+        <th style="width: 50%" colspan="3">Date
             Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
         </th>
         <th style="width: 50%;text-align:right" colspan="3">Processed By {{ auth()->user()->name }}</th>
@@ -27,7 +27,7 @@
         <th>CUSTOMER</th>
         {{-- <th>CODE</th> --}}
         {{-- <th>PRODUCT</th> --}}
-        {{-- <th>QUANTITY</th> --}}
+        <th>QUANTITY</th>
         {{-- <th>UNIT</th> --}}
         <th>COST</th>
         <th>SALES</th>
@@ -46,7 +46,7 @@
             <td>{{ $sale->customer_name }}</td>
             {{-- <td>{{ $sale->code }}</td> --}}
             {{-- <td>{{ $sale->item }}</td> --}}
-            {{-- <td style="text-align: right">{{ $sale->quantity }}</td> --}}
+            <td style="text-align: right">{{ $sale->quantity }}</td>
             {{-- <td>{{ $sale->item_unit }}</td> --}}
             <td style="text-align: right">{{ number_format($sale->total_cost, 2, '.', ',') }}</td>
             <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>
@@ -61,7 +61,7 @@
     @endforeach
     <tfoot>
     <tr>
-        <th style="text-align: right" colspan="2">TOTAL</th>
+        <th style="text-align: right" colspan="3">TOTAL</th>
         <th style="text-align: right">
             {{ number_format($total_cost, 0, '.', ',') }}</th>
         <th style="text-align: right">

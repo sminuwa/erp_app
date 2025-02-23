@@ -92,7 +92,8 @@
                                                         <?php $total_credit += $journal_item->credit; ?>
                                                         <?php $total_debit += $journal_item->debit; ?>
                                                         <tr :wire:key="{{ $loop->index }}">
-                                                            <td>{{ $journal_item->branch->name ?? ($journal->branch->name ?? "") }}</td>
+                                                            <td>{{ $journal_item->branch->name ?? ($journal->branch->name ?? '') }}
+                                                            </td>
                                                             <td>
                                                                 {{ $journal_item->account()->code ?? $journal_item->account()->number }}
                                                                 -
@@ -122,8 +123,10 @@
                                             </h4>
                                         </div>
                                         <div class="col-md-12 mt-3">
-                                            <a href="{{ route('journal.print', $journal->id) }}" target="_blank"
-                                                class="btn btn-dark btn-sm"><i class="fa fa-print"></i> Print</a>
+                                            <a href="{{ route('journal.print', [$journal->id, 'A4']) }}" target="_blank"
+                                                class="btn btn-dark btn-sm"><i class="fa fa-print"></i> Print A4</a>
+                                            <a href="{{ route('journal.print', [$journal->id, 'A5']) }}" target="_blank"
+                                                class="btn btn-dark btn-sm"><i class="fa fa-print"></i> Print A5</a>
                                             @if ($journal->status == 0)
                                                 <a href="{{ route('journal.post', $journal->id) }}"
                                                     onclick="return confirm('Are you sure you want to post this journal?');"

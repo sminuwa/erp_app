@@ -96,9 +96,13 @@
                                                 <td>{{ $payment->postedBy->name ?? '' }}</td>
                                                 <td align="center">
                                                     @can('suppliers.debit.note.print')
-                                                        <a href="{{ route('suppliers.debit.note.print', $payment->id) }}"
+                                                        <a href="{{ route('suppliers.debit.note.print', [$payment->id, 'A4']) }}"
                                                             target="_BLANK" class="btn btn-secondary btn-sm">
-                                                            <i class="fa fa-print" aria-hidden="true"></i>
+                                                            <i class="fa fa-print" aria-hidden="true"> Print A4</i>
+                                                        </a>
+                                                        <a href="{{ route('suppliers.debit.note.print', [$payment->id, 'A5']) }}"
+                                                            target="_BLANK" class="btn btn-secondary btn-sm">
+                                                            <i class="fa fa-print" aria-hidden="true"> Print A5</i>
                                                         </a>
                                                     @endcan
                                                     {{-- <a href="javascript:void(0)" data-toggle="modal"

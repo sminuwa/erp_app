@@ -21,193 +21,197 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
     <link rel="icon" href="{{ asset('assets/backend/img/policymaker.ico') }}" type="image/x-icon" />
-
+    @include('pages.order.paper_size')
 </head>
 
 <body>
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <!-- Main content -->
-            <div class="invoice p-3 mb-3">
-                <!-- title row -->
-                <div class="row">
-                    <div class="col-11">
-                        <img src="{{ asset('assets/backend/img/logo.png') }}" style="width:100px;height:60px;"
-                             alt="logo" class="img-circle elevation-3" style="opacity: .8">
-                        <span style="font-size:24px;">&nbsp;{{App\Models\User::userBranchName()->long_name}}</span>
-                        <small class="float-right">Date: {{ date('l, d-M-Y h:i:s A') }}</small>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <!-- Main content -->
+                <div class="invoice p-3 mb-3">
+                    <!-- title row -->
+                    <div class="row">
+                        <div class="col-11">
+                            <img src="{{ asset('assets/backend/img/logo.png') }}" style="width:100px;height:60px;"
+                                alt="logo" class="img-circle elevation-3" style="opacity: .8">
+                            <span
+                                style="font-size:24px;">&nbsp;{{ App\Models\User::userBranchName()->long_name }}</span>
+                            <small class="float-right">Date: {{ date('l, d-M-Y h:i:s A') }}</small>
 
+                        </div>
+                        <!-- /.col -->
                     </div>
-                    <!-- /.col -->
-                </div>
-                <!-- info row -->
-                <div class="row invoice-info">
-                    <div class="col-sm-4">
-                        <address>
-                            <h5>HEAD OFFICE</h5>
-                            Address <span class="ion-ios-contact-outline"></span>: {{ $company->address }}
-                            {{ $company->city }} - {{ $company->zip_code }},
-                            {{ $company->country }}<br>
-                            Phone <span class="ion-android-phone-portrait"></span>:
-                            {{ $company->mobile }}
-                            {{ $company->phone !== null ? ', 0' . $company->phone : '' }}
-                            <br>
-                            Email <span class="ion-email"></span>: {{ $company->email }}
-                        </address>
-                    </div>
-                    <!-- /.col -->
+                    <!-- info row -->
+                    <div class="row invoice-info">
+                        <div class="col-sm-4">
+                            <address>
+                                <h5>HEAD OFFICE</h5>
+                                Address <span class="ion-ios-contact-outline"></span>: {{ $company->address }}
+                                {{ $company->city }} - {{ $company->zip_code }},
+                                {{ $company->country }}<br>
+                                Phone <span class="ion-android-phone-portrait"></span>:
+                                {{ $company->mobile }}
+                                {{ $company->phone !== null ? ', 0' . $company->phone : '' }}
+                                <br>
+                                Email <span class="ion-email"></span>: {{ $company->email }}
+                            </address>
+                        </div>
+                        <!-- /.col -->
 
-                    <!-- /.col -->
-                    <div class="col-sm-4 offset-3">
-                        <address>
-                            <h5>BRANCH OFFICE</h5>
-                            Address <span class="ion-ios-contact-outline"></span>: {{ $order->branch?->address }}
-                            <br>
-                            Phone <span class="ion-android-phone-portrait"></span>:
-                            {{ $order->branch->phone }}
-                            <br>
-                            Email <span class="ion-email"></span>: {{ $order->branch?->email }}
-                        </address>
+                        <!-- /.col -->
+                        <div class="col-sm-4 offset-3">
+                            <address>
+                                <h5>BRANCH OFFICE</h5>
+                                Address <span class="ion-ios-contact-outline"></span>: {{ $order->branch?->address }}
+                                <br>
+                                Phone <span class="ion-android-phone-portrait"></span>:
+                                {{ $order->branch->phone }}
+                                <br>
+                                Email <span class="ion-email"></span>: {{ $order->branch?->email }}
+                            </address>
+                        </div>
+                        <!-- /.col -->
                     </div>
-                    <!-- /.col -->
-                </div>
-                <div class="row">
-                    <div class="col-sm-4 invoice-col">
-                        <address>
-                            <b>Customer Name:</b> {{ $order->customer->code }} - {{ $order->customer->name }}<br />
-                            <b>Address:</b> <span class="ion-ios-contact-outline"></span>
-                            {{ $order->customer->address }}<br>
-                            <b>Phone:</b> <span class="ion-android-phone-portrait"></span>
-                            {{ $order->customer->phone }}<br>
-                        </address>
-                    </div>
-                    <div class="col-sm-3 invoice-col">
-                        <div style="color:aliceblue;">
-                            {{ QrCode::size(70)->generate($order->amount) }}<br />
-                            <span style="font-size:28px;margin-top:-5px">
+                    <div class="row">
+                        <div class="col-sm-4 invoice-col">
+                            <address>
+                                <b>Customer Name:</b> {{ $order->customer->code }} -
+                                {{ $order->customer->name }}<br />
+                                <b>Address:</b> <span class="ion-ios-contact-outline"></span>
+                                {{ $order->customer->address }}<br>
+                                <b>Phone:</b> <span class="ion-android-phone-portrait"></span>
+                                {{ $order->customer->phone }}<br>
+                            </address>
+                        </div>
+                        <div class="col-sm-3 invoice-col">
+                            <div style="color:aliceblue;">
+                                {{ QrCode::size(70)->generate($order->amount) }}<br />
+                                <span style="font-size:28px;margin-top:-5px">
                                     {{ $order->payment_mode }} Sales
                                 </span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <b>Invoice No:</b> {{ $order->reference }}<br>
+                            <b>Processed Date:
+                                {{ \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</b><br>
+                            <b>Created By</b> <span class="ion-card"></span> {{ $order->createdBy->name }}<br />
+                            <b>Date Created:
+                                {{ \Carbon\Carbon::parse($order->created_at)->toFormattedDateString() }}</b><br>
+                            <b>Printed By <span class="ion-printer"></span>
+                                &nbsp;&nbsp;{{ Auth::user()->name }}</span><span>
                         </div>
                     </div>
-                    <div class="col-sm-4">
-                        <b>Invoice No:</b> {{ $order->reference }}<br>
-                        <b>Processed Date: {{ \Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</b><br>
-                        <b>Created By</b> <span class="ion-card"></span> {{ $order->createdBy->name }}<br />
-                        <b>Date Created: {{ \Carbon\Carbon::parse($order->created_at)->toFormattedDateString() }}</b><br>
-                        <b>Printed By <span class="ion-printer"></span>
-                            &nbsp;&nbsp;{{ Auth::user()->name }}</span><span>
-                    </div>
-                </div>
-                <!-- /.row -->
+                    <!-- /.row -->
 
-                <!-- Table row -->
-                <div class="row" style="line-height: 0.4">
-                    <div class="col-11 table-responsive">
-                        <table class="table table-bordered table-condensed text-left">
-                            <thead>
-                            <tr>
-                                <th style="width:10%;">CODE</th>
-                                <th style="width:30%;">DESCRIPTION</th>
-                                <th style="width:5%;">QTY</th>
-                                <th style="width:5%;">UFM</th>
-                                <th style="width:10%;">STORE CODE</th>
-                                <th style="width:10%;">UNIT PRICE</th>
-                                <th style="width:20%;">TOTAL</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @php
-                                $total = 0;
-                                $total_discount = 0;
-                            @endphp
-                            @foreach ($order_details as $order_detail)
+                    <!-- Table row -->
+                    <div class="row" style="line-height: 0.4">
+                        <div class="col-11 table-responsive">
+                            <table class="table table-bordered table-condensed text-left">
+                                <thead>
+                                    <tr>
+                                        <th style="width:10%;">CODE</th>
+                                        <th style="width:30%;">DESCRIPTION</th>
+                                        <th style="width:5%;">QTY</th>
+                                        <th style="width:5%;">UFM</th>
+                                        <th style="width:10%;">STORE CODE</th>
+                                        <th style="width:10%;">UNIT PRICE</th>
+                                        <th style="width:20%;">TOTAL</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $total = 0;
+                                        $total_discount = 0;
+                                    @endphp
+                                    @foreach ($order_details as $order_detail)
+                                        <tr>
+                                            <td>{{ $order_detail->storeProduct->product->code }}</td>
+                                            <td>{{ $order_detail->storeProduct->product->name }}</td>
+                                            <td align="center">{{ $order_detail->quantity }}</td>
+                                            <td align="center">{{ $order_detail->unit }}</td>
+                                            <td>{{ $order_detail->storeProduct->store->code }}</td>
+
+                                            <td align="right">
+                                                &#8358;{{ number_format($order_detail->sold_price, 2) }}
+                                            </td>
+                                            <td align="right">
+                                                &#8358;{{ number_format($order_detail->sold_price * $order_detail->quantity, 2) }}
+                                            </td>
+                                        </tr>
+                                        @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
+                                    @endforeach
+                                </tbody>
+                            </table>
+                            <table class="table table-bordered table-condensed">
                                 <tr>
-                                    <td>{{ $order_detail->storeProduct->product->code }}</td>
-                                    <td>{{ $order_detail->storeProduct->product->name }}</td>
-                                    <td align="center">{{ $order_detail->quantity }}</td>
-                                    <td align="center">{{ $order_detail->unit }}</td>
-                                    <td>{{ $order_detail->storeProduct->store->code }}</td>
 
-                                    <td align="right">
-                                        &#8358;{{ number_format($order_detail->sold_price, 2) }}
-                                    </td>
-                                    <td align="right">
-                                        &#8358;{{ number_format($order_detail->sold_price * $order_detail->quantity, 2) }}
-                                    </td>
+                                    <th style="text-align: right">Total Amount := </th>
+                                    <th style="text-align: right;">
+                                        &#8358;{{ number_format($total, 2, '.', ',') }}</th>
                                 </tr>
-                                @php $total += ($order_detail->sold_price * $order_detail->quantity);  @endphp
-                            @endforeach
-                            </tbody>
-                        </table>
-                        <table class="table table-bordered table-condensed">
-                            <tr>
-
-                                <th style="text-align: right">Total Amount := </th>
-                                <th style="text-align: right;">
-                                    &#8358;{{ number_format($total, 2, '.', ',') }}</th>
-                            </tr>
-                            {{--@if ($order->discount != 0)
+                                {{-- @if ($order->discount != 0)
                                 <tr>
                                     <th style="text-align: right">Discount := </th>
                                     <th style="text-align: right;">
                                         &#8358;{{ number_format($order->discount, 2, '.', ',') }}
                                     </th>
                                 </tr>
-                            @endif--}}
+                            @endif --}}
 
-                            <tr>
-                                <td colspan="4">Amoun Paid in Words:
-                                    <span>{{ $utility->convertNumberToWords($total) }} Naira</span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                                <tr>
+                                    <td colspan="4">Amoun Paid in Words:
+                                        <span>{{ $utility->convertNumberToWords($total) }} Naira</span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
 
-                        <table class="table table-condensed">
-                            <tr>
-                                <td colspan="4" style='border-style:none;'>
-                                    ___________________________<br /><br />
-                                    Customer's Signature
-                                </td>
-                                <td style="border-style:none;text-align: center">
-                                    {{-- @php
+                            <table class="table table-condensed">
+                                <tr>
+                                    <td colspan="4" style='border-style:none;'>
+                                        ___________________________<br /><br />
+                                        Customer's Signature
+                                    </td>
+                                    <td style="border-style:none;text-align: center">
+                                        {{-- @php
                                         $uc = substr($order->invoice_no, 0, 6) . substr($order->invoice_no, 6, 10) + 3000;
                                     @endphp
                                     {{ QrCode::size(100)->backgroundColor(255, 55, 0)->generate("$total\n$uc\n\n.") }} --}}
-                                </td>
-                                <td colspan="4" style="text-align: right;border-style:none;"><span
-                                        style='font-size:14px; border-style:none;'></span>
-                                    Signature:
-                                    _______________________________<br /><br />
-                                    for: {{App\Models\User::UserBranchName()->long_name}}
-                                </td>
-                            </tr>
-                        </table>
+                                    </td>
+                                    <td colspan="4" style="text-align: right;border-style:none;"><span
+                                            style='font-size:14px; border-style:none;'></span>
+                                        Signature:
+                                        _______________________________<br /><br />
+                                        for: {{ App\Models\User::UserBranchName()->long_name }}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- /.col -->
                     </div>
-                    <!-- /.col -->
-                </div>
-                <!-- /.row -->
-                <!-- /.invoice -->
-            </div><!-- /.col -->
-        </div><!-- /.row -->
-    </div><!-- /.container-fluid -->
+                    <!-- /.row -->
+                    <!-- /.invoice -->
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
 
-    <!-- /.content -->
+        <!-- /.content -->
 
-    <!-- ./wrapper -->
+        <!-- ./wrapper -->
 
-    <!-- REQUIRED SCRIPTS -->
-    <!-- jQuery -->
-    <script src="{{ asset('assets/backend/plugins/jquery/jquery.min.js') }}"></script>
-    <!-- Bootstrap -->
-    <script src="{{ asset('assets/backend/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <!-- AdminLTE -->
-    <script src="{{ asset('assets/backend/js/adminlte.js') }}"></script>
+        <!-- REQUIRED SCRIPTS -->
+        <!-- jQuery -->
+        <script src="{{ asset('assets/backend/plugins/jquery/jquery.min.js') }}"></script>
+        <!-- Bootstrap -->
+        <script src="{{ asset('assets/backend/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+        <!-- AdminLTE -->
+        <script src="{{ asset('assets/backend/js/adminlte.js') }}"></script>
 
-    <script>
-        window.print();
-    </script>
+        <script>
+            window.print();
+        </script>
 
 </body>
 

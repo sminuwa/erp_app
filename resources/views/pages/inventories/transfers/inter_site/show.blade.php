@@ -43,8 +43,12 @@
                 @endcan
                 @can('intersite.print')
                     <a class="btn btn-secondary btn-sm" title="Print" target="_BLANK"
-                        href="{{ route('intersite.print', $record->id) }}">
-                        <span class="fa fa-print"></span> Print
+                        href="{{ route('intersite.print', [$record->id,'A4']) }}">
+                        <span class="fa fa-print"></span> Print A4
+                    </a>
+                    <a class="btn btn-secondary btn-sm" title="Print" target="_BLANK"
+                        href="{{ route('intersite.print', [$record->id,'A5']) }}">
+                        <span class="fa fa-print"></span> Print A5
                     </a>
                 @endcan
                 @if ($record->status == 1 && $record->destination_branch_id == auth()->user()->branch->id)

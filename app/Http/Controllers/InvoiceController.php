@@ -67,7 +67,7 @@ class InvoiceController extends Controller
         return view('pages.pos.invoice', compact('customer', 'contents', 'company', 'sale_mode'));
     }
 
-    public function print($order_id)
+    public function print($order_id, $papersize = "A5")
     {
         $order = Order::with('customer')->where('id', $order_id)->first();
         //return $order;
@@ -76,7 +76,7 @@ class InvoiceController extends Controller
         //$company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('created_at')->first();
         $company = Setting::find(1);
         $utility = new Utility();
-        return view('pages.order.print', compact('order_details', 'order', 'company', 'utility'));
+        return view('pages.order.print', compact('order_details', 'order', 'company', 'utility', 'papersize'));
     }
 
     public function printWithVat($order_id)
@@ -89,10 +89,10 @@ class InvoiceController extends Controller
         $company = Setting::find(1);
         $utility = new Utility();
         $with_vat = true;
-        return view('pages.order.print', compact('order_details', 'order', 'company', 'utility', 'with_vat'));
+        return view('pages.order.print', compact('order_details', 'order', 'company', 'utility', 'with_vat', 'papersize'));
     }
 
-    public function print_order_invoice($order_id)
+    public function print_order_invoice($order_id, $papersize = "A5")
     {
         $order = OrderInvoice::with('customer')->where('id', $order_id)->first();
         //return $order;
@@ -101,10 +101,10 @@ class InvoiceController extends Controller
         //$company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('created_at')->first();
         $company = Setting::find(1);
         $utility = new Utility();
-        return view('pages.order.order_invoice_print', compact('order_details', 'order', 'company', 'utility'));
+        return view('pages.order.order_invoice_print', compact('order_details', 'order', 'company', 'utility', 'papersize'));
     }
 
-    public function order_print($order_id)
+    public function order_print($order_id, $papersize = "A5")
     {
         $order = OrderInvoice::with('customer')->where('id', $order_id)->first();
         //return $order;
@@ -113,7 +113,7 @@ class InvoiceController extends Controller
         //$company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('created_at')->first();
         $company = Setting::find(1);
         $utility = new Utility();
-        return view('pages.order.order_print', compact('order_details', 'order', 'company', 'utility'));
+        return view('pages.order.order_print', compact('order_details', 'order', 'company', 'utility', 'papersize'));
     }
 
     public function final_invoice(Request $request)

@@ -1,6 +1,6 @@
 @extends('layouts.backend.app')
 
-@section('title', 'Ageing Report')
+@section('title', 'General Ledger List Report')
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
@@ -38,21 +38,33 @@
             <div class="container-fluid">
                 <form method="POST">
                     <div class="row">
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="company_id">Company</label>
                             <select class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
                                 name="company_id" id="company_id" required>
 
                             </select>
-                        </div>
-                        <div class="form-group">
+                        </div> --}}
+                        {{-- <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="branch_id">Branch</label>
                             <select
                                 class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
                                 name="branch_id" id="branch_id">
 
+                            </select>
+                        </div> --}}
+                        <div class="form-group">
+                            &nbsp;&nbsp;
+                            <label for="general_account_id">Class</label>
+                            <select style="width:300px;"
+                                class="form-control select2-single {{ $errors->has('general_account_id') ? ' is-invalid' : '' }}"
+                                name="general_account_id" id="general_account_id">
+                                <option value="all">All</option>
+                                @foreach($classes as $class)
+                                    <option value="{{ $class->class }}">{{ $class->class }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="form-group text-right">
@@ -79,16 +91,19 @@
     <script type="text/javascript">
         $(function() {
             $('#generate').on("click", function() {
-                company_id = $('#company_id').val();
-                branch_id = $('#branch_id').val();
+                // company_id = $('#company_id').val();
+                //branch_id = $('#branch_id').val();
+                general_account_id = $('#general_account_id').val();
+                
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.general.account.list.reports') }}",
                     data: {
                         _token: "{{ csrf_token() }}",
-                        company_id: company_id,
-                        branch_id: branch_id
+                        // company_id: company_id,
+                        //branch_id: branch_id
+                        general_account_id: general_account_id
                     }
                 }).done(function(data) {
                     $("#load").html(data);

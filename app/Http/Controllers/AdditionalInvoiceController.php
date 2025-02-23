@@ -106,8 +106,8 @@ class AdditionalInvoiceController extends Controller
         return back();
     }
 
-    public function print(PurchaseExpense $invoice){
-        return view('pages.inventories.expenses.print',compact('invoice'));
+    public function print(PurchaseExpense $invoice, $papersize = "A4"){
+        return view('pages.inventories.expenses.print',compact('invoice','papersize'));
     }
 
     public function delete(PurchaseExpense $invoice){

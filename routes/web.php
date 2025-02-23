@@ -50,6 +50,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\CreditNoteController;
 use App\Http\Controllers\DebitNoteController;
 use App\Http\Controllers\BackupController;
+use App\Http\Controllers\BudgetController;
 
 
 
@@ -82,7 +83,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('/edit/{stockAdjustment}', [StockAdjustmentController::class, 'edit'])->name('stock_adjustments.edit');
                 Route::put('/update/{stockadjustment}', [StockAdjustmentController::class, 'update'])->name('stock_adjustments.update');
                 Route::delete('/delete/{stockadjustment}', [StockAdjustmentController::class, 'destroy'])->name('stock_adjustments.destroy');
-                Route::get('/print/{stockAdjustment}', [StockAdjustmentController::class, 'print'])->name('stock_adjustments.print');
+                Route::get('/print/{stockAdjustment}/{papersize?}', [StockAdjustmentController::class, 'print'])->name('stock_adjustments.print');
                 Route::post('/post/{stockAdjustment}', [StockAdjustmentController::class, 'post'])->name('stock_adjustments.post');
                 Route::post('/delete/{stockAdjustment}', [StockAdjustmentController::class, 'delete'])->name('stock_adjustments.delete');
                 Route::put('/cart/update', [StockAdjustmentController::class, 'updateCart'])->name('stock_adjustments.cart.update');
@@ -294,7 +295,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/order-invoice/link/{order}', [InvoiceController::class, 'linkOrderInvoice'])->name('order.invoice.linking');
             Route::put('/order-invoice/update/{order}', [InvoiceController::class, 'updateOrderInvoice'])->name('order.invoice.update');
             Route::get('/order-print/{order_id}', [InvoiceController::class, 'order_print'])->name('invoice.order_print');
-            Route::get('/order-invoice/print/{customer_id}', [InvoiceController::class, 'print_order_invoice'])->name('order.invoice.print');
+            Route::get('/order-invoice/print/{customer_id}/{paperszie?}', [InvoiceController::class, 'print_order_invoice'])->name('order.invoice.print');
             Route::get('/order-invoice/show/{id}', [OrderController::class, 'order_invoice_show'])->name('order.invoice.show');
             Route::get('/', [OrderController::class, 'order_invoice_list'])->name('order.invoice.list');
             Route::delete('/order-invoice/delete/{order}', [OrderController::class, 'destroy_order_invoice'])->name('order.invoice.destroy');
@@ -309,8 +310,8 @@ Route::middleware('auth')->group(function () {
             Route::post('/product/search', [OrderController::class, 'search'])->name('sales_products.search');
             Route::post('/invoice', [InvoiceController::class, 'final_invoice'])->name('invoice.create');
             Route::put('/invoice/update/{order}', [InvoiceController::class, 'updateInvoice'])->name('invoice.update');
-            Route::get('/print/{customer_id}', [InvoiceController::class, 'print'])->name('invoice.print');
-            Route::get('/print-with-vat/{customer_id}', [InvoiceController::class, 'printWithVat'])->name('invoice.print-with-vat');
+            Route::get('/print/{order_id}/{papersize?}', [InvoiceController::class, 'print'])->name('invoice.print');
+            Route::get('/print-with-vat/{order_id}/{papersize?}', [InvoiceController::class, 'printWithVat'])->name('invoice.print-with-vat');
             Route::post('/invoice-final', [InvoiceController::class, 'final_invoice'])->name('invoice.final_invoice');
             Route::get('/show/{id}', [OrderController::class, 'show'])->name('orders.show');
             //            Route::delete('/delete/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
@@ -325,7 +326,7 @@ Route::middleware('auth')->group(function () {
         Route::group(['prefix' => 'proforma'], function () {
             Route::get('/create', [PosController::class, 'index'])->name('proforma.index');
             Route::post('/proforma/create', [ProformaInvoiceController::class, 'final_proformer'])->name('proformer.create');
-            Route::get('/proforma/print/{order_id}', [ProformaInvoiceController::class, 'print_proformer'])->name('proformer.print');
+            Route::get('/proforma/print/{order_id}/{papersize?}', [ProformaInvoiceController::class, 'print_proformer'])->name('proformer.print');
             Route::get('/proforma/edit/{order}', [ProformaInvoiceController::class, 'editProformer'])->name('proformer.edit');
             Route::put('/proforma-invoice/update/{order}', [ProformaInvoiceController::class, 'UpdateProforma'])->name('proformer.update');
             Route::delete('/proforma-invoice/delete/{order}', [ProformaInvoiceController::class, 'destroy_proformer'])->name('proformer.destroy');
@@ -350,7 +351,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/cart', [CreditNoteController::class, 'addToCart'])->name('credit.note.cart.store');
             Route::post('/update/cart', [CreditNoteController::class, 'updateCreditNoteCart'])->name('credit.note.cart.update');
             Route::post('/remove/{id}', [CreditNoteController::class, 'removeCart'])->name('credit.note.cart.remove');
-            Route::get('/print/{credit_note}', [CreditNoteController::class, 'printCreditNoteReceipt'])->name('credit.note.print');
+            Route::get('/print/{credit_note}/{paperszie?}', [CreditNoteController::class, 'printCreditNoteReceipt'])->name('credit.note.print');
             Route::get('/show/{credit_note}', [CreditNoteController::class, 'show'])->name('credit.note.show');
             Route::post('/post/{credit_note}', [CreditNoteController::class, 'post'])->name('credit.note.post');
             Route::get('/edit/{credit_note}', [CreditNoteController::class, 'edit'])->name('credit.note.edit');
@@ -361,7 +362,7 @@ Route::middleware('auth')->group(function () {
         Route::get('pos/whole-sale', [PosController::class, 'wholeSale'])->name('pos.whole.sale');
 
         Route::get('barcode/search/product', [PosController::class, 'barcodeSearch'])->name('barcode.search.product');
-        Route::get('/waybill/order-print/{order_id}', [InvoiceController::class, 'waybill_print'])->name('waybill.order_print');
+        Route::get('/waybill/order-print/{order_id}/{papersize?}', [InvoiceController::class, 'waybill_print'])->name('waybill.order_print');
         Route::get('/pos/order-print/{order_id}', [InvoiceController::class, 'pos_print'])->name('pos.order_print');
         Route::get('/sales-today', [OrderController::class, 'today_sales'])->name('sales.today');
         Route::get('/sales-monthly/{month?}', [OrderController::class, 'monthly_sales'])->name('sales.monthly');
@@ -375,7 +376,7 @@ Route::middleware('auth')->group(function () {
     Route::group(['prefix' => 'orders'], function () {
         Route::get('/customers/{id}', [OrderController::class, 'customer_order'])->name('orders.customer');
         Route::get('/download/{id}', [OrderController::class, 'download'])->name('orders.download');
-        Route::get('/payment/print/{id}', [OrderController::class, 'printPayment'])->name('orders.payment.print');
+        Route::get('/payment/print/{id}/{papersize?}', [OrderController::class, 'printPayment'])->name('orders.payment.print');
         Route::post('/order/edit{order}', [OrderController::class, 'edit'])->name('orders.edit');
         Route::get('/load', [OrderController::class, 'load'])->name('orders.load');
         Route::get('/edit', [OrderController::class, 'loadEdit'])->name('orders.detail.edit');
@@ -437,7 +438,7 @@ Route::middleware('auth')->group(function () {
             Route::delete('/destroy/{ledger}', [ReceiptController::class, 'deleteReceipt'])->name('receipt.payment.destroy');
             Route::put('/update/{ledger}', [ReceiptController::class, 'updateReceipt'])->name('receipt.payment.update');
             Route::post('/search', [ReceiptController::class, 'search'])->name('receipt.payment.search');
-            Route::get('/print/receipt/{payment}', [ReceiptController::class, 'printReceipt'])->name('receipt.payment.print');
+            Route::get('/print/receipt/{payment}/{papersize?}', [ReceiptController::class, 'printReceipt'])->name('receipt.payment.print');
             Route::get('/print/receipt/pos/{payment}', [ReceiptController::class, 'printPoSPaymentReceipt'])->name('receipt.payment.print.pos');
             Route::get('/load/payers', [ReceiptController::class, 'loadPayers'])->name('ajax.load.payers');
             Route::get('/reverse/{receipt}', [ReceiptController::class, 'reverse'])->name('receipt.payment.reverse');
@@ -456,7 +457,7 @@ Route::middleware('auth')->group(function () {
             Route::put('/update/{interbank}', [InterBankController::class, 'update'])->name('interbank.update');
             Route::get('/edit/{interbank}', [InterBankController::class, 'edit'])->name('interbank.edit');
             Route::post('/search', [InterBankController::class, 'search'])->name('interbank.search');
-            Route::get('/print/interbank/{interbank}', [InterBankController::class, 'print'])->name('interbank.print');
+            Route::get('/print/interbank/{interbank}/{papersize?}', [InterBankController::class, 'print'])->name('interbank.print');
             Route::get('/print/interbank/pos/{interbank}', [InterBankController::class, 'printPos'])->name('interbank.print.pos');
             Route::get('/reverse/{interbank}', [InterBankController::class, 'reverse'])->name('interbank.reverse');
             Route::get('/show/{interbank}', [InterBankController::class, 'show'])->name('interbank.show');
@@ -474,7 +475,7 @@ Route::middleware('auth')->group(function () {
             Route::delete('/destroy/{ledger}', [PaymentController::class, 'deletePayment'])->name('payment.destroy');
             Route::put('/update/{ledger}', [PaymentController::class, 'updateReceipt'])->name('payment.update');
             Route::post('/search', [PaymentController::class, 'search'])->name('payment.search');
-            Route::get('/print/payment/{payment}', [PaymentController::class, 'printPaymentReceipt'])->name('payment.print');
+            Route::get('/print/payment/{payment}/{papersize?}', [PaymentController::class, 'printPaymentReceipt'])->name('payment.print');
             Route::get('/print/payment/pos/{payment}', [PaymentController::class, 'printPoSPaymentReceipt'])->name('payment.print.pos');
             Route::get('/reverse/{payment}', [PaymentController::class, 'reverse'])->name('payment.reverse');
             Route::get('/show/{payment}', [PaymentController::class, 'show'])->name('payment.show');
@@ -527,7 +528,7 @@ Route::middleware('auth')->group(function () {
                     Route::get('/balance', [MisController::class, 'loadSupplierBalance'])->name('ajax.load.supplier.balance');
                     Route::delete('/delete/{ledger}', [SupplierController::class, 'deletePayment'])->name('suppliers.payment.destroy');
                     Route::post('/search', [SupplierController::class, 'searchPayment'])->name('suppliers.payment.search');
-                    Route::get('/print/receipt/{payment}', [SupplierController::class, 'printPaymentReceipt'])->name('supplier.payment.print');
+                    Route::get('/print/receipt/{payment}/{papersize?}', [SupplierController::class, 'printPaymentReceipt'])->name('supplier.payment.print');
                     Route::get('/print/receipt/pos/{payment}', [SupplierController::class, 'printPoSPaymentReceipt'])->name('supplier.payment.print.pos');
 
                     //Debite Note
@@ -739,6 +740,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/site/sales/category', [ReportController::class, 'categorySaleBySiteReport'])->name('sales.report.by.category.site');
             Route::get('/site/sales/category/load', [ReportController::class, 'loadCategorySaleBySiteReport'])->name('ajax.category.site.sales.report');
             Route::get('/site/sales/category/print/{from_date}/{to_date}/{company_id}/{branch_id}/{category_id1}', [ReportController::class, 'printCategorySaleBySiteReport'])->name('ajax.category.site.sales.report.print');
+            Route::get('/category/export-excel', [ReportController::class, 'exportBySiteExcel'])->name('export.by.site.excel');
+            Route::get('/category/export-pdf', [ReportController::class, 'exportBySitePDF'])->name('export.by.site.pdf');
 
             //Staff Sales Report
             Route::get('/sa/sales/staff', [ReportController::class, 'staffSaleReport'])->name('staff.sales.report');
@@ -812,7 +815,7 @@ Route::middleware('auth')->group(function () {
 
 
             //Begin Customer Sales Analysis Report
-
+    
             //Customer Debt Report
             Route::get('/ca/customer/debt', [ReportController::class, 'customerDebtReport'])->name('customer.total.debt.reports');
             Route::get('/ca/customer/debt/load', [ReportController::class, 'loadCustomerDebtReport'])->name('ajax.load.customer.total.debt.reports');
@@ -912,7 +915,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/product/valuation/load', [ReportController::class, 'loadProductValuationReport'])->name('ajax.product.valuation.report');
             Route::post('/product/valuation/print/', [ReportController::class, 'printProductValuationReport'])->name('ajax.product.valuation.report.print');
             //User Ledger and Loans
-
+    
             //Loan Balances
             Route::get('/us/user/balance', [ReportController::class, 'loanBalance'])->name('user.loan.balance.report');
             Route::get('/us/user/balance/load', [ReportController::class, 'loadLoanBalance'])->name('ajax.load.user.loan.balance.report');
@@ -948,8 +951,8 @@ Route::middleware('auth')->group(function () {
                 Route::get('/income_statement', [ReportController::class, 'incomeStatement'])->name('income.statement.report');
                 Route::get('/income_statement/load', [ReportController::class, 'loadIncomeStatement'])->name('ajax.load.income.statement.report');
                 Route::get('/income_statement/print/{from_date}/{to_date}/{company_id}/{branch_id}/{category_id1}/{category_id2}', [ReportController::class, 'printIncomeStatement'])->name('ajax.income.statement.report.print');
-//                Route::get('/income_statement/print/{from_month}/{to_month}/{income_year}/{company_id}/{branch_id}/{category_id1}/{category_id2}', [ReportController::class, 'printIncomeStatement'])->name('ajax.income.statement.report.print');
-
+                //                Route::get('/income_statement/print/{from_month}/{to_month}/{income_year}/{company_id}/{branch_id}/{category_id1}/{category_id2}', [ReportController::class, 'printIncomeStatement'])->name('ajax.income.statement.report.print');
+    
                 //Trial Balance
                 Route::get('/trial_balance', [ReportController::class, 'trialBalance'])->name('trial.balance.report');
                 Route::get('/trial_balance/load', [ReportController::class, 'loadTrialBalance'])->name('ajax.load.trial.balance.report');
@@ -980,7 +983,7 @@ Route::middleware('auth')->group(function () {
                 //General Account
                 Route::get('/general/account/list', [ReportController::class, 'generalLedgerList'])->name('general.account.list.reports');
                 Route::get('/general/account/list/load', [ReportController::class, 'loadGeneralLedgerListReport'])->name('ajax.load.general.account.list.reports');
-                Route::get('/general/account/load/print/{company_id}/{branch_id}', [ReportController::class, 'printGeneralLedgerListReport'])->name('ajax.general.ledger.list.report.print');
+                Route::get('/general/account/load/print/{general_account_class}', [ReportController::class, 'printGeneralLedgerListReport'])->name('ajax.general.ledger.list.report.print');
 
 
             });
@@ -1028,7 +1031,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/update/{journal}', [JournalController::class, 'update'])->name('journal.update');
         Route::get('/post/{journal}', [JournalController::class, 'post'])->name('journal.post');
         Route::get('/reverse/{journal}', [JournalController::class, 'reverse'])->name('journal.reverse');
-        Route::get('/print/{journal}', [JournalController::class, 'print'])->name('journal.print');
+        Route::get('/print/{journal}/{papersize?}', [JournalController::class, 'print'])->name('journal.print');
         Route::get('/edit/{journal}', [JournalController::class, 'edit'])->name('journal.edit');
         Route::get('/delete/{journal}', [JournalController::class, 'delete'])->name('journal.delete');
     });
@@ -1051,7 +1054,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/store', [AdditionalInvoiceController::class, 'store'])->name('purchase.additional-invoice.store');
             Route::post('/post/{invoice}', [AdditionalInvoiceController::class, 'post'])->name('purchase.additional-invoice.post');
             Route::post('/reverse/{invoice}', [AdditionalInvoiceController::class, 'reverse'])->name('purchase.additional-invoice.reverse');
-            Route::get('/print/{invoice}', [AdditionalInvoiceController::class, 'print'])->name('purchase.additional-invoice.print');
+            Route::get('/print/{invoice}/{pagesize?}', [AdditionalInvoiceController::class, 'print'])->name('purchase.additional-invoice.print');
             Route::post('/delete/{invoice}', [AdditionalInvoiceController::class, 'delete'])->name('purchase.additional-invoice.delete');
 
         });
@@ -1090,7 +1093,7 @@ Route::middleware('auth')->group(function () {
                 Route::post('/cart', [ReturnDebitController::class, 'addToCart'])->name('return.debit.cart.store');
                 Route::get('/update-cart', [ReturnDebitController::class, 'updateCart'])->name('return.debit.cart.update');
                 Route::delete('/remove/{id}', [ReturnDebitController::class, 'removeCart'])->name('return.debit.cart.remove');
-                Route::get('/print/receipt/{returnDebit}', [ReturnDebitController::class, 'printReturnDebitReceipt'])->name('return.debit.print');
+                Route::get('/print/receipt/{returnDebit}/{papersize?}', [ReturnDebitController::class, 'printReturnDebitReceipt'])->name('return.debit.print');
             }
         );
         Route::group(
@@ -1107,7 +1110,7 @@ Route::middleware('auth')->group(function () {
                 Route::post('/cart', [PurchaseGRNController::class, 'addToCart'])->name('purchases.cart.store');
                 Route::delete('/remove/{id}', [PurchaseGRNController::class, 'removeCart'])->name('purchases.cart.remove');
                 Route::post('/clear', [PurchaseGRNController::class, 'clearAllCart'])->name('purchases.cart.clear');
-                Route::get('/print/{purchase}', [PurchaseGRNController::class, 'printInvoice'])->name('purchase.print');
+                Route::get('/print/{purchase}/{papersize?}', [PurchaseGRNController::class, 'printInvoice'])->name('purchase.print');
                 Route::post('/waybill/{purchase}', [PurchaseGRNController::class, 'generateWaybill'])->name('purchase.generate.waybill');
                 Route::get('/print/waybill/{purchase}', [PurchaseGRNController::class, 'printWaybill'])->name('purchase.waybill.print');
                 Route::post('/search', [PurchaseGRNController::class, 'search'])->name('purchases.search');
@@ -1129,7 +1132,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/cart', [PurchaseRequestController::class, 'addToCart'])->name('purchases.request.cart.store');
             Route::delete('/remove/{id}', [PurchaseRequestController::class, 'removeCart'])->name('purchases.request.cart.remove');
             Route::post('/clear', [PurchaseRequestController::class, 'clearAllCart'])->name('purchases.request.cart.clear');
-            Route::get('/print/{purchase}', [PurchaseRequestController::class, 'printInvoice'])->name('purchase.request.print');
+            Route::get('/print/{purchase}/{papersize?}', [PurchaseRequestController::class, 'printInvoice'])->name('purchase.request.print');
             Route::post('/waybill/{purchase}', [PurchaseRequestController::class, 'generateWaybill'])->name('purchase.request.generate.waybill');
             Route::get('/print/waybill/{purchase}', [PurchaseRequestController::class, 'printWaybill'])->name('purchase.request.waybill.print');
             Route::post('/search', [PurchaseRequestController::class, 'search'])->name('purchases.request.search');
@@ -1167,7 +1170,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/cart', [InterSiteTransferController::class, 'addToCart'])->name('intersite.cart');
             Route::delete('/remove/{id}', [InterSiteTransferController::class, 'removeCart'])->name('intersite.cart.remove');
             Route::post('/clear', [InterSiteTransferController::class, 'clearAllCart'])->name('intersite.cart.clear');
-            Route::get('/print/{intersite}', [InterSiteTransferController::class, 'printStockTransfer'])->name('intersite.print');
+            Route::get('/print/{intersite}/{papersize?}', [InterSiteTransferController::class, 'printStockTransfer'])->name('intersite.print');
             Route::post('/delete/{intersite}', [InterSiteTransferController::class, 'delete'])->name('intersite.delete');
             Route::post('/post/{intersite}', [InterSiteTransferController::class, 'post'])->name('intersite.post');
             Route::post('/receive/{intersite}', [InterSiteTransferController::class, 'receive'])->name('intersite.receive');
@@ -1212,6 +1215,14 @@ Route::middleware('auth')->group(function () {
         Route::delete('backup/delete/{file}', [BackupController::class, 'deleteBackup'])->name('backup.delete');
 
     });
-
-
+    Route::prefix('budgets')->group(function () {
+        Route::get('/', [BudgetController::class, 'index'])->name('budgets.index');
+        Route::get('/create', [BudgetController::class, 'create'])->name('budgets.create');
+        Route::post('/store', [BudgetController::class, 'store'])->name('budgets.store');
+        Route::get('/edit/{id}/edit', [BudgetController::class, 'edit'])->name('budgets.edit');
+        Route::put('/update/{id}', [BudgetController::class, 'update'])->name('budgets.update');
+        Route::get('/import/form', [BudgetController::class, 'importForm'])->name('budgets.import.form');
+        Route::post('/import', [BudgetController::class, 'import'])->name('budgets.import');
+        Route::delete('/delete', [BudgetController::class, 'destroy'])->name('budgets.destroy');
+    });
 });

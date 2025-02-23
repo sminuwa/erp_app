@@ -46,12 +46,21 @@
 
                             </select>
                         </div>
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="branch_id">Branch</label>
                             <select
                                 class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
                                 name="branch_id" id="branch_id">
+
+                            </select>
+                        </div> --}}
+                        <div class="form-group">
+                            &nbsp;&nbsp;
+                            <label for="category_id">Category</label>
+                            <select
+                                class="form-control select2-single ajax-categories {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
+                                name="category_id" id="category_id">
 
                             </select>
                         </div>
@@ -80,7 +89,8 @@
         $(function() {
             $('#generate').on("click", function() {
                 company_id = $('#company_id').val();
-                branch_id = $('#branch_id').val();
+                //branch_id = $('#branch_id').val();
+                category_id = $('#category_id').val();
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
@@ -88,7 +98,8 @@
                     data: {
                         _token: "{{ csrf_token() }}",
                         company_id: company_id,
-                        branch_id: branch_id
+                        category_id: category_id
+                        //branch_id: branch_id
                     }
                 }).done(function(data) {
                     $("#load").html(data);

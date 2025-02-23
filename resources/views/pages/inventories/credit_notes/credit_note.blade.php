@@ -111,9 +111,13 @@
                                                                 </a>
                                                             @endcan
                                                             @can('credit.note.print')
-                                                                <a href="{{ route('credit.note.print', $payment->id) }}"
+                                                                <a href="{{ route('credit.note.print', [$payment->id, 'A4']) }}"
                                                                     target="_BLANK" class="dropdown-item">
-                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print A4
+                                                                </a>
+                                                                <a href="{{ route('credit.note.print', [$payment->id, 'A5']) }}"
+                                                                    target="_BLANK" class="dropdown-item">
+                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print A5
                                                                 </a>
                                                             @endcan
                                                             @if ($payment->status == 0)

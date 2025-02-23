@@ -55,7 +55,7 @@
 
                 <div class="row" style="line-height: 0.4">
                     <div class="col-12 table-responsive">
-                        <table class="display table table-bordered caption" id="example1" data-ordering="false">
+                        <table class="display table table-bordered caption" id="example1" data-ordering="true">
                             <?php
                             $total_revenue = 0;
                             $credit_sum = 0;

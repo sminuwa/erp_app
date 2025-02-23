@@ -5,7 +5,7 @@
     </div>
 </div>
 {{-- <h3>{{ $product->item ?? '' }}</h3> --}}
-<table class="display table table-bordered caption" id="example1" data-ordering="false">
+<table class="display table table-bordered caption" id="example1" data-ordering="true">
     <thead>
         <tr>
             <th style="width: 50%" colspan="4">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}

@@ -175,7 +175,7 @@
                             @if ($type == 'Invoice')
                                 <table id="example1"
                                     class="table table-bordered table-striped text-left table-responsive-xl"
-                                    data-ordering="false">
+                                    data-ordering="true">
                                     <thead>
                                         <tr>
                                             <th>Date</th>

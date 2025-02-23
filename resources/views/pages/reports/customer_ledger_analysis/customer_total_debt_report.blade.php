@@ -21,12 +21,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h4>Customer Total Debt Report</h4>
+                        <h4>Total Receipt and Invoices</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Customer Debt Report</li>
+                            <li class="breadcrumb-item active">Total Receipt and Invoices</li>
                         </ol>
                     </div>
                 </div>
@@ -36,7 +36,7 @@
         <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
-                <form method="POST" >
+                <form method="POST">
                     <div class="row">
                         {{-- <div class="form-group  col-sm-2">
                             <label for="from_date">From Date</label>
@@ -66,7 +66,8 @@
                 </form>
                 <div class="row">
                     <div class="col-sm-12 table-responsive" id="load">
-                        <img src="{{ asset('assets/backend/img/loader.png') }}" style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                        <img src="{{ asset('assets/backend/img/loader.png') }}"
+                            style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
                     </div>
                 </div>
 
@@ -95,7 +96,7 @@
             };
 
             $('#generate').on("click", function() {
-                from_date = 'all';//$('#from_date').val();
+                from_date = 'all'; //$('#from_date').val();
                 to_date = $('#to_date').val();
                 customer_id = $('#customer_id').val();
                 $('#img-loader').show();
@@ -111,6 +112,7 @@
                 }).done(function(data) {
                     $("#load").html(data);
                     loadDataTable()
+                    
                 });
             });
         });

@@ -686,3 +686,21 @@ ADD COLUMN `gender` ENUM('Male', 'Female', 'Other') COLLATE utf8mb4_unicode_ci D
 ADD COLUMN `business_type` VARCHAR(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL AFTER `photo`,
 ADD COLUMN `business_age` VARCHAR(12) DEFAULT NULL AFTER `business_type`;
 
+CREATE TABLE `budgets` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `branch_id` bigint(20) DEFAULT NULL,
+  `category_id` bigint(20) DEFAULT NULL,
+  `budget_year` year(4) NOT NULL,
+  `quarter` enum('Q1','Q2','Q3','Q4') NOT NULL,
+  `month1` decimal(10,2) DEFAULT NULL,
+  `month2` decimal(10,2) DEFAULT NULL,
+  `month3` decimal(10,2) DEFAULT NULL,
+  `total` decimal(10,2) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `branch_id` (`branch_id`),
+  KEY `category_id` (`category_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+

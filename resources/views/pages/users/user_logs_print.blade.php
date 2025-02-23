@@ -53,7 +53,7 @@
 
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
-                            <table class="table table-bordered caption" id="example1" data-ordering="false">
+                            <table class="table table-bordered caption" id="example1" data-ordering="true">
                                 <thead>
                                     <tr>
                                         <th>Action </th>

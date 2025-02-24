@@ -3306,36 +3306,65 @@ class ReportController extends Controller
         $company_id = $request->company_id;
         $branch_id = $request->branch_id;
 
-        if ($customer_id == 'all' || $customer_id == '') {
+        if ($customer_id == 'all' || $customer_id == '' || $customer_id == null) {
             $customer_id = '%';
         }
-        if ($company_id == 'all' || $company_id == '') {
+        if ($company_id == 'all' || $company_id == '' || $company_id == null) {
             $company_id = '%';
         }
-        if ($branch_id == 'all' || $branch_id == '') {
+        if ($branch_id == 'all' || $branch_id == '' || $branch_id == null) {
             $branch_id = '%';
         }
 
+//        $sales = Customer::select(
+//            DB::raw('SUM(general_account_ledgers.credit)-SUM(general_account_ledgers.debit) AS balance'),
+//            'reference',
+//            'description',
+//            'date',
+//            'customers.name',
+//            'customers.code',
+//            'model_id AS customer_id',
+//            'users.name AS relation_officer',
+//            DB::raw('DATEDIFF(NOW(), general_account_ledgers.date) AS age')
+//        )
+//            ->join('general_account_ledgers', 'general_account_ledgers.model_id', '=', 'customers.id')
+//            ->leftJoin('users', 'users.id', '=', 'customers.relation_officer')
+//            ->join('branches', 'branches.id', '=', 'general_account_ledgers.branch_id')
+//            ->where('branches.company_id', 'LIKE', $company_id)
+//            ->where('general_account_ledgers.model_id', 'LIKE', $customer_id)
+//            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+//            ->where('general_account_ledgers.model_name', 'LIKE', 'Customer')
+//            ->groupBy('model_id')
+//            ->having(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit)'), '<', 0);
+
+        $latestTransaction = DB::table('general_account_ledgers')
+            ->select('model_id', DB::raw('MAX(date) as last_transaction_date'))
+            ->where('model_name', 'Customer')
+            ->groupBy('model_id');
+
         $sales = Customer::select(
-            DB::raw('SUM(general_account_ledgers.credit)-SUM(general_account_ledgers.debit) AS balance'),
+            DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'),
             'reference',
             'description',
-            'date',
             'customers.name',
             'customers.code',
-            'model_id AS customer_id',
+            'customers.id AS customer_id',
             'users.name AS relation_officer',
-            DB::raw('DATEDIFF(NOW(), general_account_ledgers.date) AS age')
+            'latest_transactions.last_transaction_date',
+            DB::raw('DATEDIFF(NOW(), latest_transactions.last_transaction_date) AS age')
         )
             ->join('general_account_ledgers', 'general_account_ledgers.model_id', '=', 'customers.id')
+            ->leftJoinSub($latestTransaction, 'latest_transactions', function ($join) {
+                $join->on('latest_transactions.model_id', '=', 'customers.id');
+            })
             ->leftJoin('users', 'users.id', '=', 'customers.relation_officer')
             ->join('branches', 'branches.id', '=', 'general_account_ledgers.branch_id')
             ->where('branches.company_id', 'LIKE', $company_id)
             ->where('general_account_ledgers.model_id', 'LIKE', $customer_id)
             ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
             ->where('general_account_ledgers.model_name', 'LIKE', 'Customer')
-            ->groupBy('model_id')
-            ->having(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit)'), '<', 0);
+            ->groupBy('customers.id', 'latest_transactions.last_transaction_date')
+            ->havingRaw('balance < 0');
 
         switch ($to_date) {
             case 1:

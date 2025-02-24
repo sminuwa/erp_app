@@ -55,7 +55,7 @@
                     @else
                     {{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}
                 @endif --}}
-                {{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}
+                {{ \Carbon\Carbon::parse($sale->last_transaction_date)->toFormattedDateString() }}
             </td>
             <td>
                 {{-- @if (customerLastTransaction($sale->customer_id) != null)

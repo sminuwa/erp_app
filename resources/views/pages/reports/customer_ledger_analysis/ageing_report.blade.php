@@ -91,7 +91,7 @@
                                 name="customer_id" id="customer_id">
                             </select>
                         </div>
-                        <div class="form-group text-right">
+                        <div class="form-group text-right ml-3">
                             <input type="button" class="btn btn-primary" id="generate" name="generate"
                                    value="Generate"/>
                         </div>

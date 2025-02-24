@@ -1614,8 +1614,8 @@ class ReportController extends Controller
             JOIN products p ON store_products.product_id = p.id
             WHERE s.branch_id LIKE stores.branch_id
             AND p.category_id = categories.id) as qty_available')
-                :
-                DB::raw('(SELECT SUM(store_products.qty_available)
+                    :
+                    DB::raw('(SELECT SUM(store_products.qty_available)
             FROM store_products
             JOIN products p ON store_products.product_id = p.id
             WHERE p.category_id = categories.id) as qty_available')
@@ -3802,13 +3802,13 @@ class ReportController extends Controller
         $branch_id = $request->branch_id;
         $status = $request->status;
         $where = [];
-        if ($company_id != '' && $company_id != '%')
+        if ($company_id != '' && $company_id != '%' && $company_id != null)
             $where[] = ['branches.company_id', $company_id];
 
-        if ($branch_id != '' && $branch_id != '%')
+        if ($branch_id != '' && $branch_id != '%' && $branch_id != null)
             $where[] = ['orders.branch_id', $branch_id];
 
-        if ($status != '' && $status != '%')
+        if ($status != '' && $status != '%' && $status != null)
             $where[] = ['orders.status', $status];
 
         $sales = Order::with(['customer', 'order_items'])
@@ -3819,10 +3819,13 @@ class ReportController extends Controller
             ->orderBy('order_date', 'DESC')
             ->get();
 
-        if ($branch_id == "%")
+        if ($company_id == '%' || $company_id == null || $company_id == '')
+            $company_id = 'all';
+
+        if ($branch_id == "%" || $branch_id == null || $branch_id == '')
             $branch_id = "all";
 
-        if ($status == "%")
+        if ($status == "%" || $status == null || $status == '')
             $status = "all";
 
         $company = null;
@@ -7100,6 +7103,7 @@ class ReportController extends Controller
             $general_account = GeneralAccount::find($general_account_class);
         return view('pages.reports.ap_ar.general_ledger.print_general_ledger_list_report', compact('records', 'general_account'));
     }
+
     public function showROCustomerReport()
     {
         return view('pages.reports.relation_officers.customer_list');
@@ -7153,10 +7157,12 @@ class ReportController extends Controller
 
         return view('pages.reports.relation_officers.load_customers', compact('relationOfficers', 'customers', 'from_date', 'to_date', 'branch_id'));
     }
+
     public function slowOverstayedReport()
     {
         return view('pages.reports.inventory.slow_overstay.slow_overstay_report');
     }
+
     public function loadslowOverstayedReport(Request $request)
     {
         $validated = $request->validate([
@@ -7222,10 +7228,12 @@ class ReportController extends Controller
 
         return back()->withErrors(['error' => 'Invalid report type selected.']);
     }
+
     public function backdatedEntriesReport()
     {
         return view('pages.reports.inventory.user_entries.backdated_postdated_entries_report');
     }
+
     public function loadBackdatedEntriesReport(Request $request)
     {
         $validated = $request->validate([
@@ -7349,6 +7357,7 @@ class ReportController extends Controller
         $route_name = $this->getRouteName($validated['type']);
         return view('pages.reports.inventory.user_entries.load_backdated_postdated_entries_report', compact('reports', 'route_name'));
     }
+
     public function getRouteName($type)
     {
         $route_name = "orders.show";
@@ -7388,10 +7397,12 @@ class ReportController extends Controller
         }
         return $route_name;
     }
+
     public function userEntriesReport()
     {
         return view('pages.reports.inventory.user_entries.user_entries_report');
     }
+
     public function loadUserEntriesReport(Request $request)
     {
         $validated = $request->validate([
@@ -7505,8 +7516,7 @@ class ReportController extends Controller
                 $q->where("$table.source_branch_id", $validated['branch_id'])
                     ->orWhere("$table.destination_branch_id", $validated['branch_id']);
             });
-        }
-        // Special case: `purchase_expenses` needs branch_id from `purchases`
+        } // Special case: `purchase_expenses` needs branch_id from `purchases`
         elseif ($validated['type'] === 'purchase_expenses') {
             $query->where("purchases.branch_id", $validated['branch_id']);
         } else {

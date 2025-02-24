@@ -3274,7 +3274,7 @@ class ReportController extends Controller
             $company_id = 'all';
 
         if ($branch_id == '%')
-            $branch_id == 'all';
+            $branch_id = 'all';
 
         if ($customer_id == "%")
             $customer_id = "all";

@@ -34,19 +34,24 @@
     </thead>
     @php
         $total_balance = 0;
+        $total_cr = 0;
+        $total_dr = 0;
     @endphp
     @foreach ($sales as $sale)
         @php
 
             $running_balance = $sale->balance;
             $total_balance += $running_balance;
+        if ($running_balance > 0)
+            $total_cr += $running_balance;
+        else
+            $total_dr += $running_balance;
         @endphp
         <tr>
             <td>{{ $sale->code }}</td>
             <td>{{ $sale->customer }}</td>
             <td>{{ $sale->last_transaction?->reference }}</td>
-            <td>{{ \Carbon\Carbon::parse($sale->last_transaction?->date)->toFormattedDateString() }}
-            </td>
+            <td>{{ \Carbon\Carbon::parse($sale->last_transaction?->date)->toFormattedDateString() }}</td>
             <td style="text-align: right">
                 @if ($running_balance < 0)
                     {{ number_format(abs($running_balance), 2) }}
@@ -64,14 +69,16 @@
     <tr>
         <th style="text-align: right" colspan="4">TOTAL</th>
         <th style="text-align: right">
-            @if ($total_balance < 0)
-                ({{ number_format(abs($total_balance), 2) }})
-            @endif
+            ({{ number_format(abs($total_dr), 2) }})
+            {{--            @if ($total_balance < 0)--}}
+            {{--                ({{ number_format(abs($total_balance), 2) }})--}}
+            {{--            @endif--}}
         </th>
         <th style="text-align: right">
-            @if ($total_balance > 0)
-                {{ number_format($total_balance, 2) }}
-            @endif
+            {{ number_format($total_cr, 2) }}
+            {{--            @if ($total_balance > 0)--}}
+            {{--                {{ number_format($total_balance, 2) }}--}}
+            {{--            @endif--}}
         </th>
     </tr>
     </tfoot>

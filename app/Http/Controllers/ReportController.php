@@ -3526,15 +3526,15 @@ class ReportController extends Controller
         $branch_id = $request->branch_id;
         $customer_id = $request->customer_id;
 
-        if ($customer_id == 'all' || $customer_id == '') {
+        if ($customer_id == 'all' || $customer_id == '' || $customer_id == null) {
             $customer_id = '%';
         }
 
-        if ($company_id == 'all' || $company_id == '') {
+        if ($company_id == 'all' || $company_id == '' || $company_id == null) {
             $company_id = '%';
         }
 
-        if ($branch_id == 'all' || $branch_id == '') {
+        if ($branch_id == 'all' || $branch_id == '' || $branch_id == null) {
             $branch_id = '%';
         }
 
@@ -3548,7 +3548,7 @@ class ReportController extends Controller
             ->where('model_name', 'Customer')
             ->groupBy('general_account_ledgers.model_id')
             ->orderBy('general_account_ledgers.date')
-            ->limit(500)
+            ->limit(5)
             ->get();
 
         if ($customer_id == "%")

@@ -2231,7 +2231,8 @@ class ReportController extends Controller
                     'branches.id as branch_id',
                     'branches.name as branch_name',
                     DB::raw('SUM(order_details.quantity) as total_quantity'),
-                    DB::raw('SUM(order_details.total) as total_amount')
+                    DB::raw('SUM(order_details.total) as amount'),
+                    DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
                 )
                 ->join('order_details', 'orders.id', '=', 'order_details.order_id')
                 ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
@@ -5819,7 +5820,7 @@ class ReportController extends Controller
             ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
             ->where(function ($query) {
                 $query->where('number', 'like', 'C%');  // Expenses
-    
+
             })
             ->whereDate('date', '<=', $last_day_of_previous_year)
             ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
@@ -5838,7 +5839,7 @@ class ReportController extends Controller
             ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
             ->where(function ($query) {
                 $query->where('number', 'like', 'C%');  // Expenses
-    
+
             })
             ->whereDate('date', '>=', $first_day_of_current_year)
             ->whereDate('date', '<=', $to_date)
@@ -6063,7 +6064,7 @@ class ReportController extends Controller
             ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
             ->where(function ($query) {
                 $query->where('number', 'like', 'C%');  // Expenses
-    
+
             })
             ->whereDate('date', '<=', $last_day_of_previous_year)
             ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
@@ -6082,7 +6083,7 @@ class ReportController extends Controller
             ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
             ->where(function ($query) {
                 $query->where('number', 'like', 'C%');  // Expenses
-    
+
             })
             ->whereDate('date', '>=', $first_day_of_current_year)
             ->whereDate('date', '<=', $to_date)

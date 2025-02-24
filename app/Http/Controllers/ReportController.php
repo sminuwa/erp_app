@@ -31,6 +31,7 @@ use App\Models\Receipt;
 use App\Models\InterBank;
 use App\Models\Journal;
 use App\Models\Company;
+use App\Models\OrderInvoiceDetail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
 use App\Exports\SalesBySiteReportExport;
@@ -3230,7 +3231,7 @@ class ReportController extends Controller
     public function customerDebtReport()
     {
         return view('pages.reports.customer_ledger_analysis.customer_total_debt_report', [
-            'customers' => Customer::orderBy('name')->where('type', 'Credit')->get(),
+            'customers' => Customer::orderBy('name')->get(),
         ]);
     }
 
@@ -3257,8 +3258,10 @@ class ReportController extends Controller
             ->join('branches', 'branches.id', '=', 'customers.branch_id')
             //->whereBetween('date', [$from_date, $to_date])
             ->whereDate('date', '<=', $to_date)
-            ->where('customers.branch_id', 'LIKE', $branch_id)
             ->where('branches.company_id', 'LIKE', $company_id)
+            ->where('customers.branch_id', 'LIKE', $branch_id)
+            ->where('model_name', 'Customer')
+            ->where('status', 1)
             ->select(
                 'customers.name AS customer',
                 'customers.code AS code',
@@ -3267,7 +3270,6 @@ class ReportController extends Controller
                 DB::raw('SUM(credit) - SUM(debit) AS due')
             )
             ->havingRaw('SUM(credit) - SUM(debit) < 0')
-            ->orderBy('customers.name')
             ->groupBy('general_account_ledgers.model_id')
             ->get();
         if ($company_id == '%')
@@ -3315,6 +3317,120 @@ class ReportController extends Controller
         return view('pages.reports.customer_ledger_analysis.ageing_report');
     }
 
+    // public function loadAgeingReport(Request $request)
+    // {
+    //     $from_date = $request->from_date;
+    //     $to_date = $request->to_date;
+    //     $customer_id = $request->customer_id;
+    //     $company_id = $request->company_id;
+    //     $branch_id = $request->branch_id;
+
+    //     if ($customer_id == 'all' || $customer_id == '') {
+    //         $customer_id = '%';
+    //     }
+    //     if ($company_id == 'all' || $company_id == '') {
+    //         $company_id = '%';
+    //     }
+    //     if ($branch_id == 'all' || $branch_id == '') {
+    //         $branch_id = '%';
+    //     }
+
+    //     $sales = Customer::select(
+    //         DB::raw('SUM(general_account_ledgers.credit)-SUM(general_account_ledgers.debit) AS balance'),
+    //         'reference',
+    //         'description',
+    //         'date',
+    //         'customers.name',
+    //         'customers.code',
+    //         'model_id AS customer_id',
+    //         'users.name AS relation_officer',
+    //         DB::raw('DATEDIFF(NOW(), general_account_ledgers.date) AS age')
+    //     )
+    //         ->join('general_account_ledgers', 'general_account_ledgers.model_id', '=', 'customers.id')
+    //         ->leftJoin('users', 'users.id', '=', 'customers.relation_officer')
+    //         ->join('branches', 'branches.id', '=', 'general_account_ledgers.branch_id')
+    //         ->where('branches.company_id', 'LIKE', $company_id)
+    //         ->where('general_account_ledgers.model_id', 'LIKE', $customer_id)
+    //         ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+    //         ->where('general_account_ledgers.model_name', 'LIKE', 'Customer')
+    //         ->groupBy('model_id')
+    //         ->having(DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit)'), '<', 0);
+
+    //     switch ($to_date) {
+    //         case 1:
+    //             $lowerdays = 0;
+    //             $upperdays = 7;
+    //             break;
+    //         case 2:
+    //             $lowerdays = 8;
+    //             $upperdays = 14;
+    //             break;
+    //         case 3:
+    //             $lowerdays = 15;
+    //             $upperdays = 30;
+    //             break;
+    //         case 4:
+    //             $lowerdays = 31;
+    //             $upperdays = 60;
+    //             break;
+    //         case 5:
+    //             $lowerdays = 61;
+    //             $upperdays = 90;
+    //             break;
+    //         case 6:
+    //             $lowerdays = 91;
+    //             $upperdays = 120;
+    //             break;
+    //         case 7:
+    //             $lowerdays = 121;
+    //             $upperdays = 180;
+    //             break;
+    //         case 8:
+    //             $lowerdays = 181;
+    //             $upperdays = null; // No upper limit
+    //             break;
+    //         default:
+    //             $lowerdays = 1;
+    //             $upperdays = null; // Default to all data
+    //             break;
+    //     }
+
+    //     if ($lowerdays != null) {
+    //         $sales = $sales->whereRaw('DATEDIFF(NOW(), general_account_ledgers.date) >= ?', [$lowerdays]);
+    //     }
+
+    //     if ($upperdays != null) {
+    //         $sales = $sales->whereRaw('DATEDIFF(NOW(), general_account_ledgers.date) <= ?', [$upperdays]);
+    //     }
+    //     // if ($upperdays == null && $lowerdays == null) {
+    //     //     $sales = $sales->whereRaw('DATEDIFF(NOW(), general_account_ledgers.date) > ?', [0]);
+    //     // }
+
+    //     $sales = $sales->orderBy('age', 'DESC')->get();
+
+
+    //     if ($customer_id == "%")
+    //         $customer_id = "all";
+
+    //     if ($branch_id == "%")
+    //         $branch_id = "all";
+
+    //     if ($from_date == null)
+    //         $from_date = "all";
+
+    //     if ($to_date == null)
+    //         $to_date = "all";
+
+    //     $company = null;
+    //     if ($company_id != 'all')
+    //         $company = Company::find($company_id);
+
+    //     $branch = null;
+    //     if ($branch_id != "all")
+    //         $branch = Branch::find($branch_id);
+
+    //     return view('pages.reports.customer_ledger_analysis.load_ageing_report', compact('sales', 'from_date', 'branch', 'to_date', 'company_id', 'branch_id', 'customer_id'));
+    // }
     public function loadAgeingReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -3332,6 +3448,7 @@ class ReportController extends Controller
         if ($branch_id == 'all' || $branch_id == '' || $branch_id == null) {
             $branch_id = '%';
         }
+
 
 //        $sales = Customer::select(
 //            DB::raw('SUM(general_account_ledgers.credit)-SUM(general_account_ledgers.debit) AS balance'),
@@ -3360,6 +3477,7 @@ class ReportController extends Controller
             ->groupBy('model_id');
 
         $sales = Customer::select(
+            DB::raw('SUM(general_account_ledgers.credit)-SUM(general_account_ledgers.debit) AS balance'),
             DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'),
             'reference',
             'description',
@@ -3384,77 +3502,35 @@ class ReportController extends Controller
             ->havingRaw('balance < 0');
 
         switch ($to_date) {
-            case 1:
-                $lowerdays = 0;
-                $upperdays = 7;
-                break;
-            case 2:
-                $lowerdays = 8;
-                $upperdays = 14;
-                break;
-            case 3:
-                $lowerdays = 15;
-                $upperdays = 30;
-                break;
-            case 4:
-                $lowerdays = 31;
-                $upperdays = 60;
-                break;
-            case 5:
-                $lowerdays = 61;
-                $upperdays = 90;
-                break;
-            case 6:
-                $lowerdays = 91;
-                $upperdays = 120;
-                break;
-            case 7:
-                $lowerdays = 121;
-                $upperdays = 180;
-                break;
-            case 8:
-                $lowerdays = 181;
-                $upperdays = null; // No upper limit
-                break;
-            default:
-                $lowerdays = 1;
-                $upperdays = null; // Default to all data
-                break;
+            case 1:  $lowerdays = 0;   $upperdays = 7;   break;
+            case 2:  $lowerdays = 8;   $upperdays = 14;  break;
+            case 3:  $lowerdays = 15;  $upperdays = 30;  break;
+            case 4:  $lowerdays = 31;  $upperdays = 60;  break;
+            case 5:  $lowerdays = 61;  $upperdays = 90;  break;
+            case 6:  $lowerdays = 91;  $upperdays = 120; break;
+            case 7:  $lowerdays = 121; $upperdays = 180; break;
+            case 8:  $lowerdays = 181; $upperdays = null; break;
+            default: $lowerdays = 1;   $upperdays = null; break;
         }
 
         if ($lowerdays != null) {
-            $sales = $sales->whereRaw('DATEDIFF(NOW(), general_account_ledgers.date) >= ?', [$lowerdays]);
+            $sales = $sales->whereRaw('DATEDIFF(NOW(), (SELECT MAX(date) FROM general_account_ledgers WHERE general_account_ledgers.model_id = customers.id)) >= ?', [$lowerdays]);
         }
 
         if ($upperdays != null) {
-            $sales = $sales->whereRaw('DATEDIFF(NOW(), general_account_ledgers.date) <= ?', [$upperdays]);
+            $sales = $sales->whereRaw('DATEDIFF(NOW(), (SELECT MAX(date) FROM general_account_ledgers WHERE general_account_ledgers.model_id = customers.id)) <= ?', [$upperdays]);
         }
-        // if ($upperdays == null && $lowerdays == null) {
-        //     $sales = $sales->whereRaw('DATEDIFF(NOW(), general_account_ledgers.date) > ?', [0]);
-        // }
 
         $sales = $sales->orderBy('age', 'DESC')->get();
 
+        // 🔹 Handle Filters for View
+        if ($customer_id == "%") $customer_id = "all";
+        if ($branch_id == "%") $branch_id = "all";
+        if ($from_date == null) $from_date = "all";
+        if ($to_date == null) $to_date = "all";
 
-        if ($customer_id == "%")
-            $customer_id = "all";
-
-        if ($branch_id == "%")
-            $branch_id = "all";
-
-        if ($from_date == null)
-            $from_date = "all";
-
-        if ($to_date == null)
-            $to_date = "all";
-
-        $company = null;
-        if ($company_id != 'all')
-            $company = Company::find($company_id);
-
-        $branch = null;
-        if ($branch_id != "all")
-            $branch = Branch::find($branch_id);
+        $company = ($company_id != 'all') ? Company::find($company_id) : null;
+        $branch = ($branch_id != "all") ? Branch::find($branch_id) : null;
 
         return view('pages.reports.customer_ledger_analysis.load_ageing_report', compact('sales', 'from_date', 'branch', 'to_date', 'company_id', 'branch_id', 'customer_id'));
     }
@@ -3594,7 +3670,7 @@ class ReportController extends Controller
             ->where('model_name', 'Customer')
             ->groupBy('general_account_ledgers.model_id')
             ->orderBy('general_account_ledgers.date')
-            ->limit(5)
+            ->limit(500)
             ->get();
 
         if ($customer_id == "%")
@@ -4007,15 +4083,48 @@ class ReportController extends Controller
             $status = '%';
         }
 
-        $sales = OrderInvoice::with(['customer', 'order_items'])
+        // $sales = OrderInvoice::with(['customer', 'order_items'])
+        //     ->join('order_invoice_details', 'order_invoices.id', '=', 'order_invoice_details.order_id')
+        //     ->join('branches', 'branches.id', '=', 'order_invoices.branch_id')
+        //     ->join('customers','order_invoices.customer_id', 'customers.id')
+        //     ->join('products','order_invoice_details.product_id', 'products.id')
+        //     ->select(
+        //         'order_invoice_details.*',
+        //         'order_invoices.id as order_id',
+        //         'order_invoices.reference',
+        //         'customers.code AS customer_code',
+        //         'products.code AS product_code',
+        //         'order_invoices.status',
+        //         'order_invoices.order_date'
+        //     )
+        //     ->where('order_invoices.branch_id', 'LIKE', $branch_id)
+        //     ->where('branches.company_id', 'LIKE', $company_id)
+        //     ->whereBetween('order_invoices.order_date', [$from_date, $to_date])
+        //     // ->where('order_invoices.status', $status)
+        //     ->orderBy('order_invoices.order_date', 'DESC')
+        //     ->get();
+        $sales = OrderInvoiceDetail::with(['order', 'product', 'order.customer', 'order.branch'])
+            ->join('order_invoices', 'order_invoice_details.order_id', '=', 'order_invoices.id')
             ->join('branches', 'branches.id', '=', 'order_invoices.branch_id')
-            ->select('order_invoices.*')
-            ->where('branch_id', 'LIKE', $branch_id)
+            ->join('customers', 'order_invoices.customer_id', '=', 'customers.id')
+            ->join('products', 'order_invoice_details.product_id', '=', 'products.id')
+            ->select(
+                'order_invoice_details.*',
+                'order_invoices.id as order_id',
+                'order_invoices.reference',
+                'order_invoices.status',
+                'order_invoices.order_date',
+                'customers.code AS customer_code',
+                'products.code AS product_code',
+                'branches.name AS branch_name'
+            )
+            ->where('order_invoices.branch_id', 'LIKE', $branch_id)
             ->where('branches.company_id', 'LIKE', $company_id)
-            ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
-            ->where('order_invoices.status', 'LIKE', $status)
-            ->orderBy('order_date', 'DESC')
+            ->where('order_invoices.status', $status)
+            ->whereBetween('order_invoices.order_date', [$from_date, $to_date])
+            ->orderBy('order_invoices.order_date', 'DESC')
             ->get();
+
 
         if ($branch_id == "%")
             $branch_id = "all";
@@ -4045,13 +4154,28 @@ class ReportController extends Controller
         if ($status == 'all' || $status == '') {
             $status = '%';
         }
-        $sales = OrderInvoice::where('branch_id', 'LIKE', $branch_id)
-            ->join('branches', 'branches.id', '=', 'order_invoices.branch_id')
-            ->where('branches.company_id', 'LIKE', $company_id)
-            ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])
-            ->where('order_invoices.status', 'LIKE', $status)
-            ->orderBy('order_date', 'DESC')
-            ->get();
+        $sales = OrderInvoiceDetail::with(['order', 'product', 'order.customer', 'order.branch'])
+        ->join('order_invoices', 'order_invoice_details.order_id', '=', 'order_invoices.id')
+        ->join('branches', 'branches.id', '=', 'order_invoices.branch_id')
+        ->join('customers', 'order_invoices.customer_id', '=', 'customers.id')
+        ->join('products', 'order_invoice_details.product_id', '=', 'products.id')
+        ->select(
+            'order_invoice_details.*',
+            'order_invoices.id as order_id',
+            'order_invoices.reference',
+            'order_invoices.status',
+            'order_invoices.order_date',
+            'customers.code AS customer_code',
+            'products.code AS product_code',
+            'branches.name AS branch_name'
+        )
+        ->where('order_invoices.branch_id', 'LIKE', $branch_id)
+        ->where('branches.company_id', 'LIKE', $company_id)
+        ->where('order_invoices.status', $status)
+        ->whereBetween('order_invoices.order_date', [$from_date, $to_date])
+        ->orderBy('order_invoices.order_date', 'DESC')
+        ->get();
+
         if ($branch_id == "%")
             $branch_id = "all";
         $company = null;

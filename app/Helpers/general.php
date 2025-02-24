@@ -342,5 +342,19 @@ function getReferenceId($reference)
     if (strpos($reference, 'ITS') !== false) {
         return InterstoreTransfer::where('reference', $reference)->first()->id ?? null;
     }
-    
+    function categoryId($category)
+    {
+        return DB::table('categories')
+            ->where('name', 'LIKE', $category)
+            ->first()->id ?? null;
+
+    }
+    function branchId($branch)
+    {
+        return DB::table('branches')
+            ->where('name', 'LIKE', $branch)
+            ->first()->id ?? null;
+
+    }
+
 }

@@ -147,7 +147,7 @@
 @endif
 @if ($type == 'Invoice')
     <table id="example1" class="table table-bordered table-striped text-left table-responsive-xl"
-        data-ordering="false">
+        data-ordering="true">
         <caption style="caption-size:top">
             <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
                 DOCUMENT STATUS BETWEEN {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}

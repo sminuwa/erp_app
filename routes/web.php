@@ -50,6 +50,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\CreditNoteController;
 use App\Http\Controllers\DebitNoteController;
 use App\Http\Controllers\BackupController;
+use App\Http\Controllers\BudgetController;
 
 
 
@@ -739,8 +740,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/site/sales/category', [ReportController::class, 'categorySaleBySiteReport'])->name('sales.report.by.category.site');
             Route::get('/site/sales/category/load', [ReportController::class, 'loadCategorySaleBySiteReport'])->name('ajax.category.site.sales.report');
             Route::get('/site/sales/category/print/{from_date}/{to_date}/{company_id}/{branch_id}/{category_id1}', [ReportController::class, 'printCategorySaleBySiteReport'])->name('ajax.category.site.sales.report.print');
-            Route::get('/category/export-excel', [ReportController::class,'exportBySiteExcel'])->name('export.by.site.excel');
-            Route::get('/category/export-pdf', [ReportController::class,'exportBySitePDF'])->name('export.by.site.pdf');
+            Route::get('/category/export-excel', [ReportController::class, 'exportBySiteExcel'])->name('export.by.site.excel');
+            Route::get('/category/export-pdf', [ReportController::class, 'exportBySitePDF'])->name('export.by.site.pdf');
 
             //Staff Sales Report
             Route::get('/sa/sales/staff', [ReportController::class, 'staffSaleReport'])->name('staff.sales.report');
@@ -814,7 +815,7 @@ Route::middleware('auth')->group(function () {
 
 
             //Begin Customer Sales Analysis Report
-
+    
             //Customer Debt Report
             Route::get('/ca/customer/debt', [ReportController::class, 'customerDebtReport'])->name('customer.total.debt.reports');
             Route::get('/ca/customer/debt/load', [ReportController::class, 'loadCustomerDebtReport'])->name('ajax.load.customer.total.debt.reports');
@@ -914,7 +915,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/product/valuation/load', [ReportController::class, 'loadProductValuationReport'])->name('ajax.product.valuation.report');
             Route::post('/product/valuation/print/', [ReportController::class, 'printProductValuationReport'])->name('ajax.product.valuation.report.print');
             //User Ledger and Loans
-
+    
             //Loan Balances
             Route::get('/us/user/balance', [ReportController::class, 'loanBalance'])->name('user.loan.balance.report');
             Route::get('/us/user/balance/load', [ReportController::class, 'loadLoanBalance'])->name('ajax.load.user.loan.balance.report');
@@ -950,8 +951,8 @@ Route::middleware('auth')->group(function () {
                 Route::get('/income_statement', [ReportController::class, 'incomeStatement'])->name('income.statement.report');
                 Route::get('/income_statement/load', [ReportController::class, 'loadIncomeStatement'])->name('ajax.load.income.statement.report');
                 Route::get('/income_statement/print/{from_date}/{to_date}/{company_id}/{branch_id}/{category_id1}/{category_id2}', [ReportController::class, 'printIncomeStatement'])->name('ajax.income.statement.report.print');
-//                Route::get('/income_statement/print/{from_month}/{to_month}/{income_year}/{company_id}/{branch_id}/{category_id1}/{category_id2}', [ReportController::class, 'printIncomeStatement'])->name('ajax.income.statement.report.print');
-
+                //                Route::get('/income_statement/print/{from_month}/{to_month}/{income_year}/{company_id}/{branch_id}/{category_id1}/{category_id2}', [ReportController::class, 'printIncomeStatement'])->name('ajax.income.statement.report.print');
+    
                 //Trial Balance
                 Route::get('/trial_balance', [ReportController::class, 'trialBalance'])->name('trial.balance.report');
                 Route::get('/trial_balance/load', [ReportController::class, 'loadTrialBalance'])->name('ajax.load.trial.balance.report');
@@ -1214,6 +1215,15 @@ Route::middleware('auth')->group(function () {
         Route::delete('backup/delete/{file}', [BackupController::class, 'deleteBackup'])->name('backup.delete');
 
     });
-
-
+    Route::prefix('budgets')->group(function () {
+        Route::get('/', [BudgetController::class, 'index'])->name('budgets.index');
+        Route::get('/create', [BudgetController::class, 'create'])->name('budgets.create');
+        Route::post('/store', [BudgetController::class, 'store'])->name('budgets.store');
+        Route::get('/edit/{id}/edit', [BudgetController::class, 'edit'])->name('budgets.edit');
+        Route::put('/update/{id}', [BudgetController::class, 'update'])->name('budgets.update');
+        Route::get('/import/form', [BudgetController::class, 'importForm'])->name('budgets.import.form');
+        Route::post('/import', [BudgetController::class, 'import'])->name('budgets.import');
+        Route::delete('/delete', [BudgetController::class, 'destroy'])->name('budgets.destroy');
+        Route::get('/generate-template', [BudgetController::class, 'generate'])->name('budgets.generate_template');
+    });
 });

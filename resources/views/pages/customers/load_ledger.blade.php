@@ -4,7 +4,7 @@
             class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
-<table class="table table-bordered" id="example1" border="1" cellpadding="0" cellspacing="0" data-ordering="false">
+<table class="table table-bordered" id="example1" border="1" cellpadding="0" cellspacing="0" data-ordering="true">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">{{ strtoupper($customer->name) }} LEDGER LISTING BETWEEN {{ $from_date }}
             AND

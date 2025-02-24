@@ -26,7 +26,7 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Customer Debt Report</li>
+                            <li class="breadcrumb-item active">Total Receipt and Invoices</li>
                         </ol>
                     </div>
                 </div>
@@ -81,7 +81,7 @@
                 <div class="row">
                     <div class="col-sm-12 table-responsive" id="load">
                         <img src="{{ asset('assets/backend/img/loader.png') }}"
-                             style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                            style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
                     </div>
                 </div>
 
@@ -136,6 +136,7 @@
                 }).done(function (data) {
                     $("#load").html(data);
                     loadDataTable()
+
                 });
             });
         });

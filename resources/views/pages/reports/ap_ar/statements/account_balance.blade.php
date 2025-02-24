@@ -84,6 +84,12 @@
                                     </div>
                                 </div>
 
+                                <div class="form-group">
+                                    &nbsp;&nbsp;
+                                    <label for="zero_balance">Include Zero Balances</label>
+                                    <input type="checkbox" class="form-control" name="zero_balance"
+                                           id="zero_balance">
+                                </div>
                             </div>
 
                             <div class="text-right form-group col-sm-12">
@@ -131,9 +137,16 @@
                 company_id = $('#company_id').val();
                 branch_id = $('#branch_id').val();
                 company_id = $('#branch_id').val();
+                zeros = $('#zero_balance').prop('checked')
+
                 if (account_type == "") {
                     alert("Please select account type!");
                     return false;
+                }
+
+                if (date === '') {
+                    alert('Please select date to continue')
+                    return
                 }
 
                 $('#img-loader').show();
@@ -146,6 +159,7 @@
                         account_type: account_type,
                         company_id: company_id,
                         branch_id: branch_id,
+                        zeros: zeros
                     }
                 }).done(function (data) {
                     $('#img-loader').hide();

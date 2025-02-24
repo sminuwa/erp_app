@@ -3238,7 +3238,15 @@ class ReportController extends Controller
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
+        $company_id = $request->company_id;
+        $branch_id = $request->branch_id;
         $customer_id = $request->customer_id;
+
+        if ($company_id == 'all' || $company_id == '' || $company_id == null)
+            $company_id = '%';
+
+        if ($branch_id == 'all' || $branch_id == '' || $branch_id == null)
+            $branch_id = '%';
 
         if ($customer_id == 'all' || $customer_id == '') {
             $customer_id = '%';
@@ -3246,9 +3254,11 @@ class ReportController extends Controller
 
         $sales = GeneralAccountLedger::where('model_id', 'LIKE', $customer_id)
             ->join('customers', 'customers.id', '=', 'general_account_ledgers.model_id')
+            ->join('branches', 'branches.id', '=', 'customers.branch_id')
             //->whereBetween('date', [$from_date, $to_date])
             ->whereDate('date', '<=', $to_date)
-            ->where('customers.branch_id', 'LIKE', User::userBranchAction())
+            ->where('customers.branch_id', 'LIKE', $branch_id)
+            ->where('branches.company_id', 'LIKE', $company_id)
             ->select(
                 'customers.name AS customer',
                 'customers.code AS code',
@@ -3260,9 +3270,16 @@ class ReportController extends Controller
             ->orderBy('customers.name')
             ->groupBy('general_account_ledgers.model_id')
             ->get();
+        if ($company_id == '%')
+            $company_id = 'all';
+
+        if ($branch_id == '%')
+            $branch_id == 'all';
+
         if ($customer_id == "%")
             $customer_id = "all";
-        return view('pages.reports.customer_ledger_analysis.load_customer_total_debt_report', compact('sales', 'from_date', 'to_date', 'customer_id'));
+
+        return view('pages.reports.customer_ledger_analysis.load_customer_total_debt_report', compact('sales', 'from_date', 'to_date', 'company_id', 'branch_id', 'customer_id'));
     }
 
     public function printCustomerDebtReport($from_date, $to_date, $customer_id)
@@ -5411,10 +5428,10 @@ class ReportController extends Controller
         if ($type == 'all' || $type == '')
             $type = '%';
 
-        if ($company_id == 'all' || $company_id == '')
+        if ($company_id == 'all' || $company_id == '' || $company_id == null)
             $company_id = '%';
 
-        if ($branch_id == 'all' || $branch_id == '')
+        if ($branch_id == 'all' || $branch_id == '' || $branch_id == null)
             $branch_id = '%';
 
         if ($type == "GeneralAccount") {
@@ -5423,7 +5440,7 @@ class ReportController extends Controller
                 ->where('general_account_ledgers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '<=', $date)
                 ->where('model_name', 'LIKE', 'GeneralAccount')
-                ->havingRaw('SUM(credit) <> SUM(debit)')
+//                ->havingRaw('SUM(credit) <> SUM(debit)')
                 ->orderBy('number')
                 ->groupBy('model_id');
         }
@@ -5435,7 +5452,7 @@ class ReportController extends Controller
                 ->where('general_account_ledgers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '<=', $date)
                 ->where('model_name', 'LIKE', 'Customer')
-                ->havingRaw('SUM(credit) <> SUM(debit)')
+//                ->havingRaw('SUM(credit) <> SUM(debit)')
                 ->orderBy('code')
                 ->groupBy('model_id');
         }
@@ -5445,10 +5462,13 @@ class ReportController extends Controller
                 ->where('general_account_ledgers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '<=', $date)
                 ->where('model_name', 'LIKE', 'Supplier')
-                ->havingRaw('SUM(credit) <> SUM(debit)')
+//                ->havingRaw('SUM(credit) <> SUM(debit)')
                 ->orderBy('code')
                 ->groupBy('model_id');
         }
+
+        if ($request->zeros == 'false')
+            $query = $query->havingRaw('SUM(credit) <> SUM(debit)');
 
         $ledgers = $query;
         $ledgers = $query->where('model_name', 'LIKE', $type)->get();

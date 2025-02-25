@@ -66,7 +66,7 @@
                                                                 class="btn btn-primary">
                                                                 <span class="ti-save"> Save</span>
                                                             </button>
-                                                            
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -126,6 +126,16 @@
                         $("#checkAll").click(function() {
                             $('input:checkbox').not(this).prop('checked', this.checked);
                         });
+                        // Live Search for Permissions Table
+                        $("#searchPermissions").on("keyup", function() {
+                            var value = $(this).val()
+                                .toLowerCase(); // Convert input to lowercase
+                            $("#record1 tbody tr").filter(function() {
+                                $(this).toggle($(this).text().toLowerCase().indexOf(
+                                    value) > -1) // Hide/Show rows
+                            });
+                        });
+
                     }).fail(function() {
                         $("#loader").hide(); // Hide loader on error
                         alert("Error loading permissions.");

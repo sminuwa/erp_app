@@ -6,12 +6,15 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Date</th>
+                    <th>Created Date</th>
+                    <th>Modified Date</th>
                     @if(isset($reports[0]->reference)) <th>Reference</th> @endif
                     @if(isset($reports[0]->amount)) <th>Amount</th> @endif
                     @if(isset($reports[0]->description)) <th>Description</th> @endif
-                    <th>Branch</th>
-                    <th>Performed By</th>
+                    <th>Branch Code</th>
+                    <th>Branch Name</th>
+                    <th>User Code</th>
+                    <th>User Name</th>
                 </tr>
             </thead>
             <tbody>
@@ -19,6 +22,7 @@
                     <tr>
                         <td>{{ $index + 1 }}</td>
                         <td>{{ \Carbon\Carbon::parse($record->date)->format('d M, Y') }}</td>
+                        <td>{{ \Carbon\Carbon::parse($record->updated_at)->format('d M, Y') }}</td>
                         @if (isset($record->reference))
                             <td>
                                 <a href="{{ route($route_name, $record->id) }}"
@@ -27,7 +31,9 @@
                         @endif
                         @if(isset($record->amount)) <td style="text-align: right">{{ number_format($record->amount, 2) }}</td> @endif
                         @if(isset($record->description)) <td>{{ $record->description }}</td> @endif
+                        <td>{{ $record->branch_code }}</td>
                         <td>{{ $record->branch_name }}</td>
+                        <td>{{ $record->user_code }}</td>
                         <td>{{ $record->user_name }}</td>
                     </tr>
                 @endforeach

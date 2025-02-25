@@ -60,7 +60,7 @@
                 <td style="text-align: right">
                     {{ number_format($item->total - $item->cost_price * $item->quantity, 2, '.', ',') }}</td>
                 <td style="text-align: right">
-                    {{ number_format((($item->total - $item->cost_price * $item->quantity) / $item->total) * 100, 2, '.', ',') }}
+                    {{ $item->total>0?number_format((($item->total - $item->cost_price * $item->quantity) / $item->total) * 100, 2, '.', ','):'0.00' }}
                 </td>
                 <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
             </tr>

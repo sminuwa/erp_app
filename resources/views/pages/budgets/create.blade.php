@@ -74,22 +74,22 @@
                                 
                                 <div class="form-group">
                                     <label for="month1">Month 1</label>
-                                    <input type="number" name="month1" class="form-control" value="{{ isset($budget) ? $budget->month1 : old('month1') }}" required>
+                                    <input type="number" name="month1" id="month1" class="form-control" value="{{ isset($budget) ? $budget->month1 : old('month1') }}" required oninput="calculateTotal()">
                                 </div>
                                 
                                 <div class="form-group">
                                     <label for="month2">Month 2</label>
-                                    <input type="number" name="month2" class="form-control" value="{{ isset($budget) ? $budget->month2 : old('month2') }}" required>
+                                    <input type="number" name="month2" id="month2" step="0.2" class="form-control" value="{{ isset($budget) ? $budget->month2 : old('month2') }}" required oninput="calculateTotal()">
                                 </div>
                                 
                                 <div class="form-group">
                                     <label for="month3">Month 3</label>
-                                    <input type="number" name="month3" class="form-control" value="{{ isset($budget) ? $budget->month3 : old('month3') }}" required>
+                                    <input type="number" name="month3" id="month3" step="0.2" class="form-control" value="{{ isset($budget) ? $budget->month3 : old('month3') }}" required oninput="calculateTotal()">
                                 </div>
                                 
                                 <div class="form-group">
                                     <label for="total">Total</label>
-                                    <input type="number" name="total" class="form-control" value="{{ isset($budget) ? $budget->total : old('total') }}" required>
+                                    <input type="number" name="total" id="total" step="0.2" class="form-control" value="{{ isset($budget) ? $budget->total : old('total') }}" readonly>
                                 </div>
                                 
                                 <button type="submit" class="btn btn-primary">{{ isset($budget) ? 'Update' : 'Create' }}</button>
@@ -102,3 +102,17 @@
     </section>
 </div>
 @endsection
+
+@push('js')
+<script>
+    function calculateTotal() {
+        let month1 = parseFloat(document.getElementById('month1').value) || 0;
+        let month2 = parseFloat(document.getElementById('month2').value) || 0;
+        let month3 = parseFloat(document.getElementById('month3').value) || 0;
+        
+        let total = month1 + month2 + month3;
+        
+        document.getElementById('total').value = total.toFixed(2); // Keep two decimal places
+    }
+</script>
+@endpush

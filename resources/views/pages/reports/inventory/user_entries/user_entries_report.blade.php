@@ -92,14 +92,14 @@
                 let type = $('#type').val();
                 let from_date = $('input[name="from_date"]').val();
                 let to_date = $('input[name="to_date"]').val();
-                if (branch_id == '') {
-                    alert('Please select a branch');
-                    return false;
-                }
-                if (company_id == '') {
-                    alert('Please select a company');
-                    return false;
-                }
+                // if (branch_id == '') {
+                //     alert('Please select a branch');
+                //     return false;
+                // }
+                // if (company_id == '') {
+                //     alert('Please select a company');
+                //     return false;
+                // }
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",

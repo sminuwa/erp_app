@@ -120,6 +120,12 @@
                 company_id = $('#company_id').val();
                 branch_id = $('#branch_id').val();
                 status = $('#status').val();
+
+                if (from_date === '' || to_date === '') {
+                    alert('Provide date range to continue')
+                    return
+                }
+
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",

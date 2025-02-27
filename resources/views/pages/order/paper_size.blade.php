@@ -1,6 +1,6 @@
 @isset($papersize)
     @if ($papersize == 'A4')
-        <style>
+        {{-- <style>
             /* Print-specific styles */
             @media print {
                 @page {
@@ -54,6 +54,21 @@
                     margin-top: 30px;
                     text-align: left;
                     font-weight: bold;
+                }
+            }
+        </style> --}}
+        <style>
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            @media print {
+
+                html,
+                body {
+                    width: 210mm;
+                    height: 297mm;
                 }
             }
         </style>

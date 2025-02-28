@@ -3557,10 +3557,14 @@ class ReportController extends Controller
         $sales = $sales->orderBy('age', 'DESC')->get();
 
         // 🔹 Handle Filters for View
-        if ($customer_id == "%") $customer_id = "all";
-        if ($branch_id == "%") $branch_id = "all";
-        if ($from_date == null) $from_date = "all";
-        if ($to_date == null) $to_date = "all";
+        if ($customer_id == "%")
+            $customer_id = "all";
+        if ($branch_id == "%")
+            $branch_id = "all";
+        if ($from_date == null)
+            $from_date = "all";
+        if ($to_date == null)
+            $to_date = "all";
 
         $company = ($company_id != 'all') ? Company::find($company_id) : null;
         $branch = ($branch_id != "all") ? Branch::find($branch_id) : null;
@@ -7403,19 +7407,52 @@ class ReportController extends Controller
     public function loadslowOverstayedReport(Request $request)
     {
         $validated = $request->validate([
-            'branch_id' => 'required|integer',
-            'company_id' => 'required|integer',
-            'report_type' => 'required|string', // New field for selecting report type
+            'branch_id' => 'nullable|integer',
+            'company_id' => 'nullable|integer',
+            'report_type' => 'nullable|string', // New field for selecting report type
         ]);
 
+        $company_id = $validated['company_id'];
+        $branch_id = $validated['branch_id'];
+        if ($validated['branch_id'] == 'all' || $validated['branch_id'] == '') {
+            $branch_id = '%'; // Ensure 'all' branches are included
+        }
+        if ($validated['company_id'] == 'all' || $validated['company_id'] == '') {
+            $company_id = '%'; // Ensure 'all' branches are included
+        }
         if ($validated['report_type'] == 'overstayed') {
             // Overstayed Inventory Query
+            // $inventory = DB::table('purchase_products AS pp')
+            //     ->join('purchases AS pur', 'pp.purchase_id', '=', 'pur.id')
+            //     ->join('products AS p', 'pp.product_id', '=', 'p.id')
+            //     ->join('branches AS b', 'pur.branch_id', '=', 'b.id')
+            //     ->join('store_products AS sp', 'pp.product_id', '=', 'sp.product_id')
+            //     ->join('stores AS s', 'sp.store_id', '=', 's.id')
+            //     ->select(
+            //         'p.id AS product_id',
+            //         'p.name AS product_name',
+            //         'p.code AS product_code',
+            //         'b.name AS branch_name',
+            //         's.name AS store_name',
+            //         's.code AS store_code',
+            //         'pp.updated_at AS last_received_date',
+            //         DB::raw('DATEDIFF(CURDATE(), pp.updated_at) AS days_since_received'),
+            //         'sp.qty_available AS available_quantity'
+            //     )
+            //     ->where('pur.branch_id', $validated['branch_id'])
+            //     ->where('sp.qty_available', '>', 0)
+            //     ->havingRaw('days_since_received > 30') // Overstayed products (30+ days)
+            //     ->orderByDesc('days_since_received')
+            //     ->get();
             $inventory = DB::table('purchase_products AS pp')
                 ->join('purchases AS pur', 'pp.purchase_id', '=', 'pur.id')
                 ->join('products AS p', 'pp.product_id', '=', 'p.id')
                 ->join('branches AS b', 'pur.branch_id', '=', 'b.id')
-                ->join('store_products AS sp', 'pp.product_id', '=', 'sp.product_id')
-                ->join('stores AS s', 'sp.store_id', '=', 's.id')
+                ->join('store_products AS sp', function ($join) {
+                    $join->on('pp.product_id', '=', 'sp.product_id')
+                        ->join('stores AS s', 'sp.store_id', '=', 's.id')
+                        ->whereColumn('s.branch_id', 'pur.branch_id'); // Ensure the store belongs to the correct branch
+                })
                 ->select(
                     'p.id AS product_id',
                     'p.name AS product_name',
@@ -7427,22 +7464,49 @@ class ReportController extends Controller
                     DB::raw('DATEDIFF(CURDATE(), pp.updated_at) AS days_since_received'),
                     'sp.qty_available AS available_quantity'
                 )
-                ->where('pur.branch_id', $validated['branch_id'])
+                ->where('pur.branch_id', 'LIKE', $branch_id) // Ensuring correct branch
+                ->where('b.company_id', 'LIKE', $company_id) // Ensuring correct company_id
                 ->where('sp.qty_available', '>', 0)
                 ->havingRaw('days_since_received > 30') // Overstayed products (30+ days)
                 ->orderByDesc('days_since_received')
                 ->get();
+
             $type = 'overstayed';
             return view('pages.reports.inventory.slow_overstay.load_slow_overstay_report', compact('inventory', 'type'));
 
         } elseif ($validated['report_type'] == 'slow_moving') {
             // Slow Moving Inventory Query
+            // $inventory = DB::table('order_details AS od')
+            //     ->join('orders AS o', 'od.order_id', '=', 'o.id')
+            //     ->join('products AS p', 'od.store_product_id', '=', 'p.id')
+            //     ->join('branches AS b', 'o.branch_id', '=', 'b.id')
+            //     ->join('store_products AS sp', 'od.store_product_id', '=', 'sp.product_id')
+            //     ->join('stores AS s', 'sp.store_id', '=', 's.id')
+            //     ->select(
+            //         'p.id AS product_id',
+            //         'p.name AS product_name',
+            //         'p.code AS product_code',
+            //         'b.name AS branch_name',
+            //         's.name AS store_name',
+            //         's.code AS store_code',
+            //         'od.updated_at AS last_sold_date',
+            //         DB::raw('DATEDIFF(CURDATE(), od.updated_at) AS days_since_sold'),
+            //         'sp.qty_available AS available_quantity'
+            //     )
+            //     ->where('o.branch_id', $validated['branch_id'])
+            //     ->where('sp.qty_available', '>', 0)
+            //     ->havingRaw('days_since_sold > 60') // Slow-moving products (60+ days)
+            //     ->orderByDesc('days_since_sold')
+            //     ->get();
             $inventory = DB::table('order_details AS od')
                 ->join('orders AS o', 'od.order_id', '=', 'o.id')
                 ->join('products AS p', 'od.store_product_id', '=', 'p.id')
                 ->join('branches AS b', 'o.branch_id', '=', 'b.id')
-                ->join('store_products AS sp', 'od.store_product_id', '=', 'sp.product_id')
-                ->join('stores AS s', 'sp.store_id', '=', 's.id')
+                ->join('store_products AS sp', function ($join) {
+                    $join->on('od.store_product_id', '=', 'sp.product_id')
+                        ->join('stores AS s', 'sp.store_id', '=', 's.id')
+                        ->whereColumn('s.branch_id', 'o.branch_id'); // Ensures store belongs to the correct branch
+                })
                 ->select(
                     'p.id AS product_id',
                     'p.name AS product_name',
@@ -7454,11 +7518,13 @@ class ReportController extends Controller
                     DB::raw('DATEDIFF(CURDATE(), od.updated_at) AS days_since_sold'),
                     'sp.qty_available AS available_quantity'
                 )
-                ->where('o.branch_id', $validated['branch_id'])
+                ->where('o.branch_id', 'LIKE', $branch_id) // Ensuring correct branch
+                ->where('b.company_id', 'LIKE', $company_id) // Ensuring correct company_id
                 ->where('sp.qty_available', '>', 0)
                 ->havingRaw('days_since_sold > 60') // Slow-moving products (60+ days)
                 ->orderByDesc('days_since_sold')
                 ->get();
+
             $type = 'slow_moving';
             return view('pages.reports.inventory.slow_overstay.load_slow_overstay_report', compact('inventory', 'type'));
         }
@@ -7646,10 +7712,12 @@ class ReportController extends Controller
             'type' => 'required|string',
             'from_date' => 'required|date',
             'to_date' => 'required|date',
-            'branch_id' => 'required|integer',
-            'company_id' => 'required|integer',
+            'branch_id' => 'nullable|integer',
+            'company_id' => 'nullable|integer',
         ]);
 
+        $branch_id = $validated['branch_id'] ?? '%';
+        $company_id = $validated['company_id'] ?? '%';
         // Map report types to tables with correct fields
         $tableMap = [
             'credit_notes' => ['table' => 'credit_notes', 'date' => 'date', 'amount' => 'amount', 'branch' => 'branch_id', 'reference' => 'reference'],
@@ -7698,6 +7766,11 @@ class ReportController extends Controller
             $columns[] = "$table.description";
         }
 
+        // Check if the table has the `updated_at` column before including it
+        if (Schema::hasColumn($table, 'updated_at')) {
+            $columns[] = "$table.updated_at AS updated_at";
+        }
+
         // Special case: `purchase_expenses` needs a join with `purchases` to get branch_id
         if ($validated['type'] === 'purchase_expenses') {
             $columns[] = 'purchases.branch_id AS branch_id';
@@ -7741,6 +7814,8 @@ class ReportController extends Controller
         // Select final columns
         $query->select(array_merge($columns, [
             'branches.name AS branch_name',
+            'users.user_code AS user_code',
+            'branches.code AS branch_code',
             DB::raw("CONCAT(users.firstname, ' ', users.surname) AS user_name")
         ]));
 
@@ -7749,15 +7824,15 @@ class ReportController extends Controller
 
         // Special case: `intersite_transfers` uses `source_branch_id` for filtering
         if ($validated['type'] === 'intersite_transfers') {
-            $query->where(function ($q) use ($validated, $table) {
-                $q->where("$table.source_branch_id", $validated['branch_id'])
-                    ->orWhere("$table.destination_branch_id", $validated['branch_id']);
+            $query->where(function ($q) use ($validated, $table, $branch_id) {
+                $q->where("$table.source_branch_id", 'LIKE', $branch_id)
+                    ->orWhere("$table.destination_branch_id", 'LIKE', $branch_id);
             });
         } // Special case: `purchase_expenses` needs branch_id from `purchases`
         elseif ($validated['type'] === 'purchase_expenses') {
-            $query->where("purchases.branch_id", $validated['branch_id']);
+            $query->where("purchases.branch_id", 'LIKE', $branch_id);
         } else {
-            $query->where("$table.$branchColumn", $validated['branch_id']);
+            $query->where("$table.$branchColumn", 'LIKE', $branch_id);
         }
 
         // Order by date

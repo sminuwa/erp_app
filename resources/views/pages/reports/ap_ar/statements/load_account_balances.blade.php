@@ -65,14 +65,14 @@
                 $dif = $sum_cr - $sum_dr;
                 ?>
             <td style="text-align: right">
-                @if ($dif < 0)
-                    {{ number_format(abs($dif), 2) }}
-                @endif
+                {{--                @if ($dif < 0)--}}
+                {{ number_format(abs($dif), 2) }}
+                {{--                @endif--}}
             </td>
             <td style="text-align: right">
-                @if ($dif > 0)
-                    {{ number_format($dif, 2) }}
-                @endif
+                {{--                @if ($dif > 0)--}}
+                {{ number_format(abs($dif), 2) }}
+                {{--                @endif--}}
             </td>
         </tr>
     @endforeach

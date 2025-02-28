@@ -5596,7 +5596,7 @@ class ReportController extends Controller
                 ->join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
                 ->where('general_account_ledgers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '<=', $date)
-                ->where('model_name', 'LIKE', 'GeneralAccount')
+                ->where('model_name', '=', 'GeneralAccount')
 //                ->havingRaw('SUM(credit) <> SUM(debit)')
                 ->orderBy('number')
                 ->groupBy('model_id');
@@ -5608,7 +5608,7 @@ class ReportController extends Controller
                 ->leftJoin('users', 'users.id', '=', 'customers.relation_officer')
                 ->where('general_account_ledgers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '<=', $date)
-                ->where('model_name', 'LIKE', 'Customer')
+                ->where('model_name', '=', 'Customer')
 //                ->havingRaw('SUM(credit) <> SUM(debit)')
                 ->orderBy('code')
                 ->groupBy('model_id');
@@ -5618,7 +5618,7 @@ class ReportController extends Controller
                 ->join('suppliers', 'suppliers.id', '=', 'general_account_ledgers.model_id')
                 ->where('general_account_ledgers.branch_id', 'like', $branch_id)
                 ->whereDate('date', '<=', $date)
-                ->where('model_name', 'LIKE', 'Supplier')
+                ->where('model_name', '=', 'Supplier')
 //                ->havingRaw('SUM(credit) <> SUM(debit)')
                 ->orderBy('code')
                 ->groupBy('model_id');
@@ -5628,7 +5628,9 @@ class ReportController extends Controller
             $query = $query->havingRaw('SUM(credit) <> SUM(debit)');
 
         $ledgers = $query;
-        $ledgers = $query->where('model_name', 'LIKE', $type)->get();
+        $ledgers = $query
+//            ->where('model_name', 'LIKE', $type)
+            ->get();
 
         $credit_sum = $query->sum('credit');
         $debit_sum = $query->sum('debit');

@@ -3476,6 +3476,9 @@ class ReportController extends Controller
             ->where('model_name', 'Customer')
             ->groupBy('model_id');
 
+        if ($customer_id != '%')
+            $latestTransaction = $latestTransaction->where('customer_id', $customer_id);
+
         $sales = Customer::select(
             DB::raw('SUM(general_account_ledgers.credit)-SUM(general_account_ledgers.debit) AS balance'),
             DB::raw('SUM(general_account_ledgers.credit) - SUM(general_account_ledgers.debit) AS balance'),
@@ -3495,22 +3498,52 @@ class ReportController extends Controller
             ->leftJoin('users', 'users.id', '=', 'customers.relation_officer')
             ->join('branches', 'branches.id', '=', 'general_account_ledgers.branch_id')
             ->where('branches.company_id', 'LIKE', $company_id)
-            ->where('general_account_ledgers.model_id', 'LIKE', $customer_id)
+//            ->where('general_account_ledgers.model_id', 'LIKE', $customer_id)
             ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
             ->where('general_account_ledgers.model_name', 'LIKE', 'Customer')
             ->groupBy('customers.id', 'latest_transactions.last_transaction_date')
             ->havingRaw('balance < 0');
 
+        if ($customer_id != '%')
+            $sales = $sales->where(['general_account_ledgers.model_id' => $customer_id]);
+
         switch ($to_date) {
-            case 1:  $lowerdays = 0;   $upperdays = 7;   break;
-            case 2:  $lowerdays = 8;   $upperdays = 14;  break;
-            case 3:  $lowerdays = 15;  $upperdays = 30;  break;
-            case 4:  $lowerdays = 31;  $upperdays = 60;  break;
-            case 5:  $lowerdays = 61;  $upperdays = 90;  break;
-            case 6:  $lowerdays = 91;  $upperdays = 120; break;
-            case 7:  $lowerdays = 121; $upperdays = 180; break;
-            case 8:  $lowerdays = 181; $upperdays = null; break;
-            default: $lowerdays = 1;   $upperdays = null; break;
+            case 1:
+                $lowerdays = 0;
+                $upperdays = 7;
+                break;
+            case 2:
+                $lowerdays = 8;
+                $upperdays = 14;
+                break;
+            case 3:
+                $lowerdays = 15;
+                $upperdays = 30;
+                break;
+            case 4:
+                $lowerdays = 31;
+                $upperdays = 60;
+                break;
+            case 5:
+                $lowerdays = 61;
+                $upperdays = 90;
+                break;
+            case 6:
+                $lowerdays = 91;
+                $upperdays = 120;
+                break;
+            case 7:
+                $lowerdays = 121;
+                $upperdays = 180;
+                break;
+            case 8:
+                $lowerdays = 181;
+                $upperdays = null;
+                break;
+            default:
+                $lowerdays = 1;
+                $upperdays = null;
+                break;
         }
 
         if ($lowerdays != null) {
@@ -4155,26 +4188,26 @@ class ReportController extends Controller
             $status = '%';
         }
         $sales = OrderInvoiceDetail::with(['order', 'product', 'order.customer', 'order.branch'])
-        ->join('order_invoices', 'order_invoice_details.order_id', '=', 'order_invoices.id')
-        ->join('branches', 'branches.id', '=', 'order_invoices.branch_id')
-        ->join('customers', 'order_invoices.customer_id', '=', 'customers.id')
-        ->join('products', 'order_invoice_details.product_id', '=', 'products.id')
-        ->select(
-            'order_invoice_details.*',
-            'order_invoices.id as order_id',
-            'order_invoices.reference',
-            'order_invoices.status',
-            'order_invoices.order_date',
-            'customers.code AS customer_code',
-            'products.code AS product_code',
-            'branches.name AS branch_name'
-        )
-        ->where('order_invoices.branch_id', 'LIKE', $branch_id)
-        ->where('branches.company_id', 'LIKE', $company_id)
-        ->where('order_invoices.status', $status)
-        ->whereBetween('order_invoices.order_date', [$from_date, $to_date])
-        ->orderBy('order_invoices.order_date', 'DESC')
-        ->get();
+            ->join('order_invoices', 'order_invoice_details.order_id', '=', 'order_invoices.id')
+            ->join('branches', 'branches.id', '=', 'order_invoices.branch_id')
+            ->join('customers', 'order_invoices.customer_id', '=', 'customers.id')
+            ->join('products', 'order_invoice_details.product_id', '=', 'products.id')
+            ->select(
+                'order_invoice_details.*',
+                'order_invoices.id as order_id',
+                'order_invoices.reference',
+                'order_invoices.status',
+                'order_invoices.order_date',
+                'customers.code AS customer_code',
+                'products.code AS product_code',
+                'branches.name AS branch_name'
+            )
+            ->where('order_invoices.branch_id', 'LIKE', $branch_id)
+            ->where('branches.company_id', 'LIKE', $company_id)
+            ->where('order_invoices.status', $status)
+            ->whereBetween('order_invoices.order_date', [$from_date, $to_date])
+            ->orderBy('order_invoices.order_date', 'DESC')
+            ->get();
 
         if ($branch_id == "%")
             $branch_id = "all";
@@ -7040,17 +7073,44 @@ class ReportController extends Controller
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
 
-        $customers = Customer::select(DB::raw("ABS(SUM(credit) - SUM(debit)) as balance"), 'customers.*')
-            ->join('branches', 'customers.branch_id', 'branches.id')
-            ->join('general_account_ledgers', 'general_account_ledgers.model_id', '=', 'customers.id')
-            ->where('branches.company_id', 'LIKE', $company_id)
-            ->where('customers.branch_id', 'LIKE', $branch_id)
-            ->where('credit_limit', '>', 0)
-            ->groupBy('model_id')
-            ->havingRaw('ABS(SUM(credit) - SUM(debit)) > credit_limit')
-            ->orderBy('code')
-            ->orderBy('name')
-            ->get();
+        $customers = DB::table('customers')
+            ->leftJoin('general_account_ledgers', function ($join) {
+                $join->on('customers.id', '=', 'general_account_ledgers.model_id')
+                    ->where('general_account_ledgers.model_name', '=', 'Customer');
+            })
+            ->join('branches', 'branches.id', '=', 'customers.branch_id')
+            ->join('companies', 'companies.id', '=', 'branches.company_id')
+//            ->where('customers.credit_limit', '>', 0)
+            ->select(
+                'customers.id',
+                'customers.code',
+                'customers.name',
+                'customers.type',
+                'customers.credit_limit',
+                'branches.name as branch',
+                DB::raw('SUM(general_account_ledgers.debit) - SUM(general_account_ledgers.credit) AS balance')
+            )
+            ->groupBy('customers.id', 'customers.name', 'customers.credit_limit')
+            ->havingRaw('balance > customers.credit_limit');
+
+        if ($company_id != '%')
+            $customers = $customers->where('companies.id', '=', $company_id);
+
+        if ($branch_id != '%')
+            $customers = $customers->where('branches.id', '=', $branch_id);
+
+//        $customers = Customer::select(DB::raw("ABS(SUM(credit) - SUM(debit)) as balance"), 'customers.*')
+//            ->join('branches', 'branches.id', '=', 'customers.branch_id')
+//            ->join('general_account_ledgers', 'customers.id', '=', 'general_account_ledgers.model_id')
+//            ->where('general_account_ledgers.model_name', '=', 'Customer')
+//            ->where('branches.company_id', 'LIKE', $company_id)
+//            ->where('customers.branch_id', 'LIKE', $branch_id)
+//            ->where('credit_limit', '>', 0)
+//            ->groupBy('model_id')
+//            ->havingRaw('ABS(SUM(credit) - SUM(debit)) > credit_limit')
+//            ->orderBy('code')
+//            ->orderBy('name')
+//            ->get();
 
         if ($company_id == '%')
             $company_id = 'all';
@@ -7065,6 +7125,8 @@ class ReportController extends Controller
         $branch = null;
         if ($branch_id != 'all')
             $branch = Branch::find($branch_id);
+
+        $customers = $customers->get();
 
         return view('pages.reports.customer_ledger_analysis.load_customer_exceed_credit_limit_report', compact('customers', 'branch', 'company_id', 'branch_id'));
     }

@@ -34,16 +34,16 @@
             <td>{{ $customer->code }}</td>
             <td>{{ strtoupper($customer->name) }}</td>
             <td>{{ $customer->type }}</td>
-            <td>{{ $customer->branch->name }}</td>
+            <td>{{ $customer->branch }}</td>
             <td style="text-align: right">{{ number_format($customer->credit_limit, 2) }}</td>
             @php
                 $total += $customer->balance;
             @endphp
-            @if ($customer->balance < 0)
-                <td style="text-align: right">({{ number_format(abs($customer->balance), 2) }})</td>
-            @else
-                <td style="text-align: right">{{ number_format($customer->balance, 2) }}</td>
-            @endif
+            {{--            @if ($customer->balance < 0)--}}
+            {{--                <td style="text-align: right">({{ number_format(abs($customer->balance), 2) }})</td>--}}
+            {{--            @else--}}
+            <td style="text-align: right">{{ number_format($customer->balance, 2) }}</td>
+            {{--            @endif--}}
             {{-- <td style="text-align: right">{{ number_format($customer->balance-$customer->credit_limit, 2) }}</td> --}}
         </tr>
     @endforeach

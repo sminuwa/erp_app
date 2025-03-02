@@ -4,7 +4,7 @@
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
-<table class="display table table-bordered caption" id="example1" data-ordering="false">
+<table class="display table table-bordered caption" id="example1" data-ordering="true">
     <caption style="caption-size:top">
         <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>
         <h5 style="text-align: center;">List of Invoices Report
@@ -38,7 +38,8 @@
         @endphp
         <tr>
             <td>{{ \Carbon\Carbon::parse($sale->order_date)->toFormattedDateString() }}</td>
-            <td>{{ $sale->reference }}</td>
+            {{-- <td>{{ $sale->reference }}</td> --}}
+            <td><a href="{{ route('order.invoice.show',$sale->id) }}" target="_BLANK">{{ $sale->reference }}</a></td>
             <td>{{ $sale->customer->code }}</td>
             <td>{{ $sale->customer->name }}</td>
             <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>

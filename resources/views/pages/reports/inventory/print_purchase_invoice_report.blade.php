@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/backend/img/favicon.ico') }}" type="image/x-icon">
-    <title>Purchase Invoice Report - {{ config('app.name', 'Inventory Management System') }}</title>
+    <title>Invoice/GRN Report - {{ config('app.name', 'Inventory Management System') }}</title>
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
@@ -34,12 +34,12 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:100px;height:60px;"
+                            <img src="{{ asset('assets/backend/img/logo.png') }}" style="width:100px;height:60px;"
                                 alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
                             <h3 style="text-align: center;">
                                 {{$branch->name ?? 'All Branches'}}
                             </h3>
-                            <h5 style="text-align: center;">Purchase Invoice Report
+                            <h5 style="text-align: center;">Invoice/GRN Report
                                 From
                                 {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                                 AND
@@ -53,7 +53,7 @@
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
                             <table class="display table table-bordered caption" id="example1" border="1" cellpadding="0"
-                                cellspacing="0" data-ordering="false">
+                                cellspacing="0" data-ordering="true">
                                 <thead>
                                     <tr>
                                         <th style="width: 50%" colspan="4">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
@@ -72,37 +72,38 @@
                                     </tr>
                                 </thead>
                                 @php
-                                    $total_cost = 0;
+                                $total_cost = 0;
+                            @endphp
+                            @foreach ($sales as $sale)
+                                <tr>
+                                    <td>{{ \Carbon\Carbon::parse($sale->purchase_date)->toFormattedDateString() }}</td>
+                                    <td>{{ $sale->reference }}</td>
+                                    <td style="text-align: right">
+                                        {{ number_format($sale->total, 2, '.', ',') }}</td>
+                                    <td>{{ $sale->atc_no }}</td>
+                                    <td>{{ $sale->supplier }}</td>
+                                    <td>{{ $sale->created_by }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}</td>
+                                    <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
+                        
+                                </tr>
+                                @php
+                                    $total_cost += $sale->total;
                                 @endphp
-                                @foreach ($sales as $sale)
-                                    <tr>
-                                        <td>{{ \Carbon\Carbon::parse($sale->purchase_date)->toFormattedDateString() }}</td>
-                                        <td>{{ $sale->reference }}</td>
-                                        <td style="text-align: right">
-                                            {{ number_format($sale->total, 2, '.', ',') }}</td>
-                                        <td>{{ $sale->atc_no }}</td>
-                                        <td>{{ $sale->supplier }}</td>
-                                        <td>{{ $sale->name }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}</td>
-                                        <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
-                                    </tr>
-                                    @php
-                                        $total_cost += $sale->total;
-                                    @endphp
-                                @endforeach
-                                <tfoot>
-                                    <tr>
-                                        <th colspan="2" style="text-align: right">TOTAL</th>
-                                        <th style="text-align: right">
-                                            {{ number_format($total_cost, 2, '.', ',') }}
-                                        </th>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
-                                    </tr>
-                                </tfoot>
+                            @endforeach
+                            <tfoot>
+                                <tr>
+                                    <th colspan="2" style="text-align: right">TOTAL</th>
+                                    <th style="text-align: right">
+                                        {{ number_format($total_cost, 2, '.', ',') }}
+                                    </th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
                             </table>
                         </div>
                         <!-- /.col -->

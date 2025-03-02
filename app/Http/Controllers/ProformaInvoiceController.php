@@ -210,7 +210,7 @@ class ProformaInvoiceController extends Controller
         $store = Store::where('branch_id', 'LIKE', $user_branch)->get();
         return view('pages.pos.proformer', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'order'));
     }
-    public function print_proformer($order_id)
+    public function print_proformer($order_id, $papersize = "A4")
     {
         $order = Proformer::with('customer')->where('id', $order_id)->first();
         //return $order;
@@ -219,7 +219,7 @@ class ProformaInvoiceController extends Controller
         //$company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('created_at')->first();
         $company = Setting::find(1);
         $utility = new Utility();
-        return view('pages.order.proformer_print', compact('order_details', 'order', 'company', 'utility'));
+        return view('pages.order.proformer_print', compact('order_details', 'order', 'company', 'utility','papersize'));
     }
     public function final_proformer(Request $request)
     {

@@ -48,8 +48,25 @@
                     <td>{{ $loop->index + 1 }}</td>
                     <td>{{ $ledger->date->toFormattedDateString() }}</td>
                     <td>{{ $ledger->payer()->code ?? ($ledger->payer()->number ?? '') }}</td>
-                    <td>{{ transactionDecription($ledger->reference) != '' ? transactionDecription($ledger->reference) : $ledger->description }}</td>
-                    <td>{{ $ledger->reference }}</td>
+                    <td>{{ transactionDecription($ledger->reference) != '' ? transactionDecription($ledger->reference) : $ledger->description }}
+                    </td>
+                    <td>
+                        @if (strpos($ledger->reference, 'RCT') !== false)
+                            <a href="{{ route('receipt.payment.show', getReferenceId($ledger->reference)) }}" target="_BLANK">
+                                {{ $ledger->reference }}
+                            </a>
+                        @endif
+                        @if (strpos($ledger->reference, 'INV') !== false)
+                            <a href="{{ route('orders.show', getReferenceId($ledger->reference)) }}" target="_BLANK">
+                                {{ $ledger->reference }}
+                            </a>
+                        @endif
+                        @if (strpos($ledger->reference, 'PAY') !== false)
+                            <a href="{{ route('payment.show', getReferenceId($ledger->reference)) }}" target="_BLANK">
+                                {{ $ledger->reference }}
+                            </a>
+                        @endif
+                    </td>
                     <td style="text-align: right">
                         @if ($debit > 0.0)
                             {{ number_format(abs($debit), 2) }}
@@ -83,8 +100,10 @@
                 <th colspan="5" style="text-align: right">Total</th>
                 <th style="text-align: right;">{{ number_format($sum_dr, 2) }}</th>
                 <th style="text-align: right;">{{ number_format($sum_cr, 2) }}</th>
-                <th style="text-align: right;">{{ $sum_cr - $sum_dr < 0 ? number_format(abs($sum_cr - $sum_dr), 2) : '' }}</th>
-                <th style="text-align: right;">{{ $sum_cr - $sum_dr > 0 ? number_format($sum_cr - $sum_dr, 2) : '' }}</th>
+                <th style="text-align: right;">
+                    {{ $sum_cr - $sum_dr < 0 ? number_format(abs($sum_cr - $sum_dr), 2) : '' }}</th>
+                <th style="text-align: right;">{{ $sum_cr - $sum_dr > 0 ? number_format($sum_cr - $sum_dr, 2) : '' }}
+                </th>
             </tr>
         </tfoot>
     </table>

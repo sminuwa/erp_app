@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -21,18 +21,15 @@
                     <div class="receipt-header">
                         <div class="col-xs-6 col-sm-6 col-md-6">
                             <div class="receipt-left">
-                                <img src="{{ asset('assets/backend/img/logo'.".png") }}"
+                                <img src="{{ asset('assets/backend/img/logo' . '.png') }}"
                                     style="width:100px;height:60px;border-radius: 43px;" alt="Albabello Logo"
                                     class="img-circle elevation-3 img-responsive" style="opacity: .8">
-                                <strong>{{App\Models\User::UserBranchName()->name}}</strong>
+                                <strong>{{ App\Models\User::UserBranchName()->name }}</strong>
                             </div>
                         </div>
                         <div class="col-xs-6 col-sm-6 col-md-6 text-right">
                             <div class="receipt-right">
                                 <h5>AL-BABELLO</h5>
-{{--                                <p>{{ optional($payment->customer)->branch->address }} <i class="fa fa-location-arrow"></i></p>--}}
-{{--                                <p>{{ optional($payment->customer)->branch->email }}<i class="fa fa-envelope-o"></i></p>--}}
-{{--                                <p>{{ optional($payment->customer)->branch->phone }} <i class="fa fa-phone"></i></p>--}}
                             </div>
                         </div>
                     </div>
@@ -59,38 +56,40 @@
                     <h4 style="text-align: center;font-weight:700">Entry Details</h4>
                     <table class="table">
                         <thead>
-                        <tr>
-                            <th>SNO</th>
-                            <th>Account</th>
-                            <th>Debit</th>
-                            <th>Credit</th>
-                            <th>Description</th>
-                        </tr>
+                            <tr>
+                                <th>SNO</th>
+                                <th>Account</th>
+                                <th>Debit</th>
+                                <th>Credit</th>
+                                <th>Description</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        <?php $total_credit = $total_debit = 0; ?>
-                        @foreach($journal->items as $journal_item)
-                            <?php $total_credit += $journal_item->credit; ?>
-                            <?php $total_debit += $journal_item->debit; ?>
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>
-                                    {{ $journal_item->account()->code ?? $journal_item->account()->number }} -
-                                    {{ $journal_item->account()->name ?? $journal_item->account()->description }}
-                                </td>
-                                <td style="text-align: right">{{ number_format($journal_item->debit,2) }}</td>
-                                <td style="text-align: right">{{ number_format($journal_item->credit,2) }}</td>
-                                <td>{{ $journal_item->description }}</td>
-                            </tr>
-                        @endforeach
+                            <?php $total_credit = $total_debit = 0; ?>
+                            @foreach ($journal->items as $journal_item)
+                                <?php $total_credit += $journal_item->credit; ?>
+                                <?php $total_debit += $journal_item->debit; ?>
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>
+                                        {{ $journal_item->account()->code ?? $journal_item->account()->number }} -
+                                        {{ $journal_item->account()->name ?? $journal_item->account()->description }}
+                                    </td>
+                                    <td style="text-align: right">{{ number_format($journal_item->debit, 2) }}</td>
+                                    <td style="text-align: right">{{ number_format($journal_item->credit, 2) }}</td>
+                                    <td>{{ $journal_item->description }}</td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                     <div class="col-md-12 mt-3">
                         <h4 class="text-bold">
                             <small>Total Credit:</small> N{{ $total_credit }} <br>
                             <small>Total Debit:</small> N{{ $total_debit }} <br>
-                            <small>Balance:</small> N{{ $total_credit-$total_debit }} <br>
-                            <b>Status :</b> {!!  $journal->status == 0 ? '<span class="badge badge-danger">pending</span>' : '<span class="badge badge-success">posted</span>' !!}
+                            <small>Balance:</small> N{{ $total_credit - $total_debit }} <br>
+                            <b>Status :</b> {!! $journal->status == 0
+                                ? '<span class="badge badge-danger">pending</span>'
+                                : '<span class="badge badge-success">posted</span>' !!}
                         </h4>
                     </div>
                 </div>
@@ -99,7 +98,8 @@
                     <div class="container">
                         <div class="col-xs-10 col-sm-10 col-md-10 text-left">
                             <div class="receipt-right">
-                                <p><b>Date Created :</b> {{ \Carbon\Carbon::parse($journal->created_at)->toFormattedDateString() }}</p>
+                                <p><b>Date Created :</b>
+                                    {{ \Carbon\Carbon::parse($journal->created_at)->toFormattedDateString() }}</p>
                                 <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
                                 <p><b>Created By :</b> {{ $journal->createdBy->name ?? null }}</p>
                                 <p><b>Posted By :</b> {{ $journal->postedBy->name ?? null }}</p>
@@ -235,4 +235,104 @@
     </script>
 </body>
 
+</html> --}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Journal - ALBABELLO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+@include('pages.order.paper_size')
+</head>
+
+<body>
+    <div class="container">
+        <div class="receipt-main">
+            <div class="row">
+                <div class="col-xs-6">
+                    <img src="{{ asset('assets/backend/img/logo.png') }}" style="width:100px;height:60px;" alt="Albabello Logo">
+                    <span style="font-size:20px;">&nbsp;{{ App\Models\User::UserBranchName()->name }}</span>
+                </div>
+                <div class="col-xs-6 text-right">
+                    <h5>AL-BABELLO</h5>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-7 text-left">
+                    <h5>Journal</h5>
+                    <h5>{{ $journal->description ?? 'N/A' }}</h5>
+                </div>
+                <div class="col-xs-5 text-right">
+                    <p><b>Journal No:</b> {{ $journal->reference }}</p>
+                    <p><b>Journal Date:</b> {{ \Carbon\Carbon::parse($journal->date)->toFormattedDateString() }}</p>
+                </div>
+            </div>
+
+            <h4 class="text-center text-bold">Entry Details</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>SNO</th>
+                        <th>Account</th>
+                        <th>Debit</th>
+                        <th>Credit</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php $total_credit = 0; $total_debit = 0; @endphp
+                    @foreach ($journal->items as $journal_item)
+                        @php 
+                            $total_credit += $journal_item->credit;
+                            $total_debit += $journal_item->debit;
+                        @endphp
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $journal_item->account()->code ?? $journal_item->account()->number }} - {{ $journal_item->account()->name ?? $journal_item->account()->description }}</td>
+                            <td align="right">{{ number_format($journal_item->debit, 2) }}</td>
+                            <td align="right">{{ number_format($journal_item->credit, 2) }}</td>
+                            <td>{{ $journal_item->description }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+
+            <div class="text-bold">
+                <p><small>Total Credit:</small> N{{ number_format($total_credit, 2) }}</p>
+                <p><small>Total Debit:</small> N{{ number_format($total_debit, 2) }}</p>
+                <p><small>Balance:</small> N{{ number_format($total_credit - $total_debit, 2) }}</p>
+                <p><b>Status:</b> {!! $journal->status == 0 ? '<span class="badge badge-danger">Pending</span>' : '<span class="badge badge-success">Posted</span>' !!}</p>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-10 text-left">
+                    <p><b>Date Created:</b> {{ \Carbon\Carbon::parse($journal->created_at)->toFormattedDateString() }}</p>
+                    <p><b>Printed On:</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
+                    <p><b>Created By:</b> {{ $journal->createdBy->name ?? 'N/A' }}</p>
+                    <p><b>Posted By:</b> {{ $journal->postedBy->name ?? 'N/A' }}</p>
+                    <p><b>Modified By:</b> {{ $journal->updatedBy->name ?? 'N/A' }}</p>
+                    <p><b>Printed By:</b> {{ Auth::user()->name }}</p>
+
+                    <p><b>Signature:</b> ______________________________________</p>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For: ALBABELLO</span>
+                </div>
+                <div class="col-xs-2 text-right">
+                    {{ QrCode::size(70)->backgroundColor(255, 55, 0)->generate("$journal->dr\n$journal->reference\n\n.") }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.print();
+    </script>
+</body>
+
 </html>
+

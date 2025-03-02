@@ -21,7 +21,7 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
     <link rel="icon" href="{{ asset('assets/backend/img/policymaker.ico') }}" type="image/x-icon" />
-
+    @include('pages.order.paper_size')
 </head>
 
 <body>
@@ -94,14 +94,16 @@
                                                 {{ number_format($item->original_unit_cost * $item->original_quantity_purchased, 2) }}
                                             </td>
                                             <td align="right">
-                                                {{ number_format($item->current_unit_cost * $item->current_quantity, 2) }}</td>
+                                                {{ number_format($item->current_unit_cost * $item->current_quantity, 2) }}
+                                            </td>
                                             <td align="right">
                                                 {{ number_format($item->original_unit_cost * $item->original_quantity_purchased - $item->current_unit_cost * $item->current_quantity, 2) }}
                                             </td>
                                         </tr>
                                         @php
                                             $current_total += $item->current_unit_cost * $item->current_quantity;
-                                            $original_total += $item->original_unit_cost * $item->original_quantity_purchased;
+                                            $original_total +=
+                                                $item->original_unit_cost * $item->original_quantity_purchased;
                                         @endphp
                                     @endforeach
 
@@ -123,7 +125,7 @@
                                         </td>
                                         <td>
                                             <p>
-                                                <strong>&#8358;{{ number_format($original_total-$current_total, 2) }}</strong>
+                                                <strong>&#8358;{{ number_format($original_total - $current_total, 2) }}</strong>
                                             </p>
                                         </td>
                                     </tr>
@@ -132,7 +134,8 @@
                             <table class="table">
                                 <tr>
                                     <td style='border-style:none;'>
-                                        Created By/Date Created: {{ $payment->createdBy->name }}/{{ \Carbon\Carbon::parse($payment->created_at)->toFormattedDateString() }}
+                                        Created By/Date Created:
+                                        {{ $payment->createdBy->name }}/{{ \Carbon\Carbon::parse($payment->created_at)->toFormattedDateString() }}
                                     </td>
                                 </tr>
                                 <tr>

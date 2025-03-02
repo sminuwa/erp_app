@@ -347,7 +347,7 @@ class Transaction
                 'reference' => 'R' . $intersite->reference,
                 'credit' => 0,
                 'debit' => $cat['amount'],
-                'date' =>date('Y-m-d'),
+                'date' => date('Y-m-d'),
                 // 'date' => $intersite->date,
                 'user_id' => auth()->id(),
                 'receipt_no' => 'A' . 'R' . $intersite->reference
@@ -725,6 +725,8 @@ class Transaction
             $general_account_ledger = array_merge($asset_account, $cost_account, $revenue_account, $customer_ledger, $discount_account, $refund_account);
             //            return $general_account_ledger;
             if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
+                $order->status = 1;
+                $order->save();
                 return ['status' => true, 'message' => 'success'];
             }
             return ['status' => false, 'message' => 'Something went wrong.'];
@@ -966,16 +968,16 @@ class Transaction
 
         //getting the cross branch control account
         $control_account = GeneralAccountControl::where('code', 'clearing')->first();
-//        return $control_account;
+        //        return $control_account;
         $user = auth()->user();
         $branch = $user->branch;
         $general_account_ledgers = [];
         $cd = [];
         $cc = [];
         foreach ($accounts_details as $account) {
-            if(!isset($cc[$account['branch_id']]))
+            if (!isset($cc[$account['branch_id']]))
                 $cc[$account['branch_id']] = 0;
-            if(!isset($cd[$account['branch_id']]))
+            if (!isset($cd[$account['branch_id']]))
                 $cd[$account['branch_id']] = 0;
             $general_account_ledgers[] = [
                 'model_id' => $account['account_id'],
@@ -994,7 +996,7 @@ class Transaction
 
 
         }
-        foreach(array_filter($cc) as $key=>$c){
+        foreach (array_filter($cc) as $key => $c) {
             $general_account_ledgers[] = [
                 'model_id' => $control_account->general_account_id,
                 'model_name' => 'GeneralAccount',
@@ -1008,7 +1010,7 @@ class Transaction
                 'receipt_no' => $type . '_' . $reference
             ];
         }
-        foreach(array_filter($cd) as $key2=>$d){
+        foreach (array_filter($cd) as $key2 => $d) {
             $general_account_ledgers[] = [
                 'model_id' => $control_account->general_account_id,
                 'model_name' => 'GeneralAccount',
@@ -1091,7 +1093,7 @@ class Transaction
             } else {
                 $quantity_sold = Transaction::quantity_sold($product->id, $cart->quantity, $unit);
                 $total_sales += $quantity_sold * $cart->price;
-//                $total_sales += $cart->quantity * $cart->price;
+                //                $total_sales += $cart->quantity * $cart->price;
             }
         }
 

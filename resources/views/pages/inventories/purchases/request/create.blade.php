@@ -1,4 +1,5 @@
 @extends('layouts.backend.app')
+
 @section('title', 'Purchase Panel')
 
 @push('css')
@@ -42,9 +43,10 @@
                             <div class="card-body">
                                 <h5 class="card-title"></h5>
                                 <form action="{{ isset($route) ? $route : route('purchases.request.store') }}"
-                                    method="POST">
+                                      method="POST">
                                     {{ csrf_field() }}
-                                    <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
+                                    <input type="hidden" name="_method"
+                                           value="{{ isset($method) ? $method : 'POST' }}"/>
                                     <div class="row">
                                         <div class="col-md-7">
                                             <div class="form-group">
@@ -67,14 +69,14 @@
                                             <div class="form-group">
                                                 <label for="invoice">Reference No</label>
                                                 <input type="hidden"
-                                                    class="form-control {{ $errors->has('old_invoice') ? ' is-invalid' : '' }}"
-                                                    name="old_invoice" id="old_invoice"
-                                                    value="{{ old('old_invoice', $model->invoice) }}">
+                                                       class="form-control {{ $errors->has('old_invoice') ? ' is-invalid' : '' }}"
+                                                       name="old_invoice" id="old_invoice"
+                                                       value="{{ old('old_invoice', $model->invoice) }}">
                                                 <input type="text"
-                                                    class="form-control {{ $errors->has('invoice') ? ' is-invalid' : '' }}"
-                                                    name="invoice" id="invoice"
-                                                    value="{{ old('invoice', $model->invoice) }}" placeholder=""
-                                                    maxlength="191" required="required">
+                                                       class="form-control {{ $errors->has('invoice') ? ' is-invalid' : '' }}"
+                                                       name="invoice" id="invoice"
+                                                       value="{{ old('invoice', $model->invoice) }}" placeholder=""
+                                                       maxlength="191" required="required">
                                                 @if ($errors->has('invoice'))
                                                     <div class="invalid-feedback">
                                                         <strong>{{ $errors->first('invoice') }}</strong>
@@ -84,9 +86,9 @@
                                         </div>
                                     </div>
 
-                                    <input type="hidden" name="updated_by" value="{{ Auth::id() }}" />
+                                    <input type="hidden" name="updated_by" value="{{ Auth::id() }}"/>
                                     <div class="form-group text-right ">
-                                        <input type="submit" class="btn btn-primary" value="Save" />
+                                        <input type="submit" class="btn btn-primary" value="Save"/>
                                     </div>
                                 </form>
                             </div>
@@ -101,13 +103,13 @@
                                 <div class="float-right">
                                     @can('ajax.cart.add')
                                         <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
-                                            class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
+                                           class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
                                                 class="fa fa-plus"></i> Add Product </a>
                                     @endcan
                                 </div>
                             </div>
                             <div class="card-body table-responsive">
-                                <?php $total_price = 0; ?>
+                                    <?php $total_price = 0; ?>
                                 <div class="cart-container"></div>
                             </div>
                         </div>
@@ -129,8 +131,8 @@
                 </div>
                 <div class="modal-body">
                     <form action="{{ route('ajax.cart.add') }}" method="POST" class="addCartItemForm">
-                        <input type="hidden" name="purchase_id" value="{{ $model->id }}" />
-                        <input type="hidden" name="type" value="{{ $type }}" />
+                        <input type="hidden" name="purchase_id" value="{{ $model->id }}"/>
+                        <input type="hidden" name="type" value="{{ $type }}"/>
                         @csrf
                         {{-- <div class="form-group">
                             <label for="category_id">Category</label>
@@ -148,25 +150,25 @@
                         <div class="form-group">
                             <label for="product_id">Product Name</label>
                             <select
-                            class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
-                            name="product_id" id="product_id" required="required">
-                            <option value="">Select...</option>
-                            @if (isset($products))
-                                
-                                @foreach ($products as $data)
-                                    <option value="{{ $data->id }}"
-                                        {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>
-                                        {{ $data->code }}-{{ $data->name }}</option>
-                                @endforeach
-                            @endif
-                        </select>
+                                class="form-control select2-single {{ $errors->has('product_id') ? ' is-invalid' : '' }}"
+                                name="product_id" id="product_id" required="required">
+                                <option value="">Select...</option>
+                                @if (isset($products))
+
+                                    @foreach ($products as $data)
+                                        <option value="{{ $data->id }}"
+                                            {{ $data->id == optional($model)->product_id ? 'selected' : '' }}>
+                                            {{ $data->code }}-{{ $data->name }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
                         </div>
 
                         <div class="form-group">
                             <label for="qty_supplied">Quantity</label>
                             <input type="number" step=".01"
-                                class="form-control {{ $errors->has('qty_supplied') ? ' is-invalid' : '' }}"
-                                name="qty_supplied" id="qty_supplied" placeholder="" required="required">
+                                   class="form-control {{ $errors->has('qty_supplied') ? ' is-invalid' : '' }}"
+                                   name="qty_supplied" id="qty_supplied" placeholder="" required="required">
                             @if ($errors->has('qty_supplied'))
                                 <div class="invalid-feedback">
                                     <strong>{{ $errors->first('qty_supplied') }}</strong>
@@ -175,9 +177,9 @@
                         </div>
                         <div class="form-group">
                             <label for="unit_price">Cost Price</label>
-                            <input type="text"
-                                class="form-control {{ $errors->has('unit_price') ? ' is-invalid' : '' }}"
-                                name="unit_price" id="unit_price" placeholder="Optional">
+                            <input type="text" oninput="formatNumber(this)"
+                                   class="form-control {{ $errors->has('unit_price') ? ' is-invalid' : '' }}"
+                                   name="unit_price" id="unit_price" placeholder="Optional">
                             @if ($errors->has('unit_price'))
                                 <div class="invalid-feedback">
                                     <strong>{{ $errors->first('unit_price') }}</strong>
@@ -186,7 +188,8 @@
                         </div>
                         <div class="form-group text-right ">
                             <button type="submit" class="btn btn-primary"><span class="ion-android-cart"> </span>Add to
-                                Cart</button>
+                                Cart
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -194,18 +197,19 @@
         </div>
     </div>
 @endsection
+
 @push('js')
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script type="text/javascript">
-        $(function() {
-            $("#category_link,#product_link,#supplier_link").on('click', function() {
+        $(function () {
+            $("#category_link,#product_link,#supplier_link").on('click', function () {
                 $('<input>').attr({
                     type: 'hidden',
                     id: 'shortcut',
                     name: 'shortcut'
                 }).appendTo('form');
             });
-            $(document).on("change", "#category_id", function(event) {
+            $(document).on("change", "#category_id", function (event) {
                 $("#product_id").html(" < option value = '' > Loading... < /option>");
                 $.ajax({
                     url: "{{ route('ajax.loadproducts') }}",
@@ -213,7 +217,7 @@
                     data: {
                         category_id: $("#category_id").val()
                     }
-                }).done(function(msg) {
+                }).done(function (msg) {
                     $("#product_id").html("<option value=''>--select--</option>" + msg);
                 });
             });
@@ -249,6 +253,28 @@
                     )
                 }
             })
+        }
+
+        function formatNumber(input) {
+            // Remove non-numeric and non-decimal characters
+            let value = input.value.replace(/[^\d.]/g, '');
+
+            // Split the value into integer and decimal parts
+            const parts = value.split('.');
+            let integerPart = parts[0] ? parseFloat(parts[0]) : 0;
+            let decimalPart = parts[1] !== undefined ? '.' + parts[1] : '';
+
+            // Check if the integer part is not NaN
+            if (!isNaN(integerPart)) {
+                // Format the integer part with commas and dot as decimal separator
+                integerPart = integerPart.toLocaleString('en-US', {
+                    maximumFractionDigits: 2,
+                    useGrouping: true
+                });
+
+                // Set the formatted value back to the input
+                input.value = integerPart + decimalPart;
+            }
         }
     </script>
 @endpush

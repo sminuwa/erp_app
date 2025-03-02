@@ -56,10 +56,10 @@
                                 cellpadding="0" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th style="width: 50%" colspan="5">Date Processed:
+                                        <th style="width: 50%" colspan="7">Date Processed:
                                             {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
                                         </th>
-                                        <th style="width: 50%;text-align:right" colspan="4">Processed By
+                                        <th style="width: 50%;text-align:right" colspan="5">Processed By
                                             {{ auth()->user()->name }}</th>
                                     </tr>
                                     <tr>
@@ -68,6 +68,7 @@
                                         <th>Item Name</th>
                                         <th>From Branch</th>
                                         <th>To Branch</th>
+                                        <th>Truck No</th>
                                         <th>Rerefence No</th>
                                         <th>Created By</th>
                                         <th>Date Created</th>
@@ -86,6 +87,7 @@
                                         </td>
                                         <td>{{ \App\Models\Branch::find($transfer->destination_branch_id)->code ?? '' }}
                                         </td>
+                                        <td>{{ $transfer->vehicle_no }}</td>
                                         <td>{{ $transfer->reference }}</td>
                                         <td>{{ $transfer->created_by }}</td>
                                         <td>{{ Carbon\Carbon::parse($transfer->created_at)->toFormattedDateString() }}
@@ -102,7 +104,7 @@
                                 <tfoot>
                                     <tr>
 
-                                        <th colspan="8"> Total</th>
+                                        <th colspan="11"> Total</th>
                                         <th style="text-align: right">{{ number_format($total, 2) }}</th>
                                     </tr>
                                 </tfoot>

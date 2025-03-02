@@ -1,4 +1,4 @@
-<div class="card">
+{{-- <div class="card">
     <div class="card-body">
         <div class="row">
             <div class="col-md-12">
@@ -88,6 +88,66 @@
                     </tr>
                     </tfoot>
 
+                </table>
+            </div>
+        </div>
+    </div>
+</div> --}}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-12 mt-1">
+                <h5 style="text-align: center;">
+                    Sales Report From {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
+                    To {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
+                </h5>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 table-responsive">
+                <table class="display table table-bordered table-striped" data-ordering="true">
+                    <thead>
+                        <tr>
+                            @if ($group_by_category)
+                                <th>CATEGORY</th>
+                            @endif
+                            @if ($group_by_product)
+                                <th>PRODUCT</th>
+                            @endif
+                            <th>QTY AVAILABLE</th>
+                            <th>QTY SOLD</th>
+                            <th>UNIT</th>
+                            <th>AMOUNT</th>
+                            <th>COST</th>
+                            <th>PROFIT</th>
+                            <th>MARGIN (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($sales as $sale)
+                            @php
+                                $profit = $sale->amount - $sale->cost;
+                            @endphp
+                            <tr>
+                                @if ($group_by_category)
+                                    <td>{{ $sale->category }}</td>
+                                @endif
+                                @if ($group_by_product)
+                                    <td>{{ $sale->product_name ?? '-' }}</td>
+                                @endif
+                                <td style="text-align: right">{{ number_format($sale->qty_available, 6) }}</td>
+                                <td style="text-align: right">{{ number_format($sale->quantity, 6) }}</td>
+                                <td>{{ $sale->product_unit }}</td>
+                                <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}</td>
+                                <td style="text-align: right">{{ number_format($sale->cost, 2, '.', ',') }}</td>
+                                <td style="text-align: right">{{ number_format($profit, 2, '.', ',') }}</td>
+                                <td style="text-align: right">
+                                    {{ $sale->amount != 0 ? number_format(($profit / $sale->amount) * 100, 2) : 0 }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
                 </table>
             </div>
         </div>

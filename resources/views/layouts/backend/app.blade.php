@@ -174,7 +174,7 @@
         });
 
         var date = new Date();
-        date.setDate( date.getDate() - 3 );
+        date.setDate( date.getDate() - 2 );
 
 
         $('.datepicker-entry').datepicker({
@@ -225,6 +225,7 @@
             $('.display').DataTable({
                 dom: 'Bfrtip',
                 "responsive": true,
+                "ordering": true,
                 lengthMenu: [25, 50, 75, 100],
                 pageLength: 100,
                 buttons: [

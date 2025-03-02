@@ -9,11 +9,11 @@
 
                 <form action="{{ route('purchases.store') }}" method="POST">
                     {{ csrf_field() }}
-                    <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
+                    <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}"/>
                     @isset($purchase_request_id)
-                        <input type="hidden" name="purchase_request_id" value="{{ $purchase_request_id }}" />
+                        <input type="hidden" name="purchase_request_id" value="{{ $purchase_request_id }}"/>
                     @else
-                        <input type="hidden" name="purchase_id" value="{{ isset($model->id) ? $model->id : '' }}" />
+                        <input type="hidden" name="purchase_id" value="{{ isset($model->id) ? $model->id : '' }}"/>
                     @endisset
 
                     <div class="row">
@@ -43,10 +43,10 @@
                                 <label for="purchase_date">Purchase Date</label>
                                 <div class="input-group">
                                     <input type="text"
-                                        class="form-control datepicker-entry {{ $errors->has('purchase_date') ? ' is-invalid' : '' }}"
-                                        name="purchase_date" id="purchase_date"
-                                        value="{{ $model->purchase_date == null ? date('Y-m-d') : old('purchase_date', $model->purchase_date->format('Y-m-d')) }}"
-                                        placeholder="" required="required">
+                                           class="form-control datepicker-entry {{ $errors->has('purchase_date') ? ' is-invalid' : '' }}"
+                                           name="purchase_date" id="purchase_date"
+                                           value="{{ $model->purchase_date == null ? date('Y-m-d') : old('purchase_date', $model->purchase_date->format('Y-m-d')) }}"
+                                           placeholder="" required="required">
                                     <?php date_default_timezone_set('Africa/Lagos'); ?>
                                     {{-- <input type="text"
                                         class="form-control datetimepicker input-sm {{ $errors->has('purchase_time') ? ' is-invalid' : '' }}"
@@ -69,9 +69,9 @@
                             <div class="form-group">
                                 <label for="invoice">ATC/WayBill No</label>
                                 <input type="text"
-                                    class="form-control {{ $errors->has('atc_no') ? ' is-invalid' : '' }}"
-                                    name="atc_no" id="atc_no" value="{{ old('invoice', $model->atc_no) }}"
-                                    placeholder="" maxlength="191" required="required">
+                                       class="form-control {{ $errors->has('atc_no') ? ' is-invalid' : '' }}"
+                                       name="atc_no" id="atc_no" value="{{ old('invoice', $model->atc_no) }}"
+                                       placeholder="" maxlength="191" required="required">
                                 @if ($errors->has('atc_no'))
                                     <div class="invalid-feedback">
                                         <strong>{{ $errors->first('atc_no') }}</strong>
@@ -83,9 +83,9 @@
                             <div class="form-group">
                                 <label for="vehicle_reg_no">Truck No</label>
                                 <input type="text"
-                                    class="form-control {{ $errors->has('truck_no') ? ' is-invalid' : '' }}"
-                                    name="truck_no" id="truck_no" value="{{ old('truck_no', $model->truck_no) }}"
-                                    placeholder="" maxlength="191">
+                                       class="form-control {{ $errors->has('truck_no') ? ' is-invalid' : '' }}"
+                                       name="truck_no" id="truck_no" value="{{ old('truck_no', $model->truck_no) }}"
+                                       placeholder="" maxlength="191">
                                 @if ($errors->has('truck_no'))
                                     <div class="invalid-feedback">
                                         <strong>{{ $errors->first('truck_no') }}</strong>
@@ -96,7 +96,7 @@
                         <div class="col-md-4"></div>
                     </div>
                     <div class="form-group text-right ">
-                        <input type="submit" class="btn btn-primary" value="Save" />
+                        <input type="submit" class="btn btn-primary" value="Save"/>
                     </div>
                 </form>
             </div>
@@ -111,7 +111,7 @@
                 <i class="ion-android-cart"></i> Supplier Cart: <small>Purchased Products</small>
                 <div class="float-right">
                     <a href="javascript:void(0)" data-toggle="modal" data-target="#add_product_form"
-                        class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
+                       class="btn btn-sm btn-secondary float-md-right" style="margin-left: 2px;"><i
                             class="fa fa-plus"></i> Add Product </a>
                 </div>
             </div>
@@ -133,8 +133,8 @@
             </div>
             <div class="modal-body">
                 <form action="{{ route('ajax.cart.add') }}" method="POST" class="addCartItemForm">
-                    <input type="hidden" name="purchase_id" value="{{ $model->id }}" />
-                    <input type="hidden" name="type" value="{{ $type }}" />
+                    <input type="hidden" name="purchase_id" value="{{ $model->id }}"/>
+                    <input type="hidden" name="type" value="{{ $type }}"/>
                     @csrf
                     {{-- <div class="form-group">
                         <label for="category_id">Category</label>
@@ -167,8 +167,8 @@
                     <div class="form-group">
                         <label for="qty_supplied">Quantity</label>
                         <input type="text" pattern="^[0-9\.]*$"
-                            class="form-control {{ $errors->has('qty_supplied') ? ' is-invalid' : '' }}"
-                            name="qty_supplied" id="qty_supplied" placeholder="" required="required">
+                               class="form-control {{ $errors->has('qty_supplied') ? ' is-invalid' : '' }}"
+                               name="qty_supplied" id="qty_supplied" placeholder="" required="required">
                         @if ($errors->has('qty_supplied'))
                             <div class="invalid-feedback">
                                 <strong>{{ $errors->first('qty_supplied') }}</strong>
@@ -177,9 +177,9 @@
                     </div>
                     <div class="form-group">
                         <label for="unit_price">Cost Price</label>
-                        <input type="text"
-                            class="form-control {{ $errors->has('unit_price') ? ' is-invalid' : '' }}"
-                            name="unit_price" id="unit_price" placeholder="" required="required">
+                        <input type="text" oninput="formatNumber(this)"
+                               class="form-control {{ $errors->has('unit_price') ? ' is-invalid' : '' }}"
+                               name="unit_price" id="unit_price" placeholder="" required="required">
                         @if ($errors->has('unit_price'))
                             <div class="invalid-feedback">
                                 <strong>{{ $errors->first('unit_price') }}</strong>
@@ -203,7 +203,8 @@
                     </div>
                     <div class="form-group text-right ">
                         <button type="submit" class="btn btn-primary"><span class="ion-android-cart"> </span>Add to
-                            Cart</button>
+                            Cart
+                        </button>
                     </div>
                 </form>
             </div>

@@ -1,7 +1,7 @@
 @extends('layouts.backend.app')
 
 @section('title', 'Customer')
-<meta name="csrf-token" content="{{ csrf_token() }}" />
+<meta name="csrf-token" content="{{ csrf_token() }}"/>
 @push('css')
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datatables/datatables.css') }}">
 @endpush
@@ -46,15 +46,17 @@
                             <div class="card-body">
                                 <form action="{{ route('purchase.additional-invoice.store') }}" method="post">
                                     @csrf
-                                    <input type="hidden" name="invoice_id" value="{{ isset($invoice) ? $invoice->id : '' }}">
+                                    <input type="hidden" name="invoice_id"
+                                           value="{{ isset($invoice) ? $invoice->id : '' }}">
                                     <div class="row">
                                         <div class="col-md-4">
 
                                             <div class="form-group">
                                                 <label for="date">Date</label>
-                                                <input type="text" name="date" class="form-control date_ datepicker-entry"
-                                                    value="{{ isset($invoice) ? $invoice->date : date('Y-m-d') }}"
-                                                    required />
+                                                <input type="text" name="date"
+                                                       class="form-control date_ datepicker-entry"
+                                                       value="{{ isset($invoice) ? $invoice->date : date('Y-m-d') }}"
+                                                       required/>
                                             </div>
 
                                         </div>
@@ -62,11 +64,13 @@
                                             <div class="form-group">
                                                 <label>Purchase</label>
                                                 <select name="purchase_id" id="purchase_id"
-                                                    class="form-control select2-single" required>
+                                                        class="form-control select2-single" required>
                                                     <option value="" disabled selected>Select...</option>
                                                     @foreach ($purchases as $purchase)
                                                         <option value="{{ $purchase->id }}"
-                                                            @if (isset($invoice->id)) {{ $invoice->purchase_id == $purchase->id ? 'selected' : '' }} @endif>
+                                                        @if (isset($invoice->id))
+                                                            {{ $invoice->purchase_id == $purchase->id ? 'selected' : '' }}
+                                                            @endif>
                                                             {{ $purchase->reference }} -
                                                             {{ $purchase->supplier->name ?? null }}
                                                         </option>
@@ -80,11 +84,13 @@
                                             <div class="form-group">
                                                 <label>Supplier/Transporter</label>
                                                 <select name="supplier_id" id="supplier_id"
-                                                    class="form-control select2-single" required>
+                                                        class="form-control select2-single" required>
                                                     <option value="" disabled selected>Select...</option>
                                                     @foreach ($suppliers as $supplier)
                                                         <option value="{{ $supplier->id }}"
-                                                            @if (isset($invoice->id)) {{ $invoice->supplier_id == $supplier->id ? 'selected' : '' }} @endif>
+                                                        @if (isset($invoice->id))
+                                                            {{ $invoice->supplier_id == $supplier->id ? 'selected' : '' }}
+                                                            @endif>
                                                             {{ $supplier->code }} - {{ $supplier->name ?? null }}
                                                         </option>
                                                     @endforeach
@@ -94,17 +100,18 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="date">Amount</label>
-                                                <input type="number" name="amount" id="amount" class="form-control"
-                                                    placeholder="Amount"
-                                                    value="{{ isset($invoice) ? $invoice->amount : '' }}" required />
+                                                <input type="text" name="amount" id="amount" class="form-control"
+                                                       placeholder="Amount" oninput="formatNumber(this)"
+                                                       value="{{ isset($invoice) ? $invoice->amount : '' }}" required/>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="date">Description/WayBill</label>
                                                 <input type="text" name="description" id="description"
-                                                    class="form-control" placeholder="Description"
-                                                    value="{{ isset($invoice) ? $invoice->description : '' }}" required />
+                                                       class="form-control" placeholder="Description"
+                                                       value="{{ isset($invoice) ? $invoice->description : '' }}"
+                                                       required/>
                                             </div>
                                         </div>
 
@@ -142,7 +149,7 @@
     <!-- Sweet Alert Js -->
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script>
-        $(function() {
+        $(function () {
             $("#example1,#store_data").DataTable();
             $('#example2').DataTable({
                 "paging": true,
@@ -153,32 +160,32 @@
                 "autoWidth": false
             });
 
-            $('#account_type').on("change", function() {
+            $('#account_type').on("change", function () {
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.customers') }}",
                     data: {
                         type: $(this).val()
                     }
-                }).done(function(data) {
+                }).done(function (data) {
                     $("#customer_record").html(data);
                 });
             });
 
-            $('.customer_id').on('change', function() {
+            $('.customer_id').on('change', function () {
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.customer-orders') }}",
                     data: {
                         customer_id: $(this).val()
                     }
-                }).done(function(data) {
+                }).done(function (data) {
                     // console.log(data)
                     $(".customer-orders").html(data);
                 });
             });
 
-            $(document).on('keyup', '#search', function() {
+            $(document).on('keyup', '#search', function () {
                 var searchText = $(this).val();
                 $.ajax({
                     url: "{{ route('load.order-invoices') }}",
@@ -186,19 +193,19 @@
                     data: {
                         search: searchText
                     },
-                    success: function(response) {
+                    success: function (response) {
                         if (response == null)
                             $('#table-body').html("");
                         $('#table-body').html(response);
 
                     },
-                    error: function(error) {
+                    error: function (error) {
                         // console.log(error);
                     }
                 });
             });
 
-            $(document).on('change', '#purchase_id', function() {
+            $(document).on('change', '#purchase_id', function () {
                 var searchText = $(this).val();
                 $.ajax({
                     url: "{{ route('load.order-invoices') }}",
@@ -206,28 +213,28 @@
                     data: {
                         search: searchText
                     },
-                    success: function(response) {
+                    success: function (response) {
                         if (response == null)
                             $('#table-body').html("");
                         $('#table-body').html(response);
 
                     },
-                    error: function(error) {
+                    error: function (error) {
                         // console.log(error);
                     }
                 });
             });
 
-            var delay = (function() {
+            var delay = (function () {
                 var timer = 0;
-                return function(callback, ms) {
+                return function (callback, ms) {
                     clearTimeout(timer);
                     timer = setTimeout(callback, ms);
                 };
             })();
 
             // function load() {
-            $(document).on('click', '.invoice', function() {
+            $(document).on('click', '.invoice', function () {
                 var reference = $(this).attr('data-val');
 
                 $('#load').html("<h3>Please wait... while it is loading...</h3>");
@@ -237,10 +244,10 @@
                     data: {
                         reference: reference
                     },
-                    success: function(response) {
+                    success: function (response) {
                         $('#load').html(response);
                     },
-                    error: function(error) {
+                    error: function (error) {
                         // console.log(error);
                     }
                 });
@@ -255,19 +262,19 @@
                 };
             })();*/
 
-            $(document).on('keyup', '.quantity', function() {
+            $(document).on('keyup', '.quantity', function () {
                 let id = $(this).attr('data-value');
                 $("#valid_qty" + id.substr(1)).html("");
                 if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(
-                        1)).attr(
-                        'max-qty'))) {
+                    1)).attr(
+                    'max-qty'))) {
                     $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $(
                         '#quantity' +
                         id.substr(1)).attr('max-qty') + ")");
                     $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
                     return false;
                 }
-                delay(function() {
+                delay(function () {
 
                     $.ajax({
                         url: $('#' + id).attr('action'),
@@ -279,7 +286,7 @@
                             _token: "{{ csrf_token() }}"
                         },
                         //dataType: 'json',
-                        success: function(data) {
+                        success: function (data) {
                             // console.log(data)
                             id = id.substr(1);
                             subtotal = $('#price' + id).val() * $('#quantity' + id)
@@ -287,7 +294,7 @@
                             $('.subtotal' + id).text(formatMoney(subtotal));
                             $('.total').text(formatMoney(data));
                         },
-                        error: function(xhr, err) {
+                        error: function (xhr, err) {
 
                         }
                     });
@@ -307,7 +314,7 @@
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
 
-            $(document).on('submit', '.deleteForm', function(event) {
+            $(document).on('submit', '.deleteForm', function (event) {
                 event.preventDefault();
                 var id = $(this).attr('data-val');
                 const swalWithBootstrapButtons = swal.mixin({
@@ -334,7 +341,7 @@
                                 id: id,
                                 _token: '{{ csrf_token() }}'
                             }
-                        }).done(function(data) {
+                        }).done(function (data) {
                             $('.total').text(formatMoney(data));
                             $('.item' + id).remove();
                         });
@@ -351,9 +358,9 @@
                     }
                 })
             });
-            var delay = (function() {
+            var delay = (function () {
                 var timer = 0;
-                return function(callback, ms) {
+                return function (callback, ms) {
                     clearTimeout(timer);
                     timer = setTimeout(callback, ms);
                 };
@@ -361,5 +368,27 @@
 
 
         });
+
+        function formatNumber(input) {
+            // Remove non-numeric and non-decimal characters
+            let value = input.value.replace(/[^\d.]/g, '');
+
+            // Split the value into integer and decimal parts
+            const parts = value.split('.');
+            let integerPart = parts[0] ? parseFloat(parts[0]) : 0;
+            let decimalPart = parts[1] !== undefined ? '.' + parts[1] : '';
+
+            // Check if the integer part is not NaN
+            if (!isNaN(integerPart)) {
+                // Format the integer part with commas and dot as decimal separator
+                integerPart = integerPart.toLocaleString('en-US', {
+                    maximumFractionDigits: 2,
+                    useGrouping: true
+                });
+
+                // Set the formatted value back to the input
+                input.value = integerPart + decimalPart;
+            }
+        }
     </script>
 @endpush

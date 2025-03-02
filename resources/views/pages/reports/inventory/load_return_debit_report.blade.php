@@ -4,7 +4,7 @@
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
-<table class="display table table-bordered caption" id="example1" data-ordering="false">
+<table class="display table table-bordered caption" id="example1" data-ordering="true">
     <caption style="caption-size:top">
         <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>
         <h5 style="text-align: center;">List of Return & Debit Report
@@ -35,11 +35,12 @@
     @foreach ($sales as $sale)
         <tr>
             <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}</td>
-            <td>{{ $sale->reference }}</td>
+            {{-- <td>{{ $sale->reference }}</td> --}}
+            <td><a href="{{ route('return.debit.show',$sale->id) }}" target="_BLANK">{{ $sale->reference }}</a></td>
             <td>{{ $sale->supplier->code }}</td>
             <td>{{ $sale->invoice_no }}</td>
-            <td>{{ $sale->createdBy->name ?? '' }}</td>
             <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}</td>
+            <td>{{ $sale->createdBy->name ?? '' }}</td>
             <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}</td>
             <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
         </tr>

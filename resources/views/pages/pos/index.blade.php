@@ -46,28 +46,30 @@
                                             &nbsp
                                             @can('customer.ledger')
                                                 <a href="javascript:void(0)" data-toggle="modal"
-                                                    data-target="#customer_ledgerform"
-                                                    class="btn btn-sm btn-secondary float-md-right"
-                                                    style="margin-left: 2px;">Customer Ledger </a>
+                                                   data-target="#customer_ledgerform"
+                                                   class="btn btn-sm btn-secondary float-md-right"
+                                                   style="margin-left: 2px;">Customer Ledger </a>
                                             @endcan
                                             @can('credit_limits.create')
-                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#credit_limitform"
-                                                    class="btn btn-sm btn-success float-md-right"
-                                                    style="margin-left: 2px;">Increase Limit </a>
+                                                <a href="javascript:void(0)" data-toggle="modal"
+                                                   data-target="#credit_limitform"
+                                                   class="btn btn-sm btn-success float-md-right"
+                                                   style="margin-left: 2px;">Increase Limit </a>
                                             @endcan
                                             @can('customers.create')
-                                                <a href="javascript:void(0)" data-toggle="modal" data-target="#customermodal"
-                                                    class="btn btn-sm btn-primary float-md-right">Add New</a>
+                                                <a href="javascript:void(0)" data-toggle="modal"
+                                                   data-target="#customermodal"
+                                                   class="btn btn-sm btn-primary float-md-right">Add New</a>
                                             @endcan
                                             @can('receipt.payment.store')
                                                 <a href="javascript:void(0)" data-toggle="modal" data-target="#receipt"
-                                                    class="btn btn-sm btn-secondary float-md-right"
-                                                    onclick="checkCustomerSelection()" style="margin-left: 2px;">Receipt
+                                                   class="btn btn-sm btn-secondary float-md-right"
+                                                   onclick="checkCustomerSelection()" style="margin-left: 2px;">Receipt
                                                 </a>
                                             @endcan
                                             &nbsp;
                                             <span class="text text-danger fa fa-mobile">Send SMS: </span> <input
-                                                type="checkbox" name="sms" id="sms" />
+                                                type="checkbox" name="sms" id="sms"/>
                                         </span>
                                     </h3>
 
@@ -79,8 +81,9 @@
                                             {{--                                            @hasanyrole('Super-admin|Admin') --}}
                                             <div class="form-group">
                                                 <label for="order_date">Sale Date</label>
-                                                <input type="text" name="order_date" class="form-control datepicker-entry"
-                                                    value="{{ isset($order) ? Carbon\Carbon::parse($order->order_date)->format('Y-m-d') : date('Y-m-d') }}" />
+                                                <input type="text" name="order_date"
+                                                       class="form-control datepicker-entry"
+                                                       value="{{ isset($order) ? Carbon\Carbon::parse($order->order_date)->format('Y-m-d') : date('Y-m-d') }}"/>
                                             </div>
                                             {{--                                            @else --}}
                                             {{--                                                <input type="hidden" name="order_date" class="form-control datepicker-entry" --}}
@@ -91,14 +94,16 @@
                                             <div class="form-group">
                                                 <label>Customer Type</label>
                                                 <select name="account_type" id="account_type" class="form-control"
-                                                    {{ !empty(old('account_type')) ? 'disabled' : '' }} required>
+                                                        {{ !empty(old('account_type')) ? 'disabled' : '' }} required>
                                                     <option value="" disabled selected>Select...</option>
                                                     <option value="Retail"
                                                         {{ (isset($order) && $order->customer->type == 'Retail') || old('account_type') == 'Retail' || (session()->has('customer') && session('customer')->type == 'Retail') ? 'selected' : '' }}>
-                                                        Retail</option>
+                                                        Retail
+                                                    </option>
                                                     <option value="Wholesale"
                                                         {{ (isset($order) && $order->customer->type == 'Wholesale') || old('account_type') == 'Wholesale' || (session()->has('customer') && session('customer')->type == 'Wholesale') ? 'selected' : '' }}>
-                                                        WholeSale</option>
+                                                        WholeSale
+                                                    </option>
                                                 </select>
 
                                             </div>
@@ -108,10 +113,11 @@
                                                 <label>Customer</label>
                                                 <div class="form-group">
                                                     <input type="hidden" class="form-control" name="customer_id"
-                                                        id="customer_val_id" value="">
-                                                    <select onchange="$('.customer').val($(this).val())" name="customer_id"
-                                                        {{ old('customer_id') > 0 ? 'disabled' : '' }} id="customer_record"
-                                                        class="form-control select2-single">
+                                                           id="customer_val_id" value="">
+                                                    <select onchange="$('.customer').val($(this).val())"
+                                                            name="customer_id"
+                                                            {{ old('customer_id') > 0 ? 'disabled' : '' }} id="customer_record"
+                                                            class="form-control select2-single">
                                                         @if (session()->has('customer'))
                                                             <option value="{{ session('customer')->id }}">
                                                                 {{ session('customer')->code }} -
@@ -119,14 +125,15 @@
                                                         @endif
                                                         @if (isset($order))
                                                             <option value="{{ $order->customer->id }}"
-                                                                @if ((session()->has('customer') && session('customer')->id) == $order->customer?->id) selected @endif>
+                                                                    @if ((session()->has('customer') && session('customer')->id) == $order->customer?->id) selected @endif>
                                                                 {{ $order->customer->code }} -
                                                                 {{ $order->customer->name }}</option>
                                                         @endif
                                                         @if (old('customer_id') > 0)
                                                             <option value="{{ old('customer_id') }}"
-                                                                @if ((session()->has('customer') && session('customer')->id) == old('customer_id')) selected @endif>
-                                                                {{ App\Models\Customer::find(old('customer_id'))->code }} -
+                                                                    @if ((session()->has('customer') && session('customer')->id) == old('customer_id')) selected @endif>
+                                                                {{ App\Models\Customer::find(old('customer_id'))->code }}
+                                                                -
                                                                 {{ App\Models\Customer::find(old('customer_id'))->name }}
                                                             </option>
                                                         @endif
@@ -134,14 +141,14 @@
 
                                                     <div class="form-group">
                                                         <span class="text  ion-android-alert"
-                                                            id="credit_balance"></span>: <span
+                                                              id="credit_balance"></span>: <span
                                                             class="text ion-android-alert"
                                                             id="customer_balance"></span>
                                                     </div>
                                                 </div>
                                                 @isset($order)
                                                     <input type="hidden" name="order_invoice_id"
-                                                        value="{{ $order->id }}" />
+                                                           value="{{ $order->id }}"/>
                                                 @endisset
 
                                             </div>
@@ -150,33 +157,36 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-4">
-                                            <textarea class="form-control" name="description" placeholder="Description" id="description" required></textarea>
+                                            <textarea class="form-control" name="description" placeholder="Description"
+                                                      id="description" required></textarea>
                                         </div>
                                         <div class="col-md-4">
-                                            <input type="number" class="form-control" name="discount" step=".01"
-                                                placeholder="Discount" id="discount" />
+                                            <input type="text" class="form-control" name="discount" id="discount"
+                                                   oninput="formatNumber(this)" placeholder="Discount"/>
                                         </div>
 
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <input type="number" step=".01" class="form-control"
-                                                    placeholder="Refund" name="refund" id="refund" />
+                                                <input type="text" class="form-control" oninput="formatNumber(this)"
+                                                       placeholder="Refund" name="refund" id="refund"/>
 
                                             </div>
                                         </div>
                                         <div class="col-md-2">
-                                            <input type="checkbox" id="show_vat" name="show_vat"  data-switch="bool">
-                                            <label for="show_vat" data-on-label="On" data-off-label="Off">Show VAT</label>
+                                            <input type="checkbox" id="show_vat" name="show_vat" data-switch="bool">
+                                            <label for="show_vat" data-on-label="On" data-off-label="Off">Show
+                                                VAT</label>
                                         </div>
                                         <div class="col-md-2">
                                             <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create
-                                                Invoice</button>
+                                                Invoice
+                                            </button>
                                         </div>
                                         @if (old('customer_id'))
                                             <div class="col-md-6">
                                                 <span style="color:red;">If the credit limit is exceeded, click here to
                                                     refresh <i class="fa fa-refresh"
-                                                        onclick="window.location.reload()"></i></span>
+                                                               onclick="window.location.reload()"></i></span>
                                             </div>
                                         @endif
                                     </div>
@@ -193,85 +203,85 @@
 
                                 {{--                                @can('make.daily.sale') --}}
                                 <input type="text" id="barcode" class="form-control" name="barcode"
-                                    placeholder="Scan barcode">
+                                       placeholder="Scan barcode">
                                 {{--                                @endcannot --}}
                             </div>
                             <!-- /.card-header -->
                             {{--                            @can('view.sale.products') --}}
                             <div class="card-body table-responsive" id="load">
                                 <table id="example1" class="table table-bordered table-striped text-left"
-                                    style="font-size: 12px;">
+                                       style="font-size: 12px;">
                                     <thead>
-                                        <tr>
-                                            <th>Store</th>
-                                            <th>Code</th>
-                                            <th>Name</th>
-                                            <th>Unit</th>
-                                            <th>QTY</th>
-                                            {{-- <th>Price</th> --}}
-                                            <th>Add To Cart</th>
-                                        </tr>
+                                    <tr>
+                                        <th>Store</th>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>Unit</th>
+                                        <th>QTY</th>
+                                        {{-- <th>Price</th> --}}
+                                        <th>Add To Cart</th>
+                                    </tr>
                                     </thead>
                                     <tfoot>
-                                        <tr>
-                                            <th>Store</th>
-                                            <th>Code</th>
-                                            <th>Name</th>
-                                            <th>Unit</th>
-                                            <th>QTY</th>
-                                            {{-- <th>Price</th> --}}
-                                            <th>Add To Cart</th>
-                                        </tr>
+                                    <tr>
+                                        <th>Store</th>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>Unit</th>
+                                        <th>QTY</th>
+                                        {{-- <th>Price</th> --}}
+                                        <th>Add To Cart</th>
+                                    </tr>
                                     </tfoot>
                                     <tbody>
 
-                                        @foreach ($stores as $key => $store)
-                                            <tr>
-                                                <form action="{{ route('ajax.cart.add') }}" method="POST"
-                                                    class="addCartItemForm">
-                                                    @csrf
+                                    @foreach ($stores as $key => $store)
+                                        <tr>
+                                            <form action="{{ route('ajax.cart.add') }}" method="POST"
+                                                  class="addCartItemForm">
+                                                @csrf
 
-                                                    <input type="hidden" name="customer" class="customer"
-                                                        value="@if (session()->has('customer')) {{ session('customer')->id }} @endif">
-                                                    <input type="hidden" name="id" value="{{ $store->id }}">
-                                                    <input type="hidden" name="name" value="{{ $store->name }}">
-                                                    <input type="hidden" name="code" value="{{ $store->code }}">
-                                                    <input type="hidden" name="store" value="{{ $store->store }}">
-                                                    <input type="hidden" name="unit" value="{{ $store->unit }}">
-                                                    <input type="hidden" name="qty" value="1">
-                                                    <input type="hidden" name="selling_price"
-                                                        value="{{ $store->selling_price }}">
-                                                    <input type="hidden" name="qty_available"
-                                                        value="{{ $store->qty_available }}">
-                                                    <input type="hidden" name="sold_price"
-                                                        value="{{ $store->selling_price }}">
-                                                    <input type="hidden" name="cost_price"
-                                                        value="{{ $store->cost_price }}">
+                                                <input type="hidden" name="customer" class="customer"
+                                                       value="@if (session()->has('customer')) {{ session('customer')->id }} @endif">
+                                                <input type="hidden" name="id" value="{{ $store->id }}">
+                                                <input type="hidden" name="name" value="{{ $store->name }}">
+                                                <input type="hidden" name="code" value="{{ $store->code }}">
+                                                <input type="hidden" name="store" value="{{ $store->store }}">
+                                                <input type="hidden" name="unit" value="{{ $store->unit }}">
+                                                <input type="hidden" name="qty" value="1">
+                                                <input type="hidden" name="selling_price"
+                                                       value="{{ $store->selling_price }}">
+                                                <input type="hidden" name="qty_available"
+                                                       value="{{ $store->qty_available }}">
+                                                <input type="hidden" name="sold_price"
+                                                       value="{{ $store->selling_price }}">
+                                                <input type="hidden" name="cost_price"
+                                                       value="{{ $store->cost_price }}">
 
-                                                    <td>{{ ucwords($store->store) }}</td>
-                                                    <td title="{{$store->information}}">{{ $store->code }}</td>
-                                                    <td>{{ $store->name }}</td>
-                                                    <td>{{ $store->unit }}</td>
-                                                    <td align="center">{{ $store->qty_available }}</td>
-                                                    {{-- <td align="right">
-                                                            {{ number_format($store->selling_price, 2) }}
-                                                        </td> --}}
-                                                    @if ($store->qty_available > 0 && str_replace(',', '', $store->retail_selling_price) > 0)
-                                                        <td align="center">
-                                                            <button type="submit"
+                                                <td>{{ ucwords($store->store) }}</td>
+                                                <td title="{{$store->information}}">{{ $store->code }}</td>
+                                                <td>{{ $store->name }}</td>
+                                                <td>{{ $store->unit }}</td>
+                                                <td align="center">{{ $store->qty_available }}</td>
+                                                {{-- <td align="right">
+                                                        {{ number_format($store->selling_price, 2) }}
+                                                    </td> --}}
+                                                @if ($store->qty_available > 0 && str_replace(',', '', $store->retail_selling_price) > 0)
+                                                    <td align="center">
+                                                        <button type="submit"
                                                                 class="btn btn-sm btn-success px-2 add">
-                                                                <i class="fa fa-cart-plus" aria-hidden="true"></i>
-                                                            </button>
-                                                        </td>
-                                                    @else
-                                                        <td align="center">
+                                                            <i class="fa fa-cart-plus" aria-hidden="true"></i>
+                                                        </button>
+                                                    </td>
+                                                @else
+                                                    <td align="center">
                                                             <span class="fa fa-crosshairs text text-danger"
-                                                                title="Selling price not set!"></span>
-                                                        </td>
-                                                    @endif
-                                                </form>
-                                            </tr>
-                                        @endforeach
+                                                                  title="Selling price not set!"></span>
+                                                    </td>
+                                                @endif
+                                            </form>
+                                        </tr>
+                                    @endforeach
 
                                     </tbody>
 
@@ -329,26 +339,27 @@
                                 <div class="form-group">
                                     <label>Name</label>
                                     <input type="text" class="form-control" name="name"
-                                        value="{{ old('name') }}" placeholder="Enter Name">
+                                           value="{{ old('name') }}" placeholder="Enter Name">
                                 </div>
                                 <div class="form-group">
                                     <label>Phone</label>
-                                    <input type="text" class="form-control" name="phone"
-                                        value="{{ old('phone') }}" placeholder="Enter Phone">
+                                    <input type="number" class="form-control" name="phone"
+                                           value="{{ old('phone') }}" placeholder="Enter Phone">
                                 </div>
                                 <div class="form-group">
                                     <label>Address</label>
-                                    <input type="text" class="form-control" name="address"
-                                        value="{{ old('address') }}" placeholder="Enter Address">
+                                    <input type="email" class="form-control" name="address"
+                                           value="{{ old('address') }}" placeholder="Enter Address">
                                 </div>
 
                                 <div class="form-group">
                                     <label>Credit Limit</label>
                                     <input type="text" class="form-control" name="credit_limit"
-                                        value="{{ old('credit_limit') }}" placeholder="Credit Limit">
+                                           oninput="formatNumber(this)" value="{{ old('credit_limit') }}"
+                                           placeholder="Credit Limit">
                                 </div>
                             </div>
-                            <input type="hidden" name="modal" value="modal" />
+                            <input type="hidden" name="modal" value="modal"/>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-dark" data-dismiss="modal"><i class="fa fa-times"></i>
@@ -375,16 +386,16 @@
                 <form action="{{ isset($route) ? $route : route('receipt.payment.store') }}" method="POST">
                     <div class="modal-body">
                         {{ csrf_field() }}
-                        <input type="hidden" name="payer_id" id="payer_id" value="" required />
-                        <input type="hidden" name="type" value="Customer" required />
+                        <input type="hidden" name="payer_id" id="payer_id" value="" required/>
+                        <input type="hidden" name="type" value="Customer" required/>
                         <div class="row">
                             <div class="col-md-12">
                                 <label for="payment_date">Payment Date</label>
                                 <input type="text"
-                                    class="form-control datepicker-entry {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
-                                    name="payment_date" id="payment_date"
-                                    value="{{ old('payment_date') == '' ? date('Y-m-d') : old('payment_date') }}"
-                                    required="required">
+                                       class="form-control datepicker-entry {{ $errors->has('payment_date') ? ' is-invalid' : '' }}"
+                                       name="payment_date" id="payment_date"
+                                       value="{{ old('payment_date') == '' ? date('Y-m-d') : old('payment_date') }}"
+                                       required="required">
                                 @if ($errors->has('payment_date'))
                                     <div class="invalid-feedback">
                                         <strong>{{ $errors->first('payment_date') }}</strong>
@@ -411,9 +422,9 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <label for="amount_paid">Amount</label>
-                                <input type="number" step=".01"
-                                    class="form-control {{ $errors->has('amount_paid') ? ' is-invalid' : '' }}"
-                                    name="amount_paid" id="amount_paid" value="{{ old('amount_paid') }}" required>
+                                <input type="text" oninput="formatNumber(this)"
+                                       class="form-control {{ $errors->has('amount_paid') ? ' is-invalid' : '' }}"
+                                       name="amount_paid" id="amount_paid" value="{{ old('amount_paid') }}" required>
                                 @if ($errors->has('amount_paid'))
                                     <div class="invalid-feedback">
                                         <strong>{{ $errors->first('amount_paid') }}</strong>
@@ -424,7 +435,8 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <label for="payment_ref">Description</label>
-                                <textarea type="text" class="form-control" name="payment_ref" id="payment_ref"></textarea>
+                                <textarea type="text" class="form-control" name="payment_ref"
+                                          id="payment_ref"></textarea>
                                 @if ($errors->has('payment_ref'))
                                     <div class="invalid-feedback">
                                         <strong>{{ $errors->first('payment_ref') }}</strong>
@@ -464,18 +476,19 @@
                                 <div class="form-group">
                                     <label>Existing Amount</label>
                                     <input type="text" class="form-control" name="amount" value=""
-                                        id="existing_amount">
+                                           id="existing_amount">
                                 </div>
                                 <div class="form-group">
                                     <label>New Amount:</label>
                                     <input type="text" class="form-control" name="new_amount"
-                                        value="{{ old('new_amount') }}" placeholder="Enter the amount" required>
+                                           oninput="formatNumber(this)" value="{{ old('new_amount') }}"
+                                           placeholder="Enter the amount" required>
                                 </div>
                                 <input type="hidden" class="form-control" name="customer_id" id="credit_limit_customer"
-                                    value="">
+                                       value="">
                             </div>
                         </div>
-                        <input type="hidden" name="modal" value="modal" />
+                        <input type="hidden" name="modal" value="modal"/>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-dark" data-dismiss="modal"><i class="fa fa-times"></i>
@@ -501,17 +514,17 @@
                 </div>
                 <div class="modal-body">
                     <form method="get" action="{{ route('ajax.general.customer.ledger') }}" id="ledger_form"
-                        target="_BLANK">
+                          target="_BLANK">
                         @csrf
                         <div class="form-group">
                             <label for="from_date">From Date</label>
                             <input type="text" class="form-control datepicker-entry" name="from_date" id="from_date"
-                                placeholder="" autocomplete="off">
+                                   placeholder="" autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label for="to_date">To Date</label>
                             <input type="text" class="form-control datepicker-entry" name="to_date" id="to_date"
-                                placeholder="" autocomplete="off">
+                                   placeholder="" autocomplete="off">
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp;
@@ -527,8 +540,8 @@
                                 @endforeach
                             </select>
                         </div>
-                        <input type="hidden" name="print" value="print" />
-                        <input type="hidden" name="modal" value="modal" />
+                        <input type="hidden" name="print" value="print"/>
+                        <input type="hidden" name="modal" value="modal"/>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-dark" data-dismiss="modal"><i class="fa fa-times"></i>
                                 Close
@@ -544,43 +557,36 @@
     </div>
 @endsection
 
-
-
-
 @push('js')
     <!-- Sweet Alert Js -->
     <script src="{{ asset('assets/backend/js/sweetalert2.all.min.js') }}"></script>
     <script>
-        $(function() {
+        $(function () {
             $("#example1").DataTable({
                 'iDisplayLength': 100,
-
             });
 
-
-            $('body').on('click', '.add', function() {
+            $('body').on('click', '.add', function () {
                 var customer_id = $('#customer_record').val();
                 $('.customer').val(customer_id);
             })
 
-            $('#account_type').on("change", function() {
+            $('#account_type').on("change", function () {
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.customers') }}",
                     data: {
                         type: $(this).val()
                     }
-                }).done(function(data) {
+                }).done(function (data) {
                     $("#customer_record").html(data);
                 });
             });
-
-
         });
     </script>
     <script type="text/javascript">
         //To update available qty based on unit of measure
-        $(document).on('change', '.unit_measure', function() {
+        $(document).on('change', '.unit_measure', function () {
             var formid = $(this).attr('data-value').substr(1);
             unit = $(this).val();
             $.ajax({
@@ -591,7 +597,7 @@
                 data: {
                     unit: unit
                 }
-            }).done(function(value) {
+            }).done(function (value) {
                 //console.log(value)
                 $('#quantity' + formid).attr(
                     'max-qty', value)
@@ -614,7 +620,8 @@
                 $("#" + tagg_id).html("Selling QTY is more than the available quantity");
             }
         }
-        $('#customer_record').on("change", function() {
+
+        $('#customer_record').on("change", function () {
             customer_id = $(this).val();
             $('.customer').val(customer_id);
             $('#payer_id').val(customer_id);
@@ -624,14 +631,15 @@
                 data: {
                     customer_id: customer_id
                 }
-            }).done(function(data) {
+            }).done(function (data) {
                 balance = formatMoney(data);
                 $("#credit_balance").html("<b>Credit limit: &#8358;</b>" + balance);
                 $('#existing_amount').val(balance);
                 $('#credit_limit_customer').val(customer_id);
             });
         });
-        $('#customer_record').on("change", function() {
+
+        $('#customer_record').on("change", function () {
             customer_id = $(this).val();
             $('.customer').val(customer_id);
             $('#payer_id').val(customer_id);
@@ -641,12 +649,12 @@
                 data: {
                     customer_id: customer_id
                 }
-            }).done(function(data) {
+            }).done(function (data) {
                 let $new_data = formatMoney(Math.abs(data));
-                if(data < 0){
-                    balance = `<span class="text-danger"><b>Balance: &#8358;</b>`+ $new_data +`</span>`;
-                }else
-                    balance = `<span class="text-success"><b>Balance: &#8358;</b>`+ $new_data +`</span>`;
+                if (data < 0) {
+                    balance = `<span class="text-danger"><b>Balance: &#8358;</b>` + $new_data + `</span>`;
+                } else
+                    balance = `<span class="text-success"><b>Balance: &#8358;</b>` + $new_data + `</span>`;
                 // balance = formatMoney(Math.abs(data));
 
                 $("#customer_balance").html(balance);
@@ -696,7 +704,7 @@
             })
         }
 
-        $(function() {
+        $(function () {
             function formatMoney(n, c, d, t) {
                 var c = isNaN(c = Math.abs(c)) ? 2 : c,
                     d = d == undefined ? "." : d,
@@ -710,33 +718,32 @@
 
         });
 
-        var delay = (function() {
+        var delay = (function () {
             var timer = 0;
-            return function(callback, ms) {
+            return function (callback, ms) {
                 clearTimeout(timer);
                 timer = setTimeout(callback, ms);
             };
         })();
 
-
-        $('.quantity,.price').keyup(function() {
+        $('.quantity,.price').keyup(function () {
             id = $(this).attr('data-value');
             $("#valid_qty" + id.substr(1)).html("");
             if (parseFloat($('#quantity' + id.substr(1)).val()) > parseFloat($('#quantity' + id.substr(1)).attr(
-                    'max-qty'))) {
+                'max-qty'))) {
                 $("#valid_qty" + id.substr(1)).html("Selling QTY is more than the available QTY(" + $('#quantity' +
                     id.substr(1)).attr('max-qty') + ")");
                 $('#quantity' + id.substr(1)).val($('#quantity' + id.substr(1)).attr('max-qty'));
                 return false;
             }
-            delay(function() {
+            delay(function () {
 
                 $.ajax({
                     url: $('#' + id).attr('action'),
                     type: $('#' + id).attr('method'),
                     //dataType: 'json',
                     data: $('#' + id).serialize(),
-                    success: function(data) {
+                    success: function (data) {
                         id = id.substr(1);
 
                         subtotal = $('#price' + id).val() * $('#quantity' + id).val();
@@ -744,7 +751,7 @@
                         $('#total').text(formatMoney(data));
                         $('#subtotal').text(formatMoney(data));
                     },
-                    error: function(xhr, err) {
+                    error: function (xhr, err) {
                         //$('#total').text(formatMoney(data));
                         //$('#subtotal').text(formatMoney(data));
                     }
@@ -769,12 +776,12 @@
                             barcode: code
                         },
                         dataType: 'html',
-                        success: function(response) {
+                        success: function (response) {
                             // update the cart items container with the new cart data
                             $('#load_cart').html(response);
                             $('#barcode').val("")
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             // display an error message
                             alert('An error occurred while adding the product to cart.');
                         }
@@ -801,6 +808,28 @@
                 alert('Please select a customer below.');
 
                 return false;
+            }
+        }
+
+        function formatNumber(input) {
+            // Remove non-numeric and non-decimal characters
+            let value = input.value.replace(/[^\d.]/g, '');
+
+            // Split the value into integer and decimal parts
+            const parts = value.split('.');
+            let integerPart = parts[0] ? parseFloat(parts[0]) : 0;
+            let decimalPart = parts[1] !== undefined ? '.' + parts[1] : '';
+
+            // Check if the integer part is not NaN
+            if (!isNaN(integerPart)) {
+                // Format the integer part with commas and dot as decimal separator
+                integerPart = integerPart.toLocaleString('en-US', {
+                    maximumFractionDigits: 2,
+                    useGrouping: true
+                });
+
+                // Set the formatted value back to the input
+                input.value = integerPart + decimalPart;
             }
         }
     </script>

@@ -116,9 +116,13 @@
                                                             Action
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            <a href="{{ route('interbank.print', $interbank->id) }}"
+                                                            <a href="{{ route('interbank.print', [$interbank->id,'A4']) }}"
                                                                 target="_blank" class="dropdown-item">
-                                                                <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                <i class="fa fa-print" aria-hidden="true"></i> Print A4
+                                                            </a>
+                                                            <a href="{{ route('interbank.print', [$interbank->id,'A5']) }}"
+                                                                target="_blank" class="dropdown-item">
+                                                                <i class="fa fa-print" aria-hidden="true"></i> Print A5
                                                             </a>
                                                             <a href="{{ route('interbank.print.pos', $interbank->id) }}"
                                                                 target="_blank" class="dropdown-item">

@@ -126,9 +126,9 @@ class UserController extends Controller
       * @return \Illuminate\Http\Response
       */
     public function update(Update $request, User $user)
-    {
+    { 
         $user->fill($request->all());
-
+        
         if ($user->save()) {
             $action = "Updated a user: " . $user->name;
             AuditLog::auditLog(Auth::id(), $action);

@@ -41,21 +41,21 @@
                         <div class="form-group  col-sm-2">
                             <label for="from_date">From Date</label>
                             <input type="text" autocomplete="off"
-                                class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
-                                name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="">
+                                   class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
+                                   name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="">
                         </div>
                         <div class="form-group  col-sm-2">
                             <label for="to_date">To Date</label>
                             <input type="text" autocomplete="off"
-                                class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
-                                name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
+                                   class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
+                                   name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="company_id">Company</label>
-                            <select class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
+                            <select
+                                class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
                                 name="company_id" id="company_id" required>
-
                             </select>
                         </div>
                         <div class="form-group">
@@ -64,21 +64,21 @@
                             <select
                                 class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
                                 name="branch_id" id="branch_id">
-
                             </select>
                         </div>
                         <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="status">Status</label>
                             <select class="form-control {{ $errors->has('status') ? ' is-invalid' : '' }}" name="status"
-                                id="status">
+                                    id="status">
                                 <option value="">Select...</option>
                                 <option value="0">Pending</option>
                                 <option value="1">Completed</option>
                             </select>
                         </div>
                         <div class="form-group text-right">
-                            <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />
+                            <input type="button" class="btn btn-primary" id="generate" name="generate"
+                                   value="Generate"/>
                         </div>
                     </div>
 
@@ -86,7 +86,7 @@
                 <div class="row">
                     <div class="col-sm-12 table-responsive" id="load">
                         <img src="{{ asset('assets/backend/img/loader.png') }}"
-                            style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                             style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
@@ -101,7 +101,7 @@
     <!-- Sweet Alert Js -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>
     <script type="text/javascript">
-        $(function() {
+        $(function () {
             function formatMoney(n, c, d, t) {
                 var c = isNaN(c = Math.abs(c)) ? 0 : c,
                     d = d == undefined ? "." : d,
@@ -114,13 +114,18 @@
             };
 
 
-
-            $('#generate').on("click", function() {
+            $('#generate').on("click", function () {
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
                 company_id = $('#company_id').val();
                 branch_id = $('#branch_id').val();
                 status = $('#status').val();
+
+                if (from_date === '' || to_date === '') {
+                    alert('Provide date range to continue')
+                    return
+                }
+
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
@@ -133,7 +138,7 @@
                         branch_id: branch_id,
                         status: status
                     }
-                }).done(function(data) {
+                }).done(function (data) {
                     $("#load").html(data);
                     loadDataTable()
                 });

@@ -21,6 +21,22 @@
                     <td>{{ $record->name }}</td>
                 </tr>
                 <tr>
+                    <th>Gender</th>
+                    <td>{{ $record->gender }}</td>
+                </tr>
+                <tr>
+                    <th>Account Type</th>
+                    <td>{{ $record->type }}</td>
+                </tr>
+                <tr>
+                    <th>Business Type</th>
+                    <td>{{ $record->business_type }}</td>
+                </tr>
+                <tr>
+                    <th>Business Age</th>
+                    <td>{{ $record->business_age }}</td>
+                </tr>
+                <tr>
                     <th>Email</th>
                     <td>{{ $record->email }}</td>
                 </tr>

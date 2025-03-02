@@ -48,9 +48,13 @@
                                 @endcan
 
                                 @can('interbank.print')
-                                    <a href="{{ route('interbank.print', $interbank->id) }}" target="_BLANK"
+                                    <a href="{{ route('interbank.print', [$interbank->id, 'A4']) }}" target="_BLANK"
                                         class="btn btn-dark btn-sm ">
-                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print A4
+                                    </a>
+                                    <a href="{{ route('interbank.print', [$interbank->id, 'A5']) }}" target="_BLANK"
+                                        class="btn btn-dark btn-sm ">
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print A5
                                     </a>
                                 @endcan
                                 @can('interbank.print.pos')
@@ -104,7 +108,8 @@
                                     <p><b>Payment Date:
                                             {{ \Carbon\Carbon::parse($interbank->date)->toFormattedDateString() }}</b></p>
                                     <p><b>Date Created:
-                                            {{ \Carbon\Carbon::parse($interbank->created_at)->toFormattedDateString() }}</b></p>
+                                            {{ \Carbon\Carbon::parse($interbank->created_at)->toFormattedDateString() }}</b>
+                                    </p>
                                     <b>Transfer Status:</b>
                                     {!! $interbank->status == 0
                                         ? '<span class="badge badge-warning">Pending</span>'

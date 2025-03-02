@@ -326,7 +326,7 @@ class PurchaseRequestController extends Controller
         }
         return redirect()->back();
     }
-    public function printInvoice(PurchaseRequest $purchase)
+    public function printInvoice(PurchaseRequest $purchase, $papersize = "A4")
     {
         $purchase = PurchaseRequest::with('supplier')->where('id', $purchase->id)->first();
 
@@ -334,7 +334,7 @@ class PurchaseRequestController extends Controller
 
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         $utility = new Utility();
-        return view('pages.inventories.purchases.request.print', compact('purchase_details', 'purchase', 'company', 'utility'));
+        return view('pages.inventories.purchases.request.print', compact('purchase_details', 'purchase', 'company', 'utility','papersize'));
     }
     public function generateWaybill(Request $request, PurchaseRequest $purchase)
     {

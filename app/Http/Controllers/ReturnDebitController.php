@@ -157,9 +157,9 @@ class ReturnDebitController extends Controller
         return view('pages.inventories.return_debit.return_debit', ['payments' => $payments]);
     }
 
-    public function printReturnDebitReceipt(ReturnDebit $returnDebit)
+    public function printReturnDebitReceipt(ReturnDebit $returnDebit, $papersize = "A4")
     {
-        return view('pages.inventories.return_debit.print_return_debit_receipt', ['payment' => $returnDebit, 'setting' => Setting::first()]);
+        return view('pages.inventories.return_debit.print_return_debit_receipt', ['payment' => $returnDebit, 'setting' => Setting::first(),'papersize'=>$papersize]);
     }
 
     public function loadInvoices(Request $request)

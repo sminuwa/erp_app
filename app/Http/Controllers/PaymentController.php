@@ -116,7 +116,7 @@ class PaymentController extends Controller
     }
     public function post(Payment $payment)
     {
-        if($payment->status ==0) {
+        if ($payment->status == 0) {
             $payment->status = 1;
             $payment->posted_by = auth()->id();
             DB::beginTransaction();
@@ -152,9 +152,9 @@ class PaymentController extends Controller
         }
         return back();
     }
-    public function printPaymentReceipt(Payment $payment)
+    public function printPaymentReceipt(Payment $payment, $papersize = "A4")
     {
-        return view('pages.payments.print_payment', ['payment' => $payment, 'setting' => Setting::first()]);
+        return view('pages.payments.print_payment', ['payment' => $payment, 'setting' => Setting::first(), 'papersize' => $papersize]);
     }
     public function printPoSPaymentReceipt(Payment $payment)
     {

@@ -1,0 +1,4 @@
+27/02/2025:
+==========
+
+ALTER TABLE `general_account_ledgers` ADD INDEX(`model_id`);

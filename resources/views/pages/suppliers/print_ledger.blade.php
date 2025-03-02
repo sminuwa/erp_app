@@ -21,7 +21,7 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
     <link rel="icon" href="{{ asset('assets/backend/img/policymaker.ico') }}" type="image/x-icon" />
-
+    @include('pages.order.paper_size')
 </head>
 
 <body>
@@ -34,15 +34,19 @@
                     <div class="row">
                         <div class="col-12" style="text-align: center">
 
-                            <img src="{{ asset('assets/backend/img/logo'.App\Models\User::userBranchAction().".png") }}" style="width:50px;height:50px;"
-                                alt="Albabello Logo" class="img-circle elevation-3" style="opacity: .8">
+                            <img src="{{ asset('assets/backend/img/logo' . App\Models\User::userBranchAction() . '.png') }}"
+                                style="width:50px;height:50px;" alt="Albabello Logo" class="img-circle elevation-3"
+                                style="opacity: .8">
                             <h3>
-                                {{App\Models\User::UserBranchName()->long_name}}
+                                {{ App\Models\User::UserBranchName()->long_name }}
                             </h3>
-                            <h5 style="text-align: center;">{{ strtoupper($supplier->code) }}-{{ strtoupper($supplier->name) }} LEDGER LISTING BETWEEN
+                            <h5 style="text-align: center;">
+                                {{ strtoupper($supplier->code) }}-{{ strtoupper($supplier->name) }} LEDGER LISTING
+                                BETWEEN
                                 {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                                 AND
-                                {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}<br /> Runining Balance B/d Before this date {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
+                                {{ \Carbon\Carbon::parse($to_date)->toFormattedDateString() }}<br /> Runining Balance
+                                B/d Before this date {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
                                 was = @if ($balance_b_d < 0)
                                     &#8358;({{ number_format(abs($balance_b_d), 2) }})
                                 @else
@@ -56,8 +60,8 @@
 
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
-                            <table class="table table-bordered caption" id="example1" border="1" data-ordering="false" cellpadding="0"
-                                cellspacing="0">
+                            <table class="table table-bordered caption" id="example1" border="1"
+                                data-ordering="false" cellpadding="0" cellspacing="0">
                                 <thead>
                                     <tr>
                                         <th>Date</th>
@@ -76,7 +80,8 @@
                                     <tr>
                                         <td>{{ \Carbon\Carbon::parse($ledger->date)->toFormattedDateString() }}</td>
                                         <td>{{ $ledger->description }}</td>
-                                        <td>{{ $ledger->dr > 0 ? $ledger->payment_mode : optional($ledger->purchase)->purchase_mode }}, {{$ledger->teller_no}}
+                                        <td>{{ $ledger->dr > 0 ? $ledger->payment_mode : optional($ledger->purchase)->purchase_mode }},
+                                            {{ $ledger->teller_no }}
                                         </td>
                                         <td>{{ $ledger->Ref }}</td>
                                         <td style="text-align: right"> &#8358;{{ number_format($ledger->cr, 2) }}

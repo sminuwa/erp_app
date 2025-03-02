@@ -54,6 +54,7 @@ return [
     |
     */
 
+    // 'asset_url' => 'public',
     'asset_url' => null,
 
     /*

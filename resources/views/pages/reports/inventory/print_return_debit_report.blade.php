@@ -52,7 +52,7 @@
                     <div class="row" style="line-height: 0.4">
                         <div class="col-12 table-responsive">
                             <table class="display table table-bordered caption" id="example1" border="1"
-                                cellpadding="0" cellspacing="0" data-ordering="false">
+                                cellpadding="0" cellspacing="0" data-ordering="true">
                                 <thead>
                                     <tr>
                                         <th style="width: 50%" colspan="3">Date Processed:
@@ -78,9 +78,9 @@
                                         <td>{{ $sale->reference }}</td>
                                         <td>{{ $sale->supplier->code }}</td>
                                         <td>{{ $sale->invoice_no }}</td>
-                                        <td>{{ $sale->createdBy->name ?? '' }}</td>
                                         <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}
                                         </td>
+                                        <td>{{ $sale->createdBy->name ?? '' }}</td>
                                         <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}
                                         </td>
                                         <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>

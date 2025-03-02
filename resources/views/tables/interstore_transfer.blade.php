@@ -32,8 +32,12 @@
                     <td>
                         @can('interstore.print')
                             <a class="btn btn-secondary btn-sm" title="Stock Tranfer Report" target="_BLANK"
-                                href="{{ route('interstore.print', $record->transfer_id) }}">
-                                <span class="fa fa-print"></span> Print
+                                href="{{ route('interstore.print', [$record->transfer_id,'A4']) }}">
+                                <span class="fa fa-print"></span> Print A4
+                            </a>
+                            <a class="btn btn-secondary btn-sm" title="Stock Tranfer Report" target="_BLANK"
+                                href="{{ route('interstore.print', [$record->transfer_id,'A5']) }}">
+                                <span class="fa fa-print"></span> Print A5
                             </a>
                         @endcan
 

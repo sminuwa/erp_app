@@ -4,7 +4,7 @@
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
-<table class="display table table-bordered caption" id="example1" data-ordering="false">
+<table class="display table table-bordered caption" id="example1" data-ordering="true">
     <caption style="caption-size:top">
         <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>
         <h5 style="text-align: center;">Additional Invoices
@@ -16,7 +16,7 @@
     </caption>
     <thead>
         <tr>
-            <th style="width: 50%" colspan="5">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            <th style="width: 50%" colspan="4">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
             </th>
             <th style="width: 50%;text-align:right" colspan="5">Processed By {{ auth()->user()->name }}</th>
         </tr>
@@ -24,9 +24,8 @@
             <th>PROCESSED DATE</th>
             <th>INVOICE</th>
             <th>NAME</th>
-            <th>DESCRIPTION</th>
-            <th>WAYBILL</th>
-            <th>SUPPLIER</th>
+            <th>DESCRIPTION/WAYBILL</th>
+            <th>TRANSPORTER</th>
             <th>AMOUNT</th>
             <th>CREATED BY</th>
             <th>DATE CREATED</th>
@@ -39,15 +38,15 @@
     @foreach ($sales as $sale)
         <tr>
             <td>{{ \Carbon\Carbon::parse($sale->purchase_date)->toFormattedDateString() }}</td>
-            <td>{{ $sale->reference }}</td>
-            <td>{{ $sale->name }}</td>
+            {{-- <td>{{ $sale->reference }}</td> --}}
+            <td><a href="{{ route('purchase.additional-invoice.print',$sale->purchase_id) }}" target="_BLANK">{{ $sale->reference }}</a></td>
+            <td>{{ $sale->branch }}</td>
             <td>{{ $sale->description }}</td>
-            <td>{{ $sale->wbno }}</td>
-            <td>{{ $sale->supplier }}</td>
-            <td>{{ $sale->name }}</td>
-            <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}</td>
+            <td>{{ $sale->code }}-{{ $sale->supplier }}</td>
             <td style="text-align: right">
                 {{ number_format($sale->amount, 2, '.', ',') }}</td>
+            <td>{{ $sale->created_by }}</td>
+            <td>{{ \Carbon\Carbon::parse($sale->created_at)->toFormattedDateString() }}</td>
             <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
 
 
@@ -59,7 +58,7 @@
     @endforeach
     <tfoot>
         <tr>
-            <th colspan="6" style="text-align: right">TOTAL</th>
+            <th colspan="5" style="text-align: right">TOTAL</th>
             <th style="text-align: right">
                 {{ number_format($total_cost, 2, '.', ',') }}
             </th>

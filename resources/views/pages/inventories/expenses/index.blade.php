@@ -146,9 +146,13 @@
                                                                 @endcan
                                                             @endif
                                                             @can('purchase.additional-invoice.print')
-                                                                <a href="{{ route('purchase.additional-invoice.print', $invoice->id) }}"
+                                                                <a href="{{ route('purchase.additional-invoice.print', [$invoice->id,'A4']) }}"
                                                                     target="_blank" class="dropdown-item">
-                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print A4
+                                                                </a>
+                                                                <a href="{{ route('purchase.additional-invoice.print', [$invoice->id,'A5']) }}"
+                                                                    target="_blank" class="dropdown-item">
+                                                                    <i class="fa fa-print" aria-hidden="true"></i> Print A5
                                                                 </a>
                                                             @endcan
                                                         </div>

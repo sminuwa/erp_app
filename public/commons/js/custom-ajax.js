@@ -3,6 +3,7 @@ $(document).ready(function () {
     ajerks('GET', '/misc/ajax/categories', 'ajax-categories')
     ajerks('GET', '/misc/ajax/customers', 'ajax-customers')
     ajerks('GET', '/misc/ajax/suppliers', 'ajax-suppliers')
+    ajerks('GET', '/misc/ajax/transporters', 'ajax-transporters')
     ajerks('GET', '/misc/ajax/products', 'ajax-products')
     ajerks('GET', '/misc/ajax/products/active', 'ajax-active-products')
     ajerks('GET', '/misc/ajax/stores', 'ajax-stores')
@@ -48,28 +49,28 @@ function ajerks(method, url, cssClass) {
     let data;
     if (element.attr('branch_id') && element.attr('name') === 'store_id') {
         let branch_id = element.attr('branch_id')
-        data = { branch_id: branch_id }
+        data = {branch_id: branch_id}
     }
     if (element.attr('branch_id') && element.attr('name') === 'user_id') {
         let branch_id = element.attr('branch_id')
-        data = { branch_id: branch_id }
+        data = {branch_id: branch_id}
     }
     if (element.attr('branch_id') && element.attr('name') === 'customer_id') {
         let branch_id = element.attr('branch_id')
-        data = { branch_id: branch_id }
+        data = {branch_id: branch_id}
     }
     if (element.attr('category_id') && element.attr('name') === 'product_id') {
         let category_id = element.attr('category_id')
-        data = { category_id: category_id }
+        data = {category_id: category_id}
     }
     if (element.attr('store_id') && element.attr('name') === 'product_id') {
         let store_id = element.attr('store_id')
-        data = { store_id: store_id }
+        data = {store_id: store_id}
 
     }
     if (element.attr('company_id') && element.attr('name') === 'branch_id') {
         let company_id = element.attr('company_id')
-        data = { company_id: company_id }
+        data = {company_id: company_id}
     }
 
     $.ajax({
@@ -115,7 +116,6 @@ $.ajax({
     // console.log(component)
     cart_container.html(component)
 })
-
 
 
 //add cart item

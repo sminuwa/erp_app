@@ -1,10 +1,10 @@
 <div class="row">
-    <div class="offset-10">
+    <div class="col-sm-12">
         <a href="{{ route('ajax.customer.print.ledger', [$from_date, $to_date, $customer->id]) }}" target="_BLANK"
             class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
-<table class="display table table-bordered caption" id="example1" data-ordering="false">
+<table class="display table table-bordered caption" id="example1" data-ordering="true">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">{{ strtoupper($customer->name) }} LEDGER LISTING BETWEEN {{ $from_date }}
             AND

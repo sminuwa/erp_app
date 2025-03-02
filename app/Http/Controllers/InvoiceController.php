@@ -67,7 +67,7 @@ class InvoiceController extends Controller
         return view('pages.pos.invoice', compact('customer', 'contents', 'company', 'sale_mode'));
     }
 
-    public function print($order_id)
+    public function print($order_id, $papersize = "A5")
     {
         $order = Order::with('customer')->where('id', $order_id)->first();
         //return $order;
@@ -76,8 +76,9 @@ class InvoiceController extends Controller
         //$company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('created_at')->first();
         $company = Setting::find(1);
         $utility = new Utility();
-        return view('pages.order.print', compact('order_details', 'order', 'company', 'utility'));
+        return view('pages.order.print', compact('order_details', 'order', 'company', 'utility', 'papersize'));
     }
+
     public function printWithVat($order_id)
     {
         $order = Order::with('customer')->where('id', $order_id)->first();
@@ -88,10 +89,10 @@ class InvoiceController extends Controller
         $company = Setting::find(1);
         $utility = new Utility();
         $with_vat = true;
-        return view('pages.order.print', compact('order_details', 'order', 'company', 'utility', 'with_vat'));
+        return view('pages.order.print', compact('order_details', 'order', 'company', 'utility', 'with_vat', 'papersize'));
     }
-   
-    public function print_order_invoice($order_id)
+
+    public function print_order_invoice($order_id, $papersize = "A5")
     {
         $order = OrderInvoice::with('customer')->where('id', $order_id)->first();
         //return $order;
@@ -100,10 +101,10 @@ class InvoiceController extends Controller
         //$company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('created_at')->first();
         $company = Setting::find(1);
         $utility = new Utility();
-        return view('pages.order.order_invoice_print', compact('order_details', 'order', 'company', 'utility'));
+        return view('pages.order.order_invoice_print', compact('order_details', 'order', 'company', 'utility', 'papersize'));
     }
 
-    public function order_print($order_id)
+    public function order_print($order_id, $papersize = "A5")
     {
         $order = OrderInvoice::with('customer')->where('id', $order_id)->first();
         //return $order;
@@ -112,13 +113,11 @@ class InvoiceController extends Controller
         //$company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->orderBy('created_at')->first();
         $company = Setting::find(1);
         $utility = new Utility();
-        return view('pages.order.order_print', compact('order_details', 'order', 'company', 'utility'));
+        return view('pages.order.order_print', compact('order_details', 'order', 'company', 'utility', 'papersize'));
     }
 
     public function final_invoice(Request $request)
     {
-        //dd(\Cart::getContent());
-
         $invoice_id = $request->invoice_id;
         $description = $request->description;
         $show_vat = 0;
@@ -156,7 +155,6 @@ class InvoiceController extends Controller
         $tax = 0;
         $total = str_replace(',', '', \Cart::getTotal());
 
-
         $pay = $request->input('pay');
         //$due = $total - $pay;
         $order_id = 0;
@@ -183,7 +181,6 @@ class InvoiceController extends Controller
                     $amount_paid = abs($running_balance);
                 else
                     $amount_paid = abs($running_balance) - $total;
-
             }
 
             $invoice = Order::find($invoice_id);
@@ -193,16 +190,15 @@ class InvoiceController extends Controller
                 $invoice->branch_id = User::userBranchAction();
                 $invoice->order_status = 'approved';
                 $invoice->sold_by = Auth::id();
-                $invoice->discount = $discount;
-                $invoice->refund = $refund;
+                $invoice->discount = str_replace(',', '', $discount);
+                $invoice->refund = str_replace(',', '', $refund);
                 $invoice->customer_id = $customer_id;
                 $invoice->invoice_no = $reference;
                 $invoice->show_vat = $show_vat;
-
             } else {
                 $invoice->order_invoice_id = $request->order_invoice_id ?? 0;
-                $invoice->discount = $discount;
-                $invoice->refund = $refund;
+                $invoice->discount = str_replace(',', '', $discount);
+                $invoice->refund = str_replace(',', '', $refund);
                 $invoice->show_vat = $show_vat;
             }
             $invoice->pay = $amount_paid;
@@ -376,15 +372,18 @@ class InvoiceController extends Controller
         return redirect()->route('order.invoice.show', $order_id);
 
     }
+
     public function getTotalDiscount($order_id)
     {
         return OrderDetail::sum('discount_unit_price')->where(['order_id' => $order_id, 'status' => 1])->first();
     }
+
     public function generateInvoice()
     {
         $invoice = DB::table('orders')->select(DB::raw('MAX(SUBSTR(invoice_no,8,11)) as max'))->where(DB::raw('YEAR(created_at)'), '=', date('Y'))->where(DB::raw('MONTH(created_at)'), '=', date('m'))->first();
         return Auth::user()->user_code . date('y') . '' . date('m') . str_pad(($invoice->max + 1), 6, "0", STR_PAD_LEFT);
     }
+
     public function generateProfomerInvoice($type)
     {
         if ($type == "PFI")
@@ -393,12 +392,14 @@ class InvoiceController extends Controller
             $invoice = DB::table('order_invoices')->select(DB::raw('MAX(SUBSTR(invoice_no,8,11)) as max'))->where(DB::raw('YEAR(created_at)'), '=', date('Y'))->where(DB::raw('MONTH(created_at)'), '=', date('m'))->first();
         return $type . date('y') . '' . date('m') . str_pad(($invoice->max + 1), 6, "0", STR_PAD_LEFT);
     }
+
     public function runninigBalance($customer_id)
     {
         $cr = CustomerLedger::where('customer_id', $customer_id)->sum('cr');
         $dr = CustomerLedger::where('customer_id', $customer_id)->sum('dr');
         return $cr - $dr;
     }
+
     public function waybill_print($order_id)
     {
         $order = Order::with('customer')->where('id', $order_id)->first();
@@ -409,6 +410,7 @@ class InvoiceController extends Controller
         $utility = new Utility();
         return view('pages.order.print_waybill', compact('order_details', 'order', 'company', 'utility'));
     }
+
     public function pos_print($order_id)
     {
         $order = Order::with('customer')->where('id', $order_id)->first();
@@ -679,6 +681,7 @@ class InvoiceController extends Controller
         }
         return $items;
     }
+
     public function linkOrderInvoice(Request $request, OrderInvoice $order)
     {
         $user_branch = User::userBranchAction();
@@ -691,7 +694,6 @@ class InvoiceController extends Controller
                     ->on('branch_product_prices.branch_id', '=', 'branches.id');
 
             })
-
             ->where('branch_product_prices.status', 1)
             ->where('branches.id', $user_branch)
             ->orderBy('products.name')->orderBy('stores.name')->get();
@@ -704,6 +706,7 @@ class InvoiceController extends Controller
         $store = Store::where('id', 'LIKE', $user_branch)->get();
         return view('pages.pos.index', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'order'));
     }
+
     public function editOrderInvoice(Request $request, OrderInvoice $order)
     {
         $user_branch = User::userBranchAction();
@@ -756,6 +759,7 @@ class InvoiceController extends Controller
         $store = Store::where('branch_id', 'LIKE', $user_branch)->get();
         return view('pages.pos.order_invoice', compact('stores', 'customers', 'cart_products', 'categories', 'store', 'order'));
     }
+
     public function loadOrderInvoiceToCart(OrderInvoice $order)
     {
         foreach ($order->order_items()->get() as $item) {
@@ -787,6 +791,7 @@ class InvoiceController extends Controller
 
         //dd(\Cart::getContent());
     }
+
     public function updateOrderInvoice(Request $request, OrderInvoice $order)
     {
         $invoice = $order->invoice_no;
@@ -869,6 +874,7 @@ class InvoiceController extends Controller
         session()->flash('Order invoice updated successfully');
         return redirect()->route('order.invoice.show', $order_id);
     }
+
     public function loadProformaToCart(Proformer $order)
     {
         foreach ($order->order_items()->get() as $item) {
@@ -899,8 +905,8 @@ class InvoiceController extends Controller
 
         //dd(\Cart::getContent());
     }
- 
-    
+
+
     public function delete(Request $request, Order $invoice)
     {
         $method = $request->method();

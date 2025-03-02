@@ -8,6 +8,19 @@
         caption {
             caption-side: top;
         }
+
+        /* Loader CSS */
+        .loader {
+            display: none;
+            width: 100%;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .loader img {
+            width: 50px;
+            height: 50px;
+        }
     </style>
 @endpush
 
@@ -15,8 +28,6 @@
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
-        <!-- Content Header (Page header) -->
         <section class="content-header">
             <div class="container-fluid">
                 @can('roles.create')
@@ -35,46 +46,31 @@
                                     <div class="row">
                                         <div class='col-md-12'>
                                             <form action="{{ route('role-permission.store') }}" id="roleperm"
-                                                name="roleperm" method="POST">
+                                                method="POST">
                                                 @csrf
                                                 <div class="form-row">
                                                     <div class="col-md-4 mb-3">
                                                         <label for="faculty">Role:</label>
-                                                        <select
-                                                            class="form-control {{ $errors->has('role') ? 'is-invalid' : 'is-valid' }}"
-                                                            name="role" id="role"
-                                                            value="{{ isset($model->name) ? $model->name : '' }}"
-                                                            placeholder="Role Name" required>
+                                                        <select class="form-control" name="role" id="role" required>
                                                             <option value="">Select...</option>
                                                             @foreach ($roles as $role)
-                                                                <option value="{{ $role->id }}"
-                                                                    {{ (isset($model) ? $model->role : 0) == $role->id ? 'selected' : '' }}>
-                                                                    {{ $role->name }}</option>
+                                                                <option value="{{ $role->id }}">{{ $role->name }}
+                                                                </option>
                                                             @endforeach
                                                         </select>
-                                                        @if ($errors->has('role'))
-                                                            <div class="invalid-feedback" style="color:red;">
-                                                                {{ $errors->first('role') }}
-                                                            </div>
-                                                        @endif
                                                     </div>
                                                     <div class="col-md-2 mb-2 text-right">
                                                         <div class="form-group">
                                                             <label for="">&nbsp;</label>
                                                             <button type="button" name="add" id="addbtn"
-                                                                class="btn btn-primary text-right"><span class="ti-save">
-                                                                    Save
-                                                                </span></button>
-                                                            @if (isset($model) && $model != null)
-                                                                <button type="button" id="close" name="close"
-                                                                    class="btn btn-danger btn-sm"><span
-                                                                        class="ti-close"></span>
-                                                                    Close
-                                                                </button>
-                                                            @endif
+                                                                class="btn btn-primary">
+                                                                <span class="ti-save"> Save</span>
+                                                            </button>
+
                                                         </div>
                                                     </div>
-                                                </div><!-- end of form row-->
+                                                </div>
+
                                                 <div class="intro-y grid grid-cols-12 gap-6 mt-5">
                                                     <div class="col-span-12 lg:col-span-12">
                                                         <div class="row">
@@ -82,6 +78,11 @@
                                                                 <div class="preview">
                                                                     <div class="overflow-x-auto">
                                                                         <div id="display" class="table-responsive">
+                                                                        </div>
+                                                                        <!-- Loader -->
+                                                                        <div class="loader" id="loader">
+                                                                            <img src="{{ asset('assets/backend/img/loader.png') }}"
+                                                                                alt="Loading...">
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -102,55 +103,58 @@
     </div>
 
 @endsection
+
 @push('js')
     <!-- DataTables -->
     <script src="{{ asset('assets/backend/plugins/datatables/datatables.js') }}"></script>
-{{--    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>--}}
-    <script type="text/javascript">
-        $(function() {
-            // $("#record1").DataTable({
-            //     'iDisplayLength': 100
-            // });
-            // $('#record2').DataTable({
-            //     "paging": true,
-            //     "lengthChange": false,
-            //     "searching": true,
-            //     "ordering": true,
-            //     "info": true,
-            //     "autoWidth": false
-            // });
-        });
-    </script>
     <script>
         $(document).ready(function() {
-            $('#close').click(function() {
-                window.location.href = "{{ url('/role/permission') }}";
-            });
 
             $('#role').on("change", function() {
                 var role = $(this).val();
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route('role-permission.show') }}",
-                    data: {
-                        role_id: role
-                    }
-                }).done(function(data) {
+                if (role) {
+                    $("#loader").show(); // Show loader
+                    $.ajax({
+                        type: "GET",
+                        url: "{{ route('role-permission.show') }}",
+                        data: {
+                            role_id: role
+                        }
+                    }).done(function(data) {
+                        $("#loader").hide(); // Hide loader
+                        $('#display').html(data);
+                        $("#checkAll").click(function() {
+                            $('input:checkbox').not(this).prop('checked', this.checked);
+                        });
+                        // Live Search for Permissions Table
+                        $("#searchPermissions").on("keyup", function() {
+                            var value = $(this).val()
+                                .toLowerCase(); // Convert input to lowercase
+                            $("#record1 tbody tr").filter(function() {
+                                $(this).toggle($(this).text().toLowerCase().indexOf(
+                                    value) > -1) // Hide/Show rows
+                            });
+                        });
 
-                    $('#display').html(data);
-
-                    $("#checkAll").click(function() {
-                        $('input:checkbox').not(this).prop('checked', this.checked);
+                    }).fail(function() {
+                        $("#loader").hide(); // Hide loader on error
+                        alert("Error loading permissions.");
                     });
-                });
+                }
             });
+
             $('#addbtn').on("click", function() {
+                $("#loader").show(); // Show loader
                 $.ajax({
                     type: "POST",
                     url: "{{ route('role-permission.store') }}",
                     data: $('#roleperm').serialize()
                 }).done(function(data) {
+                    $("#loader").hide(); // Hide loader
                     alert(data);
+                }).fail(function() {
+                    $("#loader").hide(); // Hide loader on error
+                    alert("Error saving permissions.");
                 });
             });
 

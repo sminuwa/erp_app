@@ -53,7 +53,8 @@
                         <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="to_date">Age Time</label>
-                            <select class="form-control select2-single {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
+                            <select
+                                class="form-control select2-single {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
                                 name="to_date" id="to_date">
                                 <option value="0">Select...</option>
                                 <option value="1">0-7 days</option>
@@ -69,9 +70,9 @@
                         <div class="form-group">
                             &nbsp;&nbsp;
                             <label for="company_id">Company</label>
-                            <select class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
+                            <select
+                                class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
                                 name="company_id" id="company_id" required>
-
                             </select>
                         </div>
                         <div class="form-group">
@@ -80,7 +81,6 @@
                             <select
                                 class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
                                 name="branch_id" id="branch_id">
-
                             </select>
                         </div>
                         <div class="form-group">
@@ -91,15 +91,17 @@
                                 name="customer_id" id="customer_id">
                             </select>
                         </div>
-                        <div class="form-group text-right">
-                            <input type="button" class="btn btn-primary" id="generate" name="generate" value="Generate" />
+                        <div class="form-group text-right ml-3">
+                            <input type="button" class="btn btn-primary" id="generate" name="generate"
+                                   value="Generate"/>
                         </div>
                     </div>
                 </form>
                 <div class="row">
-                    <div class="col-sm-12 table-responsive" id="load">
+                    <div class="col-sm-12 table-responsive">
                         <img src="{{ asset('assets/backend/img/loader.png') }}"
-                            style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                             style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                        <div id="load"></div>
                     </div>
                 </div>
 
@@ -113,7 +115,7 @@
 
 @push('js')
     <script type="text/javascript">
-        $(function() {
+        $(function () {
             function formatMoney(n, c, d, t) {
                 var c = isNaN(c = Math.abs(c)) ? 0 : c,
                     d = d == undefined ? "." : d,
@@ -125,7 +127,7 @@
                     d + Math.abs(n - i).toFixed(c).slice(2) : "");
             };
 
-            $('#generate').on("click", function() {
+            $('#generate').on("click", function () {
 
                 from_date = 'all'; //$('#from_date').val();
                 to_date = $('#to_date').val();
@@ -144,7 +146,8 @@
                         branch_id: branch_id,
                         customer_id: customer_id
                     }
-                }).done(function(data) {
+                }).done(function (data) {
+                    $('#img-loader').hide();
                     $("#load").html(data);
                     loadDataTable()
                 });

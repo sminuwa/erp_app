@@ -4,7 +4,7 @@
             class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
-<table class="display table table-bordered caption" id="example1" data-ordering="false">
+<table class="display table table-bordered caption" id="example1" data-ordering="true">
     <caption style="caption-size:top">
         <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>
         <h5 style="text-align: center;">Goods in Transit
@@ -21,12 +21,12 @@
             <th style="width: 50%;text-align:right" colspan="5">Processed By {{ auth()->user()->name }}</th>
         </tr>
         <tr>
-            <th>DATE</th>
+            <th>TRANSACTION DATE</th>
             <th>REFERENCE</th>
             <th>SOURCE</th>
             <th>DESTINATION</th>
             <th>CODE</th>
-            <th>ITEM</th>
+            <th>PRODUCT DESCRIPTION</th>
             <th>QTY</th>
             <th>COST PRICE</th>
             <th>TOTAL COST</th>
@@ -40,7 +40,8 @@
     @foreach ($sales as $sale)
         <tr>
             <td>{{ \Carbon\Carbon::parse($sale->date)->toFormattedDateString() }}</td>
-            <td>{{ $sale->reference }}</td>
+            {{-- <td>{{ $sale->reference }}</td> --}}
+            <td><a href="{{ route('intersite.show',$sale->transfer_id) }}" target="_BLANK">{{ $sale->reference }}</a></td>
             <td>{{ $sale->source }}</td>
             <td>{{ $sale->destination }}</td>
             <td>{{ $sale->code }}</td>

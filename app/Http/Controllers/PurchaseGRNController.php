@@ -353,7 +353,7 @@ class PurchaseGRNController extends Controller
         }
         return redirect()->back();
     }
-    public function printInvoice(Purchase $purchase)
+    public function printInvoice(Purchase $purchase, $papersize = "A4")
     {
         $this->authorize('purchase.print');
         $purchase = Purchase::with('supplier')->where('id', $purchase->id)->first();
@@ -362,7 +362,7 @@ class PurchaseGRNController extends Controller
 
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         $utility = new Utility();
-        return view('pages.inventories.purchases.grn.print', compact('purchase_details', 'purchase', 'company', 'utility'));
+        return view('pages.inventories.purchases.grn.print', compact('purchase_details', 'purchase', 'company', 'utility','papersize'));
     }
     public function generateWaybill(Request $request, Purchase $purchase)
     {

@@ -2221,81 +2221,80 @@ class ReportController extends Controller
 //            ->whereBetween('order_date', [$from_date, $to_date]);
 
 
-        if ($is_summary)
-            $data = DB::table('orders')
-                ->select(
-                    'users.id as ro_id',
-                    'users.user_code as ro_code',
-                    'users.name as ro_name',
-                    'companies.id as company_id',
-                    'companies.name as company_name',
-                    'branches.id as branch_id',
-                    'branches.name as branch_name',
-                    DB::raw('SUM(order_details.quantity) as total_quantity'),
-                    DB::raw('SUM(order_details.total) as amount'),
-                    DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
-                )
-                ->join('order_details', 'orders.id', '=', 'order_details.order_id')
-                ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
-                ->join('stores', 'store_products.store_id', '=', 'stores.id')
-                ->join('branches', 'stores.branch_id', '=', 'branches.id')
-                ->join('companies', 'branches.company_id', '=', 'companies.id')
-                ->join('customers', 'customers.id', '=', 'orders.customer_id')
-                ->join('users', 'users.id', '=', 'customers.relation_officer')
-                ->where('branches.company_id', 'LIKE', $company_id)
-                ->where('order_details.status', '=', 1)
-                ->whereBetween('order_date', [$from_date, $to_date])
-                ->groupBy('users.id', 'users.user_code', 'users.name', 'companies.id', 'companies.name', 'branches.id', 'branches.name')
-                ->orderBy('users.name', 'ASC');
-        else
-            $data = DB::table('orders')
-                ->select(
-                    'branches.id as branch_id',
-                    'branches.name as branch_name',
-                    'branches.code as branch_code',
-                    'categories.name as category',
-                    'categories.code as code',
-                    'users.user_code as ro_code',
-                    'users.id as ro_id',
-                    'users.name as user_name',
-                    'order_details.unit as product_unit',
-                    DB::raw('SUM(order_details.quantity) as quantity'),
-                    DB::raw('SUM(order_details.total) as amount'),
-                    DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
-                    DB::raw('COALESCE(qty_data.qty_available, 0) as qty_available')
-                )
-                ->join('order_details', 'orders.id', '=', 'order_details.order_id')
-                ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
-                ->join('stores', 'store_products.store_id', '=', 'stores.id')
-                ->join('branches', 'stores.branch_id', '=', 'branches.id')
-                ->join('companies', 'branches.company_id', '=', 'companies.id')
-                ->join('products', 'store_products.product_id', '=', 'products.id')
-                ->join('categories', 'products.category_id', '=', 'categories.id')
-                ->join('customers', 'customers.id', '=', 'orders.customer_id')
-                ->join('users', 'users.id', '=', 'customers.relation_officer')
-                // Left join a pre-aggregated subquery for qty_available
-                ->leftJoin(
-                    DB::raw('(SELECT stores.branch_id, p.category_id, SUM(store_products.qty_available) AS qty_available
-                 FROM store_products
-                 JOIN products p ON store_products.product_id = p.id
-                 JOIN stores ON store_products.store_id = stores.id
-                 GROUP BY stores.branch_id, p.category_id) AS qty_data'),
-                    function ($join) {
-                        $join->on('qty_data.branch_id', '=', 'branches.id')
-                            ->on('qty_data.category_id', '=', 'categories.id');
-                    }
-                )
-                ->where('branches.company_id', 'LIKE', $company_id)
-                ->where('order_details.status', '=', 1)
-                ->whereBetween('order_date', [$from_date, $to_date]);
+if ($is_summary)
+$data = DB::table('orders')
+    ->select(
+        'users.id as ro_id',
+        'users.user_code as ro_code',
+        'users.name as ro_name',
+        'companies.id as company_id',
+        'companies.name as company_name',
+        'branches.id as branch_id',
+        'branches.name as branch_name',
+        DB::raw('SUM(order_details.quantity) as total_quantity'),
+        DB::raw('SUM(order_details.total) as total_amount')
+    )
+    ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+    ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
+    ->join('stores', 'store_products.store_id', '=', 'stores.id')
+    ->join('branches', 'stores.branch_id', '=', 'branches.id')
+    ->join('companies', 'branches.company_id', '=', 'companies.id')
+    ->join('customers', 'customers.id', '=', 'orders.customer_id')
+    ->join('users', 'users.id', '=', 'customers.relation_officer')
+    ->where('branches.company_id', 'LIKE', $company_id)
+    ->where('order_details.status', '=', 1)
+    ->whereBetween('order_date', [$from_date, $to_date])
+    ->groupBy('users.id', 'users.user_code', 'users.name', 'companies.id', 'companies.name', 'branches.id', 'branches.name')
+    ->orderBy('users.name', 'ASC');
+else
+$data = DB::table('orders')
+    ->select(
+        'branches.id as branch_id',
+        'branches.name as branch_name',
+        'branches.code as branch_code',
+        'categories.name as category',
+        'categories.code as code',
+        'users.user_code as ro_code',
+        'users.id as ro_id',
+        'users.name as user_name',
+        'order_details.unit as product_unit',
+        DB::raw('SUM(order_details.quantity) as quantity'),
+        DB::raw('SUM(order_details.total) as amount'),
+        DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
+        DB::raw('COALESCE(qty_data.qty_available, 0) as qty_available')
+    )
+    ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+    ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
+    ->join('stores', 'store_products.store_id', '=', 'stores.id')
+    ->join('branches', 'stores.branch_id', '=', 'branches.id')
+    ->join('companies', 'branches.company_id', '=', 'companies.id')
+    ->join('products', 'store_products.product_id', '=', 'products.id')
+    ->join('categories', 'products.category_id', '=', 'categories.id')
+    ->join('customers', 'customers.id', '=', 'orders.customer_id')
+    ->join('users', 'users.id', '=', 'customers.relation_officer')
+    // Left join a pre-aggregated subquery for qty_available
+    ->leftJoin(
+        DB::raw('(SELECT stores.branch_id, p.category_id, SUM(store_products.qty_available) AS qty_available
+     FROM store_products
+     JOIN products p ON store_products.product_id = p.id
+     JOIN stores ON store_products.store_id = stores.id
+     GROUP BY stores.branch_id, p.category_id) AS qty_data'),
+        function ($join) {
+            $join->on('qty_data.branch_id', '=', 'branches.id')
+                ->on('qty_data.category_id', '=', 'categories.id');
+        }
+    )
+    ->where('branches.company_id', 'LIKE', $company_id)
+    ->where('order_details.status', '=', 1)
+    ->whereBetween('order_date', [$from_date, $to_date]);
 
 
-        if (!in_array('%', $category_id1)) {
-            $data = $data->whereIn('products.category_id', $category_id1);
-        }
-        if (!in_array('%', $user_id)) {
-            $data = $data->whereIn('customers.relation_officer', $user_id);
-        }
+if (!in_array('%', $category_id1)) {
+$data = $data->whereIn('products.category_id', $category_id1);
+}
+if (!in_array('%', $user_id)) {
+$data = $data->whereIn('customers.relation_officer', $user_id);
+}
 
         //        $salesByOfficer = $data
 //            ->groupBy('customers.relation_officer', 'products.category_id')

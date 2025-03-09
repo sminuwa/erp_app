@@ -63,7 +63,7 @@
                                         @foreach ($budgets as $budget)
                                             <tr>
                                                 <td>{{ $budget->branch->name }}</td>
-                                                <td>{{ $budget->category->name }}</td>
+                                                <td>{{ $budget->category->name ?? ''}}</td>
                                                 <td>{{ $budget->budget_year }}</td>
                                                 <td>{{ $budget->quarter }}</td>
                                                 <td>{{ $budget->month1 }}</td>

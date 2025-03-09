@@ -14,6 +14,7 @@ use App\Models\Setting;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Models\CustomerLedger;
+use App\Notifications\SMS;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -115,7 +116,7 @@ class PaymentController extends Controller
         return back();
     }
     public function post(Payment $payment)
-    {
+    {   
         if ($payment->status == 0) {
             $payment->status = 1;
             $payment->posted_by = auth()->id();
@@ -135,6 +136,7 @@ class PaymentController extends Controller
                     $action = "Made payment of $payment->amount for : " . $payment->receipt_no;
                     AuditLog::auditLog(auth()->id(), $action);
                     session()->flash('app_message', 'Payment generated successfully');
+                    SMS::sendSms("2348030804973", "Testing testing, $payment->amount has been made paid to your account. Kindly confirm! Albabello Testing SMS", "", "promotional");
                     DB::commit();
                 } else {
                     DB::rollBack();

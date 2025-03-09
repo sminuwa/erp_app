@@ -136,7 +136,7 @@ class PaymentController extends Controller
                     $action = "Made payment of $payment->amount for : " . $payment->receipt_no;
                     AuditLog::auditLog(auth()->id(), $action);
                     session()->flash('app_message', 'Payment generated successfully');
-                    SMS::sendSms("2348030804973", "Testing testing, $payment->amount has been made paid to your account. Kindly confirm! Albabello Testing SMS", "", "promotional");
+                    //SMS::sendSms("2348030804973", "Testing testing, $payment->amount has been made paid to your account. Kindly confirm! Albabello Testing SMS", "", "promotional");
                     DB::commit();
                 } else {
                     DB::rollBack();

@@ -53,7 +53,7 @@ class RoBudget extends Model
     *
     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
     */
-    public function user()
+    public function staff()
     {
         return $this->belongsTo(User::class,'staff_id','id');
     }

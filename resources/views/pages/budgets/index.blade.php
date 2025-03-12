@@ -94,9 +94,6 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="card-footer">
-                                {{ $budgets->links() }} <!-- Pagination -->
-                            </div>
                         </div>
                     </div>
                 </div>

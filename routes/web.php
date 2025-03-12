@@ -52,6 +52,7 @@ use App\Http\Controllers\DebitNoteController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\RoBudgetController;
+use App\Http\Controllers\AreaManagerController;
 
 
 
@@ -1241,5 +1242,14 @@ Route::middleware('auth')->group(function () {
             Route::get('/import', [RoBudgetController::class, 'import'])->name('ro_budgets.import');
             Route::get('/download-template', [RoBudgetController::class, 'downloadTemplate'])->name('ro_budgets.download_template');
         });
+    });
+    // Area Managers Management Routes
+    Route::prefix('area-managers')->group(function () {
+        Route::get('/', [AreaManagerController::class, 'index'])->name('area_managers.index');
+        Route::get('/create', [AreaManagerController::class, 'create'])->name('area_managers.create');
+        Route::post('/store', [AreaManagerController::class, 'store'])->name('area_managers.store');
+        Route::get('/edit/{areaManager}', [AreaManagerController::class, 'edit'])->name('area_managers.edit');
+        Route::put('/update/{areaManager}', [AreaManagerController::class, 'update'])->name('area_managers.update');
+        Route::delete('/delete/{areaManager}', [AreaManagerController::class, 'destroy'])->name('area_managers.destroy');
     });
 });

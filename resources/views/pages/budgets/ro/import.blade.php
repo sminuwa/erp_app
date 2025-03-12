@@ -27,16 +27,21 @@
             <div class="card">
                 <div class="card-header">Upload Budget File</div>
                 <div class="card-body">
-                    <a href="{{ route('ro_budgets.download_template') }}" class="btn btn-sm btn-success mb-3">
+                    <a href="{{ route('ro_budgets.index') }}" class="btn btn-sm btn-secondary mb-3">
+                        <i class="fa fa-list"></i> List
+                    </a>
+                    <a href="{{ route('ro_budgets.download_template') }}" class="btn btn-sm btn-secondary mb-3">
                         <i class="fa fa-download"></i> Download Budget Template
                     </a>
-                    <form action="{{ route('ro_budgets.import') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('ro_budgets.import.store') }}" method="POST" enctype="multipart/form-data" onsubmit="disableButton()">
                         @csrf
                         <div class="form-group">
                             <label for="file">Excel File</label>
                             <input type="file" name="file" class="form-control" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Import</button>
+                        <button type="submit" id="import-button" class="btn btn-sm btn-primary">
+                            Import
+                        </button>
                     </form>
                 </div>
             </div>
@@ -44,3 +49,13 @@
     </section>
 </div>
 @endsection
+
+@push('js')
+<script>
+    function disableButton() {
+        let button = document.getElementById('import-button');
+        button.disabled = true;
+        button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Importing...';
+    }
+</script>
+@endpush

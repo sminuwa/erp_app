@@ -16,7 +16,7 @@ class RoBudgetController extends Controller
 {
     public function index()
     {
-        $budgets = RoBudget::with(['staff', 'branch', 'category'])->paginate(10);
+        $budgets = RoBudget::with(['staff', 'branch', 'category'])->latest('budget_year')->get();
         return view('pages.budgets.ro.index', compact('budgets'));
     }
 
@@ -89,9 +89,24 @@ class RoBudgetController extends Controller
     public function importStore(Request $request)
     {
         $request->validate(['file' => 'required|mimes:xlsx,csv']);
-        Excel::import(new RoBudgetImport, $request->file('file'));
-        return redirect()->route('ro_budgets.index')->with('success', 'Budget data imported successfully.');
+
+        $import = new RoBudgetImport();
+        Excel::import($import, $request->file('file'));
+
+        $message = "Budget data import completed: ";
+        $message .= "Inserted: " . $import->inserted . ", ";
+        $message .= "Updated: " . $import->updated . ", ";
+        $message .= "Skipped: " . $import->skipped . ".";
+
+        if (!empty($import->errors)) {
+            $message .= " Errors: " . implode(' | ', $import->errors);
+            session()->flash('app_error', $message);
+            return redirect()->route('ro_budgets.index')->withErrors(array('message' => $message));
+        }
+        session()->flash('app_message', $message);
+        return redirect()->route('ro_budgets.index')->withErrors(array('message' => $message));
     }
+
     public function import(Request $request)
     {
 

@@ -918,6 +918,15 @@
                                     </a>
                                 </li>
                             @endcan
+                            @can('budget.view')
+                                <li class="nav-item">
+                                    <a href="{{ route('ro_budgets.index') }}" class="nav-link ">
+                                        <i class="ion-card"></i>
+                                        <p>ROs Budget</p>
+                                    </a>
+                                </li>
+                            @endcan
+                            
                             @can('budget.import')
                                 <li class="nav-item">
                                     <a href="{{ route('budgets.import.form') }}" class="nav-link ">

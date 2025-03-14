@@ -7,6 +7,7 @@
 @endpush
 
 @section('content')
+<input name="cart_page_type" type="hidden" value="credit">
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
@@ -113,8 +114,10 @@
 
                         </div>
                     </div>
-
-                    <div class="col-md-8" id="load">
+                    
+                    <div class="col-md-8">
+                        {{-- <div id="load"></div> --}}
+                        <div class="cart-container"></div>
                         {{-- @if (isset($order) && $order != null)
                             @include('pages.inventories.credit_notes.load_products')
                         @endif --}}
@@ -229,7 +232,7 @@
                     },
                     success: function(response) {
                         console.log(response)
-                        $('#load').html(response);
+                        $('.cart-container').html(response);
                     },
                     error: function(error) {
                         console.log(error);

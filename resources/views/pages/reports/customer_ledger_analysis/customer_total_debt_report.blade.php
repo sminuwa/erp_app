@@ -79,9 +79,10 @@
                     </div>
                 </form>
                 <div class="row">
-                    <div class="col-sm-12 table-responsive" id="load">
+                    <div class="col-sm-12 table-responsive">
                         <img src="{{ asset('assets/backend/img/loader.png') }}"
-                            style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                             style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                        <div id="load"></div>
                     </div>
                 </div>
 
@@ -134,6 +135,7 @@
                         customer_id: customer_id
                     }
                 }).done(function (data) {
+                    $('#img-loader').hide();
                     $("#load").html(data);
                     loadDataTable()
 

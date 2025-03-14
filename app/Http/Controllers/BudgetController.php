@@ -17,7 +17,7 @@ class BudgetController extends Controller
     {
         if(!auth()->user()->can('budget.view'))
             return abort('403');
-        $budgets = Budget::with(['branch', 'category'])->paginate(10); // Pagination
+        $budgets = Budget::with(['branch', 'category'])->latest('budget_year')->get(); // Pagination
         return view('pages.budgets.index', compact('budgets'));
     }
 

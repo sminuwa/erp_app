@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ALTER TABLE `permissions` ADD COLUMN `description` VARCHAR(255) NULL AFTER `name`;
 ALTER TABLE `permissions` ADD COLUMN `active` Tinyint(1) NULL AFTER `description` default 1;
 ALTER TABLE `permissions` ADD COLUMN `active` TINYINT(1) NULL AFTER `description` DEFAULT 1;
@@ -724,10 +725,13 @@ ADD COLUMN `gender` ENUM('Male', 'Female', 'Other') COLLATE utf8mb4_unicode_ci D
 ADD COLUMN `business_type` VARCHAR(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL AFTER `photo`,
 ADD COLUMN `business_age` VARCHAR(12) DEFAULT NULL AFTER `business_type`;
 
-CREATE TABLE `budgets` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `branch_id` bigint(20) DEFAULT NULL,
-  `category_id` bigint(20) DEFAULT NULL,
+
+CREATE TABLE `ro_budgets` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `staff_id` bigint(20) unsigned NOT NULL,
+  `branch_id` bigint(20) unsigned DEFAULT NULL,
+  `category_id` bigint(20) unsigned DEFAULT NULL,
+
   `budget_year` year(4) NOT NULL,
   `quarter` enum('Q1','Q2','Q3','Q4') NOT NULL,
   `month1` decimal(10,2) DEFAULT NULL,
@@ -738,16 +742,27 @@ CREATE TABLE `budgets` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `branch_id` (`branch_id`),
-  KEY `category_id` (`category_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  KEY `category_id` (`category_id`),
+  KEY `ro_budgets_ibfk_1` (`staff_id`),
+  KEY `budget_year` (`budget_year`,`quarter`,`month1`,`month2`,`month3`),
+  CONSTRAINT `ro_budgets_ibfk_1` FOREIGN KEY (`staff_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `ro_budgets_ibfk_2` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `ro_budgets_ibfk_3` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-INSERT INTO `permissions` (`name`, `description`) VALUES ('menu.budget', 'View budget menu'); 
-INSERT INTO `permissions` (`name`, `description`) VALUES ('budget.create', 'Create budget'); 
-INSERT INTO `permissions` (`name`, `description`) VALUES ('budget.import', 'Upload budget'); 
-INSERT INTO `permissions` (`name`, `description`) VALUES ('budget.edit', 'Edit budget'); 
-INSERT INTO `permissions` (`name`, `description`) VALUES ('budget.view', 'View budget'); 
-INSERT INTO `permissions` (`name`, `description`) VALUES ('budget.delete', 'Delete budget');
-
-
+CREATE TABLE `area_managers` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `manager_id` bigint(20) unsigned NOT NULL,
+  `branch_id` bigint(20) unsigned NOT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `manager_id` (`manager_id`),
+  KEY `branch_id` (`branch_id`),
+  KEY `status` (`status`),
+  CONSTRAINT `area_managers_ibfk_1` FOREIGN KEY (`manager_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `area_managers_ibfk_2` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
 

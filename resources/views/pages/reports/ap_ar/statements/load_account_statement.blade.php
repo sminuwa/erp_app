@@ -29,6 +29,7 @@
             <tr>
                 <th rowspan="2" style="width: 5%;">S/N</th>
                 <th rowspan="2">Date</th>
+                <th rowspan="2">Branch</th>
                 <th rowspan="2">Account No</th>
                 <th rowspan="2">Description</th>
                 <th rowspan="2">Reference</th>
@@ -47,6 +48,7 @@
                 <tr>
                     <td>{{ $loop->index + 1 }}</td>
                     <td>{{ $ledger->date->toFormattedDateString() }}</td>
+                    <td>{{ $ledger->code }}</td>
                     <td>{{ $ledger->payer()->code ?? ($ledger->payer()->number ?? '') }}</td>
                     <td>{{ transactionDecription($ledger->reference) != '' ? transactionDecription($ledger->reference) : $ledger->description }}
                     </td>
@@ -97,7 +99,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="5" style="text-align: right">Total</th>
+                <th colspan="6" style="text-align: right">Total</th>
                 <th style="text-align: right;">{{ number_format($sum_dr, 2) }}</th>
                 <th style="text-align: right;">{{ number_format($sum_cr, 2) }}</th>
                 <th style="text-align: right;">

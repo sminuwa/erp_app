@@ -5,13 +5,17 @@ namespace App\Http\Controllers;
 use App\Classes\CostPrice;
 use App\Classes\Transaction;
 use App\Models\AuditLog;
+use App\Models\BranchProductPrice;
 use App\Models\CreditNote;
 use App\Models\CreditNoteDetail;
 use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\Product;
+use App\Models\ProductUnitMeasure;
 use App\Models\Setting;
+use App\Models\Store;
 use App\Models\StoreProduct;
 use App\Models\User;
 use App\Models\Utility;
@@ -271,29 +275,78 @@ class CreditNoteController extends Controller
         $reference = $request->reference;
         $order = Order::where('reference', $reference)->first();
         $order_items = OrderDetail::where('order_id', $order->id)->where('status', 1)->get();
-        // return $order_items;
-        \Cart::clear();
+        // return $order;
+        // \Cart::clear();
+        // foreach ($order_items as $data) {
+        //     $qty = $data->quantity == 0 ? 1 : $data->quantity;
+        //     // return $qty;
+        //     \Cart::add([
+        //         'id' => $data->store_product_id,
+        //         'name' => $data->storeProduct->product->name ?? 'No name found',
+        //         'price' => $data->sold_price,
+        //         'quantity' => $qty,
+        //         'attributes' => array(
+        //             'cost_price' => $data->cost_price,
+        //             'selling_price' => $data->selling_price,
+        //             'sold_price' => $data->sold_price,
+        //             'discount' => 0,
+        //             'code' => $data->storeProduct->product->code ?? '',
+        //             'unit' => $data->unit
+        //         ),
+        //     ]);
+        // }
+        // Cart::getContent();
+        $customer = Customer::find($order->customer_id);
+        $type = 'credit';
         foreach ($order_items as $data) {
-            $qty = $data->quantity == 0 ? 1 : $data->quantity;
-            // return $qty;
-            \Cart::add([
-                'id' => $data->store_product_id,
-                'name' => $data->storeProduct->product->name ?? 'No name found',
-                'price' => $data->sold_price,
-                'quantity' => $qty,
+            // return $data;
+            
+            // $order = Order::find($data->order_id);
+            // return $order;
+            // return $store_product;
+            $cost_price = str_replace(',', '', $data->cost_price);
+            
+            $qty_available = $data->quantity;
+            $store_product = StoreProduct::find($data->store_product_id);
+            $product = Product::find($store_product->product_id);
+            $get_store = Store::find($store_product->store_id);
+            $name = $product->name;
+            $code = $product->code;
+            $product_id = $store_product->product_id;
+            $id = $data->store_product_id;
+            $unit = $data->unit;
+
+            $prices = BranchProductPrice::where(['product_id' => $product_id, 'branch_id' => auth()->user()->branch->id])->first();
+            $selling_price = $data->sold_price;// Price for Order and Profoma but change below if it is sales invoice
+            // if ($prices) {
+            //     if ($customer->type == 'Retail')
+            //         $selling_price = str_replace(',', '', $prices->retail_selling_price);
+            //     if ($customer->type == 'Wholesale')
+            //         $selling_price = str_replace(',', '', $prices->whole_selling_price);
+            //     $cost_price = str_replace(',', '', $prices->cost_price);
+            // }
+            $qty = $data->quantity;
+
+            $store = $get_store->code;
+            $add = \Cart::add([
+                'id' => $id,
+                'name' => $name,
+                'price' => str_replace(',', '', $selling_price),
+                'quantity' => $qty == 0 ? 1 : $qty,
                 'attributes' => array(
-                    'cost_price' => $data->cost_price,
-                    'selling_price' => $data->selling_price,
-                    'sold_price' => $data->sold_price,
+                    'cost_price' => str_replace(',', '', $cost_price),
+                    'code' => $code,
+                    'selling_price' => str_replace(',', '', $selling_price),
+                    'qty_available' => $qty_available,
                     'discount' => 0,
-                    'code' => $data->storeProduct->product->code ?? '',
-                    'unit' => $data->unit
+                    'store' => $store,
+                    'unit' => $unit,
                 ),
             ]);
         }
-        // Cart::getContent();
         $cart_products = \Cart::getContent();
-        return $cart_products;
+        // return $cart_products;
+        return view('components.cart', compact('type'));
         return view('pages.inventories.credit_notes.load_products', ['cart_products' => $cart_products, 'reference' => $reference, 'order' => $order]);
     }
     public function addToCart(Request $request)

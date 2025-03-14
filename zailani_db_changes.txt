@@ -2,3 +2,27 @@
 ==========
 
 ALTER TABLE `general_account_ledgers` ADD INDEX(`model_id`);
+
+01/03/2025:
+==========
+
+ALTER TABLE `users` ADD INDEX(`branch_id`);
+
+ALTER TABLE `general_account_ledgers` ADD INDEX(`branch_id`);
+
+ALTER TABLE `general_account_ledgers` ADD INDEX(`user_id`);
+
+ALTER TABLE general_account_ledgers ADD INDEX idx_date (date);
+
+ALTER TABLE `customer_ledgers` ADD INDEX(`order_id`);
+
+ALTER TABLE `customer_ledgers` ADD INDEX(`cr`);
+
+ALTER TABLE `customer_ledgers` ADD INDEX(`user_id`);
+
+ALTER TABLE `supplier_ledgers` ADD INDEX(`bank_account_id`);
+
+ALTER TABLE `general_account_controls` CHANGE `updated_at` `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE `general_account_controls` ADD INDEX(`general_account_id`);
+

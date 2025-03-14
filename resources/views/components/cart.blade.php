@@ -3,7 +3,7 @@
         No Product Added
     </div>
 @else
-    @if ($type == 'order' || $type == 'proforma' || $type == 'invoice')
+    @if ($type == 'order' || $type == 'proforma' || $type == 'invoice' || $type == 'credit')
         <div class="c-table c-table-bordered c-table-striped" style="font-size: 12px; ">
             <div class="c-thead">
                 <div class="c-tr">

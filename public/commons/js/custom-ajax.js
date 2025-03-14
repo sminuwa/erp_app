@@ -102,8 +102,8 @@ function mySelect2() {
 
 
 //cart activities
-let type = $('input[name=cart_page_type]').val();
-let cart_container = $('.cart-container');
+const type = $('input[name=cart_page_type]').val();
+const $cart_container = $('.cart-container');
 
 //load cart
 $.ajax({
@@ -114,7 +114,7 @@ $.ajax({
     }
 }).done(function (component) {
     // console.log(component)
-    cart_container.html(component)
+    $cart_container.html(component)
 })
 
 
@@ -149,7 +149,7 @@ $(document).on('submit', '.addCartItemForm', function (e) {
             $('.select2-single').val(null).trigger('change');
         }
         console.log(component)
-        cart_container.html(component)
+        $cart_container.html(component)
     })
 })
 
@@ -207,7 +207,8 @@ $(document).on('click', '.deleteCartItem', function (e) {
             $('#customer_record').attr('disabled', false);
             $('#account_type').attr('disabled', false);
         }
-        cart_container.html(component)
+        console.log(component);
+        $cart_container.html(component)
     })
 })
 

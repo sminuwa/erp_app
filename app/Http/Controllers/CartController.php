@@ -157,8 +157,7 @@ class CartController extends Controller
                 $quantity = $store_product->qty_available;
             $items = \Cart::getContent();
             foreach ($items as $item) {
-//                $store_id = $item->attributes['store_id'];
-//                $product_id = $item->attributes['product_id'];
+
                 $sp = StoreProduct::where(['store_id' => $store_id, 'product_id' => $product_id])->first();
                 if (($item->quantity + $quantity) > $sp->qty_available) {
                     \Cart::remove($store_id . $product_id);
@@ -176,7 +175,7 @@ class CartController extends Controller
                 ),
             ]);
 
-//            return \Cart::getContent();
+
 
         }
         if ($type == 'grn') {
@@ -255,7 +254,6 @@ class CartController extends Controller
         }
         if ($type == 'order' || $type == 'proforma' || $type == 'invoice') {
             $customer = Customer::find($request->customer);
-            //return $request;
             $cost_price = str_replace(',', '', $request->cost_price);
             if ($type == 'proforma' || $type == 'order') {
                 $product_id = $request->product_id;
@@ -447,8 +445,7 @@ class CartController extends Controller
                 $quantity = $store_product->qty_available;
             $items = \Cart::getContent();
             foreach ($items as $item) {
-//                $store_id = $item->attributes['store_id'];
-//                $product_id = $item->attributes['product_id'];
+
                 $sp = StoreProduct::where(['store_id' => $store_id, 'product_id' => $product_id])->first();
                 if (($item->quantity + $quantity) > $sp->qty_available) {
                     \Cart::remove($store_id . $product_id);
@@ -471,7 +468,7 @@ class CartController extends Controller
                 ]
             );
         }
-        if ($type == 'order' || $type == 'proforma' || $type == 'invoice') {
+        if ($type == 'order' || $type == 'proforma' || $type == 'invoice' || $type == 'credit') {
 
             $unit = $request->unit;
             $store_product_id = $request->id;
@@ -493,9 +490,6 @@ class CartController extends Controller
                 }
             }
 
-            // else {
-            //     return $sold_price = $selling_price;
-            // }
             $discount = ($selling_price > 0 ? $selling_price : 0) - ($sold_price > 0 ? $sold_price : 0);
 
             \Cart::update(

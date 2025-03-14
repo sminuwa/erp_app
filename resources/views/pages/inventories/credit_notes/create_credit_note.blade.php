@@ -118,6 +118,19 @@
                     <div class="col-md-8">
                         {{-- <div id="load"></div> --}}
                         <div class="cart-container"></div>
+                        <form action="{{ route('credit.note.store') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="date" class="date" value="" />
+                            <input type="hidden" name="order_id" id="order_id" value="{{ $order->id }}" />
+                            <input type="hidden" name="customer_id" id="customer_id" value="{{ $order->customer_id }}" />
+                            <input name="comment" placeholder="Comment" class="form-control">
+                
+                            <div class="form-group text-right mt-3">
+                                <input type="submit" onclick="$('.date').val($('.date_').val())" class=" btn btn-primary"
+                                    value="Submit" />
+                            </div>
+                
+                        </form>
                         {{-- @if (isset($order) && $order != null)
                             @include('pages.inventories.credit_notes.load_products')
                         @endif --}}

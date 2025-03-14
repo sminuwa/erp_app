@@ -13,6 +13,7 @@
             $grand_total_amount = 0;
             $grand_total_cost = 0;
             $grand_total_profit = 0;
+            $grand_total_qty = 0;
         @endphp
 
         @if($is_summary)
@@ -38,21 +39,15 @@
                             $grand_total_amount+= $sales->amount;
                             $grand_total_cost+=$sales->cost;
                             $grand_total_profit+=$profit;
+                            $grand_total_qty += $sales->total_quantity;
                         @endphp
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $sales->ro_code }} - {{ $sales->ro_name }}</td>
                             <td>{{ $sales->company_name }}</td>
                             <td>{{ $sales->branch_name }}</td>
-                            <td>{{ number_format($sales->total_quantity, 2) }}</td>
-                            <td>{{ number_format($sales->amount, 2) }}</td>
-                            <td style="text-align: right">{{ number_format($sales->cost, 2, '.', ',') }}</td>
-                            <td>
-                                {{ $profit < 0 ? '(' . number_format(abs($profit), 2, '.', ',') . ')' : number_format($profit, 2) }}
-                            </td>
-                            <td>
-                                {{ $sales->amount != 0 ? number_format(($profit / $sales->amount) * 100, 2) : 0 }}
-                            </td>
+                            <td>{{ number_format($sales->total_quantity,2) }}</td>
+                            <td>{{ number_format($sales->total_amount,2) }}</td>
                         </tr>
                     @endforeach
                     </tbody>
@@ -67,6 +62,7 @@
                                 $officer_total_amount = 0;
                                 $officer_total_cost = 0;
                                 $officer_total_profit = 0;
+                                $officer_total_qty = 0;
                             @endphp
                             <thead>
                             <tr>
@@ -94,6 +90,7 @@
                                     $officer_total_amount += $sale->amount;
                                     $officer_total_cost += $sale->cost;
                                     $officer_total_profit += $profit;
+                                    $officer_total_qty += $sale->quantity;
                                 @endphp
                                 <tr>
                                     <td>{{ $sale->code }}</td>
@@ -112,12 +109,7 @@
                                 </tr>
                             @endforeach
                             <tr>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                {{--                                <th></th>--}}
-                                <th style="text-align: right">OFFICER TOTAL</th>
+                                <th colspan="5" style="text-align: right">OFFICER TOTAL</th>
                                 <th style="text-align: right">{{ number_format($officer_total_amount, 2, '.', ',') }}</th>
                                 <th style="text-align: right">{{ number_format($officer_total_cost, 2, '.', ',') }}</th>
                                 <th style="text-align: right">
@@ -132,6 +124,7 @@
                                 $grand_total_amount += $officer_total_amount;
                                 $grand_total_cost += $officer_total_cost;
                                 $grand_total_profit += $officer_total_profit;
+                                $grand_total_qty += $officer_total_qty;
                             @endphp
                         @endforeach
                     </table>
@@ -145,6 +138,7 @@
                     <tfoot>
                     <tr>
                         <th></th>
+                        <th style="text-align: right">TOTAL QUANTITY</th>
                         <th style="text-align: right">TOTAL AMOUNT</th>
                         <th style="text-align: right">TOTAL COST</th>
                         <th style="text-align: right">TOTAL MARGIN</th>
@@ -152,6 +146,7 @@
                     </tr>
                     <tr>
                         <th style="text-align: right">GRAND TOTAL</th>
+                        <th style="text-align: right">{{ number_format($grand_total_qty, 2, '.', ',') }}</th>
                         <th style="text-align: right">{{ number_format($grand_total_amount, 2, '.', ',') }}</th>
                         <th style="text-align: right">{{ number_format($grand_total_cost, 2, '.', ',') }}</th>
                         <th style="text-align: right">

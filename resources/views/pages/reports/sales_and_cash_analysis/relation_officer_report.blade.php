@@ -123,10 +123,11 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-sm-12 table-responsive" id="load">
+                    <div id="img-loader">
                         <img src="{{ asset('assets/backend/img/loader.png') }}"
-                             style="width:80px;height:80px;display:none;text-align:center" id="img-loader">
+                             style="width:80px;height:80px;display:none;text-align:center">
                     </div>
+                    <div class="col-sm-12 table-responsive" id="load"></div>
                 </div>
             </div><!-- /.container-fluid -->
         </section>

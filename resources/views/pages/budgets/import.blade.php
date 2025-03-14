@@ -40,13 +40,13 @@
                     <div class="card">
                         <div class="card-header">Upload Budget File</div>
                         <div class="card-body">
-                            <form action="{{ route('budgets.import') }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ route('budgets.import') }}" method="POST" enctype="multipart/form-data" onsubmit="disableButton()">
                                 @csrf
                                 <div class="form-group">
                                     <label for="file">Excel File</label>
                                     <input type="file" name="file" class="form-control" required>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Import</button>
+                                <button type="submit" class="btn btn-primary" id="import-button">Import</button>
                             </form>
                         </div>
                     </div>
@@ -56,3 +56,13 @@
     </section>
 </div>
 @endsection
+
+@push('js')
+<script>
+    function disableButton() {
+        let button = document.getElementById('import-button');
+        button.disabled = true;
+        button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Importing...';
+    }
+</script>
+@endpush

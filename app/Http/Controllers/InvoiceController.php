@@ -271,6 +271,7 @@ class InvoiceController extends Controller
 
                 $action = "Made a sell of $invoice: $total";
                 AuditLog::auditLog(Auth::id(), $action);
+                
                 DB::commit();
             }
         } catch (\Exception $ex) {

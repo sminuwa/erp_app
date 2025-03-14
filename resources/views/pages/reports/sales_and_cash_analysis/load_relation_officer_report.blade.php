@@ -46,15 +46,8 @@
                             <td>{{ $sales->ro_code }} - {{ $sales->ro_name }}</td>
                             <td>{{ $sales->company_name }}</td>
                             <td>{{ $sales->branch_name }}</td>
-                            <td>{{ number_format($sales->total_quantity, 2) }}</td>
-                            <td>{{ number_format($sales->amount, 2) }}</td>
-                            <td style="text-align: right">{{ number_format($sales->cost, 2, '.', ',') }}</td>
-                            <td>
-                                {{ $profit < 0 ? '(' . number_format(abs($profit), 2, '.', ',') . ')' : number_format($profit, 2) }}
-                            </td>
-                            <td>
-                                {{ $sales->amount != 0 ? number_format(($profit / $sales->amount) * 100, 2) : 0 }}
-                            </td>
+                            <td>{{ number_format($sales->total_quantity,2) }}</td>
+                            <td>{{ number_format($sales->total_amount,2) }}</td>
                         </tr>
                     @endforeach
                     </tbody>
@@ -116,12 +109,7 @@
                                 </tr>
                             @endforeach
                             <tr>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                {{--                                <th></th>--}}
-                                <th style="text-align: right">OFFICER TOTAL</th>
+                                <th colspan="5" style="text-align: right">OFFICER TOTAL</th>
                                 <th style="text-align: right">{{ number_format($officer_total_amount, 2, '.', ',') }}</th>
                                 <th style="text-align: right">{{ number_format($officer_total_cost, 2, '.', ',') }}</th>
                                 <th style="text-align: right">

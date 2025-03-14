@@ -351,12 +351,12 @@
                                     </a>
                                     <ul class="nav nav-treeview">
                                         <!--                                        <li class="nav-item">
-                                                                                                                    <a href="{{-- {{ route('stock.balances.report') }} --}}"
-                                                                                                                        class="nav-link {{-- {{ Request::is('reports/sc/stock/balances*') ? 'active' : '' }} --}}">
-                                                                                                                        <i class="ion-code-working"></i>
-                                                                                                                        <p>Previous Stock Balances</p>
-                                                                                                                    </a>
-                                                                                                                </li>-->
+                                                                                                                            <a href="{{-- {{ route('stock.balances.report') }} --}}"
+                                                                                                                                class="nav-link {{-- {{ Request::is('reports/sc/stock/balances*') ? 'active' : '' }} --}}">
+                                                                                                                                <i class="ion-code-working"></i>
+                                                                                                                                <p>Previous Stock Balances</p>
+                                                                                                                            </a>
+                                                                                                                        </li>-->
                                         <li class="nav-item">
                                             <a href="{{ route('current.stock.report') }}"
                                                 class="nav-link {{ Request::is('reports/sc/current-stock*') ? 'active' : '' }}">
@@ -914,26 +914,24 @@
                                 <li class="nav-item">
                                     <a href="{{ route('budgets.index') }}" class="nav-link ">
                                         <i class="ion-card"></i>
-                                        <p>View Budget</p>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('budget.import')
-                                <li class="nav-item">
-                                    <a href="{{ route('budgets.import.form') }}" class="nav-link ">
-                                        <i class="ion-card"></i>
-                                        <p>Import</p>
+                                        <p>Sales Budget</p>
                                     </a>
                                 </li>
                             @endcan
                             @can('budget.view')
                                 <li class="nav-item">
-                                    <a href="{{ route('budgets.create') }}" class="nav-link ">
+                                    <a href="{{ route('ro_budgets.index') }}" class="nav-link ">
                                         <i class="ion-card"></i>
-                                        <p>New Budget</p>
+                                        <p>ROs Budget</p>
                                     </a>
                                 </li>
                             @endcan
+                            <li class="nav-item">
+                                <a href="{{ route('area_managers.index') }}" class="nav-link ">
+                                    <i class="ion-card"></i>
+                                    <p>Area Managers</p>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 @endcan

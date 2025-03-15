@@ -67,11 +67,13 @@ class CreditNoteController extends Controller
     public function store(Request $request)
     {
         //        return "To call your function";
-//        return $request;
+    //    return $request;
         $order_id = $request->order_id;
+        $reference = $request->reference;
         $comment = $request->comment;
-        $order = Order::with('order_items')->find($order_id);
-//        return $order;
+        $order = Order::where('reference',$reference)->with('order_items')->first();
+    //    return $order;
+        $order_id = $order->id;
         $credit_note_id = $request->credit_note_id;
         $reference = CreditNote::generateNewNumber();
         $credit_note = CreditNote::find($credit_note_id);
@@ -82,7 +84,7 @@ class CreditNoteController extends Controller
                 $credit_note = new CreditNote();
                 $credit_note->reference = $reference;
                 $credit_note->customer_id = $request->customer_id;
-                $credit_note->order_id = $request->order_id;
+                $credit_note->order_id = $order_id;
                 $credit_note->status = 0;
                 $credit_note->branch_id = $order->branch_id;
                 $credit_note->created_by = auth()->id();
@@ -276,7 +278,7 @@ class CreditNoteController extends Controller
         $order = Order::where('reference', $reference)->first();
         $order_items = OrderDetail::where('order_id', $order->id)->where('status', 1)->get();
         // return $order;
-        // \Cart::clear();
+        \Cart::clear();
         // foreach ($order_items as $data) {
         //     $qty = $data->quantity == 0 ? 1 : $data->quantity;
         //     // return $qty;

@@ -123,6 +123,7 @@
                             @csrf
                             <input type="hidden" name="date" class="date" value="" />
                             <input type="hidden" name="order_id" id="order_id" value="" />
+                            <input type="hidden" name="reference" id="reference" value="" />
                             <input type="hidden" name="customer_id" id="customer_id" value="" />
                             <input name="comment" placeholder="Comment" class="form-control">
                 
@@ -191,7 +192,7 @@
             });
 
             $(document).on('change', '.customer_id', function() {
-
+                $('#customer_id').val($(this).val());
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.customer-orders') }}",
@@ -236,7 +237,7 @@
             // function load() {
             $(document).on('click', '.invoice', function() {
                 var reference = $(this).attr('data-val');
-
+                $('#reference').val(reference);
                 $('#load').html("<h3>Please wait... while it is loading...</h3>");
                 $.ajax({
                     url: "{{ route('load.order-cart') }}",

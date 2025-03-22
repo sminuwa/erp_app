@@ -7,6 +7,7 @@
 @endpush
 
 @section('content')
+<input name="cart_page_type" type="hidden" value="credit">
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
@@ -113,8 +114,25 @@
 
                         </div>
                     </div>
+                    
+                    <div class="col-md-8">
+                        {{-- <div id="load"></div> --}}
+                        <div class="cart-container"></div>
 
-                    <div class="col-md-8" id="load">
+                        <form action="{{ route('credit.note.store') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="date" class="date" value="" />
+                            <input type="hidden" name="order_id" id="order_id" value="" />
+                            <input type="hidden" name="reference" id="reference" value="" />
+                            <input type="hidden" name="customer_id" id="customer_id" value="" />
+                            <input name="comment" placeholder="Comment" class="form-control">
+                
+                            <div class="form-group text-right mt-3">
+                                <input type="submit" onclick="$('.date').val($('.date_').val())" class=" btn btn-primary"
+                                    value="Submit" />
+                            </div>
+                
+                        </form>
                         {{-- @if (isset($order) && $order != null)
                             @include('pages.inventories.credit_notes.load_products')
                         @endif --}}
@@ -174,7 +192,7 @@
             });
 
             $(document).on('change', '.customer_id', function() {
-
+                $('#customer_id').val($(this).val());
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.customer-orders') }}",
@@ -219,7 +237,7 @@
             // function load() {
             $(document).on('click', '.invoice', function() {
                 var reference = $(this).attr('data-val');
-
+                $('#reference').val(reference);
                 $('#load').html("<h3>Please wait... while it is loading...</h3>");
                 $.ajax({
                     url: "{{ route('load.order-cart') }}",
@@ -229,7 +247,7 @@
                     },
                     success: function(response) {
                         console.log(response)
-                        $('#load').html(response);
+                        $('.cart-container').html(response);
                     },
                     error: function(error) {
                         console.log(error);

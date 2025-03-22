@@ -35,8 +35,8 @@
                     <tbody>
                     @foreach($salesByOfficer as $sales)
                         @php
-                            $profit =$sales->amount -$sales->cost;
-                            $grand_total_amount+= $sales->amount;
+                            $profit =$sales->total_amount -$sales->cost;
+                            $grand_total_amount+= $sales->total_amount;
                             $grand_total_cost+=$sales->cost;
                             $grand_total_profit+=$profit;
                             $grand_total_qty += $sales->total_quantity;
@@ -48,6 +48,13 @@
                             <td>{{ $sales->branch_name }}</td>
                             <td>{{ number_format($sales->total_quantity,2) }}</td>
                             <td>{{ number_format($sales->total_amount,2) }}</td>
+                            <td>{{ number_format($sales->cost, 2) }}</td>
+                            <td style="text-align: right">
+                                {{ $profit < 0 ? '(' . number_format(abs($profit), 2, '.', ',') . ')' : number_format($profit, 2) }}
+                            </td>
+                            <td style="text-align: right">
+                                {{ $sales->total_amount != 0 ? number_format(($profit / $sales->total_amount) * 100, 2) : 0 }}
+                            </td>
                         </tr>
                     @endforeach
                     </tbody>
@@ -64,13 +71,14 @@
                                 $officer_total_profit = 0;
                                 $officer_total_qty = 0;
                             @endphp
-                            <thead>
+                                <!-- Move the officer header outside the table -->
                             <tr>
                                 <td colspan="9">
                                     <h4>{{ $officerSales->first()->ro_code }}
                                         - {{ $officerSales->first()->user_name }}</h4>
                                 </td>
                             </tr>
+                            <thead>
                             <tr>
                                 <th>CODE</th>
                                 <th>CATEGORY</th>
@@ -87,27 +95,28 @@
                             @foreach ($officerSales as $sale)
                                 @php
                                     $profit = $sale->amount - $sale->cost;
-                                    $officer_total_amount += $sale->amount;
-                                    $officer_total_cost += $sale->cost;
+                                    $officer_total_amount += $sale->amount ?? 0; // Fallback for null
+                                    $officer_total_cost += $sale->cost ?? 0; // Fallback for null
                                     $officer_total_profit += $profit;
-                                    $officer_total_qty += $sale->quantity;
+                                    $officer_total_qty += $sale->quantity ?? 0; // Fallback for null
                                 @endphp
                                 <tr>
-                                    <td>{{ $sale->code }}</td>
-                                    <td>{{ $sale->category }}</td>
-                                    <td>{{ $sale->branch_code }}</td>
-                                    <td style="text-align: right">{{ number_format($sale->qty_available, 6) }}</td>
-                                    <td style="text-align: right">{{ number_format($sale->quantity, 6) }}</td>
-                                    <td style="text-align: right">{{ number_format($sale->amount, 2, '.', ',') }}</td>
-                                    <td style="text-align: right">{{ number_format($sale->cost, 2, '.', ',') }}</td>
+                                    <td>{{ $sale->code ?? 'N/A' }}</td>
+                                    <td>{{ $sale->category ?? 'N/A' }}</td>
+                                    <td>{{ $sale->branch_code ?? 'N/A' }}</td>
+                                    <td style="text-align: right">{{ number_format($sale->qty_available ?? 0, 6) }}</td>
+                                    <td style="text-align: right">{{ number_format($sale->quantity ?? 0, 6) }}</td>
+                                    <td style="text-align: right">{{ number_format($sale->amount ?? 0, 2, '.', ',') }}</td>
+                                    <td style="text-align: right">{{ number_format($sale->cost ?? 0, 2, '.', ',') }}</td>
                                     <td style="text-align: right">
                                         {{ $profit < 0 ? '(' . number_format(abs($profit), 2, '.', ',') . ')' : number_format($profit, 2) }}
                                     </td>
                                     <td style="text-align: right">
-                                        {{ $sale->amount != 0 ? number_format(($profit / $sale->amount) * 100, 2) : 0 }}
+                                        {{ ($sale->amount ?? 0) != 0 ? number_format(($profit / ($sale->amount ?? 1)) * 100, 2) : 0 }}
                                     </td>
                                 </tr>
                             @endforeach
+                            </tbody>
                             <tr>
                                 <th colspan="5" style="text-align: right">OFFICER TOTAL</th>
                                 <th style="text-align: right">{{ number_format($officer_total_amount, 2, '.', ',') }}</th>
@@ -119,7 +128,6 @@
                                     {{ $officer_total_amount != 0 ? number_format(($officer_total_profit / $officer_total_amount) * 100, 2) : 0 }}
                                 </th>
                             </tr>
-                            </tbody>
                             @php
                                 $grand_total_amount += $officer_total_amount;
                                 $grand_total_cost += $officer_total_cost;
@@ -134,10 +142,10 @@
 
         <div class="row">
             <div class="col-md-12 mt-3 table-responsive">
-                <table class="display table table-bordered table-striped">
+                <table class="table table-bordered table-striped">
                     <tfoot>
                     <tr>
-                        <th></th>
+                        <th style="text-align: right">TOTAL</th>
                         <th style="text-align: right">TOTAL QUANTITY</th>
                         <th style="text-align: right">TOTAL AMOUNT</th>
                         <th style="text-align: right">TOTAL COST</th>

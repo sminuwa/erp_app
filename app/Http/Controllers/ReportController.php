@@ -3179,7 +3179,7 @@ class ReportController extends Controller
                 DB::raw('customers.opening_balance + COALESCE(SUM(general_account_ledgers.debit), 0) - COALESCE(SUM(general_account_ledgers.credit), 0) AS due')
             )
             ->whereDate('date', '<=', $to_date)
-            ->havingRaw('customers.opening_balance + (SUM(debit) - SUM(credit)) > 0')
+            //->havingRaw('customers.opening_balance + (SUM(debit) - SUM(credit)) > 0')
             ->groupBy('customers.id', 'customers.name', 'customers.credit_limit', 'customers.opening_balance');
 
         if ($company_id != '%')
@@ -3190,25 +3190,6 @@ class ReportController extends Controller
 
         $sales = $query->get();
 
-//         $sales = GeneralAccountLedger::where('model_id', 'LIKE', $customer_id)
-//            ->join('customers', 'customers.id', '=', 'general_account_ledgers.model_id')
-//            ->join('branches', 'branches.id', '=', 'customers.branch_id')
-//            //->whereBetween('date', [$from_date, $to_date])
-//            ->whereDate('date', '<=', $to_date)
-//            ->where('branches.company_id', 'LIKE', $company_id)
-//            ->where('customers.branch_id', 'LIKE', $branch_id)
-//            ->where('model_name', 'Customer')
-////            ->where('status', 1)
-//            ->select(
-//                'customers.name AS customer',
-//                'customers.code AS code',
-//                DB::raw('SUM(credit) AS total'),
-//                DB::raw('SUM(debit) AS pay'),
-//                DB::raw('SUM(credit) - SUM(debit) AS due')
-//            )
-//            ->havingRaw('SUM(credit) - SUM(debit) < 0')
-//            ->groupBy('general_account_ledgers.model_id')
-//            ->get();
 
         if ($company_id == '%')
             $company_id = 'all';
@@ -6689,7 +6670,7 @@ class ReportController extends Controller
             'general_accounts.description',
             'general_account_ledgers.id',
             'users.name'
-        )->join('users', 'users.id', 'general_account_ledgers.user_id')
+        )->join('users', 'users.id', '=', 'general_account_ledgers.user_id')
             ->where('model_id', 'LIKE', $payee_id)
             ->where('user_id', 'LIKE', $user_id)
             ->where(function ($ledgers) {

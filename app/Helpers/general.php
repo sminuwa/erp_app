@@ -342,6 +342,10 @@ function getReferenceId($reference)
     if (strpos($reference, 'ITS') !== false) {
         return InterstoreTransfer::where('reference', $reference)->first()->id ?? null;
     }
+    if (strpos($reference, 'OPE') !== false) {
+        return null;
+    }
+    
     function categoryId($category)
     {
         return DB::table('categories')

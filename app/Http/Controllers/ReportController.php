@@ -6401,12 +6401,22 @@ class ReportController extends Controller
     // }
     private function generalAccountLedgerBy($from_date, $to_date, $company_id, $branch_id, $type = null)
     {
+        // Validate and format dates
+        $from_date = $from_date ? date('Y-m-d', strtotime($from_date)) : null;
+        $to_date = $to_date ? date('Y-m-d', strtotime($to_date)) : null;
+
         $query = GeneralAccountLedger::query()
             ->join('branches', 'general_account_ledgers.branch_id', '=', 'branches.id')
             ->where('branches.company_id', 'LIKE', $company_id)
-            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
-            ->whereDate('general_account_ledgers.date', '>=', $from_date)
-            ->whereDate('general_account_ledgers.date', '<=', $to_date);
+            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id);
+
+        // Apply date filters using where instead of whereDate
+        if ($from_date) {
+            $query->where('general_account_ledgers.date', '>=', $from_date);
+        }
+        if ($to_date) {
+            $query->where('general_account_ledgers.date', '<=', $to_date);
+        }
 
         if ($type === 'Customer') {
             $query->join('customers', 'customers.id', '=', 'general_account_ledgers.model_id')

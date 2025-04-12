@@ -1615,8 +1615,8 @@ class ReportController extends Controller
             JOIN products p ON store_products.product_id = p.id
             WHERE s.branch_id LIKE stores.branch_id
             AND p.category_id = categories.id) as qty_available')
-                    :
-                    DB::raw('(SELECT SUM(store_products.qty_available)
+                :
+                DB::raw('(SELECT SUM(store_products.qty_available)
             FROM store_products
             JOIN products p ON store_products.product_id = p.id
             WHERE p.category_id = categories.id) as qty_available')
@@ -5448,7 +5448,7 @@ class ReportController extends Controller
 
     public function loadAccountBalance(Request $request)
     {
-//        return $request->query();
+        //        return $request->query();
 
         set_time_limit(600); // 10 minutes
 
@@ -5920,7 +5920,7 @@ class ReportController extends Controller
             ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
             ->where(function ($query) {
                 $query->where('number', 'like', 'C%');  // Expenses
-
+    
             })
             ->whereDate('date', '<=', $last_day_of_previous_year)
             ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
@@ -5939,7 +5939,7 @@ class ReportController extends Controller
             ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
             ->where(function ($query) {
                 $query->where('number', 'like', 'C%');  // Expenses
-
+    
             })
             ->whereDate('date', '>=', $first_day_of_current_year)
             ->whereDate('date', '<=', $to_date)
@@ -6164,7 +6164,7 @@ class ReportController extends Controller
             ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
             ->where(function ($query) {
                 $query->where('number', 'like', 'C%');  // Expenses
-
+    
             })
             ->whereDate('date', '<=', $last_day_of_previous_year)
             ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
@@ -6183,7 +6183,7 @@ class ReportController extends Controller
             ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
             ->where(function ($query) {
                 $query->where('number', 'like', 'C%');  // Expenses
-
+    
             })
             ->whereDate('date', '>=', $first_day_of_current_year)
             ->whereDate('date', '<=', $to_date)
@@ -6354,50 +6354,72 @@ class ReportController extends Controller
     }
 
 
+    // private function generalAccountLedgerBy($from_date, $to_date, $company_id, $branch_id, $type = null)
+    // {
+    //     if ($branch_id == 'all' || $branch_id == '')
+    //         $branch_id = '%';
+    //     if ($type != null && $type == "Customer") {
+    //         $query = GeneralAccountLedger::join('customers', 'customers.id', '=', 'general_account_ledgers.model_id')
+    //             ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
+    //             ->where('general_account_ledgers.branch_id', 'like', $branch_id)
+    //             ->where('branches.company_id', 'LIKE', $company_id)
+    //             ->whereDate('date', '<=', $to_date)
+    //             ->where('model_name', 'Customer');
+    //         if ($from_date != null)
+    //             $query = $query->whereDate('date', '>=', $from_date);
+    //         return $query;
+    //     }
+    //     if ($type != null && $type == "Supplier") {
+    //         $query = GeneralAccountLedger::join('suppliers', 'suppliers.id', '=', 'general_account_ledgers.model_id')
+    //             ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
+    //             ->where('general_account_ledgers.branch_id', 'like', $branch_id)
+    //             ->where('branches.company_id', 'LIKE', $company_id)
+    //             ->whereDate('date', '<=', $to_date)
+    //             ->where('model_name', 'Supplier');
+    //         if ($from_date != null)
+    //             $query = $query->whereDate('date', '>=', $from_date);
+    //         return $query;
+    //     }
+    //     if ($type != null && $type == "GeneralAccount") {
+    //         $query = GeneralAccountLedger::leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+    //             ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
+    //             ->where('general_account_ledgers.branch_id', 'like', $branch_id)
+    //             ->where('branches.company_id', 'LIKE', $company_id)
+    //             ->whereDate('date', '<=', $to_date)
+    //             ->where('model_name', 'GeneralAccount');
+    //         if ($from_date != null)
+    //             $query = $query->whereDate('date', '>=', $from_date);
+    //         return $query;
+    //     }
+    //     return GeneralAccountLedger::leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+    //         ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
+    //         ->where('general_account_ledgers.branch_id', 'like', $branch_id)
+    //         ->where('branches.company_id', 'LIKE', $company_id)
+    //         ->whereDate('date', '>=', $from_date)
+    //         ->whereDate('date', '<=', $to_date);
+
+    // }
     private function generalAccountLedgerBy($from_date, $to_date, $company_id, $branch_id, $type = null)
     {
-        if ($branch_id == 'all' || $branch_id == '')
-            $branch_id = '%';
-        if ($type != null && $type == "Customer") {
-            $query = GeneralAccountLedger::join('customers', 'customers.id', '=', 'general_account_ledgers.model_id')
-                ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
-                ->where('general_account_ledgers.branch_id', 'like', $branch_id)
-                ->where('branches.company_id', 'LIKE', $company_id)
-                ->whereDate('date', '<=', $to_date)
-                ->where('model_name', 'Customer');
-            if ($from_date != null)
-                $query = $query->whereDate('date', '>=', $from_date);
-            return $query;
-        }
-        if ($type != null && $type == "Supplier") {
-            $query = GeneralAccountLedger::join('suppliers', 'suppliers.id', '=', 'general_account_ledgers.model_id')
-                ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
-                ->where('general_account_ledgers.branch_id', 'like', $branch_id)
-                ->where('branches.company_id', 'LIKE', $company_id)
-                ->whereDate('date', '<=', $to_date)
-                ->where('model_name', 'Supplier');
-            if ($from_date != null)
-                $query = $query->whereDate('date', '>=', $from_date);
-            return $query;
-        }
-        if ($type != null && $type == "GeneralAccount") {
-            $query = GeneralAccountLedger::leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
-                ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
-                ->where('general_account_ledgers.branch_id', 'like', $branch_id)
-                ->where('branches.company_id', 'LIKE', $company_id)
-                ->whereDate('date', '<=', $to_date)
-                ->where('model_name', 'GeneralAccount');
-            if ($from_date != null)
-                $query = $query->whereDate('date', '>=', $from_date);
-            return $query;
-        }
-        return GeneralAccountLedger::leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
-            ->join('branches', 'general_account_ledgers.branch_id', 'branches.id')
-            ->where('general_account_ledgers.branch_id', 'like', $branch_id)
+        $query = GeneralAccountLedger::query()
+            ->join('branches', 'general_account_ledgers.branch_id', '=', 'branches.id')
             ->where('branches.company_id', 'LIKE', $company_id)
-            ->whereDate('date', '>=', $from_date)
-            ->whereDate('date', '<=', $to_date);
+            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+            ->whereDate('general_account_ledgers.date', '>=', $from_date)
+            ->whereDate('general_account_ledgers.date', '<=', $to_date);
 
+        if ($type === 'Customer') {
+            $query->join('customers', 'customers.id', '=', 'general_account_ledgers.model_id')
+                ->where('general_account_ledgers.model_name', 'Customer');
+        } elseif ($type === 'Supplier') {
+            $query->join('suppliers', 'suppliers.id', '=', 'general_account_ledgers.model_id')
+                ->where('general_account_ledgers.model_name', 'Supplier');
+        } elseif ($type === 'GeneralAccount') {
+            $query->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+                ->where('general_account_ledgers.model_name', 'GeneralAccount');
+        }
+
+        return $query;
     }
 
 
@@ -6645,67 +6667,127 @@ class ReportController extends Controller
         return view('pages.reports.ap_ar.remittance.index', compact('users'));
     }
 
+    // public function loadRemittance(Request $request)
+    // {
+    //     $from_date = $request->from_date;
+    //     $to_date = $request->to_date;
+    //     $company_id = $request->company_id;
+    //     $branch_id = $request->branch_id;
+    //     $payee_id = $request->payee_id;
+    //     $user_id = $request->user_id;
+    //     if ($user_id == 'all' || $user_id == '')
+    //         $user_id = '%';
+    //     if ($company_id == 'all' || $company_id == '') {
+    //         $company_id = '%';
+    //     }
+    //     if ($branch_id == 'all' || $branch_id == '')
+    //         $branch_id = '%';
+    //     if ($payee_id == 'all' || $payee_id == '')
+    //         $payee_id = '%';
+    //     $query = $this->generalAccountLedgerBy($from_date, $to_date, $company_id, $branch_id);
+    //     $ledgers = $query->select(
+    //         DB::raw('SUM(credit) AS credit'),
+    //         DB::raw('SUM(debit) AS debit'),
+    //         'number',
+    //         'general_accounts.description',
+    //         'general_account_ledgers.id',
+    //         'users.name'
+    //     )->join('users', 'users.id', '=', 'general_account_ledgers.user_id')
+    //         ->where('model_id', 'LIKE', $payee_id)
+    //         ->where('user_id', 'LIKE', $user_id)
+    //         ->where(function ($ledgers) {
+    //             $ledgers->where('class', 'LIKE', 'A11%')
+    //                 ->orWhere('class', 'LIKE', 'A12%')
+    //                 ->orWhere('class', 'LIKE', 'A13%');
+    //         })
+    //         ->orderBy('number')
+    //         ->groupBy('user_id')
+    //         ->groupBy('number')
+    //         ->get();
+
+
+    //     $credit_sum = $query->sum('credit');
+    //     $debit_sum = $query->sum('debit');
+    //     $balance = $credit_sum - $debit_sum;
+    //     $branch = Branch::find($branch_id);
+    //     if ($user_id == '%')
+    //         $user_id = 'all';
+    //     if ($company_id == '%') {
+    //         $company_id = 'all';
+    //     }
+    //     if ($branch_id == '%')
+    //         $branch_id = 'all';
+    //     if ($payee_id == '%')
+    //         $payee_id = 'all';
+    //     $company = null;
+    //     if ($company_id != 'all')
+    //         $company = Company::find($company_id);
+    //     $branch = null;
+    //     if ($branch_id != 'all')
+    //         $branch = Branch::find($branch_id);
+    //     return view('pages.reports.ap_ar.remittance.load', compact('ledgers', 'branch', 'from_date', 'to_date', 'balance', 'company_id', 'branch_id', 'payee_id', 'user_id', 'credit_sum', 'debit_sum'));
+    // }
     public function loadRemittance(Request $request)
     {
         $from_date = $request->from_date;
         $to_date = $request->to_date;
-        $company_id = $request->company_id;
-        $branch_id = $request->branch_id;
-        $payee_id = $request->payee_id;
-        $user_id = $request->user_id;
-        if ($user_id == 'all' || $user_id == '')
-            $user_id = '%';
-        if ($company_id == 'all' || $company_id == '') {
-            $company_id = '%';
-        }
-        if ($branch_id == 'all' || $branch_id == '')
-            $branch_id = '%';
-        if ($payee_id == 'all' || $payee_id == '')
-            $payee_id = '%';
+        $company_id = $request->company_id ?: '%';
+        $branch_id = $request->branch_id ?: '%';
+        $payee_id = $request->payee_id ?: '%';
+        $user_id = $request->user_id ?: '%';
+
         $query = $this->generalAccountLedgerBy($from_date, $to_date, $company_id, $branch_id);
+
         $ledgers = $query->select(
-            DB::raw('SUM(credit) AS credit'),
-            DB::raw('SUM(debit) AS debit'),
-            'number',
+            DB::raw('SUM(general_account_ledgers.credit) AS credit'),
+            DB::raw('SUM(general_account_ledgers.debit) AS debit'),
+            'general_accounts.number',
             'general_accounts.description',
             'general_account_ledgers.id',
-            'users.name'
-        )->join('users', 'users.id', '=', 'general_account_ledgers.user_id')
-            ->where('model_id', 'LIKE', $payee_id)
-            ->where('user_id', 'LIKE', $user_id)
-            ->where(function ($ledgers) {
-                $ledgers->where('class', 'LIKE', 'A11%')
-                    ->orWhere('class', 'LIKE', 'A12%')
-                    ->orWhere('class', 'LIKE', 'A13%');
+            'users.name AS user_name',
+            'bank_accounts.account_name',
+            'bank_accounts.id AS bank_account_id'
+        )
+            ->join('users', 'users.id', '=', 'general_account_ledgers.user_id')
+            ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+            ->leftJoin('bank_accounts', function ($join) {
+                $join->on('bank_accounts.id', '=', DB::raw('(SELECT bank_account_id FROM bank_transactions WHERE ref_no = general_account_ledgers.reference LIMIT 1)'));
             })
-            ->orderBy('number')
-            ->groupBy('user_id')
-            ->groupBy('number')
+            ->where('general_account_ledgers.model_id', 'LIKE', $payee_id)
+            ->where('general_account_ledgers.user_id', 'LIKE', $user_id)
+            ->where(function ($q) {
+                $q->where('general_accounts.class', 'LIKE', 'A11%')
+                    ->orWhere('general_accounts.class', 'LIKE', 'A12%')
+                    ->orWhere('general_accounts.class', 'LIKE', 'A13%');
+            })
+            ->whereNotNull('general_account_ledgers.reference') // Ensure only valid transactions
+            ->groupBy('general_account_ledgers.user_id', 'general_accounts.number', 'bank_accounts.id')
+            ->orderBy('general_accounts.number')
+            ->havingRaw('SUM(general_account_ledgers.credit) > 0 OR SUM(general_account_ledgers.debit) > 0') // Only users with transactions
             ->get();
 
-
-        $credit_sum = $query->sum('credit');
-        $debit_sum = $query->sum('debit');
+        $credit_sum = $ledgers->sum('credit');
+        $debit_sum = $ledgers->sum('debit');
         $balance = $credit_sum - $debit_sum;
-        $branch = Branch::find($branch_id);
-        if ($user_id == '%')
-            $user_id = 'all';
-        if ($company_id == '%') {
-            $company_id = 'all';
-        }
-        if ($branch_id == '%')
-            $branch_id = 'all';
-        if ($payee_id == '%')
-            $payee_id = 'all';
-        $company = null;
-        if ($company_id != 'all')
-            $company = Company::find($company_id);
-        $branch = null;
-        if ($branch_id != 'all')
-            $branch = Branch::find($branch_id);
-        return view('pages.reports.ap_ar.remittance.load', compact('ledgers', 'branch', 'from_date', 'to_date', 'balance', 'company_id', 'branch_id', 'payee_id', 'user_id', 'credit_sum', 'debit_sum'));
-    }
 
+        $company = $company_id !== '%' ? Company::find($company_id) : null;
+        $branch = $branch_id !== '%' ? Branch::find($branch_id) : null;
+
+        return view('pages.reports.ap_ar.remittance.load', compact(
+            'ledgers',
+            'branch',
+            'from_date',
+            'to_date',
+            'balance',
+            'company_id',
+            'branch_id',
+            'payee_id',
+            'user_id',
+            'credit_sum',
+            'debit_sum',
+            'company'
+        ));
+    }
     public function printRemittance($from, $to, $company_id, $branch_id, $payee_id, $user_id)
     {
         if ($user_id == 'all' || $user_id == '')
@@ -6971,7 +7053,7 @@ class ReportController extends Controller
             })
             ->join('branches', 'branches.id', '=', 'customers.branch_id')
             ->join('companies', 'companies.id', '=', 'branches.company_id')
-//            ->where('customers.credit_limit', '>', 0)
+            //            ->where('customers.credit_limit', '>', 0)
             ->select(
                 'customers.id',
                 'customers.code',
@@ -6990,7 +7072,7 @@ class ReportController extends Controller
         if ($branch_id != '%')
             $customers = $customers->where('branches.id', '=', $branch_id);
 
-//        $customers = Customer::select(DB::raw("ABS(SUM(credit) - SUM(debit)) as balance"), 'customers.*')
+        //        $customers = Customer::select(DB::raw("ABS(SUM(credit) - SUM(debit)) as balance"), 'customers.*')
 //            ->join('branches', 'branches.id', '=', 'customers.branch_id')
 //            ->join('general_account_ledgers', 'customers.id', '=', 'general_account_ledgers.model_id')
 //            ->where('general_account_ledgers.model_name', '=', 'Customer')
@@ -7066,8 +7148,14 @@ class ReportController extends Controller
         if ($branch_id == 'all' || $branch_id == '')
             $branch_id = '%';
         $suppliers = Supplier::select('suppliers.*')
-            ->where('branch_id', 'LIKE', $branch_id)
-            ->orWhereNull('suppliers.branch_id')
+            ->selectRaw('(SELECT SUM(CAST(gal.debit AS DECIMAL(15,2))) - SUM(CAST(gal.credit AS DECIMAL(15,2)))
+                  FROM general_account_ledgers gal
+                  WHERE gal.model_id = suppliers.id
+                  AND gal.model_name = "Supplier") as balance')
+            ->where(function ($query) use ($branch_id) {
+                $query->where('branch_id', 'LIKE', $branch_id)
+                    ->orWhereNull('suppliers.branch_id');
+            })
             ->leftJoin('branches', 'suppliers.branch_id', 'branches.id')
             ->leftJoin('companies', 'branches.company_id', 'companies.id')
             ->where('branches.company_id', 'LIKE', $company_id)
@@ -7493,8 +7581,9 @@ class ReportController extends Controller
         }
 
         // Identify user column (`posted_by`, `created_by`, `updated_by`)
+        //['posted_by', 'created_by', 'updated_by']
         $userColumn = null;
-        foreach (['posted_by', 'created_by', 'updated_by'] as $col) {
+        foreach (['created_by'] as $col) {
             if (Schema::hasColumn($table, $col)) {
                 $userColumn = $col;
                 break;
@@ -7519,6 +7608,7 @@ class ReportController extends Controller
 
         // Join with `users` to get user name
         if ($userColumn) {
+            //$query->leftJoin('users', "users.id", '=', "$table.$userColumn");
             $query->leftJoin('users', "users.id", '=', "$table.$userColumn");
         }
 
@@ -7582,6 +7672,9 @@ class ReportController extends Controller
                 break;
             case 'return_debits':
                 $route_name = 'return.debit.show';
+                break;
+            case 'purchase_expenses':
+                $route_name = 'purchase.additional-invoice.print';
                 break;
             default:
                 $route_name = "orders.show";
@@ -7668,7 +7761,8 @@ class ReportController extends Controller
 
         // Identify user column (`posted_by`, `created_by`, `updated_by`, etc.)
         $userColumn = null;
-        $possibleUserColumns = ['posted_by', 'created_by', 'updated_by'];
+        //$possibleUserColumns = ['posted_by', 'created_by', 'updated_by'];
+        $possibleUserColumns = ['created_by'];
         foreach ($possibleUserColumns as $col) {
             if (Schema::hasColumn($table, $col)) {
                 $userColumn = $col;

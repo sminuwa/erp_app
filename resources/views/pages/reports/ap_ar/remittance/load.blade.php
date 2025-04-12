@@ -1,10 +1,10 @@
-<div class="row">
+{{-- <div class="row">
     <div class="offset-10">
         <a href="{{ route('ajax.print.remittance.report', [$from_date, $to_date, $company_id, $branch_id, $payee_id, $user_id]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
-</div>
-<table class="display table table-bordered caption" id="example1" data-ordering="true">
+</div> --}}
+{{-- <table class="display table table-bordered caption" id="example1" data-ordering="true">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
             DAILY REMITTANCE BETWEEN {{ \Carbon\Carbon::parse($from_date)->toFormattedDateString() }}
@@ -23,7 +23,6 @@
             <th>User</th>
             <th style="text-align: center; align-content: center">Total (Dr.)</th>
             <th style="text-align: center; align-content: center">Total (Cr.)</th>
-            {{-- <th style="text-align: center; align-content: center">Total</th> --}}
         </tr>
 
     </thead>
@@ -40,16 +39,7 @@
                 <td>{{ $ledger->number }}</td>
                 <td>{{ $ledger->description }}</td>
                 <td>{{ $ledger->name ?? '' }}</td>
-                {{-- <td style="text-align: right">
-                    @if ($credit > 0.0)
-                         {{ $credit }}
-                    @endif
-                </td>
-                <td style="text-align: right">
-                    @if ($debit > 0.0)
-                         {{ $debit }}
-                    @endif
-                </td> --}}
+            
                 @php
                     $total_credit += $ledger->credit;
                     $total_debit += $ledger->debit;
@@ -64,11 +54,42 @@
     <tfoot>
         <tr>
             <th colspan="3" style="text-align: right;">Total</th>
-            {{-- <th style="text-align: right;">{{ number_format($total_credit, 2) }}</th>
-            <th style="text-align: right;">{{ number_format($total_debit, 2) }}</th> --}}
             <th style="text-align: right;">{{ $diff < 0 ? number_format(abs($diff), 2) : '' }}</th>
             <th style="text-align: right;">{{ $diff > 0 ? number_format(abs($diff), 2) : '' }}</th>
         </tr>
     </tfoot>
     </tbody>
+</table> --}}
+<table class="display table table-bordered caption">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Account Number</th>
+            <th>Bank Account</th>
+            <th>Credit</th>
+            <th>Debit</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($ledgers as $ledger)
+        <tr>
+            <td>{{ $ledger->user_name }}</td>
+            <td>{{ $ledger->number }}</td>
+            <td>{{ $ledger->description }}</td>
+            <td>{{ number_format($ledger->credit, 2) }}</td>
+            <td>{{ number_format($ledger->debit, 2) }}</td>
+        </tr>
+        @endforeach
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3">Total</td>
+            <td>{{ number_format($credit_sum, 2) }}</td>
+            <td>{{ number_format($debit_sum, 2) }}</td>
+        </tr>
+        {{-- <tr>
+            <td colspan="4">Balance: </td>
+            <td>Balance: {{ number_format($balance, 2) }}</td>
+        </tr> --}}
+    </tfoot>
 </table>

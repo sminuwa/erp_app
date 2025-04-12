@@ -104,7 +104,7 @@
 
                                 <!-- /.col -->
                                 <div class="col-sm-4 invoice-col">
-                                    <p><b>Refrence No: {{ $interbank->reference }}</b></p>
+                                    <p><b>Reference No: {{ $interbank->reference }}</b></p>
                                     <p><b>Payment Date:
                                             {{ \Carbon\Carbon::parse($interbank->date)->toFormattedDateString() }}</b></p>
                                     <p><b>Date Created:

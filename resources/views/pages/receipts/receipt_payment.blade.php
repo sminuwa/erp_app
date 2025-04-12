@@ -173,9 +173,15 @@
                                                                 @endcan
                                                             @else
                                                                 @can('receipt.payment.print')
-                                                                    <a href="{{ route('receipt.payment.print', $payment->id) }}"
+                                                                    <a href="{{ route('receipt.payment.print', [$payment->id, 'A4']) }}"
                                                                         target="_blank" class="dropdown-item">
                                                                         <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                        A4
+                                                                    </a>
+                                                                    <a href="{{ route('receipt.payment.print', [$payment->id, 'A5']) }}"
+                                                                        target="_blank" class="dropdown-item">
+                                                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                                                        A5
                                                                     </a>
                                                                 @endcan
                                                                 @can('receipt.payment.print.pos')

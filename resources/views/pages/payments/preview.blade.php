@@ -74,9 +74,13 @@
                                     @endcan
                                 @else
                                     @can('payment.print')
-                                        <a href="{{ route('payment.print', $payment->id) }}" target="_BLANK"
+                                        <a href="{{ route('payment.print', [$payment->id.'A4']) }}" target="_BLANK"
                                             class="btn btn-dark btn-sm ">
-                                            <i class="fa fa-print" aria-hidden="true"></i> Print
+                                            <i class="fa fa-print" aria-hidden="true"></i> Print A4
+                                        </a>
+                                        <a href="{{ route('payment.print', [$payment->id.'A5']) }}" target="_BLANK"
+                                            class="btn btn-dark btn-sm ">
+                                            <i class="fa fa-print" aria-hidden="true"></i> Print A5
                                         </a>
                                     @endcan
                                     @can('payment.print.pos')
@@ -133,7 +137,7 @@
                                 </div>
                                 <!-- /.col -->
                                 <div class="col-sm-4 invoice-col">
-                                    <p><b>Receipt No: {{ $payment->payment_no }}</b></p>
+                                    <p><b>Receipt No: {{ $payment->receipt_no }}</b></p>
                                     <p><b>Payment Date:
                                             {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}</b></p>
                                     <b>Invoice Status:</b>

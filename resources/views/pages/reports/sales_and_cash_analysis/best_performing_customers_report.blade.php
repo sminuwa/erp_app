@@ -121,12 +121,12 @@
             };
 
             $('#generate').on("click", function() {
-                from_date = $('#from_date').val();
-                to_date = $('#to_date').val();
-                number_limit = $('#number_limit').val();
-                type = $('input[name="type"]:checked').val();
-                company_id = $('#company_id').val();
-                branch_id = $('#branch_id').val();
+                let from_date = $('#from_date').val();
+                let to_date = $('#to_date').val();
+                let number_limit = $('#number_limit').val();
+                let type = $('input[name="type"]:checked').val();
+                let company_id = $('#company_id').val();
+                let branch_id = $('#branch_id').val();
                 if (!number_limit > 0) {
                     alert("Please enter a number of limit")
                     return false;

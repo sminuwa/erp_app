@@ -59,7 +59,7 @@
                         @endphp
 
                         @if ($isSpecialCode)
-                            {{ getContraAccount($reference) }}
+                            {{ getContraAccount($reference, $ledger->credit, $ledger->debit) }}
                         @else
                             {{ $ledger->payer()->code ?? ($ledger->payer()->number ?? '') }}
                         @endif

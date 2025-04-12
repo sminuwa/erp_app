@@ -19,26 +19,26 @@
         </h5>
     </caption>
     <thead>
-    <tr>
-        <th style="width: 50%" colspan="4">Date
-            Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
-        </th>
-        <th style="width: 50%;text-align:right" colspan="4">Processed By {{ auth()->user()->name }}</th>
-    </tr>
-    <tr>
-        <th colspan="6"></th>
-        <th colspan="2" style="text-align: center">BALANCE</th>
-    </tr>
-    <tr>
-        <th>CODE</th>
-        <th>CUSTOMER</th>
-        <th>RO</th>
-        <th>LAST INVOICE</th>
-        <th>DATE</th>
-        <th>AGE(days)</th>
-        <th>Dr.</th>
-        <th>Cr.</th>
-    </tr>
+        <tr>
+            <th style="width: 50%" colspan="4">Date
+                Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            </th>
+            <th style="width: 50%;text-align:right" colspan="4">Processed By {{ auth()->user()->name }}</th>
+        </tr>
+        <tr>
+            <th colspan="6"></th>
+            <th colspan="2" style="text-align: center">BALANCE</th>
+        </tr>
+        <tr>
+            <th>CODE</th>
+            <th>CUSTOMER</th>
+            <th>RO</th>
+            <th>LAST INVOICE</th>
+            <th>DATE</th>
+            <th>AGE(days)</th>
+            <th>Dr.</th>
+            <th>Cr.</th>
+        </tr>
 
     </thead>
     @php $total_dr = $total_cr = 0; @endphp
@@ -48,7 +48,26 @@
             <td>{{ $sale->name }}</td>
             <td>{{ $sale->relation_officer }}</td>
             {{-- <td>{{ customerLastTransaction($sale->customer_id)->reference ?? '' }}</td> --}}
-            <td>{{ $sale->reference }}</td>
+            <td>
+                @if (strpos($sale->reference, 'PAY') !== false)
+                    @if (getReferenceId($sale->reference) > 0)
+                        <a href="{{ route('payment.show', getReferenceId($sale->reference)) }}" target="_BLANK">
+                            {{ $sale->reference }}
+                        </a>
+                    @else
+                        {{ $sale->reference }}
+                    @endif
+                @endif
+                @if (strpos($sale->reference, 'INV') !== false)
+                    @if (getReferenceId($sale->reference) > 0)
+                        <a href="{{ route('orders.show', getReferenceId($sale->reference)) }}" target="_BLANK">
+                            {{ $sale->reference }}
+                        </a>
+                    @else
+                        {{ $sale->reference }}
+                    @endif
+                @endif
+            </td>
             <td>
                 {{-- @if (customerLastTransaction($sale->customer_id) != null)
                     {{ \Carbon\Carbon::parse(customerLastTransaction($sale->customer_id)->date)->toFormattedDateString() }}
@@ -83,15 +102,15 @@
         </tr>
     @endforeach
     <tfoot>
-    <tr>
-        <th style="text-align: right" colspan="6">TOTAL BALANCE</th>
-        <td style="text-align: right">
-            {{ $total_dr - $total_cr < 0 ? number_format(abs($total_dr - $total_cr), 2, '.', ',') : '' }}
-        </td>
-        <td style="text-align: right">
-            {{ $total_dr - $total_cr > 0 ? number_format($total_dr - $total_cr, 2, '.', ',') : '' }}
-        </td>
+        <tr>
+            <th style="text-align: right" colspan="6">TOTAL BALANCE</th>
+            <td style="text-align: right">
+                {{ $total_dr - $total_cr < 0 ? number_format(abs($total_dr - $total_cr), 2, '.', ',') : '' }}
+            </td>
+            <td style="text-align: right">
+                {{ $total_dr - $total_cr > 0 ? number_format($total_dr - $total_cr, 2, '.', ',') : '' }}
+            </td>
 
-    </tr>
+        </tr>
     </tfoot>
 </table>

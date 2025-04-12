@@ -368,23 +368,30 @@ function getReferenceId($reference)
     }
 
 }
-function getContraAccount($reference)
+function getContraAccount($reference, $credit, $debit)
 {
     // Determine the query conditions based on reference prefix
     $query = GeneralAccountLedger::where('reference', $reference)
         ->join('general_accounts', 'general_account_ledgers.model_id', 'general_accounts.id');
 
-    if (str_contains($reference, 'RCT')) {
+    // if (str_contains($reference, 'RCT')) {
+    //     $query->where('general_account_ledgers.debit', '>', 0);
+    // } elseif (str_contains($reference, 'PAY')) {
+    //     $query->where('general_account_ledgers.credit', '>', 0);
+    // } elseif (str_contains($reference, 'ITB')) {
+    //     $query->where('general_account_ledgers.model_name', 'GeneralAccount');
+    //     $query->where('general_account_ledgers.credit', '>', 0);
+    // }
+    if($credit >0){
         $query->where('general_account_ledgers.debit', '>', 0);
-    } elseif (str_contains($reference, 'PAY')) {
-        $query->where('general_account_ledgers.credit', '>', 0);
-    } elseif (str_contains($reference, 'ITB')) {
-        $query->where('general_account_ledgers.model_name', 'GeneralAccount');
+    }
+    if($debit >0){
         $query->where('general_account_ledgers.credit', '>', 0);
     }
 
     // Execute the query and process results
-    $numbers = $query->get()->pluck('number');
+    // $numbers = $query->get()->pluck('number');
+    $numbers = $query->first()->number ?? '';
     
-    return $numbers->isNotEmpty() ? $numbers->implode('|') : '';
+    return $numbers;//->isNotEmpty() ? $numbers->implode('|') : '';
 }

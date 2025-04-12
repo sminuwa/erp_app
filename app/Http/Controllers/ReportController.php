@@ -3353,13 +3353,13 @@ class ReportController extends Controller
     public function loadAgeingReport(Request $request)
     {
         set_time_limit(600); // 10 minutes
-
+    
         $from_date = $request->from_date;
         $to_date = $request->to_date;
         $customer_id = $request->customer_id;
         $company_id = $request->company_id;
         $branch_id = $request->branch_id;
-
+    
         // Define age ranges
         $daysRange = [
             1 => [0, 7],
@@ -3372,7 +3372,7 @@ class ReportController extends Controller
             8 => [181, null],
         ];
         [$lowerdays, $upperdays] = $daysRange[$to_date] ?? [1, null];
-
+    
         // Ensure NULL values are handled properly
         $filters = [];
         if ($company_id !== 'all' && !empty($company_id)) {
@@ -3384,18 +3384,30 @@ class ReportController extends Controller
         if ($customer_id !== 'all' && !empty($customer_id)) {
             $filters[] = ['gal.model_id', '=', $customer_id];
         }
-
-        // Get last transaction date per customer (Optimized Indexed Subquery)
+    
+        // Subquery to get the last transaction date and ID per customer, excluding references starting with 'RCT'
         $subquery = DB::table('general_account_ledgers AS gal')
-            ->select('gal.model_id', DB::raw('MAX(gal.date) as last_transaction_date'))
+            ->select(
+                'gal.model_id',
+                DB::raw('MAX(gal.date) as last_transaction_date'),
+                DB::raw('MAX(gal.id) as last_transaction_id')
+            )
             ->where('gal.model_name', 'Customer')
+            ->where('gal.reference', 'NOT LIKE', 'RCT%') // Exclude references starting with 'RCT'
             ->groupBy('gal.model_id');
-
+    
+        // Join the subquery result with general_account_ledgers to get reference and description
+        $lastTransactionDetails = DB::table('general_account_ledgers AS gal2')
+            ->select('gal2.model_id', 'gal2.reference', 'gal2.description')
+            ->joinSub($subquery, 'lt', function ($join) {
+                $join->on('gal2.id', '=', 'lt.last_transaction_id')
+                     ->on('gal2.model_id', '=', 'lt.model_id');
+            });
+    
         $sales = Customer::select(
             DB::raw('SUM(gal.credit) - SUM(gal.debit) AS balance'),
-            'gal.reference',
-            'gal.description',
-            'gal.date',
+            'last_transaction_details.reference',
+            'last_transaction_details.description',
             'customers.name',
             'customers.code',
             'gal.model_id AS customer_id',
@@ -3409,20 +3421,23 @@ class ReportController extends Controller
             ->joinSub($subquery, 'lt', function ($join) {
                 $join->on('lt.model_id', '=', 'customers.id');
             })
+            ->joinSub($lastTransactionDetails, 'last_transaction_details', function ($join) {
+                $join->on('last_transaction_details.model_id', '=', 'customers.id');
+            })
             ->where($filters)
             ->where('gal.model_name', 'Customer')
-            ->groupBy('gal.model_id', 'lt.last_transaction_date')
+            ->groupBy('gal.model_id', 'lt.last_transaction_date', 'last_transaction_details.reference', 'last_transaction_details.description')
             ->havingRaw('SUM(gal.credit) - SUM(gal.debit) < 0');
-
+    
         if ($lowerdays !== null) {
             $sales->havingRaw('DATEDIFF(NOW(), lt.last_transaction_date) >= ?', [$lowerdays]);
         }
         if ($upperdays !== null) {
             $sales->havingRaw('DATEDIFF(NOW(), lt.last_transaction_date) <= ?', [$upperdays]);
         }
-
+    
         $sales = $sales->orderByDesc('age')->get();
-
+    
         // 🔹 Handle Filters for View
         if ($customer_id == "%" || $customer_id == '' || $customer_id == null)
             $customer_id = "all";
@@ -3432,10 +3447,10 @@ class ReportController extends Controller
             $from_date = "all";
         if ($to_date == null)
             $to_date = "all";
-
+    
         $company = ($company_id != 'all') ? Company::find($company_id) : null;
         $branch = ($branch_id != "all") ? Branch::find($branch_id) : null;
-
+    
         return view('pages.reports.customer_ledger_analysis.load_ageing_report', compact('sales', 'from_date', 'branch', 'to_date', 'company_id', 'branch_id', 'customer_id'));
     }
 

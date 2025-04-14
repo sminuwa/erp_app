@@ -2095,55 +2095,175 @@ class ReportController extends Controller
         return view('pages.reports.sales_and_cash_analysis.relation_officer_report', compact('relation_officers'));
     }
 
+    // public function loadRelationOfficerReport(Request $request)
+    // {
+    //     set_time_limit(600); // 10 minutes
+
+    //     $is_summary = $request->is_summary;
+    //     $user_id = $request->input('user_id', ['%']);
+
+    //     // Remove any '%' values from the array if it's not the only value
+    //     if (count($user_id) > 1) {
+    //         $user_id = array_filter($user_id, function ($value) {
+    //             return $value !== '%';
+    //         });
+    //     }
+
+    //     $category_id1 = $request->input('category_id1', ['%']);
+
+    //     // Remove any '%' values from the array if it's not the only value
+    //     if (count($category_id1) > 1) {
+    //         $category_id1 = array_filter($category_id1, function ($value) {
+    //             return $value !== '%';
+    //         });
+    //     }
+
+
+    //     $from_date = date('Y-m-d', strtotime($request->from_date));
+    //     $to_date = date('Y-m-d', strtotime($request->to_date));
+    //     $company_id = $request->company_id;
+
+    //     if ($company_id == 'all' || $company_id == '' || $company_id == null) {
+    //         $company_id = '%';
+    //     }
+
+    //     if ($is_summary)
+    //         $data = DB::table('orders')
+    //             ->select(
+    //                 'users.id as ro_id',
+    //                 'users.user_code as ro_code',
+    //                 'users.name as ro_name',
+    //                 'companies.id as company_id',
+    //                 'companies.name as company_name',
+    //                 'branches.id as branch_id',
+    //                 'branches.name as branch_name',
+    //                 DB::raw('SUM(order_details.quantity) as total_quantity'),
+    //                 DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
+    //                 DB::raw('SUM(order_details.total) as total_amount')
+    //             )
+    //             ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+    //             ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
+    //             ->join('stores', 'store_products.store_id', '=', 'stores.id')
+    //             ->join('branches', 'stores.branch_id', '=', 'branches.id')
+    //             ->join('companies', 'branches.company_id', '=', 'companies.id')
+    //             ->join('customers', 'customers.id', '=', 'orders.customer_id')
+    //             ->join('users', 'users.id', '=', 'customers.relation_officer')
+    //             ->where('branches.company_id', 'LIKE', $company_id)
+    //             ->where('order_details.status', '=', 1)
+    //             ->whereBetween('order_date', [$from_date, $to_date])
+    //             ->groupBy('users.id', 'users.user_code', 'users.name', 'companies.id', 'companies.name', 'branches.id', 'branches.name')
+    //             ->orderBy('users.name', 'ASC');
+    //     else
+    //         $data = DB::table('orders')
+    //             ->select(
+    //                 'branches.id as branch_id',
+    //                 'branches.name as branch_name',
+    //                 'branches.code as branch_code',
+    //                 'categories.name as category',
+    //                 'categories.code as code',
+    //                 'users.user_code as ro_code',
+    //                 'users.id as ro_id',
+    //                 'users.name as user_name',
+    //                 'order_details.unit as product_unit',
+    //                 DB::raw('SUM(order_details.quantity) as quantity'),
+    //                 DB::raw('SUM(order_details.total) as amount'),
+    //                 DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
+    //                 DB::raw('COALESCE(qty_data.qty_available, 0) as qty_available')
+    //             )
+    //             ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+    //             ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
+    //             ->join('stores', 'store_products.store_id', '=', 'stores.id')
+    //             ->join('branches', 'stores.branch_id', '=', 'branches.id')
+    //             ->join('companies', 'branches.company_id', '=', 'companies.id')
+    //             ->join('products', 'store_products.product_id', '=', 'products.id')
+    //             ->join('categories', 'products.category_id', '=', 'categories.id')
+    //             ->join('customers', 'customers.id', '=', 'orders.customer_id')
+    //             ->join('users', 'users.id', '=', 'customers.relation_officer')
+    //             // Left join a pre-aggregated subquery for qty_available
+    //             ->leftJoin(
+    //                 DB::raw('(SELECT stores.branch_id, p.category_id, SUM(store_products.qty_available) AS qty_available
+    //     FROM store_products
+    //     JOIN products p ON store_products.product_id = p.id
+    //     JOIN stores ON store_products.store_id = stores.id
+    //     GROUP BY stores.branch_id, p.category_id) AS qty_data'),
+    //                 function ($join) {
+    //                     $join->on('qty_data.branch_id', '=', 'branches.id')
+    //                         ->on('qty_data.category_id', '=', 'categories.id');
+    //                 }
+    //             )
+    //             ->where('branches.company_id', 'LIKE', $company_id)
+    //             ->where('order_details.status', '=', 1)
+    //             ->whereBetween('order_date', [$from_date, $to_date]);
+
+
+    //     if (!in_array('%', $category_id1)) {
+    //         $data = $data->whereIn('products.category_id', $category_id1);
+    //     }
+    //     if (!in_array('%', $user_id)) {
+    //         $data = $data->whereIn('customers.relation_officer', $user_id);
+    //     }
+
+    //     $salesByOfficer = $is_summary ? $data->get() : $data
+    //         ->groupBy('customers.relation_officer', 'products.category_id', 'branches.id', 'categories.id', 'users.id', 'users.name', 'branches.name', 'branches.code', 'categories.code', 'users.user_code', 'qty_data.qty_available')
+    //         ->orderBy('users.name', 'ASC')
+    //         ->orderBy('categories.code', 'ASC')
+    //         ->get()
+    //         ->groupBy('ro_id');
+
+
+    //     // Reset 'all' to make it more readable in the UI
+    //     if (in_array('%', $category_id1)) {
+    //         $category_id1 = "all";
+    //     }
+
+    //     if (in_array('%', $user_id)) {
+    //         $user_id = "all";
+    //     }
+    //     if ($company_id == '%') {
+    //         $company_id = 'all';
+    //     }
+
+    //     $company = null;
+    //     if ($company_id != 'all') {
+    //         $company = Company::find($company_id);
+    //     }
+    //     // Return the view with the data
+    //     return view(
+    //         'pages.reports.sales_and_cash_analysis.load_relation_officer_report',
+    //         compact('salesByOfficer', 'from_date', 'to_date', 'category_id1', 'user_id', 'company', 'company_id', 'is_summary')
+    //     );
+
+    // }
     public function loadRelationOfficerReport(Request $request)
     {
-        set_time_limit(600); // 10 minutes
+        set_time_limit(600);
 
         $is_summary = $request->is_summary;
         $user_id = $request->input('user_id', ['%']);
-
-        // Remove any '%' values from the array if it's not the only value
-        if (count($user_id) > 1) {
-            $user_id = array_filter($user_id, function ($value) {
-                return $value !== '%';
-            });
-        }
-        // $branch_id = $request->input('branch_id', ['%']);
-
-        // // Remove any '%' values from the array if it's not the only value
-        // if (count($branch_id) > 1) {
-        //     $branch_id = array_filter($branch_id, function ($value) {
-        //         return $value !== '%';
-        //     });
-        // }
         $category_id1 = $request->input('category_id1', ['%']);
-
-        // Remove any '%' values from the array if it's not the only value
-        if (count($category_id1) > 1) {
-            $category_id1 = array_filter($category_id1, function ($value) {
-                return $value !== '%';
-            });
-        }
-
-
         $from_date = date('Y-m-d', strtotime($request->from_date));
         $to_date = date('Y-m-d', strtotime($request->to_date));
         $company_id = $request->company_id;
-        // $branch_id = json_encode($request->branch_id);
-        // $category_id1 = json_encode($request->category_id1);  // Now an array
-        // $user_id = json_encode($request->user_id);
-        // Handle 'all' for company and branch
-        if ($company_id == 'all' || $company_id == '' || $company_id == null) {
+        $budget_year = $request->input('budget_year', date('Y'));
+        $quarter = $request->input('quarter');
+
+        if (count($user_id) > 1)
+            $user_id = array_filter($user_id, fn($val) => $val !== '%');
+        if (count($category_id1) > 1)
+            $category_id1 = array_filter($category_id1, fn($val) => $val !== '%');
+        if ($company_id == 'all' || $company_id == '' || $company_id == null)
             $company_id = '%';
-        }
 
-        // Check if any categories are selected, or treat as "all"
-        // $category_id1 = is_array($category_id1) ? $category_id1 : ['%'];  // Convert to array if not already
-        // $branch_id = is_array($branch_id) ? $branch_id : ['%'];  // Convert to array if not already
-        // $user_id = is_array($user_id) ? $user_id : ['%'];  // Convert to array if not already
+        // Preload aggregated budget per branch and category
+        $budgetMap = DB::table('budgets')
+            ->select('branch_id', 'category_id', DB::raw('SUM(month1 + month2 + month3) AS total_budget'))
+            ->where('budget_year', $budget_year)
+            ->where('quarter', $quarter)
+            ->groupBy('branch_id', 'category_id')
+            ->get()
+            ->keyBy(fn($item) => $item->branch_id . '-' . $item->category_id);
 
-
-        if ($is_summary)
+        if ($is_summary) {
             $data = DB::table('orders')
                 ->select(
                     'users.id as ro_id',
@@ -2169,12 +2289,24 @@ class ReportController extends Controller
                 ->whereBetween('order_date', [$from_date, $to_date])
                 ->groupBy('users.id', 'users.user_code', 'users.name', 'companies.id', 'companies.name', 'branches.id', 'branches.name')
                 ->orderBy('users.name', 'ASC');
-        else
+
+            $salesByOfficer = $data->get();
+
+            foreach ($salesByOfficer as $record) {
+                $key = $record->branch_id . '-' . ($record->category_id ?? 0);
+                $budget = $budgetMap[$key] ?? null;
+                $record->budget_amount = $budget->total_budget ?? 0;
+                $record->achievement_percent = $record->budget_amount > 0
+                    ? round(($record->total_amount / $record->budget_amount) * 100, 2)
+                    : null;
+            }
+        } else {
             $data = DB::table('orders')
                 ->select(
                     'branches.id as branch_id',
                     'branches.name as branch_name',
                     'branches.code as branch_code',
+                    'categories.id as category_id',
                     'categories.name as category',
                     'categories.code as code',
                     'users.user_code as ro_code',
@@ -2195,13 +2327,12 @@ class ReportController extends Controller
                 ->join('categories', 'products.category_id', '=', 'categories.id')
                 ->join('customers', 'customers.id', '=', 'orders.customer_id')
                 ->join('users', 'users.id', '=', 'customers.relation_officer')
-                // Left join a pre-aggregated subquery for qty_available
                 ->leftJoin(
                     DB::raw('(SELECT stores.branch_id, p.category_id, SUM(store_products.qty_available) AS qty_available
-        FROM store_products
-        JOIN products p ON store_products.product_id = p.id
-        JOIN stores ON store_products.store_id = stores.id
-        GROUP BY stores.branch_id, p.category_id) AS qty_data'),
+                          FROM store_products
+                          JOIN products p ON store_products.product_id = p.id
+                          JOIN stores ON store_products.store_id = stores.id
+                          GROUP BY stores.branch_id, p.category_id) AS qty_data'),
                     function ($join) {
                         $join->on('qty_data.branch_id', '=', 'branches.id')
                             ->on('qty_data.category_id', '=', 'categories.id');
@@ -2211,51 +2342,54 @@ class ReportController extends Controller
                 ->where('order_details.status', '=', 1)
                 ->whereBetween('order_date', [$from_date, $to_date]);
 
+            if (!in_array('%', $category_id1))
+                $data->whereIn('products.category_id', $category_id1);
+            if (!in_array('%', $user_id))
+                $data->whereIn('customers.relation_officer', $user_id);
 
-        if (!in_array('%', $category_id1)) {
-            $data = $data->whereIn('products.category_id', $category_id1);
-        }
-        if (!in_array('%', $user_id)) {
-            $data = $data->whereIn('customers.relation_officer', $user_id);
+            $salesByOfficer = $data
+                ->groupBy(
+                    'customers.relation_officer',
+                    'products.category_id',
+                    'branches.id',
+                    'categories.id',
+                    'users.id',
+                    'users.name',
+                    'branches.name',
+                    'branches.code',
+                    'categories.code',
+                    'users.user_code',
+                    'qty_data.qty_available'
+                )
+                ->orderBy('users.name', 'ASC')
+                ->orderBy('categories.code', 'ASC')
+                ->get()
+                ->groupBy('ro_id');
+
+            foreach ($salesByOfficer as $ro_id => $salesGroup) {
+                foreach ($salesGroup as $record) {
+                    $key = $record->branch_id . '-' . $record->category_id;
+                    $budget = $budgetMap[$key] ?? null;
+                    $record->branch_category_budget = $budget->total_budget ?? 0;
+                    $record->achievement_percent = $record->branch_category_budget > 0
+                        ? round(($record->amount / $record->branch_category_budget) * 100, 2)
+                        : null;
+                }
+            }
         }
 
-        $salesByOfficer = $is_summary ? $data->get() : $data
-            ->groupBy('customers.relation_officer', 'products.category_id', 'branches.id', 'categories.id', 'users.id', 'users.name', 'branches.name', 'branches.code', 'categories.code', 'users.user_code', 'qty_data.qty_available')
-            ->orderBy('users.name', 'ASC')
-            ->orderBy('categories.code', 'ASC')
-            ->get()
-            ->groupBy('ro_id');
+        $company = $company_id != 'all' ? Company::find($company_id) : null;
 
-
-        // Reset 'all' to make it more readable in the UI
-        if (in_array('%', $category_id1)) {
-            $category_id1 = "all";
-        }
-        // if (in_array('%', $branch_id)) {
-        //     $branch_id = "all";
-        // }
-        if (in_array('%', $user_id)) {
-            $user_id = "all";
-        }
-        if ($company_id == '%') {
-            $company_id = 'all';
-        }
-
-        // Fetch branch info if a specific branch is selected
-        // $branch = null;
-        // if ($branch_id != 'all') {
-        //     $branch = Branch::find($branch_id);
-        // }
-        $company = null;
-        if ($company_id != 'all') {
-            $company = Company::find($company_id);
-        }
-        // Return the view with the data
-        return view(
-            'pages.reports.sales_and_cash_analysis.load_relation_officer_report',
-            compact('salesByOfficer', 'from_date', 'to_date', 'category_id1', 'user_id', 'company', 'company_id', 'is_summary')
-        );
-
+        return view('pages.reports.sales_and_cash_analysis.load_relation_officer_report', compact(
+            'salesByOfficer',
+            'from_date',
+            'to_date',
+            'category_id1',
+            'user_id',
+            'company',
+            'company_id',
+            'is_summary'
+        ));
     }
 
     public function printRelationOfficerReport($from_date, $to_date, $company_id, $branch_id, $store_id, $category_id, $product_id, $staff_id)
@@ -3187,6 +3321,8 @@ class ReportController extends Controller
 
         if ($branch_id != '%')
             $query = $query->where('branches.id', $branch_id);
+        if ($customer_id != '%')
+            $query = $query->where('general_account_ledgers.model_id', $customer_id);
 
         $sales = $query->get();
 
@@ -3353,13 +3489,13 @@ class ReportController extends Controller
     public function loadAgeingReport(Request $request)
     {
         set_time_limit(600); // 10 minutes
-    
+
         $from_date = $request->from_date;
         $to_date = $request->to_date;
         $customer_id = $request->customer_id;
         $company_id = $request->company_id;
         $branch_id = $request->branch_id;
-    
+
         // Define age ranges
         $daysRange = [
             1 => [0, 7],
@@ -3372,7 +3508,7 @@ class ReportController extends Controller
             8 => [181, null],
         ];
         [$lowerdays, $upperdays] = $daysRange[$to_date] ?? [1, null];
-    
+
         // Ensure NULL values are handled properly
         $filters = [];
         if ($company_id !== 'all' && !empty($company_id)) {
@@ -3384,7 +3520,7 @@ class ReportController extends Controller
         if ($customer_id !== 'all' && !empty($customer_id)) {
             $filters[] = ['gal.model_id', '=', $customer_id];
         }
-    
+
         // Subquery to get the last transaction date and ID per customer, excluding references starting with 'RCT'
         $subquery = DB::table('general_account_ledgers AS gal')
             ->select(
@@ -3395,15 +3531,15 @@ class ReportController extends Controller
             ->where('gal.model_name', 'Customer')
             ->where('gal.reference', 'NOT LIKE', 'RCT%') // Exclude references starting with 'RCT'
             ->groupBy('gal.model_id');
-    
+
         // Join the subquery result with general_account_ledgers to get reference and description
         $lastTransactionDetails = DB::table('general_account_ledgers AS gal2')
             ->select('gal2.model_id', 'gal2.reference', 'gal2.description')
             ->joinSub($subquery, 'lt', function ($join) {
                 $join->on('gal2.id', '=', 'lt.last_transaction_id')
-                     ->on('gal2.model_id', '=', 'lt.model_id');
+                    ->on('gal2.model_id', '=', 'lt.model_id');
             });
-    
+
         $sales = Customer::select(
             DB::raw('SUM(gal.credit) - SUM(gal.debit) AS balance'),
             'last_transaction_details.reference',
@@ -3428,16 +3564,16 @@ class ReportController extends Controller
             ->where('gal.model_name', 'Customer')
             ->groupBy('gal.model_id', 'lt.last_transaction_date', 'last_transaction_details.reference', 'last_transaction_details.description')
             ->havingRaw('SUM(gal.credit) - SUM(gal.debit) < 0');
-    
+
         if ($lowerdays !== null) {
             $sales->havingRaw('DATEDIFF(NOW(), lt.last_transaction_date) >= ?', [$lowerdays]);
         }
         if ($upperdays !== null) {
             $sales->havingRaw('DATEDIFF(NOW(), lt.last_transaction_date) <= ?', [$upperdays]);
         }
-    
+
         $sales = $sales->orderByDesc('age')->get();
-    
+
         // 🔹 Handle Filters for View
         if ($customer_id == "%" || $customer_id == '' || $customer_id == null)
             $customer_id = "all";
@@ -3447,10 +3583,10 @@ class ReportController extends Controller
             $from_date = "all";
         if ($to_date == null)
             $to_date = "all";
-    
+
         $company = ($company_id != 'all') ? Company::find($company_id) : null;
         $branch = ($branch_id != "all") ? Branch::find($branch_id) : null;
-    
+
         return view('pages.reports.customer_ledger_analysis.load_ageing_report', compact('sales', 'from_date', 'branch', 'to_date', 'company_id', 'branch_id', 'customer_id'));
     }
 
@@ -3589,7 +3725,6 @@ class ReportController extends Controller
             ->where('model_name', 'Customer')
             ->groupBy('general_account_ledgers.model_id')
             ->orderBy('general_account_ledgers.date')
-            ->limit(500)
             ->get();
 
         if ($customer_id == "%")
@@ -5558,197 +5693,18 @@ class ReportController extends Controller
         return view('pages.reports.ap_ar.trial_balance.index', compact('branches'));
     }
 
-    public function loadTrialBalance(Request $request)
-    {
-        $from_date = $request->from_date;
-        $to_date = $request->to_date;
-        $company_id = $request->company_id;
-        $branch_id = $request->branch_id;
-
-        $query1 = $this->generalAccountLedgerBy($from_date, $to_date, $company_id, $branch_id, 'GeneralAccount')
-            ->whereIn(DB::raw('SUBSTR(general_accounts.number, 1, 1)'), ['R', 'C']);
-        $query2 = $this->generalAccountLedgerBy(null, $to_date, $company_id, $branch_id, 'GeneralAccount')
-            ->whereNotIn(DB::raw('SUBSTR(general_accounts.number, 1, 1)'), ['R', 'C']);
-        // $query3 = $this->generalAccountLedgerBy(null, $to_date, $branch_id, 'GeneralAccount')
-        //     ->where('general_accounts.number', 'A150001');
-        // $query4 = $this->generalAccountLedgerBy(null, $to_date, $branch_id, 'GeneralAccount')
-        //     ->where('general_accounts.number', 'L220010');
-        $ledger1 = $query1->select(
-            DB::raw('SUM(credit) AS credit'),
-            DB::raw('SUM(debit) AS debit'),
-            'number',
-            'general_accounts.description',
-            'general_account_ledgers.id'
-        )
-            ->whereNotIn('model_name', ['Customer', 'Supplier'])
-            ->orderBy('number')
-            ->groupBy('number')
-            ->get();
-
-        $ledger2 = $query2->select(
-            DB::raw('SUM(credit) AS credit'),
-            DB::raw('SUM(debit) AS debit'),
-            'number',
-            'general_accounts.description',
-            'general_account_ledgers.id'
-        )
-            ->whereNotIn('model_name', ['Customer', 'Supplier'])
-            ->orderBy('number')
-            ->groupBy('number')
-            ->get();
-        $ledger3 = DB::table('general_account_ledgers')
-            ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
-            ->select(
-                DB::raw('SUM(general_account_ledgers.credit) AS credit'),
-                DB::raw('SUM(general_account_ledgers.debit) AS debit'),
-                'general_accounts.description',
-                'general_account_ledgers.id'
-            )
-            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
-            ->whereDate('general_account_ledgers.date', '<=', $to_date)
-            ->whereNotIn('general_account_ledgers.model_name', ['GeneralAccount', 'Supplier'])
-            ->groupBy('model_name')
-            ->get();
-        $ledger4 = DB::table('general_account_ledgers')
-            ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
-            ->select(
-                DB::raw('SUM(general_account_ledgers.credit) AS credit'),
-                DB::raw('SUM(general_account_ledgers.debit) AS debit'),
-                'general_accounts.description',
-                'general_account_ledgers.id'
-            )
-            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
-            ->whereDate('general_account_ledgers.date', '<=', $to_date)
-            ->whereNotIn('general_account_ledgers.model_name', ['GeneralAccount', 'Customer'])
-            ->groupBy('model_name')
-            ->get();
-
-        $credit_sum1 = $query1->sum('credit');
-        $debit_sum1 = $query1->sum('debit');
-        $balance1 = $credit_sum1 - $debit_sum1;
-
-        $credit_sum2 = $query2->sum('credit');
-        $debit_sum2 = $query2->sum('debit');
-        $balance2 = $credit_sum2 - $debit_sum2;
-
-        $credit_sum3 = $ledger3->sum('credit');
-        $debit_sum3 = $ledger3->sum('debit');
-        $balance3 = $credit_sum3 - $debit_sum3;
-
-        $credit_sum4 = $ledger4->sum('credit');
-        $debit_sum4 = $ledger4->sum('debit');
-        $balance4 = $credit_sum4 - $debit_sum4;
-
-        $branch = null;
-        if ($company_id == 'all' || $company_id == '') {
-            $company_id = '%';
-        }
-        if ($branch_id == '' || $branch_id == '%')
-            $branch_id = 'all';
-        $company = null;
-        if ($company_id != 'all')
-            $company = Company::find($company_id);
-        if ($branch_id != 'all')
-            $branch = Branch::find($branch_id);
-        return view('pages.reports.ap_ar.trial_balance.load', compact('ledger1', 'ledger2', 'ledger3', 'ledger4', 'branch', 'from_date', 'to_date', 'company_id', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1', 'balance2', 'credit_sum2', 'debit_sum2', 'balance3', 'credit_sum3', 'debit_sum3', 'balance4', 'credit_sum4', 'debit_sum4'));
-    }
-
-    public function printTrialBalance($from, $to, $company_id, $branch_id)
-    {
-        $query1 = $this->generalAccountLedgerBy($from, $to, $branch_id, 'GeneralAccount')
-            ->whereIn(DB::raw('SUBSTR(general_accounts.number, 1, 1)'), ['R', 'C']);
-        $query2 = $this->generalAccountLedgerBy(null, $to, $branch_id, 'GeneralAccount')
-            ->whereNotIn(DB::raw('SUBSTR(general_accounts.number, 1, 1)'), ['R', 'C']);
-        // $query3 = $this->generalAccountLedgerBy(null, $to_date, $branch_id, 'GeneralAccount')
-        //     ->where('general_accounts.number', 'A150001');
-        // $query4 = $this->generalAccountLedgerBy(null, $to_date, $branch_id, 'GeneralAccount')
-        //     ->where('general_accounts.number', 'L220010');
-        $ledger1 = $query1->select(
-            DB::raw('SUM(credit) AS credit'),
-            DB::raw('SUM(debit) AS debit'),
-            'number',
-            'general_accounts.description',
-            'general_account_ledgers.id'
-        )
-            ->whereNotIn('model_name', ['Customer', 'Supplier'])
-            ->orderBy('number')
-            ->groupBy('number')
-            ->get();
-
-        $ledger2 = $query2->select(
-            DB::raw('SUM(credit) AS credit'),
-            DB::raw('SUM(debit) AS debit'),
-            'number',
-            'general_accounts.description',
-            'general_account_ledgers.id'
-        )
-            ->whereNotIn('model_name', ['Customer', 'Supplier'])
-            ->orderBy('number')
-            ->groupBy('number')
-            ->get();
-        $ledger3 = DB::table('general_account_ledgers')
-            ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
-            ->select(
-                DB::raw('SUM(general_account_ledgers.credit) AS credit'),
-                DB::raw('SUM(general_account_ledgers.debit) AS debit'),
-                'general_accounts.description',
-                'general_account_ledgers.id'
-            )
-            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
-            ->whereDate('general_account_ledgers.date', '<=', $to)
-            ->whereNotIn('general_account_ledgers.model_name', ['GeneralAccount', 'Supplier'])
-            ->groupBy('model_name')
-            ->get();
-        $ledger4 = DB::table('general_account_ledgers')
-            ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
-            ->select(
-                DB::raw('SUM(general_account_ledgers.credit) AS credit'),
-                DB::raw('SUM(general_account_ledgers.debit) AS debit'),
-                'general_accounts.description',
-                'general_account_ledgers.id'
-            )
-            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
-            ->whereDate('general_account_ledgers.date', '<=', $to)
-            ->whereNotIn('general_account_ledgers.model_name', ['GeneralAccount', 'Customer'])
-            ->groupBy('model_name')
-            ->get();
-
-        $credit_sum1 = $query1->sum('credit');
-        $debit_sum1 = $query1->sum('debit');
-        $balance1 = $credit_sum1 - $debit_sum1;
-
-        $credit_sum2 = $query2->sum('credit');
-        $debit_sum2 = $query2->sum('debit');
-        $balance2 = $credit_sum2 - $debit_sum2;
-
-        $credit_sum3 = $ledger3->sum('credit');
-        $debit_sum3 = $ledger3->sum('debit');
-        $balance3 = $credit_sum3 - $debit_sum3;
-
-        $credit_sum4 = $ledger4->sum('credit');
-        $debit_sum4 = $ledger4->sum('debit');
-        $balance4 = $credit_sum4 - $debit_sum4;
-        $company = null;
-        if ($company_id != 'all')
-            $company = Company::find($company_id);
-        $branch = null;
-        if ($branch_id != 'all')
-            $branch = Branch::find($branch_id);
-        return view('pages.reports.ap_ar.trial_balance.print', compact('ledger1', 'ledger2', 'ledger3', 'ledger4', 'branch', 'from', 'to', 'company_id', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1', 'balance2', 'credit_sum2', 'debit_sum2', 'balance3', 'credit_sum3', 'debit_sum3', 'balance4', 'credit_sum4', 'debit_sum4'));
-    }
-
-    public function balanceSheet()
-    {
-        $branches = Branch::select(['id', 'name', 'code'])->orderBy('name')->get();
-
-        return view('pages.reports.ap_ar.balance_sheet.index', compact('branches'));
-    }
-    // public function loadBalanceSheet(Request $request)
+    // public function loadTrialBalance(Request $request)
     // {
+    //     $from_date = $request->from_date;
     //     $to_date = $request->to_date;
+    //     $company_id = $request->company_id;
     //     $branch_id = $request->branch_id;
 
-    //     $query1 = $this->generalAccountLedgerBy(null, $to_date, $branch_id, 'GeneralAccount');
+    //     $query1 = $this->generalAccountLedgerBy($from_date, $to_date, $company_id, $branch_id, 'GeneralAccount')
+    //         ->whereIn(DB::raw('SUBSTR(general_accounts.number, 1, 1)'), ['R', 'C']);
+    //     $query2 = $this->generalAccountLedgerBy(null, $to_date, $company_id, $branch_id, 'GeneralAccount')
+    //         ->whereNotIn(DB::raw('SUBSTR(general_accounts.number, 1, 1)'), ['R', 'C']);
+
     //     $ledger1 = $query1->select(
     //         DB::raw('SUM(credit) AS credit'),
     //         DB::raw('SUM(debit) AS debit'),
@@ -5760,7 +5716,19 @@ class ReportController extends Controller
     //         ->orderBy('number')
     //         ->groupBy('number')
     //         ->get();
-    //     $ledger2 = DB::table('general_account_ledgers')
+
+    //     $ledger2 = $query2->select(
+    //         DB::raw('SUM(credit) AS credit'),
+    //         DB::raw('SUM(debit) AS debit'),
+    //         'number',
+    //         'general_accounts.description',
+    //         'general_account_ledgers.id'
+    //     )
+    //         ->whereNotIn('model_name', ['Customer', 'Supplier'])
+    //         ->orderBy('number')
+    //         ->groupBy('number')
+    //         ->get();
+    //     $ledger3 = DB::table('general_account_ledgers')
     //         ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
     //         ->select(
     //             DB::raw('SUM(general_account_ledgers.credit) AS credit'),
@@ -5773,7 +5741,7 @@ class ReportController extends Controller
     //         ->whereNotIn('general_account_ledgers.model_name', ['GeneralAccount', 'Supplier'])
     //         ->groupBy('model_name')
     //         ->get();
-    //     $ledger3 = DB::table('general_account_ledgers')
+    //     $ledger4 = DB::table('general_account_ledgers')
     //         ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
     //         ->select(
     //             DB::raw('SUM(general_account_ledgers.credit) AS credit'),
@@ -5787,20 +5755,170 @@ class ReportController extends Controller
     //         ->groupBy('model_name')
     //         ->get();
 
-
     //     $credit_sum1 = $query1->sum('credit');
     //     $debit_sum1 = $query1->sum('debit');
     //     $balance1 = $credit_sum1 - $debit_sum1;
 
+    //     $credit_sum2 = $query2->sum('credit');
+    //     $debit_sum2 = $query2->sum('debit');
+    //     $balance2 = $credit_sum2 - $debit_sum2;
+
+    //     $credit_sum3 = $ledger3->sum('credit');
+    //     $debit_sum3 = $ledger3->sum('debit');
+    //     $balance3 = $credit_sum3 - $debit_sum3;
+
+    //     $credit_sum4 = $ledger4->sum('credit');
+    //     $debit_sum4 = $ledger4->sum('debit');
+    //     $balance4 = $credit_sum4 - $debit_sum4;
 
     //     $branch = null;
-
+    //     if ($company_id == 'all' || $company_id == '') {
+    //         $company_id = '%';
+    //     }
     //     if ($branch_id == '' || $branch_id == '%')
     //         $branch_id = 'all';
+    //     $company = null;
+    //     if ($company_id != 'all')
+    //         $company = Company::find($company_id);
     //     if ($branch_id != 'all')
     //         $branch = Branch::find($branch_id);
-    //     return view('pages.reports.ap_ar.balance_sheet.load', compact('ledger1', 'ledger2', 'ledger3', 'branch', 'to_date', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1'));
+    //     return view('pages.reports.ap_ar.trial_balance.load', compact('ledger1', 'ledger2', 'ledger3', 'ledger4', 'branch', 'from_date', 'to_date', 'company_id', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1', 'balance2', 'credit_sum2', 'debit_sum2', 'balance3', 'credit_sum3', 'debit_sum3', 'balance4', 'credit_sum4', 'debit_sum4'));
     // }
+
+    public function loadTrialBalance(Request $request)
+    {
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
+        $company_id = $request->company_id;
+        $branch_id = $request->branch_id;
+
+        // Calculate Previous Profit (before from_date)
+        $previous_income = $this->generalAccountLedgerBy(null, $from_date, $company_id, $branch_id, 'GeneralAccount')
+            ->whereIn(DB::raw('SUBSTR(general_accounts.number, 1, 1)'), ['R'])
+            ->sum(DB::raw('credit - debit'));
+
+        $previous_expense = $this->generalAccountLedgerBy(null, $from_date, $company_id, $branch_id, 'GeneralAccount')
+            ->whereIn(DB::raw('SUBSTR(general_accounts.number, 1, 1)'), ['C'])
+            ->sum(DB::raw('debit - credit'));
+
+        $previous_profit = $previous_income - $previous_expense;
+
+        $query1 = $this->generalAccountLedgerBy($from_date, $to_date, $company_id, $branch_id, 'GeneralAccount')
+            ->whereIn(DB::raw('SUBSTR(general_accounts.number, 1, 1)'), ['R', 'C']);
+
+        $query2 = $this->generalAccountLedgerBy(null, $to_date, $company_id, $branch_id, 'GeneralAccount')
+            ->whereNotIn(DB::raw('SUBSTR(general_accounts.number, 1, 1)'), ['R', 'C']);
+
+        $ledger1 = $query1->select(
+            DB::raw('SUM(credit) AS credit'),
+            DB::raw('SUM(debit) AS debit'),
+            'number',
+            'general_accounts.description',
+            'general_account_ledgers.id'
+        )
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->orderBy('number')
+            ->groupBy('number')
+            ->get();
+
+        $ledger2 = $query2->select(
+            DB::raw('SUM(credit) AS credit'),
+            DB::raw('SUM(debit) AS debit'),
+            'number',
+            'general_accounts.description',
+            'general_account_ledgers.id'
+        )
+            ->whereNotIn('model_name', ['Customer', 'Supplier'])
+            ->orderBy('number')
+            ->groupBy('number')
+            ->get();
+
+        $ledger3 = DB::table('general_account_ledgers')
+            ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+            ->select(
+                DB::raw('SUM(general_account_ledgers.credit) AS credit'),
+                DB::raw('SUM(general_account_ledgers.debit) AS debit'),
+                'general_accounts.description',
+                'general_account_ledgers.id'
+            )
+            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+            ->whereDate('general_account_ledgers.date', '<=', $to_date)
+            ->whereNotIn('general_account_ledgers.model_name', ['GeneralAccount', 'Supplier'])
+            ->groupBy('model_name')
+            ->get();
+
+        $ledger4 = DB::table('general_account_ledgers')
+            ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+            ->select(
+                DB::raw('SUM(general_account_ledgers.credit) AS credit'),
+                DB::raw('SUM(general_account_ledgers.debit) AS debit'),
+                'general_accounts.description',
+                'general_account_ledgers.id'
+            )
+            ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
+            ->whereDate('general_account_ledgers.date', '<=', $to_date)
+            ->whereNotIn('general_account_ledgers.model_name', ['GeneralAccount', 'Customer'])
+            ->groupBy('model_name')
+            ->get();
+
+        $credit_sum1 = $query1->sum('credit');
+        $debit_sum1 = $query1->sum('debit');
+        $balance1 = $credit_sum1 - $debit_sum1;
+
+        $credit_sum2 = $query2->sum('credit');
+        $debit_sum2 = $query2->sum('debit');
+        $balance2 = $credit_sum2 - $debit_sum2 + $previous_profit;
+
+        $credit_sum3 = $ledger3->sum('credit');
+        $debit_sum3 = $ledger3->sum('debit');
+        $balance3 = $credit_sum3 - $debit_sum3;
+
+        $credit_sum4 = $ledger4->sum('credit');
+        $debit_sum4 = $ledger4->sum('debit');
+        $balance4 = $credit_sum4 - $debit_sum4;
+
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
+        if ($branch_id == '' || $branch_id == '%')
+            $branch_id = 'all';
+
+        $company = $company_id != 'all' ? Company::find($company_id) : null;
+        $branch = $branch_id != 'all' ? Branch::find($branch_id) : null;
+
+        return view('pages.reports.ap_ar.trial_balance.load', compact(
+            'ledger1',
+            'ledger2',
+            'ledger3',
+            'ledger4',
+            'branch',
+            'from_date',
+            'to_date',
+            'company_id',
+            'branch_id',
+            'balance1',
+            'credit_sum1',
+            'debit_sum1',
+            'balance2',
+            'credit_sum2',
+            'debit_sum2',
+            'balance3',
+            'credit_sum3',
+            'debit_sum3',
+            'balance4',
+            'credit_sum4',
+            'debit_sum4',
+            'previous_profit'
+        ));
+    }
+
+    public function balanceSheet()
+    {
+        $branches = Branch::select(['id', 'name', 'code'])->orderBy('name')->get();
+
+        return view('pages.reports.ap_ar.balance_sheet.index', compact('branches'));
+    }
+   
     public function loadBalanceSheet(Request $request)
     {
         $to_date = $request->to_date;
@@ -5862,7 +5980,7 @@ class ReportController extends Controller
 
         // Combine all accounts
         $allAccounts = $generalAccounts->concat($customerAccounts)->concat($supplierAccounts);
-
+        //return ( $allAccounts);
         // Separate accounts into assets, liabilities, equity, revenues, and expenses
         $assets = collect();
         $liabilities = collect();
@@ -5990,59 +6108,7 @@ class ReportController extends Controller
         }
         return view('pages.reports.ap_ar.balance_sheet.load', compact('assets', 'liabilities', 'equity', 'net_income', 'branch', 'to_date', 'company_id', 'branch_id', 'retainedEarningsFromLastYear', 'retainedEarningsFromSelectedYear'));
     }
-    // public function printBalanceSheet($to, $branch_id)
-    // {
-    //     $query1 = $this->generalAccountLedgerBy(null, $to, $branch_id, 'GeneralAccount');
-    //     $query1 = $this->generalAccountLedgerBy(null, $to, $branch_id, 'GeneralAccount');
-    //     $ledger1 = $query1->select(
-    //         DB::raw('SUM(credit) AS credit'),
-    //         DB::raw('SUM(debit) AS debit'),
-    //         'number',
-    //         'general_accounts.description',
-    //         'general_account_ledgers.id'
-    //     )
-    //         ->whereNotIn('model_name', ['Customer', 'Supplier'])
-    //         ->orderBy('number')
-    //         ->groupBy('number')
-    //         ->get();
-    //     $ledger2 = DB::table('general_account_ledgers')
-    //         ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
-    //         ->select(
-    //             DB::raw('SUM(general_account_ledgers.credit) AS credit'),
-    //             DB::raw('SUM(general_account_ledgers.debit) AS debit'),
-    //             'general_accounts.description',
-    //             'general_account_ledgers.id'
-    //         )
-    //         ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
-    //         ->whereDate('general_account_ledgers.date', '<=', $to)
-    //         ->whereNotIn('general_account_ledgers.model_name', ['GeneralAccount', 'Supplier'])
-    //         ->groupBy('model_name')
-    //         ->get();
-    //     $ledger3 = DB::table('general_account_ledgers')
-    //         ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
-    //         ->select(
-    //             DB::raw('SUM(general_account_ledgers.credit) AS credit'),
-    //             DB::raw('SUM(general_account_ledgers.debit) AS debit'),
-    //             'general_accounts.description',
-    //             'general_account_ledgers.id'
-    //         )
-    //         ->where('general_account_ledgers.branch_id', 'LIKE', $branch_id)
-    //         ->whereDate('general_account_ledgers.date', '<=', $to)
-    //         ->whereNotIn('general_account_ledgers.model_name', ['GeneralAccount', 'Customer'])
-    //         ->groupBy('model_name')
-    //         ->get();
-
-
-    //     $credit_sum1 = $query1->sum('credit');
-    //     $debit_sum1 = $query1->sum('debit');
-    //     $balance1 = $credit_sum1 - $debit_sum1;
-
-
-    //     $branch = null;
-    //     if ($branch_id != 'all')
-    //         $branch = Branch::find($branch_id);
-    //     return view('pages.reports.ap_ar.balance_sheet.print', compact('ledger1', 'branch', 'to', 'branch_id', 'balance1', 'credit_sum1', 'debit_sum1'));
-    // }
+    
     public function printBalanceSheet($to_date, $company_id, $branch_id)
     {
         // Helper function to get account type
@@ -7402,6 +7468,87 @@ class ReportController extends Controller
         return view('pages.reports.inventory.slow_overstay.slow_overstay_report');
     }
 
+    // public function loadslowOverstayedReport(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'branch_id' => 'nullable|integer',
+    //         'company_id' => 'nullable|integer',
+    //         'report_type' => 'nullable|string', // New field for selecting report type
+    //     ]);
+
+    //     $company_id = $validated['company_id'];
+    //     $branch_id = $validated['branch_id'];
+    //     if ($validated['branch_id'] == 'all' || $validated['branch_id'] == '') {
+    //         $branch_id = '%'; // Ensure 'all' branches are included
+    //     }
+    //     if ($validated['company_id'] == 'all' || $validated['company_id'] == '') {
+    //         $company_id = '%'; // Ensure 'all' branches are included
+    //     }
+    //     if ($validated['report_type'] == 'overstayed') {
+    //         $inventory = DB::table('purchase_products AS pp')
+    //             ->join('purchases AS pur', 'pp.purchase_id', '=', 'pur.id')
+    //             ->join('products AS p', 'pp.product_id', '=', 'p.id')
+    //             ->join('branches AS b', 'pur.branch_id', '=', 'b.id')
+    //             ->join('store_products AS sp', function ($join) {
+    //                 $join->on('pp.product_id', '=', 'sp.product_id')
+    //                     ->join('stores AS s', 'sp.store_id', '=', 's.id')
+    //                     ->whereColumn('s.branch_id', 'pur.branch_id'); // Ensure the store belongs to the correct branch
+    //             })
+    //             ->select(
+    //                 'p.id AS product_id',
+    //                 'p.name AS product_name',
+    //                 'p.code AS product_code',
+    //                 'b.name AS branch_name',
+    //                 's.name AS store_name',
+    //                 's.code AS store_code',
+    //                 'pp.updated_at AS last_received_date',
+    //                 DB::raw('DATEDIFF(CURDATE(), pp.updated_at) AS days_since_received'),
+    //                 'sp.qty_available AS available_quantity'
+    //             )
+    //             ->where('pur.branch_id', 'LIKE', $branch_id) // Ensuring correct branch
+    //             ->where('b.company_id', 'LIKE', $company_id) // Ensuring correct company_id
+    //             ->where('sp.qty_available', '>', 0)
+    //             ->havingRaw('days_since_received > 30') // Overstayed products (30+ days)
+    //             ->orderByDesc('days_since_received')
+    //             ->get();
+
+    //         $type = 'overstayed';
+    //         return view('pages.reports.inventory.slow_overstay.load_slow_overstay_report', compact('inventory', 'type'));
+
+    //     } elseif ($validated['report_type'] == 'slow_moving') {
+    //         $inventory = DB::table('order_details AS od')
+    //             ->join('orders AS o', 'od.order_id', '=', 'o.id')
+    //             ->join('products AS p', 'od.store_product_id', '=', 'p.id')
+    //             ->join('branches AS b', 'o.branch_id', '=', 'b.id')
+    //             ->join('store_products AS sp', function ($join) {
+    //                 $join->on('od.store_product_id', '=', 'sp.product_id')
+    //                     ->join('stores AS s', 'sp.store_id', '=', 's.id')
+    //                     ->whereColumn('s.branch_id', 'o.branch_id'); // Ensures store belongs to the correct branch
+    //             })
+    //             ->select(
+    //                 'p.id AS product_id',
+    //                 'p.name AS product_name',
+    //                 'p.code AS product_code',
+    //                 'b.name AS branch_name',
+    //                 's.name AS store_name',
+    //                 's.code AS store_code',
+    //                 'od.updated_at AS last_sold_date',
+    //                 DB::raw('DATEDIFF(CURDATE(), od.updated_at) AS days_since_sold'),
+    //                 'sp.qty_available AS available_quantity'
+    //             )
+    //             ->where('o.branch_id', 'LIKE', $branch_id) // Ensuring correct branch
+    //             ->where('b.company_id', 'LIKE', $company_id) // Ensuring correct company_id
+    //             ->where('sp.qty_available', '>', 0)
+    //             ->havingRaw('days_since_sold > 60') // Slow-moving products (60+ days)
+    //             ->orderByDesc('days_since_sold')
+    //             ->get();
+
+    //         $type = 'slow_moving';
+    //         return view('pages.reports.inventory.slow_overstay.load_slow_overstay_report', compact('inventory', 'type'));
+    //     }
+
+    //     return back()->withErrors(['error' => 'Invalid report type selected.']);
+    // }
     public function loadslowOverstayedReport(Request $request)
     {
         $validated = $request->validate([
@@ -7416,32 +7563,29 @@ class ReportController extends Controller
             $branch_id = '%'; // Ensure 'all' branches are included
         }
         if ($validated['company_id'] == 'all' || $validated['company_id'] == '') {
-            $company_id = '%'; // Ensure 'all' branches are included
+            $company_id = '%'; // Ensure 'all' companies are included
         }
         if ($validated['report_type'] == 'overstayed') {
-            // Overstayed Inventory Query
-            // $inventory = DB::table('purchase_products AS pp')
-            //     ->join('purchases AS pur', 'pp.purchase_id', '=', 'pur.id')
-            //     ->join('products AS p', 'pp.product_id', '=', 'p.id')
-            //     ->join('branches AS b', 'pur.branch_id', '=', 'b.id')
-            //     ->join('store_products AS sp', 'pp.product_id', '=', 'sp.product_id')
-            //     ->join('stores AS s', 'sp.store_id', '=', 's.id')
-            //     ->select(
-            //         'p.id AS product_id',
-            //         'p.name AS product_name',
-            //         'p.code AS product_code',
-            //         'b.name AS branch_name',
-            //         's.name AS store_name',
-            //         's.code AS store_code',
-            //         'pp.updated_at AS last_received_date',
-            //         DB::raw('DATEDIFF(CURDATE(), pp.updated_at) AS days_since_received'),
-            //         'sp.qty_available AS available_quantity'
-            //     )
-            //     ->where('pur.branch_id', $validated['branch_id'])
-            //     ->where('sp.qty_available', '>', 0)
-            //     ->havingRaw('days_since_received > 30') // Overstayed products (30+ days)
-            //     ->orderByDesc('days_since_received')
-            //     ->get();
+            // First get the latest receive date for each product in each store
+            $latestReceiveDates = DB::table('purchase_products AS pp')
+                ->join('purchases AS pur', 'pp.purchase_id', '=', 'pur.id')
+                ->join('branches AS b', 'pur.branch_id', '=', 'b.id')
+                ->join('store_products AS sp', function ($join) {
+                    $join->on('pp.product_id', '=', 'sp.product_id')
+                        ->join('stores AS s', 'sp.store_id', '=', 's.id')
+                        ->whereColumn('s.branch_id', 'pur.branch_id');
+                })
+                ->select(
+                    'pp.product_id',
+                    's.id AS store_id',
+                    DB::raw('MAX(pp.updated_at) AS latest_update')
+                )
+                ->where('pur.branch_id', 'LIKE', $branch_id)
+                ->where('b.company_id', 'LIKE', $company_id)
+                ->where('sp.qty_available', '>', 0)
+                ->groupBy('pp.product_id', 's.id');
+
+            // Then join this subquery to get the complete inventory report
             $inventory = DB::table('purchase_products AS pp')
                 ->join('purchases AS pur', 'pp.purchase_id', '=', 'pur.id')
                 ->join('products AS p', 'pp.product_id', '=', 'p.id')
@@ -7449,7 +7593,12 @@ class ReportController extends Controller
                 ->join('store_products AS sp', function ($join) {
                     $join->on('pp.product_id', '=', 'sp.product_id')
                         ->join('stores AS s', 'sp.store_id', '=', 's.id')
-                        ->whereColumn('s.branch_id', 'pur.branch_id'); // Ensure the store belongs to the correct branch
+                        ->whereColumn('s.branch_id', 'pur.branch_id');
+                })
+                ->joinSub($latestReceiveDates, 'latest_dates', function ($join) {
+                    $join->on('pp.product_id', '=', 'latest_dates.product_id')
+                        ->on('s.id', '=', 'latest_dates.store_id')
+                        ->on('pp.updated_at', '=', 'latest_dates.latest_update');
                 })
                 ->select(
                     'p.id AS product_id',
@@ -7462,8 +7611,8 @@ class ReportController extends Controller
                     DB::raw('DATEDIFF(CURDATE(), pp.updated_at) AS days_since_received'),
                     'sp.qty_available AS available_quantity'
                 )
-                ->where('pur.branch_id', 'LIKE', $branch_id) // Ensuring correct branch
-                ->where('b.company_id', 'LIKE', $company_id) // Ensuring correct company_id
+                ->where('pur.branch_id', 'LIKE', $branch_id)
+                ->where('b.company_id', 'LIKE', $company_id)
                 ->where('sp.qty_available', '>', 0)
                 ->havingRaw('days_since_received > 30') // Overstayed products (30+ days)
                 ->orderByDesc('days_since_received')
@@ -7473,29 +7622,26 @@ class ReportController extends Controller
             return view('pages.reports.inventory.slow_overstay.load_slow_overstay_report', compact('inventory', 'type'));
 
         } elseif ($validated['report_type'] == 'slow_moving') {
-            // Slow Moving Inventory Query
-            // $inventory = DB::table('order_details AS od')
-            //     ->join('orders AS o', 'od.order_id', '=', 'o.id')
-            //     ->join('products AS p', 'od.store_product_id', '=', 'p.id')
-            //     ->join('branches AS b', 'o.branch_id', '=', 'b.id')
-            //     ->join('store_products AS sp', 'od.store_product_id', '=', 'sp.product_id')
-            //     ->join('stores AS s', 'sp.store_id', '=', 's.id')
-            //     ->select(
-            //         'p.id AS product_id',
-            //         'p.name AS product_name',
-            //         'p.code AS product_code',
-            //         'b.name AS branch_name',
-            //         's.name AS store_name',
-            //         's.code AS store_code',
-            //         'od.updated_at AS last_sold_date',
-            //         DB::raw('DATEDIFF(CURDATE(), od.updated_at) AS days_since_sold'),
-            //         'sp.qty_available AS available_quantity'
-            //     )
-            //     ->where('o.branch_id', $validated['branch_id'])
-            //     ->where('sp.qty_available', '>', 0)
-            //     ->havingRaw('days_since_sold > 60') // Slow-moving products (60+ days)
-            //     ->orderByDesc('days_since_sold')
-            //     ->get();
+            // First get the latest sold date for each product in each store
+            $latestSoldDates = DB::table('order_details AS od')
+                ->join('orders AS o', 'od.order_id', '=', 'o.id')
+                ->join('branches AS b', 'o.branch_id', '=', 'b.id')
+                ->join('store_products AS sp', function ($join) {
+                    $join->on('od.store_product_id', '=', 'sp.product_id')
+                        ->join('stores AS s', 'sp.store_id', '=', 's.id')
+                        ->whereColumn('s.branch_id', 'o.branch_id');
+                })
+                ->select(
+                    'od.store_product_id AS product_id',
+                    's.id AS store_id',
+                    DB::raw('MAX(od.updated_at) AS latest_update')
+                )
+                ->where('o.branch_id', 'LIKE', $branch_id)
+                ->where('b.company_id', 'LIKE', $company_id)
+                ->where('sp.qty_available', '>', 0)
+                ->groupBy('od.store_product_id', 's.id');
+
+            // Then join this subquery to get the complete slow-moving report
             $inventory = DB::table('order_details AS od')
                 ->join('orders AS o', 'od.order_id', '=', 'o.id')
                 ->join('products AS p', 'od.store_product_id', '=', 'p.id')
@@ -7503,7 +7649,12 @@ class ReportController extends Controller
                 ->join('store_products AS sp', function ($join) {
                     $join->on('od.store_product_id', '=', 'sp.product_id')
                         ->join('stores AS s', 'sp.store_id', '=', 's.id')
-                        ->whereColumn('s.branch_id', 'o.branch_id'); // Ensures store belongs to the correct branch
+                        ->whereColumn('s.branch_id', 'o.branch_id');
+                })
+                ->joinSub($latestSoldDates, 'latest_dates', function ($join) {
+                    $join->on('od.store_product_id', '=', 'latest_dates.product_id')
+                        ->on('s.id', '=', 'latest_dates.store_id')
+                        ->on('od.updated_at', '=', 'latest_dates.latest_update');
                 })
                 ->select(
                     'p.id AS product_id',
@@ -7516,8 +7667,8 @@ class ReportController extends Controller
                     DB::raw('DATEDIFF(CURDATE(), od.updated_at) AS days_since_sold'),
                     'sp.qty_available AS available_quantity'
                 )
-                ->where('o.branch_id', 'LIKE', $branch_id) // Ensuring correct branch
-                ->where('b.company_id', 'LIKE', $company_id) // Ensuring correct company_id
+                ->where('o.branch_id', 'LIKE', $branch_id)
+                ->where('b.company_id', 'LIKE', $company_id)
                 ->where('sp.qty_available', '>', 0)
                 ->havingRaw('days_since_sold > 60') // Slow-moving products (60+ days)
                 ->orderByDesc('days_since_sold')
@@ -7529,7 +7680,6 @@ class ReportController extends Controller
 
         return back()->withErrors(['error' => 'Invalid report type selected.']);
     }
-
     public function backdatedEntriesReport()
     {
         return view('pages.reports.inventory.user_entries.backdated_postdated_entries_report');

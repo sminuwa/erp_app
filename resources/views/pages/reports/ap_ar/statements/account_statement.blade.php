@@ -80,7 +80,7 @@
                                     <div class="form-group">
                                         <label for="payer_id">Payee</label>
                                         <select
-                                            class="form-control select2-single ajax-payee {{ $errors->has('payer_id') ? ' is-invalid' : '' }}"
+                                            class="form-control select2-single {{ $errors->has('payer_id') ? ' is-invalid' : '' }}"
                                             name="payer_id" id="payer_id" required="required">
                                             <option value="all">All</option>
                                         </select>

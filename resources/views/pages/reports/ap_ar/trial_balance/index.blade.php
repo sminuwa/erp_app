@@ -47,7 +47,7 @@
                                             class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
                                             name="company_id" id="company_id">
                                             <option value="">Select...</option>
-                                            
+
                                         </select>
                                     </div>
                                 </div>
@@ -103,9 +103,7 @@
 @endsection
 
 @push('js')
-
     <!-- Sweet Alert Js -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>
     <script type="text/javascript">
         $(function() {
             $('#trialForm').on('submit', function(e) {
@@ -130,7 +128,8 @@
                     $("#load").html(data);
                     loadDataTable()
                 });
-            })
+            });
+            
         });
     </script>
 @endpush

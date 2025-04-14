@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Spatie\Permission\PermissionRegistrar;
 
-class CreatePermissionTables extends Migration
+class CustomCreatePermissionTables extends Migration
 {
     /**
      * Run the migrations.

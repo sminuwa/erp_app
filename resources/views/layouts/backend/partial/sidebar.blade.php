@@ -958,17 +958,9 @@
                             <li class="nav-item">
                                 <a href="{{ route('backup.index') }}" class="nav-link ">
                                     <i class="ion-card"></i>
-                                    <p>Backup</p>
+                                    <p>Backup & Restore</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link ">
-                                    <i class="ion-card"></i>
-                                    <p>Restore</p>
-                                </a>
-                            </li>
-
-
                         </ul>
                     </li>
                 @endcan

@@ -301,11 +301,11 @@
 
 
                     // Update footer
-                    $(api.column(7).footer()).html(
-                        "Page Total: " + formatMoney(pageTotal) +
-                        "<br> (Grand Total: " +
-                        formatMoney(total) + ")"
-                    );
+                    // $(api.column(7).footer()).html(
+                    //     "Page Total: " + formatMoney(pageTotal) +
+                    //     "<br> (Grand Total: " +
+                    //     formatMoney(total) + ")"
+                    // );
 
 
 

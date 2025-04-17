@@ -241,7 +241,8 @@
                     url: "{{ route('ajax.load.payers') }}",
                     type: 'GET',
                     data: {
-                        type: $(this).val()
+                        type: $(this).val(),
+                        exclude: 'exclude' // Exclude revenue in payment
                     }
                 }).done(function(msg) {
                     $("#payer_id").html(msg);

@@ -50,7 +50,9 @@
                     </div>
                 @endif
 
-                <a href="{{ route('backup.create') }}" class="btn btn-sm btn-success">Create Backup</a>
+                <a href="javascript:void(0)" class="btn btn-sm btn-success" id="backupBtn">
+                    <span class="fa fa-database"></span> Create Backup
+                </a>
 
                 <h5 class="mt-2">Available Backups</h5>
                 <table class="table table-bordered">
@@ -88,8 +90,10 @@
                 <h3>Restore Database</h3>
                 <form action="{{ route('backup.restore') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <input type="file" name="backup_file" required>
-                    <button type="submit" class="btn btn-danger">Restore</button>
+                    <input type="file" name="backup_file" required accept=".sql">
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        <span class="fa fa-undo"></span> Restore
+                    </button>
                 </form>
             </div>
 
@@ -104,67 +108,37 @@
 @push('js')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add loading state to backup button
-            const backupBtn = document.querySelector('a[href="{{ route('backup.create') }}"]');
+        document.getElementById('backupBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Creating Backup...',
+                text: 'Please wait.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
 
-            if (backupBtn) {
-                backupBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-
-                    if (backupBtn.classList.contains('disabled')) {
-                        return;
+            fetch('{{ route('backup.create') }}', {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
-
-                    backupBtn.classList.add('disabled');
-                    backupBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Backup...';
-
-                    fetch('{{ route('backup.create') }}', {
-                            method: 'GET',
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.status === 'success') {
-                                Swal.fire({
-                                    title: 'Backup Completed!',
-                                    text: data.message,
-                                    icon: 'success',
-                                    timer: 2000, // Auto close after 2 seconds
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload(); // Reload page after alert closes
-                                });
-                            } else {
-                                throw new Error(data.message);
-                            }
-                        })
-                        .catch(error => {
-                            Swal.fire({
-                                title: 'Error!',
-                                text: error.message,
-                                icon: 'error'
-                            });
-
-                            backupBtn.classList.remove('disabled');
-                            backupBtn.innerHTML = 'Create Backup';
-                        });
+                })
+                .then(response => response.json())
+                .then(data => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: data.message
+                    });
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Backup Failed!',
+                        text: error.message || 'An error occurred.'
+                    });
                 });
-            }
-
-            // Add confirmation to restore
-            const restoreForm = document.querySelector('form[action="{{ route('backup.restore') }}"]');
-            if (restoreForm) {
-                restoreForm.addEventListener('submit', function(e) {
-                    if (!confirm(
-                            'Warning: This will overwrite your current database. Are you sure you want to proceed?'
-                        )) {
-                        e.preventDefault();
-                    }
-                });
-            }
         });
     </script>
 @endpush

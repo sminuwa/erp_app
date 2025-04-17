@@ -31,11 +31,12 @@ class AdditionalInvoiceController extends Controller
     }
 
     public function store(Request $request){
+        // return $request;
         $invoice_id = $request->invoice_id;
         $date = $request->date;
         $purchase_id = $request->purchase_id;
         $supplier_id = $request->supplier_id;
-        $amount = $request->amount;
+        $amount = str_replace(',','',$request->amount);
         $description = $request->description;
         $invoice = PurchaseExpense::find($invoice_id);
         if(!$invoice){
@@ -51,6 +52,7 @@ class AdditionalInvoiceController extends Controller
         $invoice->description = $description;
         $invoice->description = $description;
         $invoice->status = 0;
+        // return $amount;
         if($invoice->save()){
             session()->flash('app_message', 'Additional invoice saved successfully');
             return back();

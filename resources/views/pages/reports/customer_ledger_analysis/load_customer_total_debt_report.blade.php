@@ -44,13 +44,13 @@
             <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>
             <td style="text-align: right">{{ number_format($sale->pay, 2, '.', ',') }}</td>
             <td style="text-align: right">
-                @if ($sale->due < 0)
+                @if ($sale->due > 0)
                     {{ number_format(abs($sale->due), 2, '.', ',') }}
                 @endif
             </td>
             <td style="text-align: right">
-                @if ($sale->due > 0)
-                    ({{ number_format(abs($sale->due), 2, '.', ',') }})
+                @if ($sale->due < 0)
+                    {{ number_format(abs($sale->due), 2, '.', ',') }}
                 @endif
             </td>
         </tr>
@@ -71,10 +71,10 @@
                 {{ number_format($total_sold, 2, '.', ',') }}</th>
             
             <th style="text-align: right">
-                {{ $total_due < 0 ? number_format(abs($total_due), 2, '.', ',') : '' }}
+                {{ $total_due > 0 ? number_format(abs($total_due), 2, '.', ',') : '' }}
             </th>
             <th style="text-align: right">
-                {{ $total_due > 0 ? number_format(abs($total_due), 2, '.', ',') : '' }}
+                {{ $total_due < 0 ? number_format(abs($total_due), 2, '.', ',') : '' }}
             </th>
         </tr>
     </tfoot>

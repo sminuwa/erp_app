@@ -80,7 +80,7 @@
                                     <div class="form-group">
                                         <label for="payer_id">Payee</label>
                                         <select
-                                            class="form-control select2-single ajax-payee {{ $errors->has('payer_id') ? ' is-invalid' : '' }}"
+                                            class="form-control select2-single {{ $errors->has('payer_id') ? ' is-invalid' : '' }}"
                                             name="payer_id" id="payer_id" required="required">
                                             <option value="all">All</option>
                                         </select>
@@ -163,12 +163,21 @@
             });
 
             $('#generate').on("click", function() {
-                from_date = $('#from_date').val();
-                to_date = $('#to_date').val();
-                payer_id = $('#payer_id').val();
-                company_id = $('#company_id').val();
-                branch_id = $('#branch_id').val();
-                type = $('#type').val();
+                // from_date = $('#from_date').val();
+                // to_date = $('#to_date').val();
+                // payer_id = $('#payer_id').val();
+                // company_id = $('#company_id').val();
+                // branch_id = $('#branch_id').val();
+                // type = $('#type').val();
+
+                let from_date = $('#from_date').val();
+                let to_date = $('#to_date').val();
+                let payer_id = $('#payer_id').val();
+                let company_id = $('#company_id').val();
+                let branch_id = $('#branch_id').val();
+                let type = $('#type').val();
+
+
                 $('#img-loader').show();
 
                 $.ajax({

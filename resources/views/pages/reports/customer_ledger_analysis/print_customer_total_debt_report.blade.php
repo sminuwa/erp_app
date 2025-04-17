@@ -83,8 +83,7 @@
                                     <tr>
                                         <td>{{ $sale->code }}</td>
                                         <td>{{ $sale->customer }}</td>
-                                        <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}
-                                        </td>
+                                        <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>
                                         <td style="text-align: right">{{ number_format($sale->pay, 2, '.', ',') }}</td>
                                         <td style="text-align: right">
                                             @if ($sale->due < 0)
@@ -101,7 +100,7 @@
                                         $total_sold += $sale->total;
                                         $total_pay += $sale->pay;
                                         $total_due += $sale->due;
-
+                            
                                     @endphp
                                 @endforeach
                                 <tfoot>

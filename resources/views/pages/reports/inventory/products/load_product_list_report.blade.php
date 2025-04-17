@@ -11,18 +11,19 @@
     </caption>
     <thead>
         <tr>
-            @isset($branch_id)
+            {{-- @isset($branch_id)
                 @if ($branch_id == 'all')
                     <th>Branch</th>
                 @endif
-            @endisset
-            @isset($category_id)
+            @endisset --}}
+            {{-- @isset($category_id)
                 @if ($category_id == 'all')
                     <th>Category</th>
                 @endif
-            @endisset
-            <th>Item Description </th>
-            <th>Brand Name </th>
+            @endisset --}}
+            <th>Product Code </th>
+            <th>Product Description </th>
+            <th>Product Information </th>
             <th>Barcode</th>
             <th>Status </th>
         </tr>
@@ -30,7 +31,7 @@
     <tbody>
         @foreach ($records as $record)
             <tr>
-                @isset($branch_id)
+                {{-- @isset($branch_id)
                     @if ($branch_id == 'all')
                         <td>{{ $record->branch_code }}</td>
                     @endif
@@ -39,9 +40,10 @@
                     @if ($category_id == 'all')
                         <td>{{ $record->category?->name }}</td>
                     @endif
-                @endisset
+                @endisset --}}
                 <td> {{ $record->code }} </td>
                 <td> {{ $record->name }} </td>
+                <td> {{ $record->information }} </td>
                 <td><span style="font-size: 10pt;">{{ $record->barcode }}</span>
                 </td>
                 <td> {{ $record->status == 1 ? 'Active' : 'Inactive' }} </td>

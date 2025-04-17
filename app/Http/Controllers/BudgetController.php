@@ -131,7 +131,6 @@ class BudgetController extends Controller
             $sheet->setCellValue('C3', 'MONTH 1');
             $sheet->setCellValue('D3', 'MONTH 2');
             $sheet->setCellValue('E3', 'MONTH 3');
-            $sheet->setCellValue('F3', 'TOTAL');
 
             // Populate categories
             $rowNumber = 4;

@@ -151,15 +151,15 @@
             });
 
             $('#generate').on("click", function() {
-                from_date = $('#from_date').val();
-                to_date = $('#to_date').val();
-                company_id = $('#company_id').val();
-                branch_id = $('#branch_id').val();
-                product_id = $('#product_id').val();
-                store_id = $('#store_id').val();
-                category_id = $('#category_id').val();
-                customer_id = $('#customer_id').val();
-                type = $('#type').val();
+                let from_date = $('#from_date').val();
+                let to_date = $('#to_date').val();
+                let company_id = $('#company_id').val();
+                let branch_id = $('#branch_id').val();
+                let product_id = $('#product_id').val();
+                let store_id = $('#store_id').val();
+                let category_id = $('#category_id').val();
+                let customer_id = $('#customer_id').val();
+                let type = $('#type').val();
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",

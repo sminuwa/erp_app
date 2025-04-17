@@ -5,7 +5,7 @@
     </div> --}}
 </div>
 <div class="table-responsive">
-    <table class="display table table-bordered caption" id="example1">
+    <table class="display table table-bordered caption">
         <caption style="caption-size:top">
             <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
                 ACCOUNT STATEMENTS BETWEEN {{ Carbon\carbon::parse($from_date)->toFormattedDateString() }} TO
@@ -49,24 +49,76 @@
                     <td>{{ $loop->index + 1 }}</td>
                     <td>{{ $ledger->date->toFormattedDateString() }}</td>
                     <td>{{ $ledger->code }}</td>
-                    <td>{{ $ledger->payer()->code ?? ($ledger->payer()->number ?? '') }}</td>
+                    <td>
+                        @php
+                            $reference = $ledger->reference;
+                            $isSpecialCode =
+                                strpos($reference, 'PAY') !== false ||
+                                strpos($reference, 'RCT') !== false ||
+                                strpos($reference, 'ITB') !== false;
+                        @endphp
+
+                        @if ($isSpecialCode)
+                            {{ getContraAccount($reference, $ledger->credit, $ledger->debit) }}
+                        @else
+                            {{ $ledger->payer()->code ?? ($ledger->payer()->number ?? '') }}
+                        @endif
+                    </td>
                     <td>{{ transactionDecription($ledger->reference) != '' ? transactionDecription($ledger->reference) : $ledger->description }}
                     </td>
                     <td>
                         @if (strpos($ledger->reference, 'RCT') !== false)
-                            <a href="{{ route('receipt.payment.show', getReferenceId($ledger->reference)) }}" target="_BLANK">
+                            @if (getReferenceId($ledger->reference) > 0)
+                                <a href="{{ route('receipt.payment.show', getReferenceId($ledger->reference)) }}"
+                                    target="_BLANK">
+                                    {{ $ledger->reference }}
+                                </a>
+                            @else
                                 {{ $ledger->reference }}
-                            </a>
+                            @endif
                         @endif
                         @if (strpos($ledger->reference, 'INV') !== false)
-                            <a href="{{ route('orders.show', getReferenceId($ledger->reference)) }}" target="_BLANK">
+                            @if (getReferenceId($ledger->reference) > 0)
+                                <a href="{{ route('orders.show', getReferenceId($ledger->reference)) }}"
+                                    target="_BLANK">
+                                    {{ $ledger->reference }}
+                                </a>
+                            @else
                                 {{ $ledger->reference }}
-                            </a>
+                            @endif
+                        @endif
+                        @if (strpos($ledger->reference, 'JNL') !== false)
+                            @if (getReferenceId($ledger->reference) > 0)
+                                <a href="{{ route('journal.show', getReferenceId($ledger->reference)) }}"
+                                    target="_BLANK">
+                                    {{ $ledger->reference }}
+                                </a>
+                            @else
+                                {{ $ledger->reference }}
+                            @endif
+                        @endif
+                        @if (strpos($ledger->reference, 'ITB') !== false)
+                            @if (getReferenceId($ledger->reference) > 0)
+                                <a href="{{ route('interbank.show', getReferenceId($ledger->reference)) }}"
+                                    target="_BLANK">
+                                    {{ $ledger->reference }}
+                                </a>
+                            @else
+                                {{ $ledger->reference }}
+                            @endif
+                        @endif
+                        @if (strpos($ledger->reference, 'OPE') !== false)
+                            {{ $ledger->reference }}
                         @endif
                         @if (strpos($ledger->reference, 'PAY') !== false)
-                            <a href="{{ route('payment.show', getReferenceId($ledger->reference)) }}" target="_BLANK">
+                            @if (getReferenceId($ledger->reference) > 0)
+                                <a href="{{ route('payment.show', getReferenceId($ledger->reference)) }}"
+                                    target="_BLANK">
+                                    {{ $ledger->reference }}
+                                </a>
+                            @else
                                 {{ $ledger->reference }}
-                            </a>
+                            @endif
                         @endif
                     </td>
                     <td style="text-align: right">

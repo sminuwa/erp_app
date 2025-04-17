@@ -28,7 +28,17 @@
                 </a>
             </div>
         </div>
-
+        <div class="sidebar-search mb-3">
+            <div class="input-group">
+                <input type="text" id="sidebar-search" class="form-control" placeholder="Search menu..."
+                    style="background-color: #343a40; color: #fff; border: 1px solid #4b545c;">
+                <div class="input-group-append">
+                    <span class="input-group-text" style="background-color: #343a40; border: 1px solid #4b545c;">
+                        <i class="fa fa-search"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
@@ -948,17 +958,9 @@
                             <li class="nav-item">
                                 <a href="{{ route('backup.index') }}" class="nav-link ">
                                     <i class="ion-card"></i>
-                                    <p>Backup</p>
+                                    <p>Backup & Restore</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link ">
-                                    <i class="ion-card"></i>
-                                    <p>Restore</p>
-                                </a>
-                            </li>
-
-
                         </ul>
                     </li>
                 @endcan
@@ -968,3 +970,54 @@
     </div>
     <!-- /.sidebar -->
 </aside>
+<!-- JavaScript for Search Functionality -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('sidebar-search');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        searchInput.addEventListener('input', function () {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+
+            navItems.forEach(item => {
+                // Get the text content of the menu item (top-level or sub-menu)
+                const textElement = item.querySelector('p');
+                const text = textElement ? textElement.textContent.toLowerCase() : '';
+
+                // Check if the item or any of its children match the search term
+                let hasMatch = text.includes(searchTerm);
+                const subItems = item.querySelectorAll('.nav-treeview .nav-item');
+                let hasSubMatch = false;
+
+                // Check sub-menu items
+                subItems.forEach(subItem => {
+                    const subTextElement = subItem.querySelector('p');
+                    const subText = subTextElement ? subTextElement.textContent.toLowerCase() : '';
+                    if (subText.includes(searchTerm)) {
+                        hasSubMatch = true;
+                    }
+                });
+
+                // Show or hide the item
+                if (hasMatch || hasSubMatch) {
+                    item.style.display = '';
+                    // Expand treeview if there's a match in sub-items
+                    if (hasSubMatch) {
+                        item.classList.add('menu-open');
+                        const navLink = item.querySelector('.nav-link');
+                        if (navLink) navLink.classList.add('active');
+                    }
+                } else {
+                    item.style.display = 'none';
+                }
+
+                // Show or hide sub-items based on search term
+                subItems.forEach(subItem => {
+                    const subTextElement = subItem.querySelector('p');
+                    const subText = subTextElement ? subTextElement.textContent.toLowerCase() : '';
+                    subItem.style.display = subText.includes(searchTerm) || hasMatch ? '' : 'none';
+                });
+            });
+        });
+    });
+</script>

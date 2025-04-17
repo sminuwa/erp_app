@@ -1211,9 +1211,9 @@ Route::middleware('auth')->group(function () {
 
     Route::group(['middleware' => ['auth']], function () {
         Route::get('backup', [BackupController::class, 'index'])->name('backup.index');
-        Route::get('backup/create', [BackupController::class, 'createBackup'])->name('backup.create');
+        Route::get('/backup/create', [BackupController::class, 'startBackup'])->name('backup.create');
+        Route::post('/backup/restore', [BackupController::class, 'startRestore'])->name('backup.restore');
         Route::get('backup/download/{file}', [BackupController::class, 'downloadBackup'])->name('backup.download');
-        Route::post('backup/restore', [BackupController::class, 'restoreDatabase'])->name('backup.restore');
         Route::delete('backup/delete/{file}', [BackupController::class, 'deleteBackup'])->name('backup.delete');
 
     });

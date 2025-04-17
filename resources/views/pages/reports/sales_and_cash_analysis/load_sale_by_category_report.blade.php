@@ -106,13 +106,15 @@
 
         <div class="row">
             <div class="col-md-12 table-responsive">
-                <table class="display table table-bordered table-striped" data-ordering="true">
+                <table class="display table table-bordered table-striped" data-ordering="true" id="example1">
                     <thead>
                         <tr>
                             @if ($group_by_category)
+                                <th>CODE</th>
                                 <th>CATEGORY</th>
                             @endif
                             @if ($group_by_product)
+                                <th>CODE</th>
                                 <th>PRODUCT</th>
                             @endif
                             <th>QTY AVAILABLE</th>
@@ -131,9 +133,11 @@
                             @endphp
                             <tr>
                                 @if ($group_by_category)
+                                    <td>{{ $sale->category_code }}</td>
                                     <td>{{ $sale->category }}</td>
                                 @endif
                                 @if ($group_by_product)
+                                    <td>{{ $sale->product_code ?? '-' }}</td>
                                     <td>{{ $sale->product_name ?? '-' }}</td>
                                 @endif
                                 <td style="text-align: right">{{ number_format($sale->qty_available, 6) }}</td>

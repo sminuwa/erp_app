@@ -59,7 +59,7 @@
                         @endphp
 
                         @if ($isSpecialCode)
-                            {{ getContraAccount($reference, $ledger->credit, $ledger->debit) }}
+                            {{ getContraAccount($reference, $ledger->credit, $ledger->debit, $payer_id) }}
                         @else
                             {{ $ledger->payer()->code ?? ($ledger->payer()->number ?? '') }}
                         @endif
@@ -100,6 +100,26 @@
                         @if (strpos($ledger->reference, 'ITB') !== false)
                             @if (getReferenceId($ledger->reference) > 0)
                                 <a href="{{ route('interbank.show', getReferenceId($ledger->reference)) }}"
+                                    target="_BLANK">
+                                    {{ $ledger->reference }}
+                                </a>
+                            @else
+                                {{ $ledger->reference }}
+                            @endif
+                        @endif
+                        @if (strpos($ledger->reference, 'GRN') !== false)
+                            @if (getReferenceId($ledger->reference) > 0)
+                                <a href="{{ route('purchases.show', getReferenceId($ledger->reference)) }}"
+                                    target="_BLANK">
+                                    {{ $ledger->reference }}
+                                </a>
+                            @else
+                                {{ $ledger->reference }}
+                            @endif
+                        @endif
+                        @if (strpos($ledger->reference, 'PNV') !== false)
+                            @if (getReferenceId($ledger->reference) > 0)
+                                <a href="{{ route('purchase.additional-invoice.print', getReferenceId($ledger->reference)) }}"
                                     target="_BLANK">
                                     {{ $ledger->reference }}
                                 </a>

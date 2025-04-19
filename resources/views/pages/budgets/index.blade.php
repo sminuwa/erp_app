@@ -52,6 +52,7 @@
                                             <th>Category</th>
                                             <th>Year</th>
                                             <th>Quarter</th>
+                                            <th>Proposed Budget</th>
                                             <th>Month 1</th>
                                             <th>Month 2</th>
                                             <th>Month 3</th>
@@ -66,6 +67,7 @@
                                                 <td>{{ $budget->category->name ?? ''}}</td>
                                                 <td>{{ $budget->budget_year }}</td>
                                                 <td>{{ $budget->quarter }}</td>
+                                                <td>{{ $budget->proposed_budget }}</td>
                                                 <td>{{ $budget->month1 }}</td>
                                                 <td>{{ $budget->month2 }}</td>
                                                 <td>{{ $budget->month3 }}</td>

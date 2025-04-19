@@ -57,7 +57,7 @@
                             <span style="color: red;" id="valid_price{{ $product->id }}"></span>
                         </div>
                         <div class="c-cell">
-                            <input type="text" name="quantity" id="quantity{{ $product->id }}"
+                            <input type="number" step="0.01" name="quantity" id="quantity{{ $product->id }}"
                                 class="form-control quantity" data-value="p{{ $product->id }}" style="min-width:58px;"
                                 value="{{ $product->quantity }}" min="1"
                                 @if ($type == 'invoice') max-qty="{{ $product->attributes['qty_available'] }}" @endif
@@ -152,7 +152,7 @@
                         <div class="c-cell" class="text-left">{{ $product->name }}</div>
                         <div class="c-cell" class="text-right">
                             <span style="color: red;" id="valid_price{{ $product->id }}"></span>
-                            <input type="text" name="quantity" id="quantity{{ $product->id }}"
+                            <input type="number" step="0.01" name="quantity" id="quantity{{ $product->id }}"
                                 class="form-control quantity" data-value="p{{ $product->id }}"
                                 style="min-width:58px;" value="{{ $product->quantity }}" min="0" required>
 
@@ -225,7 +225,7 @@
                         </div>
                         <div class="c-cell">
                             <span style="color: red;" id="valid_price{{ $product->id }}"></span>
-                            <input type="text" name="quantity" id="quantity{{ $product->id }}"
+                            <input type="number" step="0.01" name="quantity" id="quantity{{ $product->id }}"
                                 class="form-control quantity" data-value="p{{ $product->id }}"
                                 style="min-width:58px;" value="{{ $product->quantity }}" min="1" required>
                         </div>
@@ -287,7 +287,7 @@
                         </div>
                         <div class="c-cell">
                             <span style="color: red;" id="valid_price{{ $product->id }}"></span>
-                            <input type="text" name="quantity" id="quantity{{ $product->id }}"
+                            <input type="number" step="0.01" name="quantity" id="quantity{{ $product->id }}"
                                 class="form-control quantity" data-value="p{{ $product->id }}"
                                 style="min-width:58px;" value="{{ $product->quantity }}" min="1" required>
                         </div>
@@ -338,7 +338,7 @@
                             {{ $product->name }}</div>
                         <div class="c-cell">
                             <span style="color: red;" id="valid_price{{ $product->id }}"></span>
-                            <input type="text" name="quantity" id="quantity{{ $product->id }}"
+                            <input type="number" step="0.01" name="quantity" id="quantity{{ $product->id }}"
                                 class="form-control quantity" data-value="p{{ $product->id }}"
                                 style="min-width:58px;" value="{{ $product->quantity }}" min="1" required>
                         </div>

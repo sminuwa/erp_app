@@ -178,7 +178,7 @@
 
                         <div class="form-group">
                             <label for="quantity">Qty</label>
-                            <input type="text" pattern="^[0-9\.]*$"
+                            <input type="number" step=".01" pattern="^[0-9\.]*$"
                                 class="form-control {{ $errors->has('quantity') ? ' is-invalid' : '' }}" name="quantity"
                                 id="quantity" value="{{ $model->quantity }}" placeholder="" required="required">
                             @if ($errors->has('quantity'))

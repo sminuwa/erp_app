@@ -188,13 +188,14 @@ class ReceiptController extends Controller
     }
 
     public function printReceipt(Receipt $payment, $papersize = "A4")
-    {
+    { 
         return view('pages.receipts.print_payment_receipt', ['payment' => $payment, 'setting' => Setting::first(), 'papersize' => $papersize]);
     }
 
-    public function printPoSPaymentReceipt(Receipt $payment)
+    public function printPoSPaymentReceipt(Receipt $receipt)
     {
-        return view('pages.receipts.print_pos_payment_receipt', ['payment' => $payment, 'setting' => Setting::first()]);
+        
+        return view('pages.receipts.print_pos_payment_receipt', ['payment' => $receipt, 'setting' => Setting::first()]);
     }
 
     public function deletePayment(Request $request, CustomerLedger $ledger)

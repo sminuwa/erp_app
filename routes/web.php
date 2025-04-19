@@ -441,7 +441,7 @@ Route::middleware('auth')->group(function () {
             Route::put('/update/{ledger}', [ReceiptController::class, 'updateReceipt'])->name('receipt.payment.update');
             Route::post('/search', [ReceiptController::class, 'search'])->name('receipt.payment.search');
             Route::get('/print/receipt/{payment}/{papersize?}', [ReceiptController::class, 'printReceipt'])->name('receipt.payment.print');
-            Route::get('/print/receipt/pos/{payment}', [ReceiptController::class, 'printPoSPaymentReceipt'])->name('receipt.payment.print.pos');
+            Route::get('/print-receipt/pos/{receipt}', [ReceiptController::class, 'printPoSPaymentReceipt'])->name('receipt.payment.print.pos');
             Route::get('/load/payers', [ReceiptController::class, 'loadPayers'])->name('ajax.load.payers');
             Route::get('/reverse/{receipt}', [ReceiptController::class, 'reverse'])->name('receipt.payment.reverse');
             Route::get('/show/{receipt?}', [ReceiptController::class, 'show'])->name('receipt.payment.show');

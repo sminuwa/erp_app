@@ -107,7 +107,7 @@
                     }
                 }).done(function(data) {
                     $("#load").html(data);
-                    loadDataTable()
+                    loadDataTable2()
                 });
             });
         });

@@ -1,10 +1,10 @@
 <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.invoice.list.report.print', [$from_date, $to_date, $company_id,$branch_id, $status]) }}"
+        <a href="{{ route('ajax.invoice.list.report.print', [$from_date, $to_date, $company_id, $branch_id, $status]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
 </div>
-<table class="display table table-bordered caption" id="example1" data-ordering="true">
+<table class="display table table-bordered caption" data-ordering="true">
     <caption style="caption-size:top">
         <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>
         <h5 style="text-align: center;">List of Invoices Report
@@ -16,7 +16,8 @@
     </caption>
     <thead>
         <tr>
-            <th style="width: 50%" colspan="3">Date Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
+            <th style="width: 50%" colspan="3">Date Processed:
+                {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
             </th>
             <th style="width: 50%;text-align:right" colspan="3">Processed By {{ auth()->user()->name }}</th>
         </tr>
@@ -29,22 +30,25 @@
             <th>STATUS</th>
         </tr>
     </thead>
-    @php
-        $total = 0;
-    @endphp
-    @foreach ($sales as $sale)
+    <tbody>
         @php
-            $total += $sale->total;
+            $total = 0;
         @endphp
-        <tr>
-            <td>{{ \Carbon\Carbon::parse($sale->order_date)->toFormattedDateString() }}</td>
-            <td><a href="{{ route('orders.show',$sale->id) }}" target="_BLANK">{{ $sale->reference }}</a></td>
-            <td>{{ $sale->customer->code }}</td>
-            <td>{{ $sale->customer->name }}</td>
-            <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>
-            <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
-        </tr>
-    @endforeach
+        @foreach ($sales as $sale)
+            @php
+                $total += $sale->total;
+            @endphp
+            <tr>
+                <td>{{ \Carbon\Carbon::parse($sale->order_date)->toFormattedDateString() }}</td>
+                <td><a href="{{ route('orders.show', getReferenceId($sale->reference)) }}"
+                        target="_BLANK">{{ $sale->reference }}</a></td>
+                <td>{{ $sale->customer->code }}</td>
+                <td>{{ $sale->customer->name }}</td>
+                <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>
+                <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
+            </tr>
+        @endforeach
+    </tbody>
     <tfoot>
         <tr>
             <th style="text-align: right" colspan="4">Total</th>

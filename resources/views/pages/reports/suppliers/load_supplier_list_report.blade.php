@@ -1,9 +1,4 @@
-{{-- <div class="row">
-    <div class="offset-10">
-        <a href="{{ route('ajax.customer.list.report.print', [$company_id, $branch_id]) }}" target="_BLANK"
-            class="btn-success btn btn-sm">Print</a>
-    </div>
-</div> --}}
+
 <table class="display table table-bordered caption" id="example1" data-ordering="true">
     <caption style="caption-size:top">
         <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>

@@ -151,7 +151,7 @@
                     console.log(data)
                     $('#img-loader').hide();
                     $("#load").html(data);
-                    loadDataTable()
+                    loadDataTable2()
                 });
             });
         });

@@ -39,13 +39,15 @@
                         <!-- Branch Selection -->
                         <div class="form-group col-md-3">
                             <label for="branch_id">Branch</label>
-                            <select class="form-control select2-single ajax-branches" name="branch_id" id="branch_id" required></select>
+                            <select class="form-control select2-single ajax-branches" name="branch_id" id="branch_id"
+                                required></select>
                         </div>
 
                         <!-- Report Type Selection -->
                         <div class="form-group col-md-3">
                             <label for="report_type">Report Type</label>
                             <select class="form-control" name="report_type" id="report_type" required>
+                                <option value="all">All</option>
                                 <option value="overstayed">Overstayed Inventory</option>
                                 <option value="slow_moving">Slow Moving Inventory</option>
                             </select>
@@ -78,7 +80,7 @@
                 let company_id = $('#company_id').val();
                 let branch_id = $('#branch_id').val();
                 let report_type = $('#report_type').val();
-                
+
                 $('#img-loader').show();
                 $.ajax({
                     type: "GET",
@@ -91,7 +93,7 @@
                 }).done(function(data) {
                     $("#load").html(data);
                     $('#img-loader').hide();
-                    loadDataTable();
+                    loadDataTable2();
                 });
             });
 

@@ -150,7 +150,7 @@
                 }).done(function(data) {
                     $('#img-loader').hide();
                     $("#load").html(data);
-                    loadDataTable()
+                    loadDataTable2()
                 });
             });
         });

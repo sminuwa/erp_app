@@ -116,7 +116,7 @@
                 }).done(function (data) {
                     // console.log(data)
                     $("#load").html(data);
-                    loadDataTable()
+                    loadDataTable2()
                 });
             })
         });

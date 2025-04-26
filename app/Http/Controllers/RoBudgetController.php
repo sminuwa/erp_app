@@ -83,7 +83,8 @@ class RoBudgetController extends Controller
     public function destroy(RoBudget $roBudget)
     {
         $roBudget->delete();
-        return redirect()->route('ro_budgets.index')->with('success', 'Budget deleted successfully.');
+        session()->flash('app_message', 'Budget deleted successfully');
+        return redirect()->route('ro_budgets.index');
     }
 
     public function importStore(Request $request)

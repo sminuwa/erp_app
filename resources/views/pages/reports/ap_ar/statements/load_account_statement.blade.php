@@ -50,6 +50,7 @@
                     <td>{{ $ledger->date->toFormattedDateString() }}</td>
                     <td>{{ $ledger->code }}</td>
                     <td>
+                        
                         @php
                             $reference = $ledger->reference;
                             $isSpecialCode =
@@ -59,7 +60,7 @@
                         @endphp
 
                         @if ($isSpecialCode)
-                            {{ getContraAccount($reference, $ledger->credit, $ledger->debit, $payer_id) }}
+                            {{ getContraAccount($reference, $ledger->model_name, $payer_id) }}
                         @else
                             {{ $ledger->payer()->code ?? ($ledger->payer()->number ?? '') }}
                         @endif

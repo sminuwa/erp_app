@@ -315,7 +315,7 @@
             });
         }
     </script>
-
+    @include('layouts.backend.datatable')
     @stack('js')
 
 </body>

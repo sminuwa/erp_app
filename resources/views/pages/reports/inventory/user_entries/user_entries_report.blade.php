@@ -114,7 +114,7 @@
                 }).done(function(data) {
                     $("#load").html(data);
                     $('#img-loader').hide();
-                    loadDataTable();
+                    loadDataTable2();
                 });
             });
 

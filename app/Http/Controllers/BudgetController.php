@@ -74,6 +74,7 @@ class BudgetController extends Controller
     }
     public function destroy(Budget $budget)
     {
+        
         $budget->delete();
         session()->flash('app_message', 'Budget deleted successfully');
         return redirect()->back();

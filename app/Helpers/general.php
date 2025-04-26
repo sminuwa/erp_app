@@ -372,33 +372,100 @@ function getReferenceId($reference)
     }
 
 }
-function getContraAccount($reference, $credit, $debit, $account = 'all')
+// function getContraAccount($reference, $account_type = "GeneralAccount", $account = 'all')
+// {
+//     // Determine the query conditions based on reference prefix
+//     $query = GeneralAccountLedger::where('reference', $reference);
+//     if ($account_type == "Customer") {
+//         $query->join('customers', 'general_account_ledgers.model_id', 'customers.id');
+//     }
+//     if ($account_type == "Supplier") {
+//         $query->join('suppliers', 'general_account_ledgers.model_id', 'suppliers.id');
+//     }
+//     if ($account_type == "GeneralAccount") {
+//         $query->join('general_accounts', 'general_account_ledgers.model_id', 'general_accounts.id');
+//     }
+
+//     if ($account != 'all') {
+//         $query->where('general_account_ledgers.model_id', '<>', $account);
+//     }
+
+//     $numbers = $query->first()->number ?? '';
+
+//     return $numbers;
+// }
+/**
+ * Get contra account information based on reference, account type and optional account ID
+ *
+ * @param string $reference Transaction reference number
+ * @param string $account_type Type of account (Customer, Supplier, GeneralAccount)
+ * @param mixed $account Account ID to exclude or 'all'
+ * @return string Account number of the contra account
+ */
+/**
+ * Get contra account information for a double-entry transaction
+ * 
+ * This function returns the counterparty account when provided with a transaction reference
+ * and the current account type/ID. For example, if you provide a GeneralAccount ID, 
+ * it will return the related Customer or Supplier account involved in the same transaction.
+ *
+ * @param string $reference Transaction reference number
+ * @param string $current_account_type Type of the current account (Customer, Supplier, GeneralAccount)
+ * @param mixed $current_account_id Current account ID or 'all'
+ * @return string Account number/code of the contra account
+ */
+function getContraAccount($reference, $current_account_type = "GeneralAccount", $current_account_id = 'all')
 {
-    // Determine the query conditions based on reference prefix
-    $query = GeneralAccountLedger::where('reference', $reference)
-        ->join('general_accounts', 'general_account_ledgers.model_id', 'general_accounts.id');
+    // Start building the base query to find all entries with this reference
+    $query = DB::table('general_account_ledgers')
+        ->where('reference', $reference);
 
-    // if (str_contains($reference, 'RCT')) {
-    //     $query->where('general_account_ledgers.debit', '>', 0);
-    // } elseif (str_contains($reference, 'PAY')) {
-    //     $query->where('general_account_ledgers.credit', '>', 0);
-    // } elseif (str_contains($reference, 'ITB')) {
-    //     $query->where('general_account_ledgers.model_name', 'GeneralAccount');
-    //     $query->where('general_account_ledgers.credit', '>', 0);
-    // }
-    if ($account != 'all') {
-        $query->where('general_account_ledgers.model_id', '<>', $account);
+    // If we're looking for the opposite of a specific account
+    if ($current_account_id != 'all') {
+        // Find entries that don't match the current account type and ID
+        $query->where(function ($q) use ($current_account_type, $current_account_id) {
+            $q->where('model_name', '!=', $current_account_type)
+                ->orWhere('model_id', '!=', $current_account_id);
+        });
+    } else {
+        // If no specific account provided, exclude the current account type
+        $query->where('model_name', '!=', $current_account_type);
     }
-    // if ($credit > 0) {
-    //     $query->where('general_account_ledgers.debit', '>', 0);
-    // }
-    // if ($debit > 0) {
-    //     $query->where('general_account_ledgers.credit', '>', 0);
-    // }
 
-    // Execute the query and process results
-    // $numbers = $query->get()->pluck('number');
-    $numbers = $query->first()->number ?? '';
+    // Get the first matching contra entry
+    $contra_entry = $query->first();
 
-    return $numbers;//->isNotEmpty() ? $numbers->implode('|') : '';
+    // If no contra entry found, return empty string
+    if (!$contra_entry) {
+        return '';
+    }
+
+    // Based on the type of the contra account, fetch the account number/code
+    if ($contra_entry->model_name == 'Customer') {
+        // Get customer code if the contra account is a customer
+        $customer = DB::table('customers')
+            ->where('id', $contra_entry->model_id)
+            ->select('code')
+            ->first();
+        return $customer ? $customer->code : '';
+
+    } elseif ($contra_entry->model_name == 'Supplier') {
+        // Get supplier code if the contra account is a supplier
+        $supplier = DB::table('suppliers')
+            ->where('id', $contra_entry->model_id)
+            ->select('code')
+            ->first();
+        return $supplier ? $supplier->code : '';
+
+    } elseif ($contra_entry->model_name == 'GeneralAccount') {
+        // Get general account number if the contra account is a general account
+        $generalAccount = DB::table('general_accounts')
+            ->where('id', $contra_entry->model_id)
+            ->select('number')
+            ->first();
+        return $generalAccount ? $generalAccount->number : '';
+    }
+
+    // Default return if no match found
+    return '';
 }

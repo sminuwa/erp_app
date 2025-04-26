@@ -3280,6 +3280,64 @@ class ReportController extends Controller
         ]);
     }
 
+    // public function loadCustomerDebtReport(Request $request)
+    // {
+    //     $from_date = $request->from_date;
+    //     $to_date = $request->to_date;
+    //     $company_id = $request->company_id;
+    //     $branch_id = $request->branch_id;
+    //     $customer_id = $request->customer_id;
+
+    //     if ($company_id == 'all' || $company_id == '' || $company_id == null)
+    //         $company_id = '%';
+
+    //     if ($branch_id == 'all' || $branch_id == '' || $branch_id == null)
+    //         $branch_id = '%';
+
+    //     if ($customer_id == 'all' || $customer_id == '') {
+    //         $customer_id = '%';
+    //     }
+
+    //     $query = DB::table('customers')
+    //         ->leftJoin('general_account_ledgers', function ($join) {
+    //             $join->on('customers.id', '=', 'general_account_ledgers.model_id')
+    //                 ->where('general_account_ledgers.model_name', '=', 'Customer');
+    //         })
+    //         ->leftJoin('branches', 'branches.id', '=', 'customers.branch_id')
+    //         ->leftJoin('companies', 'companies.id', '=', 'branches.company_id')
+    //         ->select(
+    //             'customers.code',
+    //             'customers.name as customer',
+    //             DB::raw('SUM(credit) AS total'),
+    //             DB::raw('SUM(debit) AS pay'),
+    //             DB::raw('customers.opening_balance + COALESCE(SUM(general_account_ledgers.debit), 0) - COALESCE(SUM(general_account_ledgers.credit), 0) AS due')
+    //         )
+    //         ->whereDate('date', '<=', $to_date)
+    //         ->groupBy('customers.id', 'customers.name', 'customers.credit_limit', 'customers.opening_balance')
+    //         ->havingRaw('customers.opening_balance + COALESCE(SUM(general_account_ledgers.debit), 0) - COALESCE(SUM(general_account_ledgers.credit), 0) > 0');
+
+    //     if ($company_id != '%')
+    //         $query = $query->where('companies.id', $company_id);
+
+    //     if ($branch_id != '%')
+    //         $query = $query->where('branches.id', $branch_id);
+
+    //     if ($customer_id != '%')
+    //         $query = $query->where('general_account_ledgers.model_id', $customer_id);
+
+    //     $sales = $query->get();
+
+    //     if ($company_id == '%')
+    //         $company_id = 'all';
+
+    //     if ($branch_id == '%')
+    //         $branch_id = 'all';
+
+    //     if ($customer_id == "%")
+    //         $customer_id = "all";
+
+    //     return view('pages.reports.customer_ledger_analysis.load_customer_total_debt_report', compact('sales', 'from_date', 'to_date', 'company_id', 'branch_id', 'customer_id'));
+    // }
     public function loadCustomerDebtReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -3287,18 +3345,19 @@ class ReportController extends Controller
         $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $customer_id = $request->customer_id;
-    
+
         if ($company_id == 'all' || $company_id == '' || $company_id == null)
             $company_id = '%';
-    
+
         if ($branch_id == 'all' || $branch_id == '' || $branch_id == null)
             $branch_id = '%';
-    
+
         if ($customer_id == 'all' || $customer_id == '') {
             $customer_id = '%';
         }
-    
-        $query = DB::table('customers')
+
+        // Base query for both debtors and creditors
+        $baseQuery = DB::table('customers')
             ->leftJoin('general_account_ledgers', function ($join) {
                 $join->on('customers.id', '=', 'general_account_ledgers.model_id')
                     ->where('general_account_ledgers.model_name', '=', 'Customer');
@@ -3313,32 +3372,56 @@ class ReportController extends Controller
                 DB::raw('customers.opening_balance + COALESCE(SUM(general_account_ledgers.debit), 0) - COALESCE(SUM(general_account_ledgers.credit), 0) AS due')
             )
             ->whereDate('date', '<=', $to_date)
-            ->groupBy('customers.id', 'customers.name', 'customers.credit_limit', 'customers.opening_balance')
-            ->havingRaw('customers.opening_balance + COALESCE(SUM(general_account_ledgers.debit), 0) - COALESCE(SUM(general_account_ledgers.credit), 0) > 0');
-    
+            ->groupBy('customers.id', 'customers.name', 'customers.credit_limit', 'customers.opening_balance');
+
+        // Apply common filters
         if ($company_id != '%')
-            $query = $query->where('companies.id', $company_id);
-    
+            $baseQuery = $baseQuery->where('companies.id', $company_id);
+
         if ($branch_id != '%')
-            $query = $query->where('branches.id', $branch_id);
-    
+            $baseQuery = $baseQuery->where('branches.id', $branch_id);
+
         if ($customer_id != '%')
-            $query = $query->where('general_account_ledgers.model_id', $customer_id);
-    
-        $sales = $query->get();
-    
+            $baseQuery = $baseQuery->where('general_account_ledgers.model_id', $customer_id);
+
+        // Get debtors (positive balance, excluding zero)
+        $debtorsQuery = clone $baseQuery;
+        $debtors = $debtorsQuery->havingRaw('customers.opening_balance + COALESCE(SUM(general_account_ledgers.debit), 0) - COALESCE(SUM(general_account_ledgers.credit), 0) > 0')
+            ->orderBy('due', 'desc')
+            ->get()
+            ->filter(function ($item) {
+                return $item->due > 0; // Extra check to ensure no zero balances
+            });
+
+        // Get creditors (negative balance, excluding zero)
+        $creditorsQuery = clone $baseQuery;
+        $creditors = $creditorsQuery->havingRaw('customers.opening_balance + COALESCE(SUM(general_account_ledgers.debit), 0) - COALESCE(SUM(general_account_ledgers.credit), 0) < 0')
+            ->orderBy('due', 'asc')
+            ->get()
+            ->filter(function ($item) {
+                return $item->due < 0; // Extra check to ensure no zero balances
+            });
+
+        // Map due to absolute value for creditors
+        $creditors = $creditors->map(function ($item) {
+            $item->due = abs($item->due);
+            return $item;
+        });
+
         if ($company_id == '%')
             $company_id = 'all';
-    
+
         if ($branch_id == '%')
             $branch_id = 'all';
-    
+
         if ($customer_id == "%")
             $customer_id = "all";
-    
-        return view('pages.reports.customer_ledger_analysis.load_customer_total_debt_report', compact('sales', 'from_date', 'to_date', 'company_id', 'branch_id', 'customer_id'));
-    }
 
+        return view(
+            'pages.reports.customer_ledger_analysis.load_customer_total_debt_report',
+            compact('debtors', 'creditors', 'from_date', 'to_date', 'company_id', 'branch_id', 'customer_id')
+        );
+    }
     public function printCustomerDebtReport($from_date, $to_date, $customer_id)
     {
 
@@ -6837,14 +6920,10 @@ class ReportController extends Controller
             'general_accounts.description',
             'general_account_ledgers.id',
             'users.name AS user_name',
-            'bank_accounts.account_name',
-            'bank_accounts.id AS bank_account_id'
+            'branches.nam AS branch'
         )
             ->join('users', 'users.id', '=', 'general_account_ledgers.user_id')
             ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
-            ->leftJoin('bank_accounts', function ($join) {
-                $join->on('bank_accounts.id', '=', DB::raw('(SELECT bank_account_id FROM bank_transactions WHERE ref_no = general_account_ledgers.reference LIMIT 1)'));
-            })
             ->where('general_account_ledgers.model_id', 'LIKE', $payee_id)
             ->where('general_account_ledgers.user_id', 'LIKE', $user_id)
             ->where(function ($q) {
@@ -6853,7 +6932,7 @@ class ReportController extends Controller
                     ->orWhere('general_accounts.class', 'LIKE', 'A13%');
             })
             ->whereNotNull('general_account_ledgers.reference') // Ensure only valid transactions
-            ->groupBy('general_account_ledgers.user_id', 'general_accounts.number', 'bank_accounts.id')
+            ->groupBy('general_account_ledgers.user_id', 'general_accounts.number')
             ->orderBy('general_accounts.number')
             ->havingRaw('SUM(general_account_ledgers.credit) > 0 OR SUM(general_account_ledgers.debit) > 0') // Only users with transactions
             ->get();
@@ -7250,7 +7329,7 @@ class ReportController extends Controller
             })
             ->leftJoin('branches', 'suppliers.branch_id', 'branches.id')
             ->leftJoin('companies', 'branches.company_id', 'companies.id')
-            ->where('branches.company_id', 'LIKE', $company_id)
+            //->where('branches.company_id', 'LIKE', $company_id)
             ->orderBy('companies.name')
             ->orderBy('branches.code')
             ->orderBy('branches.name')
@@ -7469,6 +7548,7 @@ class ReportController extends Controller
         return view('pages.reports.inventory.slow_overstay.slow_overstay_report');
     }
 
+
     // public function loadslowOverstayedReport(Request $request)
     // {
     //     $validated = $request->validate([
@@ -7483,9 +7563,29 @@ class ReportController extends Controller
     //         $branch_id = '%'; // Ensure 'all' branches are included
     //     }
     //     if ($validated['company_id'] == 'all' || $validated['company_id'] == '') {
-    //         $company_id = '%'; // Ensure 'all' branches are included
+    //         $company_id = '%'; // Ensure 'all' companies are included
     //     }
     //     if ($validated['report_type'] == 'overstayed') {
+    //         // First get the latest receive date for each product in each store
+    //         $latestReceiveDates = DB::table('purchase_products AS pp')
+    //             ->join('purchases AS pur', 'pp.purchase_id', '=', 'pur.id')
+    //             ->join('branches AS b', 'pur.branch_id', '=', 'b.id')
+    //             ->join('store_products AS sp', function ($join) {
+    //                 $join->on('pp.product_id', '=', 'sp.product_id')
+    //                     ->join('stores AS s', 'sp.store_id', '=', 's.id')
+    //                     ->whereColumn('s.branch_id', 'pur.branch_id');
+    //             })
+    //             ->select(
+    //                 'pp.product_id',
+    //                 's.id AS store_id',
+    //                 DB::raw('MAX(pp.updated_at) AS latest_update')
+    //             )
+    //             ->where('pur.branch_id', 'LIKE', $branch_id)
+    //             ->where('b.company_id', 'LIKE', $company_id)
+    //             ->where('sp.qty_available', '>', 0)
+    //             ->groupBy('pp.product_id', 's.id');
+
+    //         // Then join this subquery to get the complete inventory report
     //         $inventory = DB::table('purchase_products AS pp')
     //             ->join('purchases AS pur', 'pp.purchase_id', '=', 'pur.id')
     //             ->join('products AS p', 'pp.product_id', '=', 'p.id')
@@ -7493,7 +7593,12 @@ class ReportController extends Controller
     //             ->join('store_products AS sp', function ($join) {
     //                 $join->on('pp.product_id', '=', 'sp.product_id')
     //                     ->join('stores AS s', 'sp.store_id', '=', 's.id')
-    //                     ->whereColumn('s.branch_id', 'pur.branch_id'); // Ensure the store belongs to the correct branch
+    //                     ->whereColumn('s.branch_id', 'pur.branch_id');
+    //             })
+    //             ->joinSub($latestReceiveDates, 'latest_dates', function ($join) {
+    //                 $join->on('pp.product_id', '=', 'latest_dates.product_id')
+    //                     ->on('s.id', '=', 'latest_dates.store_id')
+    //                     ->on('pp.updated_at', '=', 'latest_dates.latest_update');
     //             })
     //             ->select(
     //                 'p.id AS product_id',
@@ -7506,8 +7611,8 @@ class ReportController extends Controller
     //                 DB::raw('DATEDIFF(CURDATE(), pp.updated_at) AS days_since_received'),
     //                 'sp.qty_available AS available_quantity'
     //             )
-    //             ->where('pur.branch_id', 'LIKE', $branch_id) // Ensuring correct branch
-    //             ->where('b.company_id', 'LIKE', $company_id) // Ensuring correct company_id
+    //             ->where('pur.branch_id', 'LIKE', $branch_id)
+    //             ->where('b.company_id', 'LIKE', $company_id)
     //             ->where('sp.qty_available', '>', 0)
     //             ->havingRaw('days_since_received > 30') // Overstayed products (30+ days)
     //             ->orderByDesc('days_since_received')
@@ -7517,6 +7622,26 @@ class ReportController extends Controller
     //         return view('pages.reports.inventory.slow_overstay.load_slow_overstay_report', compact('inventory', 'type'));
 
     //     } elseif ($validated['report_type'] == 'slow_moving') {
+    //         // First get the latest sold date for each product in each store
+    //         $latestSoldDates = DB::table('order_details AS od')
+    //             ->join('orders AS o', 'od.order_id', '=', 'o.id')
+    //             ->join('branches AS b', 'o.branch_id', '=', 'b.id')
+    //             ->join('store_products AS sp', function ($join) {
+    //                 $join->on('od.store_product_id', '=', 'sp.product_id')
+    //                     ->join('stores AS s', 'sp.store_id', '=', 's.id')
+    //                     ->whereColumn('s.branch_id', 'o.branch_id');
+    //             })
+    //             ->select(
+    //                 'od.store_product_id AS product_id',
+    //                 's.id AS store_id',
+    //                 DB::raw('MAX(od.updated_at) AS latest_update')
+    //             )
+    //             ->where('o.branch_id', 'LIKE', $branch_id)
+    //             ->where('b.company_id', 'LIKE', $company_id)
+    //             ->where('sp.qty_available', '>', 0)
+    //             ->groupBy('od.store_product_id', 's.id');
+
+    //         // Then join this subquery to get the complete slow-moving report
     //         $inventory = DB::table('order_details AS od')
     //             ->join('orders AS o', 'od.order_id', '=', 'o.id')
     //             ->join('products AS p', 'od.store_product_id', '=', 'p.id')
@@ -7524,7 +7649,12 @@ class ReportController extends Controller
     //             ->join('store_products AS sp', function ($join) {
     //                 $join->on('od.store_product_id', '=', 'sp.product_id')
     //                     ->join('stores AS s', 'sp.store_id', '=', 's.id')
-    //                     ->whereColumn('s.branch_id', 'o.branch_id'); // Ensures store belongs to the correct branch
+    //                     ->whereColumn('s.branch_id', 'o.branch_id');
+    //             })
+    //             ->joinSub($latestSoldDates, 'latest_dates', function ($join) {
+    //                 $join->on('od.store_product_id', '=', 'latest_dates.product_id')
+    //                     ->on('s.id', '=', 'latest_dates.store_id')
+    //                     ->on('od.updated_at', '=', 'latest_dates.latest_update');
     //             })
     //             ->select(
     //                 'p.id AS product_id',
@@ -7537,10 +7667,10 @@ class ReportController extends Controller
     //                 DB::raw('DATEDIFF(CURDATE(), od.updated_at) AS days_since_sold'),
     //                 'sp.qty_available AS available_quantity'
     //             )
-    //             ->where('o.branch_id', 'LIKE', $branch_id) // Ensuring correct branch
-    //             ->where('b.company_id', 'LIKE', $company_id) // Ensuring correct company_id
+    //             ->where('o.branch_id', 'LIKE', $branch_id)
+    //             ->where('b.company_id', 'LIKE', $company_id)
     //             ->where('sp.qty_available', '>', 0)
-    //             ->havingRaw('days_since_sold > 60') // Slow-moving products (60+ days)
+    //             ->havingRaw('days_since_sold > 30') // Slow-moving products (60+ days)
     //             ->orderByDesc('days_since_sold')
     //             ->get();
 
@@ -7550,57 +7680,72 @@ class ReportController extends Controller
 
     //     return back()->withErrors(['error' => 'Invalid report type selected.']);
     // }
-    public function loadslowOverstayedReport(Request $request)
+
+    public function loadSlowOverstayedReport(Request $request)
     {
         $validated = $request->validate([
             'branch_id' => 'nullable|integer',
             'company_id' => 'nullable|integer',
-            'report_type' => 'nullable|string', // New field for selecting report type
+            'report_type' => 'nullable|string', // Field for selecting report type
         ]);
 
         $company_id = $validated['company_id'];
         $branch_id = $validated['branch_id'];
-        if ($validated['branch_id'] == 'all' || $validated['branch_id'] == '') {
+        $report_type = $validated['report_type'] ?? 'all';
+
+        if ($branch_id == 'all' || $branch_id == '') {
             $branch_id = '%'; // Ensure 'all' branches are included
         }
-        if ($validated['company_id'] == 'all' || $validated['company_id'] == '') {
+        if ($company_id == 'all' || $company_id == '') {
             $company_id = '%'; // Ensure 'all' companies are included
         }
-        if ($validated['report_type'] == 'overstayed') {
-            // First get the latest receive date for each product in each store
-            $latestReceiveDates = DB::table('purchase_products AS pp')
-                ->join('purchases AS pur', 'pp.purchase_id', '=', 'pur.id')
-                ->join('branches AS b', 'pur.branch_id', '=', 'b.id')
-                ->join('store_products AS sp', function ($join) {
-                    $join->on('pp.product_id', '=', 'sp.product_id')
-                        ->join('stores AS s', 'sp.store_id', '=', 's.id')
-                        ->whereColumn('s.branch_id', 'pur.branch_id');
-                })
-                ->select(
-                    'pp.product_id',
-                    's.id AS store_id',
-                    DB::raw('MAX(pp.updated_at) AS latest_update')
-                )
-                ->where('pur.branch_id', 'LIKE', $branch_id)
-                ->where('b.company_id', 'LIKE', $company_id)
-                ->where('sp.qty_available', '>', 0)
-                ->groupBy('pp.product_id', 's.id');
 
-            // Then join this subquery to get the complete inventory report
-            $inventory = DB::table('purchase_products AS pp')
+        $inventory = collect();
+
+        // Overstayed products report (products not received recently but still in stock)
+        if ($report_type == 'overstayed' || $report_type == 'all') {
+            $overstayedInventory = $this->getOverstayedInventory($company_id, $branch_id);
+            $inventory = $report_type == 'all' ? $inventory->concat($overstayedInventory) : $overstayedInventory;
+        }
+
+        // Slow-moving products report (products not sold recently but still in stock)
+        if ($report_type == 'slow_moving' || $report_type == 'all') {
+            $slowMovingInventory = $this->getSlowMovingInventory($company_id, $branch_id);
+            $inventory = $report_type == 'all' ? $inventory->concat($slowMovingInventory) : $slowMovingInventory;
+        }
+
+        $type = $report_type;
+        return view('pages.reports.inventory.slow_overstay.load_slow_overstay_report', compact('inventory', 'type'));
+    }
+
+    /**
+     * Get overstayed inventory (products not received recently but still in stock)
+     */
+    private function getOverstayedInventory($company_id, $branch_id)
+    {
+        // Get all store products with available quantity
+        $storeProducts = DB::table('store_products AS sp')
+            ->join('products AS p', 'sp.product_id', '=', 'p.id')
+            ->join('stores AS s', 'sp.store_id', '=', 's.id')
+            ->join('branches AS b', 's.branch_id', '=', 'b.id')
+            ->select(
+                'p.id AS product_id',
+                'sp.store_id'
+            )
+            ->where('b.company_id', 'LIKE', $company_id)
+            ->where('s.branch_id', 'LIKE', $branch_id)
+            ->where('sp.qty_available', '>', 0)
+            ->get();
+
+        $inventory = collect();
+
+        // For each store product, find the latest purchase date
+        foreach ($storeProducts as $storeProduct) {
+            $latestPurchase = DB::table('purchase_products AS pp')
                 ->join('purchases AS pur', 'pp.purchase_id', '=', 'pur.id')
                 ->join('products AS p', 'pp.product_id', '=', 'p.id')
                 ->join('branches AS b', 'pur.branch_id', '=', 'b.id')
-                ->join('store_products AS sp', function ($join) {
-                    $join->on('pp.product_id', '=', 'sp.product_id')
-                        ->join('stores AS s', 'sp.store_id', '=', 's.id')
-                        ->whereColumn('s.branch_id', 'pur.branch_id');
-                })
-                ->joinSub($latestReceiveDates, 'latest_dates', function ($join) {
-                    $join->on('pp.product_id', '=', 'latest_dates.product_id')
-                        ->on('s.id', '=', 'latest_dates.store_id')
-                        ->on('pp.updated_at', '=', 'latest_dates.latest_update');
-                })
+                ->join('stores AS s', 'pp.store_id', '=', 's.id')
                 ->select(
                     'p.id AS product_id',
                     'p.name AS product_name',
@@ -7610,52 +7755,75 @@ class ReportController extends Controller
                     's.code AS store_code',
                     'pp.updated_at AS last_received_date',
                     DB::raw('DATEDIFF(CURDATE(), pp.updated_at) AS days_since_received'),
-                    'sp.qty_available AS available_quantity'
+                    DB::raw('(SELECT qty_available FROM store_products WHERE product_id = p.id AND store_id = s.id) AS available_quantity')
                 )
-                ->where('pur.branch_id', 'LIKE', $branch_id)
-                ->where('b.company_id', 'LIKE', $company_id)
-                ->where('sp.qty_available', '>', 0)
-                ->havingRaw('days_since_received > 30') // Overstayed products (30+ days)
-                ->orderByDesc('days_since_received')
-                ->get();
+                ->where('p.id', $storeProduct->product_id)
+                ->where('s.id', $storeProduct->store_id)
+                ->orderBy('pp.updated_at', 'desc')
+                ->first();
 
-            $type = 'overstayed';
-            return view('pages.reports.inventory.slow_overstay.load_slow_overstay_report', compact('inventory', 'type'));
+            // If we found a purchase and it's overstayed (30+ days), add to inventory
+            if ($latestPurchase && $latestPurchase->days_since_received > 30) {
+                $inventory->push($latestPurchase);
+            } else if (!$latestPurchase) {
+                // If no purchase record found, create a "never received" record
+                $product = DB::table('products AS p')
+                    ->join('store_products AS sp', 'p.id', '=', 'sp.product_id')
+                    ->join('stores AS s', 'sp.store_id', '=', 's.id')
+                    ->join('branches AS b', 's.branch_id', '=', 'b.id')
+                    ->select(
+                        'p.id AS product_id',
+                        'p.name AS product_name',
+                        'p.code AS product_code',
+                        'b.name AS branch_name',
+                        's.name AS store_name',
+                        's.code AS store_code',
+                        DB::raw('NULL AS last_received_date'),
+                        DB::raw('999 AS days_since_received'), // Very high number to indicate "never received"
+                        'sp.qty_available AS available_quantity'
+                    )
+                    ->where('p.id', $storeProduct->product_id)
+                    ->where('s.id', $storeProduct->store_id)
+                    ->first();
 
-        } elseif ($validated['report_type'] == 'slow_moving') {
-            // First get the latest sold date for each product in each store
-            $latestSoldDates = DB::table('order_details AS od')
-                ->join('orders AS o', 'od.order_id', '=', 'o.id')
-                ->join('branches AS b', 'o.branch_id', '=', 'b.id')
-                ->join('store_products AS sp', function ($join) {
-                    $join->on('od.store_product_id', '=', 'sp.product_id')
-                        ->join('stores AS s', 'sp.store_id', '=', 's.id')
-                        ->whereColumn('s.branch_id', 'o.branch_id');
-                })
-                ->select(
-                    'od.store_product_id AS product_id',
-                    's.id AS store_id',
-                    DB::raw('MAX(od.updated_at) AS latest_update')
-                )
-                ->where('o.branch_id', 'LIKE', $branch_id)
-                ->where('b.company_id', 'LIKE', $company_id)
-                ->where('sp.qty_available', '>', 0)
-                ->groupBy('od.store_product_id', 's.id');
+                if ($product && $product->available_quantity > 0) {
+                    $inventory->push($product);
+                }
+            }
+        }
 
-            // Then join this subquery to get the complete slow-moving report
-            $inventory = DB::table('order_details AS od')
+        return $inventory->sortByDesc('days_since_received')->values();
+    }
+
+    /**
+     * Get slow-moving inventory (products not sold recently but still in stock)
+     */
+    private function getSlowMovingInventory($company_id, $branch_id)
+    {
+        // Get all store products with available quantity
+        $storeProducts = DB::table('store_products AS sp')
+            ->join('products AS p', 'sp.product_id', '=', 'p.id')
+            ->join('stores AS s', 'sp.store_id', '=', 's.id')
+            ->join('branches AS b', 's.branch_id', '=', 'b.id')
+            ->select(
+                'p.id AS product_id',
+                'sp.store_id'
+            )
+            ->where('b.company_id', 'LIKE', $company_id)
+            ->where('s.branch_id', 'LIKE', $branch_id)
+            ->where('sp.qty_available', '>', 0)
+            ->get();
+
+        $inventory = collect();
+
+        // For each store product, find the latest sale date
+        foreach ($storeProducts as $storeProduct) {
+            $latestSale = DB::table('order_details AS od')
                 ->join('orders AS o', 'od.order_id', '=', 'o.id')
                 ->join('products AS p', 'od.store_product_id', '=', 'p.id')
                 ->join('branches AS b', 'o.branch_id', '=', 'b.id')
-                ->join('store_products AS sp', function ($join) {
-                    $join->on('od.store_product_id', '=', 'sp.product_id')
-                        ->join('stores AS s', 'sp.store_id', '=', 's.id')
-                        ->whereColumn('s.branch_id', 'o.branch_id');
-                })
-                ->joinSub($latestSoldDates, 'latest_dates', function ($join) {
-                    $join->on('od.store_product_id', '=', 'latest_dates.product_id')
-                        ->on('s.id', '=', 'latest_dates.store_id')
-                        ->on('od.updated_at', '=', 'latest_dates.latest_update');
+                ->join('stores AS s', function ($join) {
+                    $join->on('s.branch_id', '=', 'b.id');
                 })
                 ->select(
                     'p.id AS product_id',
@@ -7666,26 +7834,178 @@ class ReportController extends Controller
                     's.code AS store_code',
                     'od.updated_at AS last_sold_date',
                     DB::raw('DATEDIFF(CURDATE(), od.updated_at) AS days_since_sold'),
-                    'sp.qty_available AS available_quantity'
+                    DB::raw('(SELECT qty_available FROM store_products WHERE product_id = p.id AND store_id = s.id) AS available_quantity')
                 )
-                ->where('o.branch_id', 'LIKE', $branch_id)
-                ->where('b.company_id', 'LIKE', $company_id)
-                ->where('sp.qty_available', '>', 0)
-                ->havingRaw('days_since_sold > 60') // Slow-moving products (60+ days)
-                ->orderByDesc('days_since_sold')
-                ->get();
+                ->where('p.id', $storeProduct->product_id)
+                ->where('s.id', $storeProduct->store_id)
+                ->orderBy('od.updated_at', 'desc')
+                ->first();
 
-            $type = 'slow_moving';
-            return view('pages.reports.inventory.slow_overstay.load_slow_overstay_report', compact('inventory', 'type'));
+            // If we found a sale and it's slow-moving (30+ days), add to inventory
+            if ($latestSale && $latestSale->days_since_sold > 30) {
+                $inventory->push($latestSale);
+            } else if (!$latestSale) {
+                // If no sale record found, create a "never sold" record
+                $product = DB::table('products AS p')
+                    ->join('store_products AS sp', 'p.id', '=', 'sp.product_id')
+                    ->join('stores AS s', 'sp.store_id', '=', 's.id')
+                    ->join('branches AS b', 's.branch_id', '=', 'b.id')
+                    ->select(
+                        'p.id AS product_id',
+                        'p.name AS product_name',
+                        'p.code AS product_code',
+                        'b.name AS branch_name',
+                        's.name AS store_name',
+                        's.code AS store_code',
+                        DB::raw('NULL AS last_sold_date'),
+                        DB::raw('999 AS days_since_sold'), // Very high number to indicate "never sold"
+                        'sp.qty_available AS available_quantity'
+                    )
+                    ->where('p.id', $storeProduct->product_id)
+                    ->where('s.id', $storeProduct->store_id)
+                    ->first();
+
+                if ($product && $product->available_quantity > 0) {
+                    $inventory->push($product);
+                }
+            }
         }
 
-        return back()->withErrors(['error' => 'Invalid report type selected.']);
+        return $inventory->sortByDesc('days_since_sold')->values();
     }
     public function backdatedEntriesReport()
     {
         return view('pages.reports.inventory.user_entries.backdated_postdated_entries_report');
     }
 
+    // public function loadBackdatedEntriesReport(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'type' => 'required|string',
+    //         'from_date' => 'required|date',
+    //         'to_date' => 'required|date',
+    //         'branch_id' => 'nullable|integer',
+    //         'company_id' => 'nullable|integer',
+    //         'entry_type' => 'required|string',
+    //     ]);
+
+    //     // Define tables and their respective fields
+    //     $tableMap = [
+    //         'credit_notes' => ['table' => 'credit_notes', 'date' => 'date', 'created' => 'created_at', 'branch' => 'credit_notes.branch_id'],
+    //         'inter_banks' => ['table' => 'inter_banks', 'date' => 'date', 'created' => 'created_at', 'branch' => 'inter_banks.branch_id'],
+    //         'intersite_transfers' => ['table' => 'intersite_transfers', 'date' => 'date', 'created' => 'created_at', 'branch' => 'source_branch_id'],
+    //         'interstore_transfers' => ['table' => 'interstore_transfers', 'date' => 'date', 'created' => 'created_at', 'branch' => 'interstore_transfers.branch_id'],
+    //         'journals' => ['table' => 'journals', 'date' => 'date', 'created' => 'created_at', 'branch' => 'journals.branch_id'],
+    //         'order_invoices' => ['table' => 'order_invoices', 'date' => 'order_date', 'created' => 'created_at', 'branch' => 'order_invoices.branch_id'],
+    //         'orders' => ['table' => 'orders', 'date' => 'order_date', 'created' => 'created_at', 'branch' => 'orders.branch_id'],
+    //         'payments' => ['table' => 'payments', 'date' => 'date', 'created' => 'created_at', 'branch' => 'payments.branch_id'],
+    //         'proformers' => ['table' => 'proformers', 'date' => 'order_date', 'created' => 'created_at', 'branch' => 'proformers.branch_id'],
+    //         'purchase_expenses' => ['table' => 'purchase_expenses', 'date' => 'date', 'created' => 'created_at', 'branch' => 'purchases.branch_id', 'join' => 'purchases'],
+    //         'purchases' => ['table' => 'purchases', 'date' => 'purchase_date', 'created' => 'created_at', 'branch' => 'purchases.branch_id'],
+    //         'receipts' => ['table' => 'receipts', 'date' => 'date', 'created' => 'created_at', 'branch' => 'receipts.branch_id'],
+    //         'return_debits' => ['table' => 'return_debits', 'date' => 'date', 'created' => 'created_at', 'branch' => 'return_debits.branch_id'],
+    //     ];
+
+    //     // Validate the report type
+    //     if (!array_key_exists($validated['type'], $tableMap)) {
+    //         return response()->json(['error' => 'Invalid report type selected.'], 400);
+    //     }
+
+    //     // Get table configuration
+    //     $tableConfig = $tableMap[$validated['type']];
+    //     $table = $tableConfig['table'];
+    //     $dateColumn = $tableConfig['date'];
+    //     $createdColumn = $tableConfig['created'];
+    //     $branchColumn = $tableConfig['branch'];
+
+    //     // Select required columns
+    //     $columns = [
+    //         "$table.id",
+    //         "$table.$dateColumn AS date",
+    //         "$table.$createdColumn AS created_at"
+    //     ];
+
+    //     // Include reference column if available
+    //     if (Schema::hasColumn($table, 'reference')) {
+    //         $columns[] = "$table.reference";
+    //     }
+    //     if (Schema::hasColumn($table, 'receipt_no')) {
+    //         $columns[] = "$table.receipt_no AS reference";
+    //     }
+
+    //     // Include amount column if available
+    //     if (Schema::hasColumn($table, 'amount')) {
+    //         $columns[] = "$table.amount";
+    //     }
+
+    //     // Include description if available
+    //     if (Schema::hasColumn($table, 'description')) {
+    //         $columns[] = "$table.description";
+    //     }
+
+    //     // Include `branch_id`
+    //     if ($branchColumn) {
+    //         $columns[] = "$branchColumn AS branch_id";
+    //     }
+
+    //     // Identify user column (`posted_by`, `created_by`, `updated_by`)
+    //     //['posted_by', 'created_by', 'updated_by']
+    //     $userColumn = null;
+    //     foreach (['created_by'] as $col) {
+    //         if (Schema::hasColumn($table, $col)) {
+    //             $userColumn = $col;
+    //             break;
+    //         }
+    //     }
+
+    //     // Include user column if found
+    //     if ($userColumn) {
+    //         $columns[] = "$table.$userColumn";
+    //     }
+
+    //     // Base Query
+    //     $query = DB::table($table);
+
+    //     // Join with `purchases` for `purchase_expenses` to get `branch_id`
+    //     if ($validated['type'] === 'purchase_expenses') {
+    //         $query->join('purchases', 'purchases.id', '=', 'purchase_expenses.purchase_id');
+    //     }
+
+    //     // Join with `branches` to get branch name
+    //     $query->leftJoin('branches', 'branches.id', '=', $branchColumn);
+
+    //     // Join with `users` to get user name
+    //     if ($userColumn) {
+    //         //$query->leftJoin('users', "users.id", '=', "$table.$userColumn");
+    //         $query->leftJoin('users', "users.id", '=', "$table.$userColumn");
+    //     }
+
+    //     // Select columns
+    //     $query->select(array_merge($columns, [
+    //         'branches.name AS branch_name',
+    //         DB::raw("CONCAT(users.firstname, ' ', users.surname) AS user_name")
+    //     ]));
+
+    //     // Apply Backdated or Postdated Condition
+    //     if ($validated['entry_type'] == 'backdated') {
+    //         $query->whereRaw("DATE($table.$dateColumn) < DATE($table.$createdColumn)");
+    //     } elseif ($validated['entry_type'] == 'postdated') {
+    //         $query->whereRaw("DATE($table.$dateColumn) > CURDATE()");
+    //     }
+
+    //     if ($validated['branch_id'] == '')
+    //         $validated['branch_id'] = '%';
+    //     // Apply filters
+    //     $query->whereBetween("$table.$dateColumn", [$validated['from_date'], $validated['to_date']])
+    //         ->where($branchColumn, 'LIKE', $validated['branch_id'])
+    //         ->where($branchColumn, 'LIKE', $validated['branch_id'])
+    //         ->orderBy("$table.$dateColumn", 'desc');
+
+    //     // Fetch results
+    //     $reports = $query->get();
+    //     $route_name = $this->getRouteName($validated['type']);
+    //     return view('pages.reports.inventory.user_entries.load_backdated_postdated_entries_report', compact('reports', 'route_name'));
+    // }
     public function loadBackdatedEntriesReport(Request $request)
     {
         $validated = $request->validate([
@@ -7745,10 +8065,18 @@ class ReportController extends Controller
         if (Schema::hasColumn($table, 'amount')) {
             $columns[] = "$table.amount";
         }
+        // Include total column if available (for orders)
+        elseif (Schema::hasColumn($table, 'total')) {
+            $columns[] = "$table.total AS amount";
+        }
 
         // Include description if available
         if (Schema::hasColumn($table, 'description')) {
             $columns[] = "$table.description";
+        }
+        // Include comment if available (as description)
+        elseif (Schema::hasColumn($table, 'comment')) {
+            $columns[] = "$table.comment AS description";
         }
 
         // Include `branch_id`
@@ -7757,9 +8085,9 @@ class ReportController extends Controller
         }
 
         // Identify user column (`posted_by`, `created_by`, `updated_by`)
-        //['posted_by', 'created_by', 'updated_by']
+        $userColumns = ['posted_by', 'created_by', 'updated_by', 'sold_by'];
         $userColumn = null;
-        foreach (['created_by'] as $col) {
+        foreach ($userColumns as $col) {
             if (Schema::hasColumn($table, $col)) {
                 $userColumn = $col;
                 break;
@@ -7784,14 +8112,15 @@ class ReportController extends Controller
 
         // Join with `users` to get user name
         if ($userColumn) {
-            //$query->leftJoin('users', "users.id", '=', "$table.$userColumn");
             $query->leftJoin('users', "users.id", '=', "$table.$userColumn");
         }
 
-        // Select columns
+        // Select columns with fixed user name
+        $userNameColumn = "users.name AS user_name";
+
         $query->select(array_merge($columns, [
             'branches.name AS branch_name',
-            DB::raw("CONCAT(users.firstname, ' ', users.surname) AS user_name")
+            $userNameColumn
         ]));
 
         // Apply Backdated or Postdated Condition
@@ -7801,20 +8130,27 @@ class ReportController extends Controller
             $query->whereRaw("DATE($table.$dateColumn) > CURDATE()");
         }
 
-        if ($validated['branch_id'] == '')
+        // Default branch to % if empty
+        if ($validated['branch_id'] == '' || $validated['branch_id'] == 'all') {
             $validated['branch_id'] = '%';
+        }
+
+        // Filter by company if provided
+        if (isset($validated['company_id']) && $validated['company_id'] != '' && $validated['company_id'] != 'all') {
+            $query->where('branches.company_id', '=', $validated['company_id']);
+        }
+
         // Apply filters
         $query->whereBetween("$table.$dateColumn", [$validated['from_date'], $validated['to_date']])
-            ->where($branchColumn, 'LIKE', $validated['branch_id'])
             ->where($branchColumn, 'LIKE', $validated['branch_id'])
             ->orderBy("$table.$dateColumn", 'desc');
 
         // Fetch results
         $reports = $query->get();
         $route_name = $this->getRouteName($validated['type']);
+
         return view('pages.reports.inventory.user_entries.load_backdated_postdated_entries_report', compact('reports', 'route_name'));
     }
-
     public function getRouteName($type)
     {
         $route_name = "orders.show";
@@ -7863,6 +8199,145 @@ class ReportController extends Controller
         return view('pages.reports.inventory.user_entries.user_entries_report');
     }
 
+    // public function loadUserEntriesReport(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'type' => 'required|string',
+    //         'from_date' => 'required|date',
+    //         'to_date' => 'required|date',
+    //         'branch_id' => 'nullable|integer',
+    //         'company_id' => 'nullable|integer',
+    //     ]);
+
+    //     $branch_id = $validated['branch_id'] ?? '%';
+    //     $company_id = $validated['company_id'] ?? '%';
+    //     // Map report types to tables with correct fields
+    //     $tableMap = [
+    //         'credit_notes' => ['table' => 'credit_notes', 'date' => 'date', 'amount' => 'amount', 'branch' => 'branch_id', 'reference' => 'reference'],
+    //         'inter_banks' => ['table' => 'inter_banks', 'date' => 'date', 'amount' => 'amount', 'branch' => 'branch_id', 'reference' => 'reference'],
+    //         'intersite_transfers' => ['table' => 'intersite_transfers', 'date' => 'date', 'amount' => null, 'branch' => 'source_branch_id', 'reference' => 'reference'],
+    //         'interstore_transfers' => ['table' => 'interstore_transfers', 'date' => 'date', 'amount' => null, 'branch' => 'branch_id', 'reference' => 'reference'],
+    //         'journals' => ['table' => 'journals', 'date' => 'date', 'amount' => 'amount', 'branch' => 'branch_id', 'reference' => 'reference'],
+    //         'order_invoices' => ['table' => 'order_invoices', 'date' => 'order_date', 'amount' => 'total', 'branch' => 'branch_id', 'reference' => 'reference'],
+    //         'orders' => ['table' => 'orders', 'date' => 'order_date', 'amount' => 'total', 'branch' => 'branch_id', 'reference' => 'reference'],
+    //         'payments' => ['table' => 'payments', 'date' => 'date', 'amount' => 'amount', 'branch' => 'branch_id', 'reference' => 'receipt_no'],
+    //         'proformers' => ['table' => 'proformers', 'date' => 'order_date', 'amount' => 'total', 'branch' => 'branch_id', 'reference' => 'reference'],
+    //         'purchase_expenses' => ['table' => 'purchase_expenses', 'date' => 'date', 'amount' => 'amount', 'branch' => 'purchases.branch_id', 'reference' => 'reference', 'join' => 'purchases'],
+    //         'purchases' => ['table' => 'purchases', 'date' => 'purchase_date', 'amount' => null, 'branch' => 'branch_id', 'reference' => 'reference'],
+    //         'receipts' => ['table' => 'receipts', 'date' => 'date', 'amount' => 'amount', 'branch' => 'branch_id', 'reference' => 'receipt_no'],
+    //         'return_debits' => ['table' => 'return_debits', 'date' => 'date', 'amount' => 'amount', 'branch' => 'branch_id', 'reference' => 'reference'],
+    //     ];
+
+    //     // Validate report type
+    //     if (!array_key_exists($validated['type'], $tableMap)) {
+    //         return response()->json(['error' => 'Invalid report type selected.'], 400);
+    //     }
+
+    //     // Get table configuration
+    //     $tableConfig = $tableMap[$validated['type']];
+    //     $table = $tableConfig['table'];
+    //     $dateColumn = $tableConfig['date'];
+    //     $amountColumn = $tableConfig['amount'];
+    //     $branchColumn = $tableConfig['branch'];
+    //     $referenceColumn = $tableConfig['reference'];
+
+    //     // Select common columns
+    //     $columns = ["$table.id", "$table.$dateColumn AS date"];
+
+    //     // Include amount column if available
+    //     if ($amountColumn) {
+    //         $columns[] = "$table.$amountColumn AS amount";
+    //     }
+
+    //     // Use `receipt_no` for `receipts` and `payments`, otherwise use `reference`
+    //     if ($referenceColumn) {
+    //         $columns[] = "$table.$referenceColumn AS reference";
+    //     }
+
+    //     // Handle tables that have `description`
+    //     if (Schema::hasColumn($table, 'description')) {
+    //         $columns[] = "$table.description";
+    //     }
+
+    //     // Check if the table has the `updated_at` column before including it
+    //     if (Schema::hasColumn($table, 'updated_at')) {
+    //         $columns[] = "$table.updated_at AS updated_at";
+    //     }
+
+    //     // Special case: `purchase_expenses` needs a join with `purchases` to get branch_id
+    //     if ($validated['type'] === 'purchase_expenses') {
+    //         $columns[] = 'purchases.branch_id AS branch_id';
+    //     } else {
+    //         $columns[] = "$table.$branchColumn AS branch_id";
+    //     }
+
+    //     // Identify user column (`posted_by`, `created_by`, `updated_by`, etc.)
+    //     $userColumn = null;
+    //     //$possibleUserColumns = ['posted_by', 'created_by', 'updated_by'];
+    //     $possibleUserColumns = ['created_by'];
+    //     foreach ($possibleUserColumns as $col) {
+    //         if (Schema::hasColumn($table, $col)) {
+    //             $userColumn = $col;
+    //             break;
+    //         }
+    //     }
+
+    //     // Include user column if found
+    //     if ($userColumn) {
+    //         $columns[] = "$table.$userColumn";
+    //     }
+
+    //     // Build Query with necessary joins
+    //     $query = DB::table($table);
+
+    //     // Join with `purchases` for `purchase_expenses` to get branch_id
+    //     if ($validated['type'] === 'purchase_expenses') {
+    //         $query->join('purchases', 'purchases.id', '=', 'purchase_expenses.purchase_id');
+    //     }
+
+    //     // Join with branches to get branch name
+    //     if ($branchColumn) {
+    //         $query->leftJoin('branches', 'branches.id', '=', $branchColumn);
+    //     }
+
+    //     // Join with users to get user name
+    //     if ($userColumn) {
+    //         $query->leftJoin('users', "users.id", '=', "$table.$userColumn");
+    //     }
+
+    //     // Select final columns
+    //     $query->select(array_merge($columns, [
+    //         'branches.name AS branch_name',
+    //         'users.user_code AS user_code',
+    //         'branches.code AS branch_code',
+    //         DB::raw("CONCAT(users.firstname, ' ', users.surname) AS user_name")
+    //     ]));
+
+    //     // Apply filters
+    //     $query->whereBetween("$table.$dateColumn", [$validated['from_date'], $validated['to_date']]);
+
+    //     // Special case: `intersite_transfers` uses `source_branch_id` for filtering
+    //     if ($validated['type'] === 'intersite_transfers') {
+    //         $query->where(function ($q) use ($validated, $table, $branch_id) {
+    //             $q->where("$table.source_branch_id", 'LIKE', $branch_id)
+    //                 ->orWhere("$table.destination_branch_id", 'LIKE', $branch_id);
+    //         });
+    //     } // Special case: `purchase_expenses` needs branch_id from `purchases`
+    //     elseif ($validated['type'] === 'purchase_expenses') {
+    //         $query->where("purchases.branch_id", 'LIKE', $branch_id);
+    //     } else {
+    //         $query->where("$table.$branchColumn", 'LIKE', $branch_id);
+    //     }
+
+    //     // Order by date
+    //     $query->orderBy("$table.$dateColumn", 'desc');
+
+    //     // Get final results
+    //     $reports = $query->get();
+    //     $route_name = $this->getRouteName($validated['type']);
+    //     return view('pages.reports.inventory.user_entries.load_user_entries_report', compact('reports', 'route_name'));
+    // }
+
     public function loadUserEntriesReport(Request $request)
     {
         $validated = $request->validate([
@@ -7874,7 +8349,15 @@ class ReportController extends Controller
         ]);
 
         $branch_id = $validated['branch_id'] ?? '%';
+        if ($branch_id == 'all' || $branch_id == '') {
+            $branch_id = '%';
+        }
+
         $company_id = $validated['company_id'] ?? '%';
+        if ($company_id == 'all' || $company_id == '') {
+            $company_id = '%';
+        }
+
         // Map report types to tables with correct fields
         $tableMap = [
             'credit_notes' => ['table' => 'credit_notes', 'date' => 'date', 'amount' => 'amount', 'branch' => 'branch_id', 'reference' => 'reference'],
@@ -7921,6 +8404,8 @@ class ReportController extends Controller
         // Handle tables that have `description`
         if (Schema::hasColumn($table, 'description')) {
             $columns[] = "$table.description";
+        } elseif (Schema::hasColumn($table, 'comment')) {
+            $columns[] = "$table.comment AS description";
         }
 
         // Check if the table has the `updated_at` column before including it
@@ -7937,8 +8422,7 @@ class ReportController extends Controller
 
         // Identify user column (`posted_by`, `created_by`, `updated_by`, etc.)
         $userColumn = null;
-        //$possibleUserColumns = ['posted_by', 'created_by', 'updated_by'];
-        $possibleUserColumns = ['created_by'];
+        $possibleUserColumns = ['created_by', 'posted_by', 'updated_by', 'sold_by'];
         foreach ($possibleUserColumns as $col) {
             if (Schema::hasColumn($table, $col)) {
                 $userColumn = $col;
@@ -7962,6 +8446,11 @@ class ReportController extends Controller
         // Join with branches to get branch name
         if ($branchColumn) {
             $query->leftJoin('branches', 'branches.id', '=', $branchColumn);
+
+            // Filter by company_id if provided
+            if ($company_id != '%') {
+                $query->where('branches.company_id', '=', $company_id);
+            }
         }
 
         // Join with users to get user name
@@ -7969,13 +8458,22 @@ class ReportController extends Controller
             $query->leftJoin('users', "users.id", '=', "$table.$userColumn");
         }
 
+        // Determine user fields to select based on schema
+        $userFields = [];
+        $userFields[] = 'branches.name AS branch_name';
+        $userFields[] = 'branches.code AS branch_code';
+
+        // Add user fields only if user join is applied
+        if ($userColumn) {
+            $userFields[] = 'users.name AS user_name';
+            // Add user_code field if it exists in the schema
+            if (Schema::hasColumn('users', 'user_code')) {
+                $userFields[] = 'users.user_code AS user_code';
+            }
+        }
+
         // Select final columns
-        $query->select(array_merge($columns, [
-            'branches.name AS branch_name',
-            'users.user_code AS user_code',
-            'branches.code AS branch_code',
-            DB::raw("CONCAT(users.firstname, ' ', users.surname) AS user_name")
-        ]));
+        $query->select(array_merge($columns, $userFields));
 
         // Apply filters
         $query->whereBetween("$table.$dateColumn", [$validated['from_date'], $validated['to_date']]);
@@ -7999,7 +8497,7 @@ class ReportController extends Controller
         // Get final results
         $reports = $query->get();
         $route_name = $this->getRouteName($validated['type']);
+
         return view('pages.reports.inventory.user_entries.load_user_entries_report', compact('reports', 'route_name'));
     }
-
 }

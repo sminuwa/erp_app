@@ -12,6 +12,7 @@ class Budget extends Model
         'branch_id',
         'category_id',
         'budget_year',
+        'proposed_budget',
         'quarter',
         'month1',
         'month2',

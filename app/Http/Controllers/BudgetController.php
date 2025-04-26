@@ -15,7 +15,7 @@ class BudgetController extends Controller
 {
     public function index()
     {
-        if(!auth()->user()->can('budget.view'))
+        if (!auth()->user()->can('budget.view'))
             return abort('403');
         $budgets = Budget::with(['branch', 'category'])->latest('budget_year')->get(); // Pagination
         return view('pages.budgets.index', compact('budgets'));
@@ -71,6 +71,12 @@ class BudgetController extends Controller
         $budget->update($request->all());
 
         return redirect()->route('budgets.index')->with('success', 'Budget updated successfully.');
+    }
+    public function destroy(Budget $budget)
+    {
+        $budget->delete();
+        session()->flash('app_message', 'Budget deleted successfully');
+        return redirect()->back();
     }
     public function importForm()
     {

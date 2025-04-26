@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ALTER TABLE `permissions` ADD COLUMN `description` VARCHAR(255) NULL AFTER `name`;
 ALTER TABLE `permissions` ADD COLUMN `active` Tinyint(1) NULL AFTER `description` default 1;
 ALTER TABLE `permissions` ADD COLUMN `active` TINYINT(1) NULL AFTER `description` DEFAULT 1;
@@ -783,3 +784,6 @@ CREATE TABLE `jobs` (
   KEY `jobs_queue_index` (`queue`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 >>>>>>> 7c5099a300d2af958cd58e02f0f8ee0657379ede
+=======
+ALTER TABLE `budgets` ADD COLUMN `proposed_budget` DECIMAL(10,2) NULL AFTER `budget_year`; 
+>>>>>>> 8c5ad994c309b12f6d03c73599576b0210edde52

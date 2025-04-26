@@ -3287,17 +3287,17 @@ class ReportController extends Controller
         $company_id = $request->company_id;
         $branch_id = $request->branch_id;
         $customer_id = $request->customer_id;
-
+    
         if ($company_id == 'all' || $company_id == '' || $company_id == null)
             $company_id = '%';
-
+    
         if ($branch_id == 'all' || $branch_id == '' || $branch_id == null)
             $branch_id = '%';
-
+    
         if ($customer_id == 'all' || $customer_id == '') {
             $customer_id = '%';
         }
-
+    
         $query = DB::table('customers')
             ->leftJoin('general_account_ledgers', function ($join) {
                 $join->on('customers.id', '=', 'general_account_ledgers.model_id')
@@ -3313,29 +3313,29 @@ class ReportController extends Controller
                 DB::raw('customers.opening_balance + COALESCE(SUM(general_account_ledgers.debit), 0) - COALESCE(SUM(general_account_ledgers.credit), 0) AS due')
             )
             ->whereDate('date', '<=', $to_date)
-            //->havingRaw('customers.opening_balance + (SUM(debit) - SUM(credit)) > 0')
-            ->groupBy('customers.id', 'customers.name', 'customers.credit_limit', 'customers.opening_balance');
-
+            ->groupBy('customers.id', 'customers.name', 'customers.credit_limit', 'customers.opening_balance')
+            ->havingRaw('customers.opening_balance + COALESCE(SUM(general_account_ledgers.debit), 0) - COALESCE(SUM(general_account_ledgers.credit), 0) > 0');
+    
         if ($company_id != '%')
             $query = $query->where('companies.id', $company_id);
-
+    
         if ($branch_id != '%')
             $query = $query->where('branches.id', $branch_id);
+    
         if ($customer_id != '%')
             $query = $query->where('general_account_ledgers.model_id', $customer_id);
-
+    
         $sales = $query->get();
-
-
+    
         if ($company_id == '%')
             $company_id = 'all';
-
+    
         if ($branch_id == '%')
             $branch_id = 'all';
-
+    
         if ($customer_id == "%")
             $customer_id = "all";
-
+    
         return view('pages.reports.customer_ledger_analysis.load_customer_total_debt_report', compact('sales', 'from_date', 'to_date', 'company_id', 'branch_id', 'customer_id'));
     }
 
@@ -5547,6 +5547,7 @@ class ReportController extends Controller
             $branch_id = '%';
 
         $query = $this->generalAccountLedgerBy($from_date, $to_date, $company_id, $branch_id, $type)
+            ->select('general_account_ledgers.*', 'branches.code')
             ->where('model_id', 'LIKE', $payer_id)
             ->orderBy('date')
             ->orderBy('general_account_ledgers.id');
@@ -5918,7 +5919,7 @@ class ReportController extends Controller
 
         return view('pages.reports.ap_ar.balance_sheet.index', compact('branches'));
     }
-   
+
     public function loadBalanceSheet(Request $request)
     {
         $to_date = $request->to_date;
@@ -6108,7 +6109,7 @@ class ReportController extends Controller
         }
         return view('pages.reports.ap_ar.balance_sheet.load', compact('assets', 'liabilities', 'equity', 'net_income', 'branch', 'to_date', 'company_id', 'branch_id', 'retainedEarningsFromLastYear', 'retainedEarningsFromSelectedYear'));
     }
-    
+
     public function printBalanceSheet($to_date, $company_id, $branch_id)
     {
         // Helper function to get account type

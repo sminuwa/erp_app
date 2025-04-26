@@ -8,6 +8,7 @@ use App\Models\Journal;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\PurchaseExpense;
+use App\Models\Purchase;
 use App\Models\Receipt;
 
 const TRANSACTION_TYPE_OPENING_BALANCE = 0;
@@ -345,6 +346,9 @@ function getReferenceId($reference)
     if (strpos($reference, 'ITS') !== false) {
         return InterstoreTransfer::where('reference', $reference)->first()->id ?? null;
     }
+    if (strpos($reference, 'GRN') !== false) {
+        return Purchase::where('reference', $reference)->first()->id ?? null;
+    }
     if (strpos($reference, 'OPE') !== false) {
         return null;
     }
@@ -368,7 +372,7 @@ function getReferenceId($reference)
     }
 
 }
-function getContraAccount($reference, $credit, $debit)
+function getContraAccount($reference, $credit, $debit, $account = 'all')
 {
     // Determine the query conditions based on reference prefix
     $query = GeneralAccountLedger::where('reference', $reference)
@@ -382,16 +386,19 @@ function getContraAccount($reference, $credit, $debit)
     //     $query->where('general_account_ledgers.model_name', 'GeneralAccount');
     //     $query->where('general_account_ledgers.credit', '>', 0);
     // }
-    if($credit >0){
-        $query->where('general_account_ledgers.debit', '>', 0);
+    if ($account != 'all') {
+        $query->where('general_account_ledgers.model_id', '<>', $account);
     }
-    if($debit >0){
-        $query->where('general_account_ledgers.credit', '>', 0);
-    }
+    // if ($credit > 0) {
+    //     $query->where('general_account_ledgers.debit', '>', 0);
+    // }
+    // if ($debit > 0) {
+    //     $query->where('general_account_ledgers.credit', '>', 0);
+    // }
 
     // Execute the query and process results
     // $numbers = $query->get()->pluck('number');
     $numbers = $query->first()->number ?? '';
-    
+
     return $numbers;//->isNotEmpty() ? $numbers->implode('|') : '';
 }

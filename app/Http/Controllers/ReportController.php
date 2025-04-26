@@ -3379,7 +3379,7 @@ class ReportController extends Controller
             $baseQuery = $baseQuery->where('companies.id', $company_id);
 
         if ($branch_id != '%')
-            $baseQuery = $baseQuery->where('branches.id', $branch_id);
+            $baseQuery = $baseQuery->where('general_account_ledgers.branch_id', $branch_id);
 
         if ($customer_id != '%')
             $baseQuery = $baseQuery->where('general_account_ledgers.model_id', $customer_id);

@@ -196,7 +196,7 @@
                     // $('#img-loader').hide();
                     console.log(data)
                     $("#load").html(data);
-                    loadDataTable2()
+                    loadDataTable2();
                 });
             });
         });

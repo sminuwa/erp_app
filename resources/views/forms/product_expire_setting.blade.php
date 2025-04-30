@@ -23,7 +23,7 @@
 
     <div class="form-group">
         <label for="no_of_days">No Of Days</label>
-        <input type="number" class="form-control {{ $errors->has('no_of_days') ? ' is-invalid' : '' }}"
+        <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '');" class="form-control {{ $errors->has('no_of_days') ? ' is-invalid' : '' }}"
             name="no_of_days" id="no_of_days" value="{{ old('no_of_days', $model->no_of_days) }}" placeholder=""
             required="required">
         @if ($errors->has('no_of_days'))

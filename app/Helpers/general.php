@@ -469,3 +469,17 @@ function getContraAccount($reference, $current_account_type = "GeneralAccount", 
     // Default return if no match found
     return '';
 }
+
+if (!function_exists('amountFromJournalItems')) {
+    function amountFromJournalItems($reference)
+    {
+        // Query journals joined with journal_items
+        $amount = DB::table('journal_items')
+            ->join('journals', 'journals.id', '=', 'journal_items.journal_id')
+            ->where('journals.reference', $reference)
+            ->select(DB::raw('SUM(CASE WHEN journal_items.debit > 0 THEN journal_items.debit ELSE journal_items.credit END) AS total_amount'))
+            ->first();
+
+        return $amount ? (float) $amount->total_amount : 0;
+    }
+}

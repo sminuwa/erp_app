@@ -6,7 +6,7 @@
             <div class="row">
                 <div class="form-group col-sm-2 mb-2">
                     <label for="qty" class="col-sm-2 col-form-label">QTY</label>
-                    <input type="number" step=".01" class="form-control form-control-sm" value="{{ $item->quantity }}" name="qty"
+                    <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '');" class="form-control form-control-sm" value="{{ $item->quantity }}" name="qty"
                         id="qty{{ $item->id }}">
                 </div>
                 <div class="form-group col-sm-3 mb-2">

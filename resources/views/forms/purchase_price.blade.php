@@ -32,7 +32,7 @@
 
     <div class="form-group">
         <label for="purchase_price">Unit Price</label>
-        <input type="number" class="form-control" step=".01" name="purchase_price" id="purchase_price" placeholder="0.0" required>
+        <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '');" class="form-control" step=".01" name="purchase_price" id="purchase_price" placeholder="0.0" required>
         @if ($errors->has('purchase_price'))
             <div class="invalid-feedback">
                 <strong>{{ $errors->first('purchase_price') }}</strong>

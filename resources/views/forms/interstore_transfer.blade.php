@@ -92,7 +92,7 @@
     </div>
     <div class="form-group">
         <label for="qty_transfered">Qty</label>
-        <input type="number" class="form-control {{ $errors->has('qty_transfered') ? ' is-invalid' : '' }}" step=".01"
+        <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '');" class="form-control {{ $errors->has('qty_transfered') ? ' is-invalid' : '' }}"
             name="qty_transfered" id="qty_transfered" value="{{ $model->qty_transfered }}" placeholder=""
             required="required">
         @if ($errors->has('qty_transfered'))

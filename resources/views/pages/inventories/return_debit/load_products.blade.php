@@ -23,13 +23,13 @@
                 <div class="c-cell text-left">{{ $attr->code ?? null }} - {{ $item->name }}</div>
                 <div class="c-cell">
                     <span style="color: red;" id="valid_price{{ $item->id }}"></span>
-                    <input type="number" step="0.01" name="unit_price" id="price{{ $item->id }}" class="form-control price"
+                    <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '');"  name="unit_price" id="price{{ $item->id }}" class="form-control price"
                         style="min-width:65px;" value="{{ $item->price }}" data-value="p{{ $item->id }}"
                         required />
                 </div>
                 <div class="c-cell">
                     <span style="color: red;" id="valid_quantity{{ $item->id }}"></span>
-                    <input type="number" step="0.01" name="quantity" id="quantity{{ $item->id }}"
+                    <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '');"  name="quantity" id="quantity{{ $item->id }}"
                         max-qty="{{ $attr->available }}" class="form-control quantity"
                         data-value="p{{ $item->id }}" style="min-width:58px;" value="{{ $item->quantity }}"
                         min="1" required>

@@ -103,7 +103,7 @@
                                                 <td>{{ $payment->receipt_no }}</td>
                                                 <td>
                                                     @if(isset($payment->payer()->code))
-                                                    {{ $payment->payer()->code ? $payment->payer()->code . ' - ' . $payment->payer()->name : $payment->payer()->number . ' - ' . $payment->payer()->description }}
+                                                       {{ $payment->payer()->code ? $payment->payer()->code . ' - ' . $payment->payer()->name : $payment->payer()->number . ' - ' . $payment->payer()->description }}
                                                     @endif
                                                 </td>
                                                 <td>

@@ -69,7 +69,7 @@
                             @endcan
                             <!-- /.card-header -->
                             <div class="card-body table-responsive">
-                                <table id="example1"
+                                <table id="example3"
                                     class="table table-bordered table-striped text-left table-responsive-xl"
                                     data-ordering="true">
                                     <thead>
@@ -292,7 +292,7 @@
     <script>
         $(function() {
 
-            $("#example1").DataTable({
+            $("#example3").DataTable({
                 'iDisplayLength': 100
             });
             $('#example2').DataTable({

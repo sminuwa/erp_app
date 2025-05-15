@@ -158,13 +158,13 @@
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="quantity">Quantity</label>
-                                    <input type="number" class="form-control" step=".01" name="quantity" id="quantity" placeholder="Quantity" required>
+                                    <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '');" class="form-control" step=".01" name="quantity" id="quantity" placeholder="Quantity" required>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="unit_price">Unit Price</label>
-                                    <input type="number" step=".01" class="form-control" name="unit_price" id="unit_price" placeholder="Unit Price" required>
+                                    <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '');" class="form-control" name="unit_price" id="unit_price" placeholder="Unit Price" required>
                                 </div>
                             </div>
                         </div>

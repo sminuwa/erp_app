@@ -1,149 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
-    <!--  This file has been downloaded from bootdey.com @bootdey on twitter -->
-    <!--  All snippets are MIT license http://bootdey.com/license -->
     <title>Payment Receipt - ALBABELLO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-    <!-- Custom CSS for A4 Printing -->
+    <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="{{ asset('assets/backend/css/adminlte.min.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <link rel="icon" href="{{ asset('assets/backend/img/policymaker.ico') }}" type="image/x-icon" />
     @include('pages.order.paper_size')
+    
+    <style>
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            padding: 20px;
+        }
+        .receipt-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .receipt-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .receipt-left img {
+            width: 71px;
+            height: 71px;
+            border-radius: 43px;
+            margin-bottom: 10px;
+        }
+        .receipt-right {
+            text-align: right;
+        }
+        .receipt-right p {
+            margin: 5px 0;
+        }
+        .receipt-right i {
+            margin-left: 5px;
+        }
+        .receipt-title {
+            text-align: center;
+            font-weight: 700;
+            margin: 20px 0;
+            font-size: 24px;
+        }
+        .customer-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .payment-info {
+            text-align: right;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        .amount-row {
+            text-align: right;
+        }
+        .amount-words {
+            color: #dc3545;
+            padding: 10px;
+        }
+        .footer-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        .signature-line {
+            margin-top: 40px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        .thank-you {
+            text-align: center;
+            color: #8c8c8c;
+            margin-top: 30px;
+        }
+        .qr-code {
+            text-align: right;
+        }
+        
+    </style>
 </head>
 
 <body>
-    <div class="col-md-12">
-        <div class="row">
-            <div class="receipt-main col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1 col-md-offset-3">
-                <div class="row">
-                    <div class="receipt-header">
-                        <div class="col-xs-6 col-sm-6 col-md-6">
-                            <div class="receipt-left">
-                                <img src="{{ asset('assets/backend/img/logo.png') }}"
-                                    style="width:71px;height:71px;border-radius: 43px;" alt="Albabello Logo"
-                                    class="img-circle elevation-3 img-responsive" style="opacity: .8">
-                                <strong>{{ App\Models\User::UserBranchName()->long_name }}</strong>
-                            </div>
-                        </div>
-                        <div class="col-xs-6 col-sm-6 col-md-6 text-right">
-                            <div class="receipt-right">
-                                <h5>AL-BABELLO</h5>
-                                <p>{{ optional($payment->customer)->branch->address }} <i
-                                        class="fa fa-location-arrow"></i></p>
-                                <p>{{ optional($payment->customer)->branch->email }}<i class="fa fa-envelope-o"></i></p>
-                                <p>{{ optional($payment->customer)->branch->phone }} <i class="fa fa-phone"></i></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <div class="receipt-container">
+        <!-- Header with Logo and Company Info -->
+        <div class="receipt-header">
+            <div class="receipt-left">
+                <img src="{{ asset('assets/backend/img/logo.png') }}" alt="Albabello Logo" class="img-circle elevation-3 img-responsive" style="opacity: .8">
+                <div><strong>{{ App\Models\User::UserBranchName()->long_name }}</strong></div>
+            </div>
+            <div class="receipt-right">
+                <h5>AL-BABELLO</h5>
+                <p>{{ optional($payment->customer)->branch->address }}</p>
+                <p>{{ optional($payment->customer)->branch->email }}</p>
+                <p>{{ optional($payment->customer)->branch->phone }}</p>
+            </div>
+        </div>
 
-                <div class="row">
-                    <div class="receipt-header receipt-header-mid">
-                        <div class="col-xs-7 col-sm-7 col-md-7 text-left">
-                            <div class="receipt-right">
-                                <h5>Payment From</h5>
-                                <p><b>{{ $payment->payer()->code ? $payment->payer()->code . ' - ' . $payment->payer()->name : $payment->payer()->number . ' - ' . $payment->payer()->description }}
-                                    </b></p>
-                                <p><b>Mobile :</b> {{ $payment->customer->phone }}</p>
-                                <p><b>Address :</b> {{ $payment->customer->address }}</p>
-                            </div>
-                        </div>
-                        <div class="col-xs-5 col-sm-5 col-md-5">
-                            <div class="receipt-right">
-                                <p><b>Receipt No: {{ $payment->receipt_no }}</b></p>
-                                <p><b>Payment Date:
-                                        {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}</b></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <h4 style="text-align: center;font-weight:700">RECEIPT</h4>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Account</th>
-                                <th>Description</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{{ $payment->account()->code ?? $payment->account()->number }} -
-                                    {{ $payment->account()->name ?? $payment->account()->description }}</td>
-                                <td class="col-md-9">
-                                    @if ($payment->description == null)
-                                        Payment for
-                                        {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
-                                    @else
-                                        {{ $payment->description }}
-                                    @endif
-                                </td>
-                                <td class="col-md-3" align="right"><i class="fa fa-inr"></i>
-                                    &#8358; {{ number_format($payment->amount, 2) }}</td>
-                            </tr>
-                            <tr>
-                                <td class="text-right">
-                                    <p>
-                                        <strong>Amount: </strong>
-                                    </p>
-                                </td>
-                                <td align="right">
-                                    <p>
-                                        <strong><i
-                                                class="fa fa-inr"></i>{{ number_format($payment->amount, 2) }}</strong>
-                                    </p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-left text-danger" colspan="2">
-                                    <p>
-                                        <strong>Amount in words: </strong>
-                                        @php
-                                            $obj = new App\Models\Utility();
-                                        @endphp
-                                        <strong><i class="fa fa-inr"></i>
-                                            {{ $obj->convertNumberToWords($payment->amount + 0.55) }}</strong>
-                                    </p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+        <!-- Customer and Receipt Info -->
+        <div class="customer-info">
+            <div class="customer-details">
+                <h5>Payment From</h5>
+                <p><b>{{ $payment->payer()->code ? $payment->payer()->code . ' - ' . $payment->payer()->name : $payment->payer()->number . ' - ' . $payment->payer()->description }}</b></p>
+                <p><b>Mobile:</b> {{ $payment->customer->phone }}</p>
+                <p><b>Address:</b> {{ $payment->customer->address }}</p>
+            </div>
+            <div class="payment-info">
+                <p><b>Receipt No:</b> {{ $payment->receipt_no }}</p>
+                <p><b>Payment Date:</b> {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}</p>
+            </div>
+        </div>
+        
+        <!-- Receipt Title -->
+        <h4 class="receipt-title">RECEIPT</h4>
+        
+        <!-- Payment Details Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Account</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ $payment->account()->code ?? $payment->account()->number }} - 
+                        {{ $payment->account()->name ?? $payment->account()->description }}</td>
+                    <td>
+                        @if ($payment->description == null)
+                            Payment for {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
+                        @else
+                            {{ $payment->description }}
+                        @endif
+                    </td>
+                    <td class="amount-row">&#8358; {{ number_format($payment->amount, 2) }}</td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="amount-row"><strong>Amount:</strong></td>
+                    <td class="amount-row"><strong>&#8358; {{ number_format($payment->amount, 2) }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <!-- Amount in Words -->
+        <div class="amount-words">
+            <strong>Amount in words:</strong>
+            @php
+                $obj = new App\Models\Utility();
+            @endphp
+            <strong>{{ $obj->convertNumberToWords($payment->amount + 0.55) }}</strong>
+        </div>
 
-                <div class="row">
-                    <div class="receipt-header receipt-header-mid receipt-footer">
-                        <div class="col-xs-10 col-sm-10 col-md-10 text-left">
-                            <div class="receipt-right">
-                                <p><b>Date Created :</b>
-                                    {{ Carbon\Carbon::parse($payment->created_at)->toFormattedDateString() }}</p>
-                                <p><b>Created By :</b> {{ $payment->createdBy?->name }}</p>
-                                <p><b>Printed By :</b> {{ Auth::user()->name }}</p>
-                                <p><b>Printed On :</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
-                                <br>
-                                <br />
-                                <p><b>Signature :</b> ______________________________________</p>
-                                <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For:
-                                    ALBABELLO </span>
-                                <br /><br />
-                                <h5 style="color: rgb(140, 140, 140);text-align:center;">Thanks for Patronage!</h5>
-                            </div>
-                        </div>
-                        <div class="col-xs-2 col-sm-2 col-md-2 text-right">
-                            <div class="receipt-left">
-                                @php
-                                    $uc = $payment->receipt_no;
-                                @endphp
-                                {{ QrCode::size(70)->generate("$payment->dr\n$uc\n\n.") }}<br />
-                            </div>
-                        </div>
-                    </div>
+        <!-- Footer Information -->
+        <div class="footer-info">
+            <div class="receipt-details">
+                <p><b>Date Created:</b> {{ Carbon\Carbon::parse($payment->created_at)->toFormattedDateString() }}</p>
+                <p><b>Created By:</b> {{ $payment->createdBy?->name }}</p>
+                <p><b>Printed By:</b> {{ Auth::user()->name }}</p>
+                <p><b>Printed On:</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
+                
+                <div class="signature-line">
+                    <p><b>Signature:</b> ______________________________________</p>
+                    <p>For: ALBABELLO</p>
                 </div>
             </div>
+            <div class="qr-code">
+                @php
+                    $uc = $payment->receipt_no;
+                @endphp
+                {{ QrCode::size(100)->generate("$payment->dr\n$uc\n\n.") }}
+            </div>
+        </div>
+        
+        <!-- Thank You Message -->
+        <div class="thank-you">
+            <h5>Thanks for Patronage!</h5>
         </div>
     </div>
 
@@ -151,5 +205,4 @@
         window.print();
     </script>
 </body>
-
 </html>

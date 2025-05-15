@@ -189,7 +189,7 @@
                                 <tr>
                                     <td style='border-style:none;'>Created By:
                                         {{ $purchase->createdBy->name }}<br /><br>
-                                        Posted By: {{ $purchase->postedBy->name }}
+                                        Posted By: {{ $purchase->postedBy->name ?? '' }}
                                     </td>
                                 </tr>
                                 <tr>

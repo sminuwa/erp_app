@@ -70,7 +70,7 @@
     </div>
 @endif --}}
 {{-- load_slow_overstay_report.blade.php --}}
-<div class="card">
+{{-- <div class="card">
     <div class="card-body">
         <div class="row">
             <div class="col-md-12 mt-1">
@@ -81,11 +81,7 @@
             </div>
         </div>
 
-        {{-- <div class="row">
-            <div class="col-md-12 mb-2 text-right">
-                <button class="btn btn-sm btn-success" onclick="window.print()">Print</button>
-            </div>
-        </div> --}}
+    
 
         <div class="row">
             <div class="col-md-12 table-responsive">
@@ -165,16 +161,116 @@
                             </tr>
                         @endforeach
                     </tbody>
-                    {{-- <tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div> --}}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-12 mt-1">
+                <h5 style="text-align: center;">
+                    {{ $type == 'overstayed' ? 'Overstayed' : ($type == 'slow_moving' ? 'Slow Moving' : 'Slow Moving & Overstayed') }}
+                    Inventory Report
+                </h5>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 table-responsive">
+                <table class="display table table-bordered table-striped" id="inventory-table" data-ordering="true">
+                    <thead>
+                        <tr>
+                            <th>PRODUCT CODE</th>
+                            <th>PRODUCT NAME</th>
+                            <th>BRANCH</th>
+                            <th>STORE</th>
+                            <th>AVAILABLE QTY</th>
+                            <th>LAST DATE RECEIVED</th>
+                            <th>DAYS</th>
+                            <th>STATUS</th>
+                            <th>LAST DATE SOLD</th>
+                            <th>DAYS</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php
+                            $total_qty = 0;
+                        @endphp
+
+                        @foreach ($inventory as $item)
+                            @php
+                                $total_qty += $item->available_quantity ?? 0;
+
+                                // Prepare received details
+                                $received_date = $item->last_received_date ?? 'Never';
+                                $received_days = $item->days_since_received ?? 999;
+                                $received_status = $received_days > 30 ? 'Overstayed' : '';
+
+                                // Prepare sold details
+                                $sold_date = $item->last_sold_date ?? 'Never';
+                                $sold_days = $item->days_since_sold ?? 999;
+                                $sold_status = $sold_days > 60 ? 'Slow Moving' : '';
+                            @endphp
+
+                            <tr>
+                                <td>{{ $item->product_code }}</td>
+                                <td>{{ $item->product_name }}</td>
+                                <td>{{ $item->branch_name }}</td>
+                                <td>{{ $item->store_name }} ({{ $item->store_code }})</td>
+                                <td style="text-align: right">{{ number_format($item->available_quantity, 2) }}</td>
+
+                                {{-- Received --}}
+                                <td>
+                                    @if (!empty($item->last_received_date))
+                                        {{ \Carbon\Carbon::parse($item->last_received_date)->format('d/m/Y') }}
+                                    @else
+                                        Never
+                                    @endif
+                                </td>
+                                <td style="text-align: right">
+                                    {{ $item->days_since_received ?? 999 }}
+                                </td>
+                                <td>
+                                    @if (!empty($item->days_since_received) && $item->days_since_received > 30)
+                                        <span class="text-danger" style="font-weight:bold">Overstayed</span>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+
+                                {{-- Sold --}}
+                                <td>
+                                    @if (!empty($item->last_sold_date))
+                                        {{ \Carbon\Carbon::parse($item->last_sold_date)->format('d/m/Y') }}
+                                    @else
+                                        Never
+                                    @endif
+                                </td>
+                                <td style="text-align: right">
+                                    {{ $item->days_since_sold ?? 999 }}
+                                </td>
+                                <td>
+                                    @if (!empty($item->days_since_sold) && $item->days_since_sold > 60)
+                                        <span class="text-warning" style="font-weight:bold">Slow Moving</span>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                    <tfoot>
                         <tr style="font-weight: bold; background-color: #f5f5f5;">
                             <td colspan="4" style="text-align: right">TOTAL</td>
                             <td style="text-align: right">{{ number_format($total_qty, 2) }}</td>
-                            <td colspan="3"></td>
+                            <td colspan="6"></td>
                         </tr>
-                    </tfoot> --}}
+                    </tfoot>
                 </table>
             </div>
         </div>
     </div>
 </div>
-

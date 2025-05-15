@@ -114,7 +114,7 @@
             </div>
 
             <p>Created By: {{ $purchase->createdBy->name }}</p>
-            <p>Posted By: {{ $purchase->postedBy->name }}</p>
+            <p>Posted By: {{ $purchase->postedBy->name ?? ''}}</p>
             <p>Printed On: {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
         </div>
     </div>

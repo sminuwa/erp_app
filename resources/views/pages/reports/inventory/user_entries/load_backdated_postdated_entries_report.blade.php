@@ -14,9 +14,9 @@
                     @if (isset($reports[0]->amount))
                         <th>Amount</th>
                     @endif
-                    @if (isset($reports[0]->description))
+                    {{-- @if (isset($reports[0]->description)) --}}
                         <th>Description</th>
-                    @endif
+                    {{-- @endif --}}
                     <th>Branch</th>
                     <th>Performed By</th>
                 </tr>
@@ -33,13 +33,17 @@
                                     target="_BLANK">{{ $record->reference }}</a>
                             </td>
                         @endif
-                        
-                        @if (isset($record->amount))
-                            <td style="text-align: right">{{ number_format($record->amount, 2) }}</td>
+
+                        @if ($type == 'journals')
+                            <td style="text-align: right">{{ number_format(amountFromJournalItems($record->reference),2) }}</td>
+                        @else
+                            @if (isset($record->amount))
+                                <td style="text-align: right">{{ number_format($record->amount, 2) }}</td>
+                            @endif
                         @endif
-                        @if (isset($record->description))
-                            <td>{{ $record->description }}</td>
-                        @endif
+                        {{-- @if (isset($record->description)) --}}
+                            <td>{{ $record->description ?? ''}}</td>
+                        {{-- @endif --}}
                         <td>{{ $record->branch_name }}</td>
                         <td>{{ $record->user_name }}</td>
                     </tr>

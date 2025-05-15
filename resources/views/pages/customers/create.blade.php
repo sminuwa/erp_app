@@ -197,7 +197,7 @@
 
                                     <div class="form-group">
                                         <label for="phone">Phone</label>
-                                        <input type="number"
+                                        <input type="number" 
                                             class="form-control {{ $errors->has('phone') ? ' is-invalid' : '' }}"
                                             name="phone" id="phone" value="{{ old('phone', $model->phone) }}"
                                             placeholder="" maxlength="191" required="required">

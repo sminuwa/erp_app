@@ -69,7 +69,7 @@
                             @endcan
                             <!-- /.card-header -->
                             <div class="card-body table-responsive">
-                                <table id="example1"
+                                <table id="example3"
                                     class="table table-bordered table-striped text-left table-responsive-xl"
                                     data-ordering="true">
                                     <thead>
@@ -78,7 +78,6 @@
                                             <th>Name</th>
                                             <th>Invoice No</th>
                                             <th>Total</th>
-                                            {{-- <th>Amount Paid</th> --}}
                                             <th>Created By</th>
                                             <th>Date Created</th>
                                             <th>Status</th>
@@ -98,17 +97,12 @@
                                                 $total_due = $total_due + $order->due;
                                             @endphp
                                             <tr class="@if ($order->status == 0) bg-warning @endif">
-                                                <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}
-                                                </td>
+                                                <td>{{ Carbon\Carbon::parse($order->order_date)->toFormattedDateString() }}</td>
                                                 <td>{{ $order->customer->name }}</td>
                                                 <td>{{ $order->reference }}</td>
-                                                <td align="right">{{ number_format($order->total, 2, '.', ',') }}
-                                                </td>
-                                                {{-- <td align="right">&#8358;{{ number_format($order->pay, 2, '.', ',') }}</td> --}}
+                                                <td align="right">{{ number_format($order->total, 2, '.', ',') }}</td>
                                                 <td>{{ $order->createdBy->name ?? '' }}</td>
-                                                <td>{{ Carbon\Carbon::parse($order->created_at)->toFormattedDateString() }}
-                                                </td>
-
+                                                <td>{{ Carbon\Carbon::parse($order->created_at)->toFormattedDateString() }}</td>
                                                 <td>
                                                     @if ($order->has_credit_note > 0)
                                                         Reversed
@@ -225,11 +219,8 @@
                                             <th>Date</th>
                                             <th>Name</th>
                                             <th>Invoice No</th>
-                                            <th style="text-align:right">&#8358;{{ number_format($total, 2, '.', ',') }}
-                                            </th>
-                                            <th style="text-align:right">
-                                                Created By
-                                            </th>
+                                            <th style="text-align:right">&#8358;{{ number_format($total, 2, '.', ',') }}</th>
+                                            <th style="text-align:right">Created By</th>
                                             <th>Date</th>
                                             <th>Status</th>
                                             <th>Actions</th>
@@ -292,17 +283,17 @@
     <script>
         $(function() {
 
-            $("#example1").DataTable({
+            $("#example3").DataTable({
                 'iDisplayLength': 100
             });
-            $('#example2').DataTable({
-                "paging": true,
-                "lengthChange": false,
-                "searching": false,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false
-            });
+            // $('#example2').DataTable({
+            //     "paging": true,
+            //     "lengthChange": false,
+            //     "searching": false,
+            //     "ordering": true,
+            //     "info": true,
+            //     "autoWidth": false
+            // });
             $(".show").on('click', function() {
                 order_id = $(this).attr('data-val');
                 $.ajax({

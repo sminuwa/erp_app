@@ -63,6 +63,7 @@
 <table class="display table table-bordered caption">
     <thead>
         <tr>
+            <th>Date</th>
             <th>User</th>
             <th>Account Number</th>
             <th>Bank Account</th>
@@ -73,6 +74,7 @@
     <tbody>
         @foreach ($ledgers as $ledger)
         <tr>
+            <td>{{ Carbon\Carbon::parse($ledger->date)->toFormattedDateString() }}</td>
             <td>{{ $ledger->user_name }}</td>
             <td>{{ $ledger->number }}</td>
             <td>{{ $ledger->description }}</td>
@@ -83,7 +85,7 @@
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="3">Total</td>
+            <td colspan="4">Total</td>
             <td>{{ number_format($credit_sum, 2) }}</td>
             <td>{{ number_format($debit_sum, 2) }}</td>
         </tr>

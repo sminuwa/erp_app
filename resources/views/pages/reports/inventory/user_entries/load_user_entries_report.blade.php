@@ -8,9 +8,15 @@
                     <th>#</th>
                     <th>Created Date</th>
                     <th>Modified Date</th>
-                    @if(isset($reports[0]->reference)) <th>Reference</th> @endif
-                    @if(isset($reports[0]->amount)) <th>Amount</th> @endif
-                    @if(isset($reports[0]->description)) <th>Description</th> @endif
+                    @if (isset($reports[0]->reference))
+                        <th>Reference</th>
+                    @endif
+                    @if (isset($reports[0]->amount))
+                        <th>Amount</th>
+                    @endif
+                    {{-- @if (isset($reports[0]->description)) --}}
+                        <th>Description</th>
+                    {{-- @endif --}}
                     <th>Branch Code</th>
                     <th>Branch Name</th>
                     <th>User Code</th>
@@ -29,8 +35,16 @@
                                     target="_BLANK">{{ $record->reference }}</a>
                             </td>
                         @endif
-                        @if(isset($record->amount)) <td style="text-align: right">{{ number_format($record->amount, 2) }}</td> @endif
-                        @if(isset($record->description)) <td>{{ $record->description }}</td> @endif
+                        @if ($type == 'journals')
+                            <td style="text-align: right">{{ number_format(amountFromJournalItems($record->reference),2) }}</td>
+                        @else
+                            @if (isset($record->amount))
+                                <td style="text-align: right">{{ number_format($record->amount, 2) }}</td>
+                            @endif
+                        @endif
+                        {{-- @if (isset($record->description)) --}}
+                            <td>{{ $record->description ?? ''}}</td>
+                        {{-- @endif --}}
                         <td>{{ $record->branch_code }}</td>
                         <td>{{ $record->branch_name }}</td>
                         <td>{{ $record->user_code }}</td>

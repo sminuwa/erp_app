@@ -474,12 +474,12 @@ if (!function_exists('amountFromJournalItems')) {
     function amountFromJournalItems($reference)
     {
         // Query journals joined with journal_items
-        $amount = DB::table('journal_items')
+        $result = DB::table('journal_items')
             ->join('journals', 'journals.id', '=', 'journal_items.journal_id')
             ->where('journals.reference', $reference)
-            ->select(DB::raw('SUM(CASE WHEN journal_items.debit > 0 THEN journal_items.debit ELSE journal_items.credit END) AS total_amount'))
+            ->select(DB::raw('CASE WHEN journal_items.debit > 0 THEN journal_items.debit ELSE journal_items.credit END AS amount'))
             ->first();
 
-        return $amount ? (float) $amount->total_amount : 0;
+        return $result ? (float) $result->amount : 0;
     }
 }

@@ -478,7 +478,7 @@ Route::middleware('auth')->group(function () {
             Route::put('/update/{ledger}', [PaymentController::class, 'updateReceipt'])->name('payment.update');
             Route::post('/search', [PaymentController::class, 'search'])->name('payment.search');
             Route::get('/print/payment/{payment}/{papersize?}', [PaymentController::class, 'printPaymentReceipt'])->name('payment.print');
-            Route::get('/print/payment/pos/{payment}', [PaymentController::class, 'printPoSPaymentReceipt'])->name('payment.print.pos');
+            Route::get('/print/payment_pos/{payment}', [PaymentController::class, 'printPoSPaymentReceipt'])->name('payment.print.pos');
             Route::get('/reverse/{payment}', [PaymentController::class, 'reverse'])->name('payment.reverse');
             Route::get('/show/{payment}', [PaymentController::class, 'show'])->name('payment.show');
             Route::post('/post/{payment}', [PaymentController::class, 'post'])->name('payment.post');
@@ -1192,7 +1192,7 @@ Route::middleware('auth')->group(function () {
     });
 
     //inventory
-
+    Route::get('/dashboard-summary', [App\Http\Controllers\HomeController::class, 'summaryAjax'])->name('dashboard.summary.ajax');
     Route::get('/sample/report', [App\Http\Controllers\HomeController::class, 'sampleReport'])->name('sample-report');
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::post('customer/search', 'CustomerController@search')->name('customer.search');

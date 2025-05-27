@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -141,109 +141,6 @@
             </div>
         </div>
     </div>
-{{-- 
-    <style type="text/css">
-        body {
-            background: #eee;
-            margin-top: 20px;
-        }
-
-        .text-danger strong {
-            color: #9f181c;
-        }
-
-        .receipt-main {
-            background: #ffffff none repeat scroll 0 0;
-            border-bottom: 1px solid;
-            border-top: 1px solid;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            padding: 40px 30px !important;
-            position: relative;
-            box-shadow: 0 1px 21px #acacac;
-            color: #333333;
-            font-family: open sans;
-        }
-
-        .receipt-main p {
-            color: #333333;
-            font-family: open sans;
-            line-height: 1.42857;
-        }
-
-        .receipt-footer h1 {
-            font-size: 15px;
-            font-weight: 400 !important;
-            margin: 0 !important;
-        }
-
-        .receipt-main::after {
-            background: #414143 none repeat scroll 0 0;
-            content: "";
-            height: 5px;
-            left: 0;
-            position: absolute;
-            right: 0;
-            top: -13px;
-        }
-
-        .receipt-right h5 {
-            font-size: 16px;
-            font-weight: bold;
-            margin: 0 0 7px 0;
-        }
-
-        .receipt-right p {
-            font-size: 12px;
-            margin: 0px;
-        }
-
-        .receipt-right p i {
-            text-align: center;
-            width: 18px;
-        }
-
-        .receipt-main td {
-            padding: 9px 20px !important;
-        }
-
-        .receipt-main th {
-            padding: 13px 10px !important;
-        }
-
-        .receipt-main td {
-            font-size: 13px;
-            font-weight: initial !important;
-        }
-
-        .receipt-main td p:last-child {
-            margin: 0;
-            padding: 0;
-        }
-
-        .receipt-main td h2 {
-            font-size: 14px;
-            font-weight: 600;
-            margin: 0;
-            text-transform: uppercase;
-        }
-
-        .receipt-header-mid .receipt-left h1 {
-            font-weight: 100;
-            margin: 34px 0 0;
-            text-align: right;
-            text-transform: uppercase;
-        }
-
-        .receipt-header-mid {
-            margin: 24px 0;
-            overflow: hidden;
-        }
-
-        #container {
-            background-color: #dcdcdc;
-        }
-    </style> --}}
 <style>
         @media print {
             body {
@@ -500,6 +397,595 @@
         }
     </style>
     <script type="text/javascript">
+        window.print();
+    </script>
+</body>
+
+</html> --}}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Payment Receipt - ALBABELLO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    @include('pages.order.paper_size')
+
+    <style>
+        /* Base styles */
+        body {
+            font-family: "Open Sans", sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #fff;
+            color: #333333;
+        }
+
+        .receipt-main {
+            background: #ffffff;
+            border-bottom: 1px solid #000;
+            border-top: 1px solid #000;
+            margin: 20px auto;
+            position: relative;
+            box-shadow: 0 1px 21px #acacac;
+        }
+
+        .receipt-main p {
+            color: #333333;
+            line-height: 1.42857;
+        }
+
+        .receipt-right h5 {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 0 0 7px 0;
+        }
+
+        .receipt-right p {
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .receipt-right p i {
+            text-align: center;
+            width: 18px;
+        }
+
+        .receipt-main td {
+            padding: 9px 20px;
+            font-size: 13px;
+            font-weight: initial;
+        }
+
+        .receipt-main th {
+            padding: 13px 10px;
+        }
+
+        .receipt-main td p:last-child {
+            margin: 0;
+            padding: 0;
+        }
+
+        .receipt-main td h2 {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .receipt-header-mid {
+            margin: 24px 0;
+            overflow: hidden;
+        }
+
+        .receipt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .receipt-left img {
+            width: 71px;
+            height: 71px;
+            border-radius: 43px;
+            opacity: 0.8;
+        }
+
+        .text-danger strong {
+            color: #9f181c;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .payment-title {
+            text-align: center;
+            font-weight: 700;
+            margin: 20px 0;
+            font-size: 20px;
+        }
+
+        .amount-row {
+            text-align: right;
+        }
+
+        .golden-signature-line {
+            margin-top: 20px;
+            border-top: 2px solid #FFD700;
+            /* Golden color */
+            padding-top: 10px;
+            text-align: left;
+        }
+
+        .receipt-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+
+        .thank-you {
+            text-align: center;
+            color: #8c8c8c;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        /* Conditional styles based on papersize */
+        @isset($papersize)
+            @if ($papersize == 'A4')
+                body {
+                    font-size: 11pt;
+                }
+
+                .receipt-main {
+                    width: 210mm;
+                    min-height: 297mm;
+                    padding: 20mm;
+                }
+
+                .receipt-left img {
+                    width: 100px;
+                    height: auto;
+                }
+
+                .table {
+                    font-size: 10pt;
+                }
+
+                @media print {
+                    @page {
+                        size: A4;
+                        margin: 10mm;
+                    }
+
+                    body,
+                    .receipt-main {
+                        width: 100%;
+                        height: 100%;
+                        margin: 0;
+                        padding: 0;
+                        box-shadow: none;
+                        background: none;
+                        border: none;
+                    }
+
+                    .receipt-left img {
+                        filter: grayscale(100%);
+                    }
+
+                    .no-print {
+                        display: none;
+                    }
+
+                    .receipt-header,
+                    .receipt-header-mid,
+                    .receipt-footer {
+                        margin: 0;
+                        padding: 0;
+                    }
+
+                    .table {
+                        width: 100%;
+                        margin-bottom: 10px;
+                    }
+
+                    .table th,
+                    .table td {
+                        padding: 8px;
+                        font-size: 12px;
+                    }
+
+                    .col-xs-1,
+                    .col-sm-1,
+                    .col-md-1,
+                    .col-xs-2,
+                    .col-sm-2,
+                    .col-md-2,
+                    .col-xs-3,
+                    .col-sm-3,
+                    .col-md-3,
+                    .col-xs-4,
+                    .col-sm-4,
+                    .col-md-4,
+                    .col-xs-5,
+                    .col-sm-5,
+                    .col-md-5,
+                    .col-xs-6,
+                    .col-sm-6,
+                    .col-md-6,
+                    .col-xs-7,
+                    .col-sm-7,
+                    .col-md-7,
+                    .col-xs-8,
+                    .col-sm-8,
+                    .col-md-8,
+                    .col-xs-9,
+                    .col-sm-9,
+                    .col-md-9,
+                    .col-xs-10,
+                    .col-sm-10,
+                    .col-md-10,
+                    .col-xs-11,
+                    .col-sm-11,
+                    .col-md-11,
+                    .col-xs-12,
+                    .col-sm-12,
+                    .col-md-12 {
+                        float: left;
+                        width: 100%;
+                    }
+
+                    .col-xs-offset-1,
+                    .col-sm-offset-1,
+                    .col-md-offset-1,
+                    .col-xs-offset-2,
+                    .col-sm-offset-2,
+                    .col-md-offset-2,
+                    .col-xs-offset-3,
+                    .col-sm-offset-3,
+                    .col-md-offset-3,
+                    .col-xs-offset-4,
+                    .col-sm-offset-4,
+                    .col-md-offset-4,
+                    .col-xs-offset-5,
+                    .col-sm-offset-5,
+                    .col-md-offset-5,
+                    .col-xs-offset-6,
+                    .col-sm-offset-6,
+                    .col-md-offset-6,
+                    .col-xs-offset-7,
+                    .col-sm-offset-7,
+                    .col-md-offset-7,
+                    .col-xs-offset-8,
+                    .col-sm-offset-8,
+                    .col-md-offset-8,
+                    .col-xs-offset-9,
+                    .col-sm-offset-9,
+                    .col-md-offset-9,
+                    .col-xs-offset-10,
+                    .col-sm-offset-10,
+                    .col-md-offset-10,
+                    .col-xs-offset-11,
+                    .col-sm-offset-11,
+                    .col-md-offset-11,
+                    .col-xs-offset-12,
+                    .col-sm-offset-12,
+                    .col-md-offset-12 {
+                        margin-left: 0;
+                    }
+                }
+            @endif
+
+            @if ($papersize == 'A5')
+                body {
+                    font-size: 9.5pt;
+                }
+
+                .receipt-main {
+                    width: 140mm;
+                    min-height: 200mm;
+                    padding: 8mm;
+                    border: none;
+                }
+
+                .receipt-left img {
+                    width: 60px;
+                    height: auto;
+                }
+
+                .receipt-right h5 {
+                    font-size: 12pt;
+                }
+
+                .receipt-right p {
+                    font-size: 9pt;
+                }
+
+                .table {
+                    font-size: 8.5pt;
+                }
+
+                .table th,
+                .table td {
+                    border: 1px solid #aaa;
+                    padding: 3px;
+                }
+
+                .table th {
+                    background-color: #f2f2f2;
+                    text-align: center;
+                }
+
+                .receipt-footer {
+                    font-size: 9pt;
+                }
+
+                @media print {
+                    @page {
+                        size: A5 portrait;
+                        margin: 5mm;
+                    }
+
+                    body,
+                    .receipt-main {
+                        width: 100%;
+                        height: 100%;
+                        margin: 0;
+                        padding: 0;
+                        box-shadow: none;
+                        background: none;
+                        border: none;
+                    }
+
+                    .receipt-left img {
+                        filter: grayscale(100%);
+                    }
+
+                    .no-print {
+                        display: none;
+                    }
+
+                    .receipt-header,
+                    .receipt-header-mid,
+                    .receipt-footer {
+                        margin: 0;
+                        padding: 0;
+                    }
+
+                    .table {
+                        width: 100%;
+                        margin-bottom: 10px;
+                    }
+
+                    .table th,
+                    .table td {
+                        padding: 8px;
+                        font-size: 10px;
+                    }
+
+                    .col-xs-1,
+                    .col-sm-1,
+                    .col-md-1,
+                    .col-xs-2,
+                    .col-sm-2,
+                    .col-md-2,
+                    .col-xs-3,
+                    .col-sm-3,
+                    .col-md-3,
+                    .col-xs-4,
+                    .col-sm-4,
+                    .col-md-4,
+                    .col-xs-5,
+                    .col-sm-5,
+                    .col-md-5,
+                    .col-xs-6,
+                    .col-sm-6,
+                    .col-md-6,
+                    .col-xs-7,
+                    .col-sm-7,
+                    .col-md-7,
+                    .col-xs-8,
+                    .col-sm-8,
+                    .col-md-8,
+                    .col-xs-9,
+                    .col-sm-9,
+                    .col-md-9,
+                    .col-xs-10,
+                    .col-sm-10,
+                    .col-md-10,
+                    .col-xs-11,
+                    .col-sm-11,
+                    .col-md-11,
+                    .col-xs-12,
+                    .col-sm-12,
+                    .col-md-12 {
+                        float: left;
+                        width: 100%;
+                    }
+
+                    .col-xs-offset-1,
+                    .col-sm-offset-1,
+                    .col-md-offset-1,
+                    .col-xs-offset-2,
+                    .col-sm-offset-2,
+                    .col-md-offset-2,
+                    .col-xs-offset-3,
+                    .col-sm-offset-3,
+                    .col-md-offset-3,
+                    .col-xs-offset-4,
+                    .col-sm-offset-4,
+                    .col-md-offset-4,
+                    .col-xs-offset-5,
+                    .col-sm-offset-5,
+                    .col-md-offset-5,
+                    .col-xs-offset-6,
+                    .col-sm-offset-6,
+                    .col-md-offset-6,
+                    .col-xs-offset-7,
+                    .col-sm-offset-7,
+                    .col-md-offset-7,
+                    .col-xs-offset-8,
+                    .col-sm-offset-8,
+                    .col-md-offset-8,
+                    .col-xs-offset-9,
+                    .col-sm-offset-9,
+                    .col-md-offset-9,
+                    .col-xs-offset-10,
+                    .col-sm-offset-10,
+                    .col-md-offset-10,
+                    .col-xs-offset-11,
+                    .col-sm-offset-11,
+                    .col-md-offset-11,
+                    .col-xs-offset-12,
+                    .col-sm-offset-12,
+                    .col-md-offset-12 {
+                        margin-left: 0;
+                    }
+
+                    .invoice {
+                        transform: scale(0.90);
+                        transform-origin: top left;
+                    }
+                }
+            @endif
+        @endisset
+    </style>
+</head>
+
+<body>
+    <div class="receipt-main">
+        <div class="row">
+            <div class="receipt-header">
+                <div class="col-xs-6 col-sm-6 col-md-6">
+                    <div class="receipt-left">
+                        <img src="{{ asset('assets/backend/img/logo.png') }}" alt="Albabello Logo">
+                        <strong>{{ App\Models\User::UserBranchName()->long_name }}</strong>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-6 text-right">
+                    <div class="receipt-right">
+                        <h5>AL-BABELLO</h5>
+                        <p>{{ optional($payment->customer)->branch->address }} <i class="fa fa-location-arrow"></i></p>
+                        <p>{{ optional($payment->customer)->branch->email }} <i class="fa fa-envelope-o"></i></p>
+                        <p>{{ optional($payment->customer)->branch->phone }} <i class="fa fa-phone"></i></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="receipt-header-mid">
+                <div class="col-xs-7 col-sm-7 col-md-7 text-left">
+                    <div class="receipt-right">
+                        <h5>Payment From</h5>
+                        <p><b>{{ $payment->payer()->code ? $payment->payer()->code . ' - ' . $payment->payer()->name : $payment->payer()->number . ' - ' . $payment->payer()->description }}</b>
+                        </p>
+                        <p><b>Mobile:</b> {{ $payment->customer->phone }}</p>
+                        <p><b>Address:</b> {{ $payment->customer->address }}</p>
+                    </div>
+                </div>
+                <div class="col-xs-5 col-sm-5 col-md-5">
+                    <div class="receipt-right">
+                        <p><b>Receipt No:</b> {{ $payment->receipt_no }}</p>
+                        <p><b>Payment Date:</b> {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h4 class="payment-title">RECEIPT</h4>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Account</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ $payment->account()->code ?? $payment->account()->number }} -
+                            {{ $payment->account()->name ?? $payment->account()->description }}</td>
+                        <td>
+                            @if ($payment->description == null)
+                                Payment for {{ \Carbon\Carbon::parse($payment->date)->toFormattedDateString() }}
+                            @else
+                                {{ $payment->description }}
+                            @endif
+                        </td>
+                        <td class="amount-row"><i class="fa fa-inr"></i> ₦ {{ number_format($payment->amount, 2) }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-right">
+                            <p><strong>Amount:</strong></p>
+                        </td>
+                        <td colspan="2" class="amount-row">
+                            <p><strong><i class="fa fa-inr"></i> ₦ {{ number_format($payment->amount, 2) }}</strong>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-left text-danger" colspan="3">
+                            <p>
+                                <strong>Amount in words:</strong>
+                                @php
+                                    $obj = new App\Models\Utility();
+                                @endphp
+                                <strong>{{ $obj->convertNumberToWords($payment->amount) }}</strong>
+                            </p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="receipt-footer">
+            <div class="col-xs-10 col-sm-10 col-md-10 text-left">
+                <div class="receipt-right">
+                    <p><b>Date Created:</b> {{ Carbon\Carbon::parse($payment->created_at)->toFormattedDateString() }}
+                    </p>
+                    <p><b>Created By:</b> {{ $payment->createdBy?->name }}</p>
+                    <p><b>Printed By:</b> {{ Auth::user()->name }}</p>
+                    <p><b>Printed On:</b> {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
+                </div>
+            </div>
+            <div class="col-xs-2 col-sm-2 col-md-2 text-right">
+                <div class="receipt-left">
+                    @php
+                        $uc = $payment->receipt_no;
+                    @endphp
+                    {{ QrCode::size(70)->backgroundColor(255, 55, 0)->generate("$payment->dr\n$uc\n\n.") }}
+                </div>
+            </div>
+        </div>
+
+        <div class="golden-signature-line">
+            <p><b>Signature:</b> ______________________________________</p>
+            <p>For: ALBABELLO</p>
+        </div>
+
+        <div class="thank-you">
+            <h5>Thanks for Patronage!</h5>
+        </div>
+    </div>
+
+    <script type="text/javascript" class="no-print">
         window.print();
     </script>
 </body>

@@ -70,9 +70,40 @@ class PurchaseGRNController extends Controller
     public function show(Show $request, Purchase $purchase)
     {
         $suppliers = Supplier::orderBy('name')->get();
+        $products = $purchase->purchasedProducts()->with('product')->get();
+        $total_product_cost = $products->sum(function ($p) {
+            return $p->quantity * $p->unit_price;
+        });
+
+        $total_expenses = $purchase->expenses()->sum('amount');
+
+        $actual_cost_table = [];
+
+        foreach ($products as $item) {
+            $product_subtotal = $item->quantity * $item->unit_price;
+            $allocated_additional_cost = ($total_product_cost > 0)
+                ? ($product_subtotal / $total_product_cost) * $total_expenses
+                : 0;
+
+            $unit_additional_cost = $item->quantity > 0 ? $allocated_additional_cost / $item->quantity : 0;
+            $actual_unit_cost = $item->unit_price + $unit_additional_cost;
+
+            $actual_cost_table[] = [
+                'code' => $item->product->code,
+                'name' => $item->product->name,
+                'unit' => $item->product->unit,
+                'quantity' => $item->quantity,
+                'unit_price' => $item->unit_price,
+                'allocated_additional_cost' => round($allocated_additional_cost, 2),
+                'actual_unit_cost' => round($actual_unit_cost, 2),
+                'actual_total_cost' => round($actual_unit_cost * $item->quantity, 2),
+            ];
+        }
+        //dd($actual_cost_table);
         return view('pages.inventories.purchases.grn.show', [
             'record' => $purchase,
             'suppliers' => $suppliers,
+            'actual_cost_table' => $actual_cost_table,
         ]);
 
     }
@@ -362,7 +393,7 @@ class PurchaseGRNController extends Controller
 
         $company = Setting::where('branch_id', 'LIKE', User::userBranchAction())->latest()->first();
         $utility = new Utility();
-        return view('pages.inventories.purchases.grn.print', compact('purchase_details', 'purchase', 'company', 'utility','papersize'));
+        return view('pages.inventories.purchases.grn.print', compact('purchase_details', 'purchase', 'company', 'utility', 'papersize'));
     }
     public function generateWaybill(Request $request, Purchase $purchase)
     {

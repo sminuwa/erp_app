@@ -159,7 +159,7 @@ class PaymentController extends Controller
         return view('pages.payments.print_payment', ['payment' => $payment, 'setting' => Setting::first(), 'papersize' => $papersize]);
     }
     public function printPoSPaymentReceipt(Payment $payment)
-    {
+    { 
         return view('pages.payments.print_pos_payment', ['payment' => $payment, 'setting' => Setting::first()]);
     }
     public function updatePayment(Request $request, Payment $ledger)

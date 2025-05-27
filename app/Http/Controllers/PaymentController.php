@@ -27,7 +27,7 @@ class PaymentController extends Controller
         $payments = Payment::select('payments.*')
             ->where('branch_id', $user_branch)
             ->orderBy('status', 'ASC')->orderBy('id', 'DESC')
-            //->where('date', '>', Carbon::now()->subDays(7))
+            ->where('date', '>', Carbon::now()->subDays(7))
             ->get();
         return view('pages.payments.payment', ['payments' => $payments]);
     }

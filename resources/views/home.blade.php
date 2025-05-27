@@ -134,6 +134,55 @@
             height: 2px;
         }
     </style>
+    <style>
+        #loading-indicator {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .lds-ring {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .lds-ring div {
+            box-sizing: border-box;
+            display: block;
+            position: absolute;
+            width: 64px;
+            height: 64px;
+            margin: 8px;
+            border: 8px solid #007bff;
+            border-radius: 50%;
+            animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            border-color: #007bff transparent transparent transparent;
+        }
+
+        .lds-ring div:nth-child(1) {
+            animation-delay: -0.45s;
+        }
+
+        .lds-ring div:nth-child(2) {
+            animation-delay: -0.3s;
+        }
+
+        .lds-ring div:nth-child(3) {
+            animation-delay: -0.15s;
+        }
+
+        @keyframes lds-ring {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -168,7 +217,7 @@
                         <h5>Today's Sales Per User</h5>
                         <ul>
                             @foreach ($user_sales_per_branch as $sale)
-                            <li>{{$sale->name}}: &#8358; {{number_format($sale->total,2,'.',',')}}</li>
+                                <li>{{ $sale->name }}: &#8358; {{ number_format($sale->total, 2, '.', ',') }}</li>
                             @endforeach
                         </ul>
                     </div>
@@ -181,505 +230,62 @@
 
             <div class="container-fluid">
                 @hasanyrole('Super-admin|Admin')
-                    <div class="row">
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="info-box bg-info">
-                                <span class="info-box-icon"><i class="fa fa-balance-scale"></i></span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Today's Sale</span>
-                                    <span class="info-box-number">&#8358;
-                                        {{ number_format($today->sum('total'), 2, '.', ',') }}</span>
-
-                                    @php
-
-                                        if ($yesterday->sum('total') != 0) {
-                                            $percentage = (($today->sum('total') - $yesterday->sum('total')) / $yesterday->sum('total')) * 100;
-                                        } else {
-                                            $percentage = 0;
-                                        }
-
-                                    @endphp
-
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%">
-                                        </div>
-                                    </div>
-
-                                    <span class="progress-description {{ $percentage < 0 ? 'text-warning' : '' }}">
-                                        {{ number_format(abs($percentage), 2) }} %
-                                        {{ $percentage > 0 ? 'Increase' : 'Decrease' }} From
-                                        {{ date('l', strtotime('-1 day')) }}
-                                    </span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <select id="company_id" class="form-control">
+                                <option value="">Select Company</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
-                        <!-- /.col -->
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="info-box bg-info">
-                                <span class="info-box-icon"><i class="fa fa-balance-scale"></i></span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text">This Month's Sale</span>
-                                    <span class="info-box-number"> &#8358;
-                                        {{ number_format($month->sum('total'), 2, '.', ',') }}</span>
-                                    @php
-
-                                        if ($previous_month->sum('total') != 0) {
-                                            $percentage = (($month->sum('total') - $previous_month->sum('total')) / $previous_month->sum('total')) * 100;
-                                        } else {
-                                            $percentage = 0;
-                                        }
-
-                                    @endphp
-
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%">
-                                        </div>
-                                    </div>
-                                    <span class="progress-description {{ $percentage < 0 ? 'text-warning' : '' }}">
-                                        {{ number_format(abs($percentage), 2) }} %
-                                        {{ $percentage > 0 ? 'Increase' : 'Decrease' }} From
-                                        {{ date('F', strtotime('-1 month')) }}
-                                    </span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
+                        <div class="col-md-2">
+                            <select id="branch_id" class="form-control select2-single">
+                                <option value="">Select Branch</option>
+                                @foreach ($branches as $branch)
+                                    <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
-                        <!-- /.col -->
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="info-box bg-info">
-                                <span class="info-box-icon"><i class="fa fa-balance-scale"></i></span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text">This Year's Sale</span>
-                                    <span class="info-box-number">&#8358;
-                                        {{ number_format($year->sum('total'), 2, '.', ',') }}</span>
-                                    @php
-
-                                        if ($previous_year->sum('total') != 0) {
-                                            $percentage = (($year->sum('total') - $previous_year->sum('total')) / $previous_year->sum('total')) * 100;
-                                        } else {
-                                            $percentage = 0;
-                                        }
-                                    @endphp
-
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%">
-                                        </div>
-                                    </div>
-                                    <span class="progress-description {{ $percentage < 0 ? 'text-warning' : '' }}">
-                                        {{ number_format(abs($percentage), 2) }} %
-                                        {{ $percentage > 0 ? 'Increase' : 'Decrease' }} From
-                                        {{ date('Y', strtotime('-1 year')) }}
-                                    </span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
+                        <div class="col-md-2">
+                            <input type="year" class="form-control" id="report_year" value="{{ now()->format('Y') }}">
                         </div>
-                        <!-- /.col -->
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="info-box bg-info">
-                                <span class="info-box-icon"><i class="fa fa-balance-scale"></i></span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text mt-3 pb-1">Total Sale</span>
-                                    <span
-                                        class="info-box-number mb-3">&#8358;{{ number_format($sales->sum('total'), 2, '.', ',') }}</span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
+                        <div class="col-md-2">
+                            <select id="report_quarter" class="form-control">
+                                <option value="">Select Quarter</option>
+                                <option value="Q1">Q1 (Jan - Mar)</option>
+                                <option value="Q2">Q2 (Apr - Jun)</option>
+                                <option value="Q3">Q3 (Jul - Sep)</option>
+                                <option value="Q4">Q4 (Oct - Dec)</option>
+                            </select>
                         </div>
-                        <!-- /.col -->
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="info-box bg-success">
-                                <span class="info-box-icon"><i class="fa fa-money"></i></span>
+                        {{-- <div class="col-md-2">
+                            <input type="month" class="form-control" id="report_month" value="{{ now()->format('Y-m') }}">
+                        </div> --}}
 
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Today's Paid</span>
-                                    <span class="info-box-number">&#8358;
-                                        {{ number_format($today->sum('pay'), 2, '.', ',') }}</span>
-                                    @php
-
-                                        if ($yesterday->sum('pay') != 0) {
-                                            $percentage = (($today->sum('pay') - $yesterday->sum('pay')) / $yesterday->sum('pay')) * 100;
-                                        } else {
-                                            $percentage = 0;
-                                        }
-
-                                    @endphp
-
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%">
-                                        </div>
-                                    </div>
-
-                                    <span class="progress-description {{ $percentage < 0 ? 'text-warning' : '' }}">
-                                        {{ number_format(abs($percentage), 2) }} %
-                                        {{ $percentage > 0 ? 'Increase' : 'Decrease' }} From
-                                        {{ date('l', strtotime('-1 day')) }}
-                                    </span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
-                        </div>
-                        <!-- /.col -->
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="info-box bg-success">
-                                <span class="info-box-icon"><i class="fa fa-money"></i></span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text">This Month's Paid</span>
-                                    <span class="info-box-number">&#8358;
-                                        {{ number_format($month->sum('pay'), 2, '.', ',') }}</span>
-                                    @php
-                                        if ($previous_month->sum('pay') != 0) {
-                                            $percentage = (($month->sum('pay') - $previous_month->sum('pay')) / $previous_month->sum('pay')) * 100;
-                                        } else {
-                                            $percentage = 0;
-                                        }
-
-                                    @endphp
-
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%">
-                                        </div>
-                                    </div>
-
-                                    <span class="progress-description {{ $percentage < 0 ? 'text-warning' : '' }}">
-                                        {{ number_format(abs($percentage), 2) }} %
-                                        {{ $percentage > 0 ? 'Increase' : 'Decrease' }} From
-                                        {{ date('F', strtotime('-1 month')) }}
-                                    </span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
-                        </div>
-                        <!-- /.col -->
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="info-box bg-success">
-                                <span class="info-box-icon"><i class="fa fa-money"></i></span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text">This Year's Paid</span>
-                                    <span class="info-box-number">&#8358;
-                                        {{ number_format($year->sum('pay'), 2, '.', ',') }}</span>
-                                    @php
-
-                                        if ($previous_year->sum('pay') != 0) {
-                                            $percentage = (($year->sum('pay') - $previous_year->sum('pay')) / $previous_year->sum('pay')) * 100;
-                                        } else {
-                                            $percentage = 0;
-                                        }
-
-                                    @endphp
-
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%">
-                                        </div>
-                                    </div>
-
-                                    <span class="progress-description {{ $percentage < 0 ? 'text-warning' : '' }}">
-                                        {{ number_format(abs($percentage), 2) }} %
-                                        {{ $percentage > 0 ? 'Increase' : 'Decrease' }} From
-                                        {{ date('Y', strtotime('-1 year')) }}
-                                    </span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
-                        </div>
-                        <!-- /.col -->
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="info-box bg-success">
-                                <span class="info-box-icon"><i class="fa fa-money"></i></span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text mt-3 pb-1">Total Paid</span>
-                                    <span class="info-box-number mb-3">&#8358;
-                                        {{ number_format($sales->sum('pay'), 2, '.', ',') }}</span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
-                        </div>
-                        <!-- /.col -->
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="info-box bg-warning">
-                                <span class="info-box-icon"><i class="fa fa-bell-o"></i></span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Today's Due</span>
-                                    <span class="info-box-number">&#8358;
-                                        {{ number_format($today_due->sum('due'), 2, '.', ',') }}</span>
-                                    @php
-
-                                        if ($yesterday_due->sum('due') != 0) {
-                                            $percentage = (($today_due->sum('due') - $yesterday_due->sum('due')) / $yesterday_due->sum('due')) * 100;
-                                        } else {
-                                            $percentage = 0;
-                                        }
-
-                                    @endphp
-
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%">
-                                        </div>
-                                    </div>
-
-                                    <span class="progress-description {{ $percentage < 0 ? 'text-success' : '' }}">
-                                        {{ number_format(abs($percentage), 2) }} %
-                                        {{ $percentage > 0 ? 'Increase' : 'Decrease' }} From
-                                        {{ date('l', strtotime('-1 day')) }}
-                                    </span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
-                        </div>
-                        <!-- /.col -->
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="info-box bg-warning">
-                                <span class="info-box-icon"><i class="fa fa-bell-o"></i></span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text">This Month's Due</span>
-                                    <span
-                                        class="info-box-number">&#8358;{{ number_format($month_due->sum('due'), 2, '.', ',') }}</span>
-                                    @php
-
-                                        if ($previous_month_due->sum('due') != 0) {
-                                            $percentage = (($month_due->sum('due') - $previous_month_due->sum('due')) / $previous_month_due->sum('due')) * 100;
-                                        } else {
-                                            $percentage = 0;
-                                        }
-
-                                    @endphp
-
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%">
-                                        </div>
-                                    </div>
-
-                                    <span class="progress-description {{ $percentage < 0 ? 'text-success' : '' }}">
-                                        {{ number_format(abs($percentage), 2) }} %
-                                        {{ $percentage > 0 ? 'Increase' : 'Decrease' }} From
-                                        {{ date('F', strtotime('-1 month')) }}
-                                    </span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
-                        </div>
-                        <!-- /.col -->
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="info-box bg-warning">
-                                <span class="info-box-icon"><i class="fa fa-bell-o"></i></span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text">This Year's Due</span>
-                                    <span class="info-box-number">&#8358;
-                                        {{ number_format($year_due->sum('due'), 2, '.', ',') }}</span>
-                                    @php
-                                        if ($previous_year_due->sum('due') != 0) {
-                                            $percentage = (($year_due->sum('due') - $previous_year_due->sum('due')) / $previous_year_due->sum('due')) * 100;
-                                        } else {
-                                            $percentage = 0;
-                                        }
-                                    @endphp
-
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%">
-                                        </div>
-                                    </div>
-
-                                    <span class="progress-description {{ $percentage < 0 ? 'text-success' : '' }}">
-                                        {{ number_format(abs($percentage), 2) }} %
-                                        {{ $percentage > 0 ? 'Increase' : 'Decrease' }} From
-                                        {{ date('Y', strtotime('-1 year')) }}
-                                    </span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
-                        </div>
-                        <!-- /.col -->
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="info-box bg-warning">
-                                <span class="info-box-icon"><i class="fa fa-bell-o"></i></span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text mt-3 pb-1">Total Due</span>
-                                    <span class="info-box-number mb-3">&#8358;
-                                        {{ number_format($sales_due->sum('due'), 2, '.', ',') }}</span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
-                        </div>
-                        <!-- /.col -->
-                        <!-- /.col -->
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="info-box bg-danger">
-                                <span class="info-box-icon"><i class="fa fa-minus-square"></i></span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Today's Expenses</span>
-                                    <span class="info-box-number">&#8358;
-                                        {{ number_format($today_expenses->sum('amount'), 2, '.', ',') }}</span>
-
-                                    @php
-
-                                        if ($yesterday_expenses->sum('amount') != 0) {
-                                            $percentage = (($today_expenses->sum('amount') - $yesterday_expenses->sum('amount')) / $yesterday_expenses->sum('amount')) * 100;
-                                        } else {
-                                            $percentage = 0;
-                                        }
-                                    @endphp
-
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%">
-                                        </div>
-                                    </div>
-
-                                    <span class="progress-description {{ $percentage < 0 ? 'text-success' : '' }}">
-                                        {{ number_format(abs($percentage), 2) }} %
-                                        {{ $percentage > 0 ? 'Increase' : 'Decrease' }} From
-                                        {{ date('l', strtotime('-1 day')) }}
-                                    </span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
-                        </div>
-                        <!-- /.col -->
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="info-box bg-danger">
-                                <span class="info-box-icon"><i class="fa fa-minus-square"></i></span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text">This Month's Expenses</span>
-                                    <span class="info-box-number">&#8358;
-                                        {{ number_format($month_expenses->sum('amount'), 2, '.', ',') }}</span>
-                                    @php
-                                        if ($yesterday_expenses->sum('amount') != 0) {
-                                            $percentage = (($today_expenses->sum('amount') - $yesterday_expenses->sum('amount')) / $yesterday_expenses->sum('amount')) * 100;
-                                        } else {
-                                            $percentage = 0;
-                                        }
-
-                                    @endphp
-
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%">
-                                        </div>
-                                    </div>
-
-                                    <span class="progress-description {{ $percentage < 0 ? 'text-success' : '' }}">
-                                        {{ number_format(abs($percentage), 2) }} %
-                                        {{ $percentage > 0 ? 'Increase' : 'Decrease' }} From
-                                        {{ date('F', strtotime('-1 month')) }}
-                                    </span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
-                        </div>
-                        <!-- /.col -->
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="info-box bg-danger">
-                                <span class="info-box-icon"><i class="fa fa-minus-square"></i></span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text">This Year's Expenses</span>
-                                    <span class="info-box-number">&#8358;
-                                        {{ number_format($year_expenses->sum('amount'), 2, '.', ',') }}</span>
-                                    @php
-                                        if ($previous_year_expenses->sum('amount') != 0) {
-                                            $percentage = (($year_expenses->sum('amount') - $previous_year_expenses->sum('amount')) / $previous_year_expenses->sum('amount')) * 100;
-                                        } else {
-                                            $percentage = 0;
-                                        }
-                                    @endphp
-
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%">
-                                        </div>
-                                    </div>
-
-                                    <span class="progress-description {{ $percentage > 0 ? 'text-warning' : '' }}">
-                                        {{ number_format(abs($percentage), 2) }} %
-                                        {{ $percentage > 0 ? 'Increase' : 'Decrease' }} From
-                                        {{ date('Y', strtotime('-1 year')) }}
-                                    </span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
-                        </div>
-                        <!-- /.col -->
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="info-box bg-danger">
-                                <span class="info-box-icon"><i class="fa fa-minus-square"></i></span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text mt-3 pb-1">Total Expenses</span>
-                                    <span class="info-box-number mb-3">&#8358;
-                                        {{ number_format($expenses->sum('amount'), 2, '.', ',') }}</span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
-                        </div>
-                        <!-- /.col -->
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <!-- AREA CHART -->
-                            <div class="card card-primary">
-                                <div class="card-header">
-                                    <h3 class="card-title">Sales Report</h3>
-                                </div>
-                                <div class="card-body">
-                                    <div class="chart">
-                                        <div id="barchart_material" style="width: 900px; height: 500px;"></div>
-                                    </div>
-                                </div>
-                                <!-- /.card-body -->
-                            </div>
-                            <!-- /.card -->
-                        </div>
-                        <div class="col-md-6">
-                            <!-- AREA CHART -->
-                            <div class="card card-primary">
-                                <div class="card-header">
-                                    <h3 class="card-title">Expenses Report</h3>
-                                </div>
-                                <div class="card-body">
-                                    <div class="chart">
-                                        <div id="barchart_material2" style="width: 900px; height: 500px;"></div>
-                                    </div>
-                                </div>
-                                <!-- /.card-body -->
-                            </div>
-                            <!-- /.card -->
+                        <div class="col-md-2">
+                            <button class="btn btn-primary" id="load_dashboard_summary">Load Summary</button>
                         </div>
                     </div>
-                    <!-- /.row -->
+
+                    <div id="dashboard-summary-placeholder"></div>
+                    <div id="loading-indicator">
+                        <div class="lds-ring">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <p class="mt-3">Generating summary, please wait...</p>
+                    </div>
                 @else
                     <div class="row">
                         <div class="col-2">
 
                         </div>
                         <div class="col-8">
-                            <h1 style="text-shadow: 5px 5px #558ABB;font-weight:900;font-size:60px;">{{App\Models\User::UserBranchName()->long_name}}
+                            <h1 style="text-shadow: 5px 5px #558ABB;font-weight:900;font-size:60px;">
+                                {{ App\Models\User::UserBranchName()->long_name }}
                             </h1>
                             <h2 style="text-shadow: 5px 5px #558ABB;font-weight:900;text-align:center">SALE AND INVENTORY
                                 APPLICATION SYSTEM</h2>
@@ -738,119 +344,30 @@
 @endsection
 
 @push('js')
-{{--    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>--}}
-    <script type="text/javascript">
-        google.charts.load('current', {
-            'packages': ['bar']
-        });
-        google.charts.setOnLoadCallback(drawStuff);
 
-        function drawStuff() {
-            var data = new google.visualization.arrayToDataTable([
-                ['Month', "Sales {{ date('Y') }}"],
-                @foreach ($current_sales as $sale)
-                    ["{{ date('M', mktime('0', 0, 0, $sale->months, 10)) }}", {{ $sale['sums'] }}],
-                @endforeach
-            ]);
+    <script>
+        $('#load_dashboard_summary').on('click', function() {
+            $('#dashboard-summary-placeholder').hide();
+            $('#loading-indicator').show();
 
-            var options = {
-                title: 'Monthly Sales Report',
-                width: 700,
-                legend: {
-                    position: 'none'
+            $.ajax({
+                url: '{{ route('dashboard.summary.ajax') }}',
+                data: {
+                    company_id: $('#company_id').val(),
+                    branch_id: $('#branch_id').val(),
+                    year: $('#report_year').val(),
+                    quarter: $('#report_quarter').val()
                 },
-                chart: {
-                    title: "Monthly Sales Report {{ date('Y') }}",
-                    subtitle: 'Monthly Sales Report'
+                success: function(response) {
+                    $('#loading-indicator').hide();
+                    $('#dashboard-summary-placeholder').html(response).fadeIn();
                 },
-                bars: 'vertical', // Required for Material Bar Charts.
-                axes: {
-                    x: {
-                        0: {
-                            side: 'bottom',
-                            label: 'Month'
-                        } // Top x-axis.
-                    }
-                },
-                bar: {
-                    groupWidth: "90%"
+                error: function() {
+                    $('#loading-indicator').hide();
+                    $('#dashboard-summary-placeholder').html(
+                        '<p class="text-danger">Failed to load summary.</p>').fadeIn();
                 }
-            };
-
-            var chart = new google.charts.Bar(document.getElementById('barchart_material'));
-            chart.draw(data, options);
-        }
-    </script>
-
-    <script type="text/javascript">
-        google.charts.load('current', {
-            'packages': ['bar']
+            });
         });
-        google.charts.setOnLoadCallback(drawStuff);
-
-        function drawStuff() {
-            var data = new google.visualization.arrayToDataTable([
-                ['Month', "Sales {{ date('Y') }}"],
-                @foreach ($current_expenses as $expense)
-                    ["{{ date('M', mktime('0', 0, 0, $expense['months'], 10)) }}", {{ $expense['sums'] }}],
-                @endforeach
-            ]);
-
-            var options = {
-                title: 'Monthly Expenses Report',
-                width: 700,
-                legend: {
-                    position: 'none'
-                },
-                chart: {
-                    title: "Monthly Expenses Report {{ date('Y') }}",
-                    subtitle: 'Monthly Expenses Report'
-                },
-                bars: 'vertical', // Required for Material Bar Charts.
-                axes: {
-                    x: {
-                        0: {
-                            side: 'bottom',
-                            label: 'Month'
-                        } // Top x-axis.
-                    }
-                },
-                bar: {
-                    groupWidth: "90%"
-                }
-            };
-
-            var chart = new google.charts.Bar(document.getElementById('barchart_material2'));
-            chart.draw(data, options);
-        }
-
-        function currentTime() {
-            let date = new Date();
-            let hh = date.getHours();
-            let mm = date.getMinutes();
-            let ss = date.getSeconds();
-            let session = "AM";
-
-            if (hh === 0) {
-                hh = 12;
-            }
-            if (hh > 12) {
-                hh = hh - 12;
-                session = "PM";
-            }
-
-            hh = (hh < 10) ? "0" + hh : hh;
-            mm = (mm < 10) ? "0" + mm : mm;
-            ss = (ss < 10) ? "0" + ss : ss;
-
-            let time = hh + ":" + mm + ":" + ss + " " + session;
-
-            document.getElementById("clock").innerText = time;
-            let t = setTimeout(function() {
-                currentTime()
-            }, 1000);
-        }
-
-        currentTime();
     </script>
 @endpush

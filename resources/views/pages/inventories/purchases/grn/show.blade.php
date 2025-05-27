@@ -82,10 +82,12 @@
                     @else
                     @endif
                     @can('purchase.print')
-                        <a class="btn btn-secondary btn-sm" href="{{ route('purchase.print', [$record->id,'A4']) }}" target="_blank">
+                        <a class="btn btn-secondary btn-sm" href="{{ route('purchase.print', [$record->id, 'A4']) }}"
+                            target="_blank">
                             <span class="fa fa-print"></span> Print A4
                         </a>
-                        <a class="btn btn-secondary btn-sm" href="{{ route('purchase.print', [$record->id,'A5']) }}" target="_blank">
+                        <a class="btn btn-secondary btn-sm" href="{{ route('purchase.print', [$record->id, 'A5']) }}"
+                            target="_blank">
                             <span class="fa fa-print"></span> Print A5
                         </a>
                     @endcan
@@ -230,12 +232,73 @@
                                         </tfoot>
                                         </tbody>
                                     </table>
+
                                 </div>
                             </div>
                         @endif
                     </div>
 
                 </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        @if (!empty($actual_cost_table))
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">Actual Cost Per Product</h4>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-bordered table-striped" style="font-size: 12px;">
+                                        <thead>
+                                            <tr>
+                                                <th>S/N</th>
+                                                <th>Code</th>
+                                                <th>Product</th>
+                                                <th>Unit</th>
+                                                <th>Qty</th>
+                                                <th>Unit Price (₦)</th>
+                                                <th>+ Additional Cost (₦)</th>
+                                                <th>Actual Unit Cost (₦)</th>
+                                                <th>Total Cost (₦)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($actual_cost_table as $index => $row)
+                                                <tr>
+                                                    <td>{{ $index + 1 }}</td>
+                                                    <td>{{ $row['code'] }}</td>
+                                                    <td>{{ $row['name'] }}</td>
+                                                    <td>{{ $row['unit'] }}</td>
+                                                    <td>{{ $row['quantity'] }}</td>
+                                                    <td style="text-align:right">{{ number_format($row['unit_price'], 2) }}
+                                                    </td>
+                                                    <td style="text-align:right">
+                                                        {{ number_format($row['allocated_additional_cost'], 2) }}</td>
+                                                    <td style="text-align:right">
+                                                        {{ number_format($row['actual_unit_cost'], 2) }}</td>
+                                                    <td style="text-align:right">
+                                                        {{ number_format($row['actual_total_cost'], 2) }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th colspan="6" style="text-align:right">Total</th>
+                                                <th style="text-align:right">
+                                                    {{ number_format(collect($actual_cost_table)->sum('allocated_additional_cost'), 2) }}
+                                                </th>
+                                                <th></th>
+                                                <th style="text-align:right">
+                                                    {{ number_format(collect($actual_cost_table)->sum('actual_total_cost'), 2) }}
+                                                </th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
             </div><!-- /.container-fluid -->
         </section>
         <!-- /.content -->

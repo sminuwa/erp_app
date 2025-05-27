@@ -69,8 +69,9 @@
                             @endcan
                             <!-- /.card-header -->
                             <div class="card-body table-responsive">
-                                <table id="example3"
-                                    class="table table-bordered table-striped text-left table-responsive-xl"
+                                <table
+                                    class="table table-bordered table-striped text-left display"
+
                                     data-ordering="true">
                                     <thead>
                                         <tr>
@@ -204,14 +205,14 @@
                                                 </td>
 
                                             </tr>
-                                            <div class="modal fade" id="order_detail_form{{ $order->id }}"
+                                            {{-- <div class="modal fade" id="order_detail_form{{ $order->id }}"
                                                 style="display: none;" aria-hidden="true">
                                                 @include('pages.order.modal')
                                             </div>
                                             <div class="modal fade" id="sale_transfer_form{{ $order->id }}"
                                                 style="display: none;" aria-hidden="true">
                                                 @include('pages.order.transfer_modal')
-                                            </div>
+                                            </div> --}}
                                         @endforeach
                                     </tbody>
                                     <tfoot>
@@ -254,7 +255,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <div class="display">
+                        <div class="display2">
 
                         </div>
                         <div class="modal-footer">
@@ -286,14 +287,7 @@
             $("#example3").DataTable({
                 'iDisplayLength': 100
             });
-            // $('#example2').DataTable({
-            //     "paging": true,
-            //     "lengthChange": false,
-            //     "searching": false,
-            //     "ordering": true,
-            //     "info": true,
-            //     "autoWidth": false
-            // });
+
             $(".show").on('click', function() {
                 order_id = $(this).attr('data-val');
                 $.ajax({
@@ -303,8 +297,8 @@
                         order_id: order_id
                     }
                 }).done(function(data) {
-                    $('.display').html();
-                    $('.display').html(data);
+                    $('.display2').html();
+                    $('.display2').html(data);
                 });
             });
             $(".edit").on('click', function() {
@@ -316,8 +310,8 @@
                         order_id: order_id
                     }
                 }).done(function(data) {
-                    $('.display').html();
-                    $('.display').html(data);
+                    $('.display2').html();
+                    $('.display2').html(data);
                     /* $('.btnForm').on('click', function() {
                          id = $(this).attr('data-val');
                          //$('#'+id).submit();

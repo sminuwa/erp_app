@@ -45,7 +45,7 @@
                 <td>{{ $sale->customer->code }}</td>
                 <td>{{ $sale->customer->name }}</td>
                 <td style="text-align: right">{{ number_format($sale->total, 2, '.', ',') }}</td>
-                <td>{{ $sale->status == 0 ? 'Pending' : 'Completed' }}</td>
+                <td>{{ $sale->status == 1 ? 'Completed' : 'Pending' }}</td>
             </tr>
         @endforeach
     </tbody>

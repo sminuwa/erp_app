@@ -4028,7 +4028,7 @@ class ReportController extends Controller
         if ($status == 'all' || $status == '') {
             $status = '%';
         }
-        $sales = Order::where('branch_id', 'LIKE', $branch_id)
+        $sales = Order::select('orders.*')->where('branch_id', 'LIKE', $branch_id)
             ->join('branches', 'branches.id', '=', 'orders.branch_id')
             ->where('branches.company_id', 'LIKE', $company_id)
             ->whereBetween(DB::raw("DATE(order_date)"), [$from_date, $to_date])

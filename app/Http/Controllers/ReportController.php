@@ -7559,139 +7559,6 @@ class ReportController extends Controller
         return view('pages.reports.inventory.slow_overstay.slow_overstay_report');
     }
 
-
-    // public function loadslowOverstayedReport(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'branch_id' => 'nullable|integer',
-    //         'company_id' => 'nullable|integer',
-    //         'report_type' => 'nullable|string', // New field for selecting report type
-    //     ]);
-
-    //     $company_id = $validated['company_id'];
-    //     $branch_id = $validated['branch_id'];
-    //     if ($validated['branch_id'] == 'all' || $validated['branch_id'] == '') {
-    //         $branch_id = '%'; // Ensure 'all' branches are included
-    //     }
-    //     if ($validated['company_id'] == 'all' || $validated['company_id'] == '') {
-    //         $company_id = '%'; // Ensure 'all' companies are included
-    //     }
-    //     if ($validated['report_type'] == 'overstayed') {
-    //         // First get the latest receive date for each product in each store
-    //         $latestReceiveDates = DB::table('purchase_products AS pp')
-    //             ->join('purchases AS pur', 'pp.purchase_id', '=', 'pur.id')
-    //             ->join('branches AS b', 'pur.branch_id', '=', 'b.id')
-    //             ->join('store_products AS sp', function ($join) {
-    //                 $join->on('pp.product_id', '=', 'sp.product_id')
-    //                     ->join('stores AS s', 'sp.store_id', '=', 's.id')
-    //                     ->whereColumn('s.branch_id', 'pur.branch_id');
-    //             })
-    //             ->select(
-    //                 'pp.product_id',
-    //                 's.id AS store_id',
-    //                 DB::raw('MAX(pp.updated_at) AS latest_update')
-    //             )
-    //             ->where('pur.branch_id', 'LIKE', $branch_id)
-    //             ->where('b.company_id', 'LIKE', $company_id)
-    //             ->where('sp.qty_available', '>', 0)
-    //             ->groupBy('pp.product_id', 's.id');
-
-    //         // Then join this subquery to get the complete inventory report
-    //         $inventory = DB::table('purchase_products AS pp')
-    //             ->join('purchases AS pur', 'pp.purchase_id', '=', 'pur.id')
-    //             ->join('products AS p', 'pp.product_id', '=', 'p.id')
-    //             ->join('branches AS b', 'pur.branch_id', '=', 'b.id')
-    //             ->join('store_products AS sp', function ($join) {
-    //                 $join->on('pp.product_id', '=', 'sp.product_id')
-    //                     ->join('stores AS s', 'sp.store_id', '=', 's.id')
-    //                     ->whereColumn('s.branch_id', 'pur.branch_id');
-    //             })
-    //             ->joinSub($latestReceiveDates, 'latest_dates', function ($join) {
-    //                 $join->on('pp.product_id', '=', 'latest_dates.product_id')
-    //                     ->on('s.id', '=', 'latest_dates.store_id')
-    //                     ->on('pp.updated_at', '=', 'latest_dates.latest_update');
-    //             })
-    //             ->select(
-    //                 'p.id AS product_id',
-    //                 'p.name AS product_name',
-    //                 'p.code AS product_code',
-    //                 'b.name AS branch_name',
-    //                 's.name AS store_name',
-    //                 's.code AS store_code',
-    //                 'pp.updated_at AS last_received_date',
-    //                 DB::raw('DATEDIFF(CURDATE(), pp.updated_at) AS days_since_received'),
-    //                 'sp.qty_available AS available_quantity'
-    //             )
-    //             ->where('pur.branch_id', 'LIKE', $branch_id)
-    //             ->where('b.company_id', 'LIKE', $company_id)
-    //             ->where('sp.qty_available', '>', 0)
-    //             ->havingRaw('days_since_received > 30') // Overstayed products (30+ days)
-    //             ->orderByDesc('days_since_received')
-    //             ->get();
-
-    //         $type = 'overstayed';
-    //         return view('pages.reports.inventory.slow_overstay.load_slow_overstay_report', compact('inventory', 'type'));
-
-    //     } elseif ($validated['report_type'] == 'slow_moving') {
-    //         // First get the latest sold date for each product in each store
-    //         $latestSoldDates = DB::table('order_details AS od')
-    //             ->join('orders AS o', 'od.order_id', '=', 'o.id')
-    //             ->join('branches AS b', 'o.branch_id', '=', 'b.id')
-    //             ->join('store_products AS sp', function ($join) {
-    //                 $join->on('od.store_product_id', '=', 'sp.product_id')
-    //                     ->join('stores AS s', 'sp.store_id', '=', 's.id')
-    //                     ->whereColumn('s.branch_id', 'o.branch_id');
-    //             })
-    //             ->select(
-    //                 'od.store_product_id AS product_id',
-    //                 's.id AS store_id',
-    //                 DB::raw('MAX(od.updated_at) AS latest_update')
-    //             )
-    //             ->where('o.branch_id', 'LIKE', $branch_id)
-    //             ->where('b.company_id', 'LIKE', $company_id)
-    //             ->where('sp.qty_available', '>', 0)
-    //             ->groupBy('od.store_product_id', 's.id');
-
-    //         // Then join this subquery to get the complete slow-moving report
-    //         $inventory = DB::table('order_details AS od')
-    //             ->join('orders AS o', 'od.order_id', '=', 'o.id')
-    //             ->join('products AS p', 'od.store_product_id', '=', 'p.id')
-    //             ->join('branches AS b', 'o.branch_id', '=', 'b.id')
-    //             ->join('store_products AS sp', function ($join) {
-    //                 $join->on('od.store_product_id', '=', 'sp.product_id')
-    //                     ->join('stores AS s', 'sp.store_id', '=', 's.id')
-    //                     ->whereColumn('s.branch_id', 'o.branch_id');
-    //             })
-    //             ->joinSub($latestSoldDates, 'latest_dates', function ($join) {
-    //                 $join->on('od.store_product_id', '=', 'latest_dates.product_id')
-    //                     ->on('s.id', '=', 'latest_dates.store_id')
-    //                     ->on('od.updated_at', '=', 'latest_dates.latest_update');
-    //             })
-    //             ->select(
-    //                 'p.id AS product_id',
-    //                 'p.name AS product_name',
-    //                 'p.code AS product_code',
-    //                 'b.name AS branch_name',
-    //                 's.name AS store_name',
-    //                 's.code AS store_code',
-    //                 'od.updated_at AS last_sold_date',
-    //                 DB::raw('DATEDIFF(CURDATE(), od.updated_at) AS days_since_sold'),
-    //                 'sp.qty_available AS available_quantity'
-    //             )
-    //             ->where('o.branch_id', 'LIKE', $branch_id)
-    //             ->where('b.company_id', 'LIKE', $company_id)
-    //             ->where('sp.qty_available', '>', 0)
-    //             ->havingRaw('days_since_sold > 30') // Slow-moving products (60+ days)
-    //             ->orderByDesc('days_since_sold')
-    //             ->get();
-
-    //         $type = 'slow_moving';
-    //         return view('pages.reports.inventory.slow_overstay.load_slow_overstay_report', compact('inventory', 'type'));
-    //     }
-
-    //     return back()->withErrors(['error' => 'Invalid report type selected.']);
-    // }
-
     public function loadSlowOverstayedReport(Request $request)
     {
         $validated = $request->validate([
@@ -7805,6 +7672,116 @@ class ReportController extends Controller
 
     //     return $inventory->sortByDesc('days_since_received')->values();
     // }
+    // private function getOverstayedInventory($company_id, $branch_id)
+    // {
+    //     // Get all store products with available quantity
+    //     $storeProducts = DB::table('store_products AS sp')
+    //         ->join('products AS p', 'sp.product_id', '=', 'p.id')
+    //         ->join('stores AS s', 'sp.store_id', '=', 's.id')
+    //         ->join('branches AS b', 's.branch_id', '=', 'b.id')
+    //         ->select(
+    //             'p.id AS product_id',
+    //             'sp.store_id'
+    //         )
+    //         ->where('b.company_id', 'LIKE', $company_id)
+    //         ->where('s.branch_id', 'LIKE', $branch_id)
+    //         //->where('sp.qty_available', '>', 0)
+    //         ->get();
+
+    //     $inventory = collect();
+
+    //     // For each store product, find the latest receipt date (purchase or transfer)
+    //     foreach ($storeProducts as $storeProduct) {
+    //         // Get the latest purchase date
+    //         $latestPurchase = DB::table('purchase_products AS pp')
+    //             ->join('purchases AS pur', 'pp.purchase_id', '=', 'pur.id')
+    //             ->join('products AS p', 'pp.product_id', '=', 'p.id')
+    //             ->join('branches AS b', 'pur.branch_id', '=', 'b.id')
+    //             ->join('stores AS s', 'pp.store_id', '=', 's.id')
+    //             ->select(
+    //                 'p.id AS product_id',
+    //                 'p.name AS product_name',
+    //                 'p.code AS product_code',
+    //                 'b.name AS branch_name',
+    //                 's.name AS store_name',
+    //                 's.code AS store_code',
+    //                 'pp.updated_at AS last_received_date',
+    //                 DB::raw('DATEDIFF(CURDATE(), pur.purchase_date) AS days_since_received'),
+    //                 DB::raw('(SELECT qty_available FROM store_products WHERE product_id = p.id AND store_id = s.id) AS available_quantity')
+    //             )
+    //             ->where('p.id', $storeProduct->product_id)
+    //             ->where('s.id', $storeProduct->store_id)
+    //             ->orderBy('pp.updated_at', 'desc')
+    //             ->first();
+
+    //         // Get the latest transfer date
+    //         $latestTransfer = DB::table('intersite_transfer_receives AS itr')
+    //             ->join('products AS p', 'itr.product_id', '=', 'p.id')
+    //             ->join('stores AS s', 'itr.store_id', '=', 's.id')
+    //             ->join('branches AS b', 's.branch_id', '=', 'b.id')
+    //             ->select(
+    //                 'p.id AS product_id',
+    //                 'p.name AS product_name',
+    //                 'p.code AS product_code',
+    //                 'b.name AS branch_name',
+    //                 's.name AS store_name',
+    //                 's.code AS store_code',
+    //                 'itr.updated_at AS last_received_date',
+    //                 DB::raw('DATEDIFF(CURDATE(), itr.updated_at) AS days_since_received'),
+    //                 DB::raw('(SELECT qty_available FROM store_products WHERE product_id = p.id AND store_id = s.id) AS available_quantity')
+    //             )
+    //             ->where('p.id', $storeProduct->product_id)
+    //             ->where('s.id', $storeProduct->store_id)
+    //             ->where('itr.quantity', '>', 0) // Ensure only received transfers are considered
+    //             ->where('itr.status', 1) // Ensure only active transfers are considered
+    //             ->orderBy('itr.updated_at', 'desc')
+    //             ->first();
+
+    //         // Determine the most recent receipt (purchase or transfer)
+    //         $latestReceipt = null;
+    //         if ($latestPurchase && $latestTransfer) {
+    //             // Compare dates to pick the most recent
+    //             $latestReceipt = $latestPurchase->last_received_date > $latestTransfer->last_received_date
+    //                 ? $latestPurchase
+    //                 : $latestTransfer;
+    //         } elseif ($latestPurchase) {
+    //             $latestReceipt = $latestPurchase;
+    //         } elseif ($latestTransfer) {
+    //             $latestReceipt = $latestTransfer;
+    //         }
+
+    //         // If we found a receipt and it's overstayed (30+ days), add to inventory
+    //         if ($latestReceipt && $latestReceipt->days_since_received > 30) {
+    //             $inventory->push($latestReceipt);
+    //         } else if (!$latestReceipt) {
+    //             // If no purchase or transfer record found, create a "never received" record
+    //             $product = DB::table('products AS p')
+    //                 ->join('store_products AS sp', 'p.id', '=', 'sp.product_id')
+    //                 ->join('stores AS s', 'sp.store_id', '=', 's.id')
+    //                 ->join('branches AS b', 's.branch_id', '=', 'b.id')
+    //                 ->select(
+    //                     'p.id AS product_id',
+    //                     'p.name AS product_name',
+    //                     'p.code AS product_code',
+    //                     'b.name AS branch_name',
+    //                     's.name AS store_name',
+    //                     's.code AS store_code',
+    //                     DB::raw('NULL AS last_received_date'),
+    //                     DB::raw('999 AS days_since_received'), // Very high number to indicate "never received"
+    //                     'sp.qty_available AS available_quantity'
+    //                 )
+    //                 ->where('p.id', $storeProduct->product_id)
+    //                 ->where('s.id', $storeProduct->store_id)
+    //                 ->first();
+
+    //             if ($product && $product->available_quantity > 0) {
+    //                 $inventory->push($product);
+    //             }
+    //         }
+    //     }
+
+    //     return $inventory->sortByDesc('days_since_received')->values();
+    // }
     private function getOverstayedInventory($company_id, $branch_id)
     {
         // Get all store products with available quantity
@@ -7818,12 +7795,12 @@ class ReportController extends Controller
             )
             ->where('b.company_id', 'LIKE', $company_id)
             ->where('s.branch_id', 'LIKE', $branch_id)
-            //->where('sp.qty_available', '>', 0)
+            //->where('sp.qty_available', '>', 0) // Uncomment if you only want products with stock
             ->get();
 
         $inventory = collect();
 
-        // For each store product, find the latest receipt date (purchase or transfer)
+        // For each store product, find the latest receipt date (purchase, transfer, or adjustment)
         foreach ($storeProducts as $storeProduct) {
             // Get the latest purchase date
             $latestPurchase = DB::table('purchase_products AS pp')
@@ -7865,29 +7842,52 @@ class ReportController extends Controller
                 )
                 ->where('p.id', $storeProduct->product_id)
                 ->where('s.id', $storeProduct->store_id)
-                ->where('itr.quantity', '>', 0) // Ensure only received transfers are considered
-                ->where('itr.status', 1) // Ensure only active transfers are considered
+                ->where('itr.quantity', '>', 0)
+                ->where('itr.status', 1)
                 ->orderBy('itr.updated_at', 'desc')
                 ->first();
 
-            // Determine the most recent receipt (purchase or transfer)
+            // Get the latest stock adjustment date (where operation = 'in')
+            $latestAdjustment = DB::table('stock_adjustment_details AS sad')
+                ->join('stock_adjustments AS sa', 'sad.stock_adjustment_id', '=', 'sa.id')
+                ->join('products AS p', 'sad.product_id', '=', 'p.id')
+                ->join('stores AS s', 'sad.store_id', '=', 's.id')
+                ->join('branches AS b', 's.branch_id', '=', 'b.id')
+                ->select(
+                    'p.id AS product_id',
+                    'p.name AS product_name',
+                    'p.code AS product_code',
+                    'b.name AS branch_name',
+                    's.name AS store_name',
+                    's.code AS store_code',
+                    'sad.updated_at AS last_received_date',
+                    DB::raw('DATEDIFF(CURDATE(), sad.updated_at) AS days_since_received'),
+                    DB::raw('(SELECT qty_available FROM store_products WHERE product_id = p.id AND store_id = s.id) AS available_quantity')
+                )
+                ->where('p.id', $storeProduct->product_id)
+                ->where('s.id', $storeProduct->store_id)
+                ->where('sa.operation', 'in') // Only consider stock adjustments that add inventory
+                ->where('sad.quantity', '>', 0) // Ensure quantity added is positive
+                ->orderBy('sad.updated_at', 'desc')
+                ->first();
+
+            // Determine the most recent receipt (purchase, transfer, or adjustment)
             $latestReceipt = null;
-            if ($latestPurchase && $latestTransfer) {
-                // Compare dates to pick the most recent
-                $latestReceipt = $latestPurchase->last_received_date > $latestTransfer->last_received_date
-                    ? $latestPurchase
-                    : $latestTransfer;
-            } elseif ($latestPurchase) {
-                $latestReceipt = $latestPurchase;
-            } elseif ($latestTransfer) {
-                $latestReceipt = $latestTransfer;
+            $receipts = array_filter([$latestPurchase, $latestTransfer, $latestAdjustment]); // Remove nulls
+
+            if (count($receipts) > 0) {
+                // Sort receipts by last_received_date to get the most recent
+                usort($receipts, function ($a, $b) {
+                    return strtotime($b->last_received_date) - strtotime($a->last_received_date);
+                });
+                $latestReceipt = reset($receipts); // Take the most recent
             }
 
             // If we found a receipt and it's overstayed (30+ days), add to inventory
             if ($latestReceipt && $latestReceipt->days_since_received > 30) {
                 $inventory->push($latestReceipt);
             } else if (!$latestReceipt) {
-                // If no purchase or transfer record found, create a "never received" record
+                // If no purchase, transfer, or adjustment record found, create a "never received" record
                 $product = DB::table('products AS p')
                     ->join('store_products AS sp', 'p.id', '=', 'sp.product_id')
                     ->join('stores AS s', 'sp.store_id', '=', 's.id')
@@ -7900,7 +7900,7 @@ class ReportController extends Controller
                         's.name AS store_name',
                         's.code AS store_code',
                         DB::raw('NULL AS last_received_date'),
-                        DB::raw('999 AS days_since_received'), // Very high number to indicate "never received"
+                        DB::raw('999 AS days_since_received'),
                         'sp.qty_available AS available_quantity'
                     )
                     ->where('p.id', $storeProduct->product_id)
@@ -7918,6 +7918,75 @@ class ReportController extends Controller
     /**
      * Get slow-moving inventory (products not sold recently but still in stock)
      */
+    // private function getSlowMovingInventory($company_id, $branch_id)
+    // {
+    //     $storeProducts = DB::table('store_products AS sp')
+    //         ->join('products AS p', 'sp.product_id', '=', 'p.id')
+    //         ->join('stores AS s', 'sp.store_id', '=', 's.id')
+    //         ->join('branches AS b', 's.branch_id', '=', 'b.id')
+    //         ->select(
+    //             'p.id AS product_id',
+    //             'sp.id AS store_product_id',
+    //             'sp.store_id'
+    //         )
+    //         ->where('b.company_id', 'LIKE', $company_id)
+    //         ->where('s.branch_id', 'LIKE', $branch_id)
+    //         ->where('sp.qty_available', '>', 0)
+    //         ->get();
+
+    //     $inventory = collect();
+
+    //     foreach ($storeProducts as $storeProduct) {
+    //         $latestSale = DB::table('order_details AS od')
+    //             ->join('orders AS o', 'od.order_id', '=', 'o.id')
+    //             ->join('store_products AS sp', 'od.store_product_id', '=', 'sp.id')
+    //             ->join('products AS p', 'sp.product_id', '=', 'p.id')
+    //             ->join('stores AS s', 'sp.store_id', '=', 's.id')
+    //             ->join('branches AS b', 's.branch_id', '=', 'b.id')
+    //             ->select(
+    //                 'p.id AS product_id',
+    //                 'p.name AS product_name',
+    //                 'p.code AS product_code',
+    //                 'b.name AS branch_name',
+    //                 's.name AS store_name',
+    //                 's.code AS store_code',
+    //                 'od.updated_at AS last_sold_date',
+    //                 DB::raw('DATEDIFF(CURDATE(), od.updated_at) AS days_since_sold'),
+    //                 DB::raw('(SELECT qty_available FROM store_products WHERE id = sp.id) AS available_quantity')
+    //             )
+    //             ->where('od.store_product_id', $storeProduct->store_product_id)
+    //             ->orderBy('od.updated_at', 'desc')
+    //             ->first();
+
+    //         if ($latestSale && $latestSale->days_since_sold > 30) {
+    //             $inventory->push($latestSale);
+    //         } elseif (!$latestSale) {
+    //             $product = DB::table('products AS p')
+    //                 ->join('store_products AS sp', 'p.id', '=', 'sp.product_id')
+    //                 ->join('stores AS s', 'sp.store_id', '=', 's.id')
+    //                 ->join('branches AS b', 's.branch_id', '=', 'b.id')
+    //                 ->select(
+    //                     'p.id AS product_id',
+    //                     'p.name AS product_name',
+    //                     'p.code AS product_code',
+    //                     'b.name AS branch_name',
+    //                     's.name AS store_name',
+    //                     's.code AS store_code',
+    //                     DB::raw('NULL AS last_sold_date'),
+    //                     DB::raw('999 AS days_since_sold'),
+    //                     'sp.qty_available AS available_quantity'
+    //                 )
+    //                 ->where('sp.id', $storeProduct->store_product_id)
+    //                 ->first();
+
+    //             if ($product && $product->available_quantity > 0) {
+    //                 $inventory->push($product);
+    //             }
+    //         }
+    //     }
+
+    //     return $inventory->sortByDesc('days_since_sold')->values();
+    // }
     private function getSlowMovingInventory($company_id, $branch_id)
     {
         $storeProducts = DB::table('store_products AS sp')
@@ -7937,6 +8006,7 @@ class ReportController extends Controller
         $inventory = collect();
 
         foreach ($storeProducts as $storeProduct) {
+            // Get the latest sale date
             $latestSale = DB::table('order_details AS od')
                 ->join('orders AS o', 'od.order_id', '=', 'o.id')
                 ->join('store_products AS sp', 'od.store_product_id', '=', 'sp.id')
@@ -7958,9 +8028,47 @@ class ReportController extends Controller
                 ->orderBy('od.updated_at', 'desc')
                 ->first();
 
-            if ($latestSale && $latestSale->days_since_sold > 30) {
-                $inventory->push($latestSale);
-            } elseif (!$latestSale) {
+            // Get the latest stock adjustment date (where operation = 'out')
+            $latestAdjustment = DB::table('stock_adjustment_details AS sad')
+                ->join('stock_adjustments AS sa', 'sad.stock_adjustment_id', '=', 'sa.id')
+                ->join('products AS p', 'sad.product_id', '=', 'p.id')
+                ->join('stores AS s', 'sad.store_id', '=', 's.id')
+                ->join('branches AS b', 's.branch_id', '=', 'b.id')
+                ->select(
+                    'p.id AS product_id',
+                    'p.name AS product_name',
+                    'p.code AS product_code',
+                    'b.name AS branch_name',
+                    's.name AS store_name',
+                    's.code AS store_code',
+                    'sad.updated_at AS last_sold_date',
+                    DB::raw('DATEDIFF(CURDATE(), sad.updated_at) AS days_since_sold'),
+                    DB::raw('(SELECT qty_available FROM store_products WHERE product_id = p.id AND store_id = s.id) AS available_quantity')
+                )
+                ->where('sad.product_id', $storeProduct->product_id)
+                ->where('sad.store_id', $storeProduct->store_id)
+                ->where('sa.operation', 'out') // Only consider stock adjustments that remove inventory
+                ->where('sad.quantity', '>', 0) // Ensure quantity removed is positive
+                ->orderBy('sad.updated_at', 'desc')
+                ->first();
+
+            // Determine the most recent movement (sale or adjustment out)
+            $latestMovement = null;
+            $movements = array_filter([$latestSale, $latestAdjustment]); // Remove nulls
+
+            if (count($movements) > 0) {
+                // Sort movements by last_sold_date to get the most recent
+                usort($movements, function ($a, $b) {
+                    return strtotime($b->last_sold_date) - strtotime($a->last_sold_date);
+                });
+                $latestMovement = reset($movements); // Take the most recent
+            }
+
+            // If we found a movement and it's slow-moving (30+ days), add to inventory
+            if ($latestMovement && $latestMovement->days_since_sold > 30) {
+                $inventory->push($latestMovement);
+            } elseif (!$latestMovement) {
+                // If no sale or adjustment record found, create a "never sold" record
                 $product = DB::table('products AS p')
                     ->join('store_products AS sp', 'p.id', '=', 'sp.product_id')
                     ->join('stores AS s', 'sp.store_id', '=', 's.id')
@@ -7987,7 +8095,6 @@ class ReportController extends Controller
 
         return $inventory->sortByDesc('days_since_sold')->values();
     }
-
     public function backdatedEntriesReport()
     {
         return view('pages.reports.inventory.user_entries.backdated_postdated_entries_report');

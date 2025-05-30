@@ -48,6 +48,13 @@
                                 <a class="dropdown-item" href="{{ route('user.site.access', $record->id) }}">
                                     <span class="fa fa-unlock"> Site Access</span>
                                 </a>
+                                <a href="#" class="dropdown-item set-entry-date" data-user-id="{{ $record->id }}"
+                                    data-user-name="{{ $record->name }}" data-date-start="{{ $record->date_range_start }}"
+                                    data-date-end="{{ $record->date_range_end }}" data-toggle="modal"
+                                    data-target="#dateRangeModal">
+                                    <span class="fa fa-calendar-check-o"> Set Entry Date</span>
+                                </a>
+                               
                             @endcan
                             @can('users.reset-password')
                                 <a class="dropdown-item" href="{{ route('users.reset-password', $record->id) }}">

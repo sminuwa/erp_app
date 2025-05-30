@@ -264,11 +264,13 @@
                         </div> --}}
 
                         <div class="col-md-2">
-                            <button class="btn btn-primary" id="load_dashboard_summary">Load Summary</button>
+                            <button class="btn btn-sm btn-primary" id="load_dashboard_summary">Load Summary</button>
                         </div>
                     </div>
 
-                    <div id="dashboard-summary-placeholder"></div>
+                    <div id="dashboard-summary-placeholder">
+                        @include('default_dashboard_report')
+                    </div>
                     <div id="loading-indicator">
                         <div class="lds-ring">
                             <div></div>

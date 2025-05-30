@@ -1,1 +1,23 @@
-ALTER TABLE `budgets` ADD COLUMN `proposed_budget` DECIMAL(10,2) NULL AFTER `budget_year`; 
+
+CREATE TABLE `budget_expenditures` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `branch_id` bigint(20) DEFAULT NULL,
+  `general_account_id` bigint(20) DEFAULT NULL,
+  `budget_year` year(4) NOT NULL,
+  `proposed_budget` decimal(10,2) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `branch_id` (`branch_id`),
+  KEY `category_id` (`general_account_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1239 DEFAULT CHARSET=latin1;
+
+ALTER TABLE users ADD COLUMN date_range_start DATE, ADD COLUMN date_range_end DATE;
+
+CREATE TABLE `period_settings` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `period_open` DATE NULL,
+    `period_close` DATE NULL,
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

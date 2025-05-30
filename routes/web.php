@@ -53,6 +53,8 @@ use App\Http\Controllers\BackupController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\RoBudgetController;
 use App\Http\Controllers\AreaManagerController;
+use App\Http\Controllers\BudgetExpenditureController;
+use App\Http\Controllers\PeriodSettingController;
 
 
 
@@ -568,6 +570,9 @@ Route::middleware('auth')->group(function () {
                     //Import Users
                     Route::get('/import/form', [UserController::class, 'importForm'])->name('users.import.form');
                     Route::post('/import', [UserController::class, 'import'])->name('users.import');
+                    Route::post('/update-user-date-range', [UserController::class, 'updateDateRange'])->name('admin.updateUserDateRange');
+                    Route::get('/period', [PeriodSettingController::class, 'index'])->name('admin.period.index');
+                    Route::post('/period', [PeriodSettingController::class, 'update'])->name('admin.period.update');
 
                     //Roles
                     Route::controller(RoleController::class)->group(
@@ -1242,6 +1247,17 @@ Route::middleware('auth')->group(function () {
             Route::get('/import', [RoBudgetController::class, 'import'])->name('ro_budgets.import');
             Route::get('/download-template', [RoBudgetController::class, 'downloadTemplate'])->name('ro_budgets.download_template');
         });
+    });
+    Route::prefix('budget-expenditures')->group(function () {
+        Route::get('/', [BudgetExpenditureController::class, 'index'])->name('budget_expenditures.index');
+        Route::get('/create', [BudgetExpenditureController::class, 'create'])->name('budget_expenditures.create');
+        Route::post('/store', [BudgetExpenditureController::class, 'store'])->name('budget_expenditures.store');
+        Route::get('/{budgetExpenditure}/edit', [BudgetExpenditureController::class, 'edit'])->name('budget_expenditures.edit');
+        Route::put('/update/{budgetExpenditure}', [BudgetExpenditureController::class, 'update'])->name('budget_expenditures.update');
+        Route::delete('/delete/{budgetExpenditure}', [BudgetExpenditureController::class, 'destroy'])->name('budget_expenditures.destroy');
+        Route::get('/import', [BudgetExpenditureController::class, 'importForm'])->name('budget_expenditures.import');
+        Route::post('/import/store', [BudgetExpenditureController::class, 'importStore'])->name('budget_expenditures.import.store');
+        Route::get('/download-template', [BudgetExpenditureController::class, 'downloadTemplate'])->name('budget_expenditures.downloadTemplate');
     });
     // Area Managers Management Routes
     Route::prefix('area-managers')->group(function () {

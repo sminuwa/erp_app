@@ -361,12 +361,12 @@
                                     </a>
                                     <ul class="nav nav-treeview">
                                         <!--                                        <li class="nav-item">
-                                                                                                                            <a href="{{-- {{ route('stock.balances.report') }} --}}"
-                                                                                                                                class="nav-link {{-- {{ Request::is('reports/sc/stock/balances*') ? 'active' : '' }} --}}">
-                                                                                                                                <i class="ion-code-working"></i>
-                                                                                                                                <p>Previous Stock Balances</p>
-                                                                                                                            </a>
-                                                                                                                        </li>-->
+                                                                                                                                            <a href="{{-- {{ route('stock.balances.report') }} --}}"
+                                                                                                                                                class="nav-link {{-- {{ Request::is('reports/sc/stock/balances*') ? 'active' : '' }} --}}">
+                                                                                                                                                <i class="ion-code-working"></i>
+                                                                                                                                                <p>Previous Stock Balances</p>
+                                                                                                                                            </a>
+                                                                                                                                        </li>-->
                                         <li class="nav-item">
                                             <a href="{{ route('current.stock.report') }}"
                                                 class="nav-link {{ Request::is('reports/sc/current-stock*') ? 'active' : '' }}">
@@ -927,12 +927,16 @@
                                         <p>Sales Budget</p>
                                     </a>
                                 </li>
-                            @endcan
-                            @can('budget.view')
                                 <li class="nav-item">
                                     <a href="{{ route('ro_budgets.index') }}" class="nav-link ">
                                         <i class="ion-card"></i>
                                         <p>ROs Budget</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('budget_expenditures.index') }}" class="nav-link ">
+                                        <i class="ion-card"></i>
+                                        <p>Budget Expenditure</p>
                                     </a>
                                 </li>
                             @endcan
@@ -972,11 +976,11 @@
 </aside>
 <!-- JavaScript for Search Functionality -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('sidebar-search');
         const navItems = document.querySelectorAll('.nav-item');
 
-        searchInput.addEventListener('input', function () {
+        searchInput.addEventListener('input', function() {
             const searchTerm = searchInput.value.trim().toLowerCase();
 
             navItems.forEach(item => {
@@ -992,7 +996,8 @@
                 // Check sub-menu items
                 subItems.forEach(subItem => {
                     const subTextElement = subItem.querySelector('p');
-                    const subText = subTextElement ? subTextElement.textContent.toLowerCase() : '';
+                    const subText = subTextElement ? subTextElement.textContent
+                        .toLowerCase() : '';
                     if (subText.includes(searchTerm)) {
                         hasSubMatch = true;
                     }
@@ -1014,8 +1019,10 @@
                 // Show or hide sub-items based on search term
                 subItems.forEach(subItem => {
                     const subTextElement = subItem.querySelector('p');
-                    const subText = subTextElement ? subTextElement.textContent.toLowerCase() : '';
-                    subItem.style.display = subText.includes(searchTerm) || hasMatch ? '' : 'none';
+                    const subText = subTextElement ? subTextElement.textContent
+                        .toLowerCase() : '';
+                    subItem.style.display = subText.includes(searchTerm) || hasMatch ?
+                        '' : 'none';
                 });
             });
         });

@@ -50,7 +50,7 @@ class HomeController extends Controller
             $user_sales_per_branch = $user_sales_per_branch->where('sold_by', $user->id);
         $user_sales_per_branch = $user_sales_per_branch->groupBy('sold_by')->get();
         //Yotal Cash Sales
-        /*$today = Order::whereDate('order_date', $today_date)->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'status' => 1])->get();
+        $today = Order::whereDate('order_date', $today_date)->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'status' => 1])->get();
         $yesterday = Order::whereDate('order_date', date('Y-m-d', strtotime('-1 day')))->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'orders.status' => 1])->get();
 
         $month_date = date('m');
@@ -112,44 +112,79 @@ class HomeController extends Controller
             ->join('bank_accounts', 'bank_accounts.id', 'expenses.bank_account_id')
             ->where(['bank_accounts.branch_id' => User::userBranchAction()])
             ->whereYear('expenses.date', date('Y'))
-            ->groupBy('months', 'expenses.date')->get();*/
+            ->groupBy('months', 'expenses.date')->get();
 
         $companies = Company::orderBy('name')->get();
         $branches = Branch::orderBy('name')->get();
+
+        $q_month = date('n'); // Numeric month (1-12)
+        $quarter = match (true) {
+            $q_month >= 1 && $q_month <= 3 => 'Q1',
+            $q_month >= 4 && $q_month <= 6 => 'Q2',
+            $q_month >= 7 && $q_month <= 9 => 'Q3',
+            default => 'Q4'
+        };
+
+        $today_budget = DB::table('budgets')
+            ->where('branch_id', auth()->user()->branch_id)
+            ->where('budget_year', date('Y'))
+            ->where('quarter', $quarter)
+            ->sum(DB::raw('IFNULL(month1, 0) + IFNULL(month2, 0) + IFNULL(month3, 0)'));
+
+        $month_budget = DB::table('budgets')
+            ->where('branch_id', auth()->user()->branch_id)
+            ->where('budget_year', date('Y'))
+            ->where('quarter', match (true) {
+                date('n') >= 1 && date('n') <= 3 => 'Q1',
+                date('n') >= 4 && date('n') <= 6 => 'Q2',
+                date('n') >= 7 && date('n') <= 9 => 'Q3',
+                default => 'Q4'
+            })
+            ->sum(DB::raw('IFNULL(month1, 0) + IFNULL(month2, 0) + IFNULL(month3, 0)'));
+
+        $year_budget = DB::table('budgets')
+            ->where('branch_id', auth()->user()->branch_id)
+            ->where('budget_year', date('Y'))
+            ->sum(DB::raw('IFNULL(month1, 0) + IFNULL(month2, 0) + IFNULL(month3, 0)'));
+
+
+        return view('home', compact(
+            'today',
+            'yesterday',
+            'month',
+            'previous_month',
+            'year',
+            'previous_year',
+            'sales',
+            'today_due',
+            'yesterday_due',
+            'month_due',
+            'previous_month_due',
+            'year_due',
+            'previous_year_due',
+            'sales_due',
+            'today_expenses',
+            'yesterday_expenses',
+            'month_expenses',
+            'previous_month_expenses',
+            'year_expenses',
+            'previous_year_expenses',
+            'expenses',
+            'current_sales',
+            'current_expenses',
+            'user_sales_per_branch',
+            'branches',
+            'companies',
+            'today_budget',
+            'month_budget',
+            'year_budget'
+        ));
         // return view('home', compact(
-        //     'today',
-        //     'yesterday',
-        //     'month',
-        //     'previous_month',
-        //     'year',
-        //     'previous_year',
-        //     'sales',
-        //     'today_due',
-        //     'yesterday_due',
-        //     'month_due',
-        //     'previous_month_due',
-        //     'year_due',
-        //     'previous_year_due',
-        //     'sales_due',
-        //     'today_expenses',
-        //     'yesterday_expenses',
-        //     'month_expenses',
-        //     'previous_month_expenses',
-        //     'year_expenses',
-        //     'previous_year_expenses',
-        //     'expenses',
-        //     'current_sales',
-        //     'current_expenses',
+
         //     'user_sales_per_branch',
         //     'branches',
         //     'companies'
         // ));
-        return view('home', compact(
-
-            'user_sales_per_branch',
-            'branches',
-            'companies'
-        ));
     }
 
     public function sampleReport()
@@ -172,7 +207,7 @@ class HomeController extends Controller
         ];
         $months = $quarter ? ($quarterMonths[$quarter] ?? []) : range(1, 12);
 
-        
+
         $summaries = [];
 
         // 1. Specific branch selected
@@ -266,37 +301,97 @@ class HomeController extends Controller
 
         //  3. No company/branch specified — loop all companies
         else {
+            // $companies = Company::with('branches')->get();
+
+            // foreach ($companies as $company) {
+            //     $branch_ids = $company->branches->pluck('id')->toArray();
+
+            //     $actual = Order::whereYear('order_date', $year)
+            //         ->whereIn(DB::raw('MONTH(order_date)'), $months)
+            //         ->whereIn('branch_id', $branch_ids)
+            //         ->where('status', 1)
+            //         ->sum('total');
+
+            //     $budgetQuery = DB::table('budgets')
+            //         ->where('budget_year', $year)
+            //         ->whereIn('branch_id', $branch_ids);
+
+            //     if ($quarter) {
+            //         $budgetQuery->where('quarter', $quarter);
+            //     } else {
+            //         $budgetQuery->where('quarter', 'LIKE', '%');
+            //     }
+
+            //     // $budget = $budgetQuery->sum(DB::raw('IFNULL(month1,0) + IFNULL(month2,0) + IFNULL(month3,0)'));
+            //     $budget = $budgetQuery->sum('total');
+
+            //     $summaries[] = [
+            //         'label' => $company->name,
+            //         'actual' => $actual,
+            //         'budget' => $budget,
+            //         'type' => 'Company'
+            //     ];
+            // }
             $companies = Company::with('branches')->get();
 
             foreach ($companies as $company) {
                 $branch_ids = $company->branches->pluck('id')->toArray();
 
-                $actual = Order::whereYear('order_date', $year)
+                // Company-wide total
+                $companyActual = Order::whereYear('order_date', $year)
                     ->whereIn(DB::raw('MONTH(order_date)'), $months)
                     ->whereIn('branch_id', $branch_ids)
                     ->where('status', 1)
                     ->sum('total');
 
-                $budgetQuery = DB::table('budgets')
+                $companyBudgetQuery = DB::table('budgets')
                     ->where('budget_year', $year)
                     ->whereIn('branch_id', $branch_ids);
 
                 if ($quarter) {
-                    $budgetQuery->where('quarter', $quarter);
+                    $companyBudgetQuery->where('quarter', $quarter);
                 } else {
-                    $budgetQuery->where('quarter', 'LIKE', '%');
+                    $companyBudgetQuery->where('quarter', 'LIKE', '%');
                 }
 
-                // $budget = $budgetQuery->sum(DB::raw('IFNULL(month1,0) + IFNULL(month2,0) + IFNULL(month3,0)'));
-                $budget = $budgetQuery->sum('total');
+                $companyBudget = $companyBudgetQuery->sum(DB::raw('IFNULL(month1,0) + IFNULL(month2,0) + IFNULL(month3,0)'));
 
                 $summaries[] = [
                     'label' => $company->name,
-                    'actual' => $actual,
-                    'budget' => $budget,
-                    'type' => 'Company'
+                    'actual' => $companyActual,
+                    'budget' => $companyBudget,
+                    'type' => 'Company',
                 ];
+
+                foreach ($company->branches as $branch) {
+                    $branchActual = Order::whereYear('order_date', $year)
+                        ->whereIn(DB::raw('MONTH(order_date)'), $months)
+                        ->where('branch_id', $branch->id)
+                        ->where('status', 1)
+                        ->sum('total');
+
+                    $branchBudgetQuery = DB::table('budgets')
+                        ->where('budget_year', $year)
+                        ->where('branch_id', $branch->id);
+
+                    if ($quarter) {
+                        $branchBudgetQuery->where('quarter', $quarter);
+                    } else {
+                        $branchBudgetQuery->where('quarter', 'LIKE', '%');
+                    }
+
+                    $branchBudget = $branchBudgetQuery->sum(DB::raw('IFNULL(month1,0) + IFNULL(month2,0) + IFNULL(month3,0)'));
+
+                    $summaries[] = [
+                        'label' => $branch->name,
+                        'actual' => $branchActual,
+                        'budget' => $branchBudget,
+                        'type' => 'Branch',
+                        'company_label' => $company->name,
+                    ];
+                }
             }
+
         }
         //dd($summaries);
         return view('dashboard_summary', [

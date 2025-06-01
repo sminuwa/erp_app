@@ -361,33 +361,26 @@
      </div>
      <!-- /.col -->
      <!-- /.col -->
-     <div class="col-md-3 col-sm-6 col-12">
+     {{-- <div class="col-md-3 col-sm-6 col-12">
          <div class="info-box bg-danger">
              <span class="info-box-icon"><i class="fa fa-minus-square"></i></span>
 
              <div class="info-box-content">
                  <span class="info-box-text">Today's Expenses</span>
                  <span class="info-box-number">&#8358;
-                     {{ number_format($today_expenses->sum('amount'), 2, '.', ',') }}</span>
+                     {{ number_format($today_expenses->sum('debit'), 2, '.', ',') }}</span>
 
                  @php
-
-                     if ($yesterday_expenses->sum('amount') != 0) {
-                         $percentage =
-                             (($today_expenses->sum('amount') - $yesterday_expenses->sum('amount')) /
-                                 $yesterday_expenses->sum('amount')) *
-                             100;
-                     } else {
-                         $percentage = 0;
-                     }
+                     $today_sum = $today_expenses->sum('debit');
+                     $yesterday_sum = $yesterday_expenses->sum('debit');
+                     $percentage = $yesterday_sum != 0 ? (($today_sum - $yesterday_sum) / $yesterday_sum) * 100 : 0;
                  @endphp
 
                  <div class="progress">
-                     <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%">
-                     </div>
+                     <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%"></div>
                  </div>
 
-                 <span class="progress-description {{ $percentage < 0 ? 'text-success' : '' }}">
+                 <span class="progress-description {{ $percentage < 0 ? 'text-white' : 'text-warning' }}">
                      {{ number_format(abs($percentage), 2) }} %
                      {{ $percentage > 0 ? 'Increase' : 'Decrease' }} From
                      {{ date('l', strtotime('-1 day')) }}
@@ -405,27 +398,25 @@
              <div class="info-box-content">
                  <span class="info-box-text">This Month's Expenses</span>
                  <span class="info-box-number">&#8358;
-                     {{ number_format($month_expenses->sum('amount'), 2, '.', ',') }}</span>
+                     {{ number_format($month_expenses->sum('debit'), 2, '.', ',') }}
+                 </span>
+
                  @php
-                     if ($yesterday_expenses->sum('amount') != 0) {
-                         $percentage =
-                             (($today_expenses->sum('amount') - $yesterday_expenses->sum('amount')) /
-                                 $yesterday_expenses->sum('amount')) *
-                             100;
-                     } else {
-                         $percentage = 0;
-                     }
+                     $month_sum = $month_expenses->sum('debit');
+                     $previous_month_sum = $previous_month_expenses->sum('debit');
+                     $percentage =
+                         $previous_month_sum != 0
+                             ? (($month_sum - $previous_month_sum) / $previous_month_sum) * 100
+                             : 0;
                  @endphp
 
                  <div class="progress">
-                     <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%">
-                     </div>
+                     <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%"></div>
                  </div>
 
-                 <span class="progress-description {{ $percentage < 0 ? 'text-success' : '' }}">
-                     {{ number_format(abs($percentage), 2) }} %
-                     {{ $percentage > 0 ? 'Increase' : 'Decrease' }} From
-                     {{ date('F', strtotime('-1 month')) }}
+                 <span class="progress-description {{ $percentage < 0 ? 'text-white' : 'text-warning' }}">
+                     {{ number_format(abs($percentage), 2) }}%
+                     {{ $percentage > 0 ? 'Increase' : 'Decrease' }} From {{ date('F', strtotime('-1 month')) }}
                  </span>
              </div>
              <!-- /.info-box-content -->
@@ -439,31 +430,33 @@
 
              <div class="info-box-content">
                  <span class="info-box-text">This Year's Expenses</span>
-                 <span class="info-box-number">&#8358;
-                     {{ number_format($year_expenses->sum('amount'), 2, '.', ',') }}</span>
                  @php
-                     if ($previous_year_expenses->sum('amount') != 0) {
-                         $percentage =
-                             (($year_expenses->sum('amount') - $previous_year_expenses->sum('amount')) /
-                                 $previous_year_expenses->sum('amount')) *
-                             100;
-                     } else {
-                         $percentage = 0;
-                     }
+                     $year_sum = $year_expenses->sum('debit');
+                     $prev_year_sum = $previous_year_expenses->sum('debit');
+                     $percentage = $prev_year_sum != 0 ? (($year_sum - $prev_year_sum) / $prev_year_sum) * 100 : 0;
                  @endphp
+                 <span class="info-box-number">&#8358;
+                     {{ number_format($year_sum, 2, '.', ',') }}
+                 </span>
 
                  <div class="progress">
                      <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%">
                      </div>
                  </div>
 
-                 <span class="progress-description {{ $percentage > 0 ? 'text-warning' : '' }}">
-                     {{ number_format(abs($percentage), 2) }} %
-                     {{ $percentage > 0 ? 'Increase' : 'Decrease' }} From
-                     {{ date('Y', strtotime('-1 year')) }}
+                 <span
+                     class="progress-description 
+            {{ $percentage < 0 ? 'text-white' : ($percentage > 0 ? 'text-warning' : '') }}">
+                     {{ number_format(abs($percentage), 2) }}%
+                     @if ($percentage > 0)
+                         Increase From {{ date('Y', strtotime('-1 year')) }}
+                     @elseif ($percentage < 0)
+                         Decrease From {{ date('Y', strtotime('-1 year')) }}
+                     @else
+                         Same As {{ date('Y', strtotime('-1 year')) }}
+                     @endif
                  </span>
              </div>
-             <!-- /.info-box-content -->
          </div>
          <!-- /.info-box -->
      </div>
@@ -475,12 +468,109 @@
              <div class="info-box-content">
                  <span class="info-box-text mt-3 pb-1">Total Expenses</span>
                  <span class="info-box-number mb-3">&#8358;
-                     {{ number_format($expenses->sum('amount'), 2, '.', ',') }}</span>
+                     {{ number_format($expenses->sum('debit'), 2, '.', ',') }}</span>
              </div>
              <!-- /.info-box-content -->
          </div>
          <!-- /.info-box -->
+     </div> --}}
+     <!-- Today's Expenses -->
+     <div class="col-md-3 col-sm-6 col-12">
+         <div class="info-box bg-danger">
+             <span class="info-box-icon"><i class="fa fa-minus-square"></i></span>
+             <div class="info-box-content">
+                 <span class="info-box-text">Today's Expenses</span>
+                 <span class="info-box-number">&#8358;{{ number_format($today_expenses->sum('debit'), 2) }}</span>
+                 @php
+                     $today_sum = $today_expenses->sum('debit');
+                     $yesterday_sum = $yesterday_expenses->sum('debit');
+                     $percentage = $yesterday_sum != 0 ? (($today_sum - $yesterday_sum) / $yesterday_sum) * 100 : 0;
+                 @endphp
+                 <div class="progress">
+                     <div class="progress-bar" style="width: {{ number_format(abs($percentage), 2) }}%"></div>
+                 </div>
+                 <span class="progress-description {{ $percentage < 0 ? 'text-white' : 'text-warning' }}">
+                     {{ number_format(abs($percentage), 2) }}%
+                     {{ $percentage > 0 ? 'Increase' : 'Decrease' }} From {{ date('l', strtotime('-1 day')) }}
+                 </span>
+             </div>
+         </div>
      </div>
+
+     <!-- This Month's Expenses + Budget -->
+     <div class="col-md-3 col-sm-6 col-12">
+         <div class="info-box bg-danger">
+             <span class="info-box-icon"><i class="fa fa-minus-square"></i></span>
+             <div class="info-box-content">
+                 <span class="info-box-text">This Month's Expenses</span>
+                 @php
+                     $month_sum = $month_expenses->sum('debit');
+                     $budget_month = $expense_budgets/12 ?? 0;
+                     $budget_util_percent = $budget_month > 0 ? ($month_sum / $budget_month) * 100 : 0;
+                     $prev_month_sum = $previous_month_expenses->sum('debit');
+                     $trend_percent =
+                         $prev_month_sum != 0 ? (($month_sum - $prev_month_sum) / $prev_month_sum) * 100 : 0;
+                 @endphp
+                 <span class="info-box-number">&#8358;{{ number_format($month_sum, 2) }}</span>
+                 <small class="text-white">Budget: &#8358;{{ number_format($budget_month, 2) }}
+                     ({{ number_format($budget_util_percent, 1) }}% used)</small>
+                 <div class="progress mt-1">
+                     <div class="progress-bar"
+                         style="width: {{ min(100, number_format($budget_util_percent, 1)) }}%"></div>
+                 </div>
+                 <span class="progress-description {{ $trend_percent < 0 ? 'text-white' : 'text-warning' }}">
+                     {{ number_format(abs($trend_percent), 2) }}%
+                     {{ $trend_percent > 0 ? 'Increase' : 'Decrease' }} From {{ date('F', strtotime('-1 month')) }}
+                 </span>
+             </div>
+         </div>
+     </div>
+
+     <!-- This Year's Expenses + Budget -->
+     <div class="col-md-3 col-sm-6 col-12">
+         <div class="info-box bg-danger">
+             <span class="info-box-icon"><i class="fa fa-minus-square"></i></span>
+             <div class="info-box-content">
+                 <span class="info-box-text">This Year's Expenses</span>
+                 @php
+                     $year_sum = $year_expenses->sum('debit');
+                     $year_budget_amount = $expense_budgets ?? 0;
+                     $year_util_percent = $year_budget_amount > 0 ? ($year_sum / $year_budget_amount) * 100 : 0;
+                     $prev_year_sum = $previous_year_expenses->sum('debit');
+                     $trend_year = $prev_year_sum != 0 ? (($year_sum - $prev_year_sum) / $prev_year_sum) * 100 : 0;
+                 @endphp
+                 <span class="info-box-number">&#8358;{{ number_format($year_sum, 2) }}</span>
+                 <small class="text-white">Budget: &#8358;{{ number_format($year_budget_amount, 2) }}
+                     ({{ number_format($year_util_percent, 1) }}% used)</small>
+                 <div class="progress mt-1">
+                     <div class="progress-bar" style="width: {{ min(100, number_format($year_util_percent, 1)) }}%">
+                     </div>
+                 </div>
+                 <span class="progress-description {{ $trend_year < 0 ? 'text-white' : 'text-warning' }}">
+                     {{ number_format(abs($trend_year), 2) }}%
+                     @if ($trend_year > 0)
+                         Increase From {{ date('Y', strtotime('-1 year')) }}
+                     @elseif ($trend_year < 0)
+                         Decrease From {{ date('Y', strtotime('-1 year')) }}
+                     @else
+                         Same As {{ date('Y', strtotime('-1 year')) }}
+                     @endif
+                 </span>
+             </div>
+         </div>
+     </div>
+
+     <!-- Total Expenses -->
+     <div class="col-md-3 col-sm-6 col-12">
+         <div class="info-box bg-danger">
+             <span class="info-box-icon"><i class="fa fa-minus-square"></i></span>
+             <div class="info-box-content">
+                 <span class="info-box-text mt-3 pb-1">Total Expenses</span>
+                 <span class="info-box-number mb-3">&#8358;{{ number_format($expenses->sum('debit'), 2) }}</span>
+             </div>
+         </div>
+     </div>
+
      <!-- /.col -->
  </div>
  <div class="row">
@@ -492,10 +582,9 @@
              </div>
              <div class="card-body">
                  <div class="chart">
-                     <div id="barchart_material" style="width: 900px; height: 500px;"></div>
+                     <div id="barchart_material" style="width: 100%; height: 500px;"></div>
                  </div>
              </div>
-             <!-- /.card-body -->
          </div>
          <!-- /.card -->
      </div>
@@ -507,7 +596,7 @@
              </div>
              <div class="card-body">
                  <div class="chart">
-                     <div id="barchart_material2" style="width: 900px; height: 500px;"></div>
+                     <div id="barchart_material2" style="width: 100%; height: 500px;"></div>
                  </div>
              </div>
              <!-- /.card-body -->

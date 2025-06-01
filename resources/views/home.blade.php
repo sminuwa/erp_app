@@ -346,6 +346,75 @@
 @endsection
 
 @push('js')
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load("current", {
+            packages: ['corechart', 'bar']
+        });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            const data = google.visualization.arrayToDataTable([
+                ['Month', 'Expenses'],
+                @foreach ($months as $index => $month)
+                    ['{{ $month }}', {{ $amounts[$index] }}],
+                @endforeach
+            ]);
+
+            const options = {
+                title: 'Monthly Expenses Report (₦)',
+                chartArea: {
+                    width: '70%'
+                },
+                hAxis: {
+                    title: 'Amount (₦)',
+                    minValue: 0
+                },
+                vAxis: {
+                    title: 'Month'
+                },
+                bars: 'horizontal',
+                colors: ['#61afff']
+            };
+
+            const chart = new google.visualization.BarChart(document.getElementById('barchart_material2'));
+            chart.draw(data, options);
+        }
+    </script>
+    <script type="text/javascript">
+        google.charts.load("current", {
+            packages: ['corechart', 'bar']
+        });
+        google.charts.setOnLoadCallback(drawSalesChart);
+
+        function drawSalesChart() {
+            const data = google.visualization.arrayToDataTable([
+                ['Month', 'Sales'],
+                @foreach ($sale_months as $index => $month)
+                    ['{{ $month }}', {{ $sale_amounts[$index] }}],
+                @endforeach
+            ]);
+
+            const options = {
+                title: 'Monthly Sales Report (₦)',
+                chartArea: {
+                    width: '70%'
+                },
+                hAxis: {
+                    title: 'Amount (₦)',
+                    minValue: 0
+                },
+                vAxis: {
+                    title: 'Month'
+                },
+                bars: 'horizontal',
+                colors: ['#007bff']
+            };
+
+            const chart = new google.visualization.BarChart(document.getElementById('barchart_material'));
+            chart.draw(data, options);
+        }
+    </script>
 
     <script>
         $('#load_dashboard_summary').on('click', function() {

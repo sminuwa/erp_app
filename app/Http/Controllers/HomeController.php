@@ -37,87 +37,346 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
+    // public function index()
+    // {
+
+
+    //     $today_date = date('Y-m-d');
+    //     $user = Auth::user();
+    //     $user_sales_per_branch = Order::select(DB::raw('SUM(total) AS total'), 'name')->distinct()
+    //         ->join('users', 'users.id', 'orders.sold_by')
+    //         ->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'orders.status' => 1])->whereDate('orders.order_date', $today_date);
+    //     if ($user->hasRole('Sales-Manager'))
+    //         $user_sales_per_branch = $user_sales_per_branch->where('sold_by', $user->id);
+    //     $user_sales_per_branch = $user_sales_per_branch->groupBy('sold_by')->get();
+    //     //Yotal Cash Sales
+    //     $today = Order::whereDate('order_date', $today_date)->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'status' => 1])->get();
+    //     $yesterday = Order::whereDate('order_date', date('Y-m-d', strtotime('-1 day')))->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'orders.status' => 1])->get();
+
+    //     $month_date = date('m');
+    //     $month = Order::distinct()->whereMonth('order_date', $month_date)->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'status' => 1])->get();
+    //     $previous_month = Order::whereMonth('order_date', date('m', strtotime('-1 month')))->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'orders.status' => 1])->get();
+
+    //     $year_date = date('Y');
+    //     $year = Order::distinct()->whereYear('order_date', $year_date)->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'status' => 1])->get();
+    //     $previous_year = Order::whereYear('order_date', date('Y', strtotime('-1 year')))->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'orders.status' => 1])->get();
+    //      $sales = Order::where([
+    //         'orders.branch_id' => User::userBranchAction(),
+    //         'orders.status' => 1
+    //      ])->get();
+    //     $sales_data = Order::where([
+    //         'orders.branch_id' => User::userBranchAction(),
+    //         'orders.status' => 1
+    //     ])
+    //         ->whereYear('orders.created_at', date('Y'))
+    //         ->selectRaw("MONTH(created_at) as month, SUM(total) as total")
+    //         ->groupBy('month')
+    //         ->pluck('total', 'month');
+
+    //     $sale_months = [];
+    //     $sale_amounts = [];
+
+    //     for ($i = 1; $i <= 12; $i++) {
+    //         $sale_months[] = date('F', mktime(0, 0, 0, $i, 1));
+    //         $sale_amounts[] = isset($sales_data[$i]) ? (float) $sales_data[$i] : 0;
+    //     }
+
+    //     //Total Credit Sales
+    //     $today_due = Order::whereDate('order_date', $today_date)->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Credit', 'status' => 1])->where('due', '>', 0)->get();
+    //     $yesterday_due = Order::whereDate('order_date', date('Y-m-d', strtotime('-1 day')))->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Credit', 'orders.status' => 1])->where('due', '>', 0)->get();
+
+
+    //     $month_due = Order::distinct()->whereMonth('order_date', $month_date)->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Credit', 'status' => 1])->where('due', '>', 0)->get();
+    //     $previous_month_due = Order::whereMonth('order_date', date('m', strtotime('-1 month')))->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Credit', 'orders.status' => 1])->where('due', '>', 0)->get();
+
+
+    //     $year_due = Order::distinct()->whereYear('order_date', $year_date)->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Credit', 'status' => 1])->where('due', '>', 0)->get();
+    //     $previous_year_due = Order::whereYear('order_date', date('Y', strtotime('-1 year')))->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Credit', 'orders.status' => 1])->where('due', '>', 0)->get();
+
+    //     $sales_due = Order::where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Credit', 'orders.status' => 1])->where('due', '>', 0)->get();
+
+    //     $today_expenses = DB::table('general_account_ledgers')
+    //         ->join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+    //         ->where('general_account_ledgers.model_name', 'GeneralAccount')
+    //         ->where('general_account_ledgers.branch_id', User::userBranchAction())
+    //         ->whereBetween('general_accounts.class', ['C51', 'C63'])
+    //         ->whereDate('general_account_ledgers.date', $today_date)
+    //         ->get();
+
+    //     $yesterday_expenses = DB::table('general_account_ledgers')
+    //         ->join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+    //         ->where('general_account_ledgers.model_name', 'GeneralAccount')
+    //         ->where('general_account_ledgers.branch_id', User::userBranchAction())
+    //         ->whereBetween('general_accounts.class', ['C51', 'C63'])
+    //         ->whereDate('general_account_ledgers.date', date('Y-m-d', strtotime('-1 day')))
+    //         ->get();
+
+    //     $month_expenses = DB::table('general_account_ledgers')
+    //         ->join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+    //         ->where('general_account_ledgers.model_name', 'GeneralAccount')
+    //         ->where('general_account_ledgers.branch_id', User::userBranchAction())
+    //         ->whereBetween('general_accounts.class', ['C51', 'C63'])
+    //         ->whereMonth('general_account_ledgers.date', $month_date)
+    //         ->whereYear('general_account_ledgers.date', $year_date)
+    //         ->get();
+    //     $monthly_expenses = DB::table('general_account_ledgers')
+    //         ->join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+    //         ->where('general_account_ledgers.model_name', 'GeneralAccount')
+    //         ->where('general_account_ledgers.branch_id', User::userBranchAction())
+    //         ->whereBetween('general_accounts.class', ['C51', 'C63'])
+    //         ->whereYear('general_account_ledgers.date', date('Y'))
+    //         ->selectRaw("MONTH(general_account_ledgers.date) as month, SUM(debit) as total")
+    //         ->groupBy('month')
+    //         ->pluck('total', 'month');
+
+    //     $months = [];
+    //     $amounts = [];
+
+    //     for ($i = 1; $i <= 12; $i++) {
+    //         $months[] = date('F', mktime(0, 0, 0, $i, 1));
+    //         $amounts[] = isset($monthly_expenses[$i]) ? (float) $monthly_expenses[$i] : 0;
+    //     }
+
+    //     $previous_month_expenses = DB::table('general_account_ledgers')
+    //         ->join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+    //         ->where('general_account_ledgers.model_name', 'GeneralAccount')
+    //         ->where('general_account_ledgers.branch_id', User::userBranchAction())
+    //         ->whereBetween('general_accounts.class', ['C51', 'C63'])
+    //         ->whereYear('general_account_ledgers.date', $year_date)
+    //         ->whereMonth('general_account_ledgers.date', date('m', strtotime('-1 month')))
+    //         ->get();
+
+    //     $year_expenses = DB::table('general_account_ledgers')
+    //         ->join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+    //         ->where('general_account_ledgers.model_name', 'GeneralAccount')
+    //         ->where('general_account_ledgers.branch_id', User::userBranchAction())
+    //         ->whereBetween('general_accounts.class', ['C51', 'C63'])
+    //         ->whereYear('general_account_ledgers.date', $year_date)
+    //         ->get();
+
+
+    //     $previous_year_expenses = DB::table('general_account_ledgers')
+    //         ->join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+    //         ->where('general_account_ledgers.model_name', 'GeneralAccount')
+    //         ->where('general_account_ledgers.branch_id', User::userBranchAction())
+    //         ->whereBetween('general_accounts.class', ['C51', 'C63'])
+    //         ->whereYear('general_account_ledgers.date', date('Y', strtotime('-1 year')))
+    //         ->get();
+
+    //     $expenses = DB::table('general_account_ledgers')
+    //         ->join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+    //         ->where('general_account_ledgers.model_name', 'GeneralAccount')
+    //         ->where('general_account_ledgers.branch_id', User::userBranchAction())
+    //         ->whereBetween('general_accounts.class', ['C51', 'C63'])
+    //         ->get();
+
+
+    //     // for charts
+    //     $current_sales = Order::select(
+    //         DB::raw('sum(total) as sums'),
+    //         DB::raw("DATE_FORMAT(order_date,'%m') as months"),
+    //         DB::raw("DATE_FORMAT(order_date,'%Y') as year")
+    //     )
+    //         ->whereYear('order_date', date('Y'))->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'orders.status' => 1])
+    //         ->groupBy('months', 'order_date')->get();
+
+    //     $current_expenses = DB::table('general_account_ledgers')
+    //         ->join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+    //         ->where('general_account_ledgers.model_name', 'GeneralAccount')
+    //         ->where('general_account_ledgers.branch_id', User::userBranchAction())
+    //         ->whereBetween('general_accounts.class', ['C51', 'C63'])
+    //         ->whereYear('general_account_ledgers.date', date('Y'))
+    //         ->select(
+    //             DB::raw('SUM(debit) as sums'),
+    //             DB::raw("DATE_FORMAT(general_account_ledgers.date,'%m') as months"),
+    //             DB::raw("DATE_FORMAT(general_account_ledgers.date,'%Y') as year")
+    //         )
+    //         ->groupBy('months', 'year')
+    //         ->get();
+
+    //     $companies = Company::orderBy('name')->get();
+    //     $branches = Branch::orderBy('name')->get();
+
+    //     $q_month = date('n'); // Numeric month (1-12)
+    //     $quarter = match (true) {
+    //         $q_month >= 1 && $q_month <= 3 => 'Q1',
+    //         $q_month >= 4 && $q_month <= 6 => 'Q2',
+    //         $q_month >= 7 && $q_month <= 9 => 'Q3',
+    //         default => 'Q4'
+    //     };
+
+    //     $today_budget = DB::table('budgets')
+    //         ->where('branch_id', auth()->user()->branch_id)
+    //         ->where('budget_year', date('Y'))
+    //         ->where('quarter', $quarter)
+    //         ->sum(DB::raw('IFNULL(month1, 0) + IFNULL(month2, 0) + IFNULL(month3, 0)'));
+
+    //     $month_budget = DB::table('budgets')
+    //         ->where('branch_id', auth()->user()->branch_id)
+    //         ->where('budget_year', date('Y'))
+    //         ->where('quarter', match (true) {
+    //             date('n') >= 1 && date('n') <= 3 => 'Q1',
+    //             date('n') >= 4 && date('n') <= 6 => 'Q2',
+    //             date('n') >= 7 && date('n') <= 9 => 'Q3',
+    //             default => 'Q4'
+    //         })
+    //         ->sum(DB::raw('IFNULL(month1, 0) + IFNULL(month2, 0) + IFNULL(month3, 0)'));
+
+    //     $year_budget = DB::table('budgets')
+    //         ->where('branch_id', auth()->user()->branch_id)
+    //         ->where('budget_year', date('Y'))
+    //         ->sum(DB::raw('IFNULL(month1, 0) + IFNULL(month2, 0) + IFNULL(month3, 0)'));
+
+
+    //     return view('home', compact(
+    //         'today',
+    //         'yesterday',
+    //         'month',
+    //         'previous_month',
+    //         'year',
+    //         'previous_year',
+    //         'sales',
+    //         'today_due',
+    //         'yesterday_due',
+    //         'month_due',
+    //         'previous_month_due',
+    //         'year_due',
+    //         'previous_year_due',
+    //         'sales_due',
+    //         'today_expenses',
+    //         'yesterday_expenses',
+    //         'month_expenses',
+    //         'previous_month_expenses',
+    //         'year_expenses',
+    //         'previous_year_expenses',
+    //         'expenses',
+    //         'current_sales',
+    //         'current_expenses',
+    //         'user_sales_per_branch',
+    //         'branches',
+    //         'companies',
+    //         'today_budget',
+    //         'month_budget',
+    //         'year_budget',
+    //         'months',
+    //         'amounts',
+    //         'sale_months',
+    //         'sale_amounts'
+    //     ));
+    // }
     public function index()
     {
-
-
         $today_date = date('Y-m-d');
-        $user = Auth::user();
-        $user_sales_per_branch = Order::select(DB::raw('SUM(total) AS total'), 'name')->distinct()
-            ->join('users', 'users.id', 'orders.sold_by')
-            ->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'orders.status' => 1])->whereDate('orders.order_date', $today_date);
-        if ($user->hasRole('Sales-Manager'))
-            $user_sales_per_branch = $user_sales_per_branch->where('sold_by', $user->id);
-        $user_sales_per_branch = $user_sales_per_branch->groupBy('sold_by')->get();
-        //Yotal Cash Sales
-        $today = Order::whereDate('order_date', $today_date)->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'status' => 1])->get();
-        $yesterday = Order::whereDate('order_date', date('Y-m-d', strtotime('-1 day')))->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'orders.status' => 1])->get();
-
         $month_date = date('m');
-        $month = Order::distinct()->whereMonth('order_date', $month_date)->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'status' => 1])->get();
-        $previous_month = Order::whereMonth('order_date', date('m', strtotime('-1 month')))->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'orders.status' => 1])->get();
-
         $year_date = date('Y');
-        $year = Order::distinct()->whereYear('order_date', $year_date)->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'status' => 1])->get();
-        $previous_year = Order::whereYear('order_date', date('Y', strtotime('-1 year')))->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'orders.status' => 1])->get();
+        $branchId = User::userBranchAction();
+        $user = Auth::user();
 
-        $sales = Order::where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'orders.status' => 1])->get();
+        // Sales data
+        $salesQuery = Order::where('orders.branch_id', $branchId)
+            ->where('orders.status', 1);
 
-        //Total Credit Sales
-        $today_due = Order::whereDate('order_date', $today_date)->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Credit', 'status' => 1])->where('due', '>', 0)->get();
-        $yesterday_due = Order::whereDate('order_date', date('Y-m-d', strtotime('-1 day')))->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Credit', 'orders.status' => 1])->where('due', '>', 0)->get();
+        $today = (clone $salesQuery)->whereDate('order_date', $today_date)->where('payment_mode', 'Cash')->get();
+        $yesterday = (clone $salesQuery)->whereDate('order_date', date('Y-m-d', strtotime('-1 day')))->where('payment_mode', 'Cash')->get();
+        $month = (clone $salesQuery)->whereMonth('order_date', $month_date)->where('payment_mode', 'Cash')->get();
+        $previous_month = (clone $salesQuery)->whereMonth('order_date', date('m', strtotime('-1 month')))->where('payment_mode', 'Cash')->get();
+        $year = (clone $salesQuery)->whereYear('order_date', $year_date)->where('payment_mode', 'Cash')->get();
+        $previous_year = (clone $salesQuery)->whereYear('order_date', date('Y', strtotime('-1 year')))->where('payment_mode', 'Cash')->get();
+        $sales = (clone $salesQuery)->get();
 
+        $sales_data = (clone $salesQuery)->whereYear('created_at', $year_date)
+            ->selectRaw("MONTH(created_at) as month, SUM(total) as total")
+            ->groupBy('month')
+            ->pluck('total', 'month');
 
-        $month_due = Order::distinct()->whereMonth('order_date', $month_date)->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Credit', 'status' => 1])->where('due', '>', 0)->get();
-        $previous_month_due = Order::whereMonth('order_date', date('m', strtotime('-1 month')))->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Credit', 'orders.status' => 1])->where('due', '>', 0)->get();
+        $sale_months = [];
+        $sale_amounts = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $sale_months[] = date('F', mktime(0, 0, 0, $i, 1));
+            $sale_amounts[] = isset($sales_data[$i]) ? (float) $sales_data[$i] : 0;
+        }
 
+        // Credit Sales Due
+        $dueQuery = (clone $salesQuery)->where('payment_mode', 'Credit')->where('due', '>', 0);
+        $today_due = (clone $dueQuery)->whereDate('order_date', $today_date)->get();
+        $yesterday_due = (clone $dueQuery)->whereDate('order_date', date('Y-m-d', strtotime('-1 day')))->get();
+        $month_due = (clone $dueQuery)->whereMonth('order_date', $month_date)->get();
+        $previous_month_due = (clone $dueQuery)->whereMonth('order_date', date('m', strtotime('-1 month')))->get();
+        $year_due = (clone $dueQuery)->whereYear('order_date', $year_date)->get();
+        $previous_year_due = (clone $dueQuery)->whereYear('order_date', date('Y', strtotime('-1 year')))->get();
+        $sales_due = $dueQuery->get();
 
-        $year_due = Order::distinct()->whereYear('order_date', $year_date)->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Credit', 'status' => 1])->where('due', '>', 0)->get();
-        $previous_year_due = Order::whereYear('order_date', date('Y', strtotime('-1 year')))->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Credit', 'orders.status' => 1])->where('due', '>', 0)->get();
+        // User sales per branch
+        $user_sales_per_branch = Order::select(DB::raw('SUM(total) AS total'), 'name')
+            ->join('users', 'users.id', 'orders.sold_by')
+            ->where('orders.branch_id', $branchId)
+            ->where('payment_mode', 'Cash')
+            ->where('orders.status', 1)
+            ->whereDate('orders.order_date', $today_date);
+        if ($user->hasRole('Sales-Manager')) {
+            $user_sales_per_branch = $user_sales_per_branch->where('sold_by', $user->id);
+        }
+        $user_sales_per_branch = $user_sales_per_branch->groupBy('sold_by')->get();
 
-        $sales_due = Order::where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Credit', 'orders.status' => 1])->where('due', '>', 0)->get();
+        // Expenses
+        $expensesQuery = DB::table('general_account_ledgers')
+            ->join('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
+            ->where('general_account_ledgers.model_name', 'GeneralAccount')
+            ->where('general_account_ledgers.branch_id', $branchId)
+            ->whereBetween('general_accounts.class', ['C51', 'C63']);
 
-        $today_expenses = Expense::join('bank_accounts', 'bank_accounts.id', 'expenses.bank_account_id')
-            ->where(['bank_accounts.branch_id' => User::userBranchAction()])->whereDate('expenses.date', $today_date)->get();
-        $yesterday_expenses = Expense::join('bank_accounts', 'bank_accounts.id', 'expenses.bank_account_id')
-            ->where(['bank_accounts.branch_id' => User::userBranchAction()])->whereDate('expenses.date', date('Y-m-d', strtotime('-1 day')))->get();
+        $today_expenses = (clone $expensesQuery)->whereDate('general_account_ledgers.date', $today_date)->get();
+        $yesterday_expenses = (clone $expensesQuery)->whereDate('general_account_ledgers.date', date('Y-m-d', strtotime('-1 day')))->get();
+        $month_expenses = (clone $expensesQuery)->whereMonth('general_account_ledgers.date', $month_date)->whereYear('general_account_ledgers.date', $year_date)->get();
+        $previous_month_expenses = (clone $expensesQuery)->whereMonth('general_account_ledgers.date', date('m', strtotime('-1 month')))->whereYear('general_account_ledgers.date', $year_date)->get();
+        $year_expenses = (clone $expensesQuery)->whereYear('general_account_ledgers.date', $year_date)->get();
+        $previous_year_expenses = (clone $expensesQuery)->whereYear('general_account_ledgers.date', date('Y', strtotime('-1 year')))->get();
+        $expenses = $expensesQuery->get();
 
-        $month_expenses = Expense::join('bank_accounts', 'bank_accounts.id', 'expenses.bank_account_id')
-            ->where(['bank_accounts.branch_id' => User::userBranchAction()])->whereMonth('expenses.date', $month_date)->get();
-        $previous_month_expenses = Expense::join('bank_accounts', 'bank_accounts.id', 'expenses.bank_account_id')
-            ->where(['bank_accounts.branch_id' => User::userBranchAction()])->whereMonth('expenses.date', date('m', strtotime('-1 month')))->get();
+        // Expense Budgets
+        $expense_budgets = DB::table('budget_expenditures')
+            ->where('branch_id', $branchId)
+            ->where('budget_year', $year_date)
+            ->select(DB::raw('SUM(proposed_budget) as total'))
+            ->value('total');
 
-        $year_expenses = Expense::join('bank_accounts', 'bank_accounts.id', 'expenses.bank_account_id')
-            ->where(['bank_accounts.branch_id' => User::userBranchAction()])->whereYear('expenses.date', $year_date)->get();
-        $previous_year_expenses = Expense::join('bank_accounts', 'bank_accounts.id', 'expenses.bank_account_id')
-            ->where(['bank_accounts.branch_id' => User::userBranchAction()])->whereYear('expenses.date', date('Y', strtotime('-1 year')))->get();
+        // Charts
+        $monthly_expenses = (clone $expensesQuery)
+            ->whereYear('general_account_ledgers.date', $year_date)
+            ->selectRaw("MONTH(general_account_ledgers.date) as month, SUM(debit) as total")
+            ->groupBy('month')
+            ->pluck('total', 'month');
 
-        $expenses = Expense::join('bank_accounts', 'bank_accounts.id', 'expenses.bank_account_id')
-            ->where(['bank_accounts.branch_id' => User::userBranchAction()])->get();
+        $months = [];
+        $amounts = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $months[] = date('F', mktime(0, 0, 0, $i, 1));
+            $amounts[] = isset($monthly_expenses[$i]) ? (float) $monthly_expenses[$i] : 0;
+        }
 
-        // for charts
-        $current_sales = Order::select(
-            DB::raw('sum(total) as sums'),
-            DB::raw("DATE_FORMAT(order_date,'%m') as months"),
-            DB::raw("DATE_FORMAT(order_date,'%Y') as year")
-        )
-            ->whereYear('order_date', date('Y'))->where(['orders.branch_id' => User::userBranchAction(), 'payment_mode' => 'Cash', 'orders.status' => 1])
-            ->groupBy('months', 'order_date')->get();
+        $current_sales = (clone $salesQuery)
+            ->select(
+                DB::raw('sum(total) as sums'),
+                DB::raw("DATE_FORMAT(order_date,'%m') as months"),
+                DB::raw("DATE_FORMAT(order_date,'%Y') as year")
+            )
+            ->where('payment_mode', 'Cash')
+            ->groupBy('months', 'order_date')
+            ->get();
 
-        $current_expenses = Expense::select(
-            DB::raw('sum(amount) as sums'),
-            DB::raw("DATE_FORMAT(expenses.date,'%m') as months"),
-            DB::raw("DATE_FORMAT(expenses.date,'%Y') as year")
-        )
-            ->join('bank_accounts', 'bank_accounts.id', 'expenses.bank_account_id')
-            ->where(['bank_accounts.branch_id' => User::userBranchAction()])
-            ->whereYear('expenses.date', date('Y'))
-            ->groupBy('months', 'expenses.date')->get();
+        $current_expenses = (clone $expensesQuery)
+            ->select(
+                DB::raw('SUM(debit) as sums'),
+                DB::raw("DATE_FORMAT(general_account_ledgers.date,'%m') as months"),
+                DB::raw("DATE_FORMAT(general_account_ledgers.date,'%Y') as year")
+            )
+            ->groupBy('months', 'year')
+            ->get();
 
         $companies = Company::orderBy('name')->get();
         $branches = Branch::orderBy('name')->get();
 
-        $q_month = date('n'); // Numeric month (1-12)
+        $q_month = date('n');
         $quarter = match (true) {
             $q_month >= 1 && $q_month <= 3 => 'Q1',
             $q_month >= 4 && $q_month <= 6 => 'Q2',
@@ -126,27 +385,21 @@ class HomeController extends Controller
         };
 
         $today_budget = DB::table('budgets')
-            ->where('branch_id', auth()->user()->branch_id)
-            ->where('budget_year', date('Y'))
+            ->where('branch_id', $branchId)
+            ->where('budget_year', $year_date)
             ->where('quarter', $quarter)
             ->sum(DB::raw('IFNULL(month1, 0) + IFNULL(month2, 0) + IFNULL(month3, 0)'));
 
         $month_budget = DB::table('budgets')
-            ->where('branch_id', auth()->user()->branch_id)
-            ->where('budget_year', date('Y'))
-            ->where('quarter', match (true) {
-                date('n') >= 1 && date('n') <= 3 => 'Q1',
-                date('n') >= 4 && date('n') <= 6 => 'Q2',
-                date('n') >= 7 && date('n') <= 9 => 'Q3',
-                default => 'Q4'
-            })
+            ->where('branch_id', $branchId)
+            ->where('budget_year', $year_date)
+            ->where('quarter', $quarter)
             ->sum(DB::raw('IFNULL(month1, 0) + IFNULL(month2, 0) + IFNULL(month3, 0)'));
 
         $year_budget = DB::table('budgets')
-            ->where('branch_id', auth()->user()->branch_id)
-            ->where('budget_year', date('Y'))
+            ->where('branch_id', $branchId)
+            ->where('budget_year', $year_date)
             ->sum(DB::raw('IFNULL(month1, 0) + IFNULL(month2, 0) + IFNULL(month3, 0)'));
-
 
         return view('home', compact(
             'today',
@@ -177,15 +430,15 @@ class HomeController extends Controller
             'companies',
             'today_budget',
             'month_budget',
-            'year_budget'
+            'year_budget',
+            'expense_budgets',
+            'months',
+            'amounts',
+            'sale_months',
+            'sale_amounts'
         ));
-        // return view('home', compact(
-
-        //     'user_sales_per_branch',
-        //     'branches',
-        //     'companies'
-        // ));
     }
+
 
     public function sampleReport()
     {

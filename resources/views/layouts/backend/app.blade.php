@@ -15,11 +15,11 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
     <!-- IonIcons -->
-{{--    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">--}}
+    {{--    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"> --}}
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('assets/backend/css/adminlte.min.css') }}">
     <!-- Google Font: Source Sans Pro -->
-{{--    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">--}}
+    {{--    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet"> --}}
 
     <link rel="stylesheet" href="{{ asset('assets/backend/css/toastr.min.css') }}">
 
@@ -28,33 +28,35 @@
     <link rel="stylesheet" href="{{ asset('assets/backend/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/backend/css/select2-bootstrap.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datepicker/datepicker3.css') }}">
-   <link href="{{ asset('assets/backend/DataTables/datatables.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/backend/DataTables/datatables.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/datepicker/jquery.datetimepicker.css') }}">
     <link rel="stylesheet" href="{{ asset('commons/css/custom-style.css') }}">
     <link rel="stylesheet" href="{{ asset('commons/css/custom-table.css') }}">
 
     <style>
-        .floating-label{
-            position:absolute;
-            left:10px;
-            top:6px;
+        .floating-label {
+            position: absolute;
+            left: 10px;
+            top: 6px;
             padding: 0 4px;
             color: #9b9b9b;
             background: #ffffff;
             transition: all 0.2s ease;
             pointer-events: none;
             font-weight: lighter !important;
-            z-index:3;
+            z-index: 3;
         }
+
         input:not(:placeholder-shown)~.floating-label,
         select:not(:placeholder-shown)~.floating-label,
         textarea:not(:placeholder-shown)~.floating-label,
         input:focus~.floating-label,
         textarea:focus~.floating-label,
         select:focus~.floating-label {
-            top:-10px;
-            font-size:13px
+            top: -10px;
+            font-size: 13px
         }
+
         .datepicker {
             padding: .375rem .75rem;
         }
@@ -112,10 +114,10 @@
     <script src="{{ asset('assets/backend/js/jquery-ui.js') }}"></script>
     <script src="{{ asset('assets/backend/js/select2.full.js') }}"></script>
     <script src="{{ asset('assets/backend/plugins/datepicker/bootstrap-datepicker.js') }}"></script>
-    {{--<script src="{{ asset('assets/backend/plugins/datepicker/datepicker-bootstrap.min.js') }}"></script> --}}
+    {{-- <script src="{{ asset('assets/backend/plugins/datepicker/datepicker-bootstrap.min.js') }}"></script> --}}
     <script src="{{ asset('assets/backend/plugins/datepicker/moment-with-locales.js') }}"></script>
     <script src="{{ asset('assets/backend/plugins/datepicker/jquery.datetimepicker.js') }}"></script>
-   <script src="{{ asset('assets/backend/DataTables/datatables.min.js') }}"></script>
+    <script src="{{ asset('assets/backend/DataTables/datatables.min.js') }}"></script>
 
     <script src="{{ asset('commons/js/custom-ajax.js') }}"></script>
 
@@ -174,14 +176,18 @@
         });
 
         var date = new Date();
-        date.setDate( date.getDate() - 2 );
+        date.setDate(date.getDate() - 2);
 
+        var startDate = '{{ $dateRangeStart ?? '' }}' ? new Date('{{ $dateRangeStart }}') : null;
+        var endDate = '{{ $dateRangeEnd ?? '' }}' ? new Date('{{ $dateRangeEnd }}') : null;
 
         $('.datepicker-entry').datepicker({
             autoclose: true,
             todayHighlight: true,
-            startDate: date,
+            startDate: startDate,
+            endDate: endDate,
         });
+
 
         $('.datepicker').datepicker({
             autoclose: true,
@@ -203,39 +209,37 @@
     </script>
 
     <script>
-
-        function ajax_loading(url, type, result_div, data ){
+        function ajax_loading(url, type, result_div, data) {
             $.ajax({
                 url: url,
-                type : type,
-                data : data,
-                beforeSend: function(){
-                    $('.'+result_div).html('<?php echo spinner(); ?>')
+                type: type,
+                data: data,
+                beforeSend: function() {
+                    $('.' + result_div).html('<?php echo spinner(); ?>')
                 },
-                success: function(response){
+                success: function(response) {
                     //TODO::remove console
                     console.log(response)
-                    $('.'+result_div).html(response)
+                    $('.' + result_div).html(response)
                 }
             })
         }
 
 
-        function loadDataTable(){
+        function loadDataTable() {
             $('.display').DataTable({
                 dom: 'Bfrtip',
                 "responsive": true,
                 "ordering": true,
                 lengthMenu: [25, 50, 75, 100],
                 pageLength: 100,
-                buttons: [
-                    {
+                buttons: [{
                         extend: 'copyHtml5',
                     },
-                    
+
                     {
                         extend: 'excelHtml5',
-                    },{
+                    }, {
                         extend: 'pdfHtml5',
                         orientation: 'landscape',
                         pageSize: 'LEGAL',

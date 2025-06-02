@@ -87,7 +87,11 @@
                     <a href="{{ route('users.index') }}" class="dropdown-item">
                         <i class="ion-ios-personadd"></i> Manage Users
                     </a>
+                    <a href="{{ route('admin.period.index') }}" class="dropdown-item">
+                        <i class="ion-ios-personadd"></i> Opening/Closing Entry
+                    </a>
                 @endcan
+
                 @can('notification')
                     <a href="{{ route('notification') }}" class="dropdown-item">
                         <i class=""></i> Notification

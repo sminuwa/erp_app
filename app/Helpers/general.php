@@ -483,3 +483,24 @@ if (!function_exists('amountFromJournalItems')) {
         return $result ? (float) $result->amount : 0;
     }
 }
+if (!function_exists('formatPhoneNumber')) {
+    function formatPhoneNumber($phone, $countryCode = '234')
+    {
+        // Remove all non-digit characters
+        $digits = preg_replace('/\D/', '', $phone);
+
+        // If it starts with '0', replace with country code
+        if (Str::startsWith($digits, '0')) {
+            return $countryCode . substr($digits, 1);
+        }
+
+        // If it already starts with country code and is 13+ digits, return as is
+        if (Str::startsWith($digits, $countryCode)) {
+            return $digits;
+        }
+
+        // If not sure, assume it needs country code prepended
+        return $countryCode . $digits;
+    }
+}
+

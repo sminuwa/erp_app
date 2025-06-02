@@ -104,9 +104,67 @@
                     </tr>
                 </tbody>
             </table>
-
+            <div class="row">
+                <div class="col-md-12">
+                    @if (!empty($actual_cost_table))
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Actual Cost Per Product</h4>
+                            </div>
+                            <div class="card-body table-responsive">
+                                <table class="table table-bordered table-striped" style="font-size: 12px;">
+                                    <thead>
+                                        <tr>
+                                            <th>S/N</th>
+                                            <th>Code</th>
+                                            <th>Product</th>
+                                            <th>Unit</th>
+                                            <th>Qty</th>
+                                            <th>Unit Price (₦)</th>
+                                            <th>+ Additional Cost (₦)</th>
+                                            <th>Actual Unit Cost (₦)</th>
+                                            <th>Total Cost (₦)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($actual_cost_table as $index => $row)
+                                            <tr>
+                                                <td>{{ $index + 1 }}</td>
+                                                <td>{{ $row['code'] }}</td>
+                                                <td>{{ $row['name'] }}</td>
+                                                <td>{{ $row['unit'] }}</td>
+                                                <td>{{ $row['quantity'] }}</td>
+                                                <td style="text-align:right">{{ number_format($row['unit_price'], 2) }}
+                                                </td>
+                                                <td style="text-align:right">
+                                                    {{ number_format($row['allocated_additional_cost'], 2) }}</td>
+                                                <td style="text-align:right">
+                                                    {{ number_format($row['actual_unit_cost'], 2) }}</td>
+                                                <td style="text-align:right">
+                                                    {{ number_format($row['actual_total_cost'], 2) }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="6" style="text-align:right">Total</th>
+                                            <th style="text-align:right">
+                                                {{ number_format(collect($actual_cost_table)->sum('allocated_additional_cost'), 2) }}
+                                            </th>
+                                            <th></th>
+                                            <th style="text-align:right">
+                                                {{ number_format(collect($actual_cost_table)->sum('actual_total_cost'), 2) }}
+                                            </th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            </div>
             <p><strong>Amount in Words:</strong> {{ $utility->convertNumberToWords($total) }} Naira</p>
-            <br/>
+            <br />
             <!-- Signatures -->
             <div class="signature-box">
                 <div>Authorized Signature</div>
@@ -114,7 +172,7 @@
             </div>
 
             <p>Created By: {{ $purchase->createdBy->name }}</p>
-            <p>Posted By: {{ $purchase->postedBy->name ?? ''}}</p>
+            <p>Posted By: {{ $purchase->postedBy->name ?? '' }}</p>
             <p>Printed On: {{ \Carbon\Carbon::now()->toFormattedDateString() }}</p>
         </div>
     </div>
@@ -123,4 +181,5 @@
         window.print();
     </script>
 </body>
+
 </html>

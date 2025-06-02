@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 ALTER TABLE `permissions` ADD COLUMN `description` VARCHAR(255) NULL AFTER `name`;
 ALTER TABLE `permissions` ADD COLUMN `active` Tinyint(1) NULL AFTER `description` default 1;
 ALTER TABLE `permissions` ADD COLUMN `active` TINYINT(1) NULL AFTER `description` DEFAULT 1;
@@ -739,10 +740,20 @@ CREATE TABLE `ro_budgets` (
   `month2` decimal(10,2) DEFAULT NULL,
   `month3` decimal(10,2) DEFAULT NULL,
   `total` decimal(10,2) DEFAULT NULL,
+=======
+
+CREATE TABLE `budget_expenditures` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `branch_id` bigint(20) DEFAULT NULL,
+  `general_account_id` bigint(20) DEFAULT NULL,
+  `budget_year` year(4) NOT NULL,
+  `proposed_budget` decimal(10,2) DEFAULT NULL,
+>>>>>>> 3f7aca758032941924e613223548a6cd74d15819
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `branch_id` (`branch_id`),
+<<<<<<< HEAD
   KEY `category_id` (`category_id`),
   KEY `ro_budgets_ibfk_1` (`staff_id`),
   KEY `budget_year` (`budget_year`,`quarter`,`month1`,`month2`,`month3`),
@@ -787,3 +798,17 @@ CREATE TABLE `jobs` (
 =======
 ALTER TABLE `budgets` ADD COLUMN `proposed_budget` DECIMAL(10,2) NULL AFTER `budget_year`; 
 >>>>>>> 8c5ad994c309b12f6d03c73599576b0210edde52
+=======
+  KEY `category_id` (`general_account_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1239 DEFAULT CHARSET=latin1;
+
+ALTER TABLE users ADD COLUMN date_range_start DATE, ADD COLUMN date_range_end DATE;
+
+CREATE TABLE `period_settings` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `period_open` DATE NULL,
+    `period_close` DATE NULL,
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+>>>>>>> 3f7aca758032941924e613223548a6cd74d15819

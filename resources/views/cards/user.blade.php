@@ -44,20 +44,32 @@
                     <td>{{ $record->active = 1 ? 'Yes' : 'No' }}</td>
                 </tr>
                 <tr>
+                    <th>Entry Date Settings</th>
+                    <td style="color:brown;font-weight: 800;">{{ Carbon\Carbon::parse($record->date_range_start)->toFormattedDateString() }} to
+                        {{ Carbon\Carbon::parse($record->date_range_end)->toFormattedDateString() }}
+                        <a href="#" class="dropdown-item set-entry-date text-danger" data-user-id="{{ $record->id }}"
+                            data-user-name="{{ $record->name }}" data-date-start="{{ $record->date_range_start }}"
+                            data-date-end="{{ $record->date_range_end }}" data-toggle="modal"
+                            data-target="#dateRangeModal">
+                            <span class="fa fa-calendar-check-o"> Set Entry Date</span>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
                     <th>Branch</th>
                     <td>{{ optional($record->branch)->name ?? null }}</td>
                 </tr>
                 <tr>
                     <th>Role</th>
-                    <td>{{ is_null($record->getUserRole)?"":$record->getUserRole->role->name ?? null }}</td>
+                    <td>{{ is_null($record->getUserRole) ? '' : $record->getUserRole->role->name ?? null }}</td>
                 </tr>
             </tbody>
         </table>
     </div>
     <div class="card-block">
-        <form action="{{ route('user.store.role',$record->id) }}" method="POST">
+        <form action="{{ route('user.store.role', $record->id) }}" method="POST">
             @csrf
-            <input type="hidden" name="model_id" value="{{ $record->id }}"/>
+            <input type="hidden" name="model_id" value="{{ $record->id }}" />
             <div class="row">
                 <div class="col-sm-4">
                     <label for="role_id">Role</label>
@@ -73,14 +85,13 @@
                     </select>
                 </div>
                 <div class="col-sm-4">
-                    <input type="radio" name="status" value="1">Assign &nbsp;&nbsp;<input type="radio" name="status"
-                        value="0">Revoke
+                    <input type="radio" name="status" value="1">Assign &nbsp;&nbsp;<input type="radio"
+                        name="status" value="0">Revoke
                 </div>
                 <div class="col-sm-4">
-                    <input type="submit" name="submit" value="Save" class="btn btn-primary"/>
+                    <input type="submit" name="submit" value="Save" class="btn btn-primary" />
                 </div>
             </div>
         </form>
     </div>
 </div>
-

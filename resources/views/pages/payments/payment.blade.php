@@ -50,8 +50,8 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-6">
-                                    @can('payments.search')
+                                <div class="col-md-6 mt-2">
+                                    {{-- @can('payments.search') --}}
                                         <form action="{{ route('payment.search') }}" method="POST">
                                             @csrf
                                             <div class="input-group">
@@ -61,13 +61,13 @@
                                                 <button type="submit" class="btn btn-outline-primary">search</button>
                                             </div>
                                         </form>
-                                    @endcan
+                                    {{-- @endcan --}}
                                 </div>
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body table-responsive">
                                 <table id="example1"
-                                    class="table table-bordered table-striped text-left table-responsive-xl">
+                                    class="table table-bordered table-striped text-left table-responsive-xl ">
                                     <thead>
                                         <tr>
                                             <th>Date</th>

@@ -37,7 +37,7 @@ class PaymentController extends Controller
         $payments = Payment::select('payments.*')
             ->where('branch_id', User::userBranchAction())
             ->where('receipt_no', 'LIKE', "%$search_value%")
-            ->orderBy('receipt_no', 'DESC')->take(10)->get();
+            ->orderBy('receipt_no', 'DESC')->take(100)->get();
         return view('pages.payments.payment', ['payments' => $payments]);
     }
     public function show(Payment $payment)
@@ -116,7 +116,7 @@ class PaymentController extends Controller
         return back();
     }
     public function post(Payment $payment)
-    {   
+    {
         if ($payment->status == 0) {
             $payment->status = 1;
             $payment->posted_by = auth()->id();
@@ -136,7 +136,13 @@ class PaymentController extends Controller
                     $action = "Made payment of $payment->amount for : " . $payment->receipt_no;
                     AuditLog::auditLog(auth()->id(), $action);
                     session()->flash('app_message', 'Payment generated successfully');
-                    //SMS::sendSms("2348030804973", "Testing testing, $payment->amount has been made paid to your account. Kindly confirm! Albabello Testing SMS", "", "promotional");
+                    $phone = null;
+                    if ($payment->model_name == "Customer")
+                        $phone = $payment->customer->phone;
+                    if ($payment->model_name == "Supplier")
+                        $phone = $payment->supplier->phone;
+                    if ($phone)
+                        SMS::sendSms(formatPhoneNumber($phone), "Testing testing, $payment->amount has been paid to your account. Kindly confirm! Albabello Testing SMS", "", "promotional");
                     DB::commit();
                 } else {
                     DB::rollBack();
@@ -159,7 +165,7 @@ class PaymentController extends Controller
         return view('pages.payments.print_payment', ['payment' => $payment, 'setting' => Setting::first(), 'papersize' => $papersize]);
     }
     public function printPoSPaymentReceipt(Payment $payment)
-    { 
+    {
         return view('pages.payments.print_pos_payment', ['payment' => $payment, 'setting' => Setting::first()]);
     }
     public function updatePayment(Request $request, Payment $ledger)

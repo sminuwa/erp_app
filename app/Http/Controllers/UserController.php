@@ -126,9 +126,9 @@ class UserController extends Controller
       * @return \Illuminate\Http\Response
       */
     public function update(Update $request, User $user)
-    { 
+    {
         $user->fill($request->all());
-        
+
         if ($user->save()) {
             $action = "Updated a user: " . $user->name;
             AuditLog::auditLog(Auth::id(), $action);
@@ -331,6 +331,26 @@ class UserController extends Controller
 
         // Return view with the user and branch data
         return view('pages.users.user_access_site', compact('user', 'companies', 'branches'));
+    }
+    public function updateDateRange(Request $request)
+    {
+        $user = User::findOrFail($request->user_id);
+        if ($request->has('reset_range')) {
+            $user->date_range_start = null;
+            $user->date_range_end = null;
+        } else {
+            $request->validate([
+                'date_range_start' => 'required|date',
+                'date_range_end' => 'required|date|after_or_equal:date_range_start',
+            ]);
+
+            $user->date_range_start = $request->date_range_start;
+            $user->date_range_end = $request->date_range_end;
+        }
+
+        $user->save();
+        session()->flash('app_message', 'Date range updated for ' . $user->name);
+        return redirect()->back();
     }
 
 }

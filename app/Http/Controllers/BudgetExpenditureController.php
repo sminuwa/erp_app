@@ -26,7 +26,8 @@ class BudgetExpenditureController extends Controller
     public function create()
     {
         $branches = Branch::all();
-        $accounts = GeneralAccount::all();
+        $accounts = GeneralAccount::whereBetween('class',['C51','C63'])
+        ->orderBy('number')->get();
         return view('pages.budgets.expenditures.create', compact('branches', 'accounts'));
     }
 
@@ -108,7 +109,8 @@ class BudgetExpenditureController extends Controller
     public function downloadTemplate()
     {
         $branches = Branch::whereNotNull('code')->get();
-        $accounts = GeneralAccount::where('status', 1)->get();
+        $accounts = GeneralAccount::where('status', 1)
+        ->whereBetween('class',['C51','C63'])->get();
 
         $spreadsheet = new Spreadsheet();
         $spreadsheet->removeSheetByIndex(0);

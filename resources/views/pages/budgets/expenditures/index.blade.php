@@ -41,6 +41,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Branch</th>
+                                    <th>Account Account</th>
                                     <th>Account</th>
                                     <th>Budget Year</th>
                                     <th>Amount</th>
@@ -52,7 +53,9 @@
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
                                         <td>{{ $budget->branch->name ?? '' }} ({{ $budget->branch->code ?? '' }})</td>
-                                        <td>{{ $budget->account->description ?? '' }} ({{ $budget->account->number ?? '' }})
+                                        <td>{{ $budget->account->number ?? '' }}
+                                        </td>
+                                        <td>{{ $budget->account->description ?? '' }}
                                         </td>
                                         <td>{{ $budget->budget_year }}</td>
                                         <td style="text-align: right;">{{ number_format($budget->proposed_budget, 2) }}</td>

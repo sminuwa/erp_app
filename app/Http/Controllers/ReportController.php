@@ -6567,6 +6567,8 @@ class ReportController extends Controller
     private function generalAccountLedgerBy($from_date, $to_date, $company_id, $branch_id, $type = null)
     {
         // Validate and format dates
+        // if(is_null($type)) 
+            // $type ='GeneralAccount';
         $from_date = $from_date ? date('Y-m-d', strtotime($from_date)) : null;
         $to_date = $to_date ? date('Y-m-d', strtotime($to_date)) : null;
 
@@ -6910,7 +6912,10 @@ class ReportController extends Controller
         $branch_id = $request->branch_id ?: '%';
         $payee_id = $request->payee_id ?: '%';
         $user_id = $request->user_id ?: '%';
-
+        $type = $request->type ?: '%';
+ 
+        // return $type;
+        
         $query = $this->generalAccountLedgerBy($from_date, $to_date, $company_id, $branch_id);
 
         $ledgers = $query->select(
@@ -6922,11 +6927,13 @@ class ReportController extends Controller
             'users.name AS user_name',
             'branches.name AS branch',
             'general_account_ledgers.date'
+            // 'general_account_ledgers.id as account_id'
         )
             ->join('users', 'users.id', '=', 'general_account_ledgers.user_id')
             ->leftJoin('general_accounts', 'general_accounts.id', '=', 'general_account_ledgers.model_id')
             ->where('general_account_ledgers.model_id', 'LIKE', $payee_id)
             ->where('general_account_ledgers.user_id', 'LIKE', $user_id)
+            ->where('general_account_ledgers.model_name', 'LIKE', $type)
             ->where(function ($q) {
                 $q->where('general_accounts.class', 'LIKE', 'A11%')
                     ->orWhere('general_accounts.class', 'LIKE', 'A12%')
@@ -6938,6 +6945,7 @@ class ReportController extends Controller
             ->havingRaw('SUM(general_account_ledgers.credit) > 0 OR SUM(general_account_ledgers.debit) > 0') // Only users with transactions
             ->get();
 
+        // return $ledgers;
         $credit_sum = $ledgers->sum('credit');
         $debit_sum = $ledgers->sum('debit');
         $balance = $credit_sum - $debit_sum;

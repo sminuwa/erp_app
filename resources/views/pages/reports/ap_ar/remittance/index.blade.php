@@ -171,27 +171,29 @@
 
             $('#remitForm').on('submit', function(e) {
                 e.preventDefault()
-                from_date = $('#from_date').val();
-                to_date = $('#to_date').val();
-                company_id = $('#company_id').val();
-                branch_id = $('#branch_id').val();
-                user_id = $('#user_id').val();
-                payee_id = $('#payer_id').val();
+                let from_date = $('#from_date').val();
+                let to_date = $('#to_date').val();
+                let company_id = $('#company_id').val();
+                let branch_id = $('#branch_id').val();
+                let user_id = $('#user_id').val();
+                let payee_id = $('#payer_id').val();
+                let type = $('#type').val();
 
                 $.ajax({
                     type: "GET",
                     url: "{{ route('ajax.load.remittance.report') }}",
                     data: {
                         _token: "{{ csrf_token() }}",
-                        from_date: from_date,
-                        to_date: to_date,
-                        company_id: company_id,
-                        branch_id: branch_id,
-                        user_id: user_id,
-                        payee_id: payee_id,
+                        from_date,
+                        to_date,
+                        company_id,
+                        branch_id,
+                        user_id,
+                        payee_id,
+                        type
                     }
                 }).done(function(data) {
-                    // console.log(data)
+                    console.log(data)
                     $("#load").html(data);
                     loadDataTable2()
                 });

@@ -220,10 +220,10 @@
                 <td>{{ $eq->number }}</td>
                 <td>{{ $eq->description }}</td>
                 <td style="text-align: right;">
-                    {{ $balance > 0 ? number_format($balance, 2) : '' }}
+                    {{ $balance < 0 ? number_format($balance, 2) : '' }}
                 </td>
                 <td style="text-align: right;">
-                    {{ $balance < 0 ? number_format(abs($balance), 2) : '' }}
+                    {{ $balance > 0 ? number_format(abs($balance), 2) : '' }}
                 </td>
             </tr>
         @endforeach

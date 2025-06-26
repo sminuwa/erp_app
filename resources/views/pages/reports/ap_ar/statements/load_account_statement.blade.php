@@ -5,7 +5,7 @@
     </div> --}}
 </div>
 <div class="table-responsive">
-    <table class="display table table-bordered caption">
+    <table class="display table table-bordered caption" data-ordering="false">
         <caption style="caption-size:top">
             <h5 style="text-align: center;">{{ strtoupper($branch->name ?? 'All Branches') }} <br>
                 ACCOUNT STATEMENTS BETWEEN {{ Carbon\carbon::parse($from_date)->toFormattedDateString() }} TO

@@ -5881,7 +5881,9 @@ class ReportController extends Controller
             ->whereIn(DB::raw('SUBSTR(general_accounts.number, 1, 1)'), ['R'])
             ->sum(DB::raw('credit - debit'));
 
-        $previous_expense = $this->generalAccountLedgerBy(null, $from_date, $company_id, $branch_id, 'GeneralAccount')
+        $previous_date = Carbon::parse($from_date)->subDay()->toDateString();
+
+        $previous_expense = $this->generalAccountLedgerBy(null, $previous_date, $company_id, $branch_id, 'GeneralAccount')
             ->whereIn(DB::raw('SUBSTR(general_accounts.number, 1, 1)'), ['C'])
             ->sum(DB::raw('debit - credit'));
 
@@ -6568,7 +6570,7 @@ class ReportController extends Controller
     {
         // Validate and format dates
         // if(is_null($type)) 
-            // $type ='GeneralAccount';
+        // $type ='GeneralAccount';
         $from_date = $from_date ? date('Y-m-d', strtotime($from_date)) : null;
         $to_date = $to_date ? date('Y-m-d', strtotime($to_date)) : null;
 
@@ -6913,9 +6915,9 @@ class ReportController extends Controller
         $payee_id = $request->payee_id ?: '%';
         $user_id = $request->user_id ?: '%';
         $type = $request->type ?: '%';
- 
+
         // return $type;
-        
+
         $query = $this->generalAccountLedgerBy($from_date, $to_date, $company_id, $branch_id);
 
         $ledgers = $query->select(

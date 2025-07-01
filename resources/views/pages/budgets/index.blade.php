@@ -45,7 +45,7 @@
                                 <h3 class="card-title">Budget List</h3>
                             </div>
                             <div class="card-body">
-                                <table class="display table table-bordered" id="record1">
+                                <table class="display table table-bordered">
                                     <thead>
                                         <tr>
                                             <th>Branch</th>

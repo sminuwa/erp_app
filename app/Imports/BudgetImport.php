@@ -40,7 +40,7 @@ class BudgetImport implements ToCollection
             $category = Category::firstOrCreate(['name' => trim($row[0])]);
 
             // Insert or update budget data
-            $total  = is_numeric($row[2]) ? $row[2] : 0 +is_numeric($row[3]) ? $row[3] : 0+is_numeric($row[4]) ? $row[4] : 0;
+            $total = (is_numeric($row[2]) ? $row[2] : 0) + (is_numeric($row[3]) ? $row[3] : 0) + (is_numeric($row[4]) ? $row[4] : 0);
             Budget::updateOrCreate(
                 [
                     'branch_id' => $branch->id,

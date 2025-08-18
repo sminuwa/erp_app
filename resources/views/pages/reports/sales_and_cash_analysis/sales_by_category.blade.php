@@ -30,7 +30,7 @@
 
         <!-- Main content -->
         <section class="content">
-            <div class="container">
+            <div class="container-fluid">
                 <div class="card">
                     <div class="card-header">
                         <h4>Sales Report - Group by Product or Category</h4>

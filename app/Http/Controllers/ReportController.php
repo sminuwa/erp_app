@@ -7870,7 +7870,8 @@ class ReportController extends Controller
                     's.code AS store_code',
                     'pp.updated_at AS last_received_date',
                     DB::raw('DATEDIFF(CURDATE(), pur.purchase_date) AS days_since_received'),
-                    DB::raw('(SELECT qty_available FROM store_products WHERE product_id = p.id AND store_id = s.id) AS available_quantity')
+                    DB::raw('(SELECT qty_available FROM store_products WHERE product_id = p.id AND store_id = s.id) AS available_quantity'),
+                    DB::raw('(SELECT bpp.cost_price FROM branch_product_prices bpp WHERE bpp.branch_id = s.branch_id AND bpp.product_id = p.id LIMIT 1) AS cost_price')
                 )
                 ->where('p.id', $storeProduct->product_id)
                 ->where('s.id', $storeProduct->store_id)
@@ -7891,7 +7892,8 @@ class ReportController extends Controller
                     's.code AS store_code',
                     'itr.updated_at AS last_received_date',
                     DB::raw('DATEDIFF(CURDATE(), itr.updated_at) AS days_since_received'),
-                    DB::raw('(SELECT qty_available FROM store_products WHERE product_id = p.id AND store_id = s.id) AS available_quantity')
+                    DB::raw('(SELECT qty_available FROM store_products WHERE product_id = p.id AND store_id = s.id) AS available_quantity'),
+                    DB::raw('(SELECT bpp.cost_price FROM branch_product_prices bpp WHERE bpp.branch_id = s.branch_id AND bpp.product_id = p.id LIMIT 1) AS cost_price')
                 )
                 ->where('p.id', $storeProduct->product_id)
                 ->where('s.id', $storeProduct->store_id)
@@ -7915,7 +7917,8 @@ class ReportController extends Controller
                     's.code AS store_code',
                     'sad.updated_at AS last_received_date',
                     DB::raw('DATEDIFF(CURDATE(), sad.updated_at) AS days_since_received'),
-                    DB::raw('(SELECT qty_available FROM store_products WHERE product_id = p.id AND store_id = s.id) AS available_quantity')
+                    DB::raw('(SELECT qty_available FROM store_products WHERE product_id = p.id AND store_id = s.id) AS available_quantity'),
+                    DB::raw('(SELECT bpp.cost_price FROM branch_product_prices bpp WHERE bpp.branch_id = s.branch_id AND bpp.product_id = p.id LIMIT 1) AS cost_price')
                 )
                 ->where('p.id', $storeProduct->product_id)
                 ->where('s.id', $storeProduct->store_id)
@@ -7954,7 +7957,8 @@ class ReportController extends Controller
                         's.code AS store_code',
                         DB::raw('NULL AS last_received_date'),
                         DB::raw('999 AS days_since_received'),
-                        'sp.qty_available AS available_quantity'
+                        'sp.qty_available AS available_quantity',
+                        DB::raw('(SELECT bpp.cost_price FROM branch_product_prices bpp WHERE bpp.branch_id = s.branch_id AND bpp.product_id = p.id LIMIT 1) AS cost_price')
                     )
                     ->where('p.id', $storeProduct->product_id)
                     ->where('s.id', $storeProduct->store_id)
@@ -8075,7 +8079,8 @@ class ReportController extends Controller
                     's.code AS store_code',
                     'od.updated_at AS last_sold_date',
                     DB::raw('DATEDIFF(CURDATE(), od.updated_at) AS days_since_sold'),
-                    DB::raw('(SELECT qty_available FROM store_products WHERE id = sp.id) AS available_quantity')
+                    DB::raw('(SELECT qty_available FROM store_products WHERE id = sp.id) AS available_quantity'),
+                    DB::raw('(SELECT bpp.cost_price FROM branch_product_prices bpp WHERE bpp.branch_id = s.branch_id AND bpp.product_id = p.id LIMIT 1) AS cost_price')
                 )
                 ->where('od.store_product_id', $storeProduct->store_product_id)
                 ->orderBy('od.updated_at', 'desc')
@@ -8096,7 +8101,8 @@ class ReportController extends Controller
                     's.code AS store_code',
                     'sad.updated_at AS last_sold_date',
                     DB::raw('DATEDIFF(CURDATE(), sad.updated_at) AS days_since_sold'),
-                    DB::raw('(SELECT qty_available FROM store_products WHERE product_id = p.id AND store_id = s.id) AS available_quantity')
+                    DB::raw('(SELECT qty_available FROM store_products WHERE product_id = p.id AND store_id = s.id) AS available_quantity'),
+                    DB::raw('(SELECT bpp.cost_price FROM branch_product_prices bpp WHERE bpp.branch_id = s.branch_id AND bpp.product_id = p.id LIMIT 1) AS cost_price')
                 )
                 ->where('sad.product_id', $storeProduct->product_id)
                 ->where('sad.store_id', $storeProduct->store_id)
@@ -8135,7 +8141,8 @@ class ReportController extends Controller
                         's.code AS store_code',
                         DB::raw('NULL AS last_sold_date'),
                         DB::raw('999 AS days_since_sold'),
-                        'sp.qty_available AS available_quantity'
+                        'sp.qty_available AS available_quantity',
+                        DB::raw('(SELECT bpp.cost_price FROM branch_product_prices bpp WHERE bpp.branch_id = s.branch_id AND bpp.product_id = p.id LIMIT 1) AS cost_price')
                     )
                     ->where('sp.id', $storeProduct->store_product_id)
                     ->first();

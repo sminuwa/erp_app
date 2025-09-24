@@ -187,6 +187,8 @@
                             <th>BRANCH</th>
                             <th>STORE</th>
                             <th>AVAILABLE QTY</th>
+                            <th>COST PRICE</th>
+                            <th>TOTAL COST</th>
                             <th>LAST DATE RECEIVED</th>
                             <th>DAYS</th>
                             <th>STATUS</th>
@@ -198,11 +200,17 @@
                     <tbody>
                         @php
                             $total_qty = 0;
+                            $total_value = 0;
                         @endphp
 
                         @foreach ($inventory as $item)
                             @php
                                 $total_qty += $item->available_quantity ?? 0;
+
+                                // Calculate cost and total value
+                                $cost_price = $item->cost_price ?? 0;
+                                $item_total_value = ($item->available_quantity ?? 0) * $cost_price;
+                                $total_value += $item_total_value;
 
                                 // Prepare received details
                                 $received_date = $item->last_received_date ?? 'Never';
@@ -221,6 +229,8 @@
                                 <td>{{ $item->branch_name }}</td>
                                 <td>{{ $item->store_name }} ({{ $item->store_code }})</td>
                                 <td style="text-align: right">{{ number_format($item->available_quantity, 2) }}</td>
+                                <td style="text-align: right">{{ number_format($cost_price, 2) }}</td>
+                                <td style="text-align: right">{{ number_format($item_total_value, 2) }}</td>
 
                                 {{-- Received --}}
                                 <td>
@@ -266,6 +276,8 @@
                         <tr style="font-weight: bold; background-color: #f5f5f5;">
                             <td colspan="4" style="text-align: right">TOTAL</td>
                             <td style="text-align: right">{{ number_format($total_qty, 2) }}</td>
+                            <td></td>
+                            <td style="text-align: right">{{ number_format($total_value, 2) }}</td>
                             <td colspan="6"></td>
                         </tr>
                     </tfoot>

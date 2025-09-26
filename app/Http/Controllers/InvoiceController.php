@@ -269,9 +269,12 @@ class InvoiceController extends Controller
 
                 //Transaction::sale($store_products, $customer_id, $reference, $order_date);
 
+                // Process selected receipts
+                $this->processSelectedReceipts($request, $invoice->id);
+
                 $action = "Made a sell of $invoice: $total";
                 AuditLog::auditLog(Auth::id(), $action);
-                
+
                 DB::commit();
             }
         } catch (\Exception $ex) {
@@ -915,10 +918,18 @@ class InvoiceController extends Controller
         if ($method == 'POST') {
             if ($invoice->status == 0) {
                 DB::beginTransaction();
-                if ($invoice->delete()) {
+                try {
+                    // Reverse receipt applications before deleting invoice
+                    $this->reverseReceiptApplications($invoice_id);
+
                     OrderDetail::where('order_id', $invoice_id)->delete();
+                    $invoice->delete();
+
                     session()->flash('app_message', 'Invoice deleted successfully!');
                     DB::commit();
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    session()->flash('app_error', 'Failed to delete invoice: ' . $e->getMessage());
                 }
             } else
                 session()->flash('app_error', 'Invoice cannot be deleted!');
@@ -927,5 +938,87 @@ class InvoiceController extends Controller
             DB::rollBack();
         }
         return redirect()->route('invoice.index');
+    }
+
+    /**
+     * Process selected receipts for invoice
+     */
+    private function processSelectedReceipts(Request $request, $order_id)
+    {
+        if (!$request->has('selected_receipts') || empty($request->selected_receipts)) {
+            return;
+        }
+
+        try {
+            $selectedReceipts = json_decode($request->selected_receipts, true);
+
+            if (!$selectedReceipts || !is_array($selectedReceipts)) {
+                return;
+            }
+
+            foreach ($selectedReceipts as $receiptData) {
+                $receiptId = $receiptData['receipt_id'];
+                $appliedAmount = $receiptData['applied_amount'];
+
+                if ($appliedAmount <= 0) {
+                    continue;
+                }
+
+                // Get the receipt
+                $receipt = \App\Models\Receipt::find($receiptId);
+                if (!$receipt || $receipt->status != 1) {
+                    continue; // Only process posted receipts
+                }
+
+                // Check if receipt has enough remaining balance
+                $currentRemainingBalance = $receipt->remaining_balance;
+                if ($appliedAmount > $currentRemainingBalance) {
+                    $appliedAmount = $currentRemainingBalance;
+                }
+
+                // Create the tracking record
+                \App\Models\OrderReceiptTracking::create([
+                    'order_id' => $order_id,
+                    'receipt_id' => $receiptId,
+                    'applied_amount' => $appliedAmount,
+                    'branch_id' => User::userBranchAction(),
+                    'applied_by' => auth()->id()
+                ]);
+
+                // Update receipt remaining balance
+                $receipt->remaining_balance = $currentRemainingBalance - $appliedAmount;
+                $receipt->save();
+            }
+        } catch (\Exception $e) {
+            // Log error but don't fail the invoice creation
+            \Illuminate\Support\Facades\Log::error('Error processing selected receipts: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Reverse receipt applications when invoice is deleted/cancelled
+     */
+    private function reverseReceiptApplications($order_id)
+    {
+        try {
+            // Get all receipt applications for this order
+            $receiptApplications = \App\Models\OrderReceiptTracking::where('order_id', $order_id)->get();
+
+            foreach ($receiptApplications as $application) {
+                // Get the receipt
+                $receipt = \App\Models\Receipt::find($application->receipt_id);
+                if ($receipt) {
+                    // Restore the applied amount to the receipt's remaining balance
+                    $receipt->remaining_balance = $receipt->remaining_balance + $application->applied_amount;
+                    $receipt->save();
+                }
+
+                // Delete the tracking record
+                $application->delete();
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error reversing receipt applications: ' . $e->getMessage());
+            throw $e; // Re-throw to ensure transaction rollback
+        }
     }
 }

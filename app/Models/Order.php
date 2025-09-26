@@ -74,6 +74,32 @@ class Order extends Model
         return $this->hasMany(CreditNote::class, 'order_id');
     }
 
+    /**
+     * Get the receipt trackings for this order
+     */
+    public function orderReceiptTrackings()
+    {
+        return $this->hasMany(OrderReceiptTracking::class);
+    }
+
+    /**
+     * Get the applied receipts for this order
+     */
+    public function appliedReceipts()
+    {
+        return $this->belongsToMany(Receipt::class, 'order_receipt_trackings')
+            ->withPivot('applied_amount', 'applied_by', 'branch_id')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get total amount covered by receipts
+     */
+    public function getTotalReceiptCoverage()
+    {
+        return $this->orderReceiptTrackings()->sum('applied_amount');
+    }
+
     /*public function scope*/
 
 }

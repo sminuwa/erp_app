@@ -56,7 +56,7 @@ class ReceiptController extends Controller
         $bank_account_id = $request->account_id;
         $date = $request->payment_date;
         $ym = Carbon::parse($date)->format('ym');
-        $reference_no = Receipt::generateNewNumber('RCT', 4, $ym);
+        $reference_no = Receipt::generateNewNumber($ym, 'RCT', 4);
         $description = $request->payment_ref;
         $user_branch = User::userBranchAction();
         $status = false;

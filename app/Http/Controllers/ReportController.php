@@ -2338,9 +2338,9 @@ class ReportController extends Controller
             foreach ($salesByOfficer as $record) {
                 $key = $record->branch_id . '-' . ($record->category_id ?? 0);
                 $budget = $budgetMap[$key] ?? null;
-                $record->budget_amount = $budget->total_budget ?? 0;
-                $record->achievement_percent = $record->budget_amount > 0
-                    ? round(($record->total_amount / $record->budget_amount) * 100, 2)
+                $record->budget_quantity = $budget->total_budget ?? 0;
+                $record->achievement_percent = $record->budget_quantity > 0
+                    ? round(($record->total_amount / $record->budget_quantity) * 100, 2)
                     : null;
             }
         } else {
@@ -2413,9 +2413,9 @@ class ReportController extends Controller
                 foreach ($salesGroup as $record) {
                     $key = $record->branch_id . '-' . $record->category_id;
                     $budget = $budgetMap[$key] ?? null;
-                    $record->branch_category_budget = $budget->total_budget ?? 0;
-                    $record->achievement_percent = $record->branch_category_budget > 0
-                        ? round(($record->amount / $record->branch_category_budget) * 100, 2)
+                    $record->branch_category_budget_quantity = $budget->total_budget ?? 0;
+                    $record->achievement_percent = $record->branch_category_budget_quantity > 0
+                        ? round(($record->amount / $record->branch_category_budget_quantity) * 100, 2)
                         : null;
                 }
             }

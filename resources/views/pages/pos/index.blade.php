@@ -75,133 +75,177 @@
 
                                 </div>
                                 <div class="card-body">
-
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            {{--                                            @hasanyrole('Super-admin|Admin') --}}
+                                    <!-- Quick Access Section -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="order_date">Sale Date</label>
-                                                <input type="text" name="order_date"
-                                                       class="form-control datepicker-entry"
-                                                       value="{{ isset($order) ? Carbon\Carbon::parse($order->order_date)->format('Y-m-d') : date('Y-m-d') }}"/>
+                                                <label for="barcode_input" style="font-weight: bold; color: #007bff;">
+                                                    <i class="fa fa-barcode"></i> Quick Product Search / Barcode Scanner
+                                                </label>
+                                                <input type="text" id="barcode_input" class="form-control form-control-lg"
+                                                       name="barcode_input" placeholder="Scan barcode or search product..."
+                                                       style="border: 2px solid #007bff; font-size: 16px;">
                                             </div>
-                                            {{--                                            @else --}}
-                                            {{--                                                <input type="hidden" name="order_date" class="form-control datepicker-entry" --}}
-                                            {{--                                                    value="{{ date('Y-m-d') }}" /> --}}
-                                            {{--                                            @endhasanyrole --}}
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label>Customer Type</label>
-                                                <select name="account_type" id="account_type" class="form-control"
-                                                        {{ !empty(old('account_type')) ? 'disabled' : '' }} required>
-                                                    <option value="" disabled selected>Select...</option>
-                                                    <option value="Retail"
-                                                        {{ (isset($order) && $order->customer->type == 'Retail') || old('account_type') == 'Retail' || (session()->has('customer') && session('customer')->type == 'Retail') ? 'selected' : '' }}>
-                                                        Retail
-                                                    </option>
-                                                    <option value="Wholesale"
-                                                        {{ (isset($order) && $order->customer->type == 'Wholesale') || old('account_type') == 'Wholesale' || (session()->has('customer') && session('customer')->type == 'Wholesale') ? 'selected' : '' }}>
-                                                        WholeSale
-                                                    </option>
-                                                </select>
-
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label>Customer</label>
-                                                <div class="form-group">
-                                                    <input type="hidden" class="form-control" name="customer_id"
-                                                           id="customer_val_id" value="">
-                                                    <select onchange="$('.customer').val($(this).val())"
-                                                            name="customer_id"
-                                                            {{ old('customer_id') > 0 ? 'disabled' : '' }} id="customer_record"
-                                                            class="form-control select2-single">
-                                                        @if (session()->has('customer'))
-                                                            <option value="{{ session('customer')->id }}">
-                                                                {{ session('customer')->code }} -
-                                                                {{ session('customer')->name }}</option>
-                                                        @endif
-                                                        @if (isset($order))
-                                                            <option value="{{ $order->customer->id }}"
-                                                                    @if ((session()->has('customer') && session('customer')->id) == $order->customer?->id) selected @endif>
-                                                                {{ $order->customer->code }} -
-                                                                {{ $order->customer->name }}</option>
-                                                        @endif
-                                                        @if (old('customer_id') > 0)
-                                                            <option value="{{ old('customer_id') }}"
-                                                                    @if ((session()->has('customer') && session('customer')->id) == old('customer_id')) selected @endif>
-                                                                {{ App\Models\Customer::find(old('customer_id'))->code }}
-                                                                -
-                                                                {{ App\Models\Customer::find(old('customer_id'))->name }}
-                                                            </option>
-                                                        @endif
-                                                    </select>
-
-                                                    <div class="form-group">
-                                                        <span class="text  ion-android-alert"
-                                                              id="credit_balance"></span>: <span
-                                                            class="text ion-android-alert"
-                                                            id="customer_balance"></span>
-                                                    </div>
-
-                                                    <!-- Receipt Selection Section -->
-                                                    <div class="form-group" id="receipt_selection_section" style="display: none;">
-                                                        <label for="customer_receipts"><strong>Available Receipts</strong></label>
-                                                        <div id="receipt_summary" style="margin-bottom: 10px; padding: 5px; background: #f8f9fa; border-radius: 4px; font-size: 12px;">
-                                                            <!-- Summary will be shown here -->
-                                                        </div>
-                                                        <div id="customer_receipts_container" style="max-height: 250px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
-                                                            <!-- Dynamic receipts will be loaded here -->
-                                                        </div>
-                                                        <input type="hidden" name="selected_receipts" id="selected_receipts" value="">
-                                                        <small class="text-muted">System auto-selects optimal receipts. You can manually adjust amounts.</small>
-                                                    </div>
-                                                </div>
-                                                @isset($order)
-                                                    <input type="hidden" name="order_invoice_id"
-                                                           value="{{ $order->id }}"/>
-                                                @endisset
-
-                                            </div>
-
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <textarea class="form-control" name="description" placeholder="Description"
-                                                      id="description" required></textarea>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="text" class="form-control" name="discount" id="discount"
-                                                   oninput="formatNumber(this)" placeholder="Discount"/>
-                                        </div>
 
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <input type="text" class="form-control" oninput="formatNumber(this)"
-                                                       placeholder="Refund" name="refund" id="refund"/>
+                                    <!-- Customer Information Section -->
+                                    <div class="card mb-3" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                        <div class="card-header py-2" style="background-color: #e9ecef;">
+                                            <h6 class="mb-0"><i class="fa fa-user"></i> Customer Information</h6>
+                                        </div>
+                                        <div class="card-body py-3">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label>Customer Type</label>
+                                                        <select name="account_type" id="account_type" class="form-control"
+                                                                {{ !empty(old('account_type')) ? 'disabled' : '' }} required>
+                                                            <option value="" disabled selected>Select...</option>
+                                                            <option value="Retail"
+                                                                {{ (isset($order) && $order->customer->type == 'Retail') || old('account_type') == 'Retail' || (session()->has('customer') && session('customer')->type == 'Retail') ? 'selected' : '' }}>
+                                                                Retail
+                                                            </option>
+                                                            <option value="Wholesale"
+                                                                {{ (isset($order) && $order->customer->type == 'Wholesale') || old('account_type') == 'Wholesale' || (session()->has('customer') && session('customer')->type == 'Wholesale') ? 'selected' : '' }}>
+                                                                WholeSale
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label>Customer</label>
+                                                        <input type="hidden" class="form-control" name="customer_id"
+                                                               id="customer_val_id" value="">
+                                                        <select onchange="$('.customer').val($(this).val())"
+                                                                name="customer_id"
+                                                                {{ old('customer_id') > 0 ? 'disabled' : '' }} id="customer_record"
+                                                                class="form-control select2-single">
+                                                            @if (session()->has('customer'))
+                                                                <option value="{{ session('customer')->id }}">
+                                                                    {{ session('customer')->code }} -
+                                                                    {{ session('customer')->name }}</option>
+                                                            @endif
+                                                            @if (isset($order))
+                                                                <option value="{{ $order->customer->id }}"
+                                                                        @if ((session()->has('customer') && session('customer')->id) == $order->customer?->id) selected @endif>
+                                                                    {{ $order->customer->code }} -
+                                                                    {{ $order->customer->name }}</option>
+                                                            @endif
+                                                            @if (old('customer_id') > 0)
+                                                                <option value="{{ old('customer_id') }}"
+                                                                        @if ((session()->has('customer') && session('customer')->id) == old('customer_id')) selected @endif>
+                                                                    {{ App\Models\Customer::find(old('customer_id'))->code }}
+                                                                    -
+                                                                    {{ App\Models\Customer::find(old('customer_id'))->name }}
+                                                                </option>
+                                                            @endif
+                                                        </select>
+                                                        @isset($order)
+                                                            <input type="hidden" name="order_invoice_id"
+                                                                   value="{{ $order->id }}"/>
+                                                        @endisset
+                                                    </div>
+                                                </div>
+                                            </div>
 
+                                            <!-- Customer Balance & Credit Info -->
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="alert alert-info py-2 mb-2" style="font-size: 12px;">
+                                                        <span class="text ion-android-alert" id="credit_balance"></span>
+                                                        <span class="ml-3"></span>
+                                                        <span class="text ion-android-alert" id="customer_balance"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Receipt Selection Section -->
+                                            <div class="form-group" id="receipt_selection_section" style="display: none;">
+                                                <label for="customer_receipts"><strong>Available Receipts</strong></label>
+                                                <div id="receipt_summary" style="margin-bottom: 10px; padding: 5px; background: #f8f9fa; border-radius: 4px; font-size: 12px;">
+                                                    <!-- Summary will be shown here -->
+                                                </div>
+                                                <div id="customer_receipts_container" style="max-height: 250px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
+                                                    <!-- Dynamic receipts will be loaded here -->
+                                                </div>
+                                                <input type="hidden" name="selected_receipts" id="selected_receipts" value="">
+                                                <small class="text-muted">System auto-selects optimal receipts. You can manually adjust amounts.</small>
                                             </div>
                                         </div>
-                                        <div class="col-md-2">
-                                            <input type="checkbox" id="show_vat" name="show_vat" data-switch="bool">
-                                            <label for="show_vat" data-on-label="On" data-off-label="Off">Show
-                                                VAT</label>
+                                    </div>
+
+                                    <!-- Transaction Details Section -->
+                                    <div class="card mb-3" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                        <div class="card-header py-2" style="background-color: #e9ecef;">
+                                            <h6 class="mb-0"><i class="fa fa-file-text"></i> Transaction Details</h6>
                                         </div>
-                                        <div class="col-md-2">
-                                            <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create
-                                                Invoice
-                                            </button>
-                                        </div>
-                                        @if (old('customer_id'))
-                                            <div class="col-md-6">
-                                                <span style="color:red;">If the credit limit is exceeded, click here to
-                                                    refresh <i class="fa fa-refresh"
-                                                               onclick="window.location.reload()"></i></span>
+                                        <div class="card-body py-3">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group mb-2">
+                                                        <label for="order_date">Sale Date</label>
+                                                        <input type="text" name="order_date"
+                                                               class="form-control datepicker-entry"
+                                                               value="{{ isset($order) ? Carbon\Carbon::parse($order->order_date)->format('Y-m-d') : date('Y-m-d') }}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-9">
+                                                    <div class="form-group mb-2">
+                                                        <label for="description">Description</label>
+                                                        <textarea class="form-control" name="description" placeholder="Transaction description (optional)"
+                                                                  id="description" rows="2"></textarea>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        @endif
+
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-group mb-2">
+                                                        <label for="discount">Discount</label>
+                                                        <input type="text" class="form-control" name="discount" id="discount"
+                                                               oninput="formatNumber(this)" placeholder="0.00"/>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group mb-2">
+                                                        <label for="refund">Refund</label>
+                                                        <input type="text" class="form-control" oninput="formatNumber(this)"
+                                                               placeholder="0.00" name="refund" id="refund"/>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group mb-2">
+                                                        <label>&nbsp;</label>
+                                                        <div class="form-control-plaintext">
+                                                            <input type="checkbox" id="show_vat" name="show_vat" data-switch="bool">
+                                                            <label for="show_vat" data-on-label="On" data-off-label="Off">Show VAT</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group mb-2">
+                                                        <label>&nbsp;</label>
+                                                        <button type="submit" class="btn btn-success btn-block">
+                                                            <i class="fa fa-save"></i> Create Invoice
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            @if (old('customer_id'))
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="alert alert-warning py-2" style="font-size: 12px;">
+                                                            <span style="color:red;">If the credit limit is exceeded, click here to refresh
+                                                                <i class="fa fa-refresh" onclick="window.location.reload()" style="cursor: pointer;"></i>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -212,11 +256,10 @@
                         <!-- general form elements -->
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">POS</h3>
+                                <h3 class="card-title">POS - Product Selection</h3>
 
                                 {{--                                @can('make.daily.sale') --}}
-                                <input type="text" id="barcode" class="form-control" name="barcode"
-                                       placeholder="Scan barcode">
+                                {{-- Barcode scanner moved to left panel --}}
                                 {{--                                @endcannot --}}
                             </div>
                             <!-- /.card-header -->
@@ -796,7 +839,8 @@
                         success: function (response) {
                             // update the cart items container with the new cart data
                             $('#load_cart').html(response);
-                            $('#barcode').val("")
+                            $('#barcode_input').val("");
+                            code = "";
                         },
                         error: function (xhr, status, error) {
                             // display an error message
@@ -1268,5 +1312,48 @@
             clearTimeout(window.receiptOptimizeTimeout);
             window.receiptOptimizeTimeout = setTimeout(reOptimizeReceipts, 500);
         });
+
+        // Handle barcode input field directly
+        $('#barcode_input').on('keypress', function(e) {
+            if (e.which === 13) { // Enter key
+                const barcodeValue = $(this).val().trim();
+                if (barcodeValue.length >= 3) {
+                    searchProductByBarcode(barcodeValue);
+                }
+            }
+        });
+
+        // Function to search product by barcode
+        function searchProductByBarcode(barcode) {
+            $.ajax({
+                url: "{{ route('barcode.search.product') }}",
+                type: 'GET',
+                data: {
+                    barcode: barcode
+                },
+                dataType: 'html',
+                success: function (response) {
+                    // update the cart items container with the new cart data
+                    $('#load_cart').html(response);
+                    $('#barcode_input').val("");
+
+                    // Show success feedback
+                    $('#barcode_input').css('border-color', '#28a745');
+                    setTimeout(function() {
+                        $('#barcode_input').css('border-color', '#007bff');
+                    }, 1000);
+                },
+                error: function (xhr, status, error) {
+                    // display an error message and visual feedback
+                    $('#barcode_input').css('border-color', '#dc3545');
+                    $('#barcode_input').attr('placeholder', 'Product not found - try again');
+
+                    setTimeout(function() {
+                        $('#barcode_input').css('border-color', '#007bff');
+                        $('#barcode_input').attr('placeholder', 'Scan barcode or search product...');
+                    }, 2000);
+                }
+            });
+        }
     </script>
 @endpush

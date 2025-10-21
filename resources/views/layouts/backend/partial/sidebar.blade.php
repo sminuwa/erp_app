@@ -832,7 +832,7 @@
                                                 </a>
                                             </li>
                                         @endcan
-                                        @can('Document.status.report')
+                                        @can('document.status.report')
                                             <li class="nav-item">
                                                 <a href="{{ route('document.status.report') }}"
                                                     class="nav-link {{ Request::is('reports/ap_ar/document_status*') ? 'active' : '' }}">

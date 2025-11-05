@@ -1,9 +1,9 @@
-<div class="row">
+{{-- <div class="row">
     <div class="offset-10">
-        <a href="{{ route('ajax.additional.invoice.report.print', [$from_date, $to_date, $company_id,$branch_id, $supplier_id, $status]) }}"
+        <a href="{{ route('ajax.additional.invoice.report.print', [$from_date, $to_date, $companyId,$branchId, $supplierId, $status]) }}"
             target="_BLANK" class="btn-success btn btn-sm">Print</a>
     </div>
-</div>
+</div> --}}
 <table class="display table table-bordered caption" id="example1" data-ordering="true">
     <caption style="caption-size:top">
         <h3 style="text-align: center;">{{ $branch->name ?? 'All Branches' }}</h3>

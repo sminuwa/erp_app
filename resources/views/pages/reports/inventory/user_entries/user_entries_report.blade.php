@@ -57,6 +57,17 @@
                                 <option value="return_debits">Return Debits</option>
                             </select>
                         </div>
+
+                        <div class="form-group">
+                            <label for="created_by">Created By</label>
+                            <select class="form-control select2-single" name="created_by" id="created_by">
+                                <option value="">Select User</option>
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}">{{ $user->user_code }}-{{ $user->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <div class="form-group">
                             <label for="from_date">From Date</label>
                             <input type="text" class="form-control datepicker" name="from_date" required>
@@ -92,6 +103,7 @@
                 let type = $('#type').val();
                 let from_date = $('input[name="from_date"]').val();
                 let to_date = $('input[name="to_date"]').val();
+                let created_by = $('#created_by').val();
                 // if (branch_id == '') {
                 //     alert('Please select a branch');
                 //     return false;
@@ -110,6 +122,7 @@
                         type: type,
                         from_date: from_date,
                         to_date: to_date,
+                        created_by: created_by
                     }
                 }).done(function(data) {
                     $("#load").html(data);

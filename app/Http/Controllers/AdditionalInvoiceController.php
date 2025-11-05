@@ -108,7 +108,8 @@ class AdditionalInvoiceController extends Controller
         return back();
     }
 
-    public function print(PurchaseExpense $invoice, $papersize = "A4"){
+    public function print(Purchase $invoice, $papersize = "A4"){
+        
         return view('pages.inventories.expenses.print',compact('invoice','papersize'));
     }
 

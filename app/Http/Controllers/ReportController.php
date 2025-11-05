@@ -1383,6 +1383,8 @@ class ReportController extends Controller
         return view('pages.reports.sales_and_cash_analysis.sales_by_category');
     }
 
+
+
     // public function loadCategorySaleReport(Request $request)
     // {
     //     $from_date = date('Y-m-d', strtotime($request->from_date));
@@ -1402,9 +1404,38 @@ class ReportController extends Controller
     //     // Convert category selection to array if not already
     //     $category_id1 = is_array($category_id1) ? $category_id1 : ['%'];
 
+    //     // Extract budget year and quarter from date range
+    //     $budget_year = date('Y', strtotime($from_date));
+    //     $from_month = date('n', strtotime($from_date));
+    //     $to_month = date('n', strtotime($to_date));
+
+    //     // Determine quarter based on date range (take the quarter of from_date)
+    //     $quarter = ceil($from_month / 3);
+
+    //     // Preload aggregated budget per branch and category (budget is for quantity, not amount)
+    //     $budgetQuery = DB::table('budgets')
+    //         ->select('branch_id', 'category_id', DB::raw('SUM(month1 + month2 + month3) AS total_budget_qty'))
+    //         ->where('budget_year', $budget_year)
+    //         ->where('quarter', $quarter);
+
+    //     // Apply branch filter to budget if specific branch selected
+    //     if ($branch_id !== '%') {
+    //         $budgetQuery->where('branch_id', $branch_id);
+    //     }
+
+    //     // Apply category filter to budget if specific categories selected
+    //     if (!in_array('%', $category_id1)) {
+    //         $budgetQuery->whereIn('category_id', $category_id1);
+    //     }
+
+    //     $budgetMap = $budgetQuery
+    //         ->groupBy('branch_id', 'category_id')
+    //         ->get()
+    //         ->keyBy(fn($item) => $item->branch_id . '-' . $item->category_id);
+
     //     // Determine Grouping Options
-    //     $group_by_category = $request->group_by_category ?? 0;
-    //     $group_by_product = $request->group_by_product ?? 0;
+    //     $group_by_category = $request->group_by_category ?? null;
+    //     $group_by_product = $request->group_by_product ?? null;
 
     //     // Define Group Fields Dynamically
     //     $groupFields = [];
@@ -1420,39 +1451,40 @@ class ReportController extends Controller
     //         $groupFields[] = 'categories.id';
     //     }
 
-    //     // Create a subquery for qty_available that respects filtering
-    //     $qtyAvailableSubquery = DB::table('store_products as sp')
-    //         ->select(DB::raw('SUM(sp.qty_available)'))
-    //         ->join('products as p', 'sp.product_id', '=', 'p.id')
-    //         ->join('stores as st', 'sp.store_id', '=', 'st.id')
-    //         ->whereColumn('p.category_id', 'categories.id');
+    //     // Build the qty_available subquery with proper filtering
+    //     $qtyAvailableSubquery = 'SELECT SUM(sp.qty_available)
+    //     FROM store_products sp
+    //     JOIN products p ON sp.product_id = p.id
+    //     JOIN stores st ON sp.store_id = st.id
+    //     WHERE p.category_id = categories.id';
 
-    //     // Apply branch filter to subquery if specific branch is selected
+    //     // Add branch filter to subquery if specific branch is selected
     //     if ($branch_id !== '%') {
-    //         $qtyAvailableSubquery->where('st.branch_id', '=', $branch_id);
+    //         $qtyAvailableSubquery .= ' AND st.branch_id = ' . intval($branch_id);
     //     } else {
     //         // If no specific branch filter, still respect the company filter
     //         if ($company_id !== '%') {
-    //             $qtyAvailableSubquery->whereIn('st.branch_id', function ($query) use ($company_id) {
-    //                 $query->select('id')
-    //                     ->from('branches')
-    //                     ->where('company_id', '=', $company_id);
-    //             });
+    //             $qtyAvailableSubquery .= ' AND st.branch_id IN (
+    //             SELECT b.id FROM branches b WHERE b.company_id = ' . intval($company_id) . '
+    //         )';
     //         }
     //     }
 
     //     // Build the query
     //     $data = DB::table('orders')
     //         ->select(
+    //             'branches.id as branch_id',
+    //             'branches.name as branch_name',
+    //             'branches.code as branch_code',
+    //             'categories.id as category_id',
     //             'categories.name as category',
     //             'categories.code as category_code',
     //             'order_details.unit as product_unit',
     //             DB::raw('SUM(order_details.quantity) as quantity'),
     //             DB::raw('SUM(order_details.total) as amount'),
     //             DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
-    //             DB::raw('(' . $qtyAvailableSubquery->toSql() . ') as qty_available')
+    //             DB::raw('(' . $qtyAvailableSubquery . ') as qty_available')
     //         )
-    //         ->mergeBindings($qtyAvailableSubquery)
     //         ->join('order_details', 'orders.id', '=', 'order_details.order_id')
     //         ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
     //         ->join('stores', 'store_products.store_id', '=', 'stores.id')
@@ -1480,6 +1512,9 @@ class ReportController extends Controller
     //         );
     //     }
 
+    //     // Add branch details to select for budget comparison
+    //     $groupFields[] = 'branches.id'; // Ensure branch is included for budget lookup
+
     //     // Apply dynamic grouping fields
     //     $sales = $data->groupBy($groupFields)
     //         ->orderBy('categories.name', 'ASC')
@@ -1487,6 +1522,20 @@ class ReportController extends Controller
     //             return $query->orderBy('products.name', 'ASC');
     //         })
     //         ->get();
+
+    //     // Add budget data to sales records (budget is for quantity)
+    //     foreach ($sales as $record) {
+    //         $key = $record->branch_id . '-' . $record->category_id;
+    //         $budget = $budgetMap[$key] ?? null;
+    //         $record->budget_qty = $budget ? $budget->total_budget_qty : 0;
+    //         $record->achievement_percent = $record->budget_qty > 0
+    //             ? round(($record->quantity / $record->budget_qty) * 100, 2)
+    //             : null;
+    //         $record->budget_variance_qty = $record->quantity - $record->budget_qty;
+    //         $record->budget_variance_percent = $record->budget_qty > 0
+    //             ? round((($record->quantity - $record->budget_qty) / $record->budget_qty) * 100, 2)
+    //             : null;
+    //     }
 
     //     // Reset 'all' for readability in UI
     //     $category_id1 = in_array('%', $category_id1) ? "all" : $category_id1;
@@ -1508,188 +1557,220 @@ class ReportController extends Controller
     //         'branch',
     //         'branch_id',
     //         'group_by_category',
-    //         'group_by_product'
+    //         'group_by_product',
+    //         'budget_year',
+    //         'quarter'
     //     ));
     // }
+   public function loadCategorySaleReport(Request $request)
+{
+    $from_date = date('Y-m-d', strtotime($request->from_date));
+    $to_date = date('Y-m-d', strtotime($request->to_date));
+    $company_id = $request->company_id;
+    $branch_id = $request->branch_id;
+    $category_id1 = $request->category_id1;
 
-    public function loadCategorySaleReport(Request $request)
-    {
-        $from_date = date('Y-m-d', strtotime($request->from_date));
-        $to_date = date('Y-m-d', strtotime($request->to_date));
-        $company_id = $request->company_id;
-        $branch_id = $request->branch_id;
-        $category_id1 = $request->category_id1; // Now an array
-
-        // Handle 'all' for company and branch
-        if ($company_id == 'all' || $company_id == '') {
-            $company_id = '%';
-        }
-        if ($branch_id == 'all' || $branch_id == '') {
-            $branch_id = '%';
-        }
-
-        // Convert category selection to array if not already
-        $category_id1 = is_array($category_id1) ? $category_id1 : ['%'];
-
-        // Extract budget year and quarter from date range
-        $budget_year = date('Y', strtotime($from_date));
-        $from_month = date('n', strtotime($from_date));
-        $to_month = date('n', strtotime($to_date));
-
-        // Determine quarter based on date range (take the quarter of from_date)
-        $quarter = ceil($from_month / 3);
-
-        // Preload aggregated budget per branch and category (budget is for quantity, not amount)
-        $budgetQuery = DB::table('budgets')
-            ->select('branch_id', 'category_id', DB::raw('SUM(month1 + month2 + month3) AS total_budget_qty'))
-            ->where('budget_year', $budget_year)
-            ->where('quarter', $quarter);
-
-        // Apply branch filter to budget if specific branch selected
-        if ($branch_id !== '%') {
-            $budgetQuery->where('branch_id', $branch_id);
-        }
-
-        // Apply category filter to budget if specific categories selected
-        if (!in_array('%', $category_id1)) {
-            $budgetQuery->whereIn('category_id', $category_id1);
-        }
-
-        $budgetMap = $budgetQuery
-            ->groupBy('branch_id', 'category_id')
-            ->get()
-            ->keyBy(fn($item) => $item->branch_id . '-' . $item->category_id);
-
-        // Determine Grouping Options
-        $group_by_category = $request->group_by_category ?? 0;
-        $group_by_product = $request->group_by_product ?? 0;
-
-        // Define Group Fields Dynamically
-        $groupFields = [];
-        if ($group_by_category) {
-            $groupFields[] = 'categories.id';
-        }
-        if ($group_by_product) {
-            $groupFields[] = 'products.id';
-        }
-
-        // Default to category grouping if no option is selected
-        if (empty($groupFields)) {
-            $groupFields[] = 'categories.id';
-        }
-
-        // Build the qty_available subquery with proper filtering
-        $qtyAvailableSubquery = 'SELECT SUM(sp.qty_available)
-        FROM store_products sp
-        JOIN products p ON sp.product_id = p.id
-        JOIN stores st ON sp.store_id = st.id
-        WHERE p.category_id = categories.id';
-
-        // Add branch filter to subquery if specific branch is selected
-        if ($branch_id !== '%') {
-            $qtyAvailableSubquery .= ' AND st.branch_id = ' . intval($branch_id);
-        } else {
-            // If no specific branch filter, still respect the company filter
-            if ($company_id !== '%') {
-                $qtyAvailableSubquery .= ' AND st.branch_id IN (
-                SELECT b.id FROM branches b WHERE b.company_id = ' . intval($company_id) . '
-            )';
-            }
-        }
-
-        // Build the query
-        $data = DB::table('orders')
-            ->select(
-                'branches.id as branch_id',
-                'branches.name as branch_name',
-                'branches.code as branch_code',
-                'categories.id as category_id',
-                'categories.name as category',
-                'categories.code as category_code',
-                'order_details.unit as product_unit',
-                DB::raw('SUM(order_details.quantity) as quantity'),
-                DB::raw('SUM(order_details.total) as amount'),
-                DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
-                DB::raw('(' . $qtyAvailableSubquery . ') as qty_available')
-            )
-            ->join('order_details', 'orders.id', '=', 'order_details.order_id')
-            ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
-            ->join('stores', 'store_products.store_id', '=', 'stores.id')
-            ->join('branches', 'stores.branch_id', '=', 'branches.id')
-            ->join('companies', 'branches.company_id', '=', 'companies.id')
-            ->join('products', 'store_products.product_id', '=', 'products.id')
-            ->join('categories', 'products.category_id', '=', 'categories.id')
-            ->where('branches.company_id', 'LIKE', $company_id)
-            ->where('order_details.status', '=', 1)
-            ->whereBetween('orders.order_date', [$from_date, $to_date]);
-
-        // Apply category and branch filters if not 'all'
-        if (!in_array('%', $category_id1)) {
-            $data->whereIn('products.category_id', $category_id1);
-        }
-        if ($branch_id !== '%') {
-            $data->where('stores.branch_id', '=', $branch_id);
-        }
-
-        // Add product details if grouping by Product
-        if ($group_by_product) {
-            $data->addSelect(
-                'products.name as product_name',
-                'products.code as product_code'
-            );
-        }
-
-        // Add branch details to select for budget comparison
-        $groupFields[] = 'branches.id'; // Ensure branch is included for budget lookup
-
-        // Apply dynamic grouping fields
-        $sales = $data->groupBy($groupFields)
-            ->orderBy('categories.name', 'ASC')
-            ->when($group_by_product, function ($query) {
-                return $query->orderBy('products.name', 'ASC');
-            })
-            ->get();
-
-        // Add budget data to sales records (budget is for quantity)
-        foreach ($sales as $record) {
-            $key = $record->branch_id . '-' . $record->category_id;
-            $budget = $budgetMap[$key] ?? null;
-            $record->budget_qty = $budget ? $budget->total_budget_qty : 0;
-            $record->achievement_percent = $record->budget_qty > 0
-                ? round(($record->quantity / $record->budget_qty) * 100, 2)
-                : null;
-            $record->budget_variance_qty = $record->quantity - $record->budget_qty;
-            $record->budget_variance_percent = $record->budget_qty > 0
-                ? round((($record->quantity - $record->budget_qty) / $record->budget_qty) * 100, 2)
-                : null;
-        }
-
-        // Reset 'all' for readability in UI
-        $category_id1 = in_array('%', $category_id1) ? "all" : $category_id1;
-        $branch_id = $branch_id === '%' ? "all" : $branch_id;
-        $company_id = $company_id === '%' ? "all" : $company_id;
-
-        // Fetch additional company & branch info
-        $company = $company_id !== 'all' ? Company::find($company_id) : null;
-        $branch = $branch_id !== 'all' ? Branch::find($branch_id) : null;
-
-        // Return view with data
-        return view('pages.reports.sales_and_cash_analysis.load_sale_by_category_report', compact(
-            'sales',
-            'from_date',
-            'to_date',
-            'category_id1',
-            'company',
-            'company_id',
-            'branch',
-            'branch_id',
-            'group_by_category',
-            'group_by_product',
-            'budget_year',
-            'quarter'
-        ));
+    // Handle 'all' for company and branch
+    if ($company_id == 'all' || $company_id == '') {
+        $company_id = '%';
+    }
+    
+    // Handle branch_id - it can be an array or single value
+    if ($branch_id == 'all' || $branch_id == '' || empty($branch_id)) {
+        $branch_id = '%';
+        $branch_ids = [];
+    } else {
+        // Ensure branch_id is an array
+        $branch_ids = is_array($branch_id) ? $branch_id : [$branch_id];
     }
 
+    // Store the actual branch_id value for subquery
+    $branch_id_for_filter = $branch_id;
+    
+    // Convert category selection to array if not already
+    $category_id1 = is_array($category_id1) ? $category_id1 : ['%'];
+
+    // Extract budget year and quarter from date range
+    $budget_year = date('Y', strtotime($from_date));
+    $from_month = date('n', strtotime($from_date));
+    $to_month = date('n', strtotime($to_date));
+    $quarter = ceil($from_month / 3);
+
+    // Preload aggregated budget per branch and category
+    $budgetQuery = DB::table('budgets')
+        ->select('branch_id', 'category_id', DB::raw('SUM(month1 + month2 + month3) AS total_budget_qty'))
+        ->where('budget_year', $budget_year)
+        ->where('quarter', $quarter);
+
+    if ($branch_id != '%' && !empty($branch_ids)) {
+        $budgetQuery->whereIn('branch_id', $branch_ids);
+    }
+
+    if (!in_array('%', $category_id1)) {
+        $budgetQuery->whereIn('category_id', $category_id1);
+    }
+
+    $budgetMap = $budgetQuery
+        ->groupBy('branch_id', 'category_id')
+        ->get()
+        ->keyBy(fn($item) => $item->branch_id . '-' . $item->category_id);
+
+    // Determine Grouping Options
+    $group_by_category = $request->group_by_category ?? null;
+    $group_by_product = $request->group_by_product ?? null;
+
+    // Define Group Fields Dynamically
+    $groupFields = ['branches.id'];
+
+    if ($group_by_product) {
+        $groupFields[] = 'categories.id';
+        $groupFields[] = 'products.id';
+    } else {
+        $groupFields[] = 'categories.id';
+    }
+
+    // FIXED: Proper qty_available subquery logic with multiple branch support
+    if ($group_by_product) {
+        // When grouping by product, get qty_available for SPECIFIC PRODUCT
+        $qtyAvailableSubquery = 'SELECT COALESCE(SUM(sp2.qty_available), 0)
+            FROM store_products sp2
+            JOIN stores st2 ON sp2.store_id = st2.id
+            WHERE sp2.product_id = products.id';
+    } else {
+        // When grouping by category only, get qty_available for ALL PRODUCTS in that category
+        $qtyAvailableSubquery = 'SELECT COALESCE(SUM(sp2.qty_available), 0)
+            FROM store_products sp2
+            JOIN products p2 ON sp2.product_id = p2.id
+            JOIN stores st2 ON sp2.store_id = st2.id
+            WHERE p2.category_id = categories.id';
+    }
+
+    // FIXED: Proper branch filtering in subquery for multiple branches
+    if ($branch_id_for_filter != '%' && !empty($branch_ids)) {
+        $branch_ids_string = implode(',', array_map('intval', $branch_ids));
+        $qtyAvailableSubquery .= ' AND st2.branch_id IN (' . $branch_ids_string . ')';
+    } else {
+        // If no specific branch filter, respect company filter
+        if ($company_id != '%') {
+            $qtyAvailableSubquery .= ' AND st2.branch_id IN (
+                SELECT b2.id FROM branches b2 WHERE b2.company_id = ' . intval($company_id) . '
+            )';
+        }
+    }
+
+    // Build the main query
+    $data = DB::table('orders')
+        ->select(
+            'branches.id as branch_id',
+            'branches.name as branch_name',
+            'branches.code as branch_code',
+            'categories.id as category_id',
+            'categories.name as category',
+            'categories.code as category_code',
+            'order_details.unit as product_unit',
+            DB::raw('SUM(order_details.quantity) as quantity'),
+            DB::raw('SUM(order_details.total) as amount'),
+            DB::raw('SUM(order_details.cost_price * order_details.quantity) as cost'),
+            DB::raw('(' . $qtyAvailableSubquery . ') as qty_available')
+        )
+        ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+        ->join('store_products', 'order_details.store_product_id', '=', 'store_products.id')
+        ->join('stores', 'store_products.store_id', '=', 'stores.id')
+        ->join('branches', 'stores.branch_id', '=', 'branches.id')
+        ->join('companies', 'branches.company_id', '=', 'companies.id')
+        ->join('products', 'store_products.product_id', '=', 'products.id')
+        ->join('categories', 'products.category_id', '=', 'categories.id')
+        ->where('branches.company_id', 'LIKE', $company_id)
+        ->where('order_details.status', '=', 1)
+        ->whereBetween('orders.order_date', [$from_date, $to_date]);
+
+    // Apply category and branch filters
+    if (!in_array('%', $category_id1)) {
+        $data->whereIn('products.category_id', $category_id1);
+    }
+    
+    // FIXED: Use stores.branch_id with multiple branch support
+    if ($branch_id != '%' && !empty($branch_ids)) {
+        $data->whereIn('stores.branch_id', $branch_ids);
+    }
+
+    // Add product details if grouping by Product
+    if ($group_by_product) {
+        $data->addSelect(
+            'products.id as product_id',
+            'products.name as product_name',
+            'products.code as product_code'
+        );
+    }
+
+    // Apply dynamic grouping
+    $sales = $data->groupBy($groupFields)
+        ->orderBy('categories.name', 'ASC')
+        ->when($group_by_product, function ($query) {
+            return $query->orderBy('products.name', 'ASC');
+        })
+        ->get();
+
+    // Debug: Check what's being returned
+    \Log::info('Sales Data Sample:', [
+        'total_records' => $sales->count(),
+        'first_record' => $sales->first(),
+        'branch_ids' => $branch_ids,
+        'branch_id_for_filter' => $branch_id_for_filter,
+        'qty_available_query' => $qtyAvailableSubquery
+    ]);
+
+    // Add budget data to sales records
+    foreach ($sales as $record) {
+        $key = $record->branch_id . '-' . $record->category_id;
+        $budget = $budgetMap[$key] ?? null;
+        $record->budget_qty = $budget ? $budget->total_budget_qty : 0;
+        $record->achievement_percent = $record->budget_qty > 0
+            ? round(($record->quantity / $record->budget_qty) * 100, 2)
+            : null;
+        $record->budget_variance_qty = $record->quantity - $record->budget_qty;
+        $record->budget_variance_percent = $record->budget_qty > 0
+            ? round((($record->quantity - $record->budget_qty) / $record->budget_qty) * 100, 2)
+            : null;
+    }
+
+    // Reset 'all' for readability in UI
+    $category_id1_display = in_array('%', $category_id1) ? "all" : $category_id1;
+    
+    // Handle branch display for multiple branches
+    if ($branch_id === '%') {
+        $branch_id_display = "all";
+    } else {
+        $branch_id_display = is_array($branch_id) ? implode(', ', $branch_id) : $branch_id;
+    }
+    
+    $company_id_display = $company_id === '%' ? "all" : $company_id;
+
+    // Fetch additional company & branch info
+    $company = ($company_id !== '%' && $company_id !== 'all') ? Company::find($company_id) : null;
+    
+    // Handle multiple branches display
+    if ($branch_id !== '%' && !empty($branch_ids)) {
+        $branches = Branch::whereIn('id', $branch_ids)->get();
+    } else {
+        $branches = collect();
+    }
+
+    return view('pages.reports.sales_and_cash_analysis.load_sale_by_category_report', compact(
+        'sales',
+        'from_date',
+        'to_date',
+        'category_id1_display',
+        'company',
+        'company_id_display',
+        'branches',
+        'branch_id_display',
+        'group_by_category',
+        'group_by_product',
+        'budget_year',
+        'quarter'
+    ));
+}
     public function printCategorySaleReport($from_date, $to_date, $company_id, $branch_id, $category_id1)
     {
         $from_date = date('Y-m-d', strtotime($from_date));
@@ -4637,60 +4718,7 @@ class ReportController extends Controller
         return view('pages.reports.inventory.additional_invoice_report');
     }
 
-    // public function loadAdditionalInvoiceReport(Request $request)
-    // {
-    //     $from_date = $request->from_date;
-    //     $to_date = $request->to_date;
 
-    //     $supplier_id = $request->supplier_id;
-    //     $company_id = $request->company_id;
-    //     $branch_id = $request->branch_id;
-    //     $status = $request->status;
-
-
-    //     if ($supplier_id == 'all' || $supplier_id == '') {
-    //         $supplier_id = '%';
-    //     }
-    //     if ($company_id == 'all' || $company_id == '') {
-    //         $company_id = '%';
-    //     }
-    //     if ($branch_id == 'all' || $branch_id == '') {
-    //         $branch_id = '%';
-    //     }
-    //     if ($status == 'all' || $status == '') {
-    //         $status = '%';
-    //     }
-
-    //     $sales = DB::table('purchases')
-    //         ->select('suppliers.name AS supplier', 'purchases.reference', 'purchase_expenses.reference AS ref', 'stores.code AS store', 'description', 'purchase_expenses.name AS expense', 'purchases.purchase_date', 'wbno', 'amount', 'purchase_expenses.status', 'purchases.created_at', 'users.name AS created_by')
-    //         ->join('purchase_products', 'purchase_products.purchase_id', 'purchases.id')
-    //         ->join('purchase_expenses', 'purchase_expenses.purchase_id', 'purchases.id')
-    //         ->join('suppliers', 'suppliers.id', 'purchases.supplier_id')
-    //         ->join('stores', 'stores.id', 'purchase_products.store_id')
-    //         ->join('users', 'users.id', 'purchases.created_by')
-    //         ->join('branches', 'branches.id', '=', 'stores.branch_id')
-    //         ->where('branches.company_id', 'LIKE', $company_id)
-    //         ->where('purchases.supplier_id', 'LIKE', $supplier_id)
-    //         ->where('purchases.supplier_id', 'LIKE', $supplier_id)
-    //         ->where('purchases.status', 'LIKE', $status)
-    //         ->where('suppliers.code', 'LIKE', 'T%')
-    //         ->where(DB::raw("DATE(purchase_date)"), '>=', $from_date)
-    //         ->where(DB::raw("DATE(purchase_date)"), '<=', $to_date)
-    //         ->orderBy('purchase_date')
-    //         ->get();
-    //     if ($supplier_id == "%")
-    //         $supplier_id = "all";
-    //     if ($branch_id == "%")
-    //         $branch_id = "all";
-    //     $company = null;
-    //     if ($company_id != 'all')
-    //         $company = Company::find($company_id);
-    //     $branch = null;
-    //     if ($branch_id != "all")
-    //         $branch = Branch::find($branch_id);
-
-    //     return view('pages.reports.inventory.load_additional_invoice_report', compact('sales', 'from_date', 'to_date', 'supplier_id', 'company_id', 'branch_id', 'branch', 'status'));
-    // }
     public function loadAdditionalInvoiceReport(Request $request)
     {
         $from_date = $request->from_date;
@@ -4701,46 +4729,80 @@ class ReportController extends Controller
         $branch_id = $request->branch_id === 'all' || empty($request->branch_id) ? '%' : $request->branch_id;
         $status = $request->status === 'all' || empty($request->status) ? '%' : $request->status;
 
-        $sales = DB::table('purchases')
-            ->select(
-                'purchase_expenses.reference',
-                'purchase_expenses.id AS purchase_id',
-                'suppliers.name AS supplier',
-                'description',
-                'branches.code AS branch',
-                'purchases.purchase_date',
-                'wbno',
-                DB::raw('SUM(amount) AS amount'),  // Aggregating amount
-                'purchase_expenses.status',
-                'purchases.created_at',
-                'users.name AS created_by',
-                'suppliers.code'
-            )
-            ->join('purchase_products', 'purchase_products.purchase_id', '=', 'purchases.id')
-            ->join('purchase_expenses', 'purchase_expenses.purchase_id', '=', 'purchases.id')
-            ->join('suppliers', 'suppliers.id', '=', 'purchase_expenses.supplier_id')
-            ->join('users', 'users.id', '=', 'purchases.created_by')
-            ->join('branches', 'branches.id', '=', 'purchases.branch_id')
-            ->where('branches.company_id', 'LIKE', $company_id)
-            ->where('purchases.branch_id', 'LIKE', $branch_id)
-            ->where('purchases.supplier_id', 'LIKE', $supplier_id)
-            ->where('purchases.status', 'LIKE', $status)
-            //->whereRaw("TRIM(LOWER(suppliers.code)) LIKE LOWER(?)", ['T%'])
-            ->whereBetween(DB::raw("DATE(purchases.purchase_date)"), [$from_date, $to_date])
-            ->groupBy(
-                'purchase_expenses.reference',
-                'suppliers.name',
-                'description',
-                'purchase_expenses.name',
-                'purchases.purchase_date',
-                'wbno',
-                'purchase_expenses.status',
-                'purchases.created_at',
-                'users.name'
-            )
-            ->orderBy('purchases.purchase_date')
-            ->get();
+        // $sales = DB::table('purchases')
+        //     ->select(
+        //         'purchase_expenses.reference',
+        //         'purchase_expenses.id AS purchase_id',
+        //         'suppliers.name AS supplier',
+        //         'description',
+        //         'branches.code AS branch',
+        //         'purchases.purchase_date',
+        //         'wbno',
+        //         DB::raw('SUM(amount) AS amount'),  // Aggregating amount
+        //         'purchase_expenses.status',
+        //         'purchases.created_at',
+        //         'users.name AS created_by',
+        //         'suppliers.code'
+        //     )
+        //     ->join('purchase_products', 'purchase_products.purchase_id', '=', 'purchases.id')
+        //     ->join('purchase_expenses', 'purchase_expenses.purchase_id', '=', 'purchases.id')
+        //     ->join('suppliers', 'suppliers.id', '=', 'purchase_expenses.supplier_id')
+        //     ->join('users', 'users.id', '=', 'purchases.created_by')
+        //     ->join('branches', 'branches.id', '=', 'purchases.branch_id')
+        //     ->where('branches.company_id', 'LIKE', $company_id)
+        //     ->where('purchases.branch_id', 'LIKE', $branch_id)
+        //     ->where('purchases.supplier_id', 'LIKE', $supplier_id)
+        //     ->where('purchases.status', 'LIKE', $status)
+        //     //->whereRaw("TRIM(LOWER(suppliers.code)) LIKE LOWER(?)", ['T%'])
+        //     ->whereBetween(DB::raw("DATE(purchases.purchase_date)"), [$from_date, $to_date])
+        //     ->groupBy(
+        //         'purchase_expenses.reference',
+        //         'suppliers.name',
+        //         'description',
+        //         'purchase_expenses.name',
+        //         'purchases.purchase_date',
+        //         'wbno',
+        //         'purchase_expenses.status',
+        //         'purchases.created_at',
+        //         'users.name'
+        //     )
+        //     ->orderBy('purchases.purchase_date')
+        //     ->get();
 
+        $sales = DB::table('purchase_expenses as pe')
+            ->join('purchases as p', 'pe.purchase_id', '=', 'p.id')
+            ->join('suppliers as s', 's.id', '=', 'pe.supplier_id')
+            ->join('users as u', 'u.id', '=', 'p.created_by')
+            ->join('branches as b', 'b.id', '=', 'p.branch_id')
+            ->select(
+                'pe.reference',
+                'p.id as purchase_id',
+                's.name as supplier',
+                'pe.description',
+                's.code',
+                'b.code as branch',
+                'p.purchase_date',
+                'p.wbno',
+                DB::raw('SUM(pe.amount) AS amount'),
+                'pe.status',
+                'p.created_at',
+                'u.name as created_by'
+            )
+            ->whereBetween(DB::raw('DATE(p.purchase_date)'), [$from_date, $to_date])
+            ->groupBy(
+                'pe.reference',
+                'p.id',
+                's.name',
+                's.code',
+                'b.code',
+                'p.purchase_date',
+                'p.wbno',
+                'pe.status',
+                'p.created_at',
+                'u.name'
+            )
+            ->orderBy('p.purchase_date')
+            ->get();
 
         $company = $company_id !== '%' ? Company::find($company_id) : null;
         $branch = $branch_id !== '%' ? Branch::find($branch_id) : null;
@@ -4756,6 +4818,70 @@ class ReportController extends Controller
             'status'
         ));
     }
+    // public function loadAdditionalInvoiceReport(Request $request)
+    // {
+    //     $from_date = $request->from_date;
+    //     $to_date = $request->to_date;
+
+    //     $supplierId = $request->supplier_id;
+    //     $companyId = $request->company_id;
+    //     $branchId = $request->branch_id;
+    //     $status = $request->status;
+
+    //     $q = DB::table('purchase_expenses as pe')
+    //         ->join('purchases as p', 'pe.purchase_id', '=', 'p.id')
+    //         ->join('suppliers as s', 's.id', '=', 'pe.supplier_id')
+    //         ->join('users as u', 'u.id', '=', 'p.created_by')
+    //         ->join('branches as b', 'b.id', '=', 'p.branch_id')
+    //         ->select(
+    //             'pe.id as expense_id',
+    //             'pe.reference',
+    //             'p.id as purchase_id',
+    //             's.name as supplier',
+    //             's.code',
+    //             'pe.description',
+    //             'b.code as branch',
+    //             'p.purchase_date',
+    //             'p.wbno',
+    //             'pe.amount',
+    //             'pe.status',
+    //             'p.created_at',
+    //             'u.name as created_by'
+    //         )
+    //         ->whereBetween(DB::raw('DATE(p.purchase_date)'), [$from_date, $to_date])
+    //         ->orderBy('p.purchase_date');
+
+    //     // Apply filters only when specified (avoid LIKE '%' on numeric ids)
+    //     if (!empty($companyId) && $companyId !== 'all') {
+    //         $q->where('b.company_id', $companyId);
+    //     }
+    //     if (!empty($branchId) && $branchId !== 'all') {
+    //         $q->where('p.branch_id', $branchId);
+    //     }
+    //     if (!empty($supplierId) && $supplierId !== 'all') {
+    //         $q->where('pe.supplier_id', $supplierId); // filter on pe (correct table)
+    //     }
+    //     if (!empty($status) && $status !== 'all') {
+    //         $q->where('pe.status', $status); // filter on pe (correct table)
+    //     }
+
+    //     $sales = $q->get();
+
+    //     $company = (!empty($companyId) && $companyId !== 'all') ? Company::find($companyId) : null;
+    //     $branch = (!empty($branchId) && $branchId !== 'all') ? Branch::find($branchId) : null;
+
+    //     return view('pages.reports.inventory.load_additional_invoice_report', compact(
+    //         'sales',
+    //         'from_date',
+    //         'to_date',
+    //         'supplierId',
+    //         'companyId',
+    //         'branchId',
+    //         'branch',
+    //         'status'
+    //     ));
+    // }
+
 
     public function printAdditionalInvoiceReport($from_date, $to_date, $company_id, $branch_id, $supplier_id, $status)
     {
@@ -8356,7 +8482,8 @@ class ReportController extends Controller
 
     public function userEntriesReport()
     {
-        return view('pages.reports.inventory.user_entries.user_entries_report');
+        $users = DB::table('users')->where('active_status', 1)->get();
+        return view('pages.reports.inventory.user_entries.user_entries_report', compact('users'));
     }
 
 
@@ -8368,6 +8495,7 @@ class ReportController extends Controller
             'to_date' => 'required|date',
             'branch_id' => 'nullable|integer',
             'company_id' => 'nullable|integer',
+            'created_by' => 'nullable|integer',
         ]);
 
         $branch_id = $validated['branch_id'] ?? '%';
@@ -8520,6 +8648,12 @@ class ReportController extends Controller
             $query->where("purchases.branch_id", 'LIKE', $branch_id);
         } else {
             $query->where("$table.$branchColumn", 'LIKE', $branch_id);
+        }
+
+        // Filter by created user if provided
+        if (!empty($validated['created_by']) && $userColumn) {
+            $created_by = $validated['created_by'];
+            $query->where("$table.$userColumn", 'LIKE', "%{$created_by}%");
         }
 
         // Order by date

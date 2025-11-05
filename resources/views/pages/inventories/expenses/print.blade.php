@@ -68,8 +68,18 @@
                                 <th>Amount</th>
                             </tr>
                         </thead>
+                        @php $total_amount = 0; @endphp
                         <tbody>
-                            <tr>
+                            @foreach ($invoice->expenses as $item)
+                                <tr>
+                                    <td>{{ $item->supplier->code . ' - ' . $item->supplier->name }}</td>
+                                    <td>{{ $item->description }}</td>
+                                    <td align="right"><i class="fa fa-inr"></i>
+                                        {{ currency_sign() . number_format($item->amount, 2) }}</td>
+                                </tr>
+                                @php $total_amount += $item->amount; @endphp
+                            @endforeach
+                            {{-- <tr>
                                 <td>{{ $invoice->supplier->code . ' - ' . $invoice->supplier->name }}</td>
                                 <td>
                                     @if ($invoice->description == null)
@@ -81,7 +91,7 @@
                                 </td>
                                 <td align="right"><i class="fa fa-inr"></i>
                                     {{ currency_sign() . number_format($invoice->amount, 2) }}</td>
-                            </tr>
+                            </tr> --}}
                             <tr>
                                 <td colspan="2" class="text-right">
                                     <strong>Amount: </strong>
@@ -89,7 +99,7 @@
                                 <td align="right">
                                     <p>
                                         <strong><i
-                                                class="fa fa-inr"></i>{{ currency_sign() . number_format($invoice->amount, 2) }}</strong>
+                                                class="fa fa-inr"></i>{{ currency_sign() . number_format($total_amount, 2) }}</strong>
                                     </p>
                                 </td>
                             </tr>
@@ -103,7 +113,7 @@
                                             /*$a = new NumberFormatter("en", NumberFormatter::SPELLOUT);*/
                                         @endphp
                                         <strong><i class="fa fa-inr"></i>
-                                            {{ $obj->convertNumberToWords($invoice->amount + 0.55) }}</strong>
+                                            {{ $obj->convertNumberToWords($total_amount + 0.55) }}</strong>
                                         {{--                                            {{ $a->format($invoice->amount/2.3) }}</strong> --}}
                                     </p>
                                 </td>

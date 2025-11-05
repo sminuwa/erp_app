@@ -806,3 +806,7 @@ CREATE TABLE `period_settings` (
     `updated_at` TIMESTAMP NULL DEFAULT NULL
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
+//03/11/2025
+UPDATE `albabello`.`permissions` SET `active` = '1' WHERE `id` = '533';
+

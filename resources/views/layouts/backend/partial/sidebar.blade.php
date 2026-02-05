@@ -949,6 +949,177 @@
                         </ul>
                     </li>
                 @endcan
+                @can('menu.manufacturing')
+                    <li class="nav-item has-treeview {{ Request::is('manufacturing/*') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ Request::is('manufacturing/*') ? 'active' : '' }}">
+                            <i class="ion-ios-cog"></i>
+                            <p>
+                                Manufacturing
+                                <i class="right fa fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @can('submenu.manufacturing.setup')
+                                <li class="nav-item has-treeview">
+                                    <a href="#" class="nav-link">
+                                        <i class="ion-wrench"></i>
+                                        <p>Setup <i class="right fa fa-angle-left"></i></p>
+                                    </a>
+                                    <ul class="nav nav-treeview" style="padding-left: 15px;">
+                                        @can('manufacturing.machines.index')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.machines.index') }}" class="nav-link">
+                                                    <i class="fa fa-cogs"></i>
+                                                    <p>Machines/Pots</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('manufacturing.staff.index')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.staff.index') }}" class="nav-link">
+                                                    <i class="fa fa-users"></i>
+                                                    <p>Manufacturing Staff</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('manufacturing.teams.index')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.teams.index') }}" class="nav-link">
+                                                    <i class="fa fa-user-plus"></i>
+                                                    <p>Production Teams</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('manufacturing.boms.index')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.boms.index') }}" class="nav-link">
+                                                    <i class="fa fa-list-alt"></i>
+                                                    <p>Bill of Materials</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                    </ul>
+                                </li>
+                            @endcan
+                            @can('submenu.manufacturing.processing')
+                                <li class="nav-item has-treeview">
+                                    <a href="#" class="nav-link">
+                                        <i class="ion-android-checkbox-outline"></i>
+                                        <p>Processing <i class="right fa fa-angle-left"></i></p>
+                                    </a>
+                                    <ul class="nav nav-treeview" style="padding-left: 15px;">
+                                        @can('manufacturing.production_orders.index')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.production_orders.index') }}" class="nav-link">
+                                                    <i class="fa fa-file-text-o"></i>
+                                                    <p>Production Orders</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('manufacturing.schedules.index')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.schedules.index') }}" class="nav-link">
+                                                    <i class="fa fa-calendar"></i>
+                                                    <p>Daily Schedules</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('manufacturing.requisitions.index')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.requisitions.index') }}" class="nav-link">
+                                                    <i class="fa fa-clipboard"></i>
+                                                    <p>Materials Requisition</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('manufacturing.single_manufacturing.index')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.single_manufacturing.index') }}" class="nav-link">
+                                                    <i class="fa fa-cube"></i>
+                                                    <p>Single Product Mfg</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('manufacturing.batch_production.index')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.batch_production.index') }}" class="nav-link">
+                                                    <i class="fa fa-cubes"></i>
+                                                    <p>Batch Production</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('manufacturing.batch_conversion.index')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.batch_conversion.index') }}" class="nav-link">
+                                                    <i class="fa fa-exchange"></i>
+                                                    <p>Batch Conversion</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('manufacturing.additional_costs.index')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.additional_costs.index') }}" class="nav-link">
+                                                    <i class="fa fa-plus-circle"></i>
+                                                    <p>Additional Costs</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('manufacturing.penalties.index')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.penalties.index') }}" class="nav-link">
+                                                    <i class="fa fa-exclamation-triangle"></i>
+                                                    <p>Penalties</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('manufacturing.returns.index')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.returns.index') }}" class="nav-link">
+                                                    <i class="fa fa-undo"></i>
+                                                    <p>Manufacturing Returns</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('manufacturing.reworks.index')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.reworks.index') }}" class="nav-link">
+                                                    <i class="fa fa-refresh"></i>
+                                                    <p>Reworks</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                    </ul>
+                                </li>
+                            @endcan
+                            @can('submenu.manufacturing.reports')
+                                <li class="nav-item has-treeview">
+                                    <a href="#" class="nav-link">
+                                        <i class="ion-stats-bars"></i>
+                                        <p>Reports <i class="right fa fa-angle-left"></i></p>
+                                    </a>
+                                    <ul class="nav nav-treeview" style="padding-left: 15px;">
+                                        @can('manufacturing.reports.history')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.reports.history.index') }}" class="nav-link">
+                                                    <i class="fa fa-history"></i>
+                                                    <p>Manufacturing History</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('manufacturing.reports.teams')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.reports.teams.index') }}" class="nav-link">
+                                                    <i class="fa fa-users"></i>
+                                                    <p>Teams Report</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                    </ul>
+                                </li>
+                            @endcan
+                        </ul>
+                    </li>
+                @endcan
                 @can('menu.backup')
                     <li class="nav-item has-treeview {{ Request::is('transaction/*') ? 'menu-open' : '' }}">
                         <a href="#" class="nav-link {{ Request::is('transaction/*') ? 'active' : '' }}">

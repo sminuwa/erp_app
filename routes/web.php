@@ -1269,4 +1269,190 @@ Route::middleware('auth')->group(function () {
         Route::put('/update/{areaManager}', [AreaManagerController::class, 'update'])->name('area_managers.update');
         Route::delete('/delete/{areaManager}', [AreaManagerController::class, 'destroy'])->name('area_managers.destroy');
     });
+
+    // ========================= MANUFACTURING MODULE =========================
+    Route::prefix('manufacturing')->group(function () {
+
+        // Setup Routes
+        Route::prefix('setup')->group(function () {
+
+            // Manufacturing Machines (Pots)
+            Route::prefix('machines')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingMachineController::class, 'index'])->name('manufacturing.machines.index');
+                Route::get('/create', [\App\Http\Controllers\Manufacturing\ManufacturingMachineController::class, 'create'])->name('manufacturing.machines.create');
+                Route::post('/store', [\App\Http\Controllers\Manufacturing\ManufacturingMachineController::class, 'store'])->name('manufacturing.machines.store');
+                Route::get('/edit/{machine}', [\App\Http\Controllers\Manufacturing\ManufacturingMachineController::class, 'edit'])->name('manufacturing.machines.edit');
+                Route::put('/update/{machine}', [\App\Http\Controllers\Manufacturing\ManufacturingMachineController::class, 'update'])->name('manufacturing.machines.update');
+                Route::delete('/delete/{machine}', [\App\Http\Controllers\Manufacturing\ManufacturingMachineController::class, 'destroy'])->name('manufacturing.machines.destroy');
+            });
+
+            // Manufacturing Staff
+            Route::prefix('staff')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingStaffController::class, 'index'])->name('manufacturing.staff.index');
+                Route::get('/create', [\App\Http\Controllers\Manufacturing\ManufacturingStaffController::class, 'create'])->name('manufacturing.staff.create');
+                Route::post('/store', [\App\Http\Controllers\Manufacturing\ManufacturingStaffController::class, 'store'])->name('manufacturing.staff.store');
+                Route::get('/edit/{staff}', [\App\Http\Controllers\Manufacturing\ManufacturingStaffController::class, 'edit'])->name('manufacturing.staff.edit');
+                Route::put('/update/{staff}', [\App\Http\Controllers\Manufacturing\ManufacturingStaffController::class, 'update'])->name('manufacturing.staff.update');
+                Route::delete('/delete/{staff}', [\App\Http\Controllers\Manufacturing\ManufacturingStaffController::class, 'destroy'])->name('manufacturing.staff.destroy');
+            });
+
+            // Manufacturing Teams
+            Route::prefix('teams')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingTeamController::class, 'index'])->name('manufacturing.teams.index');
+                Route::get('/create', [\App\Http\Controllers\Manufacturing\ManufacturingTeamController::class, 'create'])->name('manufacturing.teams.create');
+                Route::post('/store', [\App\Http\Controllers\Manufacturing\ManufacturingTeamController::class, 'store'])->name('manufacturing.teams.store');
+                Route::get('/show/{team}', [\App\Http\Controllers\Manufacturing\ManufacturingTeamController::class, 'show'])->name('manufacturing.teams.show');
+                Route::get('/edit/{team}', [\App\Http\Controllers\Manufacturing\ManufacturingTeamController::class, 'edit'])->name('manufacturing.teams.edit');
+                Route::put('/update/{team}', [\App\Http\Controllers\Manufacturing\ManufacturingTeamController::class, 'update'])->name('manufacturing.teams.update');
+                Route::delete('/delete/{team}', [\App\Http\Controllers\Manufacturing\ManufacturingTeamController::class, 'destroy'])->name('manufacturing.teams.destroy');
+            });
+
+            // Bill of Materials (BOM)
+            Route::prefix('boms')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingBomController::class, 'index'])->name('manufacturing.boms.index');
+                Route::get('/create', [\App\Http\Controllers\Manufacturing\ManufacturingBomController::class, 'create'])->name('manufacturing.boms.create');
+                Route::post('/store', [\App\Http\Controllers\Manufacturing\ManufacturingBomController::class, 'store'])->name('manufacturing.boms.store');
+                Route::get('/show/{bom}', [\App\Http\Controllers\Manufacturing\ManufacturingBomController::class, 'show'])->name('manufacturing.boms.show');
+                Route::get('/edit/{bom}', [\App\Http\Controllers\Manufacturing\ManufacturingBomController::class, 'edit'])->name('manufacturing.boms.edit');
+                Route::put('/update/{bom}', [\App\Http\Controllers\Manufacturing\ManufacturingBomController::class, 'update'])->name('manufacturing.boms.update');
+                Route::delete('/delete/{bom}', [\App\Http\Controllers\Manufacturing\ManufacturingBomController::class, 'destroy'])->name('manufacturing.boms.destroy');
+                Route::get('/print/{bom}', [\App\Http\Controllers\Manufacturing\ManufacturingBomController::class, 'print'])->name('manufacturing.boms.print');
+            });
+        });
+
+        // Processing Routes
+        Route::prefix('processing')->group(function () {
+
+            // Production Orders
+            Route::prefix('production-orders')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'index'])->name('manufacturing.production_orders.index');
+                Route::get('/create', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'create'])->name('manufacturing.production_orders.create');
+                Route::post('/store', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'store'])->name('manufacturing.production_orders.store');
+                Route::get('/show/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'show'])->name('manufacturing.production_orders.show');
+                Route::post('/approve/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'approve'])->name('manufacturing.production_orders.approve');
+                Route::post('/close/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'close'])->name('manufacturing.production_orders.close');
+                Route::delete('/delete/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'destroy'])->name('manufacturing.production_orders.destroy');
+                Route::get('/print/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'print'])->name('manufacturing.production_orders.print');
+            });
+
+            // Daily Manufacturing Schedules
+            Route::prefix('schedules')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'index'])->name('manufacturing.schedules.index');
+                Route::get('/create', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'create'])->name('manufacturing.schedules.create');
+                Route::post('/store', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'store'])->name('manufacturing.schedules.store');
+                Route::get('/show/{schedule}', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'show'])->name('manufacturing.schedules.show');
+                Route::post('/approve/{schedule}', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'approve'])->name('manufacturing.schedules.approve');
+                Route::delete('/delete/{schedule}', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'destroy'])->name('manufacturing.schedules.destroy');
+            });
+
+            // Materials Requisitions
+            Route::prefix('requisitions')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\MaterialsRequisitionController::class, 'index'])->name('manufacturing.requisitions.index');
+                Route::get('/create', [\App\Http\Controllers\Manufacturing\MaterialsRequisitionController::class, 'create'])->name('manufacturing.requisitions.create');
+                Route::post('/store', [\App\Http\Controllers\Manufacturing\MaterialsRequisitionController::class, 'store'])->name('manufacturing.requisitions.store');
+                Route::get('/show/{requisition}', [\App\Http\Controllers\Manufacturing\MaterialsRequisitionController::class, 'show'])->name('manufacturing.requisitions.show');
+                Route::post('/approve/{requisition}', [\App\Http\Controllers\Manufacturing\MaterialsRequisitionController::class, 'approve'])->name('manufacturing.requisitions.approve');
+                Route::post('/issue/{requisition}', [\App\Http\Controllers\Manufacturing\MaterialsRequisitionController::class, 'issue'])->name('manufacturing.requisitions.issue');
+                Route::post('/receive/{requisition}', [\App\Http\Controllers\Manufacturing\MaterialsRequisitionController::class, 'receive'])->name('manufacturing.requisitions.receive');
+                Route::delete('/delete/{requisition}', [\App\Http\Controllers\Manufacturing\MaterialsRequisitionController::class, 'destroy'])->name('manufacturing.requisitions.destroy');
+            });
+
+            // Single Product Manufacturing
+            Route::prefix('single-manufacturing')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'index'])->name('manufacturing.single_manufacturing.index');
+                Route::get('/create', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'create'])->name('manufacturing.single_manufacturing.create');
+                Route::post('/store', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'store'])->name('manufacturing.single_manufacturing.store');
+                Route::get('/show/{spm}', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'show'])->name('manufacturing.single_manufacturing.show');
+                Route::post('/post/{spm}', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'post'])->name('manufacturing.single_manufacturing.post');
+                Route::delete('/delete/{spm}', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'destroy'])->name('manufacturing.single_manufacturing.destroy');
+                Route::get('/print/{spm}', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'print'])->name('manufacturing.single_manufacturing.print');
+            });
+
+            // Batch Production
+            Route::prefix('batch-production')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'index'])->name('manufacturing.batch_production.index');
+                Route::get('/create', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'create'])->name('manufacturing.batch_production.create');
+                Route::post('/store', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'store'])->name('manufacturing.batch_production.store');
+                Route::get('/show/{batch}', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'show'])->name('manufacturing.batch_production.show');
+                Route::post('/post/{batch}', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'post'])->name('manufacturing.batch_production.post');
+                Route::delete('/delete/{batch}', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'destroy'])->name('manufacturing.batch_production.destroy');
+                Route::get('/print/{batch}', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'print'])->name('manufacturing.batch_production.print');
+            });
+
+            // Batch Conversion
+            Route::prefix('batch-conversion')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\BatchConversionController::class, 'index'])->name('manufacturing.batch_conversion.index');
+                Route::get('/create', [\App\Http\Controllers\Manufacturing\BatchConversionController::class, 'create'])->name('manufacturing.batch_conversion.create');
+                Route::post('/store', [\App\Http\Controllers\Manufacturing\BatchConversionController::class, 'store'])->name('manufacturing.batch_conversion.store');
+                Route::get('/show/{conversion}', [\App\Http\Controllers\Manufacturing\BatchConversionController::class, 'show'])->name('manufacturing.batch_conversion.show');
+                Route::post('/post/{conversion}', [\App\Http\Controllers\Manufacturing\BatchConversionController::class, 'post'])->name('manufacturing.batch_conversion.post');
+                Route::delete('/delete/{conversion}', [\App\Http\Controllers\Manufacturing\BatchConversionController::class, 'destroy'])->name('manufacturing.batch_conversion.destroy');
+            });
+
+            // Additional Costs
+            Route::prefix('additional-costs')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingAdditionalCostController::class, 'index'])->name('manufacturing.additional_costs.index');
+                Route::get('/create', [\App\Http\Controllers\Manufacturing\ManufacturingAdditionalCostController::class, 'create'])->name('manufacturing.additional_costs.create');
+                Route::post('/store', [\App\Http\Controllers\Manufacturing\ManufacturingAdditionalCostController::class, 'store'])->name('manufacturing.additional_costs.store');
+                Route::get('/show/{cost}', [\App\Http\Controllers\Manufacturing\ManufacturingAdditionalCostController::class, 'show'])->name('manufacturing.additional_costs.show');
+                Route::post('/post/{cost}', [\App\Http\Controllers\Manufacturing\ManufacturingAdditionalCostController::class, 'post'])->name('manufacturing.additional_costs.post');
+                Route::delete('/delete/{cost}', [\App\Http\Controllers\Manufacturing\ManufacturingAdditionalCostController::class, 'destroy'])->name('manufacturing.additional_costs.destroy');
+            });
+
+            // Penalties
+            Route::prefix('penalties')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingPenaltyController::class, 'index'])->name('manufacturing.penalties.index');
+                Route::get('/create', [\App\Http\Controllers\Manufacturing\ManufacturingPenaltyController::class, 'create'])->name('manufacturing.penalties.create');
+                Route::post('/store', [\App\Http\Controllers\Manufacturing\ManufacturingPenaltyController::class, 'store'])->name('manufacturing.penalties.store');
+                Route::get('/show/{penalty}', [\App\Http\Controllers\Manufacturing\ManufacturingPenaltyController::class, 'show'])->name('manufacturing.penalties.show');
+                Route::post('/post/{penalty}', [\App\Http\Controllers\Manufacturing\ManufacturingPenaltyController::class, 'post'])->name('manufacturing.penalties.post');
+                Route::delete('/delete/{penalty}', [\App\Http\Controllers\Manufacturing\ManufacturingPenaltyController::class, 'destroy'])->name('manufacturing.penalties.destroy');
+            });
+
+            // Manufacturing Returns
+            Route::prefix('returns')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingReturnController::class, 'index'])->name('manufacturing.returns.index');
+                Route::get('/create', [\App\Http\Controllers\Manufacturing\ManufacturingReturnController::class, 'create'])->name('manufacturing.returns.create');
+                Route::post('/store', [\App\Http\Controllers\Manufacturing\ManufacturingReturnController::class, 'store'])->name('manufacturing.returns.store');
+                Route::get('/show/{return}', [\App\Http\Controllers\Manufacturing\ManufacturingReturnController::class, 'show'])->name('manufacturing.returns.show');
+                Route::post('/post/{return}', [\App\Http\Controllers\Manufacturing\ManufacturingReturnController::class, 'post'])->name('manufacturing.returns.post');
+                Route::delete('/delete/{return}', [\App\Http\Controllers\Manufacturing\ManufacturingReturnController::class, 'destroy'])->name('manufacturing.returns.destroy');
+            });
+
+            // Reworks
+            Route::prefix('reworks')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingReworkController::class, 'index'])->name('manufacturing.reworks.index');
+                Route::get('/create', [\App\Http\Controllers\Manufacturing\ManufacturingReworkController::class, 'create'])->name('manufacturing.reworks.create');
+                Route::post('/store', [\App\Http\Controllers\Manufacturing\ManufacturingReworkController::class, 'store'])->name('manufacturing.reworks.store');
+                Route::get('/show/{rework}', [\App\Http\Controllers\Manufacturing\ManufacturingReworkController::class, 'show'])->name('manufacturing.reworks.show');
+                Route::post('/post/{rework}', [\App\Http\Controllers\Manufacturing\ManufacturingReworkController::class, 'post'])->name('manufacturing.reworks.post');
+                Route::delete('/delete/{rework}', [\App\Http\Controllers\Manufacturing\ManufacturingReworkController::class, 'destroy'])->name('manufacturing.reworks.destroy');
+            });
+        });
+
+        // Reports Routes
+        Route::prefix('reports')->group(function () {
+
+            // Manufacturing History Report
+            Route::prefix('history')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'historyReport'])->name('manufacturing.reports.history.index');
+                Route::get('/load', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'loadHistoryReport'])->name('manufacturing.reports.history.load');
+                Route::get('/print', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'printHistoryReport'])->name('manufacturing.reports.history.print');
+            });
+
+            // Manufacturing Teams Report
+            Route::prefix('teams')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'teamsReport'])->name('manufacturing.reports.teams.index');
+                Route::get('/load', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'loadTeamsReport'])->name('manufacturing.reports.teams.load');
+                Route::get('/print', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'printTeamsReport'])->name('manufacturing.reports.teams.print');
+            });
+        });
+
+        // AJAX Routes
+        Route::prefix('ajax')->group(function () {
+            Route::get('/product-cost', [\App\Http\Controllers\Manufacturing\ManufacturingBomController::class, 'getProductCostAjax'])->name('manufacturing.ajax.product-cost');
+            Route::get('/stores-by-branch', [\App\Http\Controllers\Manufacturing\ManufacturingBomController::class, 'getStoresByBranch'])->name('manufacturing.ajax.stores-by-branch');
+            Route::get('/bom-details', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'getBomDetails'])->name('manufacturing.ajax.bom-details');
+        });
+    });
 });

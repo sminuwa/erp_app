@@ -340,23 +340,30 @@ class ManufacturingBomController extends Controller
      */
     private function getProductCost($productId, $branchId)
     {
+        // First try to get from branch product price
         $branchPrice = BranchProductPrice::where([
             'product_id' => $productId,
             'branch_id' => $branchId
         ])->first();
 
-        if (!$branchPrice || $branchPrice->cost_price == 0) {
-            // Log warning for monitoring
-            \Log::warning('Cost price not found or zero', [
-                'product_id' => $productId,
-                'branch_id' => $branchId,
-                'context' => 'ManufacturingBomController.getProductCost'
-            ]);
-
-            return 0;
+        if ($branchPrice && $branchPrice->cost_price > 0) {
+            return (float) $branchPrice->cost_price;
         }
 
-        return (float) $branchPrice->cost_price;
+        // Fallback to product's purchase price
+        $product = Product::find($productId);
+        if ($product && $product->purchase_price > 0) {
+            return (float) $product->purchase_price;
+        }
+
+        // Log warning for monitoring
+        \Log::warning('Cost price not found or zero', [
+            'product_id' => $productId,
+            'branch_id' => $branchId,
+            'context' => 'ManufacturingBomController.getProductCost'
+        ]);
+
+        return 0;
     }
 
     /**

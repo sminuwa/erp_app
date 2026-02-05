@@ -64,6 +64,18 @@ class ManufacturingRework extends Model
         return $this->hasMany(ManufacturingReworkMaterial::class, 'rework_id', 'id');
     }
 
+    public function singleManufacturing()
+    {
+        return $this->belongsTo(SingleProductManufacturing::class, 'production_id', 'id')
+            ->where('production_type', self::PRODUCTION_TYPE_SINGLE);
+    }
+
+    public function batchProduction()
+    {
+        return $this->belongsTo(BatchProduction::class, 'production_id', 'id')
+            ->where('production_type', self::PRODUCTION_TYPE_BATCH);
+    }
+
     public function getProduction()
     {
         if ($this->production_type === self::PRODUCTION_TYPE_SINGLE) {

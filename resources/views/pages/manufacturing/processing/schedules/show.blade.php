@@ -1,9 +1,12 @@
-@extends('layouts.app')
+@extends('layouts.backend.app')
 
 @section('title', 'View Daily Manufacturing Schedule')
 
+@push('css')
+@endpush
+
 @section('content')
-<section class="content">
+<section class="content-wrapper">
     <div class="row">
         <div class="col-md-12">
             <div class="card">
@@ -105,9 +108,9 @@
                             @forelse($record->items as $index => $item)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
-                                <td>{{ $item->bom->reference ?? 'N/A' }}</td>
-                                <td>{{ $item->bom->finishProduct->name ?? 'N/A' }}</td>
-                                <td>{{ number_format($item->quantity, 4) }}</td>
+                                <td>{{ $item->productionOrderItem->bom->reference ?? 'N/A' }}</td>
+                                <td>{{ $item->productionOrderItem->bom->finishProduct->name ?? 'N/A' }}</td>
+                                <td>{{ number_format($item->scheduled_qty, 4) }}</td>
                             </tr>
                             @empty
                             <tr>

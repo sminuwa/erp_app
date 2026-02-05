@@ -54,7 +54,6 @@ class ManufacturingReturnController extends Controller
 
         $request->validate([
             'reference' => 'required|unique:manufacturing_returns,reference',
-            'return_type' => 'required|in:full,partial',
             'reason' => 'required|max:500'
         ]);
 
@@ -63,13 +62,23 @@ class ManufacturingReturnController extends Controller
         try {
             $user = Auth::user();
 
+            // Determine production type and ID (polymorphic)
+            $productionType = null;
+            $productionId = null;
+            if ($request->single_manufacturing_id) {
+                $productionType = ManufacturingReturn::PRODUCTION_TYPE_SINGLE;
+                $productionId = $request->single_manufacturing_id;
+            } elseif ($request->batch_production_id) {
+                $productionType = ManufacturingReturn::PRODUCTION_TYPE_BATCH;
+                $productionId = $request->batch_production_id;
+            }
+
             $model = new ManufacturingReturn;
             $model->reference = $request->reference;
             $model->return_date = $request->return_date;
-            $model->return_type = $request->return_type;
-            $model->single_manufacturing_id = $request->single_manufacturing_id;
-            $model->batch_production_id = $request->batch_production_id;
-            $model->return_qty = $request->return_qty;
+            $model->production_type = $productionType;
+            $model->production_id = $productionId;
+            $model->return_qty = $request->return_qty ?? 0;
             $model->reason = $request->reason;
             $model->branch_id = $user->branch_id;
             $model->status = ManufacturingReturn::STATUS_PENDING;
@@ -147,17 +156,19 @@ class ManufacturingReturnController extends Controller
             }
 
             // Deduct finished goods if applicable
-            if ($return->single_manufacturing_id) {
-                $spm = $return->singleManufacturing;
-                ManufacturingCostPrice::returnFinishedGoods(
-                    $spm->bom->finish_product_id,
-                    $spm->bom->output_store_id,
-                    $return->return_qty,
-                    $return->return_qty * $spm->unit_cost,
-                    $return->branch_id,
-                    $return->reference,
-                    $return->return_date
-                );
+            if ($return->production_type === ManufacturingReturn::PRODUCTION_TYPE_SINGLE) {
+                $production = $return->getProduction();
+                if ($production) {
+                    ManufacturingCostPrice::returnFinishedGoods(
+                        $production->finish_product_id,
+                        $production->output_store_id,
+                        $return->return_qty,
+                        $return->return_qty * $production->unit_cost,
+                        $return->branch_id,
+                        $return->reference,
+                        $return->return_date
+                    );
+                }
             }
 
             // Post to ledger

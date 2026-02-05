@@ -1,9 +1,12 @@
-@extends('layouts.app')
+@extends('layouts.backend.app')
 
 @section('title', 'View Materials Requisition')
 
+@push('css')
+@endpush
+
 @section('content')
-<section class="content">
+<section class="content-wrapper">
     <div class="row">
         <div class="col-md-12">
             <div class="card">
@@ -132,8 +135,8 @@
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $item->product->name ?? 'N/A' }}</td>
-                                <td>{{ $item->store->name ?? 'N/A' }}</td>
-                                <td>{{ number_format($item->quantity, 4) }}</td>
+                                <td>{{ $item->sourceStore->name ?? 'N/A' }}</td>
+                                <td>{{ number_format($item->required_qty, 4) }}</td>
                                 <td>{{ number_format($item->issued_qty ?? 0, 4) }}</td>
                                 <td>{{ number_format($item->received_qty ?? 0, 4) }}</td>
                             </tr>

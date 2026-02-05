@@ -77,7 +77,7 @@ class MaterialsRequisitionController extends Controller
                 foreach ($schedule->items as $item) {
                     $materialsData = ProductionCalculator::calculateMaterials(
                         $item->productionOrderItem->bom_id,
-                        $item->quantity,
+                        $item->scheduled_qty,
                         $model->branch_id
                     );
                     foreach ($materialsData['materials'] as $m) {
@@ -97,6 +97,19 @@ class MaterialsRequisitionController extends Controller
                     $model->branch_id
                 );
                 $materials = $materialsData['materials'];
+            } elseif ($request->has('items')) {
+                // Manual item entry from form
+                foreach ($request->items as $item) {
+                    if (!empty($item['product_id']) && !empty($item['quantity'])) {
+                        $materials[] = [
+                            'product_id' => $item['product_id'],
+                            'store_id' => $item['store_id'] ?? null,
+                            'quantity' => $item['quantity'],
+                            'unit_cost' => $item['unit_cost'] ?? 0,
+                            'total_cost' => ($item['unit_cost'] ?? 0) * $item['quantity']
+                        ];
+                    }
+                }
             }
 
             // Save materials
@@ -104,12 +117,11 @@ class MaterialsRequisitionController extends Controller
                 MaterialsRequisitionItem::create([
                     'requisition_id' => $model->id,
                     'product_id' => $m['product_id'],
-                    'store_id' => $m['store_id'],
+                    'source_store_id' => $m['store_id'],
                     'required_qty' => $m['quantity'],
                     'issued_qty' => 0,
                     'received_qty' => 0,
-                    'unit_cost' => $m['unit_cost'],
-                    'total_cost' => $m['total_cost']
+                    'unit_cost' => $m['unit_cost']
                 ]);
             }
 
@@ -129,7 +141,7 @@ class MaterialsRequisitionController extends Controller
     {
         $this->authorize('manufacturing.requisitions.show');
 
-        $requisition->load(['schedule', 'bom', 'items.product', 'items.store', 'branch', 'createdBy']);
+        $requisition->load(['schedule', 'bom', 'items.product', 'items.sourceStore', 'branch', 'createdBy']);
 
         return view('pages.manufacturing.processing.requisitions.show', [
             'record' => $requisition

@@ -1,6 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.backend.app')
 
 @section('title', 'Create Manufacturing Rework')
+
+@push('css')
+@endpush
 
 @section('content')
 <section class="content">

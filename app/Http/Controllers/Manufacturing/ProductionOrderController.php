@@ -82,9 +82,9 @@ class ProductionOrderController extends Controller
                 foreach ($request->items as $item) {
                     if (!empty($item['bom_id']) && !empty($item['quantity'])) {
                         ProductionOrderItem::create([
-                            'order_id' => $model->id,
+                            'production_order_id' => $model->id,
                             'bom_id' => $item['bom_id'],
-                            'quantity' => $item['quantity'],
+                            'quantity_to_produce' => $item['quantity'],
                             'scheduled_qty' => 0,
                             'produced_qty' => 0
                         ]);
@@ -112,9 +112,9 @@ class ProductionOrderController extends Controller
             // Save aggregated materials
             foreach ($allMaterials as $material) {
                 ProductionOrderMaterial::create([
-                    'order_id' => $model->id,
+                    'production_order_id' => $model->id,
                     'product_id' => $material['product_id'],
-                    'store_id' => $material['store_id'],
+                    'source_store_id' => $material['store_id'],
                     'required_qty' => $material['quantity'],
                     'unit_cost' => $material['unit_cost'],
                     'total_cost' => $material['total_cost']
@@ -142,7 +142,7 @@ class ProductionOrderController extends Controller
         $production_order->load([
             'items.bom.finishProduct',
             'materials.product',
-            'materials.store',
+            'materials.sourceStore',
             'branch',
             'createdBy',
             'approvedBy'
@@ -229,8 +229,8 @@ class ProductionOrderController extends Controller
 
         try {
             // Delete related records
-            ProductionOrderItem::where('order_id', $production_order->id)->delete();
-            ProductionOrderMaterial::where('order_id', $production_order->id)->delete();
+            ProductionOrderItem::where('production_order_id', $production_order->id)->delete();
+            ProductionOrderMaterial::where('production_order_id', $production_order->id)->delete();
 
             $reference = $production_order->reference;
             $production_order->delete();
@@ -275,7 +275,7 @@ class ProductionOrderController extends Controller
         $production_order->load([
             'items.bom.finishProduct',
             'materials.product',
-            'materials.store',
+            'materials.sourceStore',
             'branch',
             'createdBy',
             'approvedBy'

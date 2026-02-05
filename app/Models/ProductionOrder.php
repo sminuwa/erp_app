@@ -15,6 +15,7 @@ class ProductionOrder extends Model
 
     protected $fillable = [
         'reference',
+        'order_date',
         'branch_id',
         'start_date',
         'end_date',

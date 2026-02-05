@@ -57,6 +57,7 @@ class BatchProductionController extends Controller
             'boms' => \App\Models\ManufacturingBom::where('bom_type', 'batch')->active()->forBranch($user->branch_id)->get(),
             'teams' => ManufacturingTeam::active()->forBranch($user->branch_id)->get(),
             'machines' => ManufacturingMachine::active()->forBranch($user->branch_id)->get(),
+            'products' => \App\Models\Product::orderBy('name')->get(),
             'stores' => \App\Models\Store::where('branch_id', $user->branch_id)->orderBy('name')->get()
         ]);
     }
@@ -205,7 +206,7 @@ class BatchProductionController extends Controller
         DB::beginTransaction();
 
         try {
-            BatchProductionMaterial::where('batch_id', $batch->id)->delete();
+            BatchProductionMaterial::where('batch_production_id', $batch->id)->delete();
             $reference = $batch->reference;
             $batch->delete();
 

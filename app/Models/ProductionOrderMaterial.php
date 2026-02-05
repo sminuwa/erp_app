@@ -13,7 +13,9 @@ class ProductionOrderMaterial extends Model
         'production_order_item_id',
         'product_id',
         'required_qty',
-        'source_store_id'
+        'source_store_id',
+        'unit_cost',
+        'total_cost'
     ];
 
     public $timestamps = false;

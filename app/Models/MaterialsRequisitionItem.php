@@ -15,7 +15,8 @@ class MaterialsRequisitionItem extends Model
         'required_qty',
         'issued_qty',
         'received_qty',
-        'unit_cost'
+        'unit_cost',
+        'total_cost'
     ];
 
     protected $casts = [
@@ -23,6 +24,7 @@ class MaterialsRequisitionItem extends Model
         'issued_qty' => 'decimal:4',
         'received_qty' => 'decimal:4',
         'unit_cost' => 'decimal:2',
+        'total_cost' => 'decimal:2',
     ];
 
     public function requisition()

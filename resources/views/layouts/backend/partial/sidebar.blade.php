@@ -863,6 +863,38 @@
                                     </ul>
                                 </li>
                             @endcan
+                            @can('submenu.manufacturing.reports')
+                                <li class="nav-item has-treeview {{ Request::is('manufacturing/reports*') ? 'menu-open' : '' }}">
+                                    <a href="#"
+                                        class="nav-link {{ Request::is('manufacturing/reports*') ? 'active' : '' }}">
+                                        <i class="ion-stats-bars"></i>
+                                        <p>
+                                            Manufacturing Reports
+                                            <i class="right fa fa-angle-left"></i>
+                                        </p>
+                                    </a>
+                                    <ul class="nav nav-treeview">
+                                        @can('manufacturing.reports.history')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.reports.history.index') }}"
+                                                    class="nav-link {{ Request::is('manufacturing/reports/history*') ? 'active' : '' }}">
+                                                    <i class="fa fa-history"></i>
+                                                    <p>Manufacturing History</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('manufacturing.reports.teams')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.reports.teams.index') }}"
+                                                    class="nav-link {{ Request::is('manufacturing/reports/teams*') ? 'active' : '' }}">
+                                                    <i class="fa fa-users"></i>
+                                                    <p>Teams Report</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                    </ul>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
                 @endcan
@@ -1085,32 +1117,6 @@
                                                 <a href="{{ route('manufacturing.reworks.index') }}" class="nav-link">
                                                     <i class="fa fa-refresh"></i>
                                                     <p>Reworks</p>
-                                                </a>
-                                            </li>
-                                        @endcan
-                                    </ul>
-                                </li>
-                            @endcan
-                            @can('submenu.manufacturing.reports')
-                                <li class="nav-item has-treeview">
-                                    <a href="#" class="nav-link">
-                                        <i class="ion-stats-bars"></i>
-                                        <p>Reports <i class="right fa fa-angle-left"></i></p>
-                                    </a>
-                                    <ul class="nav nav-treeview" style="padding-left: 15px;">
-                                        @can('manufacturing.reports.history')
-                                            <li class="nav-item">
-                                                <a href="{{ route('manufacturing.reports.history.index') }}" class="nav-link">
-                                                    <i class="fa fa-history"></i>
-                                                    <p>Manufacturing History</p>
-                                                </a>
-                                            </li>
-                                        @endcan
-                                        @can('manufacturing.reports.teams')
-                                            <li class="nav-item">
-                                                <a href="{{ route('manufacturing.reports.teams.index') }}" class="nav-link">
-                                                    <i class="fa fa-users"></i>
-                                                    <p>Teams Report</p>
                                                 </a>
                                             </li>
                                         @endcan

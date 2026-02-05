@@ -38,8 +38,8 @@
                                 <tr>
                                     <th>Reference</th>
                                     <th>Date</th>
-                                    <th>Product</th>
-                                    <th>Expense Account</th>
+                                    <th>Production</th>
+                                    <th>Account</th>
                                     <th>Amount</th>
                                     <th>Status</th>
                                     <th width="100">Actions</th>
@@ -50,8 +50,14 @@
                                 <tr>
                                     <td>{{ $record->reference }}</td>
                                     <td>{{ date('d M Y', strtotime($record->cost_date)) }}</td>
-                                    <td>{{ $record->product->name ?? 'N/A' }}</td>
-                                    <td>{{ $record->expenseAccount->name ?? 'N/A' }}</td>
+                                    <td>
+                                        @if($record->production_type == 'single_product')
+                                            {{ $record->getProduction()->reference ?? 'N/A' }} (Single)
+                                        @else
+                                            {{ $record->getProduction()->reference ?? 'N/A' }} (Batch)
+                                        @endif
+                                    </td>
+                                    <td>{{ $record->account->name ?? 'N/A' }}</td>
                                     <td>{{ number_format($record->amount, 2) }}</td>
                                     <td>
                                         @if($record->status == 'pending')

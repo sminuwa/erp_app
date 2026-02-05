@@ -2,6 +2,9 @@
 
 @section('title', 'Create Batch Production')
 
+@push('css')
+@endpush
+
 @section('content')
 <div class="content-wrapper">
     <section class="content-header">

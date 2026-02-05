@@ -58,6 +58,18 @@ class ManufacturingAdditionalCost extends Model
         return $this->belongsTo(User::class, 'posted_by', 'id');
     }
 
+    public function singleManufacturing()
+    {
+        return $this->belongsTo(SingleProductManufacturing::class, 'production_id', 'id')
+            ->where('production_type', self::PRODUCTION_TYPE_SINGLE);
+    }
+
+    public function batchConversion()
+    {
+        return $this->belongsTo(BatchConversion::class, 'production_id', 'id')
+            ->where('production_type', self::PRODUCTION_TYPE_BATCH);
+    }
+
     public function getProduction()
     {
         if ($this->production_type === self::PRODUCTION_TYPE_SINGLE) {

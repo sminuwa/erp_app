@@ -1,9 +1,12 @@
-@extends('layouts.app')
+@extends('layouts.backend.app')
 
 @section('title', 'Create Manufacturing Return')
 
+@push('css')
+@endpush
+
 @section('content')
-<section class="content">
+<section class="content-wrapper">
     <form action="{{ route('manufacturing.returns.store') }}" method="POST">
         @csrf
         <div class="row">

@@ -198,12 +198,10 @@ class SingleProductManufacturingController extends Controller
             // Consume reservations
             InventoryReservationService::consumeAllForReference('requisition', $spm->requisition_id);
 
-            // Update status
-            $spm->post();
-            $spm->output_qty = $outputQty;
+            // Update status and costs
             $spm->total_cost = $totalCost;
-            $spm->unit_cost = $outputQty > 0 ? $totalCost / $outputQty : 0;
-            $spm->save();
+            $spm->unit_cost = $spm->quantity > 0 ? $totalCost / $spm->quantity : 0;
+            $spm->post();
 
             DB::commit();
 

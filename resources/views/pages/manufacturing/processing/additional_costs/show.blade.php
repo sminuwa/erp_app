@@ -1,9 +1,12 @@
-@extends('layouts.app')
+@extends('layouts.backend.app')
 
 @section('title', 'View Additional Cost')
 
+@push('css')
+@endpush
+
 @section('content')
-<section class="content">
+<section class="content-wrapper">
     <div class="row">
         <div class="col-md-12">
             <div class="card">
@@ -59,14 +62,18 @@
                             </p>
                         </div>
                         <div class="col-md-3">
-                            <strong>Product:</strong>
-                            <p>{{ $record->product->name ?? 'N/A' }}</p>
+                            <strong>Production:</strong>
+                            <p>
+                                @php $production = $record->getProduction(); @endphp
+                                {{ $production->reference ?? 'N/A' }}
+                                <small class="text-muted">({{ ucfirst(str_replace('_', ' ', $record->production_type)) }})</small>
+                            </p>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-3">
-                            <strong>Expense Account:</strong>
-                            <p>{{ $record->expenseAccount->name ?? 'N/A' }}</p>
+                            <strong>Account:</strong>
+                            <p>{{ $record->account->name ?? 'N/A' }}</p>
                         </div>
                         <div class="col-md-3">
                             <strong>Amount:</strong>

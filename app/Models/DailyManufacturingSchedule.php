@@ -15,8 +15,11 @@ class DailyManufacturingSchedule extends Model
         'reference',
         'schedule_date',
         'production_order_id',
+        'team_id',
+        'machine_id',
         'branch_id',
         'status',
+        'notes',
         'approved_by',
         'approved_at',
         'created_by'
@@ -45,6 +48,16 @@ class DailyManufacturingSchedule extends Model
     public function approvedBy()
     {
         return $this->belongsTo(User::class, 'approved_by', 'id');
+    }
+
+    public function team()
+    {
+        return $this->belongsTo(\App\Models\ManufacturingTeam::class, 'team_id', 'id');
+    }
+
+    public function machine()
+    {
+        return $this->belongsTo(\App\Models\ManufacturingMachine::class, 'machine_id', 'id');
     }
 
     public function items()

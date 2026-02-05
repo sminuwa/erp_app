@@ -64,19 +64,29 @@ class ManufacturingReworkController extends Controller
         try {
             $user = Auth::user();
 
+            // Determine production type and ID (polymorphic)
+            $productionType = null;
+            $productionId = null;
+            if ($request->single_manufacturing_id) {
+                $productionType = ManufacturingRework::PRODUCTION_TYPE_SINGLE;
+                $productionId = $request->single_manufacturing_id;
+            } elseif ($request->batch_production_id) {
+                $productionType = ManufacturingRework::PRODUCTION_TYPE_BATCH;
+                $productionId = $request->batch_production_id;
+            }
+
             $model = new ManufacturingRework;
             $model->reference = $request->reference;
             $model->rework_date = $request->rework_date;
-            $model->single_manufacturing_id = $request->single_manufacturing_id;
-            $model->batch_production_id = $request->batch_production_id;
-            $model->additional_labor_cost = $request->additional_labor_cost ?? 0;
-            $model->additional_power_cost = $request->additional_power_cost ?? 0;
-            $model->additional_other_cost = $request->additional_other_cost ?? 0;
+            $model->production_type = $productionType;
+            $model->production_id = $productionId;
+            $model->labor_cost = $request->additional_labor_cost ?? 0;
+            $model->power_cost = $request->additional_power_cost ?? 0;
+            $model->other_cost = $request->additional_other_cost ?? 0;
             $model->reason = $request->reason;
             $model->branch_id = $user->branch_id;
             $model->status = ManufacturingRework::STATUS_PENDING;
             $model->created_by = Auth::id();
-            $model->save();
 
             // Save rework materials
             $totalMaterialCost = 0;
@@ -99,8 +109,8 @@ class ManufacturingReworkController extends Controller
                 }
             }
 
-            $model->total_additional_material_cost = $totalMaterialCost;
-            $model->total_additional_cost = $totalMaterialCost + $model->additional_labor_cost + $model->additional_power_cost + $model->additional_other_cost;
+            $model->total_material_cost = $totalMaterialCost;
+            $model->total_cost = $totalMaterialCost + $model->labor_cost + $model->power_cost + $model->other_cost;
             $model->save();
 
             DB::commit();
@@ -158,13 +168,15 @@ class ManufacturingReworkController extends Controller
             }
 
             // Add cost to finished product
-            if ($rework->single_manufacturing_id) {
-                $spm = $rework->singleManufacturing;
-                ManufacturingCostPrice::addCostToExistingProduct(
-                    $spm->bom->finish_product_id,
-                    $rework->total_additional_cost,
-                    $rework->branch_id
-                );
+            if ($rework->production_type === ManufacturingRework::PRODUCTION_TYPE_SINGLE) {
+                $production = $rework->getProduction();
+                if ($production) {
+                    ManufacturingCostPrice::addCostToExistingProduct(
+                        $production->finish_product_id,
+                        $rework->total_cost,
+                        $rework->branch_id
+                    );
+                }
             }
 
             // Post to ledger

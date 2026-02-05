@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Manufacturing;
 
 use App\Http\Controllers\Controller;
 use App\Models\ManufacturingAdditionalCost;
-use App\Models\Product;
+use App\Models\SingleProductManufacturing;
+use App\Models\BatchConversion;
 use App\Models\GeneralAccount;
 use App\Classes\Manufacturing\ManufacturingTransaction;
 use App\Classes\Manufacturing\ManufacturingCostPrice;
@@ -19,7 +20,7 @@ class ManufacturingAdditionalCostController extends Controller
     {
         $this->authorize('manufacturing.additional_costs.index');
 
-        $records = ManufacturingAdditionalCost::with(['product', 'expenseAccount', 'createdBy'])
+        $records = ManufacturingAdditionalCost::with(['account', 'createdBy'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -38,10 +39,20 @@ class ManufacturingAdditionalCostController extends Controller
 
         $user = Auth::user();
 
+        // Get productions for selection (any status for now, ideally should be 'posted')
+        $singleManufacturing = SingleProductManufacturing::forBranch($user->branch_id)
+            ->orderBy('reference')
+            ->get();
+        
+        $batchProductions = BatchConversion::forBranch($user->branch_id)
+            ->orderBy('reference')
+            ->get();
+
         return view('pages.manufacturing.processing.additional_costs.create', [
             'model' => $model,
-            'products' => Product::orderBy('name')->get(),
-            'accounts' => GeneralAccount::where('class', 'expense')->orderBy('number')->get()
+            'singleManufacturing' => $singleManufacturing,
+            'batchProductions' => $batchProductions,
+            'accounts' => GeneralAccount::where('class', 'M11')->orderBy('number')->get()
         ]);
     }
 
@@ -51,10 +62,20 @@ class ManufacturingAdditionalCostController extends Controller
 
         $request->validate([
             'reference' => 'required|unique:manufacturing_additional_costs,reference',
-            'product_id' => 'required|exists:products,id',
-            'expense_account_id' => 'required|exists:general_accounts,id',
-            'amount' => 'required|numeric|min:0.01'
+            'cost_date' => 'required|date',
+            'account_id' => 'required|exists:general_accounts,id',
+            'amount' => 'required|numeric|min:0.01',
+            'production_type' => 'required|in:single_product,batch_conversion'
         ]);
+
+        // Validate production_id based on type
+        if ($request->production_type === 'single_product') {
+            $request->validate(['single_manufacturing_id' => 'required|exists:single_product_manufacturing,id']);
+            $productionId = $request->single_manufacturing_id;
+        } else {
+            $request->validate(['batch_production_id' => 'required|exists:batch_conversions,id']);
+            $productionId = $request->batch_production_id;
+        }
 
         DB::beginTransaction();
 
@@ -64,8 +85,9 @@ class ManufacturingAdditionalCostController extends Controller
             $model = new ManufacturingAdditionalCost;
             $model->reference = $request->reference;
             $model->cost_date = $request->cost_date;
-            $model->product_id = $request->product_id;
-            $model->expense_account_id = $request->expense_account_id;
+            $model->production_type = $request->production_type;
+            $model->production_id = $productionId;
+            $model->account_id = $request->account_id;
             $model->amount = $request->amount;
             $model->description = $request->description;
             $model->branch_id = $user->branch_id;
@@ -89,7 +111,7 @@ class ManufacturingAdditionalCostController extends Controller
     {
         $this->authorize('manufacturing.additional_costs.show');
 
-        $cost->load(['product', 'expenseAccount', 'createdBy', 'postedBy']);
+        $cost->load(['account', 'createdBy', 'postedBy']);
 
         return view('pages.manufacturing.processing.additional_costs.show', [
             'record' => $cost
@@ -108,9 +130,23 @@ class ManufacturingAdditionalCostController extends Controller
         DB::beginTransaction();
 
         try {
-            // Add cost to product
+            // Get the production and its finish product
+            $production = $cost->getProduction();
+            
+            if (!$production) {
+                throw new \Exception('Production record not found.');
+            }
+
+            // Get finish product ID from production
+            $finishProductId = $production->finish_product_id ?? $production->bom->finish_product_id ?? null;
+            
+            if (!$finishProductId) {
+                throw new \Exception('Finish product not found for this production.');
+            }
+
+            // Add cost to product (distributes cost across produced quantity)
             $result = ManufacturingCostPrice::addCostToExistingProduct(
-                $cost->product_id,
+                $finishProductId,
                 $cost->amount,
                 $cost->branch_id
             );

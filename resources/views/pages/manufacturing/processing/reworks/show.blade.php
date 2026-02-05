@@ -1,9 +1,12 @@
-@extends('layouts.app')
+@extends('layouts.backend.app')
 
 @section('title', 'View Manufacturing Rework')
 
+@push('css')
+@endpush
+
 @section('content')
-<section class="content">
+<section class="content-wrapper">
     <div class="row">
         <div class="col-md-12">
             <div class="card">

@@ -154,10 +154,10 @@
                                                         {{ ucfirst($item->bom->bom_type ?? '') }}
                                                     </span>
                                                 </td>
-                                                <td class="text-right">{{ number_format($item->quantity, 4) }}</td>
+                                                <td class="text-right">{{ number_format($item->quantity_to_produce, 4) }}</td>
                                                 <td class="text-right">{{ number_format($item->scheduled_qty, 4) }}</td>
                                                 <td class="text-right">{{ number_format($item->produced_qty, 4) }}</td>
-                                                <td class="text-right">{{ number_format($item->quantity - $item->scheduled_qty, 4) }}</td>
+                                                <td class="text-right">{{ number_format($item->quantity_to_produce - $item->scheduled_qty, 4) }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -192,7 +192,7 @@
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $material->product->code ?? '' }} - {{ $material->product->name ?? '-' }}</td>
-                                                <td>{{ $material->store->name ?? '-' }}</td>
+                                                <td>{{ $material->sourceStore->name ?? '-' }}</td>
                                                 <td class="text-right">{{ number_format($material->required_qty, 4) }}</td>
                                                 <td class="text-right">{{ number_format($material->unit_cost, 2) }}</td>
                                                 <td class="text-right">{{ number_format($material->total_cost, 2) }}</td>

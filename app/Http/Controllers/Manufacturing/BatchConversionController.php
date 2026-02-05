@@ -65,21 +65,29 @@ class BatchConversionController extends Controller
         try {
             $user = Auth::user();
             $batch = BatchProduction::with('bom')->find($request->batch_id);
+            $bom = $batch->bom;
 
             $model = new BatchConversion;
             $model->reference = $request->reference;
             $model->conversion_date = $request->conversion_date;
-            $model->batch_id = $request->batch_id;
-            $model->output_qty = $request->output_qty;
-            $model->notes = $request->notes;
+            $model->batch_production_id = $request->batch_id;
+            $model->produced_qty = $request->output_qty;
+            $model->finish_product_id = $bom->finish_product_id;
+            $model->output_store_id = $bom->output_store_id;
             $model->branch_id = $user->branch_id;
             $model->status = BatchConversion::STATUS_PENDING;
             $model->created_by = Auth::id();
 
-            // Calculate cost per unit from batch
-            $costPerUnit = $batch->wip_value / ($batch->quantity * $batch->bom->actual_output);
-            $model->total_cost = $request->output_qty * $costPerUnit;
-            $model->unit_cost = $costPerUnit;
+            // Calculate costs
+            $costPerUnit = $batch->wip_value / ($batch->quantity * $bom->actual_output);
+            $wipCostDeducted = $request->output_qty * $costPerUnit;
+            
+            $model->wip_cost_deducted = $wipCostDeducted;
+            $model->labor_cost = $bom->labor_cost * ($request->output_qty / $bom->actual_output);
+            $model->power_cost = $bom->power_cost * ($request->output_qty / $bom->actual_output);
+            $model->other_cost = $bom->other_cost * ($request->output_qty / $bom->actual_output);
+            $model->total_cost = $wipCostDeducted + $model->labor_cost + $model->power_cost + $model->other_cost;
+            $model->unit_cost = $model->total_cost / $request->output_qty;
 
             $model->save();
 
@@ -123,9 +131,9 @@ class BatchConversionController extends Controller
 
             // Add finished goods to inventory
             $result = ManufacturingCostPrice::addFinishedGoods(
-                $bom->finish_product_id,
-                $bom->output_store_id,
-                $conversion->output_qty,
+                $conversion->finish_product_id,
+                $conversion->output_store_id,
+                $conversion->produced_qty,
                 $conversion->total_cost,
                 $conversion->branch_id,
                 $batch->batch_number,
@@ -140,8 +148,7 @@ class BatchConversionController extends Controller
             ManufacturingTransaction::batchConversion($conversion->id);
 
             // Update batch production converted quantity
-            $batch->converted_qty += $conversion->output_qty;
-            $batch->save();
+            $batch->addConvertedQty($conversion->produced_qty, $conversion->wip_cost_deducted);
 
             // Update conversion status
             $conversion->post();

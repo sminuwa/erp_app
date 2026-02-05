@@ -38,14 +38,17 @@ class DailyScheduleController extends Controller
         $model->schedule_date = date('Y-m-d');
 
         $user = Auth::user();
-        $orders = ProductionOrder::approved()->forBranch($user->branch_id)->orderBy('reference')->get();
+        $orders = ProductionOrder::approved()
+            ->forBranch($user->branch_id)
+            ->with(['items.bom.finishProduct'])
+            ->orderBy('reference')
+            ->get();
 
         return view('pages.manufacturing.processing.schedules.create', [
             'model' => $model,
             'productionOrders' => $orders,
             'teams' => \App\Models\ManufacturingTeam::active()->forBranch($user->branch_id)->get(),
-            'machines' => \App\Models\ManufacturingMachine::active()->forBranch($user->branch_id)->get(),
-            'boms' => \App\Models\ManufacturingBom::active()->forBranch($user->branch_id)->get()
+            'machines' => \App\Models\ManufacturingMachine::active()->forBranch($user->branch_id)->get()
         ]);
     }
 
@@ -68,7 +71,9 @@ class DailyScheduleController extends Controller
             $model = new DailyManufacturingSchedule;
             $model->reference = $request->reference;
             $model->schedule_date = $request->schedule_date;
-            $model->order_id = $request->order_id;
+            $model->production_order_id = $request->order_id;
+            $model->team_id = $request->team_id;
+            $model->machine_id = $request->machine_id;
             $model->notes = $request->notes;
             $model->branch_id = $user->branch_id;
             $model->status = DailyManufacturingSchedule::STATUS_PENDING;
@@ -80,8 +85,8 @@ class DailyScheduleController extends Controller
                 if (!empty($item['order_item_id']) && !empty($item['quantity'])) {
                     DailyManufacturingScheduleItem::create([
                         'schedule_id' => $model->id,
-                        'order_item_id' => $item['order_item_id'],
-                        'quantity' => $item['quantity']
+                        'production_order_item_id' => $item['order_item_id'],
+                        'scheduled_qty' => $item['quantity']
                     ]);
                 }
             }
@@ -102,7 +107,7 @@ class DailyScheduleController extends Controller
     {
         $this->authorize('manufacturing.schedules.show');
 
-        $schedule->load(['productionOrder', 'items.orderItem.bom.finishProduct', 'branch', 'createdBy', 'approvedBy']);
+        $schedule->load(['productionOrder', 'items.productionOrderItem.bom.finishProduct', 'branch', 'createdBy', 'approvedBy']);
 
         return view('pages.manufacturing.processing.schedules.show', [
             'record' => $schedule
@@ -122,11 +127,11 @@ class DailyScheduleController extends Controller
 
         try {
             // Validate inventory availability and make reservations
-            $schedule->load(['items.orderItem.bom']);
+            $schedule->load(['items.productionOrderItem.bom']);
 
             foreach ($schedule->items as $item) {
                 $materialsData = ProductionCalculator::calculateMaterials(
-                    $item->orderItem->bom_id,
+                    $item->productionOrderItem->bom_id,
                     $item->quantity,
                     $schedule->branch_id
                 );
@@ -152,8 +157,8 @@ class DailyScheduleController extends Controller
                 }
 
                 // Update order item scheduled quantity
-                $item->orderItem->scheduled_qty += $item->quantity;
-                $item->orderItem->save();
+                $item->productionOrderItem->scheduled_qty += $item->scheduled_qty;
+                $item->productionOrderItem->save();
             }
 
             $schedule->approve();

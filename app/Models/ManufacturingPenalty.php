@@ -25,11 +25,10 @@ class ManufacturingPenalty extends Model
         'total_loss_incurred',
         'production_reference',
         'branch_id',
-        'status',
-        'posted_by',
-        'posted_at',
         'created_by'
     ];
+
+    protected $guarded = ['id', 'status', 'posted_by', 'posted_at'];
 
     protected $dates = [
         'penalty_date',

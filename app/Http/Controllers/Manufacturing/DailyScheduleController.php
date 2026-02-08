@@ -3,6 +3,12 @@
 namespace App\Http\Controllers\Manufacturing;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Manufacturing\DailySchedules\Index;
+use App\Http\Requests\Manufacturing\DailySchedules\Create;
+use App\Http\Requests\Manufacturing\DailySchedules\Store;
+use App\Http\Requests\Manufacturing\DailySchedules\Show;
+use App\Http\Requests\Manufacturing\DailySchedules\Approve;
+use App\Http\Requests\Manufacturing\DailySchedules\Destroy;
 use App\Models\DailyManufacturingSchedule;
 use App\Models\DailyManufacturingScheduleItem;
 use App\Models\ProductionOrder;
@@ -12,14 +18,11 @@ use App\Classes\Manufacturing\ProductionCalculator;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
 
 class DailyScheduleController extends Controller
 {
-    public function index(Request $request)
+    public function index(Index $request)
     {
-        $this->authorize('manufacturing.schedules.index');
-
         $records = DailyManufacturingSchedule::with(['productionOrder', 'branch', 'createdBy'])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -29,10 +32,8 @@ class DailyScheduleController extends Controller
         ]);
     }
 
-    public function create(Request $request)
+    public function create(Create $request)
     {
-        $this->authorize('manufacturing.schedules.create');
-
         $model = new DailyManufacturingSchedule;
         $model->reference = DailyManufacturingSchedule::generateNewNumber();
         $model->schedule_date = date('Y-m-d');
@@ -52,17 +53,8 @@ class DailyScheduleController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Store $request)
     {
-        $this->authorize('manufacturing.schedules.create');
-
-        $request->validate([
-            'reference' => 'required|unique:daily_manufacturing_schedules,reference',
-            'schedule_date' => 'required|date',
-            'order_id' => 'required|exists:production_orders,id',
-            'items' => 'required|array|min:1'
-        ]);
-
         DB::beginTransaction();
 
         try {
@@ -103,10 +95,8 @@ class DailyScheduleController extends Controller
         }
     }
 
-    public function show(DailyManufacturingSchedule $schedule)
+    public function show(Show $request, DailyManufacturingSchedule $schedule)
     {
-        $this->authorize('manufacturing.schedules.show');
-
         $schedule->load(['productionOrder', 'items.productionOrderItem.bom.finishProduct', 'branch', 'createdBy', 'approvedBy']);
 
         return view('pages.manufacturing.processing.schedules.show', [
@@ -114,10 +104,8 @@ class DailyScheduleController extends Controller
         ]);
     }
 
-    public function approve(DailyManufacturingSchedule $schedule)
+    public function approve(Approve $request, DailyManufacturingSchedule $schedule)
     {
-        $this->authorize('manufacturing.schedules.approve');
-
         if (!$schedule->isPending()) {
             session()->flash('app_error', 'Only pending schedules can be approved.');
             return redirect()->back();
@@ -175,10 +163,8 @@ class DailyScheduleController extends Controller
         return redirect()->back();
     }
 
-    public function destroy(DailyManufacturingSchedule $schedule)
+    public function destroy(Destroy $request, DailyManufacturingSchedule $schedule)
     {
-        $this->authorize('manufacturing.schedules.delete');
-
         if (!$schedule->isPending()) {
             session()->flash('app_error', 'Only pending schedules can be deleted.');
             return redirect()->back();

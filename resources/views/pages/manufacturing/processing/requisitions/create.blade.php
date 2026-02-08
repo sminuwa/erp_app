@@ -47,16 +47,52 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>Schedule <span class="text-danger">*</span></label>
-                                    <select name="schedule_id" id="schedule_id" class="form-control select2-single" required>
+                                    <label>Link Type <span class="text-danger">*</span></label>
+                                    <select id="link_type" class="form-control" required>
+                                        <option value="">Select Type</option>
+                                        <option value="schedule">Daily Schedule</option>
+                                        <option value="bom">BOM (Direct)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="schedule-section" style="display:none;">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label>Daily Schedule</label>
+                                    <select name="schedule_id" id="schedule_id" class="form-control select2-single">
                                         <option value="">Select Schedule</option>
                                         @foreach($schedules as $schedule)
                                         <option value="{{ $schedule->id }}">{{ $schedule->reference }} - {{ date('d M Y', strtotime($schedule->schedule_date)) }}</option>
                                         @endforeach
                                     </select>
+                                    <small class="text-muted">Materials will be auto-calculated from the selected schedule.</small>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="row" id="bom-section" style="display:none;">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Bill of Materials</label>
+                                    <select name="bom_id" id="bom_id" class="form-control select2-single">
+                                        <option value="">Select BOM</option>
+                                        @foreach($boms as $bom)
+                                        <option value="{{ $bom->id }}">{{ $bom->reference }} - {{ $bom->description }}</option>
+                                        @endforeach
+                                    </select>
+                                    <small class="text-muted">Materials will be auto-calculated from the selected BOM.</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Quantity <span class="text-danger">*</span></label>
+                                    <input type="number" name="quantity" id="quantity" class="form-control" step="0.0001" min="0.0001" value="1">
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
@@ -65,56 +101,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <hr>
-                        <h5>Requisition Items</h5>
-                        <table class="table table-bordered" id="items-table">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Store</th>
-                                    <th width="150">Quantity</th>
-                                    <th width="80">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="item-row">
-                                    <td>
-                                        <select name="items[0][product_id]" class="form-control select2-single product-select">
-                                            <option value="">Select Product</option>
-                                            @foreach($products as $product)
-                                            <option value="{{ $product->id }}">{{ $product->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select name="items[0][store_id]" class="form-control select2-single store-select">
-                                            <option value="">Select Store</option>
-                                            @foreach($stores as $store)
-                                            <option value="{{ $store->id }}">{{ $store->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input type="number" name="items[0][quantity]" class="form-control" step="0.0001" min="0">
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-danger btn-sm remove-row">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="4">
-                                        <button type="button" class="btn btn-success btn-sm" id="add-row">
-                                            <i class="fa fa-plus"></i> Add Row
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
                     </div>
                     <div class="card-footer">
                         <button type="submit" class="btn btn-primary">Save Requisition</button>
@@ -133,45 +119,18 @@
 $(document).ready(function() {
     $('.select2-single').select2();
 
-    var rowIndex = 1;
+    $('#link_type').change(function() {
+        var type = $(this).val();
+        $('#schedule-section').hide();
+        $('#bom-section').hide();
+        // Clear hidden fields when switching
+        $('#schedule_id').val(null).trigger('change');
+        $('#bom_id').val(null).trigger('change');
 
-    $('#add-row').click(function() {
-        var newRow = `
-            <tr class="item-row">
-                <td>
-                    <select name="items[${rowIndex}][product_id]" class="form-control select2-single product-select">
-                        <option value="">Select Product</option>
-                        @foreach($products as $product)
-                        <option value="{{ $product->id }}">{{ $product->name }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td>
-                    <select name="items[${rowIndex}][store_id]" class="form-control select2-single store-select">
-                        <option value="">Select Store</option>
-                        @foreach($stores as $store)
-                        <option value="{{ $store->id }}">{{ $store->name }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td>
-                    <input type="number" name="items[${rowIndex}][quantity]" class="form-control" step="0.0001" min="0">
-                </td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm remove-row">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
-        $('#items-table tbody').append(newRow);
-        $('#items-table tbody tr:last .select2-single').select2();
-        rowIndex++;
-    });
-
-    $(document).on('click', '.remove-row', function() {
-        if ($('.item-row').length > 1) {
-            $(this).closest('tr').remove();
+        if (type === 'schedule') {
+            $('#schedule-section').show();
+        } else if (type === 'bom') {
+            $('#bom-section').show();
         }
     });
 });

@@ -77,8 +77,8 @@
                             @endif
                         </div>
                         <div class="col-md-3">
-                            <strong>Amount:</strong>
-                            <p><strong>{{ number_format($record->amount, 2) }}</strong></p>
+                            <strong>Amount Charged:</strong>
+                            <p><strong>{{ number_format($record->amount_charged, 2) }}</strong></p>
                         </div>
                         <div class="col-md-3">
                             <strong>Created By:</strong>
@@ -91,8 +91,8 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <strong>Reason:</strong>
-                            <p>{{ $record->reason }}</p>
+                            <strong>Description:</strong>
+                            <p>{{ $record->description }}</p>
                         </div>
                     </div>
                 </div>

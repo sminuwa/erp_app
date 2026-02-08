@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 
 class MaterialsRequisitionController extends Controller
 {
-    public function index(Request $request)
+    public function index(Index $request)
     {
         $this->authorize('manufacturing.requisitions.index');
 
@@ -29,7 +29,7 @@ class MaterialsRequisitionController extends Controller
         ]);
     }
 
-    public function create(Request $request)
+    public function create(Create $request)
     {
         $this->authorize('manufacturing.requisitions.create');
 
@@ -48,9 +48,26 @@ class MaterialsRequisitionController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Store $request)
     {
         $this->authorize('manufacturing.requisitions.create');
+
+        $request->validate([
+            'reference' => 'required|unique:materials_requisitions,reference',
+            'requisition_date' => 'required|date',
+            'schedule_id' => 'nullable|exists:daily_manufacturing_schedules,id|required_without:bom_id',
+            'bom_id' => 'nullable|exists:manufacturing_boms,id|required_without:schedule_id',
+            'quantity' => 'nullable|numeric|min:0.0001',
+        ], [
+            'schedule_id.required_without' => 'Either a Daily Schedule or BOM must be selected.',
+            'bom_id.required_without' => 'Either a Daily Schedule or BOM must be selected.',
+        ]);
+
+        if ($request->filled('schedule_id') && $request->filled('bom_id')) {
+            return redirect()->back()->withInput()->withErrors([
+                'schedule_id' => 'Select either a Daily Schedule or a BOM, not both.'
+            ]);
+        }
 
         DB::beginTransaction();
 
@@ -137,7 +154,7 @@ class MaterialsRequisitionController extends Controller
         }
     }
 
-    public function show(MaterialsRequisition $requisition)
+    public function show(Show $request, MaterialsRequisition $requisition)
     {
         $this->authorize('manufacturing.requisitions.show');
 
@@ -148,7 +165,7 @@ class MaterialsRequisitionController extends Controller
         ]);
     }
 
-    public function approve(MaterialsRequisition $requisition)
+    public function approve(Approve $request, MaterialsRequisition $requisition)
     {
         $this->authorize('manufacturing.requisitions.approve');
 
@@ -199,7 +216,7 @@ class MaterialsRequisitionController extends Controller
         return redirect()->back();
     }
 
-    public function issue(MaterialsRequisition $requisition)
+    public function issue(Issue $request, MaterialsRequisition $requisition)
     {
         $this->authorize('manufacturing.requisitions.issue');
 
@@ -225,7 +242,7 @@ class MaterialsRequisitionController extends Controller
         return redirect()->back();
     }
 
-    public function receive(MaterialsRequisition $requisition)
+    public function receive(Receive $request, MaterialsRequisition $requisition)
     {
         $this->authorize('manufacturing.requisitions.receive');
 
@@ -251,7 +268,7 @@ class MaterialsRequisitionController extends Controller
         return redirect()->back();
     }
 
-    public function destroy(MaterialsRequisition $requisition)
+    public function destroy(Destroy $request, MaterialsRequisition $requisition)
     {
         $this->authorize('manufacturing.requisitions.delete');
 

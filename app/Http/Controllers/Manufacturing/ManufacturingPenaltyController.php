@@ -51,8 +51,8 @@ class ManufacturingPenaltyController extends Controller
         $request->validate([
             'reference' => 'required|unique:manufacturing_penalties,reference',
             'penalty_type' => 'required|in:team,staff',
-            'amount' => 'required|numeric|min:0.01',
-            'reason' => 'required|max:500'
+            'amount_charged' => 'required|numeric|min:0.01',
+            'description' => 'required|string'
         ]);
 
         DB::beginTransaction();
@@ -66,8 +66,8 @@ class ManufacturingPenaltyController extends Controller
             $model->penalty_type = $request->penalty_type;
             $model->team_id = $request->team_id;
             $model->staff_id = $request->staff_id;
-            $model->amount = $request->amount;
-            $model->reason = $request->reason;
+            $model->amount_charged = $request->amount_charged;
+            $model->description = $request->description;
             $model->branch_id = $user->branch_id;
             $model->status = ManufacturingPenalty::STATUS_PENDING;
             $model->created_by = Auth::id();
@@ -111,7 +111,7 @@ class ManufacturingPenaltyController extends Controller
             // Add penalty to team ledger balance
             if ($penalty->penalty_type === 'team' && $penalty->team_id) {
                 $team = ManufacturingTeam::find($penalty->team_id);
-                $team->addPenalty($penalty->amount);
+                $team->addPenalty($penalty->amount_charged);
             }
 
             // Post to ledger

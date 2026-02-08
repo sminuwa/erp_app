@@ -57,8 +57,8 @@
                                                     'id' => $item->id,
                                                     'bom' => $item->bom->reference ?? '',
                                                     'product' => $item->bom->finishProduct->name ?? '',
-                                                    'qty' => $item->quantity,
-                                                    'output' => $item->expected_output
+                                                    'qty' => $item->quantity_to_produce,
+                                                    'output' => $item->quantity_to_produce * ($item->bom->actual_output ?? 1)
                                                 ];
                                             });
                                         @endphp
@@ -88,7 +88,7 @@
                                     <select name="machine_id" class="form-control select2-single">
                                         <option value="">Select Machine</option>
                                         @foreach($machines as $machine)
-                                        <option value="{{ $machine->id }}">{{ $machine->name }}</option>
+                                        <option value="{{ $machine->id }}">{{ $machine->code }} - {{ $machine->description }}</option>
                                         @endforeach
                                     </select>
                                 </div>

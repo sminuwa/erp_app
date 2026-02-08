@@ -65,16 +65,16 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>Amount <span class="text-danger">*</span></label>
-                                    <input type="number" name="amount" class="form-control" step="0.01" min="0.01" required>
+                                    <label>Amount Charged <span class="text-danger">*</span></label>
+                                    <input type="number" name="amount_charged" class="form-control" step="0.01" min="0.01" value="{{ old('amount_charged') }}" required>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label>Reason <span class="text-danger">*</span></label>
-                                    <textarea name="reason" class="form-control" rows="3" required maxlength="500">{{ old('reason') }}</textarea>
+                                    <label>Description <span class="text-danger">*</span></label>
+                                    <textarea name="description" class="form-control" rows="3" required>{{ old('description') }}</textarea>
                                 </div>
                             </div>
                         </div>

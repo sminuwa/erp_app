@@ -73,7 +73,7 @@
                         </div>
                         <div class="col-md-3">
                             <strong>Machine:</strong>
-                            <p>{{ $record->machine->name ?? 'N/A' }}</p>
+                            <p>{{ $record->machine->code ?? 'N/A' }}</p>
                         </div>
                         <div class="col-md-3">
                             <strong>Created By:</strong>

@@ -37,10 +37,9 @@ class BatchConversionController extends Controller
 
         $user = Auth::user();
 
-        // Get posted batch productions that haven't been fully converted
-        $batches = BatchProduction::posted()
+        // Get posted batch productions that have remaining quantity for conversion
+        $batches = BatchProduction::availableForConversion()
             ->forBranch($user->branch_id)
-            ->whereColumn('converted_qty', '<', 'quantity')
             ->with('bom.finishProduct')
             ->get();
 
@@ -56,38 +55,42 @@ class BatchConversionController extends Controller
 
         $request->validate([
             'reference' => 'required|unique:batch_conversions,reference',
-            'batch_id' => 'required|exists:batch_productions,id',
-            'output_qty' => 'required|numeric|min:0.0001'
+            'batch_production_id' => 'required|exists:batch_productions,id',
+            'produced_qty' => 'required|numeric|min:0.0001'
         ]);
 
         DB::beginTransaction();
 
         try {
             $user = Auth::user();
-            $batch = BatchProduction::with('bom')->find($request->batch_id);
+            $batch = BatchProduction::with('bom')->find($request->batch_production_id);
             $bom = $batch->bom;
+
+            // Validate produced_qty doesn't exceed remaining
+            $remainingQty = $batch->remaining_qty;
+            if ($request->produced_qty > $remainingQty) {
+                throw new \Exception("Produced quantity ({$request->produced_qty}) exceeds remaining quantity ({$remainingQty})");
+            }
 
             $model = new BatchConversion;
             $model->reference = $request->reference;
             $model->conversion_date = $request->conversion_date;
-            $model->batch_production_id = $request->batch_id;
-            $model->produced_qty = $request->output_qty;
+            $model->batch_production_id = $request->batch_production_id;
+            $model->produced_qty = $request->produced_qty;
             $model->finish_product_id = $bom->finish_product_id;
             $model->output_store_id = $bom->output_store_id;
             $model->branch_id = $user->branch_id;
             $model->status = BatchConversion::STATUS_PENDING;
             $model->created_by = Auth::id();
 
-            // Calculate costs
-            $costPerUnit = $batch->wip_value / ($batch->quantity * $bom->actual_output);
-            $wipCostDeducted = $request->output_qty * $costPerUnit;
-            
+            // Calculate WIP cost to deduct (proportional to qty being converted)
+            $totalExpectedOutput = $batch->quantity * $bom->actual_output;
+            $wipCostPerUnit = $totalExpectedOutput > 0 ? $batch->wip_value / $totalExpectedOutput : 0;
+            $wipCostDeducted = $request->produced_qty * $wipCostPerUnit;
+
             $model->wip_cost_deducted = $wipCostDeducted;
-            $model->labor_cost = $bom->labor_cost * ($request->output_qty / $bom->actual_output);
-            $model->power_cost = $bom->power_cost * ($request->output_qty / $bom->actual_output);
-            $model->other_cost = $bom->other_cost * ($request->output_qty / $bom->actual_output);
-            $model->total_cost = $wipCostDeducted + $model->labor_cost + $model->power_cost + $model->other_cost;
-            $model->unit_cost = $model->total_cost / $request->output_qty;
+            $model->total_cost = $wipCostDeducted;
+            $model->unit_cost = $request->produced_qty > 0 ? $wipCostDeducted / $request->produced_qty : 0;
 
             $model->save();
 
@@ -181,5 +184,67 @@ class BatchConversionController extends Controller
         session()->flash('app_message', 'Batch Conversion deleted successfully');
 
         return redirect()->route('manufacturing.batch_conversion.index');
+    }
+
+    /**
+     * AJAX: Get batch production details for conversion
+     */
+    public function getBatchDetails(Request $request)
+    {
+        $request->validate([
+            'batch_production_id' => 'required|exists:batch_productions,id'
+        ]);
+
+        $batch = BatchProduction::with(['bom.finishProduct', 'bom.outputStore'])->find($request->batch_production_id);
+        $bom = $batch->bom;
+
+        $totalExpectedOutput = $batch->quantity * $bom->actual_output;
+        $wipCostPerUnit = $totalExpectedOutput > 0 ? $batch->wip_value / $totalExpectedOutput : 0;
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'batch_number' => $batch->batch_number,
+                'bom_reference' => $bom->reference,
+                'finish_product_id' => $bom->finish_product_id,
+                'finish_product_name' => $bom->finishProduct->name ?? '',
+                'output_store_id' => $bom->output_store_id,
+                'output_store_name' => $bom->outputStore->name ?? '',
+                'total_expected_output' => $totalExpectedOutput,
+                'converted_qty' => $batch->converted_qty,
+                'remaining_qty' => $batch->remaining_qty,
+                'wip_value' => $batch->wip_value,
+                'wip_cost_per_unit' => $wipCostPerUnit
+            ]
+        ]);
+    }
+
+    /**
+     * AJAX: Calculate conversion costs based on batch and quantity
+     */
+    public function calculateCosts(Request $request)
+    {
+        $request->validate([
+            'batch_production_id' => 'required|exists:batch_productions,id',
+            'produced_qty' => 'required|numeric|min:0.0001'
+        ]);
+
+        $batch = BatchProduction::with('bom')->find($request->batch_production_id);
+        $bom = $batch->bom;
+
+        $totalExpectedOutput = $batch->quantity * $bom->actual_output;
+        $wipCostPerUnit = $totalExpectedOutput > 0 ? $batch->wip_value / $totalExpectedOutput : 0;
+        $wipCostDeducted = $request->produced_qty * $wipCostPerUnit;
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'produced_qty' => $request->produced_qty,
+                'wip_cost_per_unit' => $wipCostPerUnit,
+                'wip_cost_deducted' => $wipCostDeducted,
+                'total_cost' => $wipCostDeducted,
+                'unit_cost' => $wipCostPerUnit
+            ]
+        ]);
     }
 }

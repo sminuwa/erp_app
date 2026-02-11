@@ -27,91 +27,67 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Manufacturing History Report</h3>
+                    <h3 class="card-title">Report Filters</h3>
                 </div>
                 <div class="card-body">
                     <form id="report-form">
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label>Date From <span class="text-danger">*</span></label>
                                     <input type="date" name="date_from" id="date_from" class="form-control" value="{{ date('Y-m-01') }}" required>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label>Date To <span class="text-danger">*</span></label>
                                     <input type="date" name="date_to" id="date_to" class="form-control" value="{{ date('Y-m-d') }}" required>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
-                                    <label>Branch</label>
+                                    <label>Factory/Branch</label>
                                     <select name="branch_id" id="branch_id" class="form-control select2-single">
-                                        <option value="">All Branches</option>
+                                        <option value="">All Factories</option>
                                         @foreach($branches as $branch)
                                         <option value="{{ $branch->id }}" {{ $userBranch == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
-                                    <label>Report Type</label>
-                                    <select name="report_type" id="report_type" class="form-control">
-                                        <option value="all">All Manufacturing</option>
-                                        <option value="single">Single Product Only</option>
-                                        <option value="batch">Batch Production Only</option>
+                                    <label>Category</label>
+                                    <select name="category_id" id="category_id" class="form-control select2-single">
+                                        <option value="">All Categories</option>
+                                        @foreach($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        @endforeach
                                     </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Batch Number</label>
+                                    <input type="text" name="batch_number" id="batch_number" class="form-control" placeholder="Search batch...">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>&nbsp;</label>
+                                    <div>
+                                        <button type="button" id="load-report" class="btn btn-primary btn-block">
+                                            <i class="fa fa-search"></i> Load Report
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Finish Product</label>
-                                    <select name="product_id" id="product_id" class="form-control select2-single">
-                                        <option value="">All Products</option>
-                                        @foreach($products as $product)
-                                        <option value="{{ $product->id }}">{{ $product->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>BOM</label>
-                                    <select name="bom_id" id="bom_id" class="form-control select2-single">
-                                        <option value="">All BOMs</option>
-                                        @foreach($boms as $bom)
-                                        <option value="{{ $bom->id }}">{{ $bom->reference }} - {{ $bom->finishProduct->name ?? '' }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Team</label>
-                                    <select name="team_id" id="team_id" class="form-control select2-single">
-                                        <option value="">All Teams</option>
-                                        @foreach($teams as $team)
-                                        <option value="{{ $team->id }}">{{ $team->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>&nbsp;</label>
-                                    <div>
-                                        <button type="button" id="load-report" class="btn btn-primary">
-                                            <i class="fa fa-search"></i> Load Report
-                                        </button>
-                                        <button type="button" id="print-report" class="btn btn-secondary" disabled>
-                                            <i class="fa fa-print"></i> Print
-                                        </button>
-                                    </div>
-                                </div>
+                            <div class="col-md-12">
+                                <button type="button" id="print-report" class="btn btn-secondary" disabled>
+                                    <i class="fa fa-print"></i> Print
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -128,7 +104,7 @@
 @push('js')
 <script>
 $(document).ready(function() {
-    $('.select2-single').select2();
+    $('.select2-single').select2({ width: '100%' });
 
     $('#load-report').click(function() {
         var form = $('#report-form');

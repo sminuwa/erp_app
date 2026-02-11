@@ -10,7 +10,7 @@ class ManufacturingTeamSupervisor extends Model
 
     protected $fillable = [
         'team_id',
-        'employee_id'
+        'user_id'
     ];
 
     public $timestamps = false;
@@ -20,8 +20,8 @@ class ManufacturingTeamSupervisor extends Model
         return $this->belongsTo(ManufacturingTeam::class, 'team_id', 'id');
     }
 
-    public function employee()
+    public function user()
     {
-        return $this->belongsTo(Employee::class, 'employee_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

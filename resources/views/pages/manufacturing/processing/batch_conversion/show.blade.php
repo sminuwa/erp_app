@@ -77,7 +77,7 @@
                         </div>
                         <div class="col-md-3">
                             <strong>Output Quantity:</strong>
-                            <p>{{ number_format($record->output_qty, 4) }}</p>
+                            <p>{{ number_format($record->produced_qty, 4) }}</p>
                         </div>
                         <div class="col-md-3">
                             <strong>Unit Cost:</strong>

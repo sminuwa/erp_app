@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ManufacturingRework;
 use App\Models\ManufacturingReworkMaterial;
 use App\Models\SingleProductManufacturing;
-use App\Models\BatchProduction;
+use App\Models\BatchConversion;
 use App\Models\Product;
 use App\Models\Store;
 use App\Classes\Manufacturing\ManufacturingTransaction;
@@ -22,9 +22,11 @@ class ManufacturingReworkController extends Controller
     {
         $this->authorize('manufacturing.reworks.index');
 
-        $records = ManufacturingRework::with(['singleManufacturing', 'batchProduction', 'createdBy'])
+        $user = Auth::user();
+        $records = ManufacturingRework::with(['createdBy'])
+            ->forBranch($user->branch_id)
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(50);
 
         return view('pages.manufacturing.processing.reworks.index', [
             'records' => $records
@@ -41,10 +43,23 @@ class ManufacturingReworkController extends Controller
 
         $user = Auth::user();
 
+        // Get posted productions for rework
+        $singleManufacturing = SingleProductManufacturing::posted()
+            ->forBranch($user->branch_id)
+            ->with('bom.finishProduct')
+            ->orderBy('reference')
+            ->get();
+
+        $batchConversions = BatchConversion::posted()
+            ->forBranch($user->branch_id)
+            ->with(['batchProduction.bom.finishProduct', 'finishProduct'])
+            ->orderBy('reference')
+            ->get();
+
         return view('pages.manufacturing.processing.reworks.create', [
             'model' => $model,
-            'singleManufacturing' => SingleProductManufacturing::posted()->forBranch($user->branch_id)->get(),
-            'batchProductions' => BatchProduction::posted()->forBranch($user->branch_id)->get(),
+            'singleManufacturing' => $singleManufacturing,
+            'batchConversions' => $batchConversions,
             'products' => Product::orderBy('name')->get(),
             'stores' => Store::where('branch_id', $user->branch_id)->orderBy('name')->get()
         ]);
@@ -56,8 +71,14 @@ class ManufacturingReworkController extends Controller
 
         $request->validate([
             'reference' => 'required|unique:manufacturing_reworks,reference',
+            'rework_date' => 'required|date',
             'reason' => 'required|max:500'
         ]);
+
+        // Must select one production type
+        if (!$request->single_manufacturing_id && !$request->batch_conversion_id) {
+            return redirect()->back()->withInput()->with('app_error', 'Please select a production to rework.');
+        }
 
         DB::beginTransaction();
 
@@ -70,9 +91,9 @@ class ManufacturingReworkController extends Controller
             if ($request->single_manufacturing_id) {
                 $productionType = ManufacturingRework::PRODUCTION_TYPE_SINGLE;
                 $productionId = $request->single_manufacturing_id;
-            } elseif ($request->batch_production_id) {
+            } elseif ($request->batch_conversion_id) {
                 $productionType = ManufacturingRework::PRODUCTION_TYPE_BATCH;
-                $productionId = $request->batch_production_id;
+                $productionId = $request->batch_conversion_id;
             }
 
             $model = new ManufacturingRework;
@@ -80,15 +101,15 @@ class ManufacturingReworkController extends Controller
             $model->rework_date = $request->rework_date;
             $model->production_type = $productionType;
             $model->production_id = $productionId;
-            $model->labor_cost = $request->additional_labor_cost ?? 0;
-            $model->power_cost = $request->additional_power_cost ?? 0;
-            $model->other_cost = $request->additional_other_cost ?? 0;
+            $model->labor_cost = $request->labor_cost ?? 0;
+            $model->power_cost = $request->power_cost ?? 0;
+            $model->other_cost = $request->other_cost ?? 0;
             $model->reason = $request->reason;
             $model->branch_id = $user->branch_id;
             $model->status = ManufacturingRework::STATUS_PENDING;
             $model->created_by = Auth::id();
 
-            // Save rework materials
+            // Calculate total material cost first
             $totalMaterialCost = 0;
             if ($request->has('materials') && is_array($request->materials)) {
                 foreach ($request->materials as $material) {
@@ -96,6 +117,20 @@ class ManufacturingReworkController extends Controller
                         $unitCost = $material['unit_cost'] ?? 0;
                         $totalCost = $material['quantity'] * $unitCost;
                         $totalMaterialCost += $totalCost;
+                    }
+                }
+            }
+
+            $model->total_material_cost = $totalMaterialCost;
+            $model->total_cost = $totalMaterialCost + $model->labor_cost + $model->power_cost + $model->other_cost;
+            $model->save();
+
+            // Save rework materials after model is saved (so we have the rework_id)
+            if ($request->has('materials') && is_array($request->materials)) {
+                foreach ($request->materials as $material) {
+                    if (!empty($material['product_id']) && !empty($material['quantity'])) {
+                        $unitCost = $material['unit_cost'] ?? 0;
+                        $totalCost = $material['quantity'] * $unitCost;
 
                         ManufacturingReworkMaterial::create([
                             'rework_id' => $model->id,
@@ -108,10 +143,6 @@ class ManufacturingReworkController extends Controller
                     }
                 }
             }
-
-            $model->total_material_cost = $totalMaterialCost;
-            $model->total_cost = $totalMaterialCost + $model->labor_cost + $model->power_cost + $model->other_cost;
-            $model->save();
 
             DB::commit();
 
@@ -129,7 +160,15 @@ class ManufacturingReworkController extends Controller
     {
         $this->authorize('manufacturing.reworks.show');
 
-        $rework->load(['singleManufacturing', 'batchProduction', 'materials.product', 'materials.store', 'createdBy', 'postedBy']);
+        // Load relationships based on production type
+        $relations = ['materials.product', 'materials.store', 'createdBy', 'postedBy'];
+        if ($rework->production_type === ManufacturingRework::PRODUCTION_TYPE_SINGLE) {
+            $relations[] = 'singleManufacturing.bom.finishProduct';
+        } else {
+            $relations[] = 'batchConversion.finishProduct';
+            $relations[] = 'batchConversion.batchProduction.bom.finishProduct';
+        }
+        $rework->load($relations);
 
         return view('pages.manufacturing.processing.reworks.show', [
             'record' => $rework

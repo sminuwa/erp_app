@@ -14,6 +14,8 @@ class Store extends FormRequest
     public function rules()
     {
         return [
+            'reference' => ['required', 'unique:batch_productions,reference'],
+            'batch_number' => ['required', 'string'],
             'production_date' => ['required', 'date'],
             'requisition_id' => ['required', 'exists:materials_requisitions,id'],
             'team_id' => ['required', 'exists:manufacturing_teams,id'],

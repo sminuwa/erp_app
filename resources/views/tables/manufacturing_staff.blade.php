@@ -14,7 +14,7 @@
             <tr>
                 <td>{{ $record->employment_id }}</td>
                 <td>{{ $record->name }}</td>
-                <td>{{ $record->phone ?? '-' }}</td>
+                <td>{{ $record->phone_number ?? '-' }}</td>
                 <td>{{ $record->branch->name ?? '-' }}</td>
                 <td>{{ $record->status == 1 ? 'Active' : 'Inactive' }}</td>
                 <td>

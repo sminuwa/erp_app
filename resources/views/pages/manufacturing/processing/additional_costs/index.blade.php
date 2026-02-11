@@ -57,7 +57,7 @@
                                             {{ $record->getProduction()->reference ?? 'N/A' }} (Batch)
                                         @endif
                                     </td>
-                                    <td>{{ $record->account->name ?? 'N/A' }}</td>
+                                    <td>{{ $record->account->number ?? '' }} - {{ $record->account->description ?? 'N/A' }}</td>
                                     <td>{{ number_format($record->amount, 2) }}</td>
                                     <td>
                                         @if($record->status == 'pending')
@@ -90,6 +90,9 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        <div class="mt-3">
+                            {{ $records->links() }}
+                        </div>
                     </div>
                 </div>
             </div>

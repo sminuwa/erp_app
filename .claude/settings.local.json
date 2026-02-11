@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(php artisan tinker:*)",
+      "Bash(C:UsersUSER.configherdbinphp.bat \"c:\\\\Users\\\\USER\\\\dev\\\\ASDFA\\\\erp_app\\\\artisan\" tinker --execute=\"echo ''test'';\")",
+      "Bash(cmd /c \"cd /d c:\\\\Users\\\\USER\\\\dev\\\\ASDFA\\\\erp_app && php artisan tinker --execute=\"\"echo ''USERS:''; DB::table\\(''users''\\)->select\\(''id'',''name''\\)->take\\(5\\)->get\\(\\)->each\\(function\\($u\\){ echo $u->id . '' '' . $u->name . PHP_EOL; }\\);\"\"\")",
+      "Bash(cmd /c \"cd /d c:\\\\Users\\\\USER\\\\dev\\\\ASDFA\\\\erp_app && php artisan tinker --execute=\"\"var_dump\\(DB::table\\(''users''\\)->select\\(''id'',''name''\\)->take\\(5\\)->get\\(\\)->toArray\\(\\)\\);\"\"\")",
+      "Bash(cmd /c \"cd /d c:\\\\Users\\\\USER\\\\dev\\\\ASDFA\\\\erp_app && php artisan tinker 2>&1 <<EOF\nDB::table\\(''users''\\)->select\\(''id'',''name''\\)->take\\(5\\)->get\\(\\)\nEOF\n\")",
+      "Bash(cmd /c \"cd /d c:\\\\Users\\\\USER\\\\dev\\\\ASDFA\\\\erp_app && php db_check.php 2>&1\")",
+      "Bash(cmd /c \"php c:\\\\Users\\\\USER\\\\dev\\\\ASDFA\\\\erp_app\\\\db_check.php\")",
+      "Bash(php:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(Select-String -Pattern \"^===\" -Context 0,20)",
+      "Bash(del \"c:\\\\Users\\\\USER\\\\dev\\\\ASDFA\\\\erp_app\\\\db_check.php\")"
     ]
   }
 }

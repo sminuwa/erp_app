@@ -3,194 +3,212 @@
 @section('title', 'Create Manufacturing Return')
 
 @push('css')
+<style>
+    .production-info { display: none; }
+    .production-info.active { display: block; }
+</style>
 @endpush
 
 @section('content')
-<section class="content-wrapper">
-    <form action="{{ route('manufacturing.returns.store') }}" method="POST">
-        @csrf
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Create Manufacturing Return</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Reference <span class="text-danger">*</span></label>
-                                    <input type="text" name="reference" class="form-control" value="{{ $model->reference }}" readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Return Date <span class="text-danger">*</span></label>
-                                    <input type="date" name="return_date" class="form-control" value="{{ $model->return_date }}" required>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Return Type <span class="text-danger">*</span></label>
-                                    <select name="return_type" class="form-control" required>
-                                        <option value="">Select Type</option>
-                                        <option value="full">Full Return</option>
-                                        <option value="partial">Partial Return</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Single Manufacturing</label>
-                                    <select name="single_manufacturing_id" class="form-control select2-single">
-                                        <option value="">Select (if applicable)</option>
-                                        @foreach($singleManufacturing as $sm)
-                                        <option value="{{ $sm->id }}">{{ $sm->reference }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Batch Production</label>
-                                    <select name="batch_production_id" class="form-control select2-single">
-                                        <option value="">Select (if applicable)</option>
-                                        @foreach($batchProductions as $bp)
-                                        <option value="{{ $bp->id }}">{{ $bp->batch_number }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Return Quantity</label>
-                                    <input type="number" name="return_qty" class="form-control" step="0.0001" min="0">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Reason <span class="text-danger">*</span></label>
-                                    <textarea name="reason" class="form-control" rows="3" required maxlength="500">{{ old('reason') }}</textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr>
-                        <h5>Materials to Return (Optional)</h5>
-                        <table class="table table-bordered" id="materials-table">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Store</th>
-                                    <th width="120">Quantity</th>
-                                    <th width="120">Unit Cost</th>
-                                    <th width="80">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="material-row">
-                                    <td>
-                                        <select name="materials[0][product_id]" class="form-control select2-single">
-                                            <option value="">Select Product</option>
-                                            @foreach($products ?? [] as $product)
-                                            <option value="{{ $product->id }}">{{ $product->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select name="materials[0][store_id]" class="form-control select2-single">
-                                            <option value="">Select Store</option>
-                                            @foreach($stores ?? [] as $store)
-                                            <option value="{{ $store->id }}">{{ $store->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input type="number" name="materials[0][quantity]" class="form-control" step="0.0001" min="0">
-                                    </td>
-                                    <td>
-                                        <input type="number" name="materials[0][unit_cost]" class="form-control" step="0.01" min="0">
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-danger btn-sm remove-row">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="5">
-                                        <button type="button" class="btn btn-success btn-sm" id="add-material">
-                                            <i class="fa fa-plus"></i> Add Row
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                    <div class="card-footer">
-                        <button type="submit" class="btn btn-primary">Save Return</button>
-                        <a href="{{ route('manufacturing.returns.index') }}" class="btn btn-secondary">Cancel</a>
-                    </div>
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h4>Create Manufacturing Return</h4>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item">Manufacturing</li>
+                        <li class="breadcrumb-item">Processing</li>
+                        <li class="breadcrumb-item active">Create Return</li>
+                    </ol>
                 </div>
             </div>
         </div>
-    </form>
-</section>
+    </section>
+
+    <section class="content">
+        <form action="{{ route('manufacturing.returns.store') }}" method="POST">
+            @csrf
+            <input type="hidden" name="reference" value="{{ $model->reference }}">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Manufacturing Return Details</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Reference</label>
+                                        <input type="text" class="form-control" value="{{ $model->reference }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Return Date <span class="text-danger">*</span></label>
+                                        <input type="date" name="return_date" class="form-control" value="{{ $model->return_date }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Production Document <span class="text-danger">*</span></label>
+                                        <select name="production_select" id="production_select" class="form-control select2-single" required>
+                                            <option value="">Select Production</option>
+                                            <optgroup label="Single Product Manufacturing">
+                                                @foreach($singleManufacturing as $sm)
+                                                <option value="single_{{ $sm->id }}"
+                                                    data-type="single_product"
+                                                    data-id="{{ $sm->id }}"
+                                                    data-product="{{ $sm->bom->finishProduct->name ?? 'N/A' }}"
+                                                    data-qty="{{ $sm->quantity }}"
+                                                    data-returned="{{ $sm->getTotalReturnedQty() }}"
+                                                    data-remaining="{{ $sm->getRemainingReturnableQty() }}">
+                                                    {{ $sm->reference }} - {{ $sm->bom->finishProduct->name ?? 'N/A' }} (Remaining: {{ number_format($sm->getRemainingReturnableQty(), 4) }})
+                                                </option>
+                                                @endforeach
+                                            </optgroup>
+                                            <optgroup label="Batch Conversion">
+                                                @foreach($batchConversions as $bc)
+                                                <option value="batch_{{ $bc->id }}"
+                                                    data-type="batch_conversion"
+                                                    data-id="{{ $bc->id }}"
+                                                    data-product="{{ $bc->finishProduct->name ?? ($bc->batchProduction->bom->finishProduct->name ?? 'N/A') }}"
+                                                    data-qty="{{ $bc->produced_qty }}"
+                                                    data-returned="{{ $bc->getTotalReturnedQty() }}"
+                                                    data-remaining="{{ $bc->getRemainingReturnableQty() }}">
+                                                    {{ $bc->reference }} - {{ $bc->finishProduct->name ?? ($bc->batchProduction->bom->finishProduct->name ?? 'N/A') }} (Remaining: {{ number_format($bc->getRemainingReturnableQty(), 4) }})
+                                                </option>
+                                                @endforeach
+                                            </optgroup>
+                                        </select>
+                                        <input type="hidden" name="single_manufacturing_id" id="single_manufacturing_id" value="">
+                                        <input type="hidden" name="batch_conversion_id" id="batch_conversion_id" value="">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Production Info Panel -->
+                            <div class="row production-info" id="production-info-panel">
+                                <div class="col-md-12">
+                                    <div class="alert alert-info">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <strong>Finish Product:</strong>
+                                                <span id="info-product">-</span>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <strong>Produced Qty:</strong>
+                                                <span id="info-qty">-</span>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <strong>Already Returned:</strong>
+                                                <span id="info-returned">-</span>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <strong>Returnable Qty:</strong>
+                                                <span id="info-remaining" class="text-white font-weight-bold">-</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Return Quantity <span class="text-danger">*</span></label>
+                                        <input type="number" name="return_qty" id="return_qty" class="form-control" step="0.0001" min="0.0001" required>
+                                        <small class="text-muted">Max returnable: <span id="max-returnable">0</span></small>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <label>Reason <span class="text-danger">*</span></label>
+                                        <textarea name="reason" class="form-control" rows="2" required maxlength="500" placeholder="Enter return reason">{{ old('reason') }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-warning">
+                                <i class="fa fa-info-circle"></i>
+                                <strong>Note:</strong> Upon posting, the return will:
+                                <ul class="mb-0 mt-1">
+                                    <li>Credit back raw materials to inventory</li>
+                                    <li>Debit finish goods from inventory</li>
+                                    <li>Recalculate average cost for affected products</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-save"></i> Save Return
+                            </button>
+                            <a href="{{ route('manufacturing.returns.index') }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
 @endsection
 
-@section('scripts')
+@push('js')
 <script>
 $(document).ready(function() {
-    $('.select2-single').select2();
+    $('.select2-single').select2({ width: '100%' });
 
-    var rowIndex = 1;
+    $('#production_select').on('change', function() {
+        var selected = $(this).find('option:selected');
+        var type = selected.data('type');
+        var id = selected.data('id');
 
-    $('#add-material').click(function() {
-        var newRow = `
-            <tr class="material-row">
-                <td>
-                    <select name="materials[${rowIndex}][product_id]" class="form-control select2-single">
-                        <option value="">Select Product</option>
-                        @foreach($products ?? [] as $product)
-                        <option value="{{ $product->id }}">{{ $product->name }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td>
-                    <select name="materials[${rowIndex}][store_id]" class="form-control select2-single">
-                        <option value="">Select Store</option>
-                        @foreach($stores ?? [] as $store)
-                        <option value="{{ $store->id }}">{{ $store->name }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td>
-                    <input type="number" name="materials[${rowIndex}][quantity]" class="form-control" step="0.0001" min="0">
-                </td>
-                <td>
-                    <input type="number" name="materials[${rowIndex}][unit_cost]" class="form-control" step="0.01" min="0">
-                </td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm remove-row">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
-        $('#materials-table tbody').append(newRow);
-        $('#materials-table tbody tr:last .select2-single').select2();
-        rowIndex++;
+        // Reset hidden fields
+        $('#single_manufacturing_id').val('');
+        $('#batch_conversion_id').val('');
+
+        if (type && id) {
+            // Set the appropriate hidden field
+            if (type === 'single_product') {
+                $('#single_manufacturing_id').val(id);
+            } else if (type === 'batch_conversion') {
+                $('#batch_conversion_id').val(id);
+            }
+
+            // Update info panel
+            $('#info-product').text(selected.data('product'));
+            $('#info-qty').text(parseFloat(selected.data('qty')).toFixed(4));
+            $('#info-returned').text(parseFloat(selected.data('returned')).toFixed(4));
+            $('#info-remaining').text(parseFloat(selected.data('remaining')).toFixed(4));
+            $('#max-returnable').text(parseFloat(selected.data('remaining')).toFixed(4));
+
+            // Update max on return qty input
+            $('#return_qty').attr('max', selected.data('remaining'));
+
+            // Show info panel
+            $('#production-info-panel').addClass('active');
+        } else {
+            $('#production-info-panel').removeClass('active');
+            $('#max-returnable').text('0');
+            $('#return_qty').removeAttr('max');
+        }
     });
 
-    $(document).on('click', '.remove-row', function() {
-        $(this).closest('tr').remove();
+    // Validate return quantity doesn't exceed remaining
+    $('form').on('submit', function(e) {
+        var returnQty = parseFloat($('#return_qty').val()) || 0;
+        var maxReturnable = parseFloat($('#production_select option:selected').data('remaining')) || 0;
+
+        if (returnQty > maxReturnable) {
+            e.preventDefault();
+            alert('Return quantity cannot exceed the remaining returnable quantity (' + maxReturnable.toFixed(4) + ')');
+            return false;
+        }
     });
 });
 </script>
-@endsection
+@endpush

@@ -42,16 +42,16 @@
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <label for="supervisors">Supervisors (Company Staff)</label>
+                <label for="supervisors">Supervisors (System Users)</label>
                 <select class="form-control select2-multiple {{ $errors->has('supervisors') ? ' is-invalid' : '' }}"
                     name="supervisors[]" id="supervisors" multiple="multiple">
                     @php
-                        $selectedSupervisors = old('supervisors', isset($model->id) ? $model->supervisors->pluck('employee_id')->toArray() : []);
+                        $selectedSupervisors = old('supervisors', isset($model->id) ? $model->supervisors->pluck('user_id')->toArray() : []);
                     @endphp
-                    @if (isset($employees))
-                        @foreach ($employees as $employee)
-                            <option value="{{ $employee->id }}" {{ in_array($employee->id, $selectedSupervisors) ? 'selected' : '' }}>
-                                {{ $employee->name }}
+                    @if (isset($users))
+                        @foreach ($users as $user)
+                            <option value="{{ $user->id }}" {{ in_array($user->id, $selectedSupervisors) ? 'selected' : '' }}>
+                                {{ $user->surname }} {{ $user->firstname }}
                             </option>
                         @endforeach
                     @endif
@@ -61,7 +61,7 @@
                         <strong>{{ $errors->first('supervisors') }}</strong>
                     </div>
                 @endif
-                <small class="text-muted">Select one or more supervisors from company employees.</small>
+                <small class="text-muted">Select one or more supervisors from system users.</small>
             </div>
         </div>
         <div class="col-md-6">

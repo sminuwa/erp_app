@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class ManufacturingAdditionalCost extends Model
 {
@@ -23,10 +24,14 @@ class ManufacturingAdditionalCost extends Model
         'amount',
         'description',
         'branch_id',
+        'created_by'
+    ];
+
+    protected $guarded = [
+        'id',
         'status',
         'posted_by',
-        'posted_at',
-        'created_by'
+        'posted_at'
     ];
 
     protected $dates = [
@@ -58,16 +63,20 @@ class ManufacturingAdditionalCost extends Model
         return $this->belongsTo(User::class, 'posted_by', 'id');
     }
 
+    /**
+     * Get the single manufacturing record (only valid when production_type = 'single_product')
+     */
     public function singleManufacturing()
     {
-        return $this->belongsTo(SingleProductManufacturing::class, 'production_id', 'id')
-            ->where('production_type', self::PRODUCTION_TYPE_SINGLE);
+        return $this->belongsTo(SingleProductManufacturing::class, 'production_id', 'id');
     }
 
+    /**
+     * Get the batch conversion record (only valid when production_type = 'batch_conversion')
+     */
     public function batchConversion()
     {
-        return $this->belongsTo(BatchConversion::class, 'production_id', 'id')
-            ->where('production_type', self::PRODUCTION_TYPE_BATCH);
+        return $this->belongsTo(BatchConversion::class, 'production_id', 'id');
     }
 
     public function getProduction()
@@ -80,14 +89,21 @@ class ManufacturingAdditionalCost extends Model
 
     public static function generateNewNumber($prefix = 'MAC', $length = 4)
     {
-        $prefix = $prefix . date('ym') . auth()->user()->branch->code;
-        $record = self::where('reference', 'like', $prefix . '%')->orderBy('reference', 'desc')->first();
-        if ($record) {
-            $number = $record->reference;
-            $new = intval(substr($number, strlen($prefix))) + 1;
-            return $prefix . str_pad($new, $length, 0, STR_PAD_LEFT);
-        }
-        return $prefix . str_pad(1, $length, 0, STR_PAD_LEFT);
+        return DB::transaction(function () use ($prefix, $length) {
+            $prefix = $prefix . date('ym') . auth()->user()->branch->code;
+
+            $record = self::where('reference', 'like', $prefix . '%')
+                ->orderBy('reference', 'desc')
+                ->lockForUpdate()
+                ->first();
+
+            if ($record) {
+                $number = $record->reference;
+                $new = intval(substr($number, strlen($prefix))) + 1;
+                return $prefix . str_pad($new, $length, 0, STR_PAD_LEFT);
+            }
+            return $prefix . str_pad(1, $length, 0, STR_PAD_LEFT);
+        });
     }
 
     public function isPending()

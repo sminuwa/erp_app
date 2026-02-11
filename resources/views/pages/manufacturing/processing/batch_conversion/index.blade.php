@@ -53,7 +53,7 @@
                                     <td>{{ date('d M Y', strtotime($record->conversion_date)) }}</td>
                                     <td>{{ $record->batchProduction->batch_number ?? 'N/A' }}</td>
                                     <td>{{ $record->batchProduction->bom->finishProduct->name ?? 'N/A' }}</td>
-                                    <td>{{ number_format($record->output_qty, 4) }}</td>
+                                    <td>{{ number_format($record->produced_qty, 4) }}</td>
                                     <td>{{ number_format($record->total_cost, 2) }}</td>
                                     <td>
                                         @if($record->status == 'pending')

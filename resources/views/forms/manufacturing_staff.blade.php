@@ -27,13 +27,13 @@
     </div>
 
     <div class="form-group">
-        <label for="phone">Phone Number</label>
-        <input type="text" class="form-control {{ $errors->has('phone') ? ' is-invalid' : '' }}"
-            name="phone" id="phone" value="{{ old('phone', $model->phone) }}"
+        <label for="phone_number">Phone Number</label>
+        <input type="text" class="form-control {{ $errors->has('phone_number') ? ' is-invalid' : '' }}"
+            name="phone_number" id="phone_number" value="{{ old('phone_number', $model->phone_number) }}"
             placeholder="Phone Number" maxlength="50">
-        @if ($errors->has('phone'))
+        @if ($errors->has('phone_number'))
             <div class="invalid-feedback">
-                <strong>{{ $errors->first('phone') }}</strong>
+                <strong>{{ $errors->first('phone_number') }}</strong>
             </div>
         @endif
     </div>

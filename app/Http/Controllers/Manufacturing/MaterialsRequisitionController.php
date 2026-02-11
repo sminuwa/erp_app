@@ -13,6 +13,14 @@ use App\Models\AuditLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Http\Requests\Manufacturing\Requisitions\Index;
+use App\Http\Requests\Manufacturing\Requisitions\Create;
+use App\Http\Requests\Manufacturing\Requisitions\Store;
+use App\Http\Requests\Manufacturing\Requisitions\Show;
+use App\Http\Requests\Manufacturing\Requisitions\Approve;
+use App\Http\Requests\Manufacturing\Requisitions\Issue;
+use App\Http\Requests\Manufacturing\Requisitions\Receive;
+use App\Http\Requests\Manufacturing\Requisitions\Destroy;
 
 class MaterialsRequisitionController extends Controller
 {

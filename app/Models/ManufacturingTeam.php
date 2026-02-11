@@ -42,9 +42,9 @@ class ManufacturingTeam extends Model
         return $this->hasMany(ManufacturingTeamMember::class, 'team_id', 'id');
     }
 
-    public function supervisorEmployees()
+    public function supervisorUsers()
     {
-        return $this->belongsToMany(Employee::class, 'manufacturing_team_supervisors', 'team_id', 'employee_id');
+        return $this->belongsToMany(User::class, 'manufacturing_team_supervisors', 'team_id', 'user_id');
     }
 
     public function memberStaff()

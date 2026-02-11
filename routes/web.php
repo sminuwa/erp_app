@@ -1366,6 +1366,7 @@ Route::middleware('auth')->group(function () {
                 Route::post('/post/{spm}', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'post'])->name('manufacturing.single_manufacturing.post');
                 Route::delete('/delete/{spm}', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'destroy'])->name('manufacturing.single_manufacturing.destroy');
                 Route::get('/print/{spm}', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'print'])->name('manufacturing.single_manufacturing.print');
+                Route::post('/calculate-costs', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'calculateCosts'])->name('manufacturing.single_manufacturing.calculate_costs');
             });
 
             // Batch Production
@@ -1377,6 +1378,7 @@ Route::middleware('auth')->group(function () {
                 Route::post('/post/{batch}', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'post'])->name('manufacturing.batch_production.post');
                 Route::delete('/delete/{batch}', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'destroy'])->name('manufacturing.batch_production.destroy');
                 Route::get('/print/{batch}', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'print'])->name('manufacturing.batch_production.print');
+                Route::post('/calculate-costs', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'calculateCosts'])->name('manufacturing.batch_production.calculate_costs');
             });
 
             // Batch Conversion
@@ -1387,6 +1389,8 @@ Route::middleware('auth')->group(function () {
                 Route::get('/show/{conversion}', [\App\Http\Controllers\Manufacturing\BatchConversionController::class, 'show'])->name('manufacturing.batch_conversion.show');
                 Route::post('/post/{conversion}', [\App\Http\Controllers\Manufacturing\BatchConversionController::class, 'post'])->name('manufacturing.batch_conversion.post');
                 Route::delete('/delete/{conversion}', [\App\Http\Controllers\Manufacturing\BatchConversionController::class, 'destroy'])->name('manufacturing.batch_conversion.destroy');
+                Route::post('/get-batch-details', [\App\Http\Controllers\Manufacturing\BatchConversionController::class, 'getBatchDetails'])->name('manufacturing.batch_conversion.get_batch_details');
+                Route::post('/calculate-costs', [\App\Http\Controllers\Manufacturing\BatchConversionController::class, 'calculateCosts'])->name('manufacturing.batch_conversion.calculate_costs');
             });
 
             // Additional Costs

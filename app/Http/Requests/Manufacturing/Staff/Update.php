@@ -28,7 +28,7 @@ class Update extends FormRequest
         return [
             'employment_id' => 'required|max:50|unique:manufacturing_staff,employment_id,' . $staffId,
             'name' => 'required|max:191',
-            'phone' => 'nullable|max:50',
+            'phone_number' => 'nullable|max:50',
             'address' => 'nullable|max:500',
             'bvn' => 'nullable|max:20',
             'nin' => 'nullable|max:20',

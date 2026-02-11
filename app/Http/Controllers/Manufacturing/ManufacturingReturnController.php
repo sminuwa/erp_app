@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ManufacturingReturn;
 use App\Models\ManufacturingReturnMaterial;
 use App\Models\SingleProductManufacturing;
-use App\Models\BatchProduction;
+use App\Models\BatchConversion;
 use App\Classes\Manufacturing\ManufacturingTransaction;
 use App\Classes\Manufacturing\ManufacturingCostPrice;
 use App\Models\AuditLog;
@@ -20,9 +20,11 @@ class ManufacturingReturnController extends Controller
     {
         $this->authorize('manufacturing.returns.index');
 
-        $records = ManufacturingReturn::with(['singleManufacturing', 'batchProduction', 'createdBy'])
+        $user = Auth::user();
+        $records = ManufacturingReturn::with(['createdBy'])
+            ->forBranch($user->branch_id)
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(50);
 
         return view('pages.manufacturing.processing.returns.index', [
             'records' => $records
@@ -39,12 +41,27 @@ class ManufacturingReturnController extends Controller
 
         $user = Auth::user();
 
+        // Get posted productions that have remaining quantity to return (partial returns allowed)
+        $singleManufacturing = SingleProductManufacturing::posted()
+            ->forBranch($user->branch_id)
+            ->with(['bom.finishProduct', 'materials.product'])
+            ->get()
+            ->filter(function ($sm) {
+                return $sm->getRemainingReturnableQty() > 0;
+            });
+
+        $batchConversions = BatchConversion::posted()
+            ->forBranch($user->branch_id)
+            ->with(['batchProduction.bom.finishProduct', 'finishProduct'])
+            ->get()
+            ->filter(function ($bc) {
+                return $bc->getRemainingReturnableQty() > 0;
+            });
+
         return view('pages.manufacturing.processing.returns.create', [
             'model' => $model,
-            'singleManufacturing' => SingleProductManufacturing::posted()->forBranch($user->branch_id)->get(),
-            'batchProductions' => BatchProduction::posted()->forBranch($user->branch_id)->get(),
-            'products' => \App\Models\Product::orderBy('name')->get(),
-            'stores' => \App\Models\Store::where('branch_id', $user->branch_id)->orderBy('name')->get()
+            'singleManufacturing' => $singleManufacturing,
+            'batchConversions' => $batchConversions
         ]);
     }
 
@@ -54,8 +71,15 @@ class ManufacturingReturnController extends Controller
 
         $request->validate([
             'reference' => 'required|unique:manufacturing_returns,reference',
+            'return_date' => 'required|date',
+            'return_qty' => 'required|numeric|min:0.0001',
             'reason' => 'required|max:500'
         ]);
+
+        // Must select one production type
+        if (!$request->single_manufacturing_id && !$request->batch_conversion_id) {
+            return redirect()->back()->withInput()->with('app_error', 'Please select a production to return.');
+        }
 
         DB::beginTransaction();
 
@@ -65,12 +89,34 @@ class ManufacturingReturnController extends Controller
             // Determine production type and ID (polymorphic)
             $productionType = null;
             $productionId = null;
+            $totalCostReturned = 0;
+
             if ($request->single_manufacturing_id) {
                 $productionType = ManufacturingReturn::PRODUCTION_TYPE_SINGLE;
                 $productionId = $request->single_manufacturing_id;
-            } elseif ($request->batch_production_id) {
+
+                // Validate return qty doesn't exceed remaining
+                $production = SingleProductManufacturing::find($productionId);
+                if ($production) {
+                    $remainingQty = $production->getRemainingReturnableQty();
+                    if ($request->return_qty > $remainingQty) {
+                        throw new \Exception("Return quantity ({$request->return_qty}) exceeds remaining quantity ({$remainingQty})");
+                    }
+                    $totalCostReturned = $request->return_qty * $production->getUnitCost();
+                }
+            } elseif ($request->batch_conversion_id) {
                 $productionType = ManufacturingReturn::PRODUCTION_TYPE_BATCH;
-                $productionId = $request->batch_production_id;
+                $productionId = $request->batch_conversion_id;
+
+                // Validate return qty doesn't exceed remaining
+                $conversion = BatchConversion::find($productionId);
+                if ($conversion) {
+                    $remainingQty = $conversion->getRemainingReturnableQty();
+                    if ($request->return_qty > $remainingQty) {
+                        throw new \Exception("Return quantity ({$request->return_qty}) exceeds remaining quantity ({$remainingQty})");
+                    }
+                    $totalCostReturned = $request->return_qty * $conversion->getUnitCost();
+                }
             }
 
             $model = new ManufacturingReturn;
@@ -78,28 +124,13 @@ class ManufacturingReturnController extends Controller
             $model->return_date = $request->return_date;
             $model->production_type = $productionType;
             $model->production_id = $productionId;
-            $model->return_qty = $request->return_qty ?? 0;
+            $model->return_qty = $request->return_qty;
+            $model->total_cost_returned = $totalCostReturned;
             $model->reason = $request->reason;
             $model->branch_id = $user->branch_id;
             $model->status = ManufacturingReturn::STATUS_PENDING;
             $model->created_by = Auth::id();
             $model->save();
-
-            // Save return materials if provided
-            if ($request->has('materials') && is_array($request->materials)) {
-                foreach ($request->materials as $material) {
-                    if (!empty($material['product_id']) && !empty($material['quantity'])) {
-                        ManufacturingReturnMaterial::create([
-                            'return_id' => $model->id,
-                            'product_id' => $material['product_id'],
-                            'store_id' => $material['store_id'],
-                            'quantity' => $material['quantity'],
-                            'unit_cost' => $material['unit_cost'] ?? 0,
-                            'total_cost' => ($material['quantity'] ?? 0) * ($material['unit_cost'] ?? 0)
-                        ]);
-                    }
-                }
-            }
 
             DB::commit();
 
@@ -117,7 +148,15 @@ class ManufacturingReturnController extends Controller
     {
         $this->authorize('manufacturing.returns.show');
 
-        $return->load(['singleManufacturing', 'batchProduction', 'materials.product', 'createdBy', 'postedBy']);
+        // Load relationships based on production type
+        $relations = ['createdBy', 'postedBy'];
+        if ($return->production_type === ManufacturingReturn::PRODUCTION_TYPE_SINGLE) {
+            $relations[] = 'singleManufacturing.bom.finishProduct';
+        } else {
+            $relations[] = 'batchConversion.finishProduct';
+            $relations[] = 'batchConversion.batchProduction.bom.finishProduct';
+        }
+        $return->load($relations);
 
         return view('pages.manufacturing.processing.returns.show', [
             'record' => $return

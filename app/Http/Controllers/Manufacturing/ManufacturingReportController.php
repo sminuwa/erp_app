@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Manufacturing;
 use App\Http\Controllers\Controller;
 use App\Models\SingleProductManufacturing;
 use App\Models\BatchProduction;
+use App\Models\BatchConversion;
 use App\Models\ManufacturingTeam;
 use App\Models\ManufacturingBom;
 use App\Models\Product;
 use App\Models\Branch;
+use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -17,6 +19,7 @@ class ManufacturingReportController extends Controller
 {
     /**
      * Manufacturing History Report - Index with filters
+     * Per PDF: Filters: Date Range, Factory, Category, Batch Number
      */
     public function historyReport(Request $request)
     {
@@ -26,15 +29,14 @@ class ManufacturingReportController extends Controller
 
         return view('pages.manufacturing.reports.history.index', [
             'branches' => Branch::orderBy('name')->get(),
-            'products' => Product::orderBy('name')->get(),
-            'boms' => ManufacturingBom::with('finishProduct')->orderBy('reference')->get(),
-            'teams' => ManufacturingTeam::active()->orderBy('name')->get(),
+            'categories' => Category::orderBy('name')->get(),
             'userBranch' => $user->branch_id
         ]);
     }
 
     /**
      * Load Manufacturing History Report data
+     * Per PDF: Fields: S/N, Product Code, Product Description, Quantity, Unit Cost, Total Cost, Batch Number
      */
     public function loadHistoryReport(Request $request)
     {
@@ -48,76 +50,100 @@ class ManufacturingReportController extends Controller
         $dateFrom = $request->date_from;
         $dateTo = $request->date_to;
         $branchId = $request->branch_id;
-        $productId = $request->product_id;
-        $bomId = $request->bom_id;
-        $teamId = $request->team_id;
-        $reportType = $request->report_type ?? 'all';
+        $categoryId = $request->category_id;
+        $batchNumber = $request->batch_number;
 
-        $singleManufacturing = collect([]);
-        $batchProductions = collect([]);
+        // Get detailed production records in unified format
+        $productions = collect([]);
 
         // Get Single Product Manufacturing records
-        if ($reportType == 'all' || $reportType == 'single') {
-            $singleQuery = SingleProductManufacturing::with(['bom.finishProduct', 'team', 'createdBy'])
-                ->where('status', 'posted')
-                ->whereBetween('manufacturing_date', [$dateFrom, $dateTo]);
+        $singleQuery = SingleProductManufacturing::with(['bom.finishProduct', 'bom.category'])
+            ->where('status', 'posted')
+            ->whereBetween('manufacturing_date', [$dateFrom, $dateTo]);
 
-            if ($branchId) {
-                $singleQuery->where('branch_id', $branchId);
-            }
-            if ($bomId) {
-                $singleQuery->where('bom_id', $bomId);
-            }
-            if ($teamId) {
-                $singleQuery->where('team_id', $teamId);
-            }
-            if ($productId) {
-                $singleQuery->whereHas('bom', function($q) use ($productId) {
-                    $q->where('finish_product_id', $productId);
-                });
-            }
+        if ($branchId) {
+            $singleQuery->where('branch_id', $branchId);
+        }
+        if ($categoryId) {
+            $singleQuery->whereHas('bom', function($q) use ($categoryId) {
+                $q->where('category_id', $categoryId);
+            });
+        }
+        if ($batchNumber) {
+            $singleQuery->where('reference', 'like', '%' . $batchNumber . '%');
+        }
 
-            $singleManufacturing = $singleQuery->orderBy('manufacturing_date', 'desc')->get();
+        $singleManufacturing = $singleQuery->orderBy('manufacturing_date', 'desc')->get();
+
+        // Transform single manufacturing to standard format per PDF
+        foreach ($singleManufacturing as $item) {
+            $productions->push([
+                'type' => 'Single',
+                'date' => $item->manufacturing_date,
+                'batch_number' => $item->reference,
+                'product_code' => $item->bom->finishProduct->product_code ?? 'N/A',
+                'product_name' => $item->bom->finishProduct->name ?? 'N/A',
+                'category' => $item->bom->category->name ?? 'N/A',
+                'quantity' => $item->quantity,
+                'unit_cost' => $item->unit_cost ?? 0,
+                'total_cost' => $item->total_cost ?? 0,
+            ]);
         }
 
         // Get Batch Production records
-        if ($reportType == 'all' || $reportType == 'batch') {
-            $batchQuery = BatchProduction::with(['bom.finishProduct', 'team', 'createdBy'])
-                ->where('status', 'posted')
-                ->whereBetween('production_date', [$dateFrom, $dateTo]);
+        $batchQuery = BatchProduction::with(['bom.finishProduct', 'bom.category', 'conversions'])
+            ->where('status', 'posted')
+            ->whereBetween('production_date', [$dateFrom, $dateTo]);
 
-            if ($branchId) {
-                $batchQuery->where('branch_id', $branchId);
-            }
-            if ($bomId) {
-                $batchQuery->where('bom_id', $bomId);
-            }
-            if ($teamId) {
-                $batchQuery->where('team_id', $teamId);
-            }
-            if ($productId) {
-                $batchQuery->whereHas('bom', function($q) use ($productId) {
-                    $q->where('finish_product_id', $productId);
-                });
-            }
-
-            $batchProductions = $batchQuery->orderBy('production_date', 'desc')->get();
+        if ($branchId) {
+            $batchQuery->where('branch_id', $branchId);
         }
+        if ($categoryId) {
+            $batchQuery->whereHas('bom', function($q) use ($categoryId) {
+                $q->where('category_id', $categoryId);
+            });
+        }
+        if ($batchNumber) {
+            $batchQuery->where('batch_number', 'like', '%' . $batchNumber . '%');
+        }
+
+        $batchProductions = $batchQuery->orderBy('production_date', 'desc')->get();
+
+        // Transform batch production to standard format per PDF
+        foreach ($batchProductions as $item) {
+            $convertedQty = $item->conversions->where('status', 'posted')->sum('converted_qty');
+            $convertedCost = $item->conversions->where('status', 'posted')->sum('total_cost');
+
+            // Use converted values if available, otherwise use batch values
+            $quantity = $convertedQty > 0 ? $convertedQty : $item->quantity;
+            $totalCost = $convertedQty > 0 ? $convertedCost : $item->wip_value;
+            $unitCost = $quantity > 0 ? ($totalCost / $quantity) : 0;
+
+            $productions->push([
+                'type' => 'Batch',
+                'date' => $item->production_date,
+                'batch_number' => $item->batch_number,
+                'product_code' => $item->bom->finishProduct->product_code ?? 'N/A',
+                'product_name' => $item->bom->finishProduct->name ?? 'N/A',
+                'category' => $item->bom->category->name ?? 'N/A',
+                'quantity' => $quantity,
+                'unit_cost' => $unitCost,
+                'total_cost' => $totalCost,
+            ]);
+        }
+
+        // Sort by date descending
+        $productions = $productions->sortByDesc('date')->values();
 
         // Calculate totals
         $totals = [
-            'single_count' => $singleManufacturing->count(),
-            'single_qty' => $singleManufacturing->sum('quantity'),
-            'single_cost' => $singleManufacturing->sum('total_cost'),
-            'batch_count' => $batchProductions->count(),
-            'batch_qty' => $batchProductions->sum('quantity'),
-            'batch_wip' => $batchProductions->sum('wip_value'),
-            'batch_converted' => $batchProductions->sum('converted_qty')
+            'total_records' => $productions->count(),
+            'total_qty' => $productions->sum('quantity'),
+            'total_cost' => $productions->sum('total_cost'),
         ];
 
         return view('pages.manufacturing.reports.history.load', [
-            'singleManufacturing' => $singleManufacturing,
-            'batchProductions' => $batchProductions,
+            'productions' => $productions,
             'totals' => $totals,
             'filters' => $request->all()
         ]);
@@ -133,76 +159,100 @@ class ManufacturingReportController extends Controller
         $dateFrom = $request->date_from;
         $dateTo = $request->date_to;
         $branchId = $request->branch_id;
-        $productId = $request->product_id;
-        $bomId = $request->bom_id;
-        $teamId = $request->team_id;
-        $reportType = $request->report_type ?? 'all';
+        $categoryId = $request->category_id;
+        $batchNumber = $request->batch_number;
 
-        $singleManufacturing = collect([]);
-        $batchProductions = collect([]);
+        // Get detailed production records in unified format
+        $productions = collect([]);
 
         // Get Single Product Manufacturing records
-        if ($reportType == 'all' || $reportType == 'single') {
-            $singleQuery = SingleProductManufacturing::with(['bom.finishProduct', 'team', 'createdBy'])
-                ->where('status', 'posted')
-                ->whereBetween('manufacturing_date', [$dateFrom, $dateTo]);
+        $singleQuery = SingleProductManufacturing::with(['bom.finishProduct', 'bom.category'])
+            ->where('status', 'posted')
+            ->whereBetween('manufacturing_date', [$dateFrom, $dateTo]);
 
-            if ($branchId) {
-                $singleQuery->where('branch_id', $branchId);
-            }
-            if ($bomId) {
-                $singleQuery->where('bom_id', $bomId);
-            }
-            if ($teamId) {
-                $singleQuery->where('team_id', $teamId);
-            }
-            if ($productId) {
-                $singleQuery->whereHas('bom', function($q) use ($productId) {
-                    $q->where('finish_product_id', $productId);
-                });
-            }
+        if ($branchId) {
+            $singleQuery->where('branch_id', $branchId);
+        }
+        if ($categoryId) {
+            $singleQuery->whereHas('bom', function($q) use ($categoryId) {
+                $q->where('category_id', $categoryId);
+            });
+        }
+        if ($batchNumber) {
+            $singleQuery->where('reference', 'like', '%' . $batchNumber . '%');
+        }
 
-            $singleManufacturing = $singleQuery->orderBy('manufacturing_date', 'desc')->get();
+        $singleManufacturing = $singleQuery->orderBy('manufacturing_date', 'desc')->get();
+
+        // Transform single manufacturing to standard format per PDF
+        foreach ($singleManufacturing as $item) {
+            $productions->push([
+                'type' => 'Single',
+                'date' => $item->manufacturing_date,
+                'batch_number' => $item->reference,
+                'product_code' => $item->bom->finishProduct->product_code ?? 'N/A',
+                'product_name' => $item->bom->finishProduct->name ?? 'N/A',
+                'category' => $item->bom->category->name ?? 'N/A',
+                'quantity' => $item->quantity,
+                'unit_cost' => $item->unit_cost ?? 0,
+                'total_cost' => $item->total_cost ?? 0,
+            ]);
         }
 
         // Get Batch Production records
-        if ($reportType == 'all' || $reportType == 'batch') {
-            $batchQuery = BatchProduction::with(['bom.finishProduct', 'team', 'createdBy'])
-                ->where('status', 'posted')
-                ->whereBetween('production_date', [$dateFrom, $dateTo]);
+        $batchQuery = BatchProduction::with(['bom.finishProduct', 'bom.category', 'conversions'])
+            ->where('status', 'posted')
+            ->whereBetween('production_date', [$dateFrom, $dateTo]);
 
-            if ($branchId) {
-                $batchQuery->where('branch_id', $branchId);
-            }
-            if ($bomId) {
-                $batchQuery->where('bom_id', $bomId);
-            }
-            if ($teamId) {
-                $batchQuery->where('team_id', $teamId);
-            }
-            if ($productId) {
-                $batchQuery->whereHas('bom', function($q) use ($productId) {
-                    $q->where('finish_product_id', $productId);
-                });
-            }
-
-            $batchProductions = $batchQuery->orderBy('production_date', 'desc')->get();
+        if ($branchId) {
+            $batchQuery->where('branch_id', $branchId);
         }
+        if ($categoryId) {
+            $batchQuery->whereHas('bom', function($q) use ($categoryId) {
+                $q->where('category_id', $categoryId);
+            });
+        }
+        if ($batchNumber) {
+            $batchQuery->where('batch_number', 'like', '%' . $batchNumber . '%');
+        }
+
+        $batchProductions = $batchQuery->orderBy('production_date', 'desc')->get();
+
+        // Transform batch production to standard format per PDF
+        foreach ($batchProductions as $item) {
+            $convertedQty = $item->conversions->where('status', 'posted')->sum('converted_qty');
+            $convertedCost = $item->conversions->where('status', 'posted')->sum('total_cost');
+
+            // Use converted values if available, otherwise use batch values
+            $quantity = $convertedQty > 0 ? $convertedQty : $item->quantity;
+            $totalCost = $convertedQty > 0 ? $convertedCost : $item->wip_value;
+            $unitCost = $quantity > 0 ? ($totalCost / $quantity) : 0;
+
+            $productions->push([
+                'type' => 'Batch',
+                'date' => $item->production_date,
+                'batch_number' => $item->batch_number,
+                'product_code' => $item->bom->finishProduct->product_code ?? 'N/A',
+                'product_name' => $item->bom->finishProduct->name ?? 'N/A',
+                'category' => $item->bom->category->name ?? 'N/A',
+                'quantity' => $quantity,
+                'unit_cost' => $unitCost,
+                'total_cost' => $totalCost,
+            ]);
+        }
+
+        // Sort by date descending
+        $productions = $productions->sortByDesc('date')->values();
 
         // Calculate totals
         $totals = [
-            'single_count' => $singleManufacturing->count(),
-            'single_qty' => $singleManufacturing->sum('quantity'),
-            'single_cost' => $singleManufacturing->sum('total_cost'),
-            'batch_count' => $batchProductions->count(),
-            'batch_qty' => $batchProductions->sum('quantity'),
-            'batch_wip' => $batchProductions->sum('wip_value'),
-            'batch_converted' => $batchProductions->sum('converted_qty')
+            'total_records' => $productions->count(),
+            'total_qty' => $productions->sum('quantity'),
+            'total_cost' => $productions->sum('total_cost'),
         ];
 
         return view('pages.manufacturing.reports.history.print', [
-            'singleManufacturing' => $singleManufacturing,
-            'batchProductions' => $batchProductions,
+            'productions' => $productions,
             'totals' => $totals,
             'filters' => $request->all(),
             'dateFrom' => $dateFrom,
@@ -212,6 +262,7 @@ class ManufacturingReportController extends Controller
 
     /**
      * Teams Report - Index with filters
+     * Per PDF: Filters: Date Range, Factory, Team, Category, Batch Number
      */
     public function teamsReport(Request $request)
     {
@@ -222,12 +273,15 @@ class ManufacturingReportController extends Controller
         return view('pages.manufacturing.reports.teams.index', [
             'branches' => Branch::orderBy('name')->get(),
             'teams' => ManufacturingTeam::orderBy('name')->get(),
+            'categories' => Category::orderBy('name')->get(),
             'userBranch' => $user->branch_id
         ]);
     }
 
     /**
      * Load Teams Report data
+     * Per PDF: Shows detailed production records with S/N, Product Code, Product Description,
+     * Quantity, Cost, Total Cost, Batch Number, Unit Amount, Total Amount
      */
     public function loadTeamsReport(Request $request)
     {
@@ -242,72 +296,109 @@ class ManufacturingReportController extends Controller
         $dateTo = $request->date_to;
         $branchId = $request->branch_id;
         $teamId = $request->team_id;
+        $categoryId = $request->category_id;
+        $batchNumber = $request->batch_number;
 
-        // Get team performance data
-        $teamsQuery = ManufacturingTeam::with(['supervisors.employee', 'members.staff'])
-            ->withCount([
-                'singleManufacturing as single_count' => function($q) use ($dateFrom, $dateTo) {
-                    $q->where('status', 'posted')
-                      ->whereBetween('manufacturing_date', [$dateFrom, $dateTo]);
-                },
-                'batchProductions as batch_count' => function($q) use ($dateFrom, $dateTo) {
-                    $q->where('status', 'posted')
-                      ->whereBetween('production_date', [$dateFrom, $dateTo]);
-                }
-            ])
-            ->withSum([
-                'singleManufacturing as single_qty' => function($q) use ($dateFrom, $dateTo) {
-                    $q->where('status', 'posted')
-                      ->whereBetween('manufacturing_date', [$dateFrom, $dateTo]);
-                }
-            ], 'quantity')
-            ->withSum([
-                'singleManufacturing as single_cost' => function($q) use ($dateFrom, $dateTo) {
-                    $q->where('status', 'posted')
-                      ->whereBetween('manufacturing_date', [$dateFrom, $dateTo]);
-                }
-            ], 'total_cost')
-            ->withSum([
-                'batchProductions as batch_qty' => function($q) use ($dateFrom, $dateTo) {
-                    $q->where('status', 'posted')
-                      ->whereBetween('production_date', [$dateFrom, $dateTo]);
-                }
-            ], 'quantity')
-            ->withSum([
-                'batchProductions as batch_wip' => function($q) use ($dateFrom, $dateTo) {
-                    $q->where('status', 'posted')
-                      ->whereBetween('production_date', [$dateFrom, $dateTo]);
-                }
-            ], 'wip_value')
-            ->withSum([
-                'penalties as total_penalties' => function($q) use ($dateFrom, $dateTo) {
-                    $q->where('status', 'posted')
-                      ->whereBetween('penalty_date', [$dateFrom, $dateTo]);
-                }
-            ], 'amount_charged');
+        // Get detailed production records
+        $productions = collect([]);
+
+        // Get Single Product Manufacturing records
+        $singleQuery = SingleProductManufacturing::with(['bom.finishProduct', 'bom.category', 'team'])
+            ->where('status', 'posted')
+            ->whereBetween('manufacturing_date', [$dateFrom, $dateTo]);
 
         if ($branchId) {
-            $teamsQuery->where('branch_id', $branchId);
+            $singleQuery->where('branch_id', $branchId);
         }
         if ($teamId) {
-            $teamsQuery->where('id', $teamId);
+            $singleQuery->where('team_id', $teamId);
+        }
+        if ($categoryId) {
+            $singleQuery->whereHas('bom', function($q) use ($categoryId) {
+                $q->where('category_id', $categoryId);
+            });
+        }
+        if ($batchNumber) {
+            $singleQuery->where('reference', 'like', '%' . $batchNumber . '%');
         }
 
-        $teams = $teamsQuery->orderBy('name')->get();
+        $singleManufacturing = $singleQuery->orderBy('manufacturing_date', 'desc')->get();
 
-        // Calculate overall totals
+        // Transform single manufacturing to standard format
+        foreach ($singleManufacturing as $item) {
+            $productions->push([
+                'type' => 'Single',
+                'date' => $item->manufacturing_date,
+                'batch_number' => $item->reference,
+                'product_code' => $item->bom->finishProduct->product_code ?? 'N/A',
+                'product_name' => $item->bom->finishProduct->name ?? 'N/A',
+                'category' => $item->bom->category->name ?? 'N/A',
+                'quantity' => $item->quantity,
+                'unit_cost' => $item->unit_cost ?? 0,
+                'total_cost' => $item->total_cost ?? 0,
+                'team_id' => $item->team_id,
+                'team_name' => $item->team->name ?? 'N/A',
+            ]);
+        }
+
+        // Get Batch Production records
+        $batchQuery = BatchProduction::with(['bom.finishProduct', 'bom.category', 'team', 'conversions'])
+            ->where('status', 'posted')
+            ->whereBetween('production_date', [$dateFrom, $dateTo]);
+
+        if ($branchId) {
+            $batchQuery->where('branch_id', $branchId);
+        }
+        if ($teamId) {
+            $batchQuery->where('team_id', $teamId);
+        }
+        if ($categoryId) {
+            $batchQuery->whereHas('bom', function($q) use ($categoryId) {
+                $q->where('category_id', $categoryId);
+            });
+        }
+        if ($batchNumber) {
+            $batchQuery->where('batch_number', 'like', '%' . $batchNumber . '%');
+        }
+
+        $batchProductions = $batchQuery->orderBy('production_date', 'desc')->get();
+
+        // Transform batch production to standard format
+        foreach ($batchProductions as $item) {
+            $convertedQty = $item->conversions->where('status', 'posted')->sum('converted_qty');
+            $convertedCost = $item->conversions->where('status', 'posted')->sum('total_cost');
+
+            $productions->push([
+                'type' => 'Batch',
+                'date' => $item->production_date,
+                'batch_number' => $item->batch_number,
+                'product_code' => $item->bom->finishProduct->product_code ?? 'N/A',
+                'product_name' => $item->bom->finishProduct->name ?? 'N/A',
+                'category' => $item->bom->category->name ?? 'N/A',
+                'quantity' => $convertedQty > 0 ? $convertedQty : $item->quantity,
+                'unit_cost' => $convertedQty > 0 ? ($convertedCost / $convertedQty) : ($item->wip_value / max($item->quantity, 1)),
+                'total_cost' => $convertedQty > 0 ? $convertedCost : $item->wip_value,
+                'team_id' => $item->team_id,
+                'team_name' => $item->team->name ?? 'N/A',
+            ]);
+        }
+
+        // Sort by date descending
+        $productions = $productions->sortByDesc('date')->values();
+
+        // Group by team for display
+        $productionsByTeam = $productions->groupBy('team_name');
+
+        // Calculate totals
         $totals = [
-            'total_single_count' => $teams->sum('single_count'),
-            'total_single_qty' => $teams->sum('single_qty'),
-            'total_single_cost' => $teams->sum('single_cost'),
-            'total_batch_count' => $teams->sum('batch_count'),
-            'total_batch_qty' => $teams->sum('batch_qty'),
-            'total_batch_wip' => $teams->sum('batch_wip'),
-            'total_penalties' => $teams->sum('total_penalties')
+            'total_qty' => $productions->sum('quantity'),
+            'total_cost' => $productions->sum('total_cost'),
+            'total_records' => $productions->count(),
         ];
 
         return view('pages.manufacturing.reports.teams.load', [
-            'teams' => $teams,
+            'productions' => $productions,
+            'productionsByTeam' => $productionsByTeam,
             'totals' => $totals,
             'filters' => $request->all()
         ]);
@@ -324,72 +415,109 @@ class ManufacturingReportController extends Controller
         $dateTo = $request->date_to;
         $branchId = $request->branch_id;
         $teamId = $request->team_id;
+        $categoryId = $request->category_id;
+        $batchNumber = $request->batch_number;
 
-        // Get team performance data
-        $teamsQuery = ManufacturingTeam::with(['supervisors.employee', 'members.staff'])
-            ->withCount([
-                'singleManufacturing as single_count' => function($q) use ($dateFrom, $dateTo) {
-                    $q->where('status', 'posted')
-                      ->whereBetween('manufacturing_date', [$dateFrom, $dateTo]);
-                },
-                'batchProductions as batch_count' => function($q) use ($dateFrom, $dateTo) {
-                    $q->where('status', 'posted')
-                      ->whereBetween('production_date', [$dateFrom, $dateTo]);
-                }
-            ])
-            ->withSum([
-                'singleManufacturing as single_qty' => function($q) use ($dateFrom, $dateTo) {
-                    $q->where('status', 'posted')
-                      ->whereBetween('manufacturing_date', [$dateFrom, $dateTo]);
-                }
-            ], 'quantity')
-            ->withSum([
-                'singleManufacturing as single_cost' => function($q) use ($dateFrom, $dateTo) {
-                    $q->where('status', 'posted')
-                      ->whereBetween('manufacturing_date', [$dateFrom, $dateTo]);
-                }
-            ], 'total_cost')
-            ->withSum([
-                'batchProductions as batch_qty' => function($q) use ($dateFrom, $dateTo) {
-                    $q->where('status', 'posted')
-                      ->whereBetween('production_date', [$dateFrom, $dateTo]);
-                }
-            ], 'quantity')
-            ->withSum([
-                'batchProductions as batch_wip' => function($q) use ($dateFrom, $dateTo) {
-                    $q->where('status', 'posted')
-                      ->whereBetween('production_date', [$dateFrom, $dateTo]);
-                }
-            ], 'wip_value')
-            ->withSum([
-                'penalties as total_penalties' => function($q) use ($dateFrom, $dateTo) {
-                    $q->where('status', 'posted')
-                      ->whereBetween('penalty_date', [$dateFrom, $dateTo]);
-                }
-            ], 'amount_charged');
+        // Get detailed production records
+        $productions = collect([]);
+
+        // Get Single Product Manufacturing records
+        $singleQuery = SingleProductManufacturing::with(['bom.finishProduct', 'bom.category', 'team'])
+            ->where('status', 'posted')
+            ->whereBetween('manufacturing_date', [$dateFrom, $dateTo]);
 
         if ($branchId) {
-            $teamsQuery->where('branch_id', $branchId);
+            $singleQuery->where('branch_id', $branchId);
         }
         if ($teamId) {
-            $teamsQuery->where('id', $teamId);
+            $singleQuery->where('team_id', $teamId);
+        }
+        if ($categoryId) {
+            $singleQuery->whereHas('bom', function($q) use ($categoryId) {
+                $q->where('category_id', $categoryId);
+            });
+        }
+        if ($batchNumber) {
+            $singleQuery->where('reference', 'like', '%' . $batchNumber . '%');
         }
 
-        $teams = $teamsQuery->orderBy('name')->get();
+        $singleManufacturing = $singleQuery->orderBy('manufacturing_date', 'desc')->get();
 
-        // Calculate overall totals
+        // Transform single manufacturing to standard format
+        foreach ($singleManufacturing as $item) {
+            $productions->push([
+                'type' => 'Single',
+                'date' => $item->manufacturing_date,
+                'batch_number' => $item->reference,
+                'product_code' => $item->bom->finishProduct->product_code ?? 'N/A',
+                'product_name' => $item->bom->finishProduct->name ?? 'N/A',
+                'category' => $item->bom->category->name ?? 'N/A',
+                'quantity' => $item->quantity,
+                'unit_cost' => $item->unit_cost ?? 0,
+                'total_cost' => $item->total_cost ?? 0,
+                'team_id' => $item->team_id,
+                'team_name' => $item->team->name ?? 'N/A',
+            ]);
+        }
+
+        // Get Batch Production records
+        $batchQuery = BatchProduction::with(['bom.finishProduct', 'bom.category', 'team', 'conversions'])
+            ->where('status', 'posted')
+            ->whereBetween('production_date', [$dateFrom, $dateTo]);
+
+        if ($branchId) {
+            $batchQuery->where('branch_id', $branchId);
+        }
+        if ($teamId) {
+            $batchQuery->where('team_id', $teamId);
+        }
+        if ($categoryId) {
+            $batchQuery->whereHas('bom', function($q) use ($categoryId) {
+                $q->where('category_id', $categoryId);
+            });
+        }
+        if ($batchNumber) {
+            $batchQuery->where('batch_number', 'like', '%' . $batchNumber . '%');
+        }
+
+        $batchProductions = $batchQuery->orderBy('production_date', 'desc')->get();
+
+        // Transform batch production to standard format
+        foreach ($batchProductions as $item) {
+            $convertedQty = $item->conversions->where('status', 'posted')->sum('converted_qty');
+            $convertedCost = $item->conversions->where('status', 'posted')->sum('total_cost');
+
+            $productions->push([
+                'type' => 'Batch',
+                'date' => $item->production_date,
+                'batch_number' => $item->batch_number,
+                'product_code' => $item->bom->finishProduct->product_code ?? 'N/A',
+                'product_name' => $item->bom->finishProduct->name ?? 'N/A',
+                'category' => $item->bom->category->name ?? 'N/A',
+                'quantity' => $convertedQty > 0 ? $convertedQty : $item->quantity,
+                'unit_cost' => $convertedQty > 0 ? ($convertedCost / $convertedQty) : ($item->wip_value / max($item->quantity, 1)),
+                'total_cost' => $convertedQty > 0 ? $convertedCost : $item->wip_value,
+                'team_id' => $item->team_id,
+                'team_name' => $item->team->name ?? 'N/A',
+            ]);
+        }
+
+        // Sort by date descending
+        $productions = $productions->sortByDesc('date')->values();
+
+        // Group by team for display
+        $productionsByTeam = $productions->groupBy('team_name');
+
+        // Calculate totals
         $totals = [
-            'total_single_count' => $teams->sum('single_count'),
-            'total_single_qty' => $teams->sum('single_qty'),
-            'total_single_cost' => $teams->sum('single_cost'),
-            'total_batch_count' => $teams->sum('batch_count'),
-            'total_batch_qty' => $teams->sum('batch_qty'),
-            'total_batch_wip' => $teams->sum('batch_wip'),
-            'total_penalties' => $teams->sum('total_penalties')
+            'total_qty' => $productions->sum('quantity'),
+            'total_cost' => $productions->sum('total_cost'),
+            'total_records' => $productions->count(),
         ];
 
         return view('pages.manufacturing.reports.teams.print', [
-            'teams' => $teams,
+            'productions' => $productions,
+            'productionsByTeam' => $productionsByTeam,
             'totals' => $totals,
             'filters' => $request->all(),
             'dateFrom' => $dateFrom,

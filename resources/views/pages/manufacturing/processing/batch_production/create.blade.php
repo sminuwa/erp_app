@@ -3,6 +3,26 @@
 @section('title', 'Create Batch Production')
 
 @push('css')
+<style>
+    .cost-summary {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+    }
+    .cost-summary .row {
+        margin-bottom: 8px;
+    }
+    .cost-summary label {
+        font-weight: 600;
+    }
+    #materials-table tbody tr td {
+        vertical-align: middle;
+    }
+    .wip-highlight {
+        background-color: #fff3cd;
+        border: 1px solid #ffc107;
+    }
+</style>
 @endpush
 
 @section('content')
@@ -26,167 +46,191 @@
     </section>
 
     <section class="content">
-    <form action="{{ route('manufacturing.batch_production.store') }}" method="POST">
-        @csrf
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Create Batch Production</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Batch Number <span class="text-danger">*</span></label>
-                                    <input type="text" name="batch_number" class="form-control" value="{{ $model->batch_number }}" readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Production Date <span class="text-danger">*</span></label>
-                                    <input type="date" name="production_date" class="form-control" value="{{ $model->production_date }}" required>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>BOM (Batch Type) <span class="text-danger">*</span></label>
-                                    <select name="bom_id" id="bom_id" class="form-control select2-single" required>
-                                        <option value="">Select BOM</option>
-                                        @foreach($boms as $bom)
-                                        <option value="{{ $bom->id }}" data-output="{{ $bom->actual_output }}">
-                                            {{ $bom->reference }} - {{ $bom->finishProduct->name ?? '' }}
-                                        </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
+        <form action="{{ route('manufacturing.batch_production.store') }}" method="POST">
+            @csrf
+            <input type="hidden" name="reference" value="{{ $model->reference }}">
+            <input type="hidden" name="batch_number" value="{{ $model->batch_number }}">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Create Batch Production</h3>
                         </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Requisition</label>
-                                    <select name="requisition_id" class="form-control select2-single">
-                                        <option value="">Select Requisition (Optional)</option>
-                                        @foreach($requisitions as $requisition)
-                                        <option value="{{ $requisition->id }}">{{ $requisition->reference }}</option>
-                                        @endforeach
-                                    </select>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Reference</label>
+                                        <input type="text" class="form-control" value="{{ $model->reference }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Batch Number</label>
+                                        <input type="text" class="form-control" value="{{ $model->batch_number }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Production Date <span class="text-danger">*</span></label>
+                                        <input type="date" name="production_date" class="form-control" value="{{ $model->production_date }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Requisition <span class="text-danger">*</span></label>
+                                        <select name="requisition_id" class="form-control select2-single" required>
+                                            <option value="">Select Requisition</option>
+                                            @foreach($requisitions as $requisition)
+                                            <option value="{{ $requisition->id }}" data-bom-id="{{ $requisition->bom_id }}">
+                                                {{ $requisition->reference }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Team <span class="text-danger">*</span></label>
-                                    <select name="team_id" class="form-control select2-single" required>
-                                        <option value="">Select Team</option>
-                                        @foreach($teams as $team)
-                                        <option value="{{ $team->id }}">{{ $team->name }}</option>
-                                        @endforeach
-                                    </select>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>BOM (Batch Type) <span class="text-danger">*</span></label>
+                                        <select name="bom_id" id="bom_id" class="form-control select2-single" required>
+                                            <option value="">Select BOM</option>
+                                            @foreach($boms as $bom)
+                                            <option value="{{ $bom->id }}" data-output="{{ $bom->actual_output }}">
+                                                {{ $bom->reference }} - {{ $bom->finishProduct->name ?? '' }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Number of Batches <span class="text-danger">*</span></label>
+                                        <input type="number" name="quantity" id="quantity" class="form-control" step="1" min="1" value="1" required>
+                                        <small class="text-muted">Default is 1 batch</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Team <span class="text-danger">*</span></label>
+                                        <select name="team_id" class="form-control select2-single" required>
+                                            <option value="">Select Team</option>
+                                            @foreach($teams as $team)
+                                            <option value="{{ $team->id }}">{{ $team->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Machine</label>
+                                        <select name="machine_id" class="form-control select2-single">
+                                            <option value="">Select Machine (Optional)</option>
+                                            @foreach($machines as $machine)
+                                            <option value="{{ $machine->id }}">{{ $machine->code }} - {{ $machine->description }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Quantity (Number of Batches) <span class="text-danger">*</span></label>
-                                    <input type="number" name="quantity" id="quantity" class="form-control" step="1" min="1" required>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Notes</label>
+                                        <textarea name="notes" class="form-control" rows="2">{{ old('notes') }}</textarea>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Labor Cost</label>
-                                    <input type="number" name="labor_cost" class="form-control" step="0.01" min="0" value="0">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Power Cost</label>
-                                    <input type="number" name="power_cost" class="form-control" step="0.01" min="0" value="0">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Other Cost</label>
-                                    <input type="number" name="other_cost" class="form-control" step="0.01" min="0" value="0">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Notes</label>
-                                    <textarea name="notes" class="form-control" rows="1">{{ old('notes') }}</textarea>
-                                </div>
-                            </div>
-                        </div>
 
-                        <hr>
-                        <h5>Raw Materials</h5>
-                        <table class="table table-bordered" id="materials-table">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Store</th>
-                                    <th width="120">Quantity</th>
-                                    <th width="120">Unit Cost</th>
-                                    <th width="120">Total Cost</th>
-                                    <th width="80">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="material-row">
-                                    <td>
-                                        <select name="materials[0][product_id]" class="form-control select2-single product-select">
-                                            <option value="">Select Product</option>
-                                            @foreach($products as $product)
-                                            <option value="{{ $product->id }}">{{ $product->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select name="materials[0][store_id]" class="form-control select2-single store-select">
-                                            <option value="">Select Store</option>
-                                            @foreach($stores as $store)
-                                            <option value="{{ $store->id }}">{{ $store->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input type="number" name="materials[0][quantity]" class="form-control mat-qty" step="0.0001" min="0">
-                                    </td>
-                                    <td>
-                                        <input type="number" name="materials[0][unit_cost]" class="form-control mat-cost" step="0.01" min="0">
-                                    </td>
-                                    <td>
-                                        <input type="number" class="form-control mat-total" readonly>
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-danger btn-sm remove-row">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="4" class="text-right"><strong>Total Material Cost:</strong></td>
-                                    <td><input type="text" id="total-material-cost" class="form-control" readonly></td>
-                                    <td>
-                                        <button type="button" class="btn btn-success btn-sm" id="add-material">
-                                            <i class="fa fa-plus"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                    <div class="card-footer">
-                        <button type="submit" class="btn btn-primary">Save Batch Production</button>
-                        <a href="{{ route('manufacturing.batch_production.index') }}" class="btn btn-secondary">Cancel</a>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5>Raw Materials (from BOM)</h5>
+                                    <div id="materials-loading" class="text-center py-3" style="display: none;">
+                                        <i class="fa fa-spinner fa-spin"></i> Loading materials...
+                                    </div>
+                                    <div id="materials-empty" class="alert alert-info">
+                                        Select a BOM and enter quantity to see required materials.
+                                    </div>
+                                    <table class="table table-bordered table-sm" id="materials-table" style="display: none;">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>Store</th>
+                                                <th class="text-right" width="100">BOM Qty</th>
+                                                <th class="text-right" width="100">Required Qty</th>
+                                                <th class="text-right" width="100">Unit Cost</th>
+                                                <th class="text-right" width="120">Total Cost</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="materials-body">
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="table-secondary">
+                                                <td colspan="5" class="text-right"><strong>Total Material Cost:</strong></td>
+                                                <td class="text-right"><strong id="total-material-cost">0.00</strong></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                                <div class="col-md-4">
+                                    <h5>Cost Summary</h5>
+                                    <div class="cost-summary">
+                                        <div class="row">
+                                            <div class="col-6"><label>Material Cost:</label></div>
+                                            <div class="col-6 text-right" id="summary-material-cost">0.00</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6"><label>Labor Cost:</label></div>
+                                            <div class="col-6 text-right" id="summary-labor-cost">0.00</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6"><label>Power Cost:</label></div>
+                                            <div class="col-6 text-right" id="summary-power-cost">0.00</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6"><label>Other Cost:</label></div>
+                                            <div class="col-6 text-right" id="summary-other-cost">0.00</div>
+                                        </div>
+                                        <hr class="my-2">
+                                        <div class="row">
+                                            <div class="col-6"><label>Total Other Cost:</label></div>
+                                            <div class="col-6 text-right" id="summary-total-other-cost">0.00</div>
+                                        </div>
+                                        <hr class="my-2">
+                                        <div class="row wip-highlight p-2 rounded">
+                                            <div class="col-6"><label class="text-warning mb-0">WIP Value:</label></div>
+                                            <div class="col-6 text-right text-warning"><strong id="summary-wip-value">0.00</strong></div>
+                                        </div>
+                                        <hr class="my-2">
+                                        <div class="row">
+                                            <div class="col-6"><label>Expected Output:</label></div>
+                                            <div class="col-6 text-right" id="summary-expected-output">0</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6"><label>Unit Cost:</label></div>
+                                            <div class="col-6 text-right" id="summary-unit-cost">0.00</div>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-info mt-3" style="font-size: 12px;">
+                                        <i class="fa fa-info-circle"></i>
+                                        <strong>Note:</strong> WIP (Work in Progress) value = Material Cost + Other Costs.
+                                        This will be credited to WIP account upon posting.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary" id="btn-submit">
+                                <i class="fa fa-save"></i> Save Batch Production
+                            </button>
+                            <a href="{{ route('manufacturing.batch_production.index') }}" class="btn btn-secondary">Cancel</a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </form>
+        </form>
     </section>
 </div>
 @endsection
@@ -196,73 +240,109 @@
 $(document).ready(function() {
     $('.select2-single').select2();
 
-    var rowIndex = 1;
+    var calculateTimeout = null;
 
-    function calculateRowTotal(row) {
-        var qty = parseFloat(row.find('.mat-qty').val()) || 0;
-        var cost = parseFloat(row.find('.mat-cost').val()) || 0;
-        row.find('.mat-total').val((qty * cost).toFixed(2));
-        calculateTotalMaterialCost();
+    function formatNumber(num) {
+        return parseFloat(num || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
-    function calculateTotalMaterialCost() {
-        var total = 0;
-        $('.mat-total').each(function() {
-            total += parseFloat($(this).val()) || 0;
+    function calculateCosts() {
+        var bomId = $('#bom_id').val();
+        var quantity = parseInt($('#quantity').val()) || 0;
+
+        if (!bomId || quantity < 1) {
+            $('#materials-table').hide();
+            $('#materials-empty').show();
+            resetCostSummary();
+            return;
+        }
+
+        $('#materials-loading').show();
+        $('#materials-table').hide();
+        $('#materials-empty').hide();
+
+        $.ajax({
+            url: '{{ route("manufacturing.batch_production.calculate_costs") }}',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                bom_id: bomId,
+                quantity: quantity
+            },
+            success: function(response) {
+                $('#materials-loading').hide();
+
+                if (response.status && response.data) {
+                    var data = response.data;
+
+                    // Populate materials table
+                    var tbody = $('#materials-body');
+                    tbody.empty();
+
+                    if (data.materials && data.materials.length > 0) {
+                        data.materials.forEach(function(m) {
+                            tbody.append(`
+                                <tr>
+                                    <td>${m.product_name || ''}</td>
+                                    <td>${m.store_name || '-'}</td>
+                                    <td class="text-right">${formatNumber(m.bom_qty)}</td>
+                                    <td class="text-right">${formatNumber(m.quantity)}</td>
+                                    <td class="text-right">${formatNumber(m.unit_cost)}</td>
+                                    <td class="text-right">${formatNumber(m.total_cost)}</td>
+                                </tr>
+                            `);
+                        });
+                        $('#total-material-cost').text(formatNumber(data.material_cost));
+                        $('#materials-table').show();
+                    } else {
+                        $('#materials-empty').html('<div class="alert alert-warning">No materials defined in this BOM.</div>').show();
+                    }
+
+                    // Update cost summary
+                    $('#summary-material-cost').text(formatNumber(data.material_cost));
+                    $('#summary-labor-cost').text(formatNumber(data.labor_cost));
+                    $('#summary-power-cost').text(formatNumber(data.power_cost));
+                    $('#summary-other-cost').text(formatNumber(data.other_cost));
+                    $('#summary-total-other-cost').text(formatNumber(data.total_other_cost));
+                    $('#summary-wip-value').text(formatNumber(data.wip_value));
+                    $('#summary-expected-output').text(formatNumber(data.expected_output));
+                    $('#summary-unit-cost').text(formatNumber(data.unit_cost));
+                }
+            },
+            error: function(xhr) {
+                $('#materials-loading').hide();
+                $('#materials-empty').html('<div class="alert alert-danger">Error calculating costs. Please try again.</div>').show();
+                resetCostSummary();
+            }
         });
-        $('#total-material-cost').val(total.toFixed(2));
     }
 
-    $(document).on('change', '.mat-qty, .mat-cost', function() {
-        calculateRowTotal($(this).closest('tr'));
+    function resetCostSummary() {
+        $('#summary-material-cost, #summary-labor-cost, #summary-power-cost, #summary-other-cost').text('0.00');
+        $('#summary-total-other-cost, #summary-wip-value, #summary-unit-cost').text('0.00');
+        $('#summary-expected-output').text('0');
+        $('#total-material-cost').text('0.00');
+        $('#materials-body').empty();
+    }
+
+    // Trigger calculation when BOM or quantity changes
+    $('#bom_id, #quantity').on('change input', function() {
+        clearTimeout(calculateTimeout);
+        calculateTimeout = setTimeout(calculateCosts, 500);
     });
 
-    $('#add-material').click(function() {
-        var newRow = `
-            <tr class="material-row">
-                <td>
-                    <select name="materials[${rowIndex}][product_id]" class="form-control select2-single product-select">
-                        <option value="">Select Product</option>
-                        @foreach($products as $product)
-                        <option value="{{ $product->id }}">{{ $product->name }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td>
-                    <select name="materials[${rowIndex}][store_id]" class="form-control select2-single store-select">
-                        <option value="">Select Store</option>
-                        @foreach($stores as $store)
-                        <option value="{{ $store->id }}">{{ $store->name }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td>
-                    <input type="number" name="materials[${rowIndex}][quantity]" class="form-control mat-qty" step="0.0001" min="0">
-                </td>
-                <td>
-                    <input type="number" name="materials[${rowIndex}][unit_cost]" class="form-control mat-cost" step="0.01" min="0">
-                </td>
-                <td>
-                    <input type="number" class="form-control mat-total" readonly>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm remove-row">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
-        $('#materials-table tbody').append(newRow);
-        $('#materials-table tbody tr:last .select2-single').select2();
-        rowIndex++;
-    });
-
-    $(document).on('click', '.remove-row', function() {
-        if ($('.material-row').length > 1) {
-            $(this).closest('tr').remove();
-            calculateTotalMaterialCost();
+    // Auto-select BOM when requisition is selected (if requisition has a bom_id)
+    $('select[name="requisition_id"]').on('change', function() {
+        var bomId = $(this).find(':selected').data('bom-id');
+        if (bomId) {
+            $('#bom_id').val(bomId).trigger('change');
         }
     });
+
+    // Trigger initial calculation if BOM is already selected
+    if ($('#bom_id').val()) {
+        calculateCosts();
+    }
 });
 </script>
 @endpush

@@ -20,9 +20,11 @@ class ManufacturingAdditionalCostController extends Controller
     {
         $this->authorize('manufacturing.additional_costs.index');
 
+        $user = Auth::user();
         $records = ManufacturingAdditionalCost::with(['account', 'createdBy'])
+            ->forBranch($user->branch_id)
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(50);
 
         return view('pages.manufacturing.processing.additional_costs.index', [
             'records' => $records
@@ -39,20 +41,35 @@ class ManufacturingAdditionalCostController extends Controller
 
         $user = Auth::user();
 
-        // Get productions for selection (any status for now, ideally should be 'posted')
-        $singleManufacturing = SingleProductManufacturing::forBranch($user->branch_id)
+        // Get only posted productions for selection
+        $singleManufacturing = SingleProductManufacturing::posted()
+            ->forBranch($user->branch_id)
+            ->with('bom.finishProduct')
             ->orderBy('reference')
             ->get();
-        
-        $batchProductions = BatchConversion::forBranch($user->branch_id)
+
+        $batchConversions = BatchConversion::posted()
+            ->forBranch($user->branch_id)
+            ->with(['batchProduction.bom.finishProduct', 'finishProduct'])
             ->orderBy('reference')
+            ->get();
+
+        // Get expense accounts for manufacturing additional costs
+        // Include both manufacturing-specific (M11) and general expense accounts (C51-C63)
+        $accounts = GeneralAccount::active()
+            ->where(function($query) {
+                $query->where('class', 'M11')
+                    ->orWhereBetween('class', ['C51', 'C63']);
+            })
+            ->orderBy('class')
+            ->orderBy('number')
             ->get();
 
         return view('pages.manufacturing.processing.additional_costs.create', [
             'model' => $model,
             'singleManufacturing' => $singleManufacturing,
-            'batchProductions' => $batchProductions,
-            'accounts' => GeneralAccount::where('class', 'M11')->orderBy('number')->get()
+            'batchConversions' => $batchConversions,
+            'accounts' => $accounts
         ]);
     }
 
@@ -111,7 +128,15 @@ class ManufacturingAdditionalCostController extends Controller
     {
         $this->authorize('manufacturing.additional_costs.show');
 
-        $cost->load(['account', 'createdBy', 'postedBy']);
+        // Load relationships based on production type
+        $relations = ['account', 'createdBy', 'postedBy'];
+        if ($cost->production_type === ManufacturingAdditionalCost::PRODUCTION_TYPE_SINGLE) {
+            $relations[] = 'singleManufacturing.bom.finishProduct';
+        } else {
+            $relations[] = 'batchConversion.finishProduct';
+            $relations[] = 'batchConversion.batchProduction.bom.finishProduct';
+        }
+        $cost->load($relations);
 
         return view('pages.manufacturing.processing.additional_costs.show', [
             'record' => $cost

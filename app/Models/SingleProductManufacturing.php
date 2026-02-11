@@ -198,6 +198,22 @@ class SingleProductManufacturing extends Model
         return $this->quantity - $this->getTotalReturnedQty();
     }
 
+    /**
+     * Alias for getAvailableReturnQty() - used by ManufacturingReturnController
+     */
+    public function getRemainingReturnableQty()
+    {
+        return $this->getAvailableReturnQty();
+    }
+
+    /**
+     * Get the unit cost of this production
+     */
+    public function getUnitCost()
+    {
+        return $this->unit_cost ?? $this->calculateUnitCost();
+    }
+
     public function scopePending($query)
     {
         return $query->where('status', self::STATUS_PENDING);

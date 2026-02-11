@@ -7,7 +7,7 @@ use App\Models\ManufacturingTeam;
 use App\Models\ManufacturingTeamSupervisor;
 use App\Models\ManufacturingTeamMember;
 use App\Models\ManufacturingStaff;
-use App\Models\Employee;
+use App\Models\User;
 use App\Models\Branch;
 use App\Http\Requests\Manufacturing\Teams\Index;
 use App\Http\Requests\Manufacturing\Teams\Create;
@@ -30,7 +30,7 @@ class ManufacturingTeamController extends Controller
      */
     public function index(Index $request)
     {
-        $records = ManufacturingTeam::with(['branch', 'supervisors.employee', 'members.staff'])
+        $records = ManufacturingTeam::with(['branch', 'supervisors.user', 'members.staff'])
             ->orderBy('name')
             ->get();
 
@@ -53,7 +53,7 @@ class ManufacturingTeamController extends Controller
         return view('pages.manufacturing.setup.teams.create', [
             'model' => $model,
             'branches' => Branch::orderBy('name')->get(),
-            'employees' => Employee::orderBy('name')->get(),
+            'users' => User::where('status', 1)->orderBy('surname')->orderBy('firstname')->get(),
             'staff' => ManufacturingStaff::where('status', 1)->orderBy('name')->get()
         ]);
     }
@@ -78,11 +78,11 @@ class ManufacturingTeamController extends Controller
 
             // Save supervisors
             if ($request->has('supervisors') && is_array($request->supervisors)) {
-                foreach ($request->supervisors as $employeeId) {
-                    if (!empty($employeeId)) {
+                foreach ($request->supervisors as $userId) {
+                    if (!empty($userId)) {
                         ManufacturingTeamSupervisor::create([
                             'team_id' => $model->id,
-                            'employee_id' => $employeeId
+                            'user_id' => $userId
                         ]);
                     }
                 }
@@ -122,7 +122,7 @@ class ManufacturingTeamController extends Controller
      */
     public function show(Show $request, ManufacturingTeam $team)
     {
-        $team->load(['branch', 'supervisors.employee', 'members.staff']);
+        $team->load(['branch', 'supervisors.user', 'members.staff']);
 
         return view('pages.manufacturing.setup.teams.show', [
             'record' => $team
@@ -143,7 +143,7 @@ class ManufacturingTeamController extends Controller
         return view('pages.manufacturing.setup.teams.edit', [
             'model' => $team,
             'branches' => Branch::orderBy('name')->get(),
-            'employees' => Employee::orderBy('name')->get(),
+            'users' => User::where('status', 1)->orderBy('surname')->orderBy('firstname')->get(),
             'staff' => ManufacturingStaff::where('status', 1)->orderBy('name')->get()
         ]);
     }
@@ -172,11 +172,11 @@ class ManufacturingTeamController extends Controller
 
             // Save supervisors
             if ($request->has('supervisors') && is_array($request->supervisors)) {
-                foreach ($request->supervisors as $employeeId) {
-                    if (!empty($employeeId)) {
+                foreach ($request->supervisors as $userId) {
+                    if (!empty($userId)) {
                         ManufacturingTeamSupervisor::create([
                             'team_id' => $team->id,
-                            'employee_id' => $employeeId
+                            'user_id' => $userId
                         ]);
                     }
                 }

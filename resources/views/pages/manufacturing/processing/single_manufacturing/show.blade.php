@@ -2,7 +2,7 @@
 
 @section('title', 'View Single Product Manufacturing')
 
-@push(css)
+@push('css')
 @endpush
 
 @section('content')

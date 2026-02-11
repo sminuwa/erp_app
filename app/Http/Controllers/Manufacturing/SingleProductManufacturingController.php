@@ -67,6 +67,8 @@ class SingleProductManufacturingController extends Controller
 
         $request->validate([
             'reference' => 'required|unique:single_product_manufacturing,reference',
+            'batch_number' => 'required',
+            'bom_id' => 'required|exists:manufacturing_boms,id',
             'requisition_id' => 'required|exists:materials_requisitions,id',
             'team_id' => 'required|exists:manufacturing_teams,id',
             'machine_id' => 'nullable|exists:manufacturing_machines,id',
@@ -77,14 +79,16 @@ class SingleProductManufacturingController extends Controller
 
         try {
             $user = Auth::user();
-            $requisition = MaterialsRequisition::with('bom')->find($request->requisition_id);
+            $bom = \App\Models\ManufacturingBom::find($request->bom_id);
 
             $model = new SingleProductManufacturing;
             $model->reference = $request->reference;
             $model->batch_number = $request->batch_number;
             $model->manufacturing_date = $request->manufacturing_date;
             $model->requisition_id = $request->requisition_id;
-            $model->bom_id = $requisition->bom_id;
+            $model->bom_id = $request->bom_id;
+            $model->finish_product_id = $bom->finish_product_id;
+            $model->output_store_id = $bom->output_store_id;
             $model->team_id = $request->team_id;
             $model->machine_id = $request->machine_id;
             $model->quantity = $request->quantity;
@@ -94,15 +98,15 @@ class SingleProductManufacturingController extends Controller
             $model->created_by = Auth::id();
             $model->save();
 
-            // Calculate and save materials
-            $materialsData = ProductionCalculator::calculateMaterials(
+            // Calculate production cost from BOM (materials + labor/power/other costs)
+            $costData = ProductionCalculator::calculateProductionCost(
                 $model->bom_id,
                 $model->quantity,
                 $model->branch_id
             );
 
-            $totalMaterialCost = 0;
-            foreach ($materialsData['materials'] as $m) {
+            // Save materials
+            foreach ($costData['materials'] as $m) {
                 SingleProductManufacturingMaterial::create([
                     'manufacturing_id' => $model->id,
                     'product_id' => $m['product_id'],
@@ -111,10 +115,13 @@ class SingleProductManufacturingController extends Controller
                     'unit_cost' => $m['unit_cost'],
                     'total_cost' => $m['total_cost']
                 ]);
-                $totalMaterialCost += $m['total_cost'];
             }
 
-            $model->total_material_cost = $totalMaterialCost;
+            // Save costs from BOM calculation
+            $model->total_material_cost = $costData['material_cost'];
+            $model->total_other_cost = $costData['total_other_cost'];
+            $model->total_cost = $costData['total_cost'];
+            $model->unit_cost = $costData['unit_cost'];
             $model->save();
 
             DB::commit();
@@ -249,6 +256,39 @@ class SingleProductManufacturingController extends Controller
 
         return view('pages.manufacturing.processing.single_manufacturing.print', [
             'record' => $spm
+        ]);
+    }
+
+    /**
+     * AJAX: Calculate production costs based on BOM and quantity
+     */
+    public function calculateCosts(Request $request)
+    {
+        $request->validate([
+            'bom_id' => 'required|exists:manufacturing_boms,id',
+            'quantity' => 'required|numeric|min:0.0001'
+        ]);
+
+        $user = Auth::user();
+        $costData = ProductionCalculator::calculateProductionCost(
+            $request->bom_id,
+            $request->quantity,
+            $user->branch_id
+        );
+
+        // Add store names to materials
+        if (!empty($costData['materials'])) {
+            $storeIds = array_column($costData['materials'], 'store_id');
+            $stores = \App\Models\Store::whereIn('id', $storeIds)->pluck('name', 'id');
+
+            foreach ($costData['materials'] as &$material) {
+                $material['store_name'] = $stores[$material['store_id']] ?? '-';
+            }
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => $costData
         ]);
     }
 }

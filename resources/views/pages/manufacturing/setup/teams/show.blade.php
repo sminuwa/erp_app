@@ -82,14 +82,14 @@
                                         <thead>
                                             <tr>
                                                 <th>#</th>
-                                                <th>Employee Name</th>
+                                                <th>User Name</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach($record->supervisors as $index => $supervisor)
                                                 <tr>
                                                     <td>{{ $index + 1 }}</td>
-                                                    <td>{{ $supervisor->employee->name ?? 'N/A' }}</td>
+                                                    <td>{{ $supervisor->user ? ($supervisor->user->surname . ' ' . $supervisor->user->firstname) : 'N/A' }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>

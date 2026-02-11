@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\ManufacturingPenalty;
 use App\Models\ManufacturingTeam;
 use App\Models\ManufacturingStaff;
+use App\Models\SingleProductManufacturing;
+use App\Models\BatchConversion;
 use App\Classes\Manufacturing\ManufacturingTransaction;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\Auth;
@@ -18,9 +20,11 @@ class ManufacturingPenaltyController extends Controller
     {
         $this->authorize('manufacturing.penalties.index');
 
+        $user = Auth::user();
         $records = ManufacturingPenalty::with(['team', 'staff', 'createdBy'])
+            ->forBranch($user->branch_id)
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(50);
 
         return view('pages.manufacturing.processing.penalties.index', [
             'records' => $records
@@ -37,10 +41,25 @@ class ManufacturingPenaltyController extends Controller
 
         $user = Auth::user();
 
+        // Get posted productions for selection (Production Document No field)
+        $singleManufacturing = SingleProductManufacturing::posted()
+            ->forBranch($user->branch_id)
+            ->with('bom.finishProduct')
+            ->orderBy('reference')
+            ->get();
+
+        $batchConversions = BatchConversion::posted()
+            ->forBranch($user->branch_id)
+            ->with('batchProduction.bom.finishProduct')
+            ->orderBy('reference')
+            ->get();
+
         return view('pages.manufacturing.processing.penalties.create', [
             'model' => $model,
             'teams' => ManufacturingTeam::active()->forBranch($user->branch_id)->get(),
-            'staff' => ManufacturingStaff::where('status', 1)->orderBy('name')->get()
+            'staff' => ManufacturingStaff::where('status', 1)->orderBy('name')->get(),
+            'singleManufacturing' => $singleManufacturing,
+            'batchConversions' => $batchConversions
         ]);
     }
 
@@ -50,10 +69,20 @@ class ManufacturingPenaltyController extends Controller
 
         $request->validate([
             'reference' => 'required|unique:manufacturing_penalties,reference',
+            'penalty_date' => 'required|date',
             'penalty_type' => 'required|in:team,staff',
             'amount_charged' => 'required|numeric|min:0.01',
+            'total_loss_incurred' => 'nullable|numeric|min:0',
+            'production_reference' => 'nullable|string',
             'description' => 'required|string'
         ]);
+
+        // Validate team_id or staff_id based on penalty_type
+        if ($request->penalty_type === 'team') {
+            $request->validate(['team_id' => 'required|exists:manufacturing_teams,id']);
+        } else {
+            $request->validate(['staff_id' => 'required|exists:manufacturing_staff,id']);
+        }
 
         DB::beginTransaction();
 
@@ -64,9 +93,11 @@ class ManufacturingPenaltyController extends Controller
             $model->reference = $request->reference;
             $model->penalty_date = $request->penalty_date;
             $model->penalty_type = $request->penalty_type;
-            $model->team_id = $request->team_id;
-            $model->staff_id = $request->staff_id;
+            $model->team_id = $request->penalty_type === 'team' ? $request->team_id : null;
+            $model->staff_id = $request->penalty_type === 'staff' ? $request->staff_id : null;
             $model->amount_charged = $request->amount_charged;
+            $model->total_loss_incurred = $request->total_loss_incurred ?? 0;
+            $model->production_reference = $request->production_reference;
             $model->description = $request->description;
             $model->branch_id = $user->branch_id;
             $model->status = ManufacturingPenalty::STATUS_PENDING;

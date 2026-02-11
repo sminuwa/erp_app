@@ -16,7 +16,7 @@
                 <td>{{ $record->branch->name ?? '-' }}</td>
                 <td>
                     @if($record->supervisors->count() > 0)
-                        {{ $record->supervisors->map(function($s) { return $s->employee->name ?? 'N/A'; })->implode(', ') }}
+                        {{ $record->supervisors->map(function($s) { return $s->user ? ($s->user->surname . ' ' . $s->user->firstname) : 'N/A'; })->implode(', ') }}
                     @else
                         -
                     @endif

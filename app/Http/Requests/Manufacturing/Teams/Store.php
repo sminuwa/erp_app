@@ -28,7 +28,7 @@ class Store extends FormRequest
             'branch_id' => 'required|exists:branches,id',
             'status' => 'required|in:0,1',
             'supervisors' => 'nullable|array',
-            'supervisors.*' => 'nullable|exists:employees,id',
+            'supervisors.*' => 'nullable|exists:users,id',
             'members' => 'nullable|array',
             'members.*' => 'nullable|exists:manufacturing_staff,id',
         ];

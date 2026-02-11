@@ -38,10 +38,11 @@
                                 <tr>
                                     <th>Reference</th>
                                     <th>Date</th>
-                                    <th>Penalty Type</th>
+                                    <th>Type</th>
                                     <th>Team/Staff</th>
-                                    <th>Amount</th>
-                                    <th>Reason</th>
+                                    <th>Production Doc</th>
+                                    <th class="text-right">Amount Charged</th>
+                                    <th class="text-right">Loss Incurred</th>
                                     <th>Status</th>
                                     <th width="100">Actions</th>
                                 </tr>
@@ -59,8 +60,9 @@
                                             {{ $record->staff->name ?? 'N/A' }}
                                         @endif
                                     </td>
-                                    <td>{{ number_format($record->amount, 2) }}</td>
-                                    <td>{{ Str::limit($record->reason, 30) }}</td>
+                                    <td>{{ $record->production_reference ?? '-' }}</td>
+                                    <td class="text-right">{{ number_format($record->amount_charged, 2) }}</td>
+                                    <td class="text-right">{{ number_format($record->total_loss_incurred ?? 0, 2) }}</td>
                                     <td>
                                         @if($record->status == 'pending')
                                             <span class="badge badge-warning">Pending</span>
@@ -92,6 +94,9 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        <div class="mt-3">
+                            {{ $records->links() }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -103,7 +108,8 @@
 <script>
 $(document).ready(function() {
     $('#dataTable').DataTable({
-        "order": [[0, "desc"]]
+        "order": [[0, "desc"]],
+        "paging": false
     });
 });
 </script>

@@ -13,6 +13,13 @@
                 <div class="card-header">
                     <h3 class="card-title">Daily Manufacturing Schedule: {{ $record->reference }}</h3>
                     <div class="card-tools">
+                        @can('manufacturing.schedules.edit')
+                        @if($record->isPending())
+                        <a href="{{ route('manufacturing.schedules.edit', $record->id) }}" class="btn btn-warning btn-sm">
+                            <i class="fa fa-edit"></i> Edit
+                        </a>
+                        @endif
+                        @endcan
                         @can('manufacturing.schedules.approve')
                         @if($record->isPending())
                         <form action="{{ route('manufacturing.schedules.approve', $record->id) }}" method="POST" style="display:inline;">

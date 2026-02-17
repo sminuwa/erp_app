@@ -79,11 +79,23 @@
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Requisition <span class="text-danger">*</span></label>
-                                        <select name="requisition_id" class="form-control select2-single" required>
+                                        <select name="requisition_id" id="requisition_id" class="form-control select2-single" required>
                                             <option value="">Select Requisition</option>
                                             @foreach($requisitions as $requisition)
-                                            <option value="{{ $requisition->id }}" data-bom-id="{{ $requisition->bom_id }}">
-                                                {{ $requisition->reference }}
+                                            @php
+                                                $reqQty = $requisition->quantity ?? 0;
+                                                $manufactured = $manufacturedQtyByRequisition[$requisition->id] ?? 0;
+                                                $remaining = $reqQty - $manufactured;
+                                            @endphp
+                                            <option value="{{ $requisition->id }}"
+                                                data-bom-id="{{ $requisition->bom_id }}"
+                                                data-bom-name="{{ $requisition->bom->reference ?? '' }} - {{ $requisition->bom->finishProduct->name ?? '' }}"
+                                                data-team-id="{{ $requisition->schedule->team_id ?? '' }}"
+                                                data-machine-id="{{ $requisition->schedule->machine_id ?? '' }}"
+                                                data-req-qty="{{ $reqQty }}"
+                                                data-manufactured="{{ $manufactured }}"
+                                                data-remaining="{{ $remaining }}">
+                                                {{ $requisition->reference }} - {{ $requisition->bom->finishProduct->name ?? 'N/A' }} (Remaining: {{ number_format($remaining, 0) }})
                                             </option>
                                             @endforeach
                                         </select>
@@ -108,7 +120,11 @@
                                     <div class="form-group">
                                         <label>Number of Batches <span class="text-danger">*</span></label>
                                         <input type="number" name="quantity" id="quantity" class="form-control" step="1" min="1" value="1" required>
-                                        <small class="text-muted">Default is 1 batch</small>
+                                        <small class="text-muted">
+                                            Req. Qty: <span id="req-qty-display">-</span> |
+                                            Manufactured: <span id="manufactured-display">-</span> |
+                                            Max: <span id="remaining-display" class="font-weight-bold">-</span>
+                                        </small>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
@@ -238,7 +254,7 @@
 @push('js')
 <script>
 $(document).ready(function() {
-    $('.select2-single').select2();
+    $('.select2-single').select2({ width: '100%' });
 
     var calculateTimeout = null;
 
@@ -331,11 +347,59 @@ $(document).ready(function() {
         calculateTimeout = setTimeout(calculateCosts, 500);
     });
 
-    // Auto-select BOM when requisition is selected (if requisition has a bom_id)
-    $('select[name="requisition_id"]').on('change', function() {
-        var bomId = $(this).find(':selected').data('bom-id');
+    // When requisition is selected: auto-load BOM, team, machine, and qty constraints
+    $('#requisition_id').on('change', function() {
+        var selected = $(this).find(':selected');
+        var bomId = selected.data('bom-id');
+        var teamId = selected.data('team-id');
+        var machineId = selected.data('machine-id');
+        var reqQty = parseFloat(selected.data('req-qty')) || 0;
+        var manufactured = parseFloat(selected.data('manufactured')) || 0;
+        var remaining = parseFloat(selected.data('remaining')) || 0;
+
+        // Auto-select BOM from requisition
         if (bomId) {
             $('#bom_id').val(bomId).trigger('change');
+        }
+
+        // Auto-select team from requisition's schedule
+        if (teamId) {
+            $('select[name="team_id"]').val(teamId).trigger('change');
+        }
+
+        // Auto-select machine from requisition's schedule
+        if (machineId) {
+            $('select[name="machine_id"]').val(machineId).trigger('change');
+        }
+
+        // Update qty display and constraints
+        if (reqQty > 0) {
+            $('#req-qty-display').text(reqQty);
+            $('#manufactured-display').text(manufactured);
+            $('#remaining-display').text(remaining);
+            $('#quantity').attr('max', remaining);
+            // Default quantity to 1 or remaining, whichever is smaller
+            if (parseInt($('#quantity').val()) > remaining) {
+                $('#quantity').val(Math.min(1, remaining));
+            }
+        } else {
+            $('#req-qty-display').text('-');
+            $('#manufactured-display').text('-');
+            $('#remaining-display').text('-');
+            $('#quantity').removeAttr('max');
+        }
+    });
+
+    // Validate quantity on form submit
+    $('form').on('submit', function(e) {
+        var selected = $('#requisition_id').find(':selected');
+        var remaining = parseFloat(selected.data('remaining')) || 0;
+        var qty = parseInt($('#quantity').val()) || 0;
+
+        if (remaining > 0 && qty > remaining) {
+            e.preventDefault();
+            alert('Quantity (' + qty + ') exceeds the remaining requisition quantity (' + remaining + ').\nAlready manufactured: ' + (parseFloat(selected.data('manufactured')) || 0));
+            return false;
         }
     });
 

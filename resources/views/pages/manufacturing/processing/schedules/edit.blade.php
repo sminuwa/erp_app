@@ -1,6 +1,6 @@
 @extends('layouts.backend.app')
 
-@section('title', 'Create Daily Manufacturing Schedule')
+@section('title', 'Edit Daily Manufacturing Schedule')
 
 @push('css')
 <style>
@@ -14,14 +14,14 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h4>Create Daily Manufacturing Schedule</h4>
+                    <h4>Edit Daily Manufacturing Schedule</h4>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
                         <li class="breadcrumb-item">Manufacturing</li>
                         <li class="breadcrumb-item">Processing</li>
-                        <li class="breadcrumb-item active">Create Schedule</li>
+                        <li class="breadcrumb-item active">Edit Schedule</li>
                     </ol>
                 </div>
             </div>
@@ -29,26 +29,27 @@
     </section>
 
     <section class="content">
-    <form action="{{ route('manufacturing.schedules.store') }}" method="POST" id="schedule-form">
+    <form action="{{ route('manufacturing.schedules.update', $model->id) }}" method="POST" id="schedule-form">
         @csrf
+        @method('PUT')
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Create Daily Manufacturing Schedule</h3>
+                        <h3 class="card-title">Edit Schedule: {{ $model->reference }}</h3>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label>Reference <span class="text-danger">*</span></label>
-                                    <input type="text" name="reference" class="form-control" value="{{ $model->reference }}" readonly>
+                                    <label>Reference</label>
+                                    <input type="text" class="form-control" value="{{ $model->reference }}" readonly>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Schedule Date <span class="text-danger">*</span></label>
-                                    <input type="date" name="schedule_date" class="form-control" value="{{ $model->schedule_date }}" required>
+                                    <input type="date" name="schedule_date" class="form-control" value="{{ $model->schedule_date instanceof \Carbon\Carbon ? $model->schedule_date->format('Y-m-d') : $model->schedule_date }}" required>
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -57,7 +58,7 @@
                                     <select name="order_id" id="order_id" class="form-control select2-single" required>
                                         <option value="">Select Production Order</option>
                                         @foreach($productionOrders as $order)
-                                        <option value="{{ $order->id }}">
+                                        <option value="{{ $order->id }}" {{ $model->production_order_id == $order->id ? 'selected' : '' }}>
                                             {{ $order->reference }}
                                         </option>
                                         @endforeach
@@ -70,7 +71,7 @@
                                     <select name="team_id" class="form-control select2-single" required>
                                         <option value="">Select Team</option>
                                         @foreach($teams as $team)
-                                        <option value="{{ $team->id }}">{{ $team->name }}</option>
+                                        <option value="{{ $team->id }}" {{ $model->team_id == $team->id ? 'selected' : '' }}>{{ $team->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -83,7 +84,7 @@
                                     <select name="machine_id" class="form-control select2-single">
                                         <option value="">Select Machine</option>
                                         @foreach($machines as $machine)
-                                        <option value="{{ $machine->id }}">{{ $machine->code }} - {{ $machine->description }}</option>
+                                        <option value="{{ $machine->id }}" {{ $model->machine_id == $machine->id ? 'selected' : '' }}>{{ $machine->code }} - {{ $machine->description }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -91,7 +92,7 @@
                             <div class="col-md-8">
                                 <div class="form-group">
                                     <label>Notes</label>
-                                    <textarea name="notes" class="form-control" rows="1">{{ old('notes') }}</textarea>
+                                    <textarea name="notes" class="form-control" rows="1">{{ $model->notes }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -116,16 +117,16 @@
                             </thead>
                             <tbody id="items-body">
                                 <tr class="empty-row">
-                                    <td colspan="8" class="text-center text-muted">Please select a Production Order to load items</td>
+                                    <td colspan="8" class="text-center text-muted">Loading...</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     <div class="card-footer">
                         <button type="submit" class="btn btn-primary" id="btn-submit">
-                            <i class="fa fa-save"></i> Save Schedule
+                            <i class="fa fa-save"></i> Update Schedule
                         </button>
-                        <a href="{{ route('manufacturing.schedules.index') }}" class="btn btn-secondary">Cancel</a>
+                        <a href="{{ route('manufacturing.schedules.show', $model->id) }}" class="btn btn-secondary">Cancel</a>
                     </div>
                 </div>
             </div>
@@ -140,20 +141,24 @@
 $(document).ready(function() {
     $('.select2-single').select2({ width: '100%' });
 
+    var scheduleId = {{ $model->id }};
     var orderItems = [];
+
+    // Existing schedule items (to pre-populate qty)
+    var existingItems = {};
+    @foreach($model->items as $item)
+    existingItems[{{ $item->production_order_item_id }}] = {{ $item->scheduled_qty }};
+    @endforeach
 
     function formatNum(num) {
         return parseFloat(num || 0).toFixed(4);
     }
 
-    // Load order items via AJAX when order is selected
-    $('#order_id').on('change', function() {
-        var orderId = $(this).val();
-        $('#items-body').empty();
-        orderItems = [];
-
+    // Load order items via AJAX
+    function loadOrderItems(orderId, preserveExisting) {
         if (!orderId) {
-            $('#items-body').append('<tr class="empty-row"><td colspan="8" class="text-center text-muted">Please select a Production Order to load items</td></tr>');
+            $('#items-body').empty();
+            $('#items-body').append('<tr class="empty-row"><td colspan="8" class="text-center text-muted">Please select a Production Order</td></tr>');
             return;
         }
 
@@ -165,7 +170,8 @@ $(document).ready(function() {
             method: 'POST',
             data: {
                 _token: '{{ csrf_token() }}',
-                order_id: orderId
+                order_id: orderId,
+                schedule_id: scheduleId
             },
             success: function(response) {
                 $('#items-loading').hide();
@@ -173,25 +179,27 @@ $(document).ready(function() {
 
                 if (response.status && response.data) {
                     orderItems = response.data;
-                    loadAllItems();
+                    loadAllItems(preserveExisting);
                 }
             },
             error: function() {
                 $('#items-loading').hide();
                 $('#items-table').show();
+                $('#items-body').empty();
                 $('#items-body').append('<tr class="empty-row"><td colspan="8" class="text-center text-danger">Error loading order items</td></tr>');
             }
         });
-    });
+    }
 
-    // Auto-load ALL order items that have remaining qty
-    function loadAllItems() {
+    function loadAllItems(preserveExisting) {
         $('#items-body').empty();
         var hasItems = false;
 
         orderItems.forEach(function(item, index) {
-            if (item.remaining > 0) {
-                addItemRow(item, index);
+            // Show items that have remaining qty OR are in the current schedule
+            var existingQty = preserveExisting ? (existingItems[item.id] || 0) : 0;
+            if (item.remaining > 0 || existingQty > 0) {
+                addItemRow(item, index, existingQty);
                 hasItems = true;
             }
         });
@@ -201,8 +209,11 @@ $(document).ready(function() {
         }
     }
 
-    function addItemRow(item, index) {
+    function addItemRow(item, index, existingQty) {
         var typeClass = item.bom_type === 'batch' ? 'info' : 'primary';
+        var scheduleQty = existingQty > 0 ? existingQty : item.remaining;
+        var maxQty = item.remaining;
+
         var newRow = `
             <tr class="item-row" data-item-id="${item.id}">
                 <td>
@@ -216,8 +227,8 @@ $(document).ready(function() {
                 <td class="text-right font-weight-bold ${item.remaining > 0 ? 'text-warning' : 'text-success'}">${formatNum(item.remaining)}</td>
                 <td>
                     <input type="number" name="items[${index}][quantity]" class="form-control form-control-sm item-qty"
-                        step="0.0001" min="0.0001" max="${item.remaining}" value="${formatNum(item.remaining)}" required
-                        data-remaining="${item.remaining}">
+                        step="0.0001" min="0.0001" max="${maxQty}" value="${formatNum(scheduleQty)}" required
+                        data-remaining="${maxQty}">
                 </td>
                 <td class="text-center">
                     <button type="button" class="btn btn-danger btn-xs remove-row" title="Remove">
@@ -234,11 +245,23 @@ $(document).ready(function() {
         $('#items-body').append(newRow);
     }
 
+    // On order change, reload items (without preserving existing)
+    $('#order_id').on('change', function() {
+        existingItems = {};
+        loadOrderItems($(this).val(), false);
+    });
+
+    // Initial load with existing items preserved
+    var initialOrderId = $('#order_id').val();
+    if (initialOrderId) {
+        loadOrderItems(initialOrderId, true);
+    }
+
     // Remove row
     $(document).on('click', '.remove-row', function() {
         $(this).closest('tr').remove();
         if ($('.item-row').length === 0) {
-            $('#items-body').append('<tr class="empty-row"><td colspan="8" class="text-center text-muted">No items. Select a Production Order to reload.</td></tr>');
+            $('#items-body').append('<tr class="empty-row"><td colspan="8" class="text-center text-muted">No items. Change order to reload.</td></tr>');
         }
     });
 

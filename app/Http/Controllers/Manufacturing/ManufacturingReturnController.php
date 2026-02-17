@@ -7,6 +7,7 @@ use App\Models\ManufacturingReturn;
 use App\Models\ManufacturingReturnMaterial;
 use App\Models\SingleProductManufacturing;
 use App\Models\BatchConversion;
+use App\Models\BatchProduction;
 use App\Classes\Manufacturing\ManufacturingTransaction;
 use App\Classes\Manufacturing\ManufacturingCostPrice;
 use App\Models\AuditLog;
@@ -44,7 +45,7 @@ class ManufacturingReturnController extends Controller
         // Get posted productions that have remaining quantity to return (partial returns allowed)
         $singleManufacturing = SingleProductManufacturing::posted()
             ->forBranch($user->branch_id)
-            ->with(['bom.finishProduct', 'materials.product'])
+            ->with(['bom.finishProduct', 'materials.product', 'materials.store'])
             ->get()
             ->filter(function ($sm) {
                 return $sm->getRemainingReturnableQty() > 0;
@@ -52,7 +53,7 @@ class ManufacturingReturnController extends Controller
 
         $batchConversions = BatchConversion::posted()
             ->forBranch($user->branch_id)
-            ->with(['batchProduction.bom.finishProduct', 'finishProduct'])
+            ->with(['batchProduction.bom.finishProduct', 'batchProduction.materials.product', 'batchProduction.materials.store', 'finishProduct'])
             ->get()
             ->filter(function ($bc) {
                 return $bc->getRemainingReturnableQty() > 0;
@@ -132,6 +133,9 @@ class ManufacturingReturnController extends Controller
             $model->created_by = Auth::id();
             $model->save();
 
+            // Calculate proportional raw materials for this return
+            $this->calculateReturnMaterials($model, $productionType, $productionId, $request->return_qty);
+
             DB::commit();
 
             AuditLog::auditLog(Auth::id(), "Created manufacturing return: " . $model->reference);
@@ -149,7 +153,7 @@ class ManufacturingReturnController extends Controller
         $this->authorize('manufacturing.returns.show');
 
         // Load relationships based on production type
-        $relations = ['createdBy', 'postedBy'];
+        $relations = ['createdBy', 'postedBy', 'materials.product', 'materials.store'];
         if ($return->production_type === ManufacturingReturn::PRODUCTION_TYPE_SINGLE) {
             $relations[] = 'singleManufacturing.bom.finishProduct';
         } else {
@@ -194,19 +198,28 @@ class ManufacturingReturnController extends Controller
                 );
             }
 
-            // Deduct finished goods if applicable
-            if ($return->production_type === ManufacturingReturn::PRODUCTION_TYPE_SINGLE) {
-                $production = $return->getProduction();
-                if ($production) {
-                    ManufacturingCostPrice::returnFinishedGoods(
-                        $production->finish_product_id,
-                        $production->output_store_id,
+            // Deduct finished goods from inventory
+            $production = $return->getProduction();
+            if ($production) {
+                $finishProductId = $production->finish_product_id
+                    ?? ($production->bom->finish_product_id ?? null);
+                $outputStoreId = $production->output_store_id ?? null;
+                $unitCost = $production->getUnitCost();
+
+                if ($finishProductId && $outputStoreId) {
+                    $result = ManufacturingCostPrice::returnFinishedGoods(
+                        $finishProductId,
+                        $outputStoreId,
                         $return->return_qty,
-                        $return->return_qty * $production->unit_cost,
+                        $return->return_qty * $unitCost,
                         $return->branch_id,
                         $return->reference,
                         $return->return_date
                     );
+
+                    if (!$result['status']) {
+                        throw new \Exception($result['message']);
+                    }
                 }
             }
 
@@ -253,5 +266,46 @@ class ManufacturingReturnController extends Controller
         }
 
         return redirect()->route('manufacturing.returns.index');
+    }
+
+    /**
+     * Calculate proportional raw materials for a return based on the original production materials.
+     * For partial returns, materials are proportionally reduced based on (return_qty / production_qty).
+     */
+    private function calculateReturnMaterials(ManufacturingReturn $return, $productionType, $productionId, $returnQty)
+    {
+        $productionMaterials = collect();
+        $productionQty = 0;
+
+        if ($productionType === ManufacturingReturn::PRODUCTION_TYPE_SINGLE) {
+            $production = SingleProductManufacturing::with('materials')->find($productionId);
+            if ($production) {
+                $productionQty = $production->quantity;
+                $productionMaterials = $production->materials;
+            }
+        } else {
+            $conversion = BatchConversion::with('batchProduction.materials')->find($productionId);
+            if ($conversion && $conversion->batchProduction) {
+                $productionQty = $conversion->batchProduction->quantity;
+                $productionMaterials = $conversion->batchProduction->materials;
+            }
+        }
+
+        if ($productionQty <= 0 || $productionMaterials->isEmpty()) {
+            return;
+        }
+
+        $ratio = $returnQty / $productionQty;
+
+        foreach ($productionMaterials as $material) {
+            ManufacturingReturnMaterial::create([
+                'return_id' => $return->id,
+                'product_id' => $material->product_id,
+                'store_id' => $material->store_id,
+                'quantity' => round($material->quantity * $ratio, 4),
+                'unit_cost' => $material->unit_cost,
+                'total_cost' => round($material->quantity * $ratio * $material->unit_cost, 2),
+            ]);
+        }
     }
 }

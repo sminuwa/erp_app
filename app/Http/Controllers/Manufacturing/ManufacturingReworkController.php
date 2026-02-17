@@ -9,6 +9,7 @@ use App\Models\SingleProductManufacturing;
 use App\Models\BatchConversion;
 use App\Models\Product;
 use App\Models\Store;
+use App\Models\BranchProductPrice;
 use App\Classes\Manufacturing\ManufacturingTransaction;
 use App\Classes\Manufacturing\ManufacturingCostPrice;
 use App\Models\AuditLog;
@@ -56,12 +57,18 @@ class ManufacturingReworkController extends Controller
             ->orderBy('reference')
             ->get();
 
+        // Load branch-specific cost prices keyed by product_id
+        $branchCostPrices = BranchProductPrice::where('branch_id', $user->branch_id)
+            ->pluck('cost_price', 'product_id')
+            ->toArray();
+
         return view('pages.manufacturing.processing.reworks.create', [
             'model' => $model,
             'singleManufacturing' => $singleManufacturing,
             'batchConversions' => $batchConversions,
             'products' => Product::orderBy('name')->get(),
-            'stores' => Store::where('branch_id', $user->branch_id)->orderBy('name')->get()
+            'stores' => Store::where('branch_id', $user->branch_id)->orderBy('name')->get(),
+            'branchCostPrices' => $branchCostPrices
         ]);
     }
 

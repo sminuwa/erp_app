@@ -8,20 +8,18 @@
         </div>
         <div class="card-body">
             <div class="row">
+                @if(isset($model->id))
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="reference">Reference</label>
-                        <input type="text" class="form-control {{ $errors->has('reference') ? ' is-invalid' : '' }}"
-                            name="reference" id="reference" value="{{ old('reference', $model->reference) }}"
-                            maxlength="50" required="required" @if(isset($model->id)) readonly @endif>
-                        @if ($errors->has('reference'))
-                            <div class="invalid-feedback">
-                                <strong>{{ $errors->first('reference') }}</strong>
-                            </div>
-                        @endif
+                        <input type="text" class="form-control" value="{{ $model->reference }}" readonly>
+                        <input type="hidden" name="reference" value="{{ $model->reference }}">
                     </div>
                 </div>
-                <div class="col-md-3">
+                @else
+                <input type="hidden" name="reference" value="{{ $model->reference }}">
+                @endif
+                <div class="col-md-{{ isset($model->id) ? '3' : '4' }}">
                     <div class="form-group">
                         <label for="bom_type">BOM Type</label>
                         <select class="form-control {{ $errors->has('bom_type') ? ' is-invalid' : '' }}"
@@ -36,7 +34,7 @@
                         @endif
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-{{ isset($model->id) ? '6' : '8' }}">
                     <div class="form-group">
                         <label for="approval_document_no">Approval Document No (Memo)</label>
                         <input type="text" class="form-control {{ $errors->has('approval_document_no') ? ' is-invalid' : '' }}"
@@ -45,27 +43,6 @@
                         @if ($errors->has('approval_document_no'))
                             <div class="invalid-feedback">
                                 <strong>{{ $errors->first('approval_document_no') }}</strong>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="category_id">Category</label>
-                        <select class="form-control select2-single {{ $errors->has('category_id') ? ' is-invalid' : '' }}"
-                            name="category_id" id="category_id">
-                            <option value="">Select Category...</option>
-                            @if (isset($categories))
-                                @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}" {{ old('category_id', $model->category_id) == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
-                                    </option>
-                                @endforeach
-                            @endif
-                        </select>
-                        @if ($errors->has('category_id'))
-                            <div class="invalid-feedback">
-                                <strong>{{ $errors->first('category_id') }}</strong>
                             </div>
                         @endif
                     </div>
@@ -329,6 +306,9 @@
                     </div>
                     <button type="button" class="btn btn-success btn-sm" id="add-material">
                         <i class="fa fa-plus"></i> Add Material
+                    </button>
+                    <button type="button" class="btn btn-info btn-sm ml-2" id="refresh-costs">
+                        <i class="fa fa-sync"></i> Refresh Costs
                     </button>
                 </div>
 

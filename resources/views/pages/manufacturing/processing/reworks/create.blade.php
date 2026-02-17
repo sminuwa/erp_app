@@ -157,7 +157,7 @@
                                             <select name="materials[0][product_id]" class="form-control select2-single product-select">
                                                 <option value="">Select Product</option>
                                                 @foreach($products as $product)
-                                                <option value="{{ $product->id }}" data-cost="{{ $product->cost_price ?? 0 }}">{{ $product->name }}</option>
+                                                <option value="{{ $product->id }}" data-cost="{{ $branchCostPrices[$product->id] ?? 0 }}">{{ $product->name }}</option>
                                                 @endforeach
                                             </select>
                                         </td>

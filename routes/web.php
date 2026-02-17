@@ -1341,7 +1341,10 @@ Route::middleware('auth')->group(function () {
                 Route::get('/create', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'create'])->name('manufacturing.schedules.create');
                 Route::post('/store', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'store'])->name('manufacturing.schedules.store');
                 Route::get('/show/{schedule}', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'show'])->name('manufacturing.schedules.show');
+                Route::get('/edit/{schedule}', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'edit'])->name('manufacturing.schedules.edit');
+                Route::put('/update/{schedule}', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'update'])->name('manufacturing.schedules.update');
                 Route::post('/approve/{schedule}', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'approve'])->name('manufacturing.schedules.approve');
+                Route::post('/get-order-items', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'getOrderItems'])->name('manufacturing.schedules.get_order_items');
                 Route::delete('/delete/{schedule}', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'destroy'])->name('manufacturing.schedules.destroy');
             });
 

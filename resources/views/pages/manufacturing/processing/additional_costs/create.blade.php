@@ -78,7 +78,7 @@
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Account <span class="text-danger">*</span></label>
-                                        <select name="account_id" class="form-control select2" required>
+                                        <select name="account_id" class="form-control select2-single" required>
                                             <option value="">Select Account</option>
                                             @foreach($accounts as $account)
                                             <option value="{{ $account->id }}">{{ $account->number }} - {{ $account->description }}</option>
@@ -93,7 +93,7 @@
                                 <div class="col-md-4 production-select" id="single-select">
                                     <div class="form-group">
                                         <label>Single Product Manufacturing <span class="text-danger">*</span></label>
-                                        <select name="single_manufacturing_id" id="single_manufacturing_id" class="form-control select2">
+                                        <select name="single_manufacturing_id" id="single_manufacturing_id" class="form-control select2-single">
                                             <option value="">Select Production</option>
                                             @forelse($singleManufacturing as $sm)
                                             <option value="{{ $sm->id }}"
@@ -118,7 +118,7 @@
                                 <div class="col-md-4 production-select" id="batch-select">
                                     <div class="form-group">
                                         <label>Batch Conversion <span class="text-danger">*</span></label>
-                                        <select name="batch_production_id" id="batch_production_id" class="form-control select2">
+                                        <select name="batch_production_id" id="batch_production_id" class="form-control select2-single">
                                             <option value="">Select Conversion</option>
                                             @forelse($batchConversions as $bc)
                                             @php
@@ -213,7 +213,13 @@
 @push('js')
 <script>
 $(document).ready(function() {
-    $('.select2').select2({ width: '100%' });
+    function reinitSelect2(selector) {
+        var $el = $(selector);
+        if ($el.hasClass('select2-hidden-accessible')) {
+            $el.select2('destroy');
+        }
+        $el.select2({ width: '100%' });
+    }
 
     function toggleProductionSelect() {
         var type = $('#production_type').val();
@@ -227,12 +233,14 @@ $(document).ready(function() {
         if (type === 'single_product') {
             $('#single-select').addClass('active');
             $('select[name="single_manufacturing_id"]').prop('required', true);
-            // Re-init select2
+            // Re-init select2 after element is visible
+            reinitSelect2('#single_manufacturing_id');
             $('#single_manufacturing_id').trigger('change');
         } else if (type === 'batch_conversion') {
             $('#batch-select').addClass('active');
             $('select[name="batch_production_id"]').prop('required', true);
-            // Re-init select2
+            // Re-init select2 after element is visible
+            reinitSelect2('#batch_production_id');
             $('#batch_production_id').trigger('change');
         }
     }

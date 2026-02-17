@@ -46,19 +46,29 @@ class BatchProductionController extends Controller
 
         $user = Auth::user();
 
-        // Get requisitions with batch BOMs only
+        // Get requisitions with batch BOMs only, eager load schedule for team/machine
         $requisitions = MaterialsRequisition::whereHas('bom', function($q) {
             $q->where('bom_type', 'batch');
-        })->received()->forBranch($user->branch_id)->get();
+        })->received()
+          ->forBranch($user->branch_id)
+          ->with(['bom.finishProduct', 'schedule'])
+          ->get();
+
+        // Calculate already-manufactured qty per requisition
+        $manufacturedQtyByRequisition = BatchProduction::where('branch_id', $user->branch_id)
+            ->whereIn('requisition_id', $requisitions->pluck('id'))
+            ->groupBy('requisition_id')
+            ->selectRaw('requisition_id, SUM(quantity) as total_manufactured')
+            ->pluck('total_manufactured', 'requisition_id')
+            ->toArray();
 
         return view('pages.manufacturing.processing.batch_production.create', [
             'model' => $model,
             'requisitions' => $requisitions,
-            'boms' => \App\Models\ManufacturingBom::where('bom_type', 'batch')->active()->forBranch($user->branch_id)->get(),
+            'manufacturedQtyByRequisition' => $manufacturedQtyByRequisition,
+            'boms' => \App\Models\ManufacturingBom::where('bom_type', 'batch')->active()->forBranch($user->branch_id)->with('finishProduct')->get(),
             'teams' => ManufacturingTeam::active()->forBranch($user->branch_id)->get(),
             'machines' => ManufacturingMachine::active()->forBranch($user->branch_id)->get(),
-            'products' => \App\Models\Product::orderBy('name')->get(),
-            'stores' => \App\Models\Store::where('branch_id', $user->branch_id)->orderBy('name')->get()
         ]);
     }
 
@@ -80,6 +90,23 @@ class BatchProductionController extends Controller
 
         try {
             $user = Auth::user();
+
+            // Validate quantity against requisition remaining
+            $requisition = MaterialsRequisition::find($request->requisition_id);
+            if ($requisition && $requisition->quantity) {
+                $alreadyManufactured = BatchProduction::where('requisition_id', $request->requisition_id)
+                    ->sum('quantity');
+                $remaining = $requisition->quantity - $alreadyManufactured;
+                if ($request->quantity > $remaining) {
+                    throw new \Exception("Quantity ({$request->quantity}) exceeds remaining requisition quantity ({$remaining}). Already manufactured: {$alreadyManufactured}");
+                }
+            }
+
+            // Validate BOM matches requisition's BOM
+            if ($requisition && $requisition->bom_id && $request->bom_id != $requisition->bom_id) {
+                throw new \Exception("Selected BOM does not match the requisition's BOM.");
+            }
+
             $bom = \App\Models\ManufacturingBom::find($request->bom_id);
 
             $model = new BatchProduction;
@@ -116,8 +143,9 @@ class BatchProductionController extends Controller
                 ]);
             }
 
-            // Save material cost (WIP value is calculated when posting)
+            // Save all costs at creation time
             $model->total_material_cost = $costData['material_cost'];
+            $model->wip_value = $costData['material_cost'] + $costData['total_other_cost'];
             $model->save();
 
             DB::commit();

@@ -179,6 +179,46 @@
                         </div>
                     </div>
 
+                    @if($record->materials && $record->materials->count() > 0)
+                    <div class="card card-outline card-info mt-3">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa fa-cubes"></i> Raw Materials to be {{ $record->isPosted() ? 'Credited' : 'Credited Back' }}</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-bordered table-striped table-sm mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Product</th>
+                                        <th>Store</th>
+                                        <th class="text-right">Quantity</th>
+                                        <th class="text-right">Unit Cost</th>
+                                        <th class="text-right">Total Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($record->materials as $index => $material)
+                                    <tr>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>{{ $material->product->name ?? 'N/A' }}</td>
+                                        <td>{{ $material->store->name ?? 'N/A' }}</td>
+                                        <td class="text-right">{{ number_format($material->quantity, 4) }}</td>
+                                        <td class="text-right">{{ number_format($material->unit_cost, 2) }}</td>
+                                        <td class="text-right">{{ number_format($material->total_cost, 2) }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot class="bg-light">
+                                    <tr>
+                                        <th colspan="5" class="text-right">Total Materials Cost:</th>
+                                        <th class="text-right">{{ number_format($record->materials->sum('total_cost'), 2) }}</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    @endif
+
                     @if($record->isPosted())
                     <div class="alert alert-success">
                         <i class="fa fa-check-circle"></i>
@@ -189,7 +229,7 @@
                         <i class="fa fa-info-circle"></i>
                         This return is pending. Upon posting:
                         <ul class="mb-0 mt-1">
-                            <li>Raw materials will be credited back to inventory</li>
+                            <li>Raw materials listed above will be credited back to inventory</li>
                             <li>Finished goods will be debited from inventory</li>
                             <li>Average cost will be recalculated for affected products</li>
                         </ul>

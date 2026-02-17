@@ -19,6 +19,7 @@ class MaterialsRequisition extends Model
         'requisition_date',
         'schedule_id',
         'bom_id',
+        'quantity',
         'branch_id',
         'created_by',
         'notes'

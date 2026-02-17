@@ -166,10 +166,26 @@ class MaterialsRequisitionController extends Controller
     {
         $this->authorize('manufacturing.requisitions.show');
 
-        $requisition->load(['schedule', 'bom', 'items.product', 'items.sourceStore', 'branch', 'createdBy']);
+        $requisition->load([
+            'schedule.team', 'schedule.machine', 'schedule.productionOrder',
+            'bom.finishProduct', 'bom.outputStore', 'bom.materials.product',
+            'items.product', 'items.sourceStore',
+            'branch', 'createdBy', 'approvedBy', 'issuedBy', 'receivedBy',
+            'singleProductManufacturing', 'batchProductions'
+        ]);
+
+        // Calculate manufacturing progress
+        $totalManufactured = 0;
+        if ($requisition->bom && $requisition->bom->bom_type === 'single') {
+            $totalManufactured = $requisition->singleProductManufacturing->sum('quantity');
+        } elseif ($requisition->bom && $requisition->bom->bom_type === 'batch') {
+            $totalManufactured = $requisition->batchProductions->sum('quantity');
+        }
 
         return view('pages.manufacturing.processing.requisitions.show', [
-            'record' => $requisition
+            'record' => $requisition,
+            'totalManufactured' => $totalManufactured,
+            'remainingQty' => max(0, ($requisition->quantity ?? 0) - $totalManufactured),
         ]);
     }
 

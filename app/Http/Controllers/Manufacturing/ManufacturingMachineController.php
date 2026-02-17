@@ -47,7 +47,6 @@ class ManufacturingMachineController extends Controller
 
         return view('pages.manufacturing.setup.machines.create', [
             'model' => $model,
-            'branches' => Branch::orderBy('name')->get()
         ]);
     }
 
@@ -61,7 +60,9 @@ class ManufacturingMachineController extends Controller
     {
         $model = new ManufacturingMachine;
         $model->fill($request->all());
+        $model->branch_id = Auth::user()->branch_id;
         $model->created_by = Auth::id();
+        $model->code = ManufacturingMachine::generateNewCode();
 
         if ($model->save()) {
             $action = "Added a new manufacturing machine: " . $model->description;

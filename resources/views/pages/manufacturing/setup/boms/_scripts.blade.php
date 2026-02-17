@@ -22,29 +22,39 @@ $(function() {
         width: '100%'
     });
 
+    // Build product options HTML
+    function buildProductOptions(selectedId) {
+        var options = '<option value="">Select Product...</option>';
+        products.forEach(function(p) {
+            var sel = (selectedId && p.id == selectedId) ? 'selected' : '';
+            options += '<option value="' + p.id + '" ' + sel + '>' + p.code + ' - ' + p.name + '</option>';
+        });
+        return options;
+    }
+
+    // Build store options HTML
+    function buildStoreOptions(selectedId) {
+        var options = '<option value="">Select Store...</option>';
+        stores.forEach(function(s) {
+            var sel = (selectedId && s.id == selectedId) ? 'selected' : '';
+            options += '<option value="' + s.id + '" ' + sel + '>' + s.name + '</option>';
+        });
+        return options;
+    }
+
     // Add new material row
     $('#add-material').on('click', function() {
-        var productOptions = '<option value="">Select Product...</option>';
-        products.forEach(function(p) {
-            productOptions += '<option value="' + p.id + '">' + p.code + ' - ' + p.name + '</option>';
-        });
-
-        var storeOptions = '<option value="">Select Store...</option>';
-        stores.forEach(function(s) {
-            storeOptions += '<option value="' + s.id + '">' + s.name + '</option>';
-        });
-
         var newRow = `
             <tr class="material-row" data-row="${rowIndex}">
-                <td>${rowIndex + 1}</td>
+                <td>${$('.material-row').length + 1}</td>
                 <td>
                     <select class="form-control select2-single material-product" name="materials[${rowIndex}][product_id]" required>
-                        ${productOptions}
+                        ${buildProductOptions()}
                     </select>
                 </td>
                 <td>
                     <select class="form-control select2-single material-store" name="materials[${rowIndex}][source_store_id]">
-                        ${storeOptions}
+                        ${buildStoreOptions()}
                     </select>
                 </td>
                 <td>
@@ -65,18 +75,22 @@ $(function() {
         $('#materials-body').append(newRow);
         rowIndex++;
 
-        // Re-initialize select2 for new row
-        $('#materials-body tr:last .select2-single').select2({
-            width: '100%'
-        });
-
-        renumberRows();
+        // Initialize select2 for new row
+        var lastRow = $('#materials-body tr:last');
+        lastRow.find('.select2-single').select2({ width: '100%' });
     });
 
-    // Remove material row
+    // Remove material row - use event delegation
     $(document).on('click', '.remove-material', function() {
         if ($('.material-row').length > 1) {
-            $(this).closest('tr').remove();
+            var row = $(this).closest('tr');
+            // Destroy select2 before removing to prevent memory leaks
+            row.find('.select2-single').each(function() {
+                if ($(this).hasClass('select2-hidden-accessible')) {
+                    $(this).select2('destroy');
+                }
+            });
+            row.remove();
             renumberRows();
             calculateTotals();
         } else {
@@ -156,13 +170,52 @@ $(function() {
     }
 
     // Recalculate when other costs change
-    $('.other-cost').on('input', function() {
+    $(document).on('input', '.other-cost', function() {
         calculateTotals();
     });
 
     // Recalculate when actual output changes
     $('#actual_output').on('input', function() {
         calculateTotals();
+    });
+
+    // Refresh all material costs to current prices
+    $('#refresh-costs').on('click', function() {
+        var $btn = $(this);
+        $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Refreshing...');
+
+        var pending = 0;
+        var done = 0;
+
+        $('.material-row').each(function() {
+            var row = $(this);
+            var productId = row.find('.material-product').val();
+            if (productId) {
+                pending++;
+                $.ajax({
+                    url: '{{ route("manufacturing.ajax.product-cost") }}',
+                    type: 'GET',
+                    data: { product_id: productId },
+                    success: function(response) {
+                        if (response.status) {
+                            row.find('.material-unit-cost').val(parseFloat(response.cost).toFixed(2));
+                            calculateRowTotal(row);
+                        }
+                    },
+                    complete: function() {
+                        done++;
+                        if (done >= pending) {
+                            calculateTotals();
+                            $btn.prop('disabled', false).html('<i class="fa fa-sync"></i> Refresh Costs');
+                        }
+                    }
+                });
+            }
+        });
+
+        if (pending === 0) {
+            $btn.prop('disabled', false).html('<i class="fa fa-sync"></i> Refresh Costs');
+        }
     });
 
     // Initial calculation

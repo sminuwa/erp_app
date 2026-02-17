@@ -156,6 +156,9 @@ class BatchConversionController extends Controller
             // Update conversion status
             $conversion->post();
 
+            // Update production order item produced qty
+            $this->updateProductionOrderProducedQty($batch, $conversion->produced_qty);
+
             DB::commit();
 
             AuditLog::auditLog(Auth::id(), "Posted batch conversion: " . $conversion->reference);
@@ -184,6 +187,43 @@ class BatchConversionController extends Controller
         session()->flash('app_message', 'Batch Conversion deleted successfully');
 
         return redirect()->route('manufacturing.batch_conversion.index');
+    }
+
+    /**
+     * Update production order item's produced_qty when batch is converted
+     * Traces: BatchProduction -> Requisition -> Schedule -> ScheduleItem -> ProductionOrderItem
+     */
+    private function updateProductionOrderProducedQty(BatchProduction $batch, $producedQty)
+    {
+        $batch->load('requisition.schedule.items.productionOrderItem');
+        $requisition = $batch->requisition;
+        if (!$requisition || !$requisition->schedule_id) {
+            return;
+        }
+
+        $schedule = $requisition->schedule;
+        if (!$schedule) {
+            return;
+        }
+
+        // Find the matching schedule item by BOM
+        $scheduleItem = $schedule->items()
+            ->whereHas('productionOrderItem', function ($q) use ($batch) {
+                $q->where('bom_id', $batch->bom_id);
+            })
+            ->first();
+
+        if ($scheduleItem && $scheduleItem->productionOrderItem) {
+            $orderItem = $scheduleItem->productionOrderItem;
+            $orderItem->addProducedQty($producedQty);
+
+            // Update parent order's processed_qty
+            $order = $orderItem->productionOrder;
+            if ($order) {
+                $order->processed_qty = $order->items()->sum('produced_qty');
+                $order->save();
+            }
+        }
     }
 
     /**

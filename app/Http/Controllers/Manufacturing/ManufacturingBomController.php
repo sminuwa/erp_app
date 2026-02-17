@@ -65,9 +65,8 @@ class ManufacturingBomController extends Controller
         return view('pages.manufacturing.setup.boms.create', [
             'model' => $model,
             'branches' => Branch::orderBy('name')->get(),
-            'categories' => Category::orderBy('name')->get(),
             'stores' => Store::where('branch_id', $user->branch_id)->orderBy('name')->get(),
-            'products' => Product::orderBy('name')->get()
+            'products' => Product::select('id', 'code', 'name')->orderBy('code', 'asc')->get()
         ]);
     }
 
@@ -169,14 +168,25 @@ class ManufacturingBomController extends Controller
     public function edit(BomEditRequest $request, ManufacturingBom $bom)
     {
         $bom->load(['materials.product', 'materials.sourceStore']);
-        $user = Auth::user();
+
+        // Refresh material costs to current average cost prices
+        foreach ($bom->materials as $material) {
+            $currentCost = $this->getProductCost($material->product_id, $bom->branch_id);
+            if ($currentCost != $material->unit_cost) {
+                $material->unit_cost = $currentCost;
+                $material->total_cost = $material->quantity * $currentCost;
+                $material->save();
+            }
+        }
+
+        // Recalculate BOM totals with updated costs
+        $bom->recalculateCosts();
 
         return view('pages.manufacturing.setup.boms.edit', [
             'model' => $bom,
             'branches' => Branch::orderBy('name')->get(),
-            'categories' => Category::orderBy('name')->get(),
             'stores' => Store::where('branch_id', $bom->branch_id)->orderBy('name')->get(),
-            'products' => Product::orderBy('name')->get()
+            'products' => Product::select('id', 'code', 'name')->orderBy('code', 'asc')->get()
         ]);
     }
 

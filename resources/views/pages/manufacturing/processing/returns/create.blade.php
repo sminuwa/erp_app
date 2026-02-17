@@ -133,11 +133,42 @@
                                 </div>
                             </div>
 
+                            <!-- Raw Materials Preview -->
+                            <div id="materials-preview" style="display:none;">
+                                <div class="card card-outline card-info">
+                                    <div class="card-header">
+                                        <h3 class="card-title"><i class="fa fa-cubes"></i> Raw Materials to be Returned</h3>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <table class="table table-bordered table-striped table-sm mb-0">
+                                            <thead class="bg-light">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Product</th>
+                                                    <th>Store</th>
+                                                    <th class="text-right">Original Qty</th>
+                                                    <th class="text-right">Return Qty</th>
+                                                    <th class="text-right">Unit Cost</th>
+                                                    <th class="text-right">Total Cost</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="materials-tbody"></tbody>
+                                            <tfoot class="bg-light">
+                                                <tr>
+                                                    <th colspan="6" class="text-right">Total Materials Cost:</th>
+                                                    <th class="text-right" id="materials-total-cost">0.00</th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="alert alert-warning">
                                 <i class="fa fa-info-circle"></i>
                                 <strong>Note:</strong> Upon posting, the return will:
                                 <ul class="mb-0 mt-1">
-                                    <li>Credit back raw materials to inventory</li>
+                                    <li>Credit back raw materials to inventory (as shown above)</li>
                                     <li>Debit finish goods from inventory</li>
                                     <li>Recalculate average cost for affected products</li>
                                 </ul>
@@ -197,6 +228,72 @@ $(document).ready(function() {
             $('#return_qty').removeAttr('max');
         }
     });
+
+    // Production materials data (keyed by "single_{id}" or "batch_{id}")
+    var productionMaterials = {
+        @foreach($singleManufacturing as $sm)
+        'single_{{ $sm->id }}': {
+            production_qty: {{ $sm->quantity }},
+            materials: [
+                @foreach($sm->materials as $mat)
+                { product: '{{ addslashes($mat->product->name ?? "N/A") }}', store: '{{ addslashes($mat->store->name ?? "N/A") }}', quantity: {{ $mat->quantity }}, unit_cost: {{ $mat->unit_cost }} },
+                @endforeach
+            ]
+        },
+        @endforeach
+        @foreach($batchConversions as $bc)
+        @if($bc->batchProduction)
+        'batch_{{ $bc->id }}': {
+            production_qty: {{ $bc->batchProduction->quantity }},
+            materials: [
+                @foreach($bc->batchProduction->materials as $mat)
+                { product: '{{ addslashes($mat->product->name ?? "N/A") }}', store: '{{ addslashes($mat->store->name ?? "N/A") }}', quantity: {{ $mat->quantity }}, unit_cost: {{ $mat->unit_cost }} },
+                @endforeach
+            ]
+        },
+        @endif
+        @endforeach
+    };
+
+    function updateMaterialsPreview() {
+        var selectVal = $('#production_select').val();
+        var returnQty = parseFloat($('#return_qty').val()) || 0;
+
+        if (!selectVal || returnQty <= 0 || !productionMaterials[selectVal]) {
+            $('#materials-preview').hide();
+            return;
+        }
+
+        var data = productionMaterials[selectVal];
+        var ratio = returnQty / data.production_qty;
+        var tbody = '';
+        var totalCost = 0;
+
+        for (var i = 0; i < data.materials.length; i++) {
+            var m = data.materials[i];
+            var returnMaterialQty = (m.quantity * ratio);
+            var lineCost = returnMaterialQty * m.unit_cost;
+            totalCost += lineCost;
+
+            tbody += '<tr>' +
+                '<td>' + (i + 1) + '</td>' +
+                '<td>' + m.product + '</td>' +
+                '<td>' + m.store + '</td>' +
+                '<td class="text-right">' + m.quantity.toFixed(4) + '</td>' +
+                '<td class="text-right">' + returnMaterialQty.toFixed(4) + '</td>' +
+                '<td class="text-right">' + m.unit_cost.toFixed(2) + '</td>' +
+                '<td class="text-right">' + lineCost.toFixed(2) + '</td>' +
+                '</tr>';
+        }
+
+        $('#materials-tbody').html(tbody);
+        $('#materials-total-cost').text(totalCost.toFixed(2));
+        $('#materials-preview').show();
+    }
+
+    // Update materials preview when production or return qty changes
+    $('#production_select').on('change', updateMaterialsPreview);
+    $('#return_qty').on('input change', updateMaterialsPreview);
 
     // Validate return quantity doesn't exceed remaining
     $('form').on('submit', function(e) {

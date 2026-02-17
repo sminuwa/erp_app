@@ -55,11 +55,22 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Requisition <span class="text-danger">*</span></label>
-                                    <select name="requisition_id" class="form-control select2-single" required>
+                                    <select name="requisition_id" id="requisition_id" class="form-control select2-single" required>
                                         <option value="">Select Requisition</option>
                                         @foreach($requisitions as $requisition)
-                                        <option value="{{ $requisition->id }}" data-bom-id="{{ $requisition->bom_id }}">
-                                            {{ $requisition->reference }}
+                                        @php
+                                            $reqQty = $requisition->quantity ?? 0;
+                                            $manufactured = $manufacturedQtyByRequisition[$requisition->id] ?? 0;
+                                            $remaining = $reqQty - $manufactured;
+                                        @endphp
+                                        <option value="{{ $requisition->id }}"
+                                            data-bom-id="{{ $requisition->bom_id }}"
+                                            data-team-id="{{ $requisition->schedule->team_id ?? '' }}"
+                                            data-machine-id="{{ $requisition->schedule->machine_id ?? '' }}"
+                                            data-req-qty="{{ $reqQty }}"
+                                            data-manufactured="{{ $manufactured }}"
+                                            data-remaining="{{ $remaining }}">
+                                            {{ $requisition->reference }} - {{ $requisition->bom->finishProduct->name ?? 'N/A' }} (Remaining: {{ number_format($remaining, 4) }})
                                         </option>
                                         @endforeach
                                     </select>
@@ -84,6 +95,11 @@
                                 <div class="form-group">
                                     <label>Quantity to Manufacture <span class="text-danger">*</span></label>
                                     <input type="number" name="quantity" id="quantity" class="form-control" step="0.0001" min="0.0001" required>
+                                    <small class="text-muted">
+                                        Req. Qty: <span id="req-qty-display">-</span> |
+                                        Manufactured: <span id="manufactured-display">-</span> |
+                                        Max: <span id="remaining-display" class="font-weight-bold">-</span>
+                                    </small>
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -206,7 +222,7 @@
 @push('js')
 <script>
 $(document).ready(function() {
-    $('.select2-single').select2();
+    $('.select2-single').select2({ width: '100%' });
 
     var calculateTimeout = null;
 
@@ -299,11 +315,61 @@ $(document).ready(function() {
         calculateTimeout = setTimeout(calculateCosts, 500);
     });
 
-    // Auto-select BOM when requisition is selected (if requisition has a bom_id)
-    $('select[name="requisition_id"]').on('change', function() {
-        var bomId = $(this).find(':selected').data('bom-id');
+    // When requisition is selected: auto-load BOM, team, machine, and qty constraints
+    $('#requisition_id').on('change', function() {
+        var selected = $(this).find(':selected');
+        var bomId = selected.data('bom-id');
+        var teamId = selected.data('team-id');
+        var machineId = selected.data('machine-id');
+        var reqQty = parseFloat(selected.data('req-qty')) || 0;
+        var manufactured = parseFloat(selected.data('manufactured')) || 0;
+        var remaining = parseFloat(selected.data('remaining')) || 0;
+
+        // Auto-select BOM from requisition
         if (bomId) {
             $('#bom_id').val(bomId).trigger('change');
+        }
+
+        // Auto-select team from requisition's schedule
+        if (teamId) {
+            $('select[name="team_id"]').val(teamId).trigger('change');
+        }
+
+        // Auto-select machine from requisition's schedule
+        if (machineId) {
+            $('select[name="machine_id"]').val(machineId).trigger('change');
+        }
+
+        // Update qty display and constraints
+        if (reqQty > 0) {
+            $('#req-qty-display').text(parseFloat(reqQty).toFixed(4));
+            $('#manufactured-display').text(parseFloat(manufactured).toFixed(4));
+            $('#remaining-display').text(parseFloat(remaining).toFixed(4));
+            $('#quantity').attr('max', remaining);
+            // Default quantity to remaining if current value exceeds it
+            var currentQty = parseFloat($('#quantity').val()) || 0;
+            if (currentQty > remaining || currentQty === 0) {
+                $('#quantity').val(remaining);
+                calculateCosts();
+            }
+        } else {
+            $('#req-qty-display').text('-');
+            $('#manufactured-display').text('-');
+            $('#remaining-display').text('-');
+            $('#quantity').removeAttr('max');
+        }
+    });
+
+    // Validate quantity on form submit
+    $('form').on('submit', function(e) {
+        var selected = $('#requisition_id').find(':selected');
+        var remaining = parseFloat(selected.data('remaining')) || 0;
+        var qty = parseFloat($('#quantity').val()) || 0;
+
+        if (remaining > 0 && qty > remaining) {
+            e.preventDefault();
+            alert('Quantity (' + qty.toFixed(4) + ') exceeds the remaining requisition quantity (' + remaining.toFixed(4) + ').\nAlready manufactured: ' + (parseFloat(selected.data('manufactured')) || 0).toFixed(4));
+            return false;
         }
     });
 });

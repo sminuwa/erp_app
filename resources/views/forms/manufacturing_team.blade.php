@@ -51,7 +51,7 @@
                     @if (isset($users))
                         @foreach ($users as $user)
                             <option value="{{ $user->id }}" {{ in_array($user->id, $selectedSupervisors) ? 'selected' : '' }}>
-                                {{ $user->surname }} {{ $user->firstname }}
+                                {{ $user->surname }} {{ $user->firstname }} ({{ $user->user_code }})
                             </option>
                         @endforeach
                     @endif

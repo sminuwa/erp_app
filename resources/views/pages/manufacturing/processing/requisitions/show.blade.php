@@ -117,6 +117,174 @@
                     </div>
                     @endif
 
+                    {{-- Production Details Section --}}
+                    @if($record->bom)
+                    <hr>
+                    <h5><i class="fa fa-industry"></i> Production Details</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>BOM Reference:</strong>
+                            <p>{{ $record->bom->reference ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>BOM Type:</strong>
+                            <p><span class="badge badge-{{ $record->bom->bom_type === 'batch' ? 'info' : 'primary' }}">{{ ucfirst($record->bom->bom_type) }}</span></p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Finish Product:</strong>
+                            <p>{{ $record->bom->finishProduct->name ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Output Store:</strong>
+                            <p>{{ $record->bom->outputStore->name ?? 'N/A' }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Quantity to Produce:</strong>
+                            <p>{{ number_format($record->quantity ?? 0, 4) }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Already Manufactured:</strong>
+                            <p>
+                                <span class="{{ $totalManufactured > 0 ? 'text-success' : '' }}">
+                                    {{ number_format($totalManufactured, 4) }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Remaining:</strong>
+                            <p>
+                                <span class="{{ $remainingQty > 0 ? 'text-warning font-weight-bold' : 'text-success' }}">
+                                    {{ number_format($remainingQty, 4) }}
+                                </span>
+                                @if($remainingQty <= 0 && ($record->quantity ?? 0) > 0)
+                                    <span class="badge badge-success">Completed</span>
+                                @endif
+                            </p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Expected Output per Unit:</strong>
+                            <p>{{ number_format($record->bom->actual_output ?? 0, 4) }}</p>
+                        </div>
+                    </div>
+
+                    {{-- Schedule Details --}}
+                    @if($record->schedule)
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Schedule:</strong>
+                            <p>{{ $record->schedule->reference ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Schedule Date:</strong>
+                            <p>{{ $record->schedule->schedule_date ? date('d M Y', strtotime($record->schedule->schedule_date)) : 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Team:</strong>
+                            <p>{{ $record->schedule->team->name ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Machine:</strong>
+                            <p>{{ $record->schedule->machine->code ?? '' }} {{ $record->schedule->machine->description ?? 'N/A' }}</p>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- BOM Cost Breakdown --}}
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <strong>BOM Cost Breakdown (per unit):</strong>
+                            <table class="table table-sm table-bordered mt-1">
+                                <tr>
+                                    <td>Labor Cost</td>
+                                    <td class="text-right">{{ number_format($record->bom->labor_cost ?? 0, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Power Cost</td>
+                                    <td class="text-right">{{ number_format($record->bom->power_cost ?? 0, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Other Cost</td>
+                                    <td class="text-right">{{ number_format($record->bom->other_cost ?? 0, 2) }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    {{-- BOM Materials --}}
+                    @if($record->bom->materials && $record->bom->materials->count() > 0)
+                    <h6 class="mt-3">BOM Materials (per unit)</h6>
+                    <table class="table table-bordered table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Raw Material</th>
+                                <th class="text-right">Qty per Unit</th>
+                                <th class="text-right">Total Required (x {{ number_format($record->quantity ?? 0, 4) }})</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($record->bom->materials as $index => $bomMat)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $bomMat->product->name ?? 'N/A' }}</td>
+                                <td class="text-right">{{ number_format($bomMat->quantity, 4) }}</td>
+                                <td class="text-right">{{ number_format($bomMat->quantity * ($record->quantity ?? 0), 4) }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    @endif
+
+                    {{-- Manufacturing Progress --}}
+                    @php
+                        $productions = $record->bom->bom_type === 'single'
+                            ? $record->singleProductManufacturing
+                            : $record->batchProductions;
+                    @endphp
+                    @if($productions && $productions->count() > 0)
+                    <h6 class="mt-3">Manufacturing Progress</h6>
+                    <table class="table table-bordered table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Reference</th>
+                                <th>Date</th>
+                                <th class="text-right">Quantity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($productions as $index => $prod)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $prod->reference }}</td>
+                                <td>{{ date('d M Y', strtotime($prod->manufacturing_date ?? $prod->production_date ?? $prod->created_at)) }}</td>
+                                <td class="text-right">{{ number_format($prod->quantity, 4) }}</td>
+                                <td>
+                                    @if($prod->status === 'pending')
+                                        <span class="badge badge-warning">Pending</span>
+                                    @elseif($prod->status === 'posted')
+                                        <span class="badge badge-success">Posted</span>
+                                    @else
+                                        <span class="badge badge-secondary">{{ ucfirst($prod->status) }}</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-secondary">
+                                <td colspan="3" class="text-right"><strong>Total Manufactured:</strong></td>
+                                <td class="text-right"><strong>{{ number_format($totalManufactured, 4) }}</strong></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    @endif
+                    @endif
+
                     <hr>
                     <h5>Requisition Items</h5>
                     <table class="table table-bordered table-striped">

@@ -72,6 +72,13 @@
                                         <i class="fa fa-eye"></i>
                                     </a>
                                     @endcan
+                                    @can('manufacturing.schedules.edit')
+                                    @if($record->isPending())
+                                    <a href="{{ route('manufacturing.schedules.edit', $record->id) }}" class="btn btn-warning btn-xs">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    @endif
+                                    @endcan
                                     @can('manufacturing.schedules.delete')
                                     @if($record->isPending())
                                     <form action="{{ route('manufacturing.schedules.destroy', $record->id) }}" method="POST" style="display:inline;">

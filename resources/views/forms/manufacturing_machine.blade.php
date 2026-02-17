@@ -2,6 +2,7 @@
     {{ csrf_field() }}
     <input type="hidden" name="_method" value="{{ isset($method) ? $method : 'POST' }}" />
 
+    @if(isset($model->id))
     <div class="form-group">
         <label for="code">Machine Code</label>
         <input type="text" class="form-control {{ $errors->has('code') ? ' is-invalid' : '' }}"
@@ -13,6 +14,8 @@
             </div>
         @endif
     </div>
+    @endif
+
 
     <div class="form-group">
         <label for="description">Description</label>
@@ -38,6 +41,7 @@
         @endif
     </div>
 
+    @if(isset($model->id))
     <div class="form-group">
         <label for="branch_id">Branch</label>
         <select class="form-control select2-single {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
@@ -57,6 +61,7 @@
             </div>
         @endif
     </div>
+    @endif
 
     <div class="form-group">
         <label>Status</label>

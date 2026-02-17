@@ -24,10 +24,8 @@ class Store extends FormRequest
     public function rules()
     {
         return [
-            'code' => 'required|max:20|unique:manufacturing_machines,code',
             'description' => 'required|max:255',
             'capacity' => 'nullable|numeric|min:0',
-            'branch_id' => 'required|exists:branches,id',
             'status' => 'required|in:0,1',
         ];
     }
@@ -43,8 +41,6 @@ class Store extends FormRequest
             'code.required' => 'The machine code is required.',
             'code.unique' => 'This machine code already exists.',
             'description.required' => 'The description is required.',
-            'branch_id.required' => 'Please select a branch.',
-            'branch_id.exists' => 'The selected branch is invalid.',
         ];
     }
 }

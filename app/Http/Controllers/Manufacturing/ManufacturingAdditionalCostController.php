@@ -55,12 +55,7 @@ class ManufacturingAdditionalCostController extends Controller
             ->get();
 
         // Get expense accounts for manufacturing additional costs
-        // Include both manufacturing-specific (M11) and general expense accounts (C51-C63)
         $accounts = GeneralAccount::active()
-            ->where(function($query) {
-                $query->where('class', 'M11')
-                    ->orWhereBetween('class', ['C51', 'C63']);
-            })
             ->orderBy('class')
             ->orderBy('number')
             ->get();

@@ -12,7 +12,8 @@
       "Bash(php:*)",
       "Bash(powershell -Command:*)",
       "Bash(Select-String -Pattern \"^===\" -Context 0,20)",
-      "Bash(del \"c:\\\\Users\\\\USER\\\\dev\\\\ASDFA\\\\erp_app\\\\db_check.php\")"
+      "Bash(del \"c:\\\\Users\\\\USER\\\\dev\\\\ASDFA\\\\erp_app\\\\db_check.php\")",
+      "Bash(grep:*)"
     ]
   }
 }

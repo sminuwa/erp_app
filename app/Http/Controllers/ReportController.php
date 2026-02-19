@@ -325,6 +325,7 @@ class ReportController extends Controller
         $category_id = $request->category_id;
         $product_id = $request->product_id;
         $store_id = $request->store_id;
+        $isManufacturing = ($type === 'manufacturing');
         if ($type == "all" || $type == "")
             $type = "%";
         if ($company_id == 'all' || $company_id == '') {
@@ -339,7 +340,7 @@ class ReportController extends Controller
         if ($product_id == "all" || $product_id == "")
             $product_id = "%";
 
-        $records = StockCard::select('date', 'branch_id', 'cr', 'dr', 'products.name AS product_name', 'products.code AS product_code', 'products.unit AS product_unit', 'branches.code AS branch_code', 'refno', 'stores.code AS store_code')
+        $query = StockCard::select('date', 'branch_id', 'cr', 'dr', 'products.name AS product_name', 'products.code AS product_code', 'products.unit AS product_unit', 'branches.code AS branch_code', 'refno', 'stores.code AS store_code')
             ->join('products', 'products.id', 'stock_cards.product_id')
             ->join('stores', 'stores.id', 'stock_cards.store_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
@@ -347,9 +348,16 @@ class ReportController extends Controller
             ->where('products.category_id', 'LIKE', $category_id)
             ->where('stores.branch_id', 'LIKE', $branch_id)
             ->where('stock_cards.store_id', 'LIKE', $store_id)
-            ->where('stock_cards.type', 'LIKE', $type)
             ->where('branches.company_id', 'LIKE', $company_id)
-            ->whereBetween('date', [$from_date, $to_date])->get();
+            ->whereBetween('date', [$from_date, $to_date]);
+
+        if ($isManufacturing) {
+            $query->whereIn('stock_cards.type', [8, 9, 10, 11]);
+        } else {
+            $query->where('stock_cards.type', 'LIKE', $type);
+        }
+
+        $records = $query->get();
 
         if ($type == "%" || $type == "")
             $type = "all";
@@ -393,12 +401,13 @@ class ReportController extends Controller
             $store_id = '%';
 
         }
+        $isManufacturing = ($type === 'manufacturing');
         if ($type == 'all') {
             $type = '%';
 
         }
 
-        $records = StockCard::select('date', 'branch_id', 'cr', 'dr', 'products.name AS product_name', 'products.code AS product_code', 'branches.code AS branch_code', 'refno', 'stores.code AS store_code')
+        $query = StockCard::select('date', 'branch_id', 'cr', 'dr', 'products.name AS product_name', 'products.code AS product_code', 'branches.code AS branch_code', 'refno', 'stores.code AS store_code')
             ->join('products', 'products.id', 'stock_cards.product_id')
             ->join('stores', 'stores.id', 'stock_cards.store_id')
             ->join('branches', 'branches.id', 'stores.branch_id')
@@ -406,9 +415,16 @@ class ReportController extends Controller
             ->where('products.category_id', 'LIKE', $category_id)
             ->where('stores.branch_id', 'LIKE', $branch_id)
             ->where('stock_cards.store_id', 'LIKE', $store_id)
-            ->where('stock_cards.type', 'LIKE', $type)
             ->where('branches.company_id', 'LIKE', $company_id)
-            ->whereBetween('date', [$from_date, $to_date])->get();
+            ->whereBetween('date', [$from_date, $to_date]);
+
+        if ($isManufacturing) {
+            $query->whereIn('stock_cards.type', [8, 9, 10, 11]);
+        } else {
+            $query->where('stock_cards.type', 'LIKE', $type);
+        }
+
+        $records = $query->get();
 
         return view('pages.reports.stock_control.print_stock_history', compact('records', 'from_date', 'to_date'));
     }

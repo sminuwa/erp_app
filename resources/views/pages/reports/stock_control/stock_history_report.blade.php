@@ -66,6 +66,7 @@
 
                                         <option value="6">Credit Note</option>
                                         <option value="7">Return & Debit</option>
+                                        <option value="manufacturing">Manufacturing</option>
                                     </select>
 
                                 </div>

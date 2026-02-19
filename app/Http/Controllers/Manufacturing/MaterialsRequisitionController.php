@@ -47,9 +47,12 @@ class MaterialsRequisitionController extends Controller
 
         $user = Auth::user();
 
+        // Exclude schedules already linked to a requisition
+        $usedScheduleIds = MaterialsRequisition::whereNotNull('schedule_id')->pluck('schedule_id');
+
         return view('pages.manufacturing.processing.requisitions.create', [
             'model' => $model,
-            'schedules' => DailyManufacturingSchedule::approved()->forBranch($user->branch_id)->get(),
+            'schedules' => DailyManufacturingSchedule::approved()->forBranch($user->branch_id)->whereNotIn('id', $usedScheduleIds)->get(),
             'boms' => ManufacturingBom::active()->forBranch($user->branch_id)->get(),
             'products' => \App\Models\Product::orderBy('name')->get(),
             'stores' => \App\Models\Store::where('branch_id', $user->branch_id)->orderBy('name')->get()
@@ -77,6 +80,16 @@ class MaterialsRequisitionController extends Controller
             ]);
         }
 
+        // Prevent duplicate requisitions for the same schedule
+        if ($request->filled('schedule_id')) {
+            $existing = MaterialsRequisition::where('schedule_id', $request->schedule_id)->exists();
+            if ($existing) {
+                return redirect()->back()->withInput()->withErrors([
+                    'schedule_id' => 'A requisition already exists for the selected schedule.'
+                ]);
+            }
+        }
+
         DB::beginTransaction();
 
         try {
@@ -87,7 +100,13 @@ class MaterialsRequisitionController extends Controller
             $model->requisition_date = $request->requisition_date;
             $model->schedule_id = $request->schedule_id;
             $model->bom_id = $request->bom_id;
-            $model->quantity = $request->quantity ?? 1;
+            // For schedule-based requisitions, auto-calculate total quantity from schedule items
+            if ($request->schedule_id) {
+                $schedule = DailyManufacturingSchedule::with('items')->find($request->schedule_id);
+                $model->quantity = $schedule ? $schedule->items->sum('scheduled_qty') : ($request->quantity ?? 1);
+            } else {
+                $model->quantity = $request->quantity ?? 1;
+            }
             $model->notes = $request->notes;
             $model->branch_id = $user->branch_id;
             $model->status = MaterialsRequisition::STATUS_PENDING;
@@ -168,6 +187,7 @@ class MaterialsRequisitionController extends Controller
 
         $requisition->load([
             'schedule.team', 'schedule.machine', 'schedule.productionOrder',
+            'schedule.items.productionOrderItem.bom.finishProduct',
             'bom.finishProduct', 'bom.outputStore', 'bom.materials.product',
             'items.product', 'items.sourceStore',
             'branch', 'createdBy', 'approvedBy', 'issuedBy', 'receivedBy',

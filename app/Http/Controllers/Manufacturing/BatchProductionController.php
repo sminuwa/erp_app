@@ -46,12 +46,16 @@ class BatchProductionController extends Controller
 
         $user = Auth::user();
 
-        // Get requisitions with batch BOMs only, eager load schedule for team/machine
-        $requisitions = MaterialsRequisition::whereHas('bom', function($q) {
-            $q->where('bom_type', 'batch');
+        // Get requisitions with batch BOMs only (via direct BOM or via schedule), eager load schedule for team/machine
+        $requisitions = MaterialsRequisition::where(function($query) {
+            $query->whereHas('bom', function($q) {
+                $q->where('bom_type', 'batch');
+            })->orWhereHas('schedule.items.productionOrderItem.bom', function($q) {
+                $q->where('bom_type', 'batch');
+            });
         })->received()
           ->forBranch($user->branch_id)
-          ->with(['bom.finishProduct', 'schedule'])
+          ->with(['bom.finishProduct', 'schedule.items.productionOrderItem.bom.finishProduct'])
           ->get();
 
         // Calculate already-manufactured qty per requisition

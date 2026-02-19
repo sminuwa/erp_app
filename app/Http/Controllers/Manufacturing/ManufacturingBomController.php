@@ -169,10 +169,10 @@ class ManufacturingBomController extends Controller
     {
         $bom->load(['materials.product', 'materials.sourceStore']);
 
-        // Refresh material costs to current average cost prices
+        // Refresh material costs to current average cost prices (only update if new cost > 0)
         foreach ($bom->materials as $material) {
             $currentCost = $this->getProductCost($material->product_id, $bom->branch_id);
-            if ($currentCost != $material->unit_cost) {
+            if ($currentCost > 0 && $currentCost != $material->unit_cost) {
                 $material->unit_cost = $currentCost;
                 $material->total_cost = $material->quantity * $currentCost;
                 $material->save();
@@ -360,10 +360,13 @@ class ManufacturingBomController extends Controller
             return (float) $branchPrice->cost_price;
         }
 
-        // Fallback to product's purchase price
-        $product = Product::find($productId);
-        if ($product && $product->purchase_price > 0) {
-            return (float) $product->purchase_price;
+        // Fallback to cost_price from any branch that has this product
+        $anyBranchPrice = BranchProductPrice::where('product_id', $productId)
+            ->where('cost_price', '>', 0)
+            ->first();
+
+        if ($anyBranchPrice) {
+            return (float) $anyBranchPrice->cost_price;
         }
 
         // Log warning for monitoring

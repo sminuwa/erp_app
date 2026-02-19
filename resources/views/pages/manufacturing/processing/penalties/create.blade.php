@@ -107,9 +107,16 @@
                                         <label>Staff <span class="text-danger">*</span></label>
                                         <select name="staff_id" id="staff_id" class="form-control select2-single">
                                             <option value="">Select Staff</option>
-                                            @foreach($staff as $s)
-                                            <option value="{{ $s->id }}">{{ $s->employee_id ?? '' }} - {{ $s->name }}</option>
-                                            @endforeach
+                                            <optgroup label="Manufacturing Staff">
+                                                @foreach($staff as $s)
+                                                <option value="{{ $s->id }}">{{ $s->employee_id ?? '' }} - {{ $s->name }}</option>
+                                                @endforeach
+                                            </optgroup>
+                                            <optgroup label="ABTC Staff">
+                                                @foreach($abtcStaff as $u)
+                                                <option value="{{ $u->id }}" data-staff-type="abtc">{{ $u->name }}</option>
+                                                @endforeach
+                                            </optgroup>
                                         </select>
                                     </div>
                                 </div>

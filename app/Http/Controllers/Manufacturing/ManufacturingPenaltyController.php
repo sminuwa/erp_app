@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ManufacturingPenalty;
 use App\Models\ManufacturingTeam;
 use App\Models\ManufacturingStaff;
+use App\Models\User;
 use App\Models\SingleProductManufacturing;
 use App\Models\BatchConversion;
 use App\Classes\Manufacturing\ManufacturingTransaction;
@@ -58,6 +59,7 @@ class ManufacturingPenaltyController extends Controller
             'model' => $model,
             'teams' => ManufacturingTeam::active()->forBranch($user->branch_id)->get(),
             'staff' => ManufacturingStaff::where('status', 1)->orderBy('name')->get(),
+            'abtcStaff' => User::where('branch_id', $user->branch_id)->where('status', 1)->orderBy('name')->get(),
             'singleManufacturing' => $singleManufacturing,
             'batchConversions' => $batchConversions
         ]);
@@ -154,6 +156,42 @@ class ManufacturingPenaltyController extends Controller
 
             AuditLog::auditLog(Auth::id(), "Posted penalty: " . $penalty->reference);
             session()->flash('app_message', 'Penalty posted successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('app_error', 'Error: ' . $e->getMessage());
+        }
+
+        return redirect()->back();
+    }
+
+    public function reverse(ManufacturingPenalty $penalty)
+    {
+        $this->authorize('manufacturing.penalties.post');
+
+        if (!$penalty->isPosted()) {
+            session()->flash('app_error', 'Only posted penalties can be reversed.');
+            return redirect()->back();
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // Reverse the penalty from team ledger
+            if ($penalty->penalty_type === 'team' && $penalty->team_id) {
+                $team = ManufacturingTeam::find($penalty->team_id);
+                if ($team) {
+                    $team->subtractPenalty($penalty->amount_charged);
+                }
+            }
+
+            // Update status
+            $penalty->status = ManufacturingPenalty::STATUS_REVERSED;
+            $penalty->save();
+
+            DB::commit();
+
+            AuditLog::auditLog(Auth::id(), "Reversed penalty: " . $penalty->reference);
+            session()->flash('app_message', 'Penalty reversed successfully');
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('app_error', 'Error: ' . $e->getMessage());

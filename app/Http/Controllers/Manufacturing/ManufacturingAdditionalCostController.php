@@ -192,6 +192,61 @@ class ManufacturingAdditionalCostController extends Controller
         return redirect()->back();
     }
 
+    public function reverse(ManufacturingAdditionalCost $cost)
+    {
+        $this->authorize('manufacturing.additional_costs.post');
+
+        if (!$cost->isPosted()) {
+            session()->flash('app_error', 'Only posted costs can be reversed.');
+            return redirect()->back();
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // Get the production and its finish product
+            $production = $cost->getProduction();
+
+            if (!$production) {
+                throw new \Exception('Production record not found.');
+            }
+
+            $finishProductId = $production->finish_product_id ?? $production->bom->finish_product_id ?? null;
+
+            if (!$finishProductId) {
+                throw new \Exception('Finish product not found for this production.');
+            }
+
+            // Reverse cost from product (subtract the previously added amount)
+            $result = ManufacturingCostPrice::addCostToExistingProduct(
+                $finishProductId,
+                -$cost->amount,
+                $cost->branch_id
+            );
+
+            if (!$result['status']) {
+                throw new \Exception($result['message']);
+            }
+
+            // Reverse ledger entries
+            ManufacturingTransaction::reverseAdditionalCost($cost->id);
+
+            // Update status
+            $cost->status = ManufacturingAdditionalCost::STATUS_REVERSED;
+            $cost->save();
+
+            DB::commit();
+
+            AuditLog::auditLog(Auth::id(), "Reversed additional cost: " . $cost->reference);
+            session()->flash('app_message', 'Additional Cost reversed successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('app_error', 'Error: ' . $e->getMessage());
+        }
+
+        return redirect()->back();
+    }
+
     public function destroy(ManufacturingAdditionalCost $cost)
     {
         $this->authorize('manufacturing.additional_costs.delete');

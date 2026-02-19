@@ -251,10 +251,10 @@
                                                 <input type="number" step="0.0001" class="form-control material-qty" name="materials[{{ $index }}][quantity]" value="{{ $material['quantity'] ?? '' }}" min="0.0001" required>
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control material-unit-cost" value="{{ number_format($material['unit_cost'] ?? 0, 2) }}" readonly>
+                                                <input type="text" class="form-control material-unit-cost" value="{{ number_format($material['unit_cost'] ?? 0, 2, '.', '') }}" readonly>
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control material-total-cost" value="{{ number_format($material['total_cost'] ?? 0, 2) }}" readonly>
+                                                <input type="text" class="form-control material-total-cost" value="{{ number_format($material['total_cost'] ?? 0, 2, '.', '') }}" readonly>
                                             </td>
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-danger btn-sm remove-material"><i class="fa fa-trash"></i></button>

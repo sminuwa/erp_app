@@ -18,9 +18,11 @@ class BatchConversionController extends Controller
     {
         $this->authorize('manufacturing.batch_conversion.index');
 
+        $user = Auth::user();
         $records = BatchConversion::with(['batchProduction.bom.finishProduct', 'createdBy'])
+            ->forBranch($user->branch_id)
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(50);
 
         return view('pages.manufacturing.processing.batch_conversion.index', [
             'records' => $records
@@ -192,29 +194,45 @@ class BatchConversionController extends Controller
     /**
      * Update production order item's produced_qty when batch is converted
      * Traces: BatchProduction -> Requisition -> Schedule -> ScheduleItem -> ProductionOrderItem
+     * Also handles BOM-only requisitions (no schedule) by matching bom_id directly.
      */
     private function updateProductionOrderProducedQty(BatchProduction $batch, $producedQty)
     {
         $batch->load('requisition.schedule.items.productionOrderItem');
         $requisition = $batch->requisition;
-        if (!$requisition || !$requisition->schedule_id) {
+        if (!$requisition) {
             return;
         }
 
-        $schedule = $requisition->schedule;
-        if (!$schedule) {
-            return;
+        $orderItem = null;
+
+        if ($requisition->schedule_id) {
+            // Path 1: Schedule-based requisition
+            $schedule = $requisition->schedule;
+            if ($schedule) {
+                $scheduleItem = $schedule->items()
+                    ->whereHas('productionOrderItem', function ($q) use ($batch) {
+                        $q->where('bom_id', $batch->bom_id);
+                    })
+                    ->first();
+
+                if ($scheduleItem && $scheduleItem->productionOrderItem) {
+                    $orderItem = $scheduleItem->productionOrderItem;
+                }
+            }
         }
 
-        // Find the matching schedule item by BOM
-        $scheduleItem = $schedule->items()
-            ->whereHas('productionOrderItem', function ($q) use ($batch) {
-                $q->where('bom_id', $batch->bom_id);
-            })
-            ->first();
+        if (!$orderItem) {
+            // Path 2: Fallback - find matching ProductionOrderItem directly by bom_id
+            $orderItem = \App\Models\ProductionOrderItem::where('bom_id', $batch->bom_id)
+                ->whereHas('productionOrder', function ($q) use ($batch) {
+                    $q->where('branch_id', $batch->branch_id)
+                      ->whereIn('status', ['approved', 'pending']);
+                })
+                ->first();
+        }
 
-        if ($scheduleItem && $scheduleItem->productionOrderItem) {
-            $orderItem = $scheduleItem->productionOrderItem;
+        if ($orderItem) {
             $orderItem->addProducedQty($producedQty);
 
             // Update parent order's processed_qty
@@ -223,6 +241,8 @@ class BatchConversionController extends Controller
                 $order->processed_qty = $order->items()->sum('produced_qty');
                 $order->save();
             }
+        } else {
+            \Log::warning("Could not find ProductionOrderItem to update produced_qty for batch: {$batch->reference}, bom_id: {$batch->bom_id}");
         }
     }
 

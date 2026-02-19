@@ -9,6 +9,7 @@ class ManufacturingAdditionalCost extends Model
 {
     const STATUS_PENDING = 'pending';
     const STATUS_POSTED = 'posted';
+    const STATUS_REVERSED = 'reversed';
 
     const PRODUCTION_TYPE_SINGLE = 'single_product';
     const PRODUCTION_TYPE_BATCH = 'batch_conversion';

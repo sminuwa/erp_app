@@ -1329,6 +1329,8 @@ Route::middleware('auth')->group(function () {
                 Route::get('/create', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'create'])->name('manufacturing.production_orders.create');
                 Route::post('/store', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'store'])->name('manufacturing.production_orders.store');
                 Route::get('/show/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'show'])->name('manufacturing.production_orders.show');
+                Route::get('/edit/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'edit'])->name('manufacturing.production_orders.edit');
+                Route::put('/update/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'update'])->name('manufacturing.production_orders.update');
                 Route::post('/approve/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'approve'])->name('manufacturing.production_orders.approve');
                 Route::post('/close/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'close'])->name('manufacturing.production_orders.close');
                 Route::delete('/delete/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'destroy'])->name('manufacturing.production_orders.destroy');
@@ -1404,6 +1406,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('/show/{cost}', [\App\Http\Controllers\Manufacturing\ManufacturingAdditionalCostController::class, 'show'])->name('manufacturing.additional_costs.show');
                 Route::post('/post/{cost}', [\App\Http\Controllers\Manufacturing\ManufacturingAdditionalCostController::class, 'post'])->name('manufacturing.additional_costs.post');
                 Route::delete('/delete/{cost}', [\App\Http\Controllers\Manufacturing\ManufacturingAdditionalCostController::class, 'destroy'])->name('manufacturing.additional_costs.destroy');
+                Route::post('/reverse/{cost}', [\App\Http\Controllers\Manufacturing\ManufacturingAdditionalCostController::class, 'reverse'])->name('manufacturing.additional_costs.reverse');
             });
 
             // Penalties
@@ -1414,6 +1417,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('/show/{penalty}', [\App\Http\Controllers\Manufacturing\ManufacturingPenaltyController::class, 'show'])->name('manufacturing.penalties.show');
                 Route::post('/post/{penalty}', [\App\Http\Controllers\Manufacturing\ManufacturingPenaltyController::class, 'post'])->name('manufacturing.penalties.post');
                 Route::delete('/delete/{penalty}', [\App\Http\Controllers\Manufacturing\ManufacturingPenaltyController::class, 'destroy'])->name('manufacturing.penalties.destroy');
+                Route::post('/reverse/{penalty}', [\App\Http\Controllers\Manufacturing\ManufacturingPenaltyController::class, 'reverse'])->name('manufacturing.penalties.reverse');
             });
 
             // Manufacturing Returns
@@ -1452,6 +1456,13 @@ Route::middleware('auth')->group(function () {
                 Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'teamsReport'])->name('manufacturing.reports.teams.index');
                 Route::get('/load', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'loadTeamsReport'])->name('manufacturing.reports.teams.load');
                 Route::get('/print', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'printTeamsReport'])->name('manufacturing.reports.teams.print');
+            });
+
+            // Team & Staff Ledger Report
+            Route::prefix('team-ledger')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'teamLedgerReport'])->name('manufacturing.reports.team_ledger.index');
+                Route::get('/load', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'loadTeamLedgerReport'])->name('manufacturing.reports.team_ledger.load');
+                Route::get('/print', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'printTeamLedgerReport'])->name('manufacturing.reports.team_ledger.print');
             });
         });
 

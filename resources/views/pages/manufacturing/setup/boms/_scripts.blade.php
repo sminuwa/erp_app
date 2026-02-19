@@ -117,10 +117,19 @@ $(function() {
                 data: { product_id: productId },
                 success: function(response) {
                     if (response.status) {
-                        row.find('.material-unit-cost').val(parseFloat(response.cost).toFixed(2));
+                        var cost = parseFloat(response.cost) || 0;
+                        if (cost > 0) {
+                            row.find('.material-unit-cost').val(cost.toFixed(2));
+                        } else {
+                            row.find('.material-unit-cost').val('0.00');
+                            toastr.warning('No cost price found for selected product. Please check Branch Product Prices.');
+                        }
                         calculateRowTotal(row);
                         calculateTotals();
                     }
+                },
+                error: function() {
+                    toastr.error('Failed to fetch product cost. Please try the Refresh Costs button.');
                 }
             });
         } else {
@@ -186,6 +195,7 @@ $(function() {
 
         var pending = 0;
         var done = 0;
+        var warnings = 0;
 
         $('.material-row').each(function() {
             var row = $(this);
@@ -198,15 +208,29 @@ $(function() {
                     data: { product_id: productId },
                     success: function(response) {
                         if (response.status) {
-                            row.find('.material-unit-cost').val(parseFloat(response.cost).toFixed(2));
+                            var cost = parseFloat(response.cost) || 0;
+                            if (cost > 0) {
+                                row.find('.material-unit-cost').val(cost.toFixed(2));
+                            } else {
+                                warnings++;
+                            }
                             calculateRowTotal(row);
                         }
+                    },
+                    error: function() {
+                        warnings++;
+                        calculateRowTotal(row);
                     },
                     complete: function() {
                         done++;
                         if (done >= pending) {
                             calculateTotals();
                             $btn.prop('disabled', false).html('<i class="fa fa-sync"></i> Refresh Costs');
+                            if (warnings > 0) {
+                                toastr.warning(warnings + ' material(s) have no cost price in Branch Product Prices. Their costs were not updated.');
+                            } else {
+                                toastr.success('All material costs refreshed successfully.');
+                            }
                         }
                     }
                 });
@@ -217,6 +241,53 @@ $(function() {
             $btn.prop('disabled', false).html('<i class="fa fa-sync"></i> Refresh Costs');
         }
     });
+
+    // Auto-refresh all material costs on page load (edit mode)
+    @if(isset($model->id))
+    (function() {
+        var pending = 0;
+        var done = 0;
+        var updated = 0;
+
+        $('.material-row').each(function() {
+            var row = $(this);
+            var productId = row.find('.material-product').val();
+            if (productId) {
+                pending++;
+                $.ajax({
+                    url: '{{ route("manufacturing.ajax.product-cost") }}',
+                    type: 'GET',
+                    data: { product_id: productId },
+                    success: function(response) {
+                        if (response.status) {
+                            var cost = parseFloat(response.cost) || 0;
+                            var currentCost = parseFloat(row.find('.material-unit-cost').val()) || 0;
+                            // Only update if AJAX returned a valid cost > 0, or if current cost is already 0
+                            if (cost > 0) {
+                                row.find('.material-unit-cost').val(cost.toFixed(2));
+                                calculateRowTotal(row);
+                                updated++;
+                            } else if (currentCost > 0) {
+                                // Keep existing cost, just recalculate totals
+                                calculateRowTotal(row);
+                            }
+                        }
+                    },
+                    error: function() {
+                        // Keep existing values on error, just recalculate
+                        calculateRowTotal(row);
+                    },
+                    complete: function() {
+                        done++;
+                        if (done >= pending) {
+                            calculateTotals();
+                        }
+                    }
+                });
+            }
+        });
+    })();
+    @endif
 
     // Initial calculation
     calculateTotals();

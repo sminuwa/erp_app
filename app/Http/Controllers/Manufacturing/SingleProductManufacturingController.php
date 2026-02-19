@@ -329,29 +329,45 @@ class SingleProductManufacturingController extends Controller
     /**
      * Update production order item's produced_qty and order's processed_qty
      * Traces: Manufacturing -> Requisition -> Schedule -> ScheduleItem -> ProductionOrderItem
+     * Also handles BOM-only requisitions (no schedule) by matching bom_id directly.
      */
     private function updateProductionOrderProducedQty(SingleProductManufacturing $spm)
     {
         $spm->load('requisition.schedule.items.productionOrderItem');
         $requisition = $spm->requisition;
-        if (!$requisition || !$requisition->schedule_id) {
+        if (!$requisition) {
             return;
         }
 
-        $schedule = $requisition->schedule;
-        if (!$schedule) {
-            return;
+        $orderItem = null;
+
+        if ($requisition->schedule_id) {
+            // Path 1: Schedule-based requisition
+            $schedule = $requisition->schedule;
+            if ($schedule) {
+                $scheduleItem = $schedule->items()
+                    ->whereHas('productionOrderItem', function ($q) use ($spm) {
+                        $q->where('bom_id', $spm->bom_id);
+                    })
+                    ->first();
+
+                if ($scheduleItem && $scheduleItem->productionOrderItem) {
+                    $orderItem = $scheduleItem->productionOrderItem;
+                }
+            }
         }
 
-        // Find the matching schedule item by BOM
-        $scheduleItem = $schedule->items()
-            ->whereHas('productionOrderItem', function ($q) use ($spm) {
-                $q->where('bom_id', $spm->bom_id);
-            })
-            ->first();
+        if (!$orderItem) {
+            // Path 2: Fallback - find matching ProductionOrderItem directly by bom_id
+            $orderItem = \App\Models\ProductionOrderItem::where('bom_id', $spm->bom_id)
+                ->whereHas('productionOrder', function ($q) use ($spm) {
+                    $q->where('branch_id', $spm->branch_id)
+                      ->whereIn('status', ['approved', 'pending']);
+                })
+                ->first();
+        }
 
-        if ($scheduleItem && $scheduleItem->productionOrderItem) {
-            $orderItem = $scheduleItem->productionOrderItem;
+        if ($orderItem) {
             $orderItem->addProducedQty($spm->quantity);
 
             // Update parent order's processed_qty
@@ -360,6 +376,8 @@ class SingleProductManufacturingController extends Controller
                 $order->processed_qty = $order->items()->sum('produced_qty');
                 $order->save();
             }
+        } else {
+            \Log::warning("Could not find ProductionOrderItem to update produced_qty for manufacturing: {$spm->reference}, bom_id: {$spm->bom_id}");
         }
     }
 }

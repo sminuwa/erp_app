@@ -86,16 +86,30 @@
                                                 $reqQty = $requisition->quantity ?? 0;
                                                 $manufactured = $manufacturedQtyByRequisition[$requisition->id] ?? 0;
                                                 $remaining = $reqQty - $manufactured;
+                                                // Get BOM from direct link or from schedule items
+                                                $bomId = $requisition->bom_id;
+                                                $bomLabel = $requisition->bom->finishProduct->name ?? null;
+                                                $bomIds = [];
+                                                if (!$bomId && $requisition->schedule) {
+                                                    foreach ($requisition->schedule->items as $schedItem) {
+                                                        $itemBom = $schedItem->productionOrderItem->bom ?? null;
+                                                        if ($itemBom && $itemBom->bom_type === 'batch') {
+                                                            $bomIds[] = $itemBom->id;
+                                                            if (!$bomLabel) $bomLabel = $itemBom->finishProduct->name ?? 'N/A';
+                                                        }
+                                                    }
+                                                    if (count($bomIds) === 1) $bomId = $bomIds[0];
+                                                }
                                             @endphp
                                             <option value="{{ $requisition->id }}"
-                                                data-bom-id="{{ $requisition->bom_id }}"
-                                                data-bom-name="{{ $requisition->bom->reference ?? '' }} - {{ $requisition->bom->finishProduct->name ?? '' }}"
+                                                data-bom-id="{{ $bomId }}"
+                                                data-bom-ids="{{ json_encode($bomIds) }}"
                                                 data-team-id="{{ $requisition->schedule->team_id ?? '' }}"
                                                 data-machine-id="{{ $requisition->schedule->machine_id ?? '' }}"
                                                 data-req-qty="{{ $reqQty }}"
                                                 data-manufactured="{{ $manufactured }}"
                                                 data-remaining="{{ $remaining }}">
-                                                {{ $requisition->reference }} - {{ $requisition->bom->finishProduct->name ?? 'N/A' }} (Remaining: {{ number_format($remaining, 0) }})
+                                                {{ $requisition->reference }} - {{ $bomLabel ?? 'N/A' }} (Remaining: {{ number_format($remaining, 0) }})
                                             </option>
                                             @endforeach
                                         </select>

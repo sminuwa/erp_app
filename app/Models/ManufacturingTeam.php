@@ -82,4 +82,10 @@ class ManufacturingTeam extends Model
         $this->ledger_balance += $amount;
         return $this->save();
     }
+
+    public function subtractPenalty($amount)
+    {
+        $this->ledger_balance -= $amount;
+        return $this->save();
+    }
 }

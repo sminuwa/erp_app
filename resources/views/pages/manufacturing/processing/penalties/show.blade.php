@@ -41,6 +41,14 @@
                                 </button>
                             </form>
                             @endif
+                            @if($record->isPosted())
+                            <form action="{{ route('manufacturing.penalties.reverse', $record->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Reverse this penalty? This will subtract the amount from the team ledger.')">
+                                    <i class="fa fa-undo"></i> Reverse
+                                </button>
+                            </form>
+                            @endif
                             @endcan
                             @can('manufacturing.penalties.delete')
                             @if($record->isPending())
@@ -79,6 +87,8 @@
                                         <span class="badge badge-warning">Pending</span>
                                     @elseif($record->status == 'posted')
                                         <span class="badge badge-success">Posted</span>
+                                    @elseif($record->status == 'reversed')
+                                        <span class="badge badge-danger">Reversed</span>
                                     @else
                                         <span class="badge badge-secondary">{{ ucfirst($record->status) }}</span>
                                     @endif

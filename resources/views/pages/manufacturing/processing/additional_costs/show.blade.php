@@ -48,6 +48,14 @@
                                 </button>
                             </form>
                             @endif
+                            @if($record->isPosted())
+                            <form action="{{ route('manufacturing.additional_costs.reverse', $record->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Reverse this additional cost? This will subtract the cost from the product and create reverse ledger entries.')">
+                                    <i class="fa fa-undo"></i> Reverse
+                                </button>
+                            </form>
+                            @endif
                             @endcan
                             @can('manufacturing.additional_costs.delete')
                             @if($record->isPending())
@@ -82,6 +90,8 @@
                                         <span class="badge badge-warning">Pending</span>
                                     @elseif($record->status == 'posted')
                                         <span class="badge badge-success">Posted</span>
+                                    @elseif($record->status == 'reversed')
+                                        <span class="badge badge-danger">Reversed</span>
                                     @else
                                         <span class="badge badge-secondary">{{ ucfirst($record->status) }}</span>
                                     @endif

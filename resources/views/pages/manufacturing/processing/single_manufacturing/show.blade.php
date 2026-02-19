@@ -89,25 +89,35 @@
                             <p>{{ $record->team->name ?? 'N/A' }}</p>
                         </div>
                     </div>
+                    @php
+                        $bom = $record->bom;
+                        $laborCost = ($bom->labor_cost ?? 0) * $record->quantity;
+                        $powerCost = ($bom->power_cost ?? 0) * $record->quantity;
+                        $otherCost = ($bom->other_cost ?? 0) * $record->quantity;
+                    @endphp
                     <div class="row">
                         <div class="col-md-3">
                             <strong>Material Cost:</strong>
-                            <p>{{ number_format($record->material_cost, 2) }}</p>
+                            <p>{{ number_format($record->total_material_cost, 2) }}</p>
                         </div>
                         <div class="col-md-3">
                             <strong>Labor Cost:</strong>
-                            <p>{{ number_format($record->labor_cost, 2) }}</p>
+                            <p>{{ number_format($laborCost, 2) }}</p>
                         </div>
                         <div class="col-md-3">
                             <strong>Power Cost:</strong>
-                            <p>{{ number_format($record->power_cost, 2) }}</p>
+                            <p>{{ number_format($powerCost, 2) }}</p>
                         </div>
                         <div class="col-md-3">
                             <strong>Other Cost:</strong>
-                            <p>{{ number_format($record->other_cost, 2) }}</p>
+                            <p>{{ number_format($otherCost, 2) }}</p>
                         </div>
                     </div>
                     <div class="row">
+                        <div class="col-md-3">
+                            <strong>Total Other Cost:</strong>
+                            <p>{{ number_format($record->total_other_cost, 2) }}</p>
+                        </div>
                         <div class="col-md-3">
                             <strong>Total Cost:</strong>
                             <p><strong>{{ number_format($record->total_cost, 2) }}</strong></p>
@@ -117,6 +127,12 @@
                             <p>{{ number_format($record->unit_cost, 2) }}</p>
                         </div>
                         <div class="col-md-3">
+                            <strong>Requisition:</strong>
+                            <p>{{ $record->requisition->reference ?? 'N/A' }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
                             <strong>Created By:</strong>
                             <p>{{ $record->createdBy->name ?? 'N/A' }}</p>
                         </div>
@@ -125,6 +141,24 @@
                             <p>{{ $record->postedBy->name ?? 'N/A' }}</p>
                         </div>
                     </div>
+
+                    {{-- Manufacturing Progress for this Requisition --}}
+                    @if($record->requisition)
+                    @php
+                        $reqQty = $record->requisition->quantity ?? 0;
+                        $totalManufactured = \App\Models\SingleProductManufacturing::where('requisition_id', $record->requisition_id)->sum('quantity');
+                        $remainingQty = max(0, $reqQty - $totalManufactured);
+                    @endphp
+                    <div class="alert alert-info mt-2">
+                        <strong>Requisition Progress:</strong>
+                        Total Qty: {{ number_format($reqQty, 4) }} |
+                        Manufactured: {{ number_format($totalManufactured, 4) }} |
+                        Remaining: <strong>{{ number_format($remainingQty, 4) }}</strong>
+                        @if($remainingQty <= 0 && $reqQty > 0)
+                            <span class="badge badge-success ml-2">Completed</span>
+                        @endif
+                    </div>
+                    @endif
 
                     <hr>
                     <h5>Raw Materials Consumed</h5>
@@ -158,7 +192,7 @@
                         <tfoot>
                             <tr>
                                 <td colspan="5" class="text-right"><strong>Total Material Cost:</strong></td>
-                                <td><strong>{{ number_format($record->material_cost, 2) }}</strong></td>
+                                <td><strong>{{ number_format($record->total_material_cost, 2) }}</strong></td>
                             </tr>
                         </tfoot>
                     </table>

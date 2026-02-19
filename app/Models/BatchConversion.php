@@ -164,7 +164,7 @@ class BatchConversion extends Model
     {
         return ManufacturingReturn::where('production_type', 'batch_conversion')
             ->where('production_id', $this->id)
-            ->where('status', 'posted')
+            ->whereIn('status', ['pending', 'posted'])
             ->sum('return_qty');
     }
 

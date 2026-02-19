@@ -39,6 +39,11 @@
             </a>
 
             @if($record->isPending())
+                @can('manufacturing.production_orders.create')
+                    <a href="{{ route('manufacturing.production_orders.edit', $record->id) }}" class="btn btn-primary btn-sm">
+                        <i class="fa fa-edit"></i> Edit
+                    </a>
+                @endcan
                 @can('manufacturing.production_orders.approve')
                     <form action="{{ route('manufacturing.production_orders.approve', $record->id) }}" method="POST" style="display: inline" onsubmit="return confirm('Are you sure you want to approve this order?')">
                         {{ csrf_field() }}

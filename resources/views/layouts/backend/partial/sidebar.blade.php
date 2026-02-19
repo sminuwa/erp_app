@@ -892,6 +892,15 @@
                                                 </a>
                                             </li>
                                         @endcan
+                                        @can('manufacturing.reports.team_ledger')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.reports.team_ledger.index') }}"
+                                                    class="nav-link {{ Request::is('manufacturing/reports/team-ledger*') ? 'active' : '' }}">
+                                                    <i class="fa fa-book"></i>
+                                                    <p>Team & Staff Ledger</p>
+                                                </a>
+                                            </li>
+                                        @endcan
                                     </ul>
                                 </li>
                             @endcan

@@ -7,6 +7,8 @@ use App\Models\SingleProductManufacturing;
 use App\Models\BatchProduction;
 use App\Models\BatchConversion;
 use App\Models\ManufacturingTeam;
+use App\Models\ManufacturingStaff;
+use App\Models\ManufacturingPenalty;
 use App\Models\ManufacturingBom;
 use App\Models\Product;
 use App\Models\Branch;
@@ -518,6 +520,196 @@ class ManufacturingReportController extends Controller
         return view('pages.manufacturing.reports.teams.print', [
             'productions' => $productions,
             'productionsByTeam' => $productionsByTeam,
+            'totals' => $totals,
+            'filters' => $request->all(),
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo
+        ]);
+    }
+
+    /**
+     * Team & Staff Ledger Report - Index with filters
+     */
+    public function teamLedgerReport(Request $request)
+    {
+        $this->authorize('manufacturing.reports.team_ledger');
+
+        $user = Auth::user();
+
+        return view('pages.manufacturing.reports.team_ledger.index', [
+            'branches' => Branch::orderBy('name')->get(),
+            'teams' => ManufacturingTeam::orderBy('name')->get(),
+            'staff' => ManufacturingStaff::where('status', 1)->orderBy('name')->get(),
+            'userBranch' => $user->branch_id
+        ]);
+    }
+
+    /**
+     * Load Team & Staff Ledger Report data
+     */
+    public function loadTeamLedgerReport(Request $request)
+    {
+        $this->authorize('manufacturing.reports.team_ledger');
+
+        $request->validate([
+            'date_from' => 'required|date',
+            'date_to' => 'required|date|after_or_equal:date_from'
+        ]);
+
+        $dateFrom = $request->date_from;
+        $dateTo = $request->date_to;
+        $branchId = $request->branch_id;
+        $teamId = $request->team_id;
+        $staffId = $request->staff_id;
+
+        // Query penalties (posted + reversed)
+        $query = ManufacturingPenalty::with(['team', 'staff', 'createdBy'])
+            ->whereIn('status', ['posted', 'reversed'])
+            ->whereBetween('penalty_date', [$dateFrom, $dateTo]);
+
+        if ($branchId) {
+            $query->where('branch_id', $branchId);
+        }
+        if ($teamId) {
+            $query->where('team_id', $teamId);
+        }
+        if ($staffId) {
+            $query->where('staff_id', $staffId);
+        }
+
+        $penalties = $query->orderBy('penalty_date', 'asc')->get();
+
+        // Build ledger entries with running balance
+        $entries = collect();
+        $runningBalance = 0;
+
+        foreach ($penalties as $penalty) {
+            $debit = 0;
+            $credit = 0;
+
+            if ($penalty->status === 'posted') {
+                $debit = $penalty->amount_charged;
+            } elseif ($penalty->status === 'reversed') {
+                $credit = $penalty->amount_charged;
+            }
+
+            $runningBalance += $debit - $credit;
+
+            $entries->push([
+                'date' => $penalty->penalty_date,
+                'reference' => $penalty->reference,
+                'description' => $penalty->description,
+                'penalty_type' => $penalty->penalty_type,
+                'team_name' => $penalty->team->name ?? 'N/A',
+                'staff_name' => $penalty->staff->name ?? 'N/A',
+                'debit' => $debit,
+                'credit' => $credit,
+                'balance' => $runningBalance,
+                'status' => $penalty->status,
+            ]);
+        }
+
+        // Get current team ledger balances
+        $teamBalances = collect();
+        $teamsQuery = ManufacturingTeam::orderBy('name');
+        if ($branchId) {
+            $teamsQuery->where('branch_id', $branchId);
+        }
+        if ($teamId) {
+            $teamsQuery->where('id', $teamId);
+        }
+        $teamBalances = $teamsQuery->get();
+
+        $totals = [
+            'total_debit' => $entries->sum('debit'),
+            'total_credit' => $entries->sum('credit'),
+            'total_records' => $entries->count(),
+        ];
+
+        return view('pages.manufacturing.reports.team_ledger.load', [
+            'entries' => $entries,
+            'teamBalances' => $teamBalances,
+            'totals' => $totals,
+            'filters' => $request->all()
+        ]);
+    }
+
+    /**
+     * Print Team & Staff Ledger Report
+     */
+    public function printTeamLedgerReport(Request $request)
+    {
+        $this->authorize('manufacturing.reports.team_ledger');
+
+        $dateFrom = $request->date_from;
+        $dateTo = $request->date_to;
+        $branchId = $request->branch_id;
+        $teamId = $request->team_id;
+        $staffId = $request->staff_id;
+
+        $query = ManufacturingPenalty::with(['team', 'staff', 'createdBy'])
+            ->whereIn('status', ['posted', 'reversed'])
+            ->whereBetween('penalty_date', [$dateFrom, $dateTo]);
+
+        if ($branchId) {
+            $query->where('branch_id', $branchId);
+        }
+        if ($teamId) {
+            $query->where('team_id', $teamId);
+        }
+        if ($staffId) {
+            $query->where('staff_id', $staffId);
+        }
+
+        $penalties = $query->orderBy('penalty_date', 'asc')->get();
+
+        $entries = collect();
+        $runningBalance = 0;
+
+        foreach ($penalties as $penalty) {
+            $debit = 0;
+            $credit = 0;
+
+            if ($penalty->status === 'posted') {
+                $debit = $penalty->amount_charged;
+            } elseif ($penalty->status === 'reversed') {
+                $credit = $penalty->amount_charged;
+            }
+
+            $runningBalance += $debit - $credit;
+
+            $entries->push([
+                'date' => $penalty->penalty_date,
+                'reference' => $penalty->reference,
+                'description' => $penalty->description,
+                'penalty_type' => $penalty->penalty_type,
+                'team_name' => $penalty->team->name ?? 'N/A',
+                'staff_name' => $penalty->staff->name ?? 'N/A',
+                'debit' => $debit,
+                'credit' => $credit,
+                'balance' => $runningBalance,
+                'status' => $penalty->status,
+            ]);
+        }
+
+        $teamsQuery = ManufacturingTeam::orderBy('name');
+        if ($branchId) {
+            $teamsQuery->where('branch_id', $branchId);
+        }
+        if ($teamId) {
+            $teamsQuery->where('id', $teamId);
+        }
+        $teamBalances = $teamsQuery->get();
+
+        $totals = [
+            'total_debit' => $entries->sum('debit'),
+            'total_credit' => $entries->sum('credit'),
+            'total_records' => $entries->count(),
+        ];
+
+        return view('pages.manufacturing.reports.team_ledger.print', [
+            'entries' => $entries,
+            'teamBalances' => $teamBalances,
             'totals' => $totals,
             'filters' => $request->all(),
             'dateFrom' => $dateFrom,

@@ -269,7 +269,7 @@ class ManufacturingTransaction
             'model_id' => $cost->account_id,
             'model_name' => 'GeneralAccount',
             'branch_id' => $branch->id,
-            'description' => 'Additional manufacturing cost - ' . $cost->reference,
+            'description' => ($cost->description ? $cost->description . ' - ' : '') . 'Additional cost - ' . $cost->reference,
             'reference' => $cost->reference,
             'credit' => $cost->amount,
             'debit' => 0,
@@ -283,13 +283,78 @@ class ManufacturingTransaction
             'model_id' => $finish_product->category->asset_account,
             'model_name' => 'GeneralAccount',
             'branch_id' => $branch->id,
-            'description' => 'Additional cost added to finished goods - ' . $cost->reference,
+            'description' => ($cost->description ? $cost->description . ' - ' : '') . 'Additional cost to FG - ' . $cost->reference,
             'reference' => $cost->reference,
             'credit' => 0,
             'debit' => $cost->amount,
             'date' => $cost->cost_date,
             'user_id' => $user->id,
             'receipt_no' => 'MAC_FG_' . $cost->reference
+        ];
+
+        $general_account_ledger = [$expense_entry, $fg_entry];
+
+        if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
+            return ['status' => true, 'message' => 'success'];
+        }
+
+        return ['status' => false, 'message' => 'Something went wrong.'];
+    }
+
+    /**
+     * Reverse ledger entries for Additional Cost
+     * Swaps debit/credit from the original additionalCost posting
+     */
+    public static function reverseAdditionalCost($cost_id)
+    {
+        $user = auth()->user();
+        $branch = $user->branch;
+
+        $cost = ManufacturingAdditionalCost::find($cost_id);
+
+        if (!$cost) {
+            return ['status' => false, 'message' => 'Additional cost record not found.'];
+        }
+
+        $production = $cost->getProduction();
+        if (!$production) {
+            return ['status' => false, 'message' => 'Production record not found.'];
+        }
+
+        $finish_product = $cost->production_type === 'single_product'
+            ? $production->finishProduct
+            : $production->finishProduct;
+
+        if (!$finish_product || !$finish_product->category) {
+            return ['status' => false, 'message' => 'Finished product category not found.'];
+        }
+
+        // Debit expense account (reverse the original credit)
+        $expense_entry = [
+            'model_id' => $cost->account_id,
+            'model_name' => 'GeneralAccount',
+            'branch_id' => $branch->id,
+            'description' => 'Reversal: ' . ($cost->description ? $cost->description . ' - ' : '') . $cost->reference,
+            'reference' => $cost->reference,
+            'credit' => 0,
+            'debit' => $cost->amount,
+            'date' => now()->format('Y-m-d'),
+            'user_id' => $user->id,
+            'receipt_no' => 'MAC_REV_EXP_' . $cost->reference
+        ];
+
+        // Credit finished goods asset account (reverse the original debit)
+        $fg_entry = [
+            'model_id' => $finish_product->category->asset_account,
+            'model_name' => 'GeneralAccount',
+            'branch_id' => $branch->id,
+            'description' => 'Reversal: Additional cost from FG - ' . $cost->reference,
+            'reference' => $cost->reference,
+            'credit' => $cost->amount,
+            'debit' => 0,
+            'date' => now()->format('Y-m-d'),
+            'user_id' => $user->id,
+            'receipt_no' => 'MAC_REV_FG_' . $cost->reference
         ];
 
         $general_account_ledger = [$expense_entry, $fg_entry];

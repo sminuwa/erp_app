@@ -135,6 +135,106 @@ class ProductionOrderController extends Controller
     }
 
     /**
+     * Show the form for editing the specified resource (pending only).
+     */
+    public function edit(ProductionOrder $production_order)
+    {
+        if (!$production_order->isPending()) {
+            session()->flash('app_error', 'Only pending orders can be edited.');
+            return redirect()->route('manufacturing.production_orders.show', $production_order->id);
+        }
+
+        $production_order->load(['items.bom.finishProduct', 'materials']);
+
+        $user = Auth::user();
+
+        return view('pages.manufacturing.processing.production_orders.edit', [
+            'model' => $production_order,
+            'boms' => ManufacturingBom::active()->forBranch($user->branch_id)->orderBy('reference')->get()
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage (pending only).
+     */
+    public function update(Request $request, ProductionOrder $production_order)
+    {
+        if (!$production_order->isPending()) {
+            session()->flash('app_error', 'Only pending orders can be edited.');
+            return redirect()->route('manufacturing.production_orders.show', $production_order->id);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $user = Auth::user();
+
+            $production_order->order_date = $request->order_date;
+            $production_order->start_date = $request->start_date;
+            $production_order->end_date = $request->end_date;
+            $production_order->notes = $request->notes;
+            $production_order->save();
+
+            // Delete old items and materials
+            ProductionOrderItem::where('production_order_id', $production_order->id)->delete();
+            ProductionOrderMaterial::where('production_order_id', $production_order->id)->delete();
+
+            // Recreate order items and materials
+            $allMaterials = [];
+            if ($request->has('items') && is_array($request->items)) {
+                foreach ($request->items as $item) {
+                    if (!empty($item['bom_id']) && !empty($item['quantity'])) {
+                        ProductionOrderItem::create([
+                            'production_order_id' => $production_order->id,
+                            'bom_id' => $item['bom_id'],
+                            'quantity_to_produce' => $item['quantity'],
+                            'scheduled_qty' => 0,
+                            'produced_qty' => 0
+                        ]);
+
+                        $materialsData = ProductionCalculator::calculateMaterials(
+                            $item['bom_id'],
+                            $item['quantity'],
+                            $production_order->branch_id
+                        );
+
+                        foreach ($materialsData['materials'] as $material) {
+                            $key = $material['product_id'] . '_' . $material['store_id'];
+                            if (!isset($allMaterials[$key])) {
+                                $allMaterials[$key] = $material;
+                            } else {
+                                $allMaterials[$key]['quantity'] += $material['quantity'];
+                                $allMaterials[$key]['total_cost'] += $material['total_cost'];
+                            }
+                        }
+                    }
+                }
+            }
+
+            foreach ($allMaterials as $material) {
+                ProductionOrderMaterial::create([
+                    'production_order_id' => $production_order->id,
+                    'product_id' => $material['product_id'],
+                    'source_store_id' => $material['store_id'],
+                    'required_qty' => $material['quantity'],
+                    'unit_cost' => $material['unit_cost'],
+                    'total_cost' => $material['total_cost']
+                ]);
+            }
+
+            DB::commit();
+
+            AuditLog::auditLog(Auth::id(), "Updated production order: " . $production_order->reference);
+            session()->flash('app_message', 'Production Order updated successfully');
+            return redirect()->route('manufacturing.production_orders.show', $production_order->id);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('app_error', 'Something went wrong: ' . $e->getMessage());
+            return redirect()->back()->withInput();
+        }
+    }
+
+    /**
      * Display the specified resource.
      */
     public function show(Show $request, ProductionOrder $production_order)

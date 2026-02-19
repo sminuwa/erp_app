@@ -117,7 +117,73 @@
                     </div>
                     @endif
 
-                    {{-- Production Details Section --}}
+                    {{-- Production Details Section (Schedule-based) --}}
+                    @if(!$record->bom && $record->schedule)
+                    <hr>
+                    <h5><i class="fa fa-industry"></i> Production Details (from Schedule)</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Schedule:</strong>
+                            <p>{{ $record->schedule->reference ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Schedule Date:</strong>
+                            <p>{{ $record->schedule->schedule_date ? date('d M Y', strtotime($record->schedule->schedule_date)) : 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Team:</strong>
+                            <p>{{ $record->schedule->team->name ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Machine:</strong>
+                            <p>{{ $record->schedule->machine->code ?? '' }} {{ $record->schedule->machine->description ?? 'N/A' }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Production Order:</strong>
+                            <p>{{ $record->schedule->productionOrder->reference ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Total Scheduled Qty:</strong>
+                            <p>{{ number_format($record->quantity ?? 0, 4) }}</p>
+                        </div>
+                    </div>
+
+                    @if($record->schedule->items && $record->schedule->items->count() > 0)
+                    <h6 class="mt-3">Items to Produce</h6>
+                    <table class="table table-bordered table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>#</th>
+                                <th>BOM Reference</th>
+                                <th>Finish Product</th>
+                                <th>BOM Type</th>
+                                <th class="text-right">Scheduled Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($record->schedule->items as $index => $schedItem)
+                            @if($schedItem->productionOrderItem && $schedItem->productionOrderItem->bom)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $schedItem->productionOrderItem->bom->reference ?? '-' }}</td>
+                                <td>{{ $schedItem->productionOrderItem->bom->finishProduct->name ?? '-' }}</td>
+                                <td>
+                                    <span class="badge badge-{{ ($schedItem->productionOrderItem->bom->bom_type ?? '') == 'batch' ? 'primary' : 'success' }}">
+                                        {{ ucfirst($schedItem->productionOrderItem->bom->bom_type ?? '') }}
+                                    </span>
+                                </td>
+                                <td class="text-right">{{ number_format($schedItem->scheduled_qty, 4) }}</td>
+                            </tr>
+                            @endif
+                            @endforeach
+                        </tbody>
+                    </table>
+                    @endif
+                    @endif
+
+                    {{-- Production Details Section (BOM-based) --}}
                     @if($record->bom)
                     <hr>
                     <h5><i class="fa fa-industry"></i> Production Details</h5>

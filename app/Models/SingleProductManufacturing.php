@@ -189,7 +189,7 @@ class SingleProductManufacturing extends Model
     {
         return ManufacturingReturn::where('production_type', 'single_product')
             ->where('production_id', $this->id)
-            ->where('status', 'posted')
+            ->whereIn('status', ['pending', 'posted'])
             ->sum('return_qty');
     }
 

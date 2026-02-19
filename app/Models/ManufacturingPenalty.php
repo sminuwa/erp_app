@@ -9,6 +9,7 @@ class ManufacturingPenalty extends Model
 {
     const STATUS_PENDING = 'pending';
     const STATUS_POSTED = 'posted';
+    const STATUS_REVERSED = 'reversed';
 
     const PENALTY_TYPE_TEAM = 'team';
     const PENALTY_TYPE_STAFF = 'staff';

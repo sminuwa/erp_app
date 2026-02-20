@@ -179,7 +179,21 @@ class ProductionCalculator
             'branch_id' => $branch_id
         ])->first();
 
-        return $branchPrice ? (float) $branchPrice->cost_price : 0;
+        if ($branchPrice && (float) $branchPrice->cost_price > 0) {
+            return (float) $branchPrice->cost_price;
+        }
+
+        // Fallback: check any branch with cost > 0
+        $anyBranchPrice = BranchProductPrice::where('product_id', $product_id)
+            ->where('cost_price', '>', 0)
+            ->first();
+
+        if ($anyBranchPrice) {
+            \Log::warning("ProductionCalculator: Using fallback cost price from branch {$anyBranchPrice->branch_id} for product {$product_id} (no price in branch {$branch_id})");
+            return (float) $anyBranchPrice->cost_price;
+        }
+
+        return 0;
     }
 
     /**

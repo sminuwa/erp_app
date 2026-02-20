@@ -66,10 +66,31 @@ class BatchProductionController extends Controller
             ->pluck('total_manufactured', 'requisition_id')
             ->toArray();
 
+        // Calculate manufactured qty per requisition AND per BOM (for per-BOM quantity tracking)
+        $manufacturedQtyByReqAndBom = BatchProduction::where('branch_id', $user->branch_id)
+            ->whereIn('requisition_id', $requisitions->pluck('id'))
+            ->groupBy('requisition_id', 'bom_id')
+            ->selectRaw('requisition_id, bom_id, SUM(quantity) as total_manufactured')
+            ->get()
+            ->groupBy('requisition_id')
+            ->map(function($items) {
+                return $items->pluck('total_manufactured', 'bom_id')->toArray();
+            })
+            ->toArray();
+
+        // Filter out exhausted requisitions (remaining qty <= 0)
+        $requisitions = $requisitions->filter(function($req) use ($manufacturedQtyByRequisition) {
+            $reqQty = $req->quantity ?? 0;
+            if ($reqQty <= 0) return true; // No quantity constraint (schedule-based), keep it
+            $remaining = $reqQty - ($manufacturedQtyByRequisition[$req->id] ?? 0);
+            return $remaining > 0;
+        });
+
         return view('pages.manufacturing.processing.batch_production.create', [
             'model' => $model,
             'requisitions' => $requisitions,
             'manufacturedQtyByRequisition' => $manufacturedQtyByRequisition,
+            'manufacturedQtyByReqAndBom' => $manufacturedQtyByReqAndBom,
             'boms' => \App\Models\ManufacturingBom::where('bom_type', 'batch')->active()->forBranch($user->branch_id)->with('finishProduct')->get(),
             'teams' => ManufacturingTeam::active()->forBranch($user->branch_id)->get(),
             'machines' => ManufacturingMachine::active()->forBranch($user->branch_id)->get(),
@@ -95,18 +116,44 @@ class BatchProductionController extends Controller
         try {
             $user = Auth::user();
 
-            // Validate quantity against requisition remaining
-            $requisition = MaterialsRequisition::find($request->requisition_id);
-            if ($requisition && $requisition->quantity) {
-                $alreadyManufactured = BatchProduction::where('requisition_id', $request->requisition_id)
-                    ->sum('quantity');
-                $remaining = $requisition->quantity - $alreadyManufactured;
-                if ($request->quantity > $remaining) {
-                    throw new \Exception("Quantity ({$request->quantity}) exceeds remaining requisition quantity ({$remaining}). Already manufactured: {$alreadyManufactured}");
+            // Validate quantity against requisition remaining (per-BOM for schedule-based)
+            $requisition = MaterialsRequisition::with(['schedule.items.productionOrderItem.bom'])->find($request->requisition_id);
+            if ($requisition) {
+                $bomId = $request->bom_id;
+                $maxQty = null;
+
+                if ($requisition->bom_id) {
+                    // Direct BOM requisition: use requisition quantity
+                    $maxQty = $requisition->quantity;
+                    $alreadyManufactured = BatchProduction::where('requisition_id', $request->requisition_id)
+                        ->sum('quantity');
+                } elseif ($requisition->schedule) {
+                    // Schedule-based: get per-BOM scheduled qty
+                    $maxQty = 0;
+                    foreach ($requisition->schedule->items as $schedItem) {
+                        $itemBom = $schedItem->productionOrderItem->bom ?? null;
+                        if ($itemBom && $itemBom->id == $bomId) {
+                            $maxQty += $schedItem->scheduled_qty;
+                        }
+                    }
+                    $alreadyManufactured = BatchProduction::where('requisition_id', $request->requisition_id)
+                        ->where('bom_id', $bomId)
+                        ->sum('quantity');
+                } else {
+                    $maxQty = $requisition->quantity;
+                    $alreadyManufactured = BatchProduction::where('requisition_id', $request->requisition_id)
+                        ->sum('quantity');
+                }
+
+                if ($maxQty > 0) {
+                    $remaining = $maxQty - $alreadyManufactured;
+                    if ($request->quantity > $remaining) {
+                        throw new \Exception("Quantity ({$request->quantity}) exceeds remaining quantity ({$remaining}). Already manufactured: {$alreadyManufactured}");
+                    }
                 }
             }
 
-            // Validate BOM matches requisition's BOM
+            // Validate BOM matches requisition's BOM (only for direct BOM requisitions)
             if ($requisition && $requisition->bom_id && $request->bom_id != $requisition->bom_id) {
                 throw new \Exception("Selected BOM does not match the requisition's BOM.");
             }
@@ -147,8 +194,11 @@ class BatchProductionController extends Controller
                 ]);
             }
 
-            // Save all costs at creation time
+            // Save all costs at creation time (individual + totals)
             $model->total_material_cost = $costData['material_cost'];
+            $model->labor_cost = $costData['labor_cost'];
+            $model->power_cost = $costData['power_cost'];
+            $model->other_cost = $costData['other_cost'];
             $model->wip_value = $costData['material_cost'] + $costData['total_other_cost'];
             $model->save();
 

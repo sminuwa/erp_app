@@ -67,6 +67,58 @@ class ManufacturingTransaction
             ];
         }
 
+        // Create credit entries for overhead costs (Labour, Power, Other)
+        $overhead_entries = [];
+
+        $labourControl = GeneralAccountControl::where('code', 'manufacturing_labour')->first();
+        $powerControl = GeneralAccountControl::where('code', 'manufacturing_power')->first();
+        $otherControl = GeneralAccountControl::where('code', 'manufacturing_other')->first();
+
+        if ($labourControl && $labourControl->general_account_id && $manufacturing->labor_cost > 0) {
+            $overhead_entries[] = [
+                'model_id' => $labourControl->general_account_id,
+                'model_name' => 'GeneralAccount',
+                'branch_id' => $branch->id,
+                'description' => 'Manufacturing labour cost - ' . $manufacturing->reference,
+                'reference' => $manufacturing->reference,
+                'credit' => $manufacturing->labor_cost,
+                'debit' => 0,
+                'date' => $manufacturing->manufacturing_date,
+                'user_id' => $user->id,
+                'receipt_no' => 'MFG_LAB_' . $manufacturing->reference
+            ];
+        }
+
+        if ($powerControl && $powerControl->general_account_id && $manufacturing->power_cost > 0) {
+            $overhead_entries[] = [
+                'model_id' => $powerControl->general_account_id,
+                'model_name' => 'GeneralAccount',
+                'branch_id' => $branch->id,
+                'description' => 'Manufacturing power cost - ' . $manufacturing->reference,
+                'reference' => $manufacturing->reference,
+                'credit' => $manufacturing->power_cost,
+                'debit' => 0,
+                'date' => $manufacturing->manufacturing_date,
+                'user_id' => $user->id,
+                'receipt_no' => 'MFG_PWR_' . $manufacturing->reference
+            ];
+        }
+
+        if ($otherControl && $otherControl->general_account_id && $manufacturing->other_cost > 0) {
+            $overhead_entries[] = [
+                'model_id' => $otherControl->general_account_id,
+                'model_name' => 'GeneralAccount',
+                'branch_id' => $branch->id,
+                'description' => 'Manufacturing other cost - ' . $manufacturing->reference,
+                'reference' => $manufacturing->reference,
+                'credit' => $manufacturing->other_cost,
+                'debit' => 0,
+                'date' => $manufacturing->manufacturing_date,
+                'user_id' => $user->id,
+                'receipt_no' => 'MFG_OTH_' . $manufacturing->reference
+            ];
+        }
+
         // Create debit entry for finished goods asset account
         $finish_product_category = $manufacturing->finishProduct->category;
         $finish_goods_entry = [
@@ -82,7 +134,7 @@ class ManufacturingTransaction
             'receipt_no' => 'MFG_FG_' . $manufacturing->reference
         ];
 
-        $general_account_ledger = array_merge($raw_material_entries, [$finish_goods_entry]);
+        $general_account_ledger = array_merge($raw_material_entries, $overhead_entries, [$finish_goods_entry]);
 
         if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
             return ['status' => true, 'message' => 'success'];
@@ -150,7 +202,59 @@ class ManufacturingTransaction
             ];
         }
 
-        // Create debit entry for WIP account
+        // Create credit entries for overhead costs (Labour, Power, Other)
+        $overhead_entries = [];
+
+        $labourControl = GeneralAccountControl::where('code', 'manufacturing_labour')->first();
+        $powerControl = GeneralAccountControl::where('code', 'manufacturing_power')->first();
+        $otherControl = GeneralAccountControl::where('code', 'manufacturing_other')->first();
+
+        if ($labourControl && $labourControl->general_account_id && $batch->labor_cost > 0) {
+            $overhead_entries[] = [
+                'model_id' => $labourControl->general_account_id,
+                'model_name' => 'GeneralAccount',
+                'branch_id' => $branch->id,
+                'description' => 'Batch production labour cost - ' . $batch->reference,
+                'reference' => $batch->reference,
+                'credit' => $batch->labor_cost,
+                'debit' => 0,
+                'date' => $batch->production_date,
+                'user_id' => $user->id,
+                'receipt_no' => 'BPC_LAB_' . $batch->reference
+            ];
+        }
+
+        if ($powerControl && $powerControl->general_account_id && $batch->power_cost > 0) {
+            $overhead_entries[] = [
+                'model_id' => $powerControl->general_account_id,
+                'model_name' => 'GeneralAccount',
+                'branch_id' => $branch->id,
+                'description' => 'Batch production power cost - ' . $batch->reference,
+                'reference' => $batch->reference,
+                'credit' => $batch->power_cost,
+                'debit' => 0,
+                'date' => $batch->production_date,
+                'user_id' => $user->id,
+                'receipt_no' => 'BPC_PWR_' . $batch->reference
+            ];
+        }
+
+        if ($otherControl && $otherControl->general_account_id && $batch->other_cost > 0) {
+            $overhead_entries[] = [
+                'model_id' => $otherControl->general_account_id,
+                'model_name' => 'GeneralAccount',
+                'branch_id' => $branch->id,
+                'description' => 'Batch production other cost - ' . $batch->reference,
+                'reference' => $batch->reference,
+                'credit' => $batch->other_cost,
+                'debit' => 0,
+                'date' => $batch->production_date,
+                'user_id' => $user->id,
+                'receipt_no' => 'BPC_OTH_' . $batch->reference
+            ];
+        }
+
+        // Create debit entry for WIP account (full WIP value including overhead)
         $wip_entry = [
             'model_id' => $wip_control->general_account_id,
             'model_name' => 'GeneralAccount',
@@ -158,13 +262,13 @@ class ManufacturingTransaction
             'description' => 'Work in Progress - Batch ' . $batch->reference,
             'reference' => $batch->reference,
             'credit' => 0,
-            'debit' => $total_material_cost,
+            'debit' => $batch->wip_value,
             'date' => $batch->production_date,
             'user_id' => $user->id,
             'receipt_no' => 'BPC_WIP_' . $batch->reference
         ];
 
-        $general_account_ledger = array_merge($raw_material_entries, [$wip_entry]);
+        $general_account_ledger = array_merge($raw_material_entries, $overhead_entries, [$wip_entry]);
 
         if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
             return ['status' => true, 'message' => 'success'];

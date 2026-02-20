@@ -109,12 +109,12 @@
                                             <option value="">Select Staff</option>
                                             <optgroup label="Manufacturing Staff">
                                                 @foreach($staff as $s)
-                                                <option value="{{ $s->id }}">{{ $s->employee_id ?? '' }} - {{ $s->name }}</option>
+                                                <option value="{{ $s->id }}">{{ $s->employment_id ?? '' }} - {{ $s->name }}</option>
                                                 @endforeach
                                             </optgroup>
                                             <optgroup label="ABTC Staff">
                                                 @foreach($abtcStaff as $u)
-                                                <option value="{{ $u->id }}" data-staff-type="abtc">{{ $u->name }}</option>
+                                                <option value="{{ $u->id }}" data-staff-type="abtc">{{ $u->user_code ?? '' }} - {{ $u->name }}</option>
                                                 @endforeach
                                             </optgroup>
                                         </select>

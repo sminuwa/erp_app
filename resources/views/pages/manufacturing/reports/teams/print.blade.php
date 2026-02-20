@@ -93,7 +93,9 @@
                                         <th class="text-right">Quantity</th>
                                         <th class="text-right">Unit Cost</th>
                                         <th class="text-right">Total Cost</th>
-                                        <th>Batch Number</th>
+                                        <th>Production No.</th>
+                                        <th>Batch No.</th>
+                                        <th>Type</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -105,7 +107,9 @@
                                         <td class="text-right">{{ number_format($production['quantity'], 4) }}</td>
                                         <td class="text-right">{{ number_format($production['unit_cost'], 2) }}</td>
                                         <td class="text-right">{{ number_format($production['total_cost'], 2) }}</td>
+                                        <td>{{ $production['reference'] }}</td>
                                         <td>{{ $production['batch_number'] }}</td>
+                                        <td>{{ $production['type'] }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -115,7 +119,7 @@
                                         <td class="text-right"><strong>{{ number_format($teamProductions->sum('quantity'), 4) }}</strong></td>
                                         <td class="text-right">-</td>
                                         <td class="text-right"><strong>{{ number_format($teamProductions->sum('total_cost'), 2) }}</strong></td>
-                                        <td></td>
+                                        <td colspan="3"></td>
                                     </tr>
                                 </tfoot>
                             </table>

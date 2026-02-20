@@ -45,7 +45,7 @@ class SingleProductManufacturingController extends Controller
 
         $user = Auth::user();
 
-        // Get requisitions with single BOMs only, eager load schedule for team/machine
+        // Get requisitions with single BOMs only, eager load schedule items for BOM extraction
         $requisitions = MaterialsRequisition::where(function($query) {
             $query->whereHas('bom', function($q) {
                 $q->where('bom_type', 'single');
@@ -54,7 +54,7 @@ class SingleProductManufacturingController extends Controller
             });
         })->received()
           ->forBranch($user->branch_id)
-          ->with(['bom.finishProduct', 'schedule'])
+          ->with(['bom.finishProduct', 'schedule.items.productionOrderItem.bom.finishProduct'])
           ->get();
 
         // Calculate already-manufactured qty per requisition
@@ -65,10 +65,31 @@ class SingleProductManufacturingController extends Controller
             ->pluck('total_manufactured', 'requisition_id')
             ->toArray();
 
+        // Calculate manufactured qty per requisition AND per BOM (for per-BOM quantity tracking)
+        $manufacturedQtyByReqAndBom = SingleProductManufacturing::where('branch_id', $user->branch_id)
+            ->whereIn('requisition_id', $requisitions->pluck('id'))
+            ->groupBy('requisition_id', 'bom_id')
+            ->selectRaw('requisition_id, bom_id, SUM(quantity) as total_manufactured')
+            ->get()
+            ->groupBy('requisition_id')
+            ->map(function($items) {
+                return $items->pluck('total_manufactured', 'bom_id')->toArray();
+            })
+            ->toArray();
+
+        // Filter out exhausted requisitions (remaining qty <= 0)
+        $requisitions = $requisitions->filter(function($req) use ($manufacturedQtyByRequisition) {
+            $reqQty = $req->quantity ?? 0;
+            if ($reqQty <= 0) return true; // No quantity constraint (schedule-based), keep it
+            $remaining = $reqQty - ($manufacturedQtyByRequisition[$req->id] ?? 0);
+            return $remaining > 0;
+        });
+
         return view('pages.manufacturing.processing.single_manufacturing.create', [
             'model' => $model,
             'requisitions' => $requisitions,
             'manufacturedQtyByRequisition' => $manufacturedQtyByRequisition,
+            'manufacturedQtyByReqAndBom' => $manufacturedQtyByReqAndBom,
             'boms' => \App\Models\ManufacturingBom::where('bom_type', 'single')->active()->forBranch($user->branch_id)->with('finishProduct')->get(),
             'teams' => ManufacturingTeam::active()->forBranch($user->branch_id)->get(),
             'machines' => ManufacturingMachine::active()->forBranch($user->branch_id)->get(),
@@ -94,18 +115,44 @@ class SingleProductManufacturingController extends Controller
         try {
             $user = Auth::user();
 
-            // Validate quantity against requisition remaining
-            $requisition = MaterialsRequisition::find($request->requisition_id);
-            if ($requisition && $requisition->quantity) {
-                $alreadyManufactured = SingleProductManufacturing::where('requisition_id', $request->requisition_id)
-                    ->sum('quantity');
-                $remaining = $requisition->quantity - $alreadyManufactured;
-                if ($request->quantity > $remaining) {
-                    throw new \Exception("Quantity ({$request->quantity}) exceeds remaining requisition quantity ({$remaining}). Already manufactured: {$alreadyManufactured}");
+            // Validate quantity against requisition remaining (per-BOM for schedule-based)
+            $requisition = MaterialsRequisition::with(['schedule.items.productionOrderItem.bom'])->find($request->requisition_id);
+            if ($requisition) {
+                $bomId = $request->bom_id;
+                $maxQty = null;
+
+                if ($requisition->bom_id) {
+                    // Direct BOM requisition: use requisition quantity
+                    $maxQty = $requisition->quantity;
+                    $alreadyManufactured = SingleProductManufacturing::where('requisition_id', $request->requisition_id)
+                        ->sum('quantity');
+                } elseif ($requisition->schedule) {
+                    // Schedule-based: get per-BOM scheduled qty
+                    $maxQty = 0;
+                    foreach ($requisition->schedule->items as $schedItem) {
+                        $itemBom = $schedItem->productionOrderItem->bom ?? null;
+                        if ($itemBom && $itemBom->id == $bomId) {
+                            $maxQty += $schedItem->scheduled_qty;
+                        }
+                    }
+                    $alreadyManufactured = SingleProductManufacturing::where('requisition_id', $request->requisition_id)
+                        ->where('bom_id', $bomId)
+                        ->sum('quantity');
+                } else {
+                    $maxQty = $requisition->quantity;
+                    $alreadyManufactured = SingleProductManufacturing::where('requisition_id', $request->requisition_id)
+                        ->sum('quantity');
+                }
+
+                if ($maxQty > 0) {
+                    $remaining = $maxQty - $alreadyManufactured;
+                    if ($request->quantity > $remaining) {
+                        throw new \Exception("Quantity ({$request->quantity}) exceeds remaining quantity ({$remaining}). Already manufactured: {$alreadyManufactured}");
+                    }
                 }
             }
 
-            // Validate BOM matches requisition's BOM
+            // Validate BOM matches requisition's BOM (only for direct BOM requisitions)
             if ($requisition && $requisition->bom_id && $request->bom_id != $requisition->bom_id) {
                 throw new \Exception("Selected BOM does not match the requisition's BOM.");
             }
@@ -148,8 +195,11 @@ class SingleProductManufacturingController extends Controller
                 ]);
             }
 
-            // Save costs from BOM calculation
+            // Save costs from BOM calculation (individual + totals)
             $model->total_material_cost = $costData['material_cost'];
+            $model->labor_cost = $costData['labor_cost'];
+            $model->power_cost = $costData['power_cost'];
+            $model->other_cost = $costData['other_cost'];
             $model->total_other_cost = $costData['total_other_cost'];
             $model->total_cost = $costData['total_cost'];
             $model->unit_cost = $costData['unit_cost'];
@@ -333,32 +383,27 @@ class SingleProductManufacturingController extends Controller
      */
     private function updateProductionOrderProducedQty(SingleProductManufacturing $spm)
     {
-        $spm->load('requisition.schedule.items.productionOrderItem');
+        $spm->load('requisition.schedule');
         $requisition = $spm->requisition;
         if (!$requisition) {
+            \Log::warning("updateProductionOrderProducedQty: No requisition for manufacturing {$spm->reference}");
             return;
         }
 
         $orderItem = null;
 
         if ($requisition->schedule_id) {
-            // Path 1: Schedule-based requisition
+            // Path 1: Schedule-based - use schedule's production_order_id directly
             $schedule = $requisition->schedule;
-            if ($schedule) {
-                $scheduleItem = $schedule->items()
-                    ->whereHas('productionOrderItem', function ($q) use ($spm) {
-                        $q->where('bom_id', $spm->bom_id);
-                    })
+            if ($schedule && $schedule->production_order_id) {
+                $orderItem = \App\Models\ProductionOrderItem::where('production_order_id', $schedule->production_order_id)
+                    ->where('bom_id', $spm->bom_id)
                     ->first();
-
-                if ($scheduleItem && $scheduleItem->productionOrderItem) {
-                    $orderItem = $scheduleItem->productionOrderItem;
-                }
             }
         }
 
         if (!$orderItem) {
-            // Path 2: Fallback - find matching ProductionOrderItem directly by bom_id
+            // Path 2: Fallback - find any open production order with matching bom_id
             $orderItem = \App\Models\ProductionOrderItem::where('bom_id', $spm->bom_id)
                 ->whereHas('productionOrder', function ($q) use ($spm) {
                     $q->where('branch_id', $spm->branch_id)
@@ -377,7 +422,7 @@ class SingleProductManufacturingController extends Controller
                 $order->save();
             }
         } else {
-            \Log::warning("Could not find ProductionOrderItem to update produced_qty for manufacturing: {$spm->reference}, bom_id: {$spm->bom_id}");
+            \Log::warning("updateProductionOrderProducedQty: No matching ProductionOrderItem for manufacturing {$spm->reference}, bom_id: {$spm->bom_id}, requisition: {$requisition->reference}, schedule_id: {$requisition->schedule_id}");
         }
     }
 }

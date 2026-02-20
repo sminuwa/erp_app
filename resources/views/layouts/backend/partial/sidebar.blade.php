@@ -901,6 +901,33 @@
                                                 </a>
                                             </li>
                                         @endcan
+                                        @can('manufacturing.reports.orders')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.reports.orders.index') }}"
+                                                    class="nav-link {{ Request::is('manufacturing/reports/orders*') ? 'active' : '' }}">
+                                                    <i class="fa fa-clipboard-list"></i>
+                                                    <p>Production Orders</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('manufacturing.reports.schedules')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.reports.schedules.index') }}"
+                                                    class="nav-link {{ Request::is('manufacturing/reports/schedules*') ? 'active' : '' }}">
+                                                    <i class="fa fa-calendar-alt"></i>
+                                                    <p>Daily Schedules</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('manufacturing.reports.requisitions')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.reports.requisitions.index') }}"
+                                                    class="nav-link {{ Request::is('manufacturing/reports/requisitions*') ? 'active' : '' }}">
+                                                    <i class="fa fa-file-alt"></i>
+                                                    <p>Requisitions</p>
+                                                </a>
+                                            </li>
+                                        @endcan
                                     </ul>
                                 </li>
                             @endcan

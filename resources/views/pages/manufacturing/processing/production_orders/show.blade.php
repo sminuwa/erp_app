@@ -145,7 +145,7 @@
                                             <th class="text-right">Quantity</th>
                                             <th class="text-right">Scheduled</th>
                                             <th class="text-right">Produced</th>
-                                            <th class="text-right">Remaining</th>
+                                            <th class="text-right">Unscheduled</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -162,7 +162,7 @@
                                                 <td class="text-right">{{ number_format($item->quantity_to_produce, 4) }}</td>
                                                 <td class="text-right">{{ number_format($item->scheduled_qty, 4) }}</td>
                                                 <td class="text-right">{{ number_format($item->produced_qty, 4) }}</td>
-                                                <td class="text-right">{{ number_format($item->quantity_to_produce - $item->scheduled_qty, 4) }}</td>
+                                                <td class="text-right">{{ number_format($item->quantity_to_produce - $item->produced_qty, 4) }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

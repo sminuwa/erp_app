@@ -198,32 +198,27 @@ class BatchConversionController extends Controller
      */
     private function updateProductionOrderProducedQty(BatchProduction $batch, $producedQty)
     {
-        $batch->load('requisition.schedule.items.productionOrderItem');
+        $batch->load('requisition.schedule');
         $requisition = $batch->requisition;
         if (!$requisition) {
+            \Log::warning("updateProductionOrderProducedQty: No requisition for batch {$batch->reference}");
             return;
         }
 
         $orderItem = null;
 
         if ($requisition->schedule_id) {
-            // Path 1: Schedule-based requisition
+            // Path 1: Schedule-based - use schedule's production_order_id directly
             $schedule = $requisition->schedule;
-            if ($schedule) {
-                $scheduleItem = $schedule->items()
-                    ->whereHas('productionOrderItem', function ($q) use ($batch) {
-                        $q->where('bom_id', $batch->bom_id);
-                    })
+            if ($schedule && $schedule->production_order_id) {
+                $orderItem = \App\Models\ProductionOrderItem::where('production_order_id', $schedule->production_order_id)
+                    ->where('bom_id', $batch->bom_id)
                     ->first();
-
-                if ($scheduleItem && $scheduleItem->productionOrderItem) {
-                    $orderItem = $scheduleItem->productionOrderItem;
-                }
             }
         }
 
         if (!$orderItem) {
-            // Path 2: Fallback - find matching ProductionOrderItem directly by bom_id
+            // Path 2: Fallback - find any open production order with matching bom_id
             $orderItem = \App\Models\ProductionOrderItem::where('bom_id', $batch->bom_id)
                 ->whereHas('productionOrder', function ($q) use ($batch) {
                     $q->where('branch_id', $batch->branch_id)
@@ -242,7 +237,7 @@ class BatchConversionController extends Controller
                 $order->save();
             }
         } else {
-            \Log::warning("Could not find ProductionOrderItem to update produced_qty for batch: {$batch->reference}, bom_id: {$batch->bom_id}");
+            \Log::warning("updateProductionOrderProducedQty: No matching ProductionOrderItem for batch {$batch->reference}, bom_id: {$batch->bom_id}, requisition: {$requisition->reference}, schedule_id: {$requisition->schedule_id}");
         }
     }
 

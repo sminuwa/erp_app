@@ -64,6 +64,8 @@
                                             <span class="badge badge-warning">Pending</span>
                                         @elseif($record->status == 'posted')
                                             <span class="badge badge-success">Posted</span>
+                                        @elseif($record->status == 'reversed')
+                                            <span class="badge badge-danger">Reversed</span>
                                         @else
                                             <span class="badge badge-secondary">{{ ucfirst($record->status) }}</span>
                                         @endif

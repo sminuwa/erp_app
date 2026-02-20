@@ -141,6 +141,16 @@
                                 {{ $ledger->reference }}
                             @endif
                         @endif
+                        @if (strpos($ledger->reference, 'RCT') === false &&
+                             strpos($ledger->reference, 'INV') === false &&
+                             strpos($ledger->reference, 'JNL') === false &&
+                             strpos($ledger->reference, 'ITB') === false &&
+                             strpos($ledger->reference, 'GRN') === false &&
+                             strpos($ledger->reference, 'PNV') === false &&
+                             strpos($ledger->reference, 'OPE') === false &&
+                             strpos($ledger->reference, 'PAY') === false)
+                            {{ $ledger->reference }}
+                        @endif
                     </td>
                     <td style="text-align: right">
                         @if ($debit > 0.0)

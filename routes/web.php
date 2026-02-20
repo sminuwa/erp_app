@@ -1464,6 +1464,27 @@ Route::middleware('auth')->group(function () {
                 Route::get('/load', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'loadTeamLedgerReport'])->name('manufacturing.reports.team_ledger.load');
                 Route::get('/print', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'printTeamLedgerReport'])->name('manufacturing.reports.team_ledger.print');
             });
+
+            // Production Orders Report
+            Route::prefix('orders')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'ordersReport'])->name('manufacturing.reports.orders.index');
+                Route::get('/load', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'loadOrdersReport'])->name('manufacturing.reports.orders.load');
+                Route::get('/print', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'printOrdersReport'])->name('manufacturing.reports.orders.print');
+            });
+
+            // Daily Schedules Report
+            Route::prefix('schedules')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'schedulesReport'])->name('manufacturing.reports.schedules.index');
+                Route::get('/load', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'loadSchedulesReport'])->name('manufacturing.reports.schedules.load');
+                Route::get('/print', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'printSchedulesReport'])->name('manufacturing.reports.schedules.print');
+            });
+
+            // Materials Requisitions Report
+            Route::prefix('requisitions')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'requisitionsReport'])->name('manufacturing.reports.requisitions.index');
+                Route::get('/load', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'loadRequisitionsReport'])->name('manufacturing.reports.requisitions.load');
+                Route::get('/print', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'printRequisitionsReport'])->name('manufacturing.reports.requisitions.print');
+            });
         });
 
         // AJAX Routes

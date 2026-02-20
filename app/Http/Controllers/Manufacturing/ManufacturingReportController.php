@@ -10,6 +10,10 @@ use App\Models\ManufacturingTeam;
 use App\Models\ManufacturingStaff;
 use App\Models\ManufacturingPenalty;
 use App\Models\ManufacturingBom;
+use App\Models\ManufacturingMachine;
+use App\Models\ProductionOrder;
+use App\Models\DailyManufacturingSchedule;
+use App\Models\MaterialsRequisition;
 use App\Models\Product;
 use App\Models\Branch;
 use App\Models\Category;
@@ -82,8 +86,9 @@ class ManufacturingReportController extends Controller
             $productions->push([
                 'type' => 'Single',
                 'date' => $item->manufacturing_date,
-                'batch_number' => $item->reference,
-                'product_code' => $item->bom->finishProduct->product_code ?? 'N/A',
+                'reference' => $item->reference,
+                'batch_number' => $item->batch_number,
+                'product_code' => $item->bom->finishProduct->code ?? 'N/A',
                 'product_name' => $item->bom->finishProduct->name ?? 'N/A',
                 'category' => $item->bom->category->name ?? 'N/A',
                 'quantity' => $item->quantity,
@@ -124,8 +129,9 @@ class ManufacturingReportController extends Controller
             $productions->push([
                 'type' => 'Batch',
                 'date' => $item->production_date,
+                'reference' => $item->reference,
                 'batch_number' => $item->batch_number,
-                'product_code' => $item->bom->finishProduct->product_code ?? 'N/A',
+                'product_code' => $item->bom->finishProduct->code ?? 'N/A',
                 'product_name' => $item->bom->finishProduct->name ?? 'N/A',
                 'category' => $item->bom->category->name ?? 'N/A',
                 'quantity' => $quantity,
@@ -191,8 +197,9 @@ class ManufacturingReportController extends Controller
             $productions->push([
                 'type' => 'Single',
                 'date' => $item->manufacturing_date,
-                'batch_number' => $item->reference,
-                'product_code' => $item->bom->finishProduct->product_code ?? 'N/A',
+                'reference' => $item->reference,
+                'batch_number' => $item->batch_number,
+                'product_code' => $item->bom->finishProduct->code ?? 'N/A',
                 'product_name' => $item->bom->finishProduct->name ?? 'N/A',
                 'category' => $item->bom->category->name ?? 'N/A',
                 'quantity' => $item->quantity,
@@ -233,8 +240,9 @@ class ManufacturingReportController extends Controller
             $productions->push([
                 'type' => 'Batch',
                 'date' => $item->production_date,
+                'reference' => $item->reference,
                 'batch_number' => $item->batch_number,
-                'product_code' => $item->bom->finishProduct->product_code ?? 'N/A',
+                'product_code' => $item->bom->finishProduct->code ?? 'N/A',
                 'product_name' => $item->bom->finishProduct->name ?? 'N/A',
                 'category' => $item->bom->category->name ?? 'N/A',
                 'quantity' => $quantity,
@@ -331,8 +339,9 @@ class ManufacturingReportController extends Controller
             $productions->push([
                 'type' => 'Single',
                 'date' => $item->manufacturing_date,
-                'batch_number' => $item->reference,
-                'product_code' => $item->bom->finishProduct->product_code ?? 'N/A',
+                'reference' => $item->reference,
+                'batch_number' => $item->batch_number,
+                'product_code' => $item->bom->finishProduct->code ?? 'N/A',
                 'product_name' => $item->bom->finishProduct->name ?? 'N/A',
                 'category' => $item->bom->category->name ?? 'N/A',
                 'quantity' => $item->quantity,
@@ -373,8 +382,9 @@ class ManufacturingReportController extends Controller
             $productions->push([
                 'type' => 'Batch',
                 'date' => $item->production_date,
+                'reference' => $item->reference,
                 'batch_number' => $item->batch_number,
-                'product_code' => $item->bom->finishProduct->product_code ?? 'N/A',
+                'product_code' => $item->bom->finishProduct->code ?? 'N/A',
                 'product_name' => $item->bom->finishProduct->name ?? 'N/A',
                 'category' => $item->bom->category->name ?? 'N/A',
                 'quantity' => $convertedQty > 0 ? $convertedQty : $item->quantity,
@@ -450,8 +460,9 @@ class ManufacturingReportController extends Controller
             $productions->push([
                 'type' => 'Single',
                 'date' => $item->manufacturing_date,
-                'batch_number' => $item->reference,
-                'product_code' => $item->bom->finishProduct->product_code ?? 'N/A',
+                'reference' => $item->reference,
+                'batch_number' => $item->batch_number,
+                'product_code' => $item->bom->finishProduct->code ?? 'N/A',
                 'product_name' => $item->bom->finishProduct->name ?? 'N/A',
                 'category' => $item->bom->category->name ?? 'N/A',
                 'quantity' => $item->quantity,
@@ -492,8 +503,9 @@ class ManufacturingReportController extends Controller
             $productions->push([
                 'type' => 'Batch',
                 'date' => $item->production_date,
+                'reference' => $item->reference,
                 'batch_number' => $item->batch_number,
-                'product_code' => $item->bom->finishProduct->product_code ?? 'N/A',
+                'product_code' => $item->bom->finishProduct->code ?? 'N/A',
                 'product_name' => $item->bom->finishProduct->name ?? 'N/A',
                 'category' => $item->bom->category->name ?? 'N/A',
                 'quantity' => $convertedQty > 0 ? $convertedQty : $item->quantity,
@@ -715,5 +727,315 @@ class ManufacturingReportController extends Controller
             'dateFrom' => $dateFrom,
             'dateTo' => $dateTo
         ]);
+    }
+
+    // ================================================================
+    // PRODUCTION ORDERS REPORT
+    // ================================================================
+
+    public function ordersReport(Request $request)
+    {
+        $this->authorize('manufacturing.reports.orders');
+
+        $user = Auth::user();
+
+        return view('pages.manufacturing.reports.orders.index', [
+            'branches' => Branch::orderBy('name')->get(),
+            'userBranch' => $user->branch_id
+        ]);
+    }
+
+    public function loadOrdersReport(Request $request)
+    {
+        $this->authorize('manufacturing.reports.orders');
+
+        $request->validate([
+            'date_from' => 'required|date',
+            'date_to' => 'required|date|after_or_equal:date_from'
+        ]);
+
+        $dateFrom = $request->date_from;
+        $dateTo = $request->date_to;
+        $branchId = $request->branch_id;
+        $status = $request->status;
+
+        $query = ProductionOrder::with(['items.bom.finishProduct', 'branch', 'createdBy', 'approvedBy'])
+            ->whereBetween('order_date', [$dateFrom, $dateTo]);
+
+        if ($branchId) {
+            $query->where('branch_id', $branchId);
+        }
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $orders = $query->orderBy('order_date', 'desc')->get();
+
+        $totals = [
+            'total_orders' => $orders->count(),
+            'total_qty' => $orders->sum('total_finish_goods_qty'),
+            'total_processed' => $orders->sum('processed_qty'),
+            'pending' => $orders->where('status', 'pending')->count(),
+            'approved' => $orders->where('status', 'approved')->count(),
+            'closed' => $orders->where('status', 'closed')->count(),
+        ];
+
+        return view('pages.manufacturing.reports.orders.load', compact('orders', 'totals'));
+    }
+
+    public function printOrdersReport(Request $request)
+    {
+        $this->authorize('manufacturing.reports.orders');
+
+        $dateFrom = $request->date_from;
+        $dateTo = $request->date_to;
+        $branchId = $request->branch_id;
+        $status = $request->status;
+
+        $query = ProductionOrder::with(['items.bom.finishProduct', 'branch', 'createdBy', 'approvedBy'])
+            ->whereBetween('order_date', [$dateFrom, $dateTo]);
+
+        if ($branchId) {
+            $query->where('branch_id', $branchId);
+        }
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $orders = $query->orderBy('order_date', 'desc')->get();
+
+        $totals = [
+            'total_orders' => $orders->count(),
+            'total_qty' => $orders->sum('total_finish_goods_qty'),
+            'total_processed' => $orders->sum('processed_qty'),
+        ];
+
+        return view('pages.manufacturing.reports.orders.print', compact('orders', 'totals', 'dateFrom', 'dateTo'));
+    }
+
+    // ================================================================
+    // DAILY MANUFACTURING SCHEDULES REPORT
+    // ================================================================
+
+    public function schedulesReport(Request $request)
+    {
+        $this->authorize('manufacturing.reports.schedules');
+
+        $user = Auth::user();
+
+        return view('pages.manufacturing.reports.schedules.index', [
+            'branches' => Branch::orderBy('name')->get(),
+            'teams' => ManufacturingTeam::orderBy('name')->get(),
+            'machines' => ManufacturingMachine::where('status', 1)->orderBy('name')->get(),
+            'userBranch' => $user->branch_id
+        ]);
+    }
+
+    public function loadSchedulesReport(Request $request)
+    {
+        $this->authorize('manufacturing.reports.schedules');
+
+        $request->validate([
+            'date_from' => 'required|date',
+            'date_to' => 'required|date|after_or_equal:date_from'
+        ]);
+
+        $dateFrom = $request->date_from;
+        $dateTo = $request->date_to;
+        $branchId = $request->branch_id;
+        $teamId = $request->team_id;
+        $machineId = $request->machine_id;
+        $status = $request->status;
+
+        $query = DailyManufacturingSchedule::with([
+                'productionOrder', 'team', 'machine', 'branch',
+                'items.productionOrderItem.bom.finishProduct', 'createdBy'
+            ])
+            ->whereBetween('schedule_date', [$dateFrom, $dateTo]);
+
+        if ($branchId) {
+            $query->where('branch_id', $branchId);
+        }
+        if ($teamId) {
+            $query->where('team_id', $teamId);
+        }
+        if ($machineId) {
+            $query->where('machine_id', $machineId);
+        }
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $schedules = $query->orderBy('schedule_date', 'desc')->get();
+
+        $totals = [
+            'total_schedules' => $schedules->count(),
+            'pending' => $schedules->where('status', 'pending')->count(),
+            'approved' => $schedules->where('status', 'approved')->count(),
+            'total_scheduled_qty' => $schedules->sum(function($s) {
+                return $s->items->sum('scheduled_qty');
+            }),
+            'total_requisitioned_qty' => $schedules->sum(function($s) {
+                return $s->items->sum('requisitioned_qty');
+            }),
+        ];
+
+        return view('pages.manufacturing.reports.schedules.load', compact('schedules', 'totals'));
+    }
+
+    public function printSchedulesReport(Request $request)
+    {
+        $this->authorize('manufacturing.reports.schedules');
+
+        $dateFrom = $request->date_from;
+        $dateTo = $request->date_to;
+        $branchId = $request->branch_id;
+        $teamId = $request->team_id;
+        $machineId = $request->machine_id;
+        $status = $request->status;
+
+        $query = DailyManufacturingSchedule::with([
+                'productionOrder', 'team', 'machine', 'branch',
+                'items.productionOrderItem.bom.finishProduct', 'createdBy'
+            ])
+            ->whereBetween('schedule_date', [$dateFrom, $dateTo]);
+
+        if ($branchId) {
+            $query->where('branch_id', $branchId);
+        }
+        if ($teamId) {
+            $query->where('team_id', $teamId);
+        }
+        if ($machineId) {
+            $query->where('machine_id', $machineId);
+        }
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $schedules = $query->orderBy('schedule_date', 'desc')->get();
+
+        $totals = [
+            'total_schedules' => $schedules->count(),
+            'total_scheduled_qty' => $schedules->sum(function($s) {
+                return $s->items->sum('scheduled_qty');
+            }),
+        ];
+
+        return view('pages.manufacturing.reports.schedules.print', compact('schedules', 'totals', 'dateFrom', 'dateTo'));
+    }
+
+    // ================================================================
+    // MATERIALS REQUISITIONS REPORT
+    // ================================================================
+
+    public function requisitionsReport(Request $request)
+    {
+        $this->authorize('manufacturing.reports.requisitions');
+
+        $user = Auth::user();
+
+        return view('pages.manufacturing.reports.requisitions.index', [
+            'branches' => Branch::orderBy('name')->get(),
+            'userBranch' => $user->branch_id
+        ]);
+    }
+
+    public function loadRequisitionsReport(Request $request)
+    {
+        $this->authorize('manufacturing.reports.requisitions');
+
+        $request->validate([
+            'date_from' => 'required|date',
+            'date_to' => 'required|date|after_or_equal:date_from'
+        ]);
+
+        $dateFrom = $request->date_from;
+        $dateTo = $request->date_to;
+        $branchId = $request->branch_id;
+        $status = $request->status;
+        $bomType = $request->bom_type;
+
+        $query = MaterialsRequisition::with([
+                'schedule.productionOrder', 'bom.finishProduct', 'items.product',
+                'items.sourceStore', 'createdBy'
+            ])
+            ->whereBetween('requisition_date', [$dateFrom, $dateTo]);
+
+        if ($branchId) {
+            $query->where('branch_id', $branchId);
+        }
+        if ($status) {
+            $query->where('status', $status);
+        }
+        if ($bomType) {
+            $query->whereHas('bom', function($q) use ($bomType) {
+                $q->where('bom_type', $bomType);
+            });
+        }
+
+        $requisitions = $query->orderBy('requisition_date', 'desc')->get();
+
+        $totals = [
+            'total_requisitions' => $requisitions->count(),
+            'pending' => $requisitions->where('status', 'pending')->count(),
+            'approved' => $requisitions->where('status', 'approved')->count(),
+            'issued' => $requisitions->where('status', 'issued')->count(),
+            'received' => $requisitions->where('status', 'received')->count(),
+            'total_required_qty' => $requisitions->sum(function($r) {
+                return $r->items->sum('required_qty');
+            }),
+            'total_issued_qty' => $requisitions->sum(function($r) {
+                return $r->items->sum('issued_qty');
+            }),
+            'total_cost' => $requisitions->sum(function($r) {
+                return $r->items->sum('total_cost');
+            }),
+        ];
+
+        return view('pages.manufacturing.reports.requisitions.load', compact('requisitions', 'totals'));
+    }
+
+    public function printRequisitionsReport(Request $request)
+    {
+        $this->authorize('manufacturing.reports.requisitions');
+
+        $dateFrom = $request->date_from;
+        $dateTo = $request->date_to;
+        $branchId = $request->branch_id;
+        $status = $request->status;
+        $bomType = $request->bom_type;
+
+        $query = MaterialsRequisition::with([
+                'schedule.productionOrder', 'bom.finishProduct', 'items.product',
+                'items.sourceStore', 'createdBy'
+            ])
+            ->whereBetween('requisition_date', [$dateFrom, $dateTo]);
+
+        if ($branchId) {
+            $query->where('branch_id', $branchId);
+        }
+        if ($status) {
+            $query->where('status', $status);
+        }
+        if ($bomType) {
+            $query->whereHas('bom', function($q) use ($bomType) {
+                $q->where('bom_type', $bomType);
+            });
+        }
+
+        $requisitions = $query->orderBy('requisition_date', 'desc')->get();
+
+        $totals = [
+            'total_requisitions' => $requisitions->count(),
+            'total_required_qty' => $requisitions->sum(function($r) {
+                return $r->items->sum('required_qty');
+            }),
+            'total_cost' => $requisitions->sum(function($r) {
+                return $r->items->sum('total_cost');
+            }),
+        ];
+
+        return view('pages.manufacturing.reports.requisitions.print', compact('requisitions', 'totals', 'dateFrom', 'dateTo'));
     }
 }

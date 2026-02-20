@@ -62,15 +62,39 @@
                                             $reqQty = $requisition->quantity ?? 0;
                                             $manufactured = $manufacturedQtyByRequisition[$requisition->id] ?? 0;
                                             $remaining = $reqQty - $manufactured;
+                                            // Compute BOM IDs and per-BOM quantities
+                                            $bomId = $requisition->bom_id;
+                                            $bomIds = [];
+                                            $bomQtys = [];
+                                            $bomLabel = $requisition->bom->finishProduct->name ?? null;
+                                            if ($bomId) {
+                                                $bomIds[] = $bomId;
+                                                $bomQtys[$bomId] = $reqQty;
+                                            } elseif ($requisition->schedule) {
+                                                foreach ($requisition->schedule->items as $schedItem) {
+                                                    $itemBom = $schedItem->productionOrderItem->bom ?? null;
+                                                    if ($itemBom && $itemBom->bom_type === 'single') {
+                                                        $bomIds[] = $itemBom->id;
+                                                        $bomQtys[$itemBom->id] = ($bomQtys[$itemBom->id] ?? 0) + $schedItem->scheduled_qty;
+                                                        if (!$bomLabel) $bomLabel = $itemBom->finishProduct->name ?? 'N/A';
+                                                    }
+                                                }
+                                                $bomIds = array_unique($bomIds);
+                                                if (count($bomIds) === 1) $bomId = $bomIds[0];
+                                            }
+                                            $bomManufactured = $manufacturedQtyByReqAndBom[$requisition->id] ?? [];
                                         @endphp
                                         <option value="{{ $requisition->id }}"
-                                            data-bom-id="{{ $requisition->bom_id }}"
+                                            data-bom-id="{{ $bomId }}"
+                                            data-bom-ids="{{ json_encode(array_values($bomIds)) }}"
+                                            data-bom-qtys="{{ json_encode($bomQtys) }}"
+                                            data-bom-manufactured="{{ json_encode($bomManufactured) }}"
                                             data-team-id="{{ $requisition->schedule->team_id ?? '' }}"
                                             data-machine-id="{{ $requisition->schedule->machine_id ?? '' }}"
                                             data-req-qty="{{ $reqQty }}"
                                             data-manufactured="{{ $manufactured }}"
                                             data-remaining="{{ $remaining }}">
-                                            {{ $requisition->reference }} - {{ $requisition->bom->finishProduct->name ?? 'N/A' }} (Remaining: {{ number_format($remaining, 4) }})
+                                            {{ $requisition->reference }} - {{ $bomLabel ?? 'N/A' }} (Remaining: {{ number_format($remaining, 4) }})
                                         </option>
                                         @endforeach
                                     </select>
@@ -315,19 +339,82 @@ $(document).ready(function() {
         calculateTimeout = setTimeout(calculateCosts, 500);
     });
 
-    // When requisition is selected: auto-load BOM, team, machine, and qty constraints
+    // Update quantity display based on selected BOM within the requisition
+    function updateQtyForBom() {
+        var reqSelected = $('#requisition_id').find(':selected');
+        var bomQtys = reqSelected.data('bom-qtys') || {};
+        var bomManufactured = reqSelected.data('bom-manufactured') || {};
+        var selectedBom = $('#bom_id').val();
+
+        if (selectedBom && bomQtys[selectedBom] !== undefined) {
+            var qty = parseFloat(bomQtys[selectedBom]);
+            var mfg = parseFloat(bomManufactured[selectedBom] || 0);
+            var remaining = qty - mfg;
+
+            $('#req-qty-display').text(qty.toFixed(4));
+            $('#manufactured-display').text(mfg.toFixed(4));
+            $('#remaining-display').text(remaining.toFixed(4));
+            $('#quantity').attr('max', remaining);
+
+            var currentQty = parseFloat($('#quantity').val()) || 0;
+            if (currentQty > remaining || currentQty === 0) {
+                $('#quantity').val(remaining);
+                calculateCosts();
+            }
+        } else {
+            // Fallback to overall requisition qty
+            var reqQty = parseFloat(reqSelected.data('req-qty')) || 0;
+            var manufactured = parseFloat(reqSelected.data('manufactured')) || 0;
+            var remaining = parseFloat(reqSelected.data('remaining')) || 0;
+
+            if (reqQty > 0) {
+                $('#req-qty-display').text(reqQty.toFixed(4));
+                $('#manufactured-display').text(manufactured.toFixed(4));
+                $('#remaining-display').text(remaining.toFixed(4));
+                $('#quantity').attr('max', remaining);
+            } else {
+                $('#req-qty-display').text('-');
+                $('#manufactured-display').text('-');
+                $('#remaining-display').text('-');
+                $('#quantity').removeAttr('max');
+            }
+        }
+    }
+
+    // When requisition is selected: filter BOMs, auto-load team/machine, update qty constraints
     $('#requisition_id').on('change', function() {
         var selected = $(this).find(':selected');
         var bomId = selected.data('bom-id');
+        var bomIds = selected.data('bom-ids') || [];
         var teamId = selected.data('team-id');
         var machineId = selected.data('machine-id');
-        var reqQty = parseFloat(selected.data('req-qty')) || 0;
-        var manufactured = parseFloat(selected.data('manufactured')) || 0;
-        var remaining = parseFloat(selected.data('remaining')) || 0;
 
-        // Auto-select BOM from requisition
+        // Filter BOM dropdown to only show BOMs from this requisition
+        // Use disabled + hidden approach that works with Select2
+        if (bomIds.length > 0) {
+            $('#bom_id option').each(function() {
+                var val = $(this).val();
+                if (!val) return; // keep placeholder
+                var show = bomIds.indexOf(parseInt(val)) !== -1;
+                $(this).prop('disabled', !show).toggle(show);
+            });
+        } else {
+            // No specific BOMs, show all
+            $('#bom_id option').prop('disabled', false).show();
+        }
+        // Refresh Select2 to reflect filtered options
+        $('#bom_id').select2({ width: '100%' });
+
+        // Auto-select BOM from requisition (or reset if not in filtered list)
         if (bomId) {
             $('#bom_id').val(bomId).trigger('change');
+        } else if (bomIds.length === 1) {
+            $('#bom_id').val(bomIds[0]).trigger('change');
+        } else {
+            var currentBom = parseInt($('#bom_id').val());
+            if (bomIds.length > 0 && bomIds.indexOf(currentBom) === -1) {
+                $('#bom_id').val('').trigger('change');
+            }
         }
 
         // Auto-select team from requisition's schedule
@@ -340,35 +427,38 @@ $(document).ready(function() {
             $('select[name="machine_id"]').val(machineId).trigger('change');
         }
 
-        // Update qty display and constraints
-        if (reqQty > 0) {
-            $('#req-qty-display').text(parseFloat(reqQty).toFixed(4));
-            $('#manufactured-display').text(parseFloat(manufactured).toFixed(4));
-            $('#remaining-display').text(parseFloat(remaining).toFixed(4));
-            $('#quantity').attr('max', remaining);
-            // Default quantity to remaining if current value exceeds it
-            var currentQty = parseFloat($('#quantity').val()) || 0;
-            if (currentQty > remaining || currentQty === 0) {
-                $('#quantity').val(remaining);
-                calculateCosts();
-            }
-        } else {
-            $('#req-qty-display').text('-');
-            $('#manufactured-display').text('-');
-            $('#remaining-display').text('-');
-            $('#quantity').removeAttr('max');
+        // Update qty display for the selected BOM
+        updateQtyForBom();
+    });
+
+    // When BOM changes, update per-BOM quantity display
+    $('#bom_id').on('change', function() {
+        if ($('#requisition_id').val()) {
+            updateQtyForBom();
         }
     });
 
-    // Validate quantity on form submit
+    // Validate quantity on form submit (use per-BOM remaining if available)
     $('form').on('submit', function(e) {
-        var selected = $('#requisition_id').find(':selected');
-        var remaining = parseFloat(selected.data('remaining')) || 0;
-        var qty = parseFloat($('#quantity').val()) || 0;
+        var reqSelected = $('#requisition_id').find(':selected');
+        var selectedBom = $('#bom_id').val();
+        var bomQtys = reqSelected.data('bom-qtys') || {};
+        var bomManufactured = reqSelected.data('bom-manufactured') || {};
+        var remaining, manufactured;
 
+        if (selectedBom && bomQtys[selectedBom] !== undefined) {
+            var bomQty = parseFloat(bomQtys[selectedBom]);
+            manufactured = parseFloat(bomManufactured[selectedBom] || 0);
+            remaining = bomQty - manufactured;
+        } else {
+            remaining = parseFloat(reqSelected.data('remaining')) || 0;
+            manufactured = parseFloat(reqSelected.data('manufactured')) || 0;
+        }
+
+        var qty = parseFloat($('#quantity').val()) || 0;
         if (remaining > 0 && qty > remaining) {
             e.preventDefault();
-            alert('Quantity (' + qty.toFixed(4) + ') exceeds the remaining requisition quantity (' + remaining.toFixed(4) + ').\nAlready manufactured: ' + (parseFloat(selected.data('manufactured')) || 0).toFixed(4));
+            alert('Quantity (' + qty.toFixed(4) + ') exceeds the remaining quantity (' + remaining.toFixed(4) + ').\nAlready manufactured: ' + manufactured.toFixed(4));
             return false;
         }
     });

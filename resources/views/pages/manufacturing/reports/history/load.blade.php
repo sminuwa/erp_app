@@ -45,19 +45,29 @@
                         <th class="text-right">Quantity</th>
                         <th class="text-right">Unit Cost</th>
                         <th class="text-right">Total Cost</th>
-                        <th>Batch Number</th>
+                        <th>Production No.</th>
+                        <th>Batch No.</th>
+                        <th>Type</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($productions as $index => $record)
                     <tr>
                         <td>{{ $index + 1 }}</td>
-                        <td>{{ $record['product_code'] }}</td>
+                        <td><code>{{ $record['product_code'] }}</code></td>
                         <td>{{ $record['product_name'] }}</td>
                         <td class="text-right">{{ number_format($record['quantity'], 4) }}</td>
                         <td class="text-right">{{ number_format($record['unit_cost'], 2) }}</td>
                         <td class="text-right">{{ number_format($record['total_cost'], 2) }}</td>
-                        <td>{{ $record['batch_number'] }}</td>
+                        <td><code>{{ $record['reference'] }}</code></td>
+                        <td><code>{{ $record['batch_number'] }}</code></td>
+                        <td>
+                            @if($record['type'] == 'Single')
+                                <span class="badge badge-info">Single</span>
+                            @else
+                                <span class="badge badge-primary">Batch</span>
+                            @endif
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -67,7 +77,7 @@
                         <td class="text-right"><strong>{{ number_format($totals['total_qty'], 4) }}</strong></td>
                         <td class="text-right"></td>
                         <td class="text-right"><strong>{{ number_format($totals['total_cost'], 2) }}</strong></td>
-                        <td></td>
+                        <td colspan="3"></td>
                     </tr>
                 </tfoot>
             </table>

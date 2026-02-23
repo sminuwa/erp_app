@@ -19,17 +19,17 @@ ADD COLUMN other_cost decimal(18,2) DEFAULT '0.00' AFTER power_cost;
 
 -- Add GL account control entries for overhead costs
 INSERT INTO general_account_controls (code, general_account_id, created_at, updated_at) VALUES
-('manufacturing_labour', NULL, NOW(), NOW()),
-('manufacturing_power', NULL, NOW(), NOW()),
-('manufacturing_other', NULL, NOW(), NOW());
+('manufacturing_labour', 860, NOW(), NOW()),
+('manufacturing_power', 805, NOW(), NOW()),
+('manufacturing_other', 600, NOW(), NOW());
 
 -- ============================================================
 -- IMPORTANT: After running this SQL, configure each control
 -- entry with the correct GL account ID via the admin panel or:
 --
--- UPDATE general_account_controls SET general_account_id = <LABOUR_GL_ID> WHERE code = 'manufacturing_labour';
--- UPDATE general_account_controls SET general_account_id = <POWER_GL_ID> WHERE code = 'manufacturing_power';
--- UPDATE general_account_controls SET general_account_id = <OTHER_GL_ID> WHERE code = 'manufacturing_other';
+-- UPDATE general_account_controls SET general_account_id = 860 WHERE code = 'manufacturing_labour';
+-- UPDATE general_account_controls SET general_account_id = 805 WHERE code = 'manufacturing_power';
+-- UPDATE general_account_controls SET general_account_id = 600 WHERE code = 'manufacturing_other';
 -- ============================================================
 
 -- Rollback:

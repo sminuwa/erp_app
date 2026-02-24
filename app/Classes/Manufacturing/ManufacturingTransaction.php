@@ -74,6 +74,18 @@ class ManufacturingTransaction
         $powerControl = GeneralAccountControl::where('code', 'manufacturing_power')->first();
         $otherControl = GeneralAccountControl::where('code', 'manufacturing_other')->first();
 
+        // Validate overhead accounts are configured before posting — a missing account with a
+        // non-zero cost would leave the FG debit without a matching overhead credit (GL imbalance).
+        if ($manufacturing->labor_cost > 0 && (!$labourControl || !$labourControl->general_account_id)) {
+            return ['status' => false, 'message' => 'Manufacturing Labour GL account is not configured but labour cost is ' . $manufacturing->labor_cost . '. Please set it up under GL Control Accounts before posting.'];
+        }
+        if ($manufacturing->power_cost > 0 && (!$powerControl || !$powerControl->general_account_id)) {
+            return ['status' => false, 'message' => 'Manufacturing Power GL account is not configured but power cost is ' . $manufacturing->power_cost . '. Please set it up under GL Control Accounts before posting.'];
+        }
+        if ($manufacturing->other_cost > 0 && (!$otherControl || !$otherControl->general_account_id)) {
+            return ['status' => false, 'message' => 'Manufacturing Other GL account is not configured but other cost is ' . $manufacturing->other_cost . '. Please set it up under GL Control Accounts before posting.'];
+        }
+
         if ($labourControl && $labourControl->general_account_id && $manufacturing->labor_cost > 0) {
             $overhead_entries[] = [
                 'model_id' => $labourControl->general_account_id,
@@ -212,6 +224,18 @@ class ManufacturingTransaction
         $labourControl = GeneralAccountControl::where('code', 'manufacturing_labour')->first();
         $powerControl = GeneralAccountControl::where('code', 'manufacturing_power')->first();
         $otherControl = GeneralAccountControl::where('code', 'manufacturing_other')->first();
+
+        // Validate overhead accounts are configured before posting — a missing account with a
+        // non-zero cost would leave the WIP debit without a matching overhead credit (GL imbalance).
+        if ($batch->labor_cost > 0 && (!$labourControl || !$labourControl->general_account_id)) {
+            return ['status' => false, 'message' => 'Manufacturing Labour GL account is not configured but labour cost is ' . $batch->labor_cost . '. Please set it up under GL Control Accounts before posting.'];
+        }
+        if ($batch->power_cost > 0 && (!$powerControl || !$powerControl->general_account_id)) {
+            return ['status' => false, 'message' => 'Manufacturing Power GL account is not configured but power cost is ' . $batch->power_cost . '. Please set it up under GL Control Accounts before posting.'];
+        }
+        if ($batch->other_cost > 0 && (!$otherControl || !$otherControl->general_account_id)) {
+            return ['status' => false, 'message' => 'Manufacturing Other GL account is not configured but other cost is ' . $batch->other_cost . '. Please set it up under GL Control Accounts before posting.'];
+        }
 
         if ($labourControl && $labourControl->general_account_id && $batch->labor_cost > 0) {
             $overhead_entries[] = [
@@ -518,6 +542,10 @@ class ManufacturingTransaction
             ? $production->finishProduct
             : $production->finishProduct;
 
+        if (!$finish_product || !$finish_product->category || !$finish_product->category->asset_account) {
+            return ['status' => false, 'message' => 'Finished product GL asset account not configured for this return.'];
+        }
+
         // Credit finished goods asset (reduce inventory)
         $fg_entry = [
             'model_id' => $finish_product->category->asset_account,
@@ -566,7 +594,32 @@ class ManufacturingTransaction
             ];
         }
 
-        $general_account_ledger = array_merge([$fg_entry], $raw_material_entries);
+        // Reconcile overhead: total_cost_returned includes overhead (labour/power/other) that was
+        // absorbed into the unit cost, but the raw material debits only cover material costs.
+        // The difference is debited to the WIP account to keep the GL balanced.
+        $total_material_debit = array_sum(array_column($categories, 'amount'));
+        $overhead_remainder   = round($return->total_cost_returned - $total_material_debit, 2);
+        $overhead_entry = [];
+
+        if ($overhead_remainder > 0) {
+            $wip_control = GeneralAccountControl::where('code', 'manufacturing_wip')->first();
+            if ($wip_control && $wip_control->general_account_id) {
+                $overhead_entry[] = [
+                    'model_id'    => $wip_control->general_account_id,
+                    'model_name'  => 'GeneralAccount',
+                    'branch_id'   => $branch->id,
+                    'description' => 'Manufacturing return overhead adjustment - ' . $return->reference,
+                    'reference'   => $return->reference,
+                    'credit'      => 0,
+                    'debit'       => $overhead_remainder,
+                    'date'        => $return->return_date,
+                    'user_id'     => $user->id,
+                    'receipt_no'  => 'MRT_WIP_' . $return->reference
+                ];
+            }
+        }
+
+        $general_account_ledger = array_merge([$fg_entry], $raw_material_entries, $overhead_entry);
 
         if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
             return ['status' => true, 'message' => 'success'];

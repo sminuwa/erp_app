@@ -213,12 +213,23 @@ class ManufacturingReworkController extends Controller
                 );
             }
 
-            // Add cost to finished product
+            // Add cost to finished product (update branch cost price with weighted average)
             if ($rework->production_type === ManufacturingRework::PRODUCTION_TYPE_SINGLE) {
                 $production = $rework->getProduction();
                 if ($production) {
                     ManufacturingCostPrice::addCostToExistingProduct(
                         $production->finish_product_id,
+                        $rework->total_cost,
+                        $rework->branch_id
+                    );
+                }
+            }
+
+            if ($rework->production_type === ManufacturingRework::PRODUCTION_TYPE_BATCH) {
+                $conversion = $rework->getProduction();
+                if ($conversion) {
+                    ManufacturingCostPrice::addCostToExistingProduct(
+                        $conversion->finish_product_id,
                         $rework->total_cost,
                         $rework->branch_id
                     );

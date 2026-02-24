@@ -849,7 +849,7 @@ class ManufacturingReportController extends Controller
 
         $query = DailyManufacturingSchedule::with([
                 'productionOrder', 'team', 'machine', 'branch',
-                'items.productionOrderItem.bom.finishProduct', 'createdBy'
+                'items.productionOrderItem.bom.finishProduct', 'requisitions', 'createdBy'
             ])
             ->whereBetween('schedule_date', [$dateFrom, $dateTo]);
 
@@ -896,7 +896,7 @@ class ManufacturingReportController extends Controller
 
         $query = DailyManufacturingSchedule::with([
                 'productionOrder', 'team', 'machine', 'branch',
-                'items.productionOrderItem.bom.finishProduct', 'createdBy'
+                'items.productionOrderItem.bom.finishProduct', 'requisitions', 'createdBy'
             ])
             ->whereBetween('schedule_date', [$dateFrom, $dateTo]);
 
@@ -989,7 +989,7 @@ class ManufacturingReportController extends Controller
                 return $r->items->sum('issued_qty');
             }),
             'total_cost' => $requisitions->sum(function($r) {
-                return $r->items->sum('total_cost');
+                return $r->items->sum(fn($i) => $i->required_qty * ($i->unit_cost ?? 0));
             }),
         ];
 
@@ -1032,10 +1032,127 @@ class ManufacturingReportController extends Controller
                 return $r->items->sum('required_qty');
             }),
             'total_cost' => $requisitions->sum(function($r) {
-                return $r->items->sum('total_cost');
+                return $r->items->sum(fn($i) => $i->required_qty * ($i->unit_cost ?? 0));
             }),
         ];
 
         return view('pages.manufacturing.reports.requisitions.print', compact('requisitions', 'totals', 'dateFrom', 'dateTo'));
+    }
+
+    // ================================================================
+    // BATCH CONVERSION REPORT
+    // ================================================================
+
+    public function batchConversionReport(Request $request)
+    {
+        $this->authorize('manufacturing.reports.batch_conversion');
+
+        $user = Auth::user();
+
+        return view('pages.manufacturing.reports.batch_conversion.index', [
+            'branches'   => Branch::orderBy('name')->get(),
+            'userBranch' => $user->branch_id
+        ]);
+    }
+
+    public function loadBatchConversionReport(Request $request)
+    {
+        $this->authorize('manufacturing.reports.batch_conversion');
+
+        $request->validate([
+            'date_from' => 'required|date',
+            'date_to'   => 'required|date|after_or_equal:date_from'
+        ]);
+
+        $conversions = $this->fetchBatchConversions($request);
+        $totals = $this->calcBatchConversionTotals($conversions);
+
+        return view('pages.manufacturing.reports.batch_conversion.load', compact('conversions', 'totals'));
+    }
+
+    public function printBatchConversionReport(Request $request)
+    {
+        $this->authorize('manufacturing.reports.batch_conversion');
+
+        $dateFrom    = $request->date_from;
+        $dateTo      = $request->date_to;
+        $conversions = $this->fetchBatchConversions($request);
+        $totals      = $this->calcBatchConversionTotals($conversions);
+
+        return view('pages.manufacturing.reports.batch_conversion.print', compact('conversions', 'totals', 'dateFrom', 'dateTo'));
+    }
+
+    private function fetchBatchConversions(Request $request)
+    {
+        $dateFrom = $request->date_from;
+        $dateTo   = $request->date_to;
+        $branchId = $request->branch_id;
+        $status   = $request->status;
+
+        $conversions = BatchConversion::with([
+                'batchProduction.bom.finishProduct',
+                'batchProduction.bom',
+                'finishProduct',
+                'branch',
+                'createdBy',
+                'postedBy'
+            ])
+            ->whereBetween('conversion_date', [$dateFrom, $dateTo]);
+
+        if ($branchId) {
+            $conversions->where('branch_id', $branchId);
+        }
+        if ($status) {
+            $conversions->where('status', $status);
+        }
+
+        $conversions = $conversions->orderBy('conversion_date', 'desc')->get();
+
+        // Enrich each conversion with tolerance computations
+        foreach ($conversions as $conv) {
+            $batch       = $conv->batchProduction;
+            $bom         = $batch ? $batch->bom : null;
+            $expectedQty = ($batch && $bom) ? $batch->quantity * ($bom->actual_output ?? 1) : 0;
+            $minQty      = $bom ? $expectedQty * (1 - ($bom->accepted_shortage / 100)) : $expectedQty;
+            $maxQty      = $bom ? $expectedQty * (1 + ($bom->accepted_excess / 100))   : $expectedQty;
+
+            $producedQty = (float) $conv->produced_qty;
+            if ($producedQty < $minQty) {
+                $toleranceDiff = $producedQty - $minQty;  // negative → shortage
+                $diffType      = 'shortage';
+            } elseif ($producedQty > $maxQty) {
+                $toleranceDiff = $producedQty - $maxQty;  // positive → excess
+                $diffType      = 'excess';
+            } else {
+                $toleranceDiff = 0;
+                $diffType      = 'within';
+            }
+
+            $conv->expected_qty    = $expectedQty;
+            $conv->min_qty         = $minQty;
+            $conv->max_qty         = $maxQty;
+            $conv->tolerance_diff  = $toleranceDiff;
+            $conv->diff_type       = $diffType;
+            $conv->accepted_shortage = $bom->accepted_shortage ?? 0;
+            $conv->accepted_excess   = $bom->accepted_excess   ?? 0;
+        }
+
+        return $conversions;
+    }
+
+    private function calcBatchConversionTotals($conversions)
+    {
+        return [
+            'total_conversions' => $conversions->count(),
+            'pending'           => $conversions->where('status', 'pending')->count(),
+            'posted'            => $conversions->where('status', 'posted')->count(),
+            'total_produced'    => $conversions->sum('produced_qty'),
+            'total_expected'    => $conversions->sum('expected_qty'),
+            'total_wip_cost'    => $conversions->sum('wip_cost_deducted'),
+            'total_cost'        => $conversions->sum('total_cost'),
+            'shortage_count'    => $conversions->where('diff_type', 'shortage')->count(),
+            'excess_count'      => $conversions->where('diff_type', 'excess')->count(),
+            'within_count'      => $conversions->where('diff_type', 'within')->count(),
+        ];
     }
 }

@@ -83,22 +83,35 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php $orderTargetQty = 0; @endphp
                         @foreach($order->items as $idx => $item)
                         @php
-                            $progress = $item->quantity_to_produce > 0 ? round(($item->produced_qty / $item->quantity_to_produce) * 100, 1) : 0;
+                            // For batch BOMs, quantity_to_produce = number of runs; target units = runs * actual_output
+                            // For single BOMs, quantity_to_produce is already in finish goods units
+                            $isBatch = ($item->bom->bom_type ?? 'single') === 'batch';
+                            $targetQty = $isBatch
+                                ? $item->quantity_to_produce * ($item->bom->actual_output ?? 1)
+                                : $item->quantity_to_produce;
+                            $orderTargetQty += $targetQty;
+                            $progress = $targetQty > 0 ? round(($item->produced_qty / $targetQty) * 100, 1) : 0;
                         @endphp
                         <tr>
                             <td>{{ $idx + 1 }}</td>
                             <td>{{ $item->bom->reference ?? 'N/A' }}</td>
                             <td>{{ $item->bom->finishProduct->code ?? 'N/A' }}</td>
                             <td>{{ $item->bom->finishProduct->name ?? 'N/A' }}</td>
-                            <td class="text-right">{{ number_format($item->quantity_to_produce, 4) }}</td>
+                            <td class="text-right">
+                                {{ number_format($item->quantity_to_produce, 4) }}
+                                @if($isBatch)
+                                    <small class="text-muted d-block">({{ number_format($targetQty, 4) }} units)</small>
+                                @endif
+                            </td>
                             <td class="text-right">{{ number_format($item->scheduled_qty ?? 0, 4) }}</td>
                             <td class="text-right">{{ number_format($item->produced_qty ?? 0, 4) }}</td>
                             <td class="text-right">
                                 <div class="progress" style="height: 20px; min-width: 80px;">
                                     <div class="progress-bar bg-{{ $progress >= 100 ? 'success' : ($progress > 0 ? 'info' : 'secondary') }}"
-                                         style="width: {{ min($progress, 100) }}%">
+                                         style="width: {{ min($progress, 100) }}%; min-width: {{ $progress > 0 ? '2rem' : '0' }}">
                                         {{ $progress }}%
                                     </div>
                                 </div>
@@ -107,13 +120,13 @@
                         @endforeach
                     </tbody>
                     <tfoot class="table-secondary">
+                        @php $orderProgress = $orderTargetQty > 0 ? round(($order->processed_qty / $orderTargetQty) * 100, 1) : 0; @endphp
                         <tr>
                             <td colspan="4"><strong>Order Total</strong></td>
-                            <td class="text-right"><strong>{{ number_format($order->total_finish_goods_qty, 4) }}</strong></td>
+                            <td class="text-right"><strong>{{ number_format($orderTargetQty, 4) }} units</strong></td>
                             <td class="text-right"><strong>{{ number_format($order->items->sum('scheduled_qty'), 4) }}</strong></td>
                             <td class="text-right"><strong>{{ number_format($order->processed_qty, 4) }}</strong></td>
                             <td class="text-right">
-                                @php $orderProgress = $order->total_finish_goods_qty > 0 ? round(($order->processed_qty / $order->total_finish_goods_qty) * 100, 1) : 0; @endphp
                                 <strong>{{ $orderProgress }}%</strong>
                             </td>
                         </tr>

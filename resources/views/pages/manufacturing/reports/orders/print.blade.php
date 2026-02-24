@@ -57,22 +57,35 @@
                 <th class="text-right">Scheduled</th>
                 <th class="text-right">Produced</th>
             </tr>
+            @php $orderTargetQty = 0; @endphp
             @foreach($order->items as $idx => $item)
+            @php
+                $isBatch = ($item->bom->bom_type ?? 'single') === 'batch';
+                $targetQty = $isBatch
+                    ? $item->quantity_to_produce * ($item->bom->actual_output ?? 1)
+                    : $item->quantity_to_produce;
+                $orderTargetQty += $targetQty;
+                $progress = $targetQty > 0 ? round(($item->produced_qty / $targetQty) * 100, 1) : 0;
+            @endphp
             <tr>
                 <td>{{ $idx + 1 }}</td>
                 <td>{{ $item->bom->reference ?? 'N/A' }}</td>
                 <td>{{ $item->bom->finishProduct->code ?? 'N/A' }}</td>
                 <td>{{ $item->bom->finishProduct->name ?? 'N/A' }}</td>
-                <td class="text-right">{{ number_format($item->quantity_to_produce, 4) }}</td>
+                <td class="text-right">
+                    {{ number_format($item->quantity_to_produce, 4) }}
+                    @if($isBatch)<br><small>({{ number_format($targetQty, 4) }} units)</small>@endif
+                </td>
                 <td class="text-right">{{ number_format($item->scheduled_qty ?? 0, 4) }}</td>
-                <td class="text-right">{{ number_format($item->produced_qty ?? 0, 4) }}</td>
+                <td class="text-right">{{ number_format($item->produced_qty ?? 0, 4) }} ({{ $progress }}%)</td>
             </tr>
             @endforeach
+            @php $orderProgress = $orderTargetQty > 0 ? round(($order->processed_qty / $orderTargetQty) * 100, 1) : 0; @endphp
             <tr style="font-weight: bold; background-color: #f5f5f5;">
                 <td colspan="4">Order Total</td>
-                <td class="text-right">{{ number_format($order->total_finish_goods_qty, 4) }}</td>
+                <td class="text-right">{{ number_format($orderTargetQty, 4) }} units</td>
                 <td class="text-right">{{ number_format($order->items->sum('scheduled_qty'), 4) }}</td>
-                <td class="text-right">{{ number_format($order->processed_qty, 4) }}</td>
+                <td class="text-right">{{ number_format($order->processed_qty, 4) }} ({{ $orderProgress }}%)</td>
             </tr>
         </table>
         @endforeach

@@ -252,6 +252,15 @@ class BatchProductionController extends Controller
                 ];
             })->toArray();
 
+            // Validate all materials have a cost price before proceeding.
+            // A zero cost price would silently post $0 to GL while still deducting stock qty.
+            foreach ($materials as $mat) {
+                if ($mat['unit_cost'] <= 0) {
+                    $productName = \App\Models\Product::find($mat['product_id'])?->name ?? "ID {$mat['product_id']}";
+                    throw new \Exception("Product \"{$productName}\" has no cost price configured for this branch. Please set a cost price in Branch Product Prices before posting.");
+                }
+            }
+
             // Recompute and FREEZE aggregate costs at posting time using live prices
             $liveMaterialCost = collect($materials)->sum(fn ($m) => $m['quantity'] * $m['unit_cost']);
             $batch->total_material_cost = $liveMaterialCost;

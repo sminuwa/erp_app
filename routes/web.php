@@ -1485,6 +1485,13 @@ Route::middleware('auth')->group(function () {
                 Route::get('/load', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'loadRequisitionsReport'])->name('manufacturing.reports.requisitions.load');
                 Route::get('/print', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'printRequisitionsReport'])->name('manufacturing.reports.requisitions.print');
             });
+
+            // Batch Conversion Report
+            Route::prefix('batch-conversion')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'batchConversionReport'])->name('manufacturing.reports.batch_conversion.index');
+                Route::get('/load', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'loadBatchConversionReport'])->name('manufacturing.reports.batch_conversion.load');
+                Route::get('/print', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'printBatchConversionReport'])->name('manufacturing.reports.batch_conversion.print');
+            });
         });
 
         // AJAX Routes

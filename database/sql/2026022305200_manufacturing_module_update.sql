@@ -75,6 +75,20 @@ CROSS JOIN (
 ) rp
 WHERE p.name = 'manufacturing.reports.team_ledger';
 
+-- Add batch conversion report permission
+INSERT IGNORE INTO permissions (name, description, guard_name, active, created_at, updated_at)
+VALUES ('manufacturing.reports.batch_conversion', 'View Batch Conversion Report', 'web', 1, NOW(), NOW());
+
+INSERT IGNORE INTO role_has_permissions (permission_id, role_id)
+SELECT p.id, rp.role_id
+FROM permissions p
+CROSS JOIN (
+    SELECT DISTINCT role_id
+    FROM role_has_permissions
+    WHERE permission_id = (SELECT id FROM permissions WHERE name = 'manufacturing.reports.history')
+) rp
+WHERE p.name = 'manufacturing.reports.batch_conversion';
+
 -- Clear permission cache (run after: php artisan cache:forget spatie.permission.cache)
 
 

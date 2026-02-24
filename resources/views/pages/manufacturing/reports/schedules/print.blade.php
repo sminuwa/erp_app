@@ -37,6 +37,7 @@
         </table>
 
         @foreach($schedules as $schedule)
+        @php $scheduleIsRequisitioned = $schedule->requisitions->count() > 0; @endphp
         <table class="print-table">
             <tr class="schedule-header">
                 <td colspan="5">
@@ -44,7 +45,7 @@
                     | Status: {{ ucfirst($schedule->status) }}
                     | Order: {{ $schedule->productionOrder->reference ?? 'N/A' }}
                     | Team: {{ $schedule->team->name ?? 'N/A' }}
-                    | Machine: {{ $schedule->machine->name ?? 'N/A' }}
+                    | Machine: {{ $schedule->machine->description ?? 'N/A' }}
                 </td>
             </tr>
             <tr>
@@ -55,18 +56,23 @@
                 <th class="text-right">Requisitioned Qty</th>
             </tr>
             @foreach($schedule->items as $idx => $item)
+            @php
+                $reqQty = ($item->requisitioned_qty > 0)
+                    ? $item->requisitioned_qty
+                    : ($scheduleIsRequisitioned ? $item->scheduled_qty : 0);
+            @endphp
             <tr>
                 <td>{{ $idx + 1 }}</td>
                 <td>{{ $item->productionOrderItem->bom->finishProduct->code ?? 'N/A' }}</td>
                 <td>{{ $item->productionOrderItem->bom->finishProduct->name ?? 'N/A' }}</td>
                 <td class="text-right">{{ number_format($item->scheduled_qty, 4) }}</td>
-                <td class="text-right">{{ number_format($item->requisitioned_qty ?? 0, 4) }}</td>
+                <td class="text-right">{{ number_format($reqQty, 4) }}</td>
             </tr>
             @endforeach
             <tr style="font-weight: bold; background-color: #f5f5f5;">
                 <td colspan="3">Schedule Total</td>
                 <td class="text-right">{{ number_format($schedule->items->sum('scheduled_qty'), 4) }}</td>
-                <td class="text-right">{{ number_format($schedule->items->sum('requisitioned_qty'), 4) }}</td>
+                <td class="text-right">{{ number_format($scheduleIsRequisitioned ? $schedule->items->sum('scheduled_qty') : $schedule->items->sum('requisitioned_qty'), 4) }}</td>
             </tr>
         </table>
         @endforeach

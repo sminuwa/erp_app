@@ -928,6 +928,15 @@
                                                 </a>
                                             </li>
                                         @endcan
+                                        @can('manufacturing.reports.batch_conversion')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.reports.batch_conversion.index') }}"
+                                                    class="nav-link {{ Request::is('manufacturing/reports/batch-conversion*') ? 'active' : '' }}">
+                                                    <i class="fa fa-exchange-alt"></i>
+                                                    <p>Batch Conversion</p>
+                                                </a>
+                                            </li>
+                                        @endcan
                                     </ul>
                                 </li>
                             @endcan

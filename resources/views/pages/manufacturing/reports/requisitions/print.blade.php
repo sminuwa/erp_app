@@ -71,7 +71,7 @@
                 <td class="text-right">{{ number_format($item->required_qty, 4) }}</td>
                 <td class="text-right">{{ number_format($item->issued_qty ?? 0, 4) }}</td>
                 <td class="text-right">{{ number_format($item->received_qty ?? 0, 4) }}</td>
-                <td class="text-right">{{ number_format($item->total_cost ?? 0, 2) }}</td>
+                <td class="text-right">{{ number_format($item->required_qty * ($item->unit_cost ?? 0), 2) }}</td>
             </tr>
             @endforeach
             <tr style="font-weight: bold; background-color: #f5f5f5;">
@@ -79,7 +79,7 @@
                 <td class="text-right">{{ number_format($requisition->items->sum('required_qty'), 4) }}</td>
                 <td class="text-right">{{ number_format($requisition->items->sum('issued_qty'), 4) }}</td>
                 <td class="text-right">{{ number_format($requisition->items->sum('received_qty'), 4) }}</td>
-                <td class="text-right">{{ number_format($requisition->items->sum('total_cost'), 2) }}</td>
+                <td class="text-right">{{ number_format($requisition->items->sum(fn($i) => $i->required_qty * ($i->unit_cost ?? 0)), 2) }}</td>
             </tr>
         </table>
         @endforeach

@@ -47,6 +47,11 @@
 
         @if($schedules->count() > 0)
         @foreach($schedules as $schedule)
+        @php
+            // For older records, requisitioned_qty may be 0 even if a requisition exists.
+            // Derive the effective value: if a requisition exists, the item is fully requisitioned.
+            $scheduleIsRequisitioned = $schedule->requisitions->count() > 0;
+        @endphp
         <div class="card card-outline card-{{ $schedule->status == 'pending' ? 'warning' : 'success' }} mb-3">
             <div class="card-header">
                 <h5 class="card-title mb-0">
@@ -60,7 +65,7 @@
                     <span class="float-right text-sm">
                         <strong>Order:</strong> {{ $schedule->productionOrder->reference ?? 'N/A' }}
                         | <strong>Team:</strong> {{ $schedule->team->name ?? 'N/A' }}
-                        | <strong>Machine:</strong> {{ $schedule->machine->name ?? 'N/A' }}
+                        | <strong>Machine:</strong> {{ $schedule->machine->description ?? 'N/A' }}
                         | <strong>Branch:</strong> {{ $schedule->branch->name ?? 'N/A' }}
                     </span>
                 </h5>
@@ -79,6 +84,12 @@
                     </thead>
                     <tbody>
                         @foreach($schedule->items as $idx => $item)
+                        @php
+                            // Use stored value if available; fall back to scheduled_qty when requisition exists
+                            $reqQty = ($item->requisitioned_qty > 0)
+                                ? $item->requisitioned_qty
+                                : ($scheduleIsRequisitioned ? $item->scheduled_qty : 0);
+                        @endphp
                         <tr>
                             <td>{{ $idx + 1 }}</td>
                             <td>{{ $item->productionOrderItem->bom->finishProduct->code ?? 'N/A' }}</td>
@@ -91,7 +102,7 @@
                                 @endif
                             </td>
                             <td class="text-right">{{ number_format($item->scheduled_qty, 4) }}</td>
-                            <td class="text-right">{{ number_format($item->requisitioned_qty ?? 0, 4) }}</td>
+                            <td class="text-right">{{ number_format($reqQty, 4) }}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -99,7 +110,7 @@
                         <tr>
                             <td colspan="4"><strong>Schedule Total</strong></td>
                             <td class="text-right"><strong>{{ number_format($schedule->items->sum('scheduled_qty'), 4) }}</strong></td>
-                            <td class="text-right"><strong>{{ number_format($schedule->items->sum('requisitioned_qty'), 4) }}</strong></td>
+                            <td class="text-right"><strong>{{ number_format($scheduleIsRequisitioned ? $schedule->items->sum('scheduled_qty') : $schedule->items->sum('requisitioned_qty'), 4) }}</strong></td>
                         </tr>
                     </tfoot>
                 </table>

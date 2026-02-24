@@ -133,6 +133,10 @@ class MaterialsRequisitionController extends Controller
                             $materials[$key]['total_cost'] += $m['total_cost'];
                         }
                     }
+
+                    // Mark this schedule item as fully requisitioned
+                    $item->requisitioned_qty = $item->scheduled_qty;
+                    $item->save();
                 }
             } elseif ($model->bom_id) {
                 $materialsData = ProductionCalculator::calculateMaterials(

@@ -118,10 +118,10 @@
                                                 <small class="text-muted">Already Converted:</small><br>
                                                 <strong id="info-converted-qty">-</strong>
                                             </div>
-                                            <div class="col-md-3">
+                                            {{-- <div class="col-md-3">
                                                 <small class="text-muted">Remaining Qty:</small><br>
                                                 <strong id="info-remaining-qty" class="text-success">-</strong>
-                                            </div>
+                                            </div> --}}
                                             <div class="col-md-3">
                                                 <small class="text-muted">WIP Cost/Unit:</small><br>
                                                 <strong id="info-wip-cost-per-unit">-</strong>
@@ -139,7 +139,7 @@
                                                 <label>Quantity to Produce <span class="text-danger">*</span></label>
                                                 <input type="number" name="produced_qty" id="produced_qty" class="form-control" step="0.0001" min="0.0001" required>
                                                 <small class="text-muted">
-                                                    Allowed range:
+                                                    Expected range (advisory):
                                                     <span id="min-qty" class="text-warning font-weight-bold">-</span>
                                                     &ndash;
                                                     <span id="max-qty" class="text-success font-weight-bold">-</span>
@@ -245,7 +245,7 @@ $(document).ready(function() {
                     $('#info-total-output').text(formatQty(batchData.total_expected_output));
                     $('#info-converted-qty').text(formatQty(batchData.converted_qty));
                     $('#info-remaining-qty').text(formatQty(batchData.remaining_qty));
-                    $('#info-wip-cost-per-unit').text(formatNumber(batchData.wip_cost_per_unit));
+                    $('#info-wip-cost-per-unit').text('—'); // computed dynamically from produced_qty
 
                     $('#min-qty').text(formatQty(batchData.min_qty));
                     $('#max-qty').text(formatQty(batchData.max_qty));
@@ -254,7 +254,6 @@ $(document).ready(function() {
                     } else {
                         $('#tolerance-info').text('');
                     }
-                    $('#produced_qty').attr('max', batchData.max_qty);
 
                     $('#batch-details-section').show();
                     $('#btn-submit').prop('disabled', false);
@@ -281,12 +280,6 @@ $(document).ready(function() {
             return;
         }
 
-        // Validate against max (BOM tolerance-aware)
-        if (producedQty > parseFloat(batchData.max_qty)) {
-            $('#produced_qty').val(batchData.max_qty);
-            producedQty = parseFloat(batchData.max_qty);
-        }
-
         $.ajax({
             url: '{{ route("manufacturing.batch_conversion.calculate_costs") }}',
             method: 'POST',
@@ -298,6 +291,7 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.status && response.data) {
                     var data = response.data;
+                    $('#info-wip-cost-per-unit').text(formatNumber(data.wip_cost_per_unit));
                     $('#summary-wip-cost-per-unit').text(formatNumber(data.wip_cost_per_unit));
                     $('#summary-produced-qty').text(formatQty(data.produced_qty));
                     $('#summary-wip-deducted').text(formatNumber(data.wip_cost_deducted));
@@ -311,6 +305,7 @@ $(document).ready(function() {
     function resetCostSummary() {
         $('#summary-wip-cost-per-unit, #summary-wip-deducted, #summary-total-cost, #summary-unit-cost').text('0.00');
         $('#summary-produced-qty').text('0');
+        $('#info-wip-cost-per-unit').text('—');
     }
 
     // Load batch details when batch is selected

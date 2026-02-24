@@ -19,7 +19,7 @@ ADD COLUMN other_cost decimal(18,2) DEFAULT '0.00' AFTER power_cost;
 
 -- Add GL account control entries for overhead costs
 INSERT INTO general_account_controls (code, general_account_id, created_at, updated_at) VALUES
-('manufacturing_wip', 1240, NOW(), NOW()),
+('manufacturing_wip', 1239, NOW(), NOW()), --1239 demosite id
 ('manufacturing_labour', 860, NOW(), NOW()),
 ('manufacturing_power', 805, NOW(), NOW()),
 ('manufacturing_other', 600, NOW(), NOW())

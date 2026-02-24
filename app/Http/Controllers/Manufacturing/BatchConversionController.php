@@ -68,18 +68,6 @@ class BatchConversionController extends Controller
             $batch = BatchProduction::with('bom')->find($request->batch_production_id);
             $bom = $batch->bom;
 
-            // Validate produced_qty against BOM tolerance range
-            $totalExpected = $batch->quantity * $bom->actual_output;
-            $maxTotal = $totalExpected * (1 + ($bom->accepted_excess / 100));
-            $maxAllowed = $maxTotal - $batch->converted_qty;
-
-            if ($request->produced_qty > $maxAllowed) {
-                throw new \Exception(
-                    "Produced quantity ({$request->produced_qty}) exceeds maximum allowed (" . number_format($maxAllowed, 4) . "). " .
-                    "BOM allows up to {$bom->accepted_excess}% excess over expected output."
-                );
-            }
-
             $model = new BatchConversion;
             $model->reference = $request->reference;
             $model->conversion_date = $request->conversion_date;
@@ -91,14 +79,13 @@ class BatchConversionController extends Controller
             $model->status = BatchConversion::STATUS_PENDING;
             $model->created_by = Auth::id();
 
-            // Calculate WIP cost to deduct (proportional to qty being converted)
-            $totalExpectedOutput = $batch->quantity * $bom->actual_output;
-            $wipCostPerUnit = $totalExpectedOutput > 0 ? $batch->wip_value / $totalExpectedOutput : 0;
-            $wipCostDeducted = $request->produced_qty * $wipCostPerUnit;
+            // Full WIP cost attributed to actual produced qty (one conversion per batch)
+            $wipCostDeducted = $batch->wip_value;
+            $wipCostPerUnit  = $request->produced_qty > 0 ? $wipCostDeducted / $request->produced_qty : 0;
 
             $model->wip_cost_deducted = $wipCostDeducted;
-            $model->total_cost = $wipCostDeducted;
-            $model->unit_cost = $request->produced_qty > 0 ? $wipCostDeducted / $request->produced_qty : 0;
+            $model->total_cost        = $wipCostDeducted;
+            $model->unit_cost         = $wipCostPerUnit;
 
             $model->save();
 
@@ -263,7 +250,6 @@ class BatchConversionController extends Controller
         $bom = $batch->bom;
 
         $totalExpectedOutput = $batch->quantity * $bom->actual_output;
-        $wipCostPerUnit = $totalExpectedOutput > 0 ? $batch->wip_value / $totalExpectedOutput : 0;
         $maxQty = ($totalExpectedOutput * (1 + ($bom->accepted_excess / 100))) - $batch->converted_qty;
         $minQty = max(0.0001, ($totalExpectedOutput * (1 - ($bom->accepted_shortage / 100))) - $batch->converted_qty);
 
@@ -280,7 +266,6 @@ class BatchConversionController extends Controller
                 'converted_qty' => $batch->converted_qty,
                 'remaining_qty' => $batch->remaining_qty,
                 'wip_value' => $batch->wip_value,
-                'wip_cost_per_unit' => $wipCostPerUnit,
                 'accepted_excess' => $bom->accepted_excess,
                 'accepted_shortage' => $bom->accepted_shortage,
                 'min_qty' => $minQty,
@@ -302,22 +287,24 @@ class BatchConversionController extends Controller
         $batch = BatchProduction::with('bom')->find($request->batch_production_id);
         $bom = $batch->bom;
 
+        // Full WIP attributed to actual produced qty (one conversion per batch)
+        $wipCostDeducted = $batch->wip_value;
+        $wipCostPerUnit  = $request->produced_qty > 0 ? $wipCostDeducted / $request->produced_qty : 0;
+
         $totalExpectedOutput = $batch->quantity * $bom->actual_output;
-        $wipCostPerUnit = $totalExpectedOutput > 0 ? $batch->wip_value / $totalExpectedOutput : 0;
-        $wipCostDeducted = $request->produced_qty * $wipCostPerUnit;
         $maxQty = ($totalExpectedOutput * (1 + ($bom->accepted_excess / 100))) - $batch->converted_qty;
         $minQty = max(0.0001, ($totalExpectedOutput * (1 - ($bom->accepted_shortage / 100))) - $batch->converted_qty);
 
         return response()->json([
             'status' => true,
             'data' => [
-                'produced_qty' => $request->produced_qty,
+                'produced_qty'      => $request->produced_qty,
                 'wip_cost_per_unit' => $wipCostPerUnit,
                 'wip_cost_deducted' => $wipCostDeducted,
-                'total_cost' => $wipCostDeducted,
-                'unit_cost' => $wipCostPerUnit,
-                'min_qty' => $minQty,
-                'max_qty' => $maxQty
+                'total_cost'        => $wipCostDeducted,
+                'unit_cost'         => $wipCostPerUnit,
+                'min_qty'           => $minQty,
+                'max_qty'           => $maxQty
             ]
         ]);
     }

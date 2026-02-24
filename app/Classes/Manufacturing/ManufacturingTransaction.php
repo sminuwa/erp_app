@@ -171,9 +171,13 @@ class ManufacturingTransaction
         $total_material_cost = 0;
 
         // Group materials by category for raw material debit
+        // Costs are fetched live from branch_product_prices (not stored on materials)
         foreach ($batch->materials as $material) {
             $category = $material->product->category;
             $category_id = $category->id;
+
+            $unitCost  = ProductionCalculator::getCurrentCostPrice($material->product_id, $batch->branch_id);
+            $totalCost = $material->quantity * $unitCost;
 
             if (!isset($categories[$category_id])) {
                 $categories[$category_id] = [
@@ -182,8 +186,8 @@ class ManufacturingTransaction
                     'amount' => 0,
                 ];
             }
-            $categories[$category_id]['amount'] += $material->total_cost;
-            $total_material_cost += $material->total_cost;
+            $categories[$category_id]['amount'] += $totalCost;
+            $total_material_cost += $totalCost;
         }
 
         // Create credit entries for raw material asset accounts (materials consumed)

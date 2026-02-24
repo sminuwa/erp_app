@@ -135,8 +135,8 @@
                                 <th>Product</th>
                                 <th>Store</th>
                                 <th>Quantity</th>
-                                <th>Unit Cost</th>
-                                <th>Total Cost</th>
+                                <th>Unit Cost (current)</th>
+                                <th>Total Cost (current)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -146,8 +146,8 @@
                                 <td>{{ $material->product->name ?? 'N/A' }}</td>
                                 <td>{{ $material->store->name ?? 'N/A' }}</td>
                                 <td>{{ number_format($material->quantity, 4) }}</td>
-                                <td>{{ number_format($material->unit_cost, 2) }}</td>
-                                <td>{{ number_format($material->total_cost, 2) }}</td>
+                                <td>{{ number_format($material->current_unit_cost, 2) }}</td>
+                                <td>{{ number_format($material->current_total_cost, 2) }}</td>
                             </tr>
                             @empty
                             <tr>

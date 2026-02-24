@@ -83,10 +83,10 @@
                 <td>{{ $material->product->code ?? '' }}</td>
                 <td>{{ $material->product->name ?? '-' }}</td>
                 <td class="text-right">{{ number_format($material->quantity, 4) }}</td>
-                <td class="text-right">{{ number_format($material->unit_cost, 2) }}</td>
-                <td class="text-right">{{ number_format($material->total_cost, 2) }}</td>
+                <td class="text-right">{{ number_format($material->current_unit_cost, 2) }}</td>
+                <td class="text-right">{{ number_format($material->current_total_cost, 2) }}</td>
             </tr>
-            @php $totalMaterialCost += $material->total_cost; @endphp
+            @php $totalMaterialCost += $material->current_total_cost; @endphp
             @endforeach
         </tbody>
         <tfoot>

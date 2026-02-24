@@ -182,15 +182,13 @@ class BatchProductionController extends Controller
                 $model->branch_id
             );
 
-            // Save materials
+            // Save materials (quantities only — costs fetched live from branch_product_prices)
             foreach ($costData['materials'] as $m) {
                 BatchProductionMaterial::create([
                     'batch_production_id' => $model->id,
                     'product_id' => $m['product_id'],
                     'store_id' => $m['store_id'],
                     'quantity' => $m['quantity'],
-                    'unit_cost' => $m['unit_cost'],
-                    'total_cost' => $m['total_cost']
                 ]);
             }
 
@@ -218,7 +216,13 @@ class BatchProductionController extends Controller
     {
         $this->authorize('manufacturing.batch_production.show');
 
-        $batch->load(['requisition', 'bom.finishProduct', 'team', 'machine', 'materials.product', 'materials.store']);
+        $batch->load(['requisition', 'bom.finishProduct', 'team', 'machine', 'materials.product', 'materials.store', 'createdBy', 'postedBy']);
+
+        foreach ($batch->materials as $material) {
+            $unitCost = ProductionCalculator::getCurrentCostPrice($material->product_id, $batch->branch_id);
+            $material->current_unit_cost  = $unitCost;
+            $material->current_total_cost = $material->quantity * $unitCost;
+        }
 
         return view('pages.manufacturing.processing.batch_production.show', [
             'record' => $batch
@@ -237,16 +241,24 @@ class BatchProductionController extends Controller
         DB::beginTransaction();
 
         try {
-            // Deduct raw materials and credit to WIP account
-            $materials = $batch->materials->map(function($m) {
+            // Build materials array with LIVE prices from branch_product_prices
+            $materials = $batch->materials->map(function ($m) use ($batch) {
+                $unitCost = ProductionCalculator::getCurrentCostPrice($m->product_id, $batch->branch_id);
                 return [
                     'product_id' => $m->product_id,
-                    'store_id' => $m->store_id,
-                    'quantity' => $m->quantity,
-                    'unit_cost' => $m->unit_cost
+                    'store_id'   => $m->store_id,
+                    'quantity'   => $m->quantity,
+                    'unit_cost'  => $unitCost,
                 ];
             })->toArray();
 
+            // Recompute and FREEZE aggregate costs at posting time using live prices
+            $liveMaterialCost = collect($materials)->sum(fn ($m) => $m['quantity'] * $m['unit_cost']);
+            $batch->total_material_cost = $liveMaterialCost;
+            $batch->wip_value = $liveMaterialCost + $batch->labor_cost + $batch->power_cost + $batch->other_cost;
+            $batch->save();
+
+            // Deduct raw materials and credit to WIP account
             $result = ManufacturingCostPrice::deductRawMaterials(
                 $materials,
                 $batch->batch_number,
@@ -312,6 +324,12 @@ class BatchProductionController extends Controller
         $this->authorize('manufacturing.batch_production.print');
 
         $batch->load(['requisition', 'bom.finishProduct', 'team', 'machine', 'materials.product']);
+
+        foreach ($batch->materials as $material) {
+            $unitCost = ProductionCalculator::getCurrentCostPrice($material->product_id, $batch->branch_id);
+            $material->current_unit_cost  = $unitCost;
+            $material->current_total_cost = $material->quantity * $unitCost;
+        }
 
         return view('pages.manufacturing.processing.batch_production.print', [
             'record' => $batch

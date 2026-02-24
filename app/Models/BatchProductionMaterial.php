@@ -13,16 +13,12 @@ class BatchProductionMaterial extends Model
         'product_id',
         'store_id',
         'quantity',
-        'unit_cost',
-        'total_cost'
     ];
 
     public $timestamps = false;
 
     protected $casts = [
         'quantity' => 'decimal:4',
-        'unit_cost' => 'decimal:2',
-        'total_cost' => 'decimal:2',
     ];
 
     public function batchProduction()

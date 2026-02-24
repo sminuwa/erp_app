@@ -826,7 +826,7 @@ class ManufacturingReportController extends Controller
         return view('pages.manufacturing.reports.schedules.index', [
             'branches' => Branch::orderBy('name')->get(),
             'teams' => ManufacturingTeam::orderBy('name')->get(),
-            'machines' => ManufacturingMachine::where('status', 1)->orderBy('name')->get(),
+            'machines' => ManufacturingMachine::where('status', 1)->orderBy('description')->get(),
             'userBranch' => $user->branch_id
         ]);
     }

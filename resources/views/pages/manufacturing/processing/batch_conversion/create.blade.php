@@ -138,7 +138,13 @@
                                             <div class="form-group">
                                                 <label>Quantity to Produce <span class="text-danger">*</span></label>
                                                 <input type="number" name="produced_qty" id="produced_qty" class="form-control" step="0.0001" min="0.0001" required>
-                                                <small class="text-muted">Max available: <span id="max-qty" class="text-success font-weight-bold">-</span></small>
+                                                <small class="text-muted">
+                                                    Allowed range:
+                                                    <span id="min-qty" class="text-warning font-weight-bold">-</span>
+                                                    &ndash;
+                                                    <span id="max-qty" class="text-success font-weight-bold">-</span>
+                                                    <span id="tolerance-info" class="text-muted"></span>
+                                                </small>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -241,8 +247,14 @@ $(document).ready(function() {
                     $('#info-remaining-qty').text(formatQty(batchData.remaining_qty));
                     $('#info-wip-cost-per-unit').text(formatNumber(batchData.wip_cost_per_unit));
 
-                    $('#max-qty').text(formatQty(batchData.remaining_qty));
-                    $('#produced_qty').attr('max', batchData.remaining_qty);
+                    $('#min-qty').text(formatQty(batchData.min_qty));
+                    $('#max-qty').text(formatQty(batchData.max_qty));
+                    if (batchData.accepted_excess > 0 || batchData.accepted_shortage > 0) {
+                        $('#tolerance-info').text('(+' + batchData.accepted_excess + '% / -' + batchData.accepted_shortage + '%)');
+                    } else {
+                        $('#tolerance-info').text('');
+                    }
+                    $('#produced_qty').attr('max', batchData.max_qty);
 
                     $('#batch-details-section').show();
                     $('#btn-submit').prop('disabled', false);
@@ -269,10 +281,10 @@ $(document).ready(function() {
             return;
         }
 
-        // Validate against max
-        if (producedQty > parseFloat(batchData.remaining_qty)) {
-            $('#produced_qty').val(batchData.remaining_qty);
-            producedQty = parseFloat(batchData.remaining_qty);
+        // Validate against max (BOM tolerance-aware)
+        if (producedQty > parseFloat(batchData.max_qty)) {
+            $('#produced_qty').val(batchData.max_qty);
+            producedQty = parseFloat(batchData.max_qty);
         }
 
         $.ajax({

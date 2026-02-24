@@ -50,7 +50,7 @@
         <div class="card card-outline card-{{ $schedule->status == 'pending' ? 'warning' : 'success' }} mb-3">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <code>{{ $schedule->reference }}</code>
+                    {{ $schedule->reference }}
                     <span class="ml-2">{{ date('d M Y', strtotime($schedule->schedule_date)) }}</span>
                     @if($schedule->status == 'pending')
                         <span class="badge badge-warning ml-2">Pending</span>
@@ -81,7 +81,7 @@
                         @foreach($schedule->items as $idx => $item)
                         <tr>
                             <td>{{ $idx + 1 }}</td>
-                            <td><code>{{ $item->productionOrderItem->bom->finishProduct->code ?? 'N/A' }}</code></td>
+                            <td>{{ $item->productionOrderItem->bom->finishProduct->code ?? 'N/A' }}</td>
                             <td>{{ $item->productionOrderItem->bom->finishProduct->name ?? 'N/A' }}</td>
                             <td>
                                 @if(($item->productionOrderItem->bom->bom_type ?? '') == 'single')

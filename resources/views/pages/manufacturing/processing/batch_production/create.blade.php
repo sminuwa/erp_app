@@ -129,10 +129,10 @@
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label>BOM (Batch Type) <span class="text-danger">*</span></label>
-                                        <select name="bom_id" id="bom_id" class="form-control select2-single" required>
-                                            <option value="">Select BOM</option>
+                                        <select name="bom_id" id="bom_id" class="form-control select2-single" required disabled>
+                                            <option value="">Select a requisition first</option>
                                             @foreach($boms as $bom)
-                                            <option value="{{ $bom->id }}" data-output="{{ $bom->actual_output }}">
+                                            <option value="{{ $bom->id }}" data-output="{{ $bom->actual_output }}" style="display:none">
                                                 {{ $bom->reference }} - {{ $bom->finishProduct->name ?? '' }}
                                             </option>
                                             @endforeach
@@ -190,7 +190,7 @@
                                         <i class="fa fa-spinner fa-spin"></i> Loading materials...
                                     </div>
                                     <div id="materials-empty" class="alert alert-info">
-                                        Select a BOM and enter quantity to see required materials.
+                                        Select a requisition and BOM to see required materials.
                                     </div>
                                     <table class="table table-bordered table-sm" id="materials-table" style="display: none;">
                                         <thead class="thead-light">
@@ -412,6 +412,26 @@ $(document).ready(function() {
 
     // When requisition is selected: filter BOMs, auto-load team/machine, update qty constraints
     $('#requisition_id').on('change', function() {
+        var reqVal = $(this).val();
+
+        // No requisition selected — disable BOM and reset state
+        if (!reqVal) {
+            $('#bom_id option').not(':first').prop('disabled', true).hide();
+            $('#bom_id').val('').prop('disabled', true);
+            $('#bom_id').select2({ width: '100%' });
+            $('#req-qty-display, #manufactured-display, #remaining-display').text('-');
+            $('#quantity').removeAttr('max');
+            $('#materials-table').hide();
+            $('#materials-empty')
+                .show()
+                .html('Select a requisition and BOM to see required materials.');
+            resetCostSummary();
+            return;
+        }
+
+        // Enable BOM select before filtering
+        $('#bom_id').prop('disabled', false);
+
         var selected = $(this).find(':selected');
         var bomId = selected.data('bom-id');
         var bomIds = selected.data('bom-ids') || [];
@@ -419,7 +439,6 @@ $(document).ready(function() {
         var machineId = selected.data('machine-id');
 
         // Filter BOM dropdown to only show BOMs from this requisition
-        // Use disabled + hidden approach that works with Select2
         if (bomIds.length > 0) {
             $('#bom_id option').each(function() {
                 var val = $(this).val();
@@ -428,8 +447,8 @@ $(document).ready(function() {
                 $(this).prop('disabled', !show).toggle(show);
             });
         } else {
-            // No specific BOMs, show all
-            $('#bom_id option').prop('disabled', false).show();
+            // Edge case: requisition has no encoded BOM IDs — show all
+            $('#bom_id option').not(':first').prop('disabled', false).show();
         }
         // Refresh Select2 to reflect filtered options
         $('#bom_id').select2({ width: '100%' });

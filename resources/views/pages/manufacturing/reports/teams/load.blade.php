@@ -64,13 +64,13 @@
                             @foreach($teamProductions as $index => $production)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
-                                <td><code>{{ $production['product_code'] }}</code></td>
+                                <td>{{ $production['product_code'] }}</td>
                                 <td>{{ $production['product_name'] }}</td>
                                 <td class="text-right">{{ number_format($production['quantity'], 4) }}</td>
                                 <td class="text-right">{{ number_format($production['unit_cost'], 2) }}</td>
                                 <td class="text-right">{{ number_format($production['total_cost'], 2) }}</td>
-                                <td><code>{{ $production['reference'] }}</code></td>
-                                <td><code>{{ $production['batch_number'] }}</code></td>
+                                <td>{{ $production['reference'] }}</td>
+                                <td>{{ $production['batch_number'] }}</td>
                                 <td>
                                     @if($production['type'] == 'Single')
                                         <span class="badge badge-info">Single</span>

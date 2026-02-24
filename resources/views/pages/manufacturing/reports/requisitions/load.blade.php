@@ -65,7 +65,7 @@
         <div class="card card-outline card-{{ $statusColor }} mb-3">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <code>{{ $requisition->reference }}</code>
+                    {{ $requisition->reference }}
                     <span class="ml-2">{{ date('d M Y', strtotime($requisition->requisition_date)) }}</span>
                     <span class="badge badge-{{ $statusColor }} ml-2">{{ ucfirst($requisition->status) }}</span>
                     <span class="float-right text-sm">
@@ -99,7 +99,7 @@
                         @foreach($requisition->items as $idx => $item)
                         <tr>
                             <td>{{ $idx + 1 }}</td>
-                            <td><code>{{ $item->product->code ?? 'N/A' }}</code></td>
+                            <td>{{ $item->product->code ?? 'N/A' }}</td>
                             <td>{{ $item->product->name ?? 'N/A' }}</td>
                             <td>{{ $item->sourceStore->name ?? '-' }}</td>
                             <td class="text-right">{{ number_format($item->required_qty, 4) }}</td>

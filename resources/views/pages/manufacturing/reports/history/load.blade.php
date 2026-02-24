@@ -54,13 +54,13 @@
                     @foreach($productions as $index => $record)
                     <tr>
                         <td>{{ $index + 1 }}</td>
-                        <td><code>{{ $record['product_code'] }}</code></td>
+                        <td>{{ $record['product_code'] }}</td>
                         <td>{{ $record['product_name'] }}</td>
                         <td class="text-right">{{ number_format($record['quantity'], 4) }}</td>
                         <td class="text-right">{{ number_format($record['unit_cost'], 2) }}</td>
                         <td class="text-right">{{ number_format($record['total_cost'], 2) }}</td>
-                        <td><code>{{ $record['reference'] }}</code></td>
-                        <td><code>{{ $record['batch_number'] }}</code></td>
+                        <td>{{ $record['reference'] }}</td>
+                        <td>{{ $record['batch_number'] }}</td>
                         <td>
                             @if($record['type'] == 'Single')
                                 <span class="badge badge-info">Single</span>

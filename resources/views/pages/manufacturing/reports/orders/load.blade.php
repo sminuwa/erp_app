@@ -51,7 +51,7 @@
         <div class="card card-outline card-{{ $order->status == 'pending' ? 'warning' : ($order->status == 'approved' ? 'success' : 'secondary') }} mb-3">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <code>{{ $order->reference }}</code>
+                    {{ $order->reference }}
                     <span class="ml-2">{{ date('d M Y', strtotime($order->order_date)) }}</span>
                     @if($order->status == 'pending')
                         <span class="badge badge-warning ml-2">Pending</span>
@@ -89,8 +89,8 @@
                         @endphp
                         <tr>
                             <td>{{ $idx + 1 }}</td>
-                            <td><code>{{ $item->bom->reference ?? 'N/A' }}</code></td>
-                            <td><code>{{ $item->bom->finishProduct->code ?? 'N/A' }}</code></td>
+                            <td>{{ $item->bom->reference ?? 'N/A' }}</td>
+                            <td>{{ $item->bom->finishProduct->code ?? 'N/A' }}</td>
                             <td>{{ $item->bom->finishProduct->name ?? 'N/A' }}</td>
                             <td class="text-right">{{ number_format($item->quantity_to_produce, 4) }}</td>
                             <td class="text-right">{{ number_format($item->scheduled_qty ?? 0, 4) }}</td>

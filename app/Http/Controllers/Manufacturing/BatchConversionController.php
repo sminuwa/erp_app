@@ -68,10 +68,16 @@ class BatchConversionController extends Controller
             $batch = BatchProduction::with('bom')->find($request->batch_production_id);
             $bom = $batch->bom;
 
-            // Validate produced_qty doesn't exceed remaining
-            $remainingQty = $batch->remaining_qty;
-            if ($request->produced_qty > $remainingQty) {
-                throw new \Exception("Produced quantity ({$request->produced_qty}) exceeds remaining quantity ({$remainingQty})");
+            // Validate produced_qty against BOM tolerance range
+            $totalExpected = $batch->quantity * $bom->actual_output;
+            $maxTotal = $totalExpected * (1 + ($bom->accepted_excess / 100));
+            $maxAllowed = $maxTotal - $batch->converted_qty;
+
+            if ($request->produced_qty > $maxAllowed) {
+                throw new \Exception(
+                    "Produced quantity ({$request->produced_qty}) exceeds maximum allowed (" . number_format($maxAllowed, 4) . "). " .
+                    "BOM allows up to {$bom->accepted_excess}% excess over expected output."
+                );
             }
 
             $model = new BatchConversion;
@@ -150,7 +156,10 @@ class BatchConversionController extends Controller
             }
 
             // Post to ledger (debit finish goods, credit WIP)
-            ManufacturingTransaction::batchConversion($conversion->id);
+            $ledgerResult = ManufacturingTransaction::batchConversion($conversion->id);
+            if (!$ledgerResult['status']) {
+                throw new \Exception('Ledger posting failed: ' . $ledgerResult['message']);
+            }
 
             // Update batch production converted quantity
             $batch->addConvertedQty($conversion->produced_qty, $conversion->wip_cost_deducted);
@@ -255,6 +264,8 @@ class BatchConversionController extends Controller
 
         $totalExpectedOutput = $batch->quantity * $bom->actual_output;
         $wipCostPerUnit = $totalExpectedOutput > 0 ? $batch->wip_value / $totalExpectedOutput : 0;
+        $maxQty = ($totalExpectedOutput * (1 + ($bom->accepted_excess / 100))) - $batch->converted_qty;
+        $minQty = max(0.0001, ($totalExpectedOutput * (1 - ($bom->accepted_shortage / 100))) - $batch->converted_qty);
 
         return response()->json([
             'status' => true,
@@ -269,7 +280,11 @@ class BatchConversionController extends Controller
                 'converted_qty' => $batch->converted_qty,
                 'remaining_qty' => $batch->remaining_qty,
                 'wip_value' => $batch->wip_value,
-                'wip_cost_per_unit' => $wipCostPerUnit
+                'wip_cost_per_unit' => $wipCostPerUnit,
+                'accepted_excess' => $bom->accepted_excess,
+                'accepted_shortage' => $bom->accepted_shortage,
+                'min_qty' => $minQty,
+                'max_qty' => $maxQty
             ]
         ]);
     }
@@ -290,6 +305,8 @@ class BatchConversionController extends Controller
         $totalExpectedOutput = $batch->quantity * $bom->actual_output;
         $wipCostPerUnit = $totalExpectedOutput > 0 ? $batch->wip_value / $totalExpectedOutput : 0;
         $wipCostDeducted = $request->produced_qty * $wipCostPerUnit;
+        $maxQty = ($totalExpectedOutput * (1 + ($bom->accepted_excess / 100))) - $batch->converted_qty;
+        $minQty = max(0.0001, ($totalExpectedOutput * (1 - ($bom->accepted_shortage / 100))) - $batch->converted_qty);
 
         return response()->json([
             'status' => true,
@@ -298,7 +315,9 @@ class BatchConversionController extends Controller
                 'wip_cost_per_unit' => $wipCostPerUnit,
                 'wip_cost_deducted' => $wipCostDeducted,
                 'total_cost' => $wipCostDeducted,
-                'unit_cost' => $wipCostPerUnit
+                'unit_cost' => $wipCostPerUnit,
+                'min_qty' => $minQty,
+                'max_qty' => $maxQty
             ]
         ]);
     }

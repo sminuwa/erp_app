@@ -86,12 +86,29 @@ class BatchProductionController extends Controller
             return $remaining > 0;
         });
 
+        // Collect only BOM IDs referenced by the available requisitions
+        $allBomIds = collect();
+        foreach ($requisitions as $req) {
+            if ($req->bom_id) {
+                $allBomIds->push($req->bom_id);
+            }
+            if ($req->schedule) {
+                foreach ($req->schedule->items as $item) {
+                    $bom = $item->productionOrderItem->bom ?? null;
+                    if ($bom && $bom->bom_type === 'batch') {
+                        $allBomIds->push($bom->id);
+                    }
+                }
+            }
+        }
+        $allBomIds = $allBomIds->unique()->values();
+
         return view('pages.manufacturing.processing.batch_production.create', [
             'model' => $model,
             'requisitions' => $requisitions,
             'manufacturedQtyByRequisition' => $manufacturedQtyByRequisition,
             'manufacturedQtyByReqAndBom' => $manufacturedQtyByReqAndBom,
-            'boms' => \App\Models\ManufacturingBom::where('bom_type', 'batch')->active()->forBranch($user->branch_id)->with('finishProduct')->get(),
+            'boms' => \App\Models\ManufacturingBom::whereIn('id', $allBomIds)->with('finishProduct')->get(),
             'teams' => ManufacturingTeam::active()->forBranch($user->branch_id)->get(),
             'machines' => ManufacturingMachine::active()->forBranch($user->branch_id)->get(),
         ]);

@@ -107,11 +107,6 @@
                                     <label>BOM <span class="text-danger">*</span></label>
                                     <select name="bom_id" id="bom_id" class="form-control select2-single" required disabled>
                                         <option value="">Select a requisition first</option>
-                                        @foreach($boms as $bom)
-                                        <option value="{{ $bom->id }}" style="display:none">
-                                            {{ $bom->reference }} - {{ $bom->finishProduct->name ?? '' }}
-                                        </option>
-                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -250,6 +245,18 @@ $(document).ready(function() {
 
     var calculateTimeout = null;
 
+    // BOM data keyed by ID — used to dynamically rebuild the BOM dropdown per requisition
+    var bomData = @php
+        $bomMap = [];
+        foreach ($boms as $b) {
+            $bomMap[$b->id] = [
+                'reference' => $b->reference,
+                'name' => $b->finishProduct->name ?? '',
+            ];
+        }
+        echo json_encode($bomMap);
+    @endphp;
+
     function formatNumber(num) {
         return parseFloat(num || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
@@ -387,7 +394,7 @@ $(document).ready(function() {
 
         // No requisition selected — disable BOM and reset state
         if (!reqVal) {
-            $('#bom_id option').not(':first').prop('disabled', true).hide();
+            $('#bom_id').empty().append('<option value="">Select a requisition first</option>');
             $('#bom_id').val('').prop('disabled', true);
             $('#bom_id').select2({ width: '100%' });
             $('#req-qty-display, #manufactured-display, #remaining-display').text('-');
@@ -400,28 +407,23 @@ $(document).ready(function() {
             return;
         }
 
-        // Enable BOM select before filtering
-        $('#bom_id').prop('disabled', false);
-
         var selected = $(this).find(':selected');
         var bomId = selected.data('bom-id');
         var bomIds = selected.data('bom-ids') || [];
         var teamId = selected.data('team-id');
         var machineId = selected.data('machine-id');
 
-        // Filter BOM dropdown to only show BOMs from this requisition
+        // Rebuild BOM dropdown with only the BOMs linked to this requisition
+        $('#bom_id').empty().append('<option value="">Select BOM</option>');
         if (bomIds.length > 0) {
-            $('#bom_id option').each(function() {
-                var val = $(this).val();
-                if (!val) return; // keep placeholder
-                var show = bomIds.indexOf(parseInt(val)) !== -1;
-                $(this).prop('disabled', !show).toggle(show);
+            bomIds.forEach(function(id) {
+                if (bomData[id]) {
+                    var b = bomData[id];
+                    $('#bom_id').append(new Option(b.reference + ' - ' + b.name, id, false, false));
+                }
             });
-        } else {
-            // Edge case: requisition has no encoded BOM IDs — show all
-            $('#bom_id option').not(':first').prop('disabled', false).show();
         }
-        // Refresh Select2 to reflect filtered options
+        $('#bom_id').prop('disabled', false);
         $('#bom_id').select2({ width: '100%' });
 
         // Auto-select BOM from requisition (or reset if not in filtered list)

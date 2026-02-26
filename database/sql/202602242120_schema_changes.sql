@@ -1,31 +1,26 @@
--- manufacturing_batch_materials_cost_removal.sql
--- ============================================================
--- Remove unit_cost and total_cost from batch_production_materials
---
--- Purpose: BOM materials should store quantities only.
--- Costs are now fetched LIVE from branch_product_prices at:
---   - Display time (show/print views)
---   - Posting time (GL entries and stock card deductions)
--- Aggregate costs (total_material_cost, wip_value) on batch_productions
--- are recomputed and FROZEN at batch posting time.
--- ============================================================
+-- 1. DROP COLUMNS SAFELY
+-- This block checks if the column exists before dropping to prevent errors on re-run
+DROP PROCEDURE IF EXISTS DropCostsIfExist;
+DELIMITER //
+CREATE PROCEDURE DropCostsIfExist()
+BEGIN
+    IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'batch_production_materials' AND COLUMN_NAME = 'unit_cost' AND TABLE_SCHEMA = DATABASE()) THEN
+        ALTER TABLE batch_production_materials DROP COLUMN unit_cost;
+    END IF;
+    IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'batch_production_materials' AND COLUMN_NAME = 'total_cost' AND TABLE_SCHEMA = DATABASE()) THEN
+        ALTER TABLE batch_production_materials DROP COLUMN total_cost;
+    END IF;
+END //
+DELIMITER ;
+CALL DropCostsIfExist();
+DROP PROCEDURE DropCostsIfExist;
 
-ALTER TABLE batch_production_materials
-    DROP COLUMN unit_cost,
-    DROP COLUMN total_cost;
-
--- ============================================================
--- Rollback (if needed):
--- ALTER TABLE batch_production_materials
---     ADD COLUMN unit_cost decimal(18,2) NOT NULL DEFAULT '0.00' AFTER quantity,
---     ADD COLUMN total_cost decimal(18,2) NOT NULL DEFAULT '0.00' AFTER unit_cost;
--- ============================================================
-
-
--- Add batch conversion report permission
+-- 2. PERMISSIONS (Safe via IGNORE)
 INSERT IGNORE INTO permissions (name, description, guard_name, active, created_at, updated_at)
 VALUES ('manufacturing.reports.batch_conversion', 'View Batch Conversion Report', 'web', 1, NOW(), NOW());
 
+-- 3. ROLE MAPPING (Safe via INSERT IGNORE and subquery check)
+-- Added a NOT EXISTS check to be extra sure we don't duplicate relationships
 INSERT IGNORE INTO role_has_permissions (permission_id, role_id)
 SELECT p.id, rp.role_id
 FROM permissions p
@@ -34,14 +29,15 @@ CROSS JOIN (
     FROM role_has_permissions
     WHERE permission_id = (SELECT id FROM permissions WHERE name = 'manufacturing.reports.history')
 ) rp
-WHERE p.name = 'manufacturing.reports.batch_conversion';
+WHERE p.name = 'manufacturing.reports.batch_conversion'
+AND NOT EXISTS (
+    SELECT 1 FROM role_has_permissions rhp 
+    WHERE rhp.permission_id = p.id AND rhp.role_id = rp.role_id
+);
 
--- Clear permission cache (run after: php artisan cache:forget spatie.permission.cache)
-
-
--- Add GL account control entries for overhead costs
-INSERT INTO general_account_controls (code, general_account_id, created_at, updated_at) VALUES
-('manufacturing_wip', 1239, NOW(), NOW()), --1239 demosite id
+-- 4. GL CONTROLS (Safe via ON DUPLICATE KEY)
+INSERT INTO general_account_controls (code, general_account_id, created_at, updated_at) 
+VALUES ('manufacturing_wip', 1239, NOW(), NOW())
 ON DUPLICATE KEY UPDATE 
     general_account_id = VALUES(general_account_id),
     updated_at = NOW();

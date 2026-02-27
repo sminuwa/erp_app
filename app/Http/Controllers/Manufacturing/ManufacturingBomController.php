@@ -20,6 +20,7 @@ use App\Http\Requests\Manufacturing\Boms\Show as BomShowRequest;
 use App\Http\Requests\Manufacturing\Boms\Edit as BomEditRequest;
 use App\Http\Requests\Manufacturing\Boms\Update as BomUpdateRequest;
 use App\Http\Requests\Manufacturing\Boms\Destroy as BomDestroyRequest;
+use App\Classes\Manufacturing\ProductionCalculator;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -36,10 +37,23 @@ class ManufacturingBomController extends Controller
     public function index(BomIndexRequest $request)
     {
         $user = Auth::user();
-        $records = ManufacturingBom::with(['finishProduct', 'outputStore', 'branch'])
+        $records = ManufacturingBom::with(['finishProduct', 'outputStore', 'branch', 'materials'])
             ->forBranch($user->branch_id)
             ->orderBy('reference', 'desc')
             ->paginate(50);
+
+        // Dynamically recalculate cost_per_unit from current BranchProductPrice
+        foreach ($records as $record) {
+            $totalMaterialCost = 0;
+            foreach ($record->materials as $material) {
+                $currentCost = ProductionCalculator::getCurrentCostPrice($material->product_id, $record->branch_id);
+                $totalMaterialCost += $material->quantity * $currentCost;
+            }
+            $record->total_material_cost = $totalMaterialCost;
+            $totalOtherCost = $record->labor_cost + $record->power_cost + $record->other_cost;
+            $totalCost = $totalMaterialCost + $totalOtherCost;
+            $record->total_cost_per_unit = $record->actual_output > 0 ? $totalCost / $record->actual_output : 0;
+        }
 
         return view('pages.manufacturing.setup.boms.index', [
             'records' => $records
@@ -152,6 +166,21 @@ class ManufacturingBomController extends Controller
     public function show(BomShowRequest $request, ManufacturingBom $bom)
     {
         $bom->load(['finishProduct', 'outputStore', 'mainRawMaterial', 'branch', 'category', 'materials.product', 'materials.sourceStore']);
+
+        // Dynamically recalculate material costs from current BranchProductPrice
+        $totalMaterialCost = 0;
+        foreach ($bom->materials as $material) {
+            $currentCost = ProductionCalculator::getCurrentCostPrice($material->product_id, $bom->branch_id);
+            $material->unit_cost = $currentCost;
+            $material->total_cost = $material->quantity * $currentCost;
+            $totalMaterialCost += $material->total_cost;
+        }
+
+        // Update summary values in-memory (not saved to DB)
+        $bom->total_material_cost = $totalMaterialCost;
+        $bom->total_other_cost = $bom->labor_cost + $bom->power_cost + $bom->other_cost;
+        $totalCost = $bom->total_material_cost + $bom->total_other_cost;
+        $bom->total_cost_per_unit = $bom->actual_output > 0 ? $totalCost / $bom->actual_output : 0;
 
         return view('pages.manufacturing.setup.boms.show', [
             'record' => $bom
@@ -335,6 +364,19 @@ class ManufacturingBomController extends Controller
         $this->authorize('manufacturing.boms.print');
 
         $bom->load(['finishProduct', 'outputStore', 'mainRawMaterial', 'branch', 'category', 'materials.product', 'materials.sourceStore']);
+
+        // Dynamically recalculate material costs from current BranchProductPrice
+        $totalMaterialCost = 0;
+        foreach ($bom->materials as $material) {
+            $currentCost = ProductionCalculator::getCurrentCostPrice($material->product_id, $bom->branch_id);
+            $material->unit_cost = $currentCost;
+            $material->total_cost = $material->quantity * $currentCost;
+            $totalMaterialCost += $material->total_cost;
+        }
+        $bom->total_material_cost = $totalMaterialCost;
+        $bom->total_other_cost = $bom->labor_cost + $bom->power_cost + $bom->other_cost;
+        $totalCost = $bom->total_material_cost + $bom->total_other_cost;
+        $bom->total_cost_per_unit = $bom->actual_output > 0 ? $totalCost / $bom->actual_output : 0;
 
         return view('pages.manufacturing.setup.boms.print', [
             'record' => $bom

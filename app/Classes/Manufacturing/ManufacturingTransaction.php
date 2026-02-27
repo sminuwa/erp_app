@@ -315,7 +315,7 @@ class ManufacturingTransaction
         $user = auth()->user();
         $branch = $user->branch;
 
-        $conversion = BatchConversion::with(['finishProduct.category', 'batchProduction'])
+        $conversion = BatchConversion::with(['finishProduct.category', 'batchProduction', 'materialProduct.category'])
             ->find($conversion_id);
 
         if (!$conversion) {
@@ -342,8 +342,34 @@ class ManufacturingTransaction
             'receipt_no' => 'BCN_WIP_' . $conversion->reference
         ];
 
+        // Credit raw material asset account (packaging material)
+        $material_entry = [];
+        if ($conversion->material_product_id && $conversion->material_cost > 0) {
+            $materialCategory = $conversion->materialProduct->category ?? null;
+            if ($materialCategory && $materialCategory->asset_account) {
+                $material_entry[] = [
+                    'model_id' => $materialCategory->asset_account,
+                    'model_name' => 'GeneralAccount',
+                    'branch_id' => $branch->id,
+                    'description' => 'Packaging material deducted - ' . $conversion->reference,
+                    'reference' => $conversion->reference,
+                    'credit' => $conversion->material_cost,
+                    'debit' => 0,
+                    'date' => $conversion->conversion_date,
+                    'user_id' => $user->id,
+                    'receipt_no' => 'BCN_RM_' . $conversion->reference
+                ];
+            } else {
+                return ['status' => false, 'message' => 'Packaging material product category asset account not configured.'];
+            }
+        }
+
         // Debit finished goods asset account
         $finish_product_category = $conversion->finishProduct->category;
+        if (!$finish_product_category || !$finish_product_category->asset_account) {
+            return ['status' => false, 'message' => 'Finish product category asset account not configured.'];
+        }
+
         $finish_goods_entry = [
             'model_id' => $finish_product_category->asset_account,
             'model_name' => 'GeneralAccount',
@@ -357,7 +383,7 @@ class ManufacturingTransaction
             'receipt_no' => 'BCN_FG_' . $conversion->reference
         ];
 
-        $general_account_ledger = [$wip_entry, $finish_goods_entry];
+        $general_account_ledger = array_merge([$wip_entry], $material_entry, [$finish_goods_entry]);
 
         if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
             return ['status' => true, 'message' => 'success'];

@@ -84,7 +84,31 @@
                             <p>{{ number_format($record->unit_cost, 2) }}</p>
                         </div>
                     </div>
+                    @if($record->material_product_id)
                     <div class="row">
+                        <div class="col-md-3">
+                            <strong>Packaging Material:</strong>
+                            <p>{{ $record->materialProduct->name ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Material Qty:</strong>
+                            <p>{{ number_format($record->material_qty, 4) }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Material Unit Cost:</strong>
+                            <p>{{ number_format($record->material_unit_cost, 2) }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Material Cost:</strong>
+                            <p>{{ number_format($record->material_cost, 2) }}</p>
+                        </div>
+                    </div>
+                    @endif
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>WIP Cost Deducted:</strong>
+                            <p>{{ number_format($record->wip_cost_deducted, 2) }}</p>
+                        </div>
                         <div class="col-md-3">
                             <strong>Total Cost:</strong>
                             <p><strong>{{ number_format($record->total_cost, 2) }}</strong></p>

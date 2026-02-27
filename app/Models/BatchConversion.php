@@ -23,6 +23,11 @@ class BatchConversion extends Model
         'labor_cost',
         'power_cost',
         'other_cost',
+        'material_product_id',
+        'material_store_id',
+        'material_qty',
+        'material_unit_cost',
+        'material_cost',
         'total_cost',
         'unit_cost',
         'branch_id',
@@ -42,6 +47,9 @@ class BatchConversion extends Model
         'labor_cost' => 'decimal:2',
         'power_cost' => 'decimal:2',
         'other_cost' => 'decimal:2',
+        'material_qty' => 'decimal:4',
+        'material_unit_cost' => 'decimal:2',
+        'material_cost' => 'decimal:2',
         'total_cost' => 'decimal:2',
         'unit_cost' => 'decimal:2',
     ];
@@ -59,6 +67,16 @@ class BatchConversion extends Model
     public function outputStore()
     {
         return $this->belongsTo(Store::class, 'output_store_id', 'id');
+    }
+
+    public function materialProduct()
+    {
+        return $this->belongsTo(Product::class, 'material_product_id', 'id');
+    }
+
+    public function materialStore()
+    {
+        return $this->belongsTo(Store::class, 'material_store_id', 'id');
     }
 
     public function branch()
@@ -152,7 +170,7 @@ class BatchConversion extends Model
 
     public function calculateTotalCost()
     {
-        return $this->wip_cost_deducted + $this->labor_cost + $this->power_cost + $this->other_cost;
+        return $this->wip_cost_deducted + $this->labor_cost + $this->power_cost + $this->other_cost + $this->material_cost;
     }
 
     public function calculateUnitCost()

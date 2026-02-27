@@ -92,7 +92,7 @@
                     <div class="row">
                         <div class="col-md-3">
                             <strong>Material Cost:</strong>
-                            <p>{{ number_format($record->material_cost, 2) }}</p>
+                            <p>{{ number_format($record->total_material_cost, 2) }}</p>
                         </div>
                         <div class="col-md-3">
                             <strong>Labor Cost:</strong>

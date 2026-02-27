@@ -127,6 +127,12 @@
                                                 <strong id="info-wip-cost-per-unit">-</strong>
                                             </div>
                                         </div>
+                                        <div class="row" id="packaging-info-row" style="display: none;">
+                                            <div class="col-md-6">
+                                                <small class="text-muted">Packaging Material:</small><br>
+                                                <strong id="info-packaging-material">-</strong>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -170,6 +176,10 @@
                                         <div class="row">
                                             <div class="col-6"><label class="text-danger">WIP Deducted:</label></div>
                                             <div class="col-6 text-right text-danger"><strong id="summary-wip-deducted">0.00</strong></div>
+                                        </div>
+                                        <div class="row" id="summary-material-row" style="display: none;">
+                                            <div class="col-6"><label class="text-info">Material Cost:</label></div>
+                                            <div class="col-6 text-right text-info"><strong id="summary-material-cost">0.00</strong></div>
                                         </div>
                                         <hr class="my-2">
                                         <div class="row">
@@ -255,6 +265,14 @@ $(document).ready(function() {
                         $('#tolerance-info').text('');
                     }
 
+                    // Show packaging material info if applicable
+                    if (batchData.main_raw_material_name) {
+                        $('#info-packaging-material').text(batchData.main_raw_material_name);
+                        $('#packaging-info-row').show();
+                    } else {
+                        $('#packaging-info-row').hide();
+                    }
+
                     $('#batch-details-section').show();
                     $('#btn-submit').prop('disabled', false);
 
@@ -295,6 +313,15 @@ $(document).ready(function() {
                     $('#summary-wip-cost-per-unit').text(formatNumber(data.wip_cost_per_unit));
                     $('#summary-produced-qty').text(formatQty(data.produced_qty));
                     $('#summary-wip-deducted').text(formatNumber(data.wip_cost_deducted));
+
+                    // Material cost (packaging)
+                    if (data.material_cost > 0) {
+                        $('#summary-material-cost').text(formatNumber(data.material_cost));
+                        $('#summary-material-row').show();
+                    } else {
+                        $('#summary-material-row').hide();
+                    }
+
                     $('#summary-total-cost').text(formatNumber(data.total_cost));
                     $('#summary-unit-cost').text(formatNumber(data.unit_cost));
                 }
@@ -303,9 +330,10 @@ $(document).ready(function() {
     }
 
     function resetCostSummary() {
-        $('#summary-wip-cost-per-unit, #summary-wip-deducted, #summary-total-cost, #summary-unit-cost').text('0.00');
+        $('#summary-wip-cost-per-unit, #summary-wip-deducted, #summary-total-cost, #summary-unit-cost, #summary-material-cost').text('0.00');
         $('#summary-produced-qty').text('0');
         $('#info-wip-cost-per-unit').text('—');
+        $('#summary-material-row').hide();
     }
 
     // Load batch details when batch is selected

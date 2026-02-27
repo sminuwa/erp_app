@@ -36,8 +36,26 @@ AND NOT EXISTS (
 );
 
 -- 4. GL CONTROLS (Safe via ON DUPLICATE KEY)
-INSERT INTO general_account_controls (code, general_account_id, created_at, updated_at) 
+INSERT INTO general_account_controls (code, general_account_id, created_at, updated_at)
 VALUES ('manufacturing_wip', 1239, NOW(), NOW())
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
     general_account_id = VALUES(general_account_id),
     updated_at = NOW();
+
+-- 5. ADD PACKAGING MATERIAL COLUMNS TO BATCH_CONVERSIONS (Safe via IF NOT EXISTS check)
+DROP PROCEDURE IF EXISTS AddMaterialColumns;
+DELIMITER //
+CREATE PROCEDURE AddMaterialColumns()
+BEGIN
+    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'batch_conversions' AND COLUMN_NAME = 'material_product_id' AND TABLE_SCHEMA = DATABASE()) THEN
+        ALTER TABLE batch_conversions
+            ADD COLUMN material_product_id BIGINT UNSIGNED DEFAULT NULL AFTER output_store_id,
+            ADD COLUMN material_store_id BIGINT UNSIGNED DEFAULT NULL AFTER material_product_id,
+            ADD COLUMN material_qty DECIMAL(18,4) DEFAULT 0.0000 AFTER material_store_id,
+            ADD COLUMN material_unit_cost DECIMAL(18,2) DEFAULT 0.00 AFTER material_qty,
+            ADD COLUMN material_cost DECIMAL(18,2) DEFAULT 0.00 AFTER material_unit_cost;
+    END IF;
+END //
+DELIMITER ;
+CALL AddMaterialColumns();
+DROP PROCEDURE AddMaterialColumns;

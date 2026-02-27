@@ -83,6 +83,13 @@
                                                 if (count($bomIds) === 1) $bomId = $bomIds[0];
                                             }
                                             $bomManufactured = $manufacturedQtyByReqAndBom[$requisition->id] ?? [];
+
+                                            // For schedule-based requisitions, derive qty from per-BOM scheduled quantities
+                                            if (!$requisition->bom_id && count($bomQtys) > 0) {
+                                                $reqQty = array_sum($bomQtys);
+                                                $manufactured = array_sum($bomManufactured);
+                                                $remaining = $reqQty - $manufactured;
+                                            }
                                         @endphp
                                         <option value="{{ $requisition->id }}"
                                             data-bom-id="{{ $bomId }}"

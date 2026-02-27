@@ -79,11 +79,30 @@ class BatchProductionController extends Controller
             ->toArray();
 
         // Filter out exhausted requisitions (remaining qty <= 0)
-        $requisitions = $requisitions->filter(function($req) use ($manufacturedQtyByRequisition) {
-            $reqQty = $req->quantity ?? 0;
-            if ($reqQty <= 0) return true; // No quantity constraint (schedule-based), keep it
-            $remaining = $reqQty - ($manufacturedQtyByRequisition[$req->id] ?? 0);
-            return $remaining > 0;
+        $requisitions = $requisitions->filter(function($req) use ($manufacturedQtyByRequisition, $manufacturedQtyByReqAndBom) {
+            if ($req->bom_id) {
+                // Direct BOM: simple quantity check
+                $reqQty = $req->quantity ?? 0;
+                if ($reqQty <= 0) return true;
+                $remaining = $reqQty - ($manufacturedQtyByRequisition[$req->id] ?? 0);
+                return $remaining > 0;
+            }
+
+            if ($req->schedule) {
+                // Schedule-based: sum per-BOM scheduled quantities and compare to manufactured
+                $totalScheduled = 0;
+                foreach ($req->schedule->items as $item) {
+                    $bom = $item->productionOrderItem->bom ?? null;
+                    if ($bom && $bom->bom_type === 'batch') {
+                        $totalScheduled += $item->scheduled_qty;
+                    }
+                }
+                if ($totalScheduled <= 0) return true;
+                $totalManufactured = array_sum($manufacturedQtyByReqAndBom[$req->id] ?? []);
+                return $totalScheduled > $totalManufactured;
+            }
+
+            return true; // Keep if we can't determine
         });
 
         // Collect only BOM IDs referenced by the available requisitions

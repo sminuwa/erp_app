@@ -260,6 +260,20 @@ class BatchProductionController extends Controller
             $material->current_total_cost = $material->quantity * $unitCost;
         }
 
+        // Compute aggregate costs dynamically from live material prices + BOM overhead
+        $bom = $batch->bom;
+        $liveMaterialCost = $batch->materials->sum('current_total_cost');
+        $laborCost = ($bom->labor_cost ?? 0) * $batch->quantity;
+        $powerCost = ($bom->power_cost ?? 0) * $batch->quantity;
+        $otherCost = ($bom->other_cost ?? 0) * $batch->quantity;
+        $wipValue  = $liveMaterialCost + $laborCost + $powerCost + $otherCost;
+
+        $batch->computed_material_cost = $liveMaterialCost;
+        $batch->computed_labor_cost    = $laborCost;
+        $batch->computed_power_cost    = $powerCost;
+        $batch->computed_other_cost    = $otherCost;
+        $batch->computed_wip_value     = $wipValue;
+
         return view('pages.manufacturing.processing.batch_production.show', [
             'record' => $batch
         ]);

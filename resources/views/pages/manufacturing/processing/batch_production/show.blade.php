@@ -92,25 +92,25 @@
                     <div class="row">
                         <div class="col-md-3">
                             <strong>Material Cost:</strong>
-                            <p>{{ number_format($record->total_material_cost, 2) }}</p>
+                            <p>{{ number_format($record->computed_material_cost, 2) }}</p>
                         </div>
                         <div class="col-md-3">
                             <strong>Labor Cost:</strong>
-                            <p>{{ number_format($record->labor_cost, 2) }}</p>
+                            <p>{{ number_format($record->computed_labor_cost, 2) }}</p>
                         </div>
                         <div class="col-md-3">
                             <strong>Power Cost:</strong>
-                            <p>{{ number_format($record->power_cost, 2) }}</p>
+                            <p>{{ number_format($record->computed_power_cost, 2) }}</p>
                         </div>
                         <div class="col-md-3">
                             <strong>Other Cost:</strong>
-                            <p>{{ number_format($record->other_cost, 2) }}</p>
+                            <p>{{ number_format($record->computed_other_cost, 2) }}</p>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-3">
                             <strong>WIP Value:</strong>
-                            <p><strong>{{ number_format($record->wip_value, 2) }}</strong></p>
+                            <p><strong>{{ number_format($record->computed_wip_value, 2) }}</strong></p>
                         </div>
                         <div class="col-md-3">
                             <strong>Converted Qty:</strong>
@@ -158,7 +158,7 @@
                         <tfoot>
                             <tr>
                                 <td colspan="5" class="text-right"><strong>Total Material Cost:</strong></td>
-                                <td><strong>{{ number_format($record->material_cost, 2) }}</strong></td>
+                                <td><strong>{{ number_format($record->computed_material_cost, 2) }}</strong></td>
                             </tr>
                         </tfoot>
                     </table>

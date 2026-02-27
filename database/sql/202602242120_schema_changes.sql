@@ -59,3 +59,20 @@ END //
 DELIMITER ;
 CALL AddMaterialColumns();
 DROP PROCEDURE AddMaterialColumns;
+
+-- 6. ADD MISSING OVERHEAD COLUMNS TO BATCH_PRODUCTIONS (Safe via IF NOT EXISTS)
+-- Original schema only had total_material_cost and wip_value; labor/power/other were missing
+DROP PROCEDURE IF EXISTS AddBatchOverheadColumns;
+DELIMITER //
+CREATE PROCEDURE AddBatchOverheadColumns()
+BEGIN
+    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'batch_productions' AND COLUMN_NAME = 'labor_cost' AND TABLE_SCHEMA = DATABASE()) THEN
+        ALTER TABLE batch_productions
+            ADD COLUMN labor_cost DECIMAL(18,2) DEFAULT 0.00 AFTER total_material_cost,
+            ADD COLUMN power_cost DECIMAL(18,2) DEFAULT 0.00 AFTER labor_cost,
+            ADD COLUMN other_cost DECIMAL(18,2) DEFAULT 0.00 AFTER power_cost;
+    END IF;
+END //
+DELIMITER ;
+CALL AddBatchOverheadColumns();
+DROP PROCEDURE AddBatchOverheadColumns;

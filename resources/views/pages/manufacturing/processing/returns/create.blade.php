@@ -85,8 +85,8 @@
                                                 @endforeach
                                             </optgroup>
                                         </select>
-                                        <input type="hidden" name="single_manufacturing_id" id="single_manufacturing_id" value="">
-                                        <input type="hidden" name="batch_conversion_id" id="batch_conversion_id" value="">
+                                        <input type="hidden" name="single_manufacturing_id" id="single_manufacturing_id" value="{{ old('single_manufacturing_id') }}">
+                                        <input type="hidden" name="batch_conversion_id" id="batch_conversion_id" value="{{ old('batch_conversion_id') }}">
                                     </div>
                                 </div>
                             </div>
@@ -233,10 +233,10 @@ $(document).ready(function() {
     var productionMaterials = {
         @foreach($singleManufacturing as $sm)
         'single_{{ $sm->id }}': {
-            production_qty: {{ $sm->quantity }},
+            production_qty: {{ $sm->quantity ?? 0 }},
             materials: [
                 @foreach($sm->materials as $mat)
-                { product: '{{ addslashes($mat->product->name ?? "N/A") }}', store: '{{ addslashes($mat->store->name ?? "N/A") }}', quantity: {{ $mat->quantity }}, unit_cost: {{ $mat->unit_cost }} },
+                { product: {!! json_encode($mat->product->name ?? 'N/A') !!}, store: {!! json_encode($mat->store->name ?? 'N/A') !!}, quantity: {{ $mat->quantity ?? 0 }}, unit_cost: {{ $mat->unit_cost ?? 0 }} },
                 @endforeach
             ]
         },
@@ -244,10 +244,10 @@ $(document).ready(function() {
         @foreach($batchConversions as $bc)
         @if($bc->batchProduction)
         'batch_{{ $bc->id }}': {
-            production_qty: {{ $bc->batchProduction->quantity }},
+            production_qty: {{ $bc->batchProduction->quantity ?? 0 }},
             materials: [
                 @foreach($bc->batchProduction->materials as $mat)
-                { product: '{{ addslashes($mat->product->name ?? "N/A") }}', store: '{{ addslashes($mat->store->name ?? "N/A") }}', quantity: {{ $mat->quantity }}, unit_cost: {{ $mat->unit_cost }} },
+                { product: {!! json_encode($mat->product->name ?? 'N/A') !!}, store: {!! json_encode($mat->store->name ?? 'N/A') !!}, quantity: {{ $mat->quantity ?? 0 }}, unit_cost: {{ $mat->unit_cost ?? 0 }} },
                 @endforeach
             ]
         },
@@ -306,6 +306,15 @@ $(document).ready(function() {
             return false;
         }
     });
+
+    // Restore production selection after validation redirect (when old() values exist)
+    var oldSingleId = '{{ old('single_manufacturing_id') }}';
+    var oldBatchId  = '{{ old('batch_conversion_id') }}';
+    if (oldSingleId) {
+        $('#production_select').val('single_' + oldSingleId).trigger('change');
+    } else if (oldBatchId) {
+        $('#production_select').val('batch_' + oldBatchId).trigger('change');
+    }
 });
 </script>
 @endpush

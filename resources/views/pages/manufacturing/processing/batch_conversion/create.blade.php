@@ -142,7 +142,7 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Quantity to Produce <span class="text-danger">*</span></label>
+                                                <label>Quantity Produced <span class="text-danger">*</span></label>
                                                 <input type="number" name="produced_qty" id="produced_qty" class="form-control" step="0.0001" min="0.0001" required>
                                                 <small class="text-muted">
                                                     Expected range (advisory):

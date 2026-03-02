@@ -39,6 +39,27 @@
         </table>
 
         @foreach($orders as $order)
+        @php
+            $pToday      = now()->startOfDay();
+            $pStartDate  = $order->start_date ? \Carbon\Carbon::parse($order->start_date) : null;
+            $pEndDate    = $order->end_date   ? \Carbon\Carbon::parse($order->end_date)->startOfDay()   : null;
+            $pClosedDate = $order->closed_at  ? \Carbon\Carbon::parse($order->closed_at)->startOfDay()  : null;
+            $pPlannedDays = ($pStartDate && $pEndDate) ? (int) $pStartDate->diffInDays($pEndDate) : null;
+
+            if ($order->status === 'closed' && $pClosedDate && $pEndDate) {
+                $pStatus   = $pClosedDate->lte($pEndDate) ? 'on_time' : 'late';
+                $pVariance = (int) $pEndDate->diffInDays($pClosedDate);
+            } elseif ($order->status !== 'closed' && $pEndDate && $pToday->gt($pEndDate)) {
+                $pStatus   = 'overdue';
+                $pVariance = (int) $pEndDate->diffInDays($pToday);
+            } elseif ($order->status !== 'closed') {
+                $pStatus   = 'in_progress';
+                $pVariance = 0;
+            } else {
+                $pStatus   = 'unknown';
+                $pVariance = 0;
+            }
+        @endphp
         <table class="print-table">
             <tr class="order-header">
                 <td colspan="7">
@@ -46,6 +67,22 @@
                     | Status: {{ ucfirst($order->status) }}
                     | Branch: {{ $order->branch->name ?? 'N/A' }}
                     | Period: {{ $order->start_date ? date('d/m/Y', strtotime($order->start_date)) : '-' }} to {{ $order->end_date ? date('d/m/Y', strtotime($order->end_date)) : '-' }}
+                </td>
+            </tr>
+            <tr style="background-color:#f9f9f9; font-size:11px;">
+                <td colspan="7">
+                    <strong>Planned Duration:</strong> {{ $pPlannedDays !== null ? $pPlannedDays . ' day(s)' : 'N/A' }} &nbsp;|&nbsp;
+                    @if($pStatus === 'on_time')
+                        &#10003; Completed On Time — Closed: {{ $pClosedDate->format('d M Y') }}
+                    @elseif($pStatus === 'late')
+                        &#9888; Completed Late (+{{ $pVariance }} day{{ $pVariance != 1 ? 's' : '' }}) — Closed: {{ $pClosedDate->format('d M Y') }}
+                    @elseif($pStatus === 'overdue')
+                        &#9888; Overdue ({{ $pVariance }} day{{ $pVariance != 1 ? 's' : '' }} past due)
+                    @elseif($pStatus === 'in_progress')
+                        In Progress
+                    @else
+                        No Timeline Set
+                    @endif
                 </td>
             </tr>
             <tr>

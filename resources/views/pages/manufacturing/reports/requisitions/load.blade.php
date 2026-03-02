@@ -80,6 +80,52 @@
                     </span>
                 </h5>
             </div>
+            <!-- Workflow Timeline -->
+            <div class="px-3 py-2 border-top border-bottom bg-light">
+                @php
+                    $createdAt  = $requisition->requisition_date ? \Carbon\Carbon::parse($requisition->requisition_date) : null;
+                    $approvedAt = $requisition->approved_at ? \Carbon\Carbon::parse($requisition->approved_at) : null;
+                    $issuedAt   = $requisition->issued_at   ? \Carbon\Carbon::parse($requisition->issued_at)   : null;
+                    $receivedAt = $requisition->received_at ? \Carbon\Carbon::parse($requisition->received_at) : null;
+                    $fmtDiff = function($from, $to) {
+                        if (!$from || !$to) return null;
+                        $hours = (int) $from->diffInHours($to);
+                        if ($hours < 1)  return '< 1hr';
+                        if ($hours < 24) return $hours . 'h';
+                        $days = (int) $from->diffInDays($to);
+                        $rem  = $hours - ($days * 24);
+                        return $days . 'd' . ($rem > 0 ? ' ' . $rem . 'h' : '');
+                    };
+                @endphp
+                <span class="text-muted mr-2">
+                    <i class="fa fa-clock-o"></i> <strong>Created:</strong>
+                    {{ $createdAt ? $createdAt->format('d M Y') : '-' }}
+                </span>
+                @if($approvedAt)
+                <span class="text-info mr-2">
+                    <i class="fa fa-arrow-right"></i> <strong>Approved:</strong>
+                    {{ $approvedAt->format('d M Y H:i') }}
+                    @php $d = $fmtDiff($createdAt, $approvedAt); @endphp
+                    @if($d)<span class="badge badge-light border">{{ $d }} after creation</span>@endif
+                </span>
+                @endif
+                @if($issuedAt)
+                <span class="text-primary mr-2">
+                    <i class="fa fa-arrow-right"></i> <strong>Issued:</strong>
+                    {{ $issuedAt->format('d M Y H:i') }}
+                    @php $d = $fmtDiff($approvedAt ?? $createdAt, $issuedAt); @endphp
+                    @if($d)<span class="badge badge-light border">{{ $d }} after {{ $approvedAt ? 'approval' : 'creation' }}</span>@endif
+                </span>
+                @endif
+                @if($receivedAt)
+                <span class="text-success mr-2">
+                    <i class="fa fa-arrow-right"></i> <strong>Received:</strong>
+                    {{ $receivedAt->format('d M Y H:i') }}
+                    @php $d = $fmtDiff($issuedAt ?? $approvedAt ?? $createdAt, $receivedAt); @endphp
+                    @if($d)<span class="badge badge-light border">{{ $d }} after {{ $issuedAt ? 'issue' : ($approvedAt ? 'approval' : 'creation') }}</span>@endif
+                </span>
+                @endif
+            </div>
             <div class="card-body p-0">
                 <table class="table table-bordered table-striped table-sm mb-0">
                     <thead class="thead-light">

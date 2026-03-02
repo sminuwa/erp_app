@@ -46,6 +46,60 @@
             </div>
         </div>
 
+        @php
+            $today = now()->startOfDay();
+            $onTimeCount  = 0; $lateCount = 0; $overdueCount = 0; $inProgressCount = 0;
+            foreach ($orders as $o) {
+                $oEnd    = $o->end_date   ? \Carbon\Carbon::parse($o->end_date)->startOfDay()   : null;
+                $oClosed = $o->closed_at  ? \Carbon\Carbon::parse($o->closed_at)->startOfDay()  : null;
+                if ($o->status === 'closed' && $oClosed && $oEnd) {
+                    if ($oClosed->lte($oEnd)) $onTimeCount++; else $lateCount++;
+                } elseif ($o->status !== 'closed' && $oEnd && $today->gt($oEnd)) {
+                    $overdueCount++;
+                } else {
+                    $inProgressCount++;
+                }
+            }
+        @endphp
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <div class="info-box bg-success">
+                    <span class="info-box-icon"><i class="fa fa-check-circle"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">On Time</span>
+                        <span class="info-box-number">{{ $onTimeCount }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="info-box bg-danger">
+                    <span class="info-box-icon"><i class="fa fa-exclamation-triangle"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Completed Late</span>
+                        <span class="info-box-number">{{ $lateCount }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="info-box bg-warning">
+                    <span class="info-box-icon"><i class="fa fa-clock"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Overdue (Open)</span>
+                        <span class="info-box-number">{{ $overdueCount }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="info-box bg-info">
+                    <span class="info-box-icon"><i class="fa fa-spinner"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">In Progress</span>
+                        <span class="info-box-number">{{ $inProgressCount }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         @if($orders->count() > 0)
         @foreach($orders as $order)
         <div class="card card-outline card-{{ $order->status == 'pending' ? 'warning' : ($order->status == 'approved' ? 'success' : 'secondary') }} mb-3">
@@ -67,6 +121,47 @@
                         | <strong>Created By:</strong> {{ $order->createdBy->name ?? 'N/A' }}
                     </span>
                 </h5>
+            </div>
+            <!-- Completion Timeline -->
+            @php
+                $oToday      = now()->startOfDay();
+                $oStartDate  = $order->start_date ? \Carbon\Carbon::parse($order->start_date) : null;
+                $oEndDate    = $order->end_date   ? \Carbon\Carbon::parse($order->end_date)->startOfDay()   : null;
+                $oClosedDate = $order->closed_at  ? \Carbon\Carbon::parse($order->closed_at)->startOfDay()  : null;
+                $oPlannedDays = ($oStartDate && $oEndDate) ? (int) $oStartDate->diffInDays($oEndDate) : null;
+
+                if ($order->status === 'closed' && $oClosedDate && $oEndDate) {
+                    $oStatus   = $oClosedDate->lte($oEndDate) ? 'on_time' : 'late';
+                    $oVariance = (int) $oEndDate->diffInDays($oClosedDate);
+                } elseif ($order->status !== 'closed' && $oEndDate && $oToday->gt($oEndDate)) {
+                    $oStatus   = 'overdue';
+                    $oVariance = (int) $oEndDate->diffInDays($oToday);
+                } elseif ($order->status !== 'closed') {
+                    $oStatus   = 'in_progress';
+                    $oVariance = 0;
+                } else {
+                    $oStatus   = 'unknown';
+                    $oVariance = 0;
+                }
+            @endphp
+            <div class="px-3 py-1 border-top bg-light">
+                <small>
+                    <strong>Planned Duration:</strong> {{ $oPlannedDays !== null ? $oPlannedDays . ' days' : 'N/A' }}
+                    &nbsp;|&nbsp;
+                    @if($oStatus === 'on_time')
+                        <span class="badge badge-success"><i class="fa fa-check"></i> Completed On Time</span>
+                        <span class="text-muted ml-1">Closed: {{ $oClosedDate->format('d M Y') }}</span>
+                    @elseif($oStatus === 'late')
+                        <span class="badge badge-danger"><i class="fa fa-exclamation-triangle"></i> Completed Late (+{{ $oVariance }} day{{ $oVariance != 1 ? 's' : '' }})</span>
+                        <span class="text-muted ml-1">Closed: {{ $oClosedDate->format('d M Y') }}</span>
+                    @elseif($oStatus === 'overdue')
+                        <span class="badge badge-danger"><i class="fa fa-clock"></i> Overdue ({{ $oVariance }} day{{ $oVariance != 1 ? 's' : '' }} past due)</span>
+                    @elseif($oStatus === 'in_progress')
+                        <span class="badge badge-info"><i class="fa fa-spinner"></i> In Progress</span>
+                    @else
+                        <span class="badge badge-secondary">No Timeline Set</span>
+                    @endif
+                </small>
             </div>
             <div class="card-body p-0">
                 <table class="table table-bordered table-striped table-sm mb-0">

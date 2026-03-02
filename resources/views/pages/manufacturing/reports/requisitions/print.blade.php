@@ -38,6 +38,21 @@
         </table>
 
         @foreach($requisitions as $requisition)
+        @php
+            $createdAt  = $requisition->requisition_date ? \Carbon\Carbon::parse($requisition->requisition_date) : null;
+            $approvedAt = $requisition->approved_at ? \Carbon\Carbon::parse($requisition->approved_at) : null;
+            $issuedAt   = $requisition->issued_at   ? \Carbon\Carbon::parse($requisition->issued_at)   : null;
+            $receivedAt = $requisition->received_at ? \Carbon\Carbon::parse($requisition->received_at) : null;
+            $fmtDiff = function($from, $to) {
+                if (!$from || !$to) return null;
+                $hours = (int) $from->diffInHours($to);
+                if ($hours < 1)  return '< 1hr';
+                if ($hours < 24) return $hours . 'h';
+                $days = (int) $from->diffInDays($to);
+                $rem  = $hours - ($days * 24);
+                return $days . 'd' . ($rem > 0 ? ' ' . $rem . 'h' : '');
+            };
+        @endphp
         <table class="print-table">
             <tr class="req-header">
                 <td colspan="8">
@@ -49,6 +64,27 @@
                     @elseif($requisition->bom)
                         | BOM: {{ $requisition->bom->reference }}
                         | Product: {{ $requisition->bom->finishProduct->name ?? 'N/A' }}
+                    @endif
+                </td>
+            </tr>
+            <tr style="background-color:#f9f9f9; font-size:11px;">
+                <td colspan="8">
+                    <strong>Timeline:</strong>
+                    Created: {{ $createdAt ? $createdAt->format('d M Y') : '-' }}
+                    @if($approvedAt)
+                        → Approved: {{ $approvedAt->format('d M Y H:i') }}
+                        @php $d = $fmtDiff($createdAt, $approvedAt); @endphp
+                        @if($d)({{ $d }} after creation)@endif
+                    @endif
+                    @if($issuedAt)
+                        → Issued: {{ $issuedAt->format('d M Y H:i') }}
+                        @php $d = $fmtDiff($approvedAt ?? $createdAt, $issuedAt); @endphp
+                        @if($d)({{ $d }} after {{ $approvedAt ? 'approval' : 'creation' }})@endif
+                    @endif
+                    @if($receivedAt)
+                        → Received: {{ $receivedAt->format('d M Y H:i') }}
+                        @php $d = $fmtDiff($issuedAt ?? $approvedAt ?? $createdAt, $receivedAt); @endphp
+                        @if($d)({{ $d }} after {{ $issuedAt ? 'issue' : ($approvedAt ? 'approval' : 'creation') }})@endif
                     @endif
                 </td>
             </tr>

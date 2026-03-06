@@ -57,6 +57,8 @@
                                         <td>
                                             @if($record->status == 'pending')
                                                 <span class="badge badge-warning">Pending</span>
+                                            @elseif($record->status == 'confirmed')
+                                                <span class="badge badge-info">Confirmed</span>
                                             @elseif($record->status == 'approved')
                                                 <span class="badge badge-success">Approved</span>
                                             @elseif($record->status == 'closed')

@@ -49,7 +49,7 @@
             {{-- <td><a href="{{ route('orders.show',$record->id) }}" target="_BLANK">{{ $record->refno }}</a></td> --}}
             <td>{{ $record->product_code }}</td>
             <td>{{ $record->product_name }}</td>
-            <td>
+            <td style="color: {{ $record->cr > 0 ? 'green' : 'red' }}">
                 @if ($record->cr > 0)
                     {{ $quantity = $record->cr }}
                 @else

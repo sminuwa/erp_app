@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 class ProductionOrder extends Model
 {
     const STATUS_PENDING = 'pending';
+    const STATUS_CONFIRMED = 'confirmed';
     const STATUS_APPROVED = 'approved';
     const STATUS_CLOSED = 'closed';
 
@@ -28,6 +29,8 @@ class ProductionOrder extends Model
     protected $guarded = [
         'id',
         'status',
+        'confirmed_by',
+        'confirmed_at',
         'approved_by',
         'approved_at',
         'closed_by',
@@ -37,6 +40,7 @@ class ProductionOrder extends Model
     protected $dates = [
         'start_date',
         'end_date',
+        'confirmed_at',
         'approved_at',
         'closed_at'
     ];
@@ -54,6 +58,11 @@ class ProductionOrder extends Model
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
+    public function confirmedBy()
+    {
+        return $this->belongsTo(User::class, 'confirmed_by', 'id');
     }
 
     public function approvedBy()
@@ -106,6 +115,11 @@ class ProductionOrder extends Model
         return $this->status === self::STATUS_PENDING;
     }
 
+    public function isConfirmed()
+    {
+        return $this->status === self::STATUS_CONFIRMED;
+    }
+
     public function isApproved()
     {
         return $this->status === self::STATUS_APPROVED;
@@ -121,14 +135,31 @@ class ProductionOrder extends Model
         return $this->isPending();
     }
 
-    public function canBeApproved()
+    public function canBeConfirmed()
     {
         return $this->isPending();
+    }
+
+    public function canBeApproved()
+    {
+        return $this->isConfirmed();
     }
 
     public function canBeClosed()
     {
         return $this->isApproved() && $this->schedules()->count() == 0;
+    }
+
+    public function confirm()
+    {
+        if (!$this->canBeConfirmed()) {
+            return false;
+        }
+
+        $this->status = self::STATUS_CONFIRMED;
+        $this->confirmed_by = auth()->id();
+        $this->confirmed_at = now();
+        return $this->save();
     }
 
     public function approve()
@@ -170,9 +201,14 @@ class ProductionOrder extends Model
         return $query->where('status', self::STATUS_APPROVED);
     }
 
+    public function scopeConfirmed($query)
+    {
+        return $query->where('status', self::STATUS_CONFIRMED);
+    }
+
     public function scopeOpen($query)
     {
-        return $query->whereIn('status', [self::STATUS_PENDING, self::STATUS_APPROVED]);
+        return $query->whereIn('status', [self::STATUS_PENDING, self::STATUS_CONFIRMED, self::STATUS_APPROVED]);
     }
 
     public function scopeForBranch($query, $branch_id = null)

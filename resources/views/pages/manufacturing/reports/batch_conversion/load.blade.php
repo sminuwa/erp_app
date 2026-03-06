@@ -75,6 +75,8 @@
                     <th class="text-right">Expected Qty</th>
                     <th class="text-right">Min (Shortage)</th>
                     <th class="text-right">Max (Excess)</th>
+                    <th class="text-right">Shortage Qty</th>
+                    <th class="text-right">Excess Qty</th>
                     <th class="text-center">Tolerance Status</th>
                     <th class="text-right">WIP Cost</th>
                     <th class="text-right">Unit Cost</th>
@@ -112,6 +114,12 @@
                             <small class="d-block text-muted">+{{ $conv->accepted_excess }}%</small>
                         @endif
                     </td>
+                    <td class="text-right {{ $conv->actual_shortage > 0 ? 'text-warning font-weight-bold' : '' }}">
+                        {{ $conv->actual_shortage > 0 ? number_format($conv->actual_shortage, 4) : '-' }}
+                    </td>
+                    <td class="text-right {{ $conv->actual_excess > 0 ? 'text-danger font-weight-bold' : '' }}">
+                        {{ $conv->actual_excess > 0 ? number_format($conv->actual_excess, 4) : '-' }}
+                    </td>
                     <td class="text-center">
                         @if($conv->diff_type === 'within')
                             <span class="badge badge-success">Within Range</span>
@@ -139,7 +147,7 @@
                     <td colspan="5"><strong>Grand Total</strong></td>
                     <td class="text-right"><strong>{{ number_format($totals['total_produced'], 4) }}</strong></td>
                     <td class="text-right"><strong>{{ number_format($totals['total_expected'], 4) }}</strong></td>
-                    <td colspan="3"></td>
+                    <td colspan="5"></td>
                     <td class="text-right"><strong>{{ number_format($totals['total_wip_cost'], 2) }}</strong></td>
                     <td></td>
                     <td class="text-right"><strong>{{ number_format($totals['total_cost'], 2) }}</strong></td>

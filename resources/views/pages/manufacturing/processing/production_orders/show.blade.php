@@ -44,6 +44,17 @@
                         <i class="fa fa-edit"></i> Edit
                     </a>
                 @endcan
+                @can('manufacturing.production_orders.confirm')
+                    <form action="{{ route('manufacturing.production_orders.confirm', $record->id) }}" method="POST" style="display: inline" onsubmit="return confirm('Are you sure you want to confirm this order?')">
+                        {{ csrf_field() }}
+                        <button type="submit" class="btn btn-info btn-sm">
+                            <i class="fa fa-check-circle"></i> Confirm
+                        </button>
+                    </form>
+                @endcan
+            @endif
+
+            @if($record->isConfirmed())
                 @can('manufacturing.production_orders.approve')
                     <form action="{{ route('manufacturing.production_orders.approve', $record->id) }}" method="POST" style="display: inline" onsubmit="return confirm('Are you sure you want to approve this order?')">
                         {{ csrf_field() }}
@@ -99,6 +110,8 @@
                                         <td>
                                             @if($record->status == 'pending')
                                                 <span class="badge badge-warning">Pending</span>
+                                            @elseif($record->status == 'confirmed')
+                                                <span class="badge badge-info">Confirmed</span>
                                             @elseif($record->status == 'approved')
                                                 <span class="badge badge-success">Approved</span>
                                             @elseif($record->status == 'closed')
@@ -110,6 +123,12 @@
                                         <th>Created By</th>
                                         <td>{{ $record->createdBy->name ?? '-' }}</td>
                                     </tr>
+                                    @if($record->confirmed_by)
+                                        <tr>
+                                            <th>Confirmed By</th>
+                                            <td>{{ $record->confirmedBy->name ?? '-' }} at {{ $record->confirmed_at ? date('d-M-Y H:i', strtotime($record->confirmed_at)) : '' }}</td>
+                                        </tr>
+                                    @endif
                                     @if($record->approved_by)
                                         <tr>
                                             <th>Approved By</th>

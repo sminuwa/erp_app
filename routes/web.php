@@ -1331,6 +1331,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('/show/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'show'])->name('manufacturing.production_orders.show');
                 Route::get('/edit/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'edit'])->name('manufacturing.production_orders.edit');
                 Route::put('/update/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'update'])->name('manufacturing.production_orders.update');
+                Route::post('/confirm/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'confirm'])->name('manufacturing.production_orders.confirm');
                 Route::post('/approve/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'approve'])->name('manufacturing.production_orders.approve');
                 Route::post('/close/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'close'])->name('manufacturing.production_orders.close');
                 Route::delete('/delete/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'destroy'])->name('manufacturing.production_orders.destroy');
@@ -1449,6 +1450,8 @@ Route::middleware('auth')->group(function () {
                 Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'historyReport'])->name('manufacturing.reports.history.index');
                 Route::get('/load', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'loadHistoryReport'])->name('manufacturing.reports.history.load');
                 Route::get('/print', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'printHistoryReport'])->name('manufacturing.reports.history.print');
+                Route::get('/export-pdf', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'exportHistoryPDF'])->name('manufacturing.reports.history.export_pdf');
+                Route::get('/export-excel', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'exportHistoryExcel'])->name('manufacturing.reports.history.export_excel');
             });
 
             // Manufacturing Teams Report
@@ -1456,6 +1459,8 @@ Route::middleware('auth')->group(function () {
                 Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'teamsReport'])->name('manufacturing.reports.teams.index');
                 Route::get('/load', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'loadTeamsReport'])->name('manufacturing.reports.teams.load');
                 Route::get('/print', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'printTeamsReport'])->name('manufacturing.reports.teams.print');
+                Route::get('/export-pdf', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'exportTeamsPDF'])->name('manufacturing.reports.teams.export_pdf');
+                Route::get('/export-excel', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'exportTeamsExcel'])->name('manufacturing.reports.teams.export_excel');
             });
 
             // Team & Staff Ledger Report
@@ -1463,6 +1468,8 @@ Route::middleware('auth')->group(function () {
                 Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'teamLedgerReport'])->name('manufacturing.reports.team_ledger.index');
                 Route::get('/load', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'loadTeamLedgerReport'])->name('manufacturing.reports.team_ledger.load');
                 Route::get('/print', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'printTeamLedgerReport'])->name('manufacturing.reports.team_ledger.print');
+                Route::get('/export-pdf', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'exportTeamLedgerPDF'])->name('manufacturing.reports.team_ledger.export_pdf');
+                Route::get('/export-excel', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'exportTeamLedgerExcel'])->name('manufacturing.reports.team_ledger.export_excel');
             });
 
             // Production Orders Report
@@ -1470,6 +1477,8 @@ Route::middleware('auth')->group(function () {
                 Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'ordersReport'])->name('manufacturing.reports.orders.index');
                 Route::get('/load', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'loadOrdersReport'])->name('manufacturing.reports.orders.load');
                 Route::get('/print', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'printOrdersReport'])->name('manufacturing.reports.orders.print');
+                Route::get('/export-pdf', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'exportOrdersPDF'])->name('manufacturing.reports.orders.export_pdf');
+                Route::get('/export-excel', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'exportOrdersExcel'])->name('manufacturing.reports.orders.export_excel');
             });
 
             // Daily Schedules Report
@@ -1477,6 +1486,8 @@ Route::middleware('auth')->group(function () {
                 Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'schedulesReport'])->name('manufacturing.reports.schedules.index');
                 Route::get('/load', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'loadSchedulesReport'])->name('manufacturing.reports.schedules.load');
                 Route::get('/print', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'printSchedulesReport'])->name('manufacturing.reports.schedules.print');
+                Route::get('/export-pdf', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'exportSchedulesPDF'])->name('manufacturing.reports.schedules.export_pdf');
+                Route::get('/export-excel', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'exportSchedulesExcel'])->name('manufacturing.reports.schedules.export_excel');
             });
 
             // Materials Requisitions Report
@@ -1484,6 +1495,8 @@ Route::middleware('auth')->group(function () {
                 Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'requisitionsReport'])->name('manufacturing.reports.requisitions.index');
                 Route::get('/load', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'loadRequisitionsReport'])->name('manufacturing.reports.requisitions.load');
                 Route::get('/print', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'printRequisitionsReport'])->name('manufacturing.reports.requisitions.print');
+                Route::get('/export-pdf', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'exportRequisitionsPDF'])->name('manufacturing.reports.requisitions.export_pdf');
+                Route::get('/export-excel', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'exportRequisitionsExcel'])->name('manufacturing.reports.requisitions.export_excel');
             });
 
             // Batch Conversion Report
@@ -1491,6 +1504,8 @@ Route::middleware('auth')->group(function () {
                 Route::get('/index', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'batchConversionReport'])->name('manufacturing.reports.batch_conversion.index');
                 Route::get('/load', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'loadBatchConversionReport'])->name('manufacturing.reports.batch_conversion.load');
                 Route::get('/print', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'printBatchConversionReport'])->name('manufacturing.reports.batch_conversion.print');
+                Route::get('/export-pdf', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'exportBatchConversionPDF'])->name('manufacturing.reports.batch_conversion.export_pdf');
+                Route::get('/export-excel', [\App\Http\Controllers\Manufacturing\ManufacturingReportController::class, 'exportBatchConversionExcel'])->name('manufacturing.reports.batch_conversion.export_excel');
             });
         });
 

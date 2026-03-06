@@ -38,6 +38,7 @@
                         <span class="info-box-text">Status Breakdown</span>
                         <span class="info-box-number" style="font-size: 14px;">
                             <span class="badge badge-warning">{{ $totals['pending'] }} Pending</span>
+                            <span class="badge badge-info">{{ $totals['confirmed'] ?? 0 }} Confirmed</span>
                             <span class="badge badge-success">{{ $totals['approved'] }} Approved</span>
                             <span class="badge badge-secondary">{{ $totals['closed'] }} Closed</span>
                         </span>
@@ -102,13 +103,15 @@
 
         @if($orders->count() > 0)
         @foreach($orders as $order)
-        <div class="card card-outline card-{{ $order->status == 'pending' ? 'warning' : ($order->status == 'approved' ? 'success' : 'secondary') }} mb-3">
+        <div class="card card-outline card-{{ $order->status == 'pending' ? 'warning' : ($order->status == 'confirmed' ? 'info' : ($order->status == 'approved' ? 'success' : 'secondary')) }} mb-3">
             <div class="card-header">
                 <h5 class="card-title mb-0">
                     {{ $order->reference }}
                     <span class="ml-2">{{ date('d M Y', strtotime($order->order_date)) }}</span>
                     @if($order->status == 'pending')
                         <span class="badge badge-warning ml-2">Pending</span>
+                    @elseif($order->status == 'confirmed')
+                        <span class="badge badge-info ml-2">Confirmed</span>
                     @elseif($order->status == 'approved')
                         <span class="badge badge-success ml-2">Approved</span>
                     @else

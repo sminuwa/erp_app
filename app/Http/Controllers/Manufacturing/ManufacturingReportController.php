@@ -17,6 +17,9 @@ use App\Models\MaterialsRequisition;
 use App\Models\Product;
 use App\Models\Branch;
 use App\Models\Category;
+use App\Exports\Manufacturing\ManufacturingReportExport;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -776,6 +779,7 @@ class ManufacturingReportController extends Controller
             'total_qty' => $orders->sum('total_finish_goods_qty'),
             'total_processed' => $orders->sum('processed_qty'),
             'pending' => $orders->where('status', 'pending')->count(),
+            'confirmed' => $orders->where('status', 'confirmed')->count(),
             'approved' => $orders->where('status', 'approved')->count(),
             'closed' => $orders->where('status', 'closed')->count(),
         ];
@@ -1128,13 +1132,15 @@ class ManufacturingReportController extends Controller
                 $diffType      = 'within';
             }
 
-            $conv->expected_qty    = $expectedQty;
-            $conv->min_qty         = $minQty;
-            $conv->max_qty         = $maxQty;
-            $conv->tolerance_diff  = $toleranceDiff;
-            $conv->diff_type       = $diffType;
+            $conv->expected_qty      = $expectedQty;
+            $conv->min_qty           = $minQty;
+            $conv->max_qty           = $maxQty;
+            $conv->tolerance_diff    = $toleranceDiff;
+            $conv->diff_type         = $diffType;
             $conv->accepted_shortage = $bom->accepted_shortage ?? 0;
             $conv->accepted_excess   = $bom->accepted_excess   ?? 0;
+            $conv->actual_shortage   = max(0, $expectedQty - $producedQty);
+            $conv->actual_excess     = max(0, $producedQty - $expectedQty);
         }
 
         return $conversions;
@@ -1154,5 +1160,179 @@ class ManufacturingReportController extends Controller
             'excess_count'      => $conversions->where('diff_type', 'excess')->count(),
             'within_count'      => $conversions->where('diff_type', 'within')->count(),
         ];
+    }
+
+    // ================================================================
+    // EXPORT METHODS (PDF & EXCEL) FOR ALL REPORTS
+    // ================================================================
+
+    /**
+     * Generic helper: render a print view to PDF and return download response
+     */
+    private function exportPdf(Request $request, string $printMethod, string $filename, string $orientation = 'landscape')
+    {
+        $response = $this->$printMethod($request);
+        $html = $response->render();
+
+        $pdf = Pdf::loadHTML($html)
+            ->setPaper('a4', $orientation)
+            ->setOptions([
+                'defaultFont' => 'Helvetica',
+                'isHtml5ParserEnabled' => true,
+                'isPhpEnabled' => true
+            ]);
+
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Generic helper: render a print view to Excel and return download response
+     */
+    private function exportExcel(Request $request, string $printMethod, string $viewName, array $viewData, string $filename)
+    {
+        return Excel::download(
+            new ManufacturingReportExport($viewName, $viewData),
+            $filename
+        );
+    }
+
+    // --- History Report Exports ---
+
+    public function exportHistoryPDF(Request $request)
+    {
+        $this->authorize('manufacturing.reports.history');
+        return $this->exportPdf($request, 'printHistoryReport', 'manufacturing_history_report.pdf');
+    }
+
+    public function exportHistoryExcel(Request $request)
+    {
+        $this->authorize('manufacturing.reports.history');
+        $response = $this->printHistoryReport($request);
+        $data = $response->getData();
+
+        return Excel::download(
+            new ManufacturingReportExport('pages.manufacturing.reports.history.print', $data, 'History'),
+            'manufacturing_history_report.xlsx'
+        );
+    }
+
+    // --- Teams Report Exports ---
+
+    public function exportTeamsPDF(Request $request)
+    {
+        $this->authorize('manufacturing.reports.teams');
+        return $this->exportPdf($request, 'printTeamsReport', 'manufacturing_teams_report.pdf');
+    }
+
+    public function exportTeamsExcel(Request $request)
+    {
+        $this->authorize('manufacturing.reports.teams');
+        $response = $this->printTeamsReport($request);
+        $data = $response->getData();
+
+        return Excel::download(
+            new ManufacturingReportExport('pages.manufacturing.reports.teams.print', $data, 'Teams'),
+            'manufacturing_teams_report.xlsx'
+        );
+    }
+
+    // --- Team Ledger Report Exports ---
+
+    public function exportTeamLedgerPDF(Request $request)
+    {
+        $this->authorize('manufacturing.reports.team_ledger');
+        return $this->exportPdf($request, 'printTeamLedgerReport', 'team_ledger_report.pdf');
+    }
+
+    public function exportTeamLedgerExcel(Request $request)
+    {
+        $this->authorize('manufacturing.reports.team_ledger');
+        $response = $this->printTeamLedgerReport($request);
+        $data = $response->getData();
+
+        return Excel::download(
+            new ManufacturingReportExport('pages.manufacturing.reports.team_ledger.print', $data, 'Team Ledger'),
+            'team_ledger_report.xlsx'
+        );
+    }
+
+    // --- Production Orders Report Exports ---
+
+    public function exportOrdersPDF(Request $request)
+    {
+        $this->authorize('manufacturing.reports.orders');
+        return $this->exportPdf($request, 'printOrdersReport', 'production_orders_report.pdf');
+    }
+
+    public function exportOrdersExcel(Request $request)
+    {
+        $this->authorize('manufacturing.reports.orders');
+        $response = $this->printOrdersReport($request);
+        $data = $response->getData();
+
+        return Excel::download(
+            new ManufacturingReportExport('pages.manufacturing.reports.orders.print', $data, 'Orders'),
+            'production_orders_report.xlsx'
+        );
+    }
+
+    // --- Daily Schedules Report Exports ---
+
+    public function exportSchedulesPDF(Request $request)
+    {
+        $this->authorize('manufacturing.reports.schedules');
+        return $this->exportPdf($request, 'printSchedulesReport', 'daily_schedules_report.pdf');
+    }
+
+    public function exportSchedulesExcel(Request $request)
+    {
+        $this->authorize('manufacturing.reports.schedules');
+        $response = $this->printSchedulesReport($request);
+        $data = $response->getData();
+
+        return Excel::download(
+            new ManufacturingReportExport('pages.manufacturing.reports.schedules.print', $data, 'Schedules'),
+            'daily_schedules_report.xlsx'
+        );
+    }
+
+    // --- Materials Requisitions Report Exports ---
+
+    public function exportRequisitionsPDF(Request $request)
+    {
+        $this->authorize('manufacturing.reports.requisitions');
+        return $this->exportPdf($request, 'printRequisitionsReport', 'requisitions_report.pdf');
+    }
+
+    public function exportRequisitionsExcel(Request $request)
+    {
+        $this->authorize('manufacturing.reports.requisitions');
+        $response = $this->printRequisitionsReport($request);
+        $data = $response->getData();
+
+        return Excel::download(
+            new ManufacturingReportExport('pages.manufacturing.reports.requisitions.print', $data, 'Requisitions'),
+            'requisitions_report.xlsx'
+        );
+    }
+
+    // --- Batch Conversion Report Exports ---
+
+    public function exportBatchConversionPDF(Request $request)
+    {
+        $this->authorize('manufacturing.reports.batch_conversion');
+        return $this->exportPdf($request, 'printBatchConversionReport', 'batch_conversion_report.pdf');
+    }
+
+    public function exportBatchConversionExcel(Request $request)
+    {
+        $this->authorize('manufacturing.reports.batch_conversion');
+        $response = $this->printBatchConversionReport($request);
+        $data = $response->getData();
+
+        return Excel::download(
+            new ManufacturingReportExport('pages.manufacturing.reports.batch_conversion.print', $data, 'Batch Conversion'),
+            'batch_conversion_report.xlsx'
+        );
     }
 }

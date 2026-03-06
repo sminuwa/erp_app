@@ -81,6 +81,12 @@
                                 <button type="button" id="print-report" class="btn btn-secondary" disabled>
                                     <i class="fa fa-print"></i> Print
                                 </button>
+                                <button type="button" id="export-pdf" class="btn btn-danger" disabled>
+                                    <i class="fa fa-file-pdf"></i> Export PDF
+                                </button>
+                                <button type="button" id="export-excel" class="btn btn-success" disabled>
+                                    <i class="fa fa-file-excel"></i> Export Excel
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -112,6 +118,8 @@ $(document).ready(function() {
             success: function(response) {
                 $('#report-results').html(response);
                 $('#print-report').prop('disabled', false);
+                $('#export-pdf').prop('disabled', false);
+                $('#export-excel').prop('disabled', false);
             },
             error: function(xhr) {
                 var message = xhr.responseJSON?.message || 'Error loading report';
@@ -126,6 +134,18 @@ $(document).ready(function() {
     $('#print-report').click(function() {
         var form = $('#report-form');
         var url = '{{ route("manufacturing.reports.batch_conversion.print") }}?' + form.serialize();
+        window.open(url, '_blank');
+    });
+
+    $('#export-pdf').click(function() {
+        var form = $('#report-form');
+        var url = '{{ route("manufacturing.reports.batch_conversion.export_pdf") }}?' + form.serialize();
+        window.open(url, '_blank');
+    });
+
+    $('#export-excel').click(function() {
+        var form = $('#report-form');
+        var url = '{{ route("manufacturing.reports.batch_conversion.export_excel") }}?' + form.serialize();
         window.open(url, '_blank');
     });
 });

@@ -236,7 +236,7 @@ $(document).ready(function() {
             production_qty: {{ $sm->quantity ?? 0 }},
             materials: [
                 @foreach($sm->materials as $mat)
-                { product: {!! json_encode($mat->product->name ?? 'N/A') !!}, store: {!! json_encode($mat->store->name ?? 'N/A') !!}, quantity: {{ $mat->quantity ?? 0 }}, unit_cost: {{ $mat->unit_cost ?? 0 }} },
+                { product: {!! json_encode($mat->product->name ?? 'N/A') !!}, store: {!! json_encode($mat->store->name ?? 'N/A') !!}, quantity: {{ $mat->quantity ?? 0 }}, unit_cost: {{ $mat->unit_cost ?? \App\Classes\Manufacturing\ProductionCalculator::getCurrentCostPrice($mat->product_id, auth()->user()->branch_id) }} },
                 @endforeach
             ]
         },
@@ -244,11 +244,14 @@ $(document).ready(function() {
         @foreach($batchConversions as $bc)
         @if($bc->batchProduction)
         'batch_{{ $bc->id }}': {
-            production_qty: {{ $bc->batchProduction->quantity ?? 0 }},
+            production_qty: {{ $bc->produced_qty ?? 0 }},
             materials: [
                 @foreach($bc->batchProduction->materials as $mat)
-                { product: {!! json_encode($mat->product->name ?? 'N/A') !!}, store: {!! json_encode($mat->store->name ?? 'N/A') !!}, quantity: {{ $mat->quantity ?? 0 }}, unit_cost: {{ $mat->unit_cost ?? 0 }} },
+                { product: {!! json_encode($mat->product->name ?? 'N/A') !!}, store: {!! json_encode($mat->store->name ?? 'N/A') !!}, quantity: {{ $mat->quantity ?? 0 }}, unit_cost: {{ $mat->unit_cost ?? \App\Classes\Manufacturing\ProductionCalculator::getCurrentCostPrice($mat->product_id, auth()->user()->branch_id) }} },
                 @endforeach
+                @if($bc->material_product_id && $bc->material_qty > 0)
+                { product: {!! json_encode($bc->materialProduct->name ?? 'N/A') !!}, store: {!! json_encode($bc->materialStore->name ?? 'N/A') !!}, quantity: {{ $bc->material_qty ?? 0 }}, unit_cost: {{ $bc->material_unit_cost ?? 0 }} },
+                @endif
             ]
         },
         @endif

@@ -13,6 +13,7 @@ use App\Http\Requests\Manufacturing\ProductionOrders\Index;
 use App\Http\Requests\Manufacturing\ProductionOrders\Create;
 use App\Http\Requests\Manufacturing\ProductionOrders\Store;
 use App\Http\Requests\Manufacturing\ProductionOrders\Show;
+use App\Http\Requests\Manufacturing\ProductionOrders\Confirm;
 use App\Http\Requests\Manufacturing\ProductionOrders\Approve;
 use App\Http\Requests\Manufacturing\ProductionOrders\Close;
 use App\Http\Requests\Manufacturing\ProductionOrders\Destroy;
@@ -245,6 +246,7 @@ class ProductionOrderController extends Controller
             'materials.sourceStore',
             'branch',
             'createdBy',
+            'confirmedBy',
             'approvedBy'
         ]);
 
@@ -254,12 +256,40 @@ class ProductionOrderController extends Controller
     }
 
     /**
+     * Confirm the production order.
+     */
+    public function confirm(Confirm $request, ProductionOrder $production_order)
+    {
+        if (!$production_order->canBeConfirmed()) {
+            session()->flash('app_error', 'Only pending orders can be confirmed.');
+            return redirect()->back();
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $production_order->confirm();
+
+            DB::commit();
+
+            $action = "Confirmed production order: " . $production_order->reference;
+            AuditLog::auditLog(Auth::id(), $action);
+            session()->flash('app_message', 'Production Order confirmed successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('app_error', 'Something went wrong: ' . $e->getMessage());
+        }
+
+        return redirect()->back();
+    }
+
+    /**
      * Approve the production order.
      */
     public function approve(Approve $request, ProductionOrder $production_order)
     {
-        if (!$production_order->isPending()) {
-            session()->flash('app_error', 'Only pending orders can be approved.');
+        if (!$production_order->canBeApproved()) {
+            session()->flash('app_error', 'Only confirmed orders can be approved.');
             return redirect()->back();
         }
 
@@ -378,6 +408,7 @@ class ProductionOrderController extends Controller
             'materials.sourceStore',
             'branch',
             'createdBy',
+            'confirmedBy',
             'approvedBy'
         ]);
 

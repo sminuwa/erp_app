@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Materials Requisitions Report - {{ config('app.name', 'ERP') }}</title>
+    <title>Requisitions Report</title>
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/backend/css/adminlte.min.css') }}">
     <style>
@@ -45,8 +45,9 @@
             $receivedAt = $requisition->received_at ? \Carbon\Carbon::parse($requisition->received_at) : null;
             $fmtDiff = function($from, $to) {
                 if (!$from || !$to) return null;
+                $totalMinutes = (int) $from->diffInMinutes($to);
+                if ($totalMinutes < 60) return $totalMinutes . 'min';
                 $hours = (int) $from->diffInHours($to);
-                if ($hours < 1)  return '< 1hr';
                 if ($hours < 24) return $hours . 'h';
                 $days = (int) $from->diffInDays($to);
                 $rem  = $hours - ($days * 24);

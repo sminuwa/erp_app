@@ -13,7 +13,14 @@
       "Bash(powershell -Command:*)",
       "Bash(Select-String -Pattern \"^===\" -Context 0,20)",
       "Bash(del \"c:\\\\Users\\\\USER\\\\dev\\\\ASDFA\\\\erp_app\\\\db_check.php\")",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(\"C:/Users/USER/.config/herd/bin/php.bat\" artisan route:list --name=manufacturing.production_orders)",
+      "Bash(\"C:/Users/USER/.config/herd/bin/php.bat\" artisan route:list --name=manufacturing.reports)",
+      "Bash(\"C:/Users/USER/.config/herd/bin/php.bat\" -l app/Http/Controllers/Manufacturing/ManufacturingReportController.php)",
+      "Bash(\"C:/Users/USER/.config/herd/bin/php.bat\" -l app/Models/ProductionOrder.php)",
+      "Bash(\"C:/Users/USER/.config/herd/bin/php.bat\" -l app/Http/Controllers/Manufacturing/ManufacturingReturnController.php)",
+      "Bash(\"C:/Users/USER/.config/herd/bin/php.bat\" -l app/Http/Controllers/Manufacturing/ProductionOrderController.php)",
+      "Bash(\"C:/Users/USER/.config/herd/bin/php.bat\" -l app/Exports/Manufacturing/ManufacturingReportExport.php)"
     ]
   }
 }

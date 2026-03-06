@@ -89,8 +89,9 @@
                     $receivedAt = $requisition->received_at ? \Carbon\Carbon::parse($requisition->received_at) : null;
                     $fmtDiff = function($from, $to) {
                         if (!$from || !$to) return null;
+                        $totalMinutes = (int) $from->diffInMinutes($to);
+                        if ($totalMinutes < 60) return $totalMinutes . 'min';
                         $hours = (int) $from->diffInHours($to);
-                        if ($hours < 1)  return '< 1hr';
                         if ($hours < 24) return $hours . 'h';
                         $days = (int) $from->diffInDays($to);
                         $rem  = $hours - ($days * 24);

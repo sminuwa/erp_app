@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Batch Conversion Report - {{ config('app.name', 'ERP') }}</title>
+    <title>Batch Conversion Report</title>
     <link rel="stylesheet" href="{{ asset('assets/backend/plugins/font-awesome/css/font-awesome.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/backend/css/adminlte.min.css') }}">
     <style>
@@ -62,6 +62,8 @@
                 <th class="text-right">Expected Qty</th>
                 <th class="text-right">Min Qty</th>
                 <th class="text-right">Max Qty</th>
+                <th class="text-right">Shortage Qty</th>
+                <th class="text-right">Excess Qty</th>
                 <th class="text-center">Tolerance Status</th>
                 <th class="text-right">Diff from Tolerance</th>
                 <th class="text-right">WIP Cost</th>
@@ -83,6 +85,8 @@
                 <td class="text-right">{{ number_format($conv->expected_qty, 4) }}</td>
                 <td class="text-right">{{ number_format($conv->min_qty, 4) }}{{ $conv->accepted_shortage > 0 ? ' (-'.$conv->accepted_shortage.'%)' : '' }}</td>
                 <td class="text-right">{{ number_format($conv->max_qty, 4) }}{{ $conv->accepted_excess > 0 ? ' (+'.$conv->accepted_excess.'%)' : '' }}</td>
+                <td class="text-right">{{ $conv->actual_shortage > 0 ? number_format($conv->actual_shortage, 4) : '-' }}</td>
+                <td class="text-right">{{ $conv->actual_excess > 0 ? number_format($conv->actual_excess, 4) : '-' }}</td>
                 <td class="text-center">
                     @if($conv->diff_type === 'within')
                         <span class="badge-within">&#10003; Within</span>
@@ -111,7 +115,7 @@
                 <td colspan="5">Grand Total</td>
                 <td class="text-right">{{ number_format($totals['total_produced'], 4) }}</td>
                 <td class="text-right">{{ number_format($totals['total_expected'], 4) }}</td>
-                <td colspan="4"></td>
+                <td colspan="6"></td>
                 <td class="text-right">{{ number_format($totals['total_wip_cost'], 2) }}</td>
                 <td></td>
                 <td class="text-right">{{ number_format($totals['total_cost'], 2) }}</td>

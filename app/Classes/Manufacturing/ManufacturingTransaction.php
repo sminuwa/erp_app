@@ -591,7 +591,8 @@ class ManufacturingTransaction
 
         // Group materials by category for raw material credit (return to stock)
         foreach ($return->materials as $material) {
-            $category = $material->product->category;
+            $category = $material->product->category ?? null;
+            if (!$category || !$category->asset_account) continue;
             $category_id = $category->id;
 
             if (!isset($categories[$category_id])) {

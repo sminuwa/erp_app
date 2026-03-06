@@ -10,6 +10,7 @@ use App\Models\BatchConversion;
 use App\Models\BatchProduction;
 use App\Classes\Manufacturing\ManufacturingTransaction;
 use App\Classes\Manufacturing\ManufacturingCostPrice;
+use App\Classes\Manufacturing\ProductionCalculator;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -53,7 +54,7 @@ class ManufacturingReturnController extends Controller
 
         $batchConversions = BatchConversion::posted()
             ->forBranch($user->branch_id)
-            ->with(['batchProduction.bom.finishProduct', 'batchProduction.materials.product', 'batchProduction.materials.store', 'finishProduct'])
+            ->with(['batchProduction.bom.finishProduct', 'batchProduction.materials.product', 'batchProduction.materials.store', 'finishProduct', 'materialProduct', 'materialStore'])
             ->get()
             ->filter(function ($bc) {
                 return $bc->getRemainingReturnableQty() > 0;
@@ -201,8 +202,12 @@ class ManufacturingReturnController extends Controller
             // Deduct finished goods from inventory
             $production = $return->getProduction();
             if ($production) {
-                $finishProductId = $production->finish_product_id
-                    ?? ($production->bom->finish_product_id ?? null);
+                if ($return->production_type === ManufacturingReturn::PRODUCTION_TYPE_SINGLE) {
+                    $finishProductId = $production->bom->finish_product_id ?? null;
+                } else {
+                    $finishProductId = $production->finish_product_id
+                        ?? ($production->batchProduction->bom->finish_product_id ?? null);
+                }
                 $outputStoreId = $production->output_store_id ?? null;
                 $unitCost = $production->getUnitCost();
 
@@ -284,9 +289,10 @@ class ManufacturingReturnController extends Controller
                 $productionMaterials = $production->materials;
             }
         } else {
-            $conversion = BatchConversion::with('batchProduction.materials')->find($productionId);
+            $conversion = BatchConversion::with('batchProduction.materials', 'batchProduction.bom')->find($productionId);
             if ($conversion && $conversion->batchProduction) {
-                $productionQty = $conversion->batchProduction->quantity;
+                // Use actual produced qty as the denominator (not expected output)
+                $productionQty = $conversion->produced_qty;
                 $productionMaterials = $conversion->batchProduction->materials;
             }
         }
@@ -298,14 +304,36 @@ class ManufacturingReturnController extends Controller
         $ratio = $returnQty / $productionQty;
 
         foreach ($productionMaterials as $material) {
+            $unitCost = $material->unit_cost
+                ?? ProductionCalculator::getCurrentCostPrice($material->product_id, $return->branch_id);
+
             ManufacturingReturnMaterial::create([
                 'return_id' => $return->id,
                 'product_id' => $material->product_id,
                 'store_id' => $material->store_id,
                 'quantity' => round($material->quantity * $ratio, 4),
-                'unit_cost' => $material->unit_cost,
-                'total_cost' => round($material->quantity * $ratio * $material->unit_cost, 2),
+                'unit_cost' => $unitCost,
+                'total_cost' => round($material->quantity * $ratio * $unitCost, 2),
             ]);
+        }
+
+        // For batch conversions, also return the main/packaging raw material
+        if ($productionType === ManufacturingReturn::PRODUCTION_TYPE_BATCH) {
+            $conversion = BatchConversion::find($productionId);
+            if ($conversion && $conversion->material_product_id && $conversion->material_qty > 0) {
+                $mainReturnQty = round($conversion->material_qty * $ratio, 4);
+                $mainUnitCost = $conversion->material_unit_cost
+                    ?? ProductionCalculator::getCurrentCostPrice($conversion->material_product_id, $return->branch_id);
+
+                ManufacturingReturnMaterial::create([
+                    'return_id' => $return->id,
+                    'product_id' => $conversion->material_product_id,
+                    'store_id' => $conversion->material_store_id,
+                    'quantity' => $mainReturnQty,
+                    'unit_cost' => $mainUnitCost,
+                    'total_cost' => round($mainReturnQty * $mainUnitCost, 2),
+                ]);
+            }
         }
     }
 }

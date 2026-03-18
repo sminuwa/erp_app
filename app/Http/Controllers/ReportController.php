@@ -897,6 +897,14 @@ class ReportController extends Controller
                 INNER JOIN interstore_transfers it ON it.id = itd.interstore_transfer_id
                 WHERE itd.destination_store_id = store_products.store_id
                 AND itd.product_id = store_products.product_id) as date_receipt_transit_store,
+            (SELECT MAX(o.order_date)
+                FROM order_details od
+                INNER JOIN store_products sp2 ON sp2.id = od.store_product_id
+                INNER JOIN orders o ON o.id = od.order_id
+                WHERE sp2.store_id = store_products.store_id
+                AND sp2.product_id = store_products.product_id
+                AND od.status = 1
+                AND o.status = 1) as last_issue_date,
             stores.code as store,
             store_products.qty_available,
             (SELECT bpp.retail_selling_price

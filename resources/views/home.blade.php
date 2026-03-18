@@ -133,6 +133,13 @@
             width: 45%;
             height: 2px;
         }
+        .dashboard-clock { font-size: 1.1rem; }
+        .dashboard-inactive-alert { font-size: 0.9rem; }
+        .dashboard-filters-card .form-control-sm { min-height: 31px; }
+        @media (min-width: 768px) {
+            .content .clock { width: 18rem; height: 18rem; margin: 1rem auto; padding: 1.25rem; }
+            .content .clock .outer-clock-face .marking { width: 2px; }
+        }
     </style>
     <style>
         #loading-indicator {
@@ -187,84 +194,96 @@
 
 @section('content')
 
-    <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
-        <!-- Content Header (Page header) -->
         <section class="content-header">
             <div class="container-fluid">
-                <div class="row mb-2">
+                <div class="row mb-2 align-items-center">
                     <div class="col-sm-6">
-                        <h1>Dashboard</h1>
-                        <marquee>
-                            <span style="font-size: 24px;">
-                                Customers who have not patronized for more than two weeks:
-                                @foreach (App\Models\User::overTwoWeeks() as $customer)
-                                    {{ $customer->name }}-{{ $customer->phone }},
-                                @endforeach
-                            </span>
-                        </marquee>
+                        <h1 class="m-0">Dashboard</h1>
                     </div>
                     <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <h3 style="text-shadow: 5px 5px #558ABB;font-weight:900;" id="clock" onload="currentTime()">
-                            </h3>
+                        <ol class="breadcrumb float-sm-right mb-0 align-items-center flex-row">
+                            <li class="breadcrumb-item mr-2 mb-0">
+                                <span class="dashboard-clock text-primary font-weight-bold" id="clock" aria-label="Current time"></span>
+                            </li>
+                            <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
                         </ol>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <h5>Today's Sales Per User</h5>
-                        <ul>
-                            @foreach ($user_sales_per_branch as $sale)
-                                <li>{{ $sale->name }}: &#8358; {{ number_format($sale->total, 2, '.', ',') }}</li>
-                            @endforeach
-                        </ul>
+                @php $inactive_customers = App\Models\User::overTwoWeeks(); @endphp
+                @if($inactive_customers->isNotEmpty())
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="alert alert-warning py-2 mb-0 mt-2 dashboard-inactive-alert" role="alert">
+                                <strong><i class="fa fa-info-circle mr-1"></i>Customers not patronized in 2+ weeks:</strong>
+                                <span class="ml-1">{{ $inactive_customers->pluck('name')->implode(', ') }}</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div><!-- /.container-fluid -->
+                @endif
+            </div>
         </section>
 
-        <!-- Main content -->
         <section class="content">
-
             <div class="container-fluid">
                 @hasanyrole('Super-admin|Admin')
-                    <div class="row mb-3">
-                        <div class="col-md-3">
-                            <select id="company_id" class="form-control">
-                                <option value="">Select Company</option>
-                                @foreach ($companies as $company)
-                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                @endforeach
-                            </select>
+                    <div class="card card-outline card-primary shadow-sm mb-4 dashboard-filters-card">
+                        <div class="card-header py-2">
+                            <h5 class="card-title mb-0"><i class="fa fa-filter mr-1"></i> Summary filters</h5>
                         </div>
-                        <div class="col-md-2">
-                            <select id="branch_id" class="form-control select2-single">
-                                <option value="">Select Branch</option>
-                                @foreach ($branches as $branch)
-                                    <option value="{{ $branch->id }}">{{ $branch->name }}</option>
-                                @endforeach
-                            </select>
+                        <div class="card-body py-3">
+                            <div class="row align-items-end">
+                                <div class="col-md-2 col-6 mb-2 mb-md-0">
+                                    <label class="small font-weight-bold text-muted mb-1">Company</label>
+                                    <select id="company_id" class="form-control form-control-sm">
+                                        <option value="">Select Company</option>
+                                        @foreach ($companies as $company)
+                                            <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-2 col-6 mb-2 mb-md-0">
+                                    <label class="small font-weight-bold text-muted mb-1">Branch</label>
+                                    <select id="branch_id" class="form-control form-control-sm select2-single">
+                                        <option value="">Select Branch</option>
+                                        @foreach ($branches as $branch)
+                                            <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-2 col-6 mb-2 mb-md-0">
+                                    <label class="small font-weight-bold text-muted mb-1">Year</label>
+                                    <input type="number" class="form-control form-control-sm" id="report_year" min="2020" max="2030" value="{{ now()->format('Y') }}">
+                                </div>
+                                <div class="col-md-2 col-6 mb-2 mb-md-0">
+                                    <label class="small font-weight-bold text-muted mb-1">Quarter</label>
+                                    <select id="report_quarter" class="form-control form-control-sm">
+                                        <option value="">Select Quarter</option>
+                                        <option value="Q1">Q1 (Jan – Mar)</option>
+                                        <option value="Q2">Q2 (Apr – Jun)</option>
+                                        <option value="Q3">Q3 (Jul – Sep)</option>
+                                        <option value="Q4">Q4 (Oct – Dec)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2 col-6 mb-2 mb-md-0">
+                                    <button class="btn btn-primary btn-sm btn-block" id="load_dashboard_summary">
+                                        <i class="fa fa-refresh mr-1"></i> Load Summary
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-2">
-                            <input type="year" class="form-control" id="report_year" value="{{ now()->format('Y') }}">
-                        </div>
-                        <div class="col-md-2">
-                            <select id="report_quarter" class="form-control">
-                                <option value="">Select Quarter</option>
-                                <option value="Q1">Q1 (Jan - Mar)</option>
-                                <option value="Q2">Q2 (Apr - Jun)</option>
-                                <option value="Q3">Q3 (Jul - Sep)</option>
-                                <option value="Q4">Q4 (Oct - Dec)</option>
-                            </select>
-                        </div>
-                        {{-- <div class="col-md-2">
-                            <input type="month" class="form-control" id="report_month" value="{{ now()->format('Y-m') }}">
-                        </div> --}}
+                    </div>
 
-                        <div class="col-md-2">
-                            <button class="btn btn-sm btn-primary" id="load_dashboard_summary">Load Summary</button>
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-header py-2 bg-light">
+                            <h5 class="card-title mb-0"><i class="fa fa-users mr-1"></i> Today's sales per user</h5>
+                        </div>
+                        <div class="card-body py-2">
+                            <ul class="list-unstyled mb-0 row">
+                                @foreach ($user_sales_per_branch as $sale)
+                                    <li class="col-md-4 col-6 mb-1"><span class="text-muted">{{ $sale->name }}:</span> &#8358;{{ number_format($sale->total, 2, '.', ',') }}</li>
+                                @endforeach
+                            </ul>
                         </div>
                     </div>
 
@@ -278,74 +297,83 @@
                             <div></div>
                             <div></div>
                         </div>
-                        <p class="mt-3">Generating summary, please wait...</p>
+                        <p class="mt-3 text-muted">Generating summary, please wait...</p>
                     </div>
                 @else
-                    <div class="row">
-                        <div class="col-2">
-
-                        </div>
-                        <div class="col-8">
-                            <h1 style="text-shadow: 5px 5px #558ABB;font-weight:900;font-size:60px;">
-                                {{ App\Models\User::UserBranchName()->long_name }}
-                            </h1>
-                            <h2 style="text-shadow: 5px 5px #558ABB;font-weight:900;text-align:center">SALE AND INVENTORY
-                                APPLICATION SYSTEM</h2>
-                            <div class="clock">
-                                <div class="outer-clock-face">
-                                    <div class="marking marking-one"></div>
-                                    <div class="marking marking-two"></div>
-                                    <div class="marking marking-three"></div>
-                                    <div class="marking marking-four"></div>
-                                    <div class="inner-clock-face">
-                                        <div class="hand hour-hand"></div>
-                                        <div class="hand min-hand"></div>
-                                        <div class="hand second-hand"></div>
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8 col-12">
+                            <div class="card shadow-sm border-0 bg-light mb-4">
+                                <div class="card-body text-center py-5">
+                                    <h1 class="h3 font-weight-bold text-primary mb-2">{{ optional(App\Models\User::UserBranchName())->long_name ?? 'Branch' }}</h1>
+                                    <p class="text-muted mb-4">Sale and Inventory Application System</p>
+                                    <div class="clock mx-auto">
+                                        <div class="outer-clock-face">
+                                            <div class="marking marking-one"></div>
+                                            <div class="marking marking-two"></div>
+                                            <div class="marking marking-three"></div>
+                                            <div class="marking marking-four"></div>
+                                            <div class="inner-clock-face">
+                                                <div class="hand hour-hand"></div>
+                                                <div class="hand min-hand"></div>
+                                                <div class="hand second-hand"></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <script>
-                                const secondHand = document.querySelector('.second-hand');
-                                const minsHand = document.querySelector('.min-hand');
-                                const hourHand = document.querySelector('.hour-hand');
-
-                                function setDate() {
-                                    const now = new Date();
-
-                                    const seconds = now.getSeconds();
-                                    const secondsDegrees = ((seconds / 60) * 360) + 90;
-                                    secondHand.style.transform = `rotate(${secondsDegrees}deg)`;
-
-                                    const mins = now.getMinutes();
-                                    const minsDegrees = ((mins / 60) * 360) + ((seconds / 60) * 6) + 90;
-                                    minsHand.style.transform = `rotate(${minsDegrees}deg)`;
-
-                                    const hour = now.getHours();
-                                    const hourDegrees = ((hour / 12) * 360) + ((mins / 60) * 30) + 90;
-                                    hourHand.style.transform = `rotate(${hourDegrees}deg)`;
-                                }
-
-                                setInterval(setDate, 1000);
-
-                                setDate();
-                            </script>
+                            <div class="card shadow-sm">
+                                <div class="card-header py-2 bg-light">
+                                    <h5 class="card-title mb-0"><i class="fa fa-users mr-1"></i> Today's sales per user</h5>
+                                </div>
+                                <div class="card-body py-2">
+                                    <ul class="list-unstyled mb-0">
+                                        @foreach ($user_sales_per_branch as $sale)
+                                            <li class="py-1 border-bottom border-light"><span class="text-muted">{{ $sale->name }}:</span> &#8358;{{ number_format($sale->total, 2, '.', ',') }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-2">
-
-                        </div>
-
                     </div>
+                    <script>
+                        (function() {
+                            const secondHand = document.querySelector('.second-hand');
+                            const minsHand = document.querySelector('.min-hand');
+                            const hourHand = document.querySelector('.hour-hand');
+                            if (!secondHand || !minsHand || !hourHand) return;
+                            function setDate() {
+                                const now = new Date();
+                                const seconds = now.getSeconds();
+                                secondHand.style.transform = 'rotate(' + (((seconds / 60) * 360) + 90) + 'deg)';
+                                const mins = now.getMinutes();
+                                minsHand.style.transform = 'rotate(' + (((mins / 60) * 360) + ((seconds / 60) * 6) + 90) + 'deg)';
+                                const hour = now.getHours();
+                                hourHand.style.transform = 'rotate(' + (((hour / 12) * 360) + ((mins / 60) * 30) + 90) + 'deg)';
+                            }
+                            setInterval(setDate, 1000);
+                            setDate();
+                        })();
+                    </script>
                 @endhasanyrole
-
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
-        <!-- /.content -->
     </div>
-    <!-- /.content-wrapper -->
 
 @endsection
 
 @push('js')
+    <script>
+        (function() {
+                            var el = document.getElementById('clock');
+                            if (!el) return;
+                            function updateClock() {
+                                var now = new Date();
+                                el.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                            }
+                            updateClock();
+                            setInterval(updateClock, 1000);
+                        })();
+    </script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         google.charts.load("current", {

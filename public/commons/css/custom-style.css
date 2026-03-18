@@ -1,0 +1,87 @@
+/* Content header – page title and breadcrumb */
+.content-header {
+  padding: 1rem 1.25rem 1rem;
+  background: linear-gradient(to bottom, #fafbfc 0%, #fff 100%);
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 0;
+}
+
+.content-header .container-fluid {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.content-header .row {
+  align-items: center;
+  min-height: 2.25rem;
+}
+
+.content-header h1,
+.content-header h4,
+.content-header .content-header-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.content-header h4 {
+  font-size: 1.25rem;
+}
+
+.content-header .breadcrumb {
+  margin-bottom: 0;
+  padding: 0.35rem 0 0;
+  background: none;
+  font-size: 0.875rem;
+}
+
+.content-header .breadcrumb-item {
+  color: #6c757d;
+}
+
+.content-header .breadcrumb-item a {
+  color: #495057;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.content-header .breadcrumb-item a:hover {
+  color: #0d6efd;
+}
+
+.content-header .breadcrumb-item.active {
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.content-header .breadcrumb-item + .breadcrumb-item::before {
+  content: "\f105";
+  font-family: "FontAwesome";
+  color: #adb5bd;
+  padding-right: 0.5rem;
+}
+
+@media (min-width: 576px) {
+  .content-header .breadcrumb {
+    padding-top: 0;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .content-header {
+    padding: 0.85rem 1rem;
+  }
+
+  .content-header h1,
+  .content-header h4 {
+    font-size: 1.15rem;
+  }
+
+  .content-header .breadcrumb {
+    font-size: 0.8125rem;
+  }
+}

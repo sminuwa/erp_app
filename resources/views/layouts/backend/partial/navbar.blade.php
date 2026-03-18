@@ -1,131 +1,121 @@
-<nav class="main-header navbar navbar-expand bg-white navbar-light border-bottom">
-    <!-- Left navbar links -->
+<nav class="main-header navbar navbar-expand navbar-white navbar-light border-bottom shadow-sm">
+    <!-- Left: sidebar toggle -->
     <ul class="navbar-nav">
         <li class="nav-item">
-            <a class="nav-link" data-widget="pushmenu" href="#"><i class="fa fa-bars"></i></a>
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fa fa-bars"></i></a>
         </li>
-        <li class="nav-item d-none d-sm-inline-block">
-            <a href="javascript:void(0)" class="nav-link"><span
-                    style="text-shadow: 2px 1px #558ABB;font-weight:900;font-size:24px">Branch Name: </span></a>
+        <li class="nav-item d-none d-md-inline-block">
+            <div class="nav-link py-0 d-flex align-items-center">
+                <span class="text-muted small mr-1">Branch:</span>
+                <span class="font-weight-bold text-primary">{{ optional(Auth::user()->branch)->name ?? '—' }}</span>
+            </div>
         </li>
-        <li class="nav-item d-none d-sm-inline-block">
-            <a href="#" class="nav-link"><span
-                    style="text-shadow: 2px 1px #558ABB;font-weight:900;font-size:24px">{{ Auth::user()->branch->name }}</span></a>
+        <li class="nav-item d-none d-lg-inline-block">
+            <div class="nav-link py-0 d-flex align-items-center">
+                <span class="text-muted small mr-1">Today's sale:</span>
+                <span class="font-weight-bold text-success">&#8358;{{ number_format(Auth::user()->todaySale(), 2, '.', ',') }}</span>
+            </div>
         </li>
-        <li class="nav-item d-none d-sm-inline-block">
-            <a href="#" class="nav-link"><span
-                    style="text-shadow: 2px 1px #558ABB;font-weight:900;font-size:24px">Today's Sale: &#8358;
-                    {{ number_format(Auth::user()->todaySale(), 2, '.', ',') }}</span></a>
-        </li>
-
     </ul>
 
-    <!-- SEARCH FORM -->
-    {{-- <form class="form-inline ml-3" method="post" action="">
-        @csrf
-        <div class="input-group input-group-sm">
-            <input class="form-control form-control-navbar" type="search" name="search" placeholder="Search"
-                aria-label="Search">
-            <div class="input-group-append">
-                <button class="btn btn-navbar" type="submit">
-                    <i class="fa fa-search"></i>
-                </button>
-            </div>
-        </div>
-    </form> --}}
     <!-- Right navbar links -->
-    <ul class="navbar-nav ml-auto">
-        <a href="{{ route('chatify') }}" title="Chat System" target="_BLANK"
-            class="fa fa-wechat text text-info float-md-right">Chat</a> &nbsp;&nbsp;&nbsp;
-        @can('setting.change-branch')
-            {{--        @if (Auth::user()->hasRole('Super-admin')) --}}
-            <a href="javascript:void(0)" data-toggle="modal" title="Switch Branch" data-target="#swtich_branch"
-                class="fa fa-adjust text text-danger float-md-right">Switch Branch</a> &nbsp;&nbsp;&nbsp;
-            <a href="javascript:void(0)" data-toggle="modal" title="Available Stock" data-target="#avail_stock"
-                class="fa fa-camera-retro text text-info float-md-right">Stock</a>
-            {{--        @endif --}}
-        @endcan
-        <!-- Profile Dropdown Menu -->
-        <li class="dropdown notification-list">
-            <a class="nav-link dropdown-toggle arrow-none waves-light waves-effect" data-toggle="dropdown"
-                href="" role="button" aria-haspopup="false" aria-expanded="false">
-                <i class="mdi mdi-bell noti-icon"></i>
-                <span class="badge badge-danger badge-pill noti-icon-badge">{{ $expires->count() }}</span>
+    <ul class="navbar-nav ml-auto align-items-center">
+        <li class="nav-item">
+            <a href="{{ route('chatify') }}" title="Chat" target="_blank" class="nav-link px-2">
+                <i class="fa fa-comments text-info"></i>
+                <span class="d-none d-sm-inline ml-1">Chat</span>
             </a>
-            <div class="dropdown-menu dropdown-menu-right dropdown-lg">
-                <!-- item-->
-                <div class="dropdown-item noti-title">
-                    <h6 class="m-0"><span class="float-right"><a href="" class="text-dark"><small>Clear
-                                    All</small></a> </span>Notification
-                    </h6>
-                </div>
-
-                <div class="slimscroll" style="max-height: 190px;">
-                    <!-- item-->
-                    <a href="" class="dropdown-item notify-item">
-                        <div class="notify-icon bg-success"><i class="mdi mdi-comment-account-outline"></i></div>
-                        <p class="notify-details">Expired products<small class="text-muted"></small></p>
-                    </a>
-                    @foreach ($expires as $prod)
-                        <a href="">{{ $prod->product->name }} expiring on
-                            {{ Carbon\Carbon::parse($prod->expire_date)->toFormattedDateString() }}</a>
-                    @endforeach
-                </div>
         </li>
-        <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#">
-                <i class="fa fa-th-large"></i>
+        @can('setting.change-branch')
+            <li class="nav-item">
+                <a href="javascript:void(0)" data-toggle="modal" data-target="#swtich_branch" title="Switch Branch" class="nav-link px-2">
+                    <i class="fa fa-exchange text-warning"></i>
+                    <span class="d-none d-sm-inline ml-1">Switch Branch</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="javascript:void(0)" data-toggle="modal" data-target="#avail_stock" title="Available Stock" class="nav-link px-2">
+                    <i class="fa fa-cubes text-info"></i>
+                    <span class="d-none d-sm-inline ml-1">Stock</span>
+                </a>
+            </li>
+        @endcan
 
+        <!-- Notifications -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-bell"></i>
+                @if($expires->count() > 0)
+                    <span class="badge badge-danger badge-pill align-top">{{ $expires->count() }}</span>
+                @endif
             </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                <span class="dropdown-item dropdown-header">Profile Menu</span>
+            <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg border-0 shadow">
+                <div class="dropdown-header d-flex justify-content-between align-items-center py-2">
+                    <span class="font-weight-bold">Notifications</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div style="max-height: 220px; overflow-y: auto;">
+                    @forelse($expires as $prod)
+                        <a href="#" class="dropdown-item py-2">
+                            <small class="text-muted d-block">Expiring {{ Carbon\Carbon::parse($prod->expire_date)->toFormattedDateString() }}</small>
+                            {{ $prod->product->name ?? 'Product' }}
+                        </a>
+                    @empty
+                        <span class="dropdown-item text-muted">No expiring products</span>
+                    @endforelse
+                </div>
+            </div>
+        </li>
+
+        <!-- User menu -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-user-circle fa-lg text-secondary mr-1"></i>
+                <span class="d-none d-md-inline">{{ Auth::user()->name ?? 'Account' }}</span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right border-0 shadow">
+                <span class="dropdown-header text-muted small">Profile Menu</span>
                 <div class="dropdown-divider"></div>
                 <a href="{{ route('profile') }}" class="dropdown-item">
-                    <i class="ion-ios-person-outline"></i> Profile
+                    <i class="fa fa-user mr-2 text-muted"></i> Profile
                 </a>
                 @can('users.index')
                     <a href="{{ route('users.index') }}" class="dropdown-item">
-                        <i class="ion-ios-personadd"></i> Manage Users
+                        <i class="fa fa-users mr-2 text-muted"></i> Manage Users
                     </a>
                     <a href="{{ route('admin.period.index') }}" class="dropdown-item">
-                        <i class="ion-ios-personadd"></i> Opening/Closing Entry
+                        <i class="fa fa-calendar mr-2 text-muted"></i> Opening/Closing Entry
                     </a>
                 @endcan
-
                 @can('notification')
                     <a href="{{ route('notification') }}" class="dropdown-item">
-                        <i class=""></i> Notification
+                        <i class="fa fa-cog mr-2 text-muted"></i> Notification
                     </a>
                 @endcan
                 @can('roles.index')
                     <a href="{{ route('roles.index') }}" class="dropdown-item">
-                        <i class="ion-ios-locked-outline"></i> Roles
+                        <i class="fa fa-id-badge mr-2 text-muted"></i> Roles
                     </a>
                 @endcan
                 @can('permissions.index')
                     <a href="{{ route('permissions.index') }}" class="dropdown-item">
-                        <i class="ion-ios-locked-outline"></i> Permissions
+                        <i class="fa fa-key mr-2 text-muted"></i> Permissions
                     </a>
                 @endcan
                 @can('role-permission')
                     <div class="dropdown-divider"></div>
                     <a href="{{ route('role-permission') }}" class="dropdown-item">
-                        <i class="ion-ios-sunny"></i> Role Permission
+                        <i class="fa fa-shield mr-2 text-muted"></i> Role Permission
                     </a>
                 @endcan
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="{{ route('logout') }}"
-                    onclick="event.preventDefault();
-                    document.getElementById('logout-form').submit();">
-                    <i class="ion-log-out"></i> Logout
+                <a class="dropdown-item text-danger" href="{{ route('logout') }}"
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="fa fa-sign-out mr-2"></i> Logout
                 </a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                    @csrf
-                </form>
-
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
             </div>
         </li>
-
     </ul>
 </nav>
 <div class="modal fade" id="swtich_branch" style="display: none;" aria-hidden="true">

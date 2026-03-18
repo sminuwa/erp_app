@@ -1,65 +1,69 @@
-<div class="row">
-    <div class="offset-10">
+<div class="store-ledger-results">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 px-1">
+        <div>
+            <h5 class="text-primary mb-0 font-weight-bold">{{ $branch->name ?? 'All Branches' }}</h5>
+            <small class="text-muted">Store Quantity Report</small>
+        </div>
         <a href="{{ route('ajax.print.store.ledger.reports', [$company_id,$branch_id, $store_id, is_array($category_id) ? implode(',', $category_id) : $category_id, $product_id]) }}"
-           target="_BLANK" class="btn-success btn btn-sm">Print</a>
+           target="_BLANK" class="btn btn-success btn-sm">
+            <i class="fas fa-print mr-1"></i> Print
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="display table table-bordered table-hover table-striped table-sm mb-0" id="example1">
+            <thead class="thead-light">
+            <tr>
+                <th colspan="5" class="border-0 py-2 text-muted small">
+                    Date Processed: {{ Carbon\Carbon::parse(now())->format('l, jS F Y h:i A') }}
+                </th>
+                <th colspan="4" class="border-0 py-2 text-right text-muted small">
+                    Processed by {{ auth()->user()->name }}
+                </th>
+            </tr>
+            <tr>
+                <th class="bg-light">Branch</th>
+                <th class="bg-light">Store</th>
+                <th class="bg-light">Product</th>
+                <th class="bg-light">Category</th>
+                <th class="bg-light text-right">Qty</th>
+                <th class="bg-light text-center">Unit</th>
+                <th class="bg-light">Date of receipt in transit store</th>
+                <th class="bg-light text-right">Cost price</th>
+                <th class="bg-light text-right">Total price</th>
+            </tr>
+            </thead>
+            <tbody>
+            @php $grantTotal = 0.0; $total_quantity = 0; @endphp
+            @foreach ($stores as $store)
+                @php
+                    $total = remove_non_numeric($store->cost_price) * remove_non_numeric(round($store->qty_available, 6));
+                    $grantTotal += $total;
+                    $total_quantity += $store->qty_available;
+                @endphp
+                <tr>
+                    <td>{{ $store->branch_code }}</td>
+                    <td>{{ $store->store }}</td>
+                    <td>{{ $store->code }} – {{ $store->name }}</td>
+                    <td>{{ $store->category }}</td>
+                    <td class="text-right">{{ number_format(round($store->qty_available, 6), 6) }}</td>
+                    <td class="text-center">{{ $store->product_unit }}</td>
+                    <td>{{ $store->date_receipt_transit_store ? \Carbon\Carbon::parse($store->date_receipt_transit_store)->format('d/m/Y') : '—' }}</td>
+                    <td class="text-right">{{ number_format(remove_non_numeric($store->cost_price), 2) }}</td>
+                    <td class="text-right font-weight-medium">{{ number_format($total, 2) }}</td>
+                </tr>
+            @endforeach
+            </tbody>
+            <tfoot class="thead-light">
+            <tr>
+                <th colspan="4" class="text-right bg-light">Total</th>
+                <th class="text-right bg-light">{{ number_format($total_quantity, 2) }}</th>
+                <th class="bg-light"></th>
+                <th class="bg-light"></th>
+                <th class="bg-light"></th>
+                <th class="text-right bg-light font-weight-bold">{{ currency_sign() . number_format($grantTotal, 2) }}</th>
+            </tr>
+            </tfoot>
+        </table>
     </div>
 </div>
-<table class="display table table-bordered caption" id="example1">
-    <caption style="caption-size:top">
-        <h5 style="text-align: center;text-transform:uppercase">{{ $branch->name ?? 'All Branches' }}</h5>
-        <h5 style="text-align: center;">STORE QUANTITY REPORT </h5>
-    </caption>
-    <thead>
-    <tr>
-        <th style="width: 50%" colspan="5">Date
-            Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
-        </th>
-        <th style="width: 50%;text-align:right" colspan="4">Processed By {{ auth()->user()->name }}</th>
-    </tr>
-    <tr>
-        <th>BRANCH</th>
-        <th>STORE</th>
-        <th>PRODUCT NAME</th>
-        <th>CATEGORY NAME</th>
-        <th>QUANTITY</th>
-        <th>UNIT</th>
-        <th>DATE OF RECEIPT IN TRANSIT STORE</th>
-        <th>COST PRICE</th>
-        <th>TOTAL PRICE</th>
-    </tr>
-    </thead>
-    @php $grantTotal=0.0;
-    $total_quantity = 0;
-    @endphp
-    @foreach ($stores as $store)
-        @php
-            $total = remove_non_numeric($store->cost_price) * remove_non_numeric(round($store->qty_available, 6));
-            $grantTotal += $total;
-            $total_quantity +=$store->qty_available;
-        @endphp
-        <tr>
-            <td> {{ $store->branch_code }} </td>
-            <td>{{ $store->store }} </td>
-            <td>{{ $store->code }} - {{ $store->name }} </td>
-            <td> {{ $store->category }} </td>
-            <td> {{ number_format(round($store->qty_available, 6), 6) }} </td>
-            <td>{{ $store->product_unit }}</td>
-            <td>{{ $store->date_receipt_transit_store ? \Carbon\Carbon::parse($store->date_receipt_transit_store)->format('d/m/Y') : '—' }}</td>
-            <td style="text-align: right;">
-                {{ number_format(remove_non_numeric($store->cost_price), 2) }} </td>
-            <td style="text-align: right;">
-                {{ number_format($total, 2) }}
-            </td>
-        </tr>
-    @endforeach
-    <tfoot>
-    <tr>
-        <th style="text-align: right" colspan="4">TOTAL</th>
-        <th>{{ number_format($total_quantity,2) }}</th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th>{{ currency_sign() . number_format($grantTotal,2) }}</th>
-    </tr>
-    </tfoot>
-</table>

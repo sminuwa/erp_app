@@ -8,12 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Receipt extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'receipt_no', 'amount', 'remaining_balance', 'date', 'description',
-        'model_id', 'model_name', 'charged_account_id', 'charged_account_name',
-        'branch_id', 'status', 'created_by', 'posted_by'
-    ];
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');
@@ -55,7 +49,7 @@ class Receipt extends Model
             return GeneralAccount::find($this->charged_account_id);
     }
 
-    public static function generateNewNumber($date, $prefix = 'RCT', $length = 4)
+    public static function generateNewNumber($prefix = 'RCT', $length = 4, $date)
     {
         $prefix = $prefix . $date . auth()->user()->branch->code;
         $record = self::where('receipt_no', 'like', '%' . $prefix . '%')->orderBy('receipt_no', 'desc')->first();
@@ -65,55 +59,6 @@ class Receipt extends Model
             return $prefix . str_pad($new, $length, 0, STR_PAD_LEFT);
         }
         return $prefix . str_pad(1, $length, 0, STR_PAD_LEFT);
-    }
-
-    /**
-     * Get the order receipt trackings for this receipt
-     */
-    public function orderReceiptTrackings()
-    {
-        return $this->hasMany(OrderReceiptTracking::class);
-    }
-
-    /**
-     * Get the total applied amount for this receipt
-     */
-    public function getTotalAppliedAmount()
-    {
-        return $this->orderReceiptTrackings()->sum('applied_amount');
-    }
-
-    /**
-     * Update the remaining balance based on applied amounts
-     */
-    public function updateRemainingBalance()
-    {
-        $totalApplied = $this->getTotalAppliedAmount();
-        $this->remaining_balance = $this->amount - $totalApplied;
-        $this->save();
-        return $this->remaining_balance;
-    }
-
-    /**
-     * Check if receipt has available balance
-     */
-    public function hasAvailableBalance()
-    {
-        return $this->remaining_balance > 0;
-    }
-
-    /**
-     * Get customer receipts with available balance for POS
-     */
-    public static function getAvailableCustomerReceipts($customer_id, $limit = 50)
-    {
-        return self::where('model_name', 'Customer')
-            ->where('model_id', $customer_id)
-            ->where('status', 1) // Only posted receipts
-            ->where('remaining_balance', '>', 0)
-            ->orderBy('date', 'asc') // Oldest first for better optimization
-            ->take($limit)
-            ->get();
     }
 
 }

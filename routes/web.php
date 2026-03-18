@@ -429,7 +429,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/ledger/load/general', [CustomerController::class, 'loadGeneralCustomerLedger'])->name('ajax.general.customer.ledger');
             Route::get('/credit_limit', [CustomerController::class, 'getCustomerCreditLimit'])->name('ajax.load.customer.credit_limit');
             Route::get('/balance', [CustomerController::class, 'getCustomerBalance'])->name('ajax.load.customer.balance');
-            Route::get('/receipts/{customer_id}', [CustomerController::class, 'getCustomerReceipts'])->name('ajax.load.customer.receipts');
             Route::post('update/credit_limit', [CustomerController::class, 'updateCreditLimit'])->name('customers.update.credit_limit');
             Route::get('/print/ledger/{from_date}/{to_date}/{customer_id}', [CustomerController::class, 'printLedger'])->name('ajax.customer.print.ledger');
         }

@@ -892,6 +892,11 @@ class ReportController extends Controller
             products.name,
             products.code,
             products.unit as product_unit,
+            (SELECT MAX(it.date)
+                FROM interstore_transfer_details itd
+                INNER JOIN interstore_transfers it ON it.id = itd.interstore_transfer_id
+                WHERE itd.destination_store_id = store_products.store_id
+                AND itd.product_id = store_products.product_id) as date_receipt_transit_store,
             stores.code as store,
             store_products.qty_available,
             (SELECT bpp.retail_selling_price
@@ -2435,9 +2440,9 @@ class ReportController extends Controller
             foreach ($salesByOfficer as $record) {
                 $key = $record->branch_id . '-' . ($record->category_id ?? 0);
                 $budget = $budgetMap[$key] ?? null;
-                $record->budget_quantity = $budget->total_budget ?? 0;
-                $record->achievement_percent = $record->budget_quantity > 0
-                    ? round(($record->total_amount / $record->budget_quantity) * 100, 2)
+                $record->budget_amount = $budget->total_budget ?? 0;
+                $record->achievement_percent = $record->budget_amount > 0
+                    ? round(($record->total_amount / $record->budget_amount) * 100, 2)
                     : null;
             }
         } else {
@@ -2510,9 +2515,9 @@ class ReportController extends Controller
                 foreach ($salesGroup as $record) {
                     $key = $record->branch_id . '-' . $record->category_id;
                     $budget = $budgetMap[$key] ?? null;
-                    $record->branch_category_budget_quantity = $budget->total_budget ?? 0;
-                    $record->achievement_percent = $record->branch_category_budget_quantity > 0
-                        ? round(($record->amount / $record->branch_category_budget_quantity) * 100, 2)
+                    $record->branch_category_budget = $budget->total_budget ?? 0;
+                    $record->achievement_percent = $record->branch_category_budget > 0
+                        ? round(($record->amount / $record->branch_category_budget) * 100, 2)
                         : null;
                 }
             }

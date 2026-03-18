@@ -11,7 +11,7 @@
     </caption>
     <thead>
     <tr>
-        <th style="width: 50%" colspan="4">Date
+        <th style="width: 50%" colspan="5">Date
             Processed: {{ Carbon\Carbon::parse(date('Y-m-d H:i:s'))->format('l, jS F Y h:i A') }}
         </th>
         <th style="width: 50%;text-align:right" colspan="4">Processed By {{ auth()->user()->name }}</th>
@@ -23,6 +23,7 @@
         <th>CATEGORY NAME</th>
         <th>QUANTITY</th>
         <th>UNIT</th>
+        <th>DATE OF RECEIPT IN TRANSIT STORE</th>
         <th>COST PRICE</th>
         <th>TOTAL PRICE</th>
     </tr>
@@ -43,6 +44,7 @@
             <td> {{ $store->category }} </td>
             <td> {{ number_format(round($store->qty_available, 6), 6) }} </td>
             <td>{{ $store->product_unit }}</td>
+            <td>{{ $store->date_receipt_transit_store ? \Carbon\Carbon::parse($store->date_receipt_transit_store)->format('d/m/Y') : '—' }}</td>
             <td style="text-align: right;">
                 {{ number_format(remove_non_numeric($store->cost_price), 2) }} </td>
             <td style="text-align: right;">
@@ -54,6 +56,7 @@
     <tr>
         <th style="text-align: right" colspan="4">TOTAL</th>
         <th>{{ number_format($total_quantity,2) }}</th>
+        <th></th>
         <th></th>
         <th></th>
         <th>{{ currency_sign() . number_format($grantTotal,2) }}</th>

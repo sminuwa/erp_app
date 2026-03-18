@@ -111,6 +111,11 @@ function generateRandomString($length = 5)
 
 function convertNumberToWords($number)
 {
+    // Handle null values
+    if ($number === null) {
+        return 'Zero';
+    }
+
     $hyphen = '-';
     $conjunction = ' and ';
     $separator = ', ';

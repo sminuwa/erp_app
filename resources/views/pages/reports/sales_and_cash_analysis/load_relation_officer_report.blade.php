@@ -212,7 +212,7 @@
                             <th>Branch</th>
                             <th>Quantity Sold</th>
                             <th>Total Amount</th>
-                            <th>Budget Quantity</th>
+                            <th>Budget Amount</th>
                             <th>Achievement (%)</th>
                             <th>Cost</th>
                             <th>Margin</th>
@@ -223,13 +223,13 @@
                         @foreach ($salesByOfficer as $sales)
                             @php
                                 $profit = $sales->total_amount - $sales->cost;
-                                $achievement = $sales->budget_quantity > 0 ? ($sales->total_amount / $sales->budget_quantity) * 100 : null;
+                                $achievement = $sales->budget_amount > 0 ? ($sales->total_amount / $sales->budget_amount) * 100 : null;
 
                                 $grand_total_amount += $sales->total_amount;
                                 $grand_total_cost += $sales->cost;
                                 $grand_total_profit += $profit;
                                 $grand_total_qty += $sales->total_quantity;
-                                $grand_total_budget += $sales->budget_quantity ?? 0;
+                                $grand_total_budget += $sales->budget_amount ?? 0;
                             @endphp
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
@@ -238,7 +238,7 @@
                                 <td>{{ $sales->branch_name }}</td>
                                 <td style="text-align: right">{{ number_format($sales->total_quantity, 2) }}</td>
                                 <td style="text-align: right">{{ number_format($sales->total_amount, 2) }}</td>
-                                <td style="text-align: right">{{ number_format($sales->budget_quantity ?? 0, 2) }}</td>
+                                <td style="text-align: right">{{ number_format($sales->budget_amount ?? 0, 2) }}</td>
                                 <td style="text-align: right">
                                     {{ $achievement !== null ? number_format($achievement, 2) . '%' : 'N/A' }}
                                 </td>
@@ -279,7 +279,7 @@
                                     <th>QTY AVAILABLE</th>
                                     <th>QTY SOLD</th>
                                     <th>AMOUNT</th>
-                                    <th>BUDGET QTY</th>
+                                    <th>BUDGET</th>
                                     <th>ACHIEVEMENT (%)</th>
                                     <th>COST</th>
                                     <th>MARGIN</th>
@@ -295,8 +295,8 @@
                                         $officer_total_profit += $profit;
                                         $officer_total_qty += $sale->quantity ?? 0;
                                         $officer_total_qty_available += $sale->qty_available ?? 0;
-                                        $achievement = $sale->branch_category_budget_quantity > 0 ? ($sale->amount / $sale->branch_category_budget_quantity) * 100 : null;
-                                        $grand_total_budget += $sale->branch_category_budget_quantity ?? 0;
+                                        $achievement = $sale->branch_category_budget > 0 ? ($sale->amount / $sale->branch_category_budget) * 100 : null;
+                                        $grand_total_budget += $sale->branch_category_budget ?? 0;
                                     @endphp
                                     <tr>
                                         <td>{{ $sale->code ?? 'N/A' }}</td>
@@ -305,7 +305,7 @@
                                         <td style="text-align: right">{{ number_format($sale->qty_available ?? 0, 6) }}</td>
                                         <td style="text-align: right">{{ number_format($sale->quantity ?? 0, 6) }}</td>
                                         <td style="text-align: right">{{ number_format($sale->amount ?? 0, 2) }}</td>
-                                        <td style="text-align: right">{{ number_format($sale->branch_category_budget_quantity ?? 0, 2) }}</td>
+                                        <td style="text-align: right">{{ number_format($sale->branch_category_budget ?? 0, 2) }}</td>
                                         <td style="text-align: right">{{ $achievement !== null ? number_format($achievement, 2) . '%' : '-' }}</td>
                                         <td style="text-align: right">{{ number_format($sale->cost ?? 0, 2) }}</td>
                                         <td style="text-align: right">{{ number_format($profit, 2) }}</td>
@@ -352,7 +352,7 @@
                             <th style="text-align: right">GRAND TOTAL</th>
                             <th style="text-align: right">QTY SOLD</th>
                             <th style="text-align: right">AMOUNT</th>
-                            <th style="text-align: right">TOTAL BUDGET QTY</th>
+                            <th style="text-align: right">TOTAL BUDGET</th>
                             <th style="text-align: right">COST</th>
                             <th style="text-align: right">MARGIN</th>
                             <th style="text-align: right">MARGIN (%)</th>

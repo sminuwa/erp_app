@@ -8,6 +8,7 @@
         "php": "^8.0.2",
         "ext-intl": "*",
         "barryvdh/laravel-dompdf": "^1.0",
+        "nesbot/carbon": "^2.73",
         "brian2694/laravel-toastr": "^5.5",
         "darryldecode/cart": "^4.2",
         "digitaldream/laracrud": "*",

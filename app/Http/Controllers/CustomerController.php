@@ -311,24 +311,6 @@ class CustomerController extends Controller
         return Customer::find($request->customer_id)->credit_limit ?? 0;
     }
 
-    public function getCustomerReceipts(Request $request, $customer_id)
-    {
-        $receipts = \App\Models\Receipt::getAvailableCustomerReceipts($customer_id, 50);
-        return response()->json([
-            'success' => true,
-            'receipts' => $receipts->map(function($receipt) {
-                return [
-                    'id' => $receipt->id,
-                    'receipt_no' => $receipt->receipt_no,
-                    'amount' => $receipt->amount,
-                    'remaining_balance' => $receipt->remaining_balance,
-                    'date' => $receipt->date,
-                    'description' => $receipt->description
-                ];
-            })
-        ]);
-    }
-
     public function updateCreditLimit(Request $request)
     {
         if ($request->customer_id != null) {

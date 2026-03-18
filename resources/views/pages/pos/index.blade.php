@@ -75,177 +75,120 @@
 
                                 </div>
                                 <div class="card-body">
-                                    <!-- Quick Access Section -->
-                                    <div class="row mb-3">
-                                        <div class="col-md-12">
+
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            {{--                                            @hasanyrole('Super-admin|Admin') --}}
                                             <div class="form-group">
-                                                <label for="barcode_input" style="font-weight: bold; color: #007bff;">
-                                                    <i class="fa fa-barcode"></i> Quick Product Search / Barcode Scanner
-                                                </label>
-                                                <input type="text" id="barcode_input" class="form-control form-control-lg"
-                                                       name="barcode_input" placeholder="Scan barcode or search product..."
-                                                       style="border: 2px solid #007bff; font-size: 16px;">
+                                                <label for="order_date">Sale Date</label>
+                                                <input type="text" name="order_date"
+                                                       class="form-control datepicker-entry"
+                                                       value="{{ isset($order) ? Carbon\Carbon::parse($order->order_date)->format('Y-m-d') : date('Y-m-d') }}"/>
                                             </div>
+                                            {{--                                            @else --}}
+                                            {{--                                                <input type="hidden" name="order_date" class="form-control datepicker-entry" --}}
+                                            {{--                                                    value="{{ date('Y-m-d') }}" /> --}}
+                                            {{--                                            @endhasanyrole --}}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Customer Type</label>
+                                                <select name="account_type" id="account_type" class="form-control"
+                                                        {{ !empty(old('account_type')) ? 'disabled' : '' }} required>
+                                                    <option value="" disabled selected>Select...</option>
+                                                    <option value="Retail"
+                                                        {{ (isset($order) && $order->customer->type == 'Retail') || old('account_type') == 'Retail' || (session()->has('customer') && session('customer')->type == 'Retail') ? 'selected' : '' }}>
+                                                        Retail
+                                                    </option>
+                                                    <option value="Wholesale"
+                                                        {{ (isset($order) && $order->customer->type == 'Wholesale') || old('account_type') == 'Wholesale' || (session()->has('customer') && session('customer')->type == 'Wholesale') ? 'selected' : '' }}>
+                                                        WholeSale
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Customer</label>
+                                                <div class="form-group">
+                                                    <input type="hidden" class="form-control" name="customer_id"
+                                                           id="customer_val_id" value="">
+                                                    <select onchange="$('.customer').val($(this).val())"
+                                                            name="customer_id"
+                                                            {{ old('customer_id') > 0 ? 'disabled' : '' }} id="customer_record"
+                                                            class="form-control select2-single">
+                                                        @if (session()->has('customer'))
+                                                            <option value="{{ session('customer')->id }}">
+                                                                {{ session('customer')->code }} -
+                                                                {{ session('customer')->name }}</option>
+                                                        @endif
+                                                        @if (isset($order))
+                                                            <option value="{{ $order->customer->id }}"
+                                                                    @if ((session()->has('customer') && session('customer')->id) == $order->customer?->id) selected @endif>
+                                                                {{ $order->customer->code }} -
+                                                                {{ $order->customer->name }}</option>
+                                                        @endif
+                                                        @if (old('customer_id') > 0)
+                                                            <option value="{{ old('customer_id') }}"
+                                                                    @if ((session()->has('customer') && session('customer')->id) == old('customer_id')) selected @endif>
+                                                                {{ App\Models\Customer::find(old('customer_id'))->code }}
+                                                                -
+                                                                {{ App\Models\Customer::find(old('customer_id'))->name }}
+                                                            </option>
+                                                        @endif
+                                                    </select>
+
+                                                    <div class="form-group">
+                                                        <span class="text  ion-android-alert"
+                                                              id="credit_balance"></span>: <span
+                                                            class="text ion-android-alert"
+                                                            id="customer_balance"></span>
+                                                    </div>
+                                                </div>
+                                                @isset($order)
+                                                    <input type="hidden" name="order_invoice_id"
+                                                           value="{{ $order->id }}"/>
+                                                @endisset
+
+                                            </div>
+
                                         </div>
                                     </div>
-
-                                    <!-- Customer Information Section -->
-                                    <div class="card mb-3" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
-                                        <div class="card-header py-2" style="background-color: #e9ecef;">
-                                            <h6 class="mb-0"><i class="fa fa-user"></i> Customer Information</h6>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <textarea class="form-control" name="description" placeholder="Description"
+                                                      id="description" required></textarea>
                                         </div>
-                                        <div class="card-body py-3">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group mb-2">
-                                                        <label>Customer Type</label>
-                                                        <select name="account_type" id="account_type" class="form-control"
-                                                                {{ !empty(old('account_type')) ? 'disabled' : '' }} required>
-                                                            <option value="" disabled selected>Select...</option>
-                                                            <option value="Retail"
-                                                                {{ (isset($order) && $order->customer->type == 'Retail') || old('account_type') == 'Retail' || (session()->has('customer') && session('customer')->type == 'Retail') ? 'selected' : '' }}>
-                                                                Retail
-                                                            </option>
-                                                            <option value="Wholesale"
-                                                                {{ (isset($order) && $order->customer->type == 'Wholesale') || old('account_type') == 'Wholesale' || (session()->has('customer') && session('customer')->type == 'Wholesale') ? 'selected' : '' }}>
-                                                                WholeSale
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group mb-2">
-                                                        <label>Customer</label>
-                                                        <input type="hidden" class="form-control" name="customer_id"
-                                                               id="customer_val_id" value="">
-                                                        <select onchange="$('.customer').val($(this).val())"
-                                                                name="customer_id"
-                                                                {{ old('customer_id') > 0 ? 'disabled' : '' }} id="customer_record"
-                                                                class="form-control select2-single">
-                                                            @if (session()->has('customer'))
-                                                                <option value="{{ session('customer')->id }}">
-                                                                    {{ session('customer')->code }} -
-                                                                    {{ session('customer')->name }}</option>
-                                                            @endif
-                                                            @if (isset($order))
-                                                                <option value="{{ $order->customer->id }}"
-                                                                        @if ((session()->has('customer') && session('customer')->id) == $order->customer?->id) selected @endif>
-                                                                    {{ $order->customer->code }} -
-                                                                    {{ $order->customer->name }}</option>
-                                                            @endif
-                                                            @if (old('customer_id') > 0)
-                                                                <option value="{{ old('customer_id') }}"
-                                                                        @if ((session()->has('customer') && session('customer')->id) == old('customer_id')) selected @endif>
-                                                                    {{ App\Models\Customer::find(old('customer_id'))->code }}
-                                                                    -
-                                                                    {{ App\Models\Customer::find(old('customer_id'))->name }}
-                                                                </option>
-                                                            @endif
-                                                        </select>
-                                                        @isset($order)
-                                                            <input type="hidden" name="order_invoice_id"
-                                                                   value="{{ $order->id }}"/>
-                                                        @endisset
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div class="col-md-4">
+                                            <input type="text" class="form-control" name="discount" id="discount"
+                                                   oninput="formatNumber(this)" placeholder="Discount"/>
+                                        </div>
 
-                                            <!-- Customer Balance & Credit Info -->
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <div class="alert alert-info py-2 mb-2" style="font-size: 12px;">
-                                                        <span class="text ion-android-alert" id="credit_balance"></span>
-                                                        <span class="ml-3"></span>
-                                                        <span class="text ion-android-alert" id="customer_balance"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" oninput="formatNumber(this)"
+                                                       placeholder="Refund" name="refund" id="refund"/>
 
-                                            <!-- Receipt Selection Section -->
-                                            <div class="form-group" id="receipt_selection_section" style="display: none;">
-                                                <label for="customer_receipts"><strong>Available Receipts</strong></label>
-                                                <div id="receipt_summary" style="margin-bottom: 10px; padding: 5px; background: #f8f9fa; border-radius: 4px; font-size: 12px;">
-                                                    <!-- Summary will be shown here -->
-                                                </div>
-                                                <div id="customer_receipts_container" style="max-height: 250px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
-                                                    <!-- Dynamic receipts will be loaded here -->
-                                                </div>
-                                                <input type="hidden" name="selected_receipts" id="selected_receipts" value="">
-                                                <small class="text-muted">System auto-selects optimal receipts. You can manually adjust amounts.</small>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <!-- Transaction Details Section -->
-                                    <div class="card mb-3" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
-                                        <div class="card-header py-2" style="background-color: #e9ecef;">
-                                            <h6 class="mb-0"><i class="fa fa-file-text"></i> Transaction Details</h6>
+                                        <div class="col-md-2">
+                                            <input type="checkbox" id="show_vat" name="show_vat" data-switch="bool">
+                                            <label for="show_vat" data-on-label="On" data-off-label="Off">Show
+                                                VAT</label>
                                         </div>
-                                        <div class="card-body py-3">
-                                            <div class="row">
-                                                <div class="col-md-3">
-                                                    <div class="form-group mb-2">
-                                                        <label for="order_date">Sale Date</label>
-                                                        <input type="text" name="order_date"
-                                                               class="form-control datepicker-entry"
-                                                               value="{{ isset($order) ? Carbon\Carbon::parse($order->order_date)->format('Y-m-d') : date('Y-m-d') }}"/>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-9">
-                                                    <div class="form-group mb-2">
-                                                        <label for="description">Description</label>
-                                                        <textarea class="form-control" name="description" placeholder="Transaction description (optional)"
-                                                                  id="description" rows="2"></textarea>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-3">
-                                                    <div class="form-group mb-2">
-                                                        <label for="discount">Discount</label>
-                                                        <input type="text" class="form-control" name="discount" id="discount"
-                                                               oninput="formatNumber(this)" placeholder="0.00"/>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-group mb-2">
-                                                        <label for="refund">Refund</label>
-                                                        <input type="text" class="form-control" oninput="formatNumber(this)"
-                                                               placeholder="0.00" name="refund" id="refund"/>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-group mb-2">
-                                                        <label>&nbsp;</label>
-                                                        <div class="form-control-plaintext">
-                                                            <input type="checkbox" id="show_vat" name="show_vat" data-switch="bool">
-                                                            <label for="show_vat" data-on-label="On" data-off-label="Off">Show VAT</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-group mb-2">
-                                                        <label>&nbsp;</label>
-                                                        <button type="submit" class="btn btn-success btn-block">
-                                                            <i class="fa fa-save"></i> Create Invoice
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            @if (old('customer_id'))
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="alert alert-warning py-2" style="font-size: 12px;">
-                                                            <span style="color:red;">If the credit limit is exceeded, click here to refresh
-                                                                <i class="fa fa-refresh" onclick="window.location.reload()" style="cursor: pointer;"></i>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endif
+                                        <div class="col-md-2">
+                                            <button type="submit" class="btn btn-sm btn-info float-md-right ml-3">Create
+                                                Invoice
+                                            </button>
                                         </div>
+                                        @if (old('customer_id'))
+                                            <div class="col-md-6">
+                                                <span style="color:red;">If the credit limit is exceeded, click here to
+                                                    refresh <i class="fa fa-refresh"
+                                                               onclick="window.location.reload()"></i></span>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </form>
@@ -256,10 +199,11 @@
                         <!-- general form elements -->
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">POS - Product Selection</h3>
+                                <h3 class="card-title">POS</h3>
 
                                 {{--                                @can('make.daily.sale') --}}
-                                {{-- Barcode scanner moved to left panel --}}
+                                <input type="text" id="barcode" class="form-control" name="barcode"
+                                       placeholder="Scan barcode">
                                 {{--                                @endcannot --}}
                             </div>
                             <!-- /.card-header -->
@@ -714,10 +658,6 @@
                 // balance = formatMoney(Math.abs(data));
 
                 $("#customer_balance").html(balance);
-
-                // Load customer receipts
-                console.log('About to load customer receipts for customer_id:', customer_id);
-                loadCustomerReceipts(customer_id);
             });
         });
 
@@ -839,8 +779,7 @@
                         success: function (response) {
                             // update the cart items container with the new cart data
                             $('#load_cart').html(response);
-                            $('#barcode_input').val("");
-                            code = "";
+                            $('#barcode').val("")
                         },
                         error: function (xhr, status, error) {
                             // display an error message
@@ -894,466 +833,5 @@
             }
         }
 
-        // Load customer receipts function
-        function loadCustomerReceipts(customer_id) {
-            console.log('loadCustomerReceipts called with customer_id:', customer_id);
-
-            if (!customer_id) {
-                $('#receipt_selection_section').hide();
-                console.log('No customer_id provided, hiding receipt section');
-                return;
-            }
-
-            // Show loading indicator
-            $('#customer_receipts_container').html('<div class="text-center"><i class="fa fa-spinner fa-spin"></i> Loading receipts...</div>');
-            $('#receipt_selection_section').show();
-
-            $.ajax({
-                type: "GET",
-                url: "{{ route('ajax.load.customer.receipts', ':customer_id') }}".replace(':customer_id', customer_id),
-                success: function(response) {
-                    console.log('AJAX response:', response);
-                    if (response.success && response.receipts.length > 0) {
-                        console.log('Found', response.receipts.length, 'receipts for customer');
-                        displayCustomerReceipts(response.receipts);
-                        $('#receipt_selection_section').show();
-                    } else {
-                        console.log('No receipts found for customer');
-                        $('#customer_receipts_container').html('<div class="alert alert-info" style="padding: 8px; font-size: 12px;">No available receipts found for this customer.</div>');
-                        $('#receipt_selection_section').show(); // Still show the section with the "no receipts" message
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('AJAX error:', xhr.responseText);
-                    $('#customer_receipts_container').html('<div class="alert alert-danger" style="padding: 8px; font-size: 12px;">Error loading receipts: ' + error + '</div>');
-                    $('#receipt_selection_section').show(); // Show with error message
-                }
-            });
-        }
-
-        // Display customer receipts function
-        function displayCustomerReceipts(receipts) {
-            // Update summary
-            const totalReceipts = receipts.length;
-            const totalAvailable = receipts.reduce((sum, r) => sum + parseFloat(r.remaining_balance), 0);
-
-            $('#receipt_summary').html(`
-                <strong>📋 Receipt Summary:</strong>
-                ${totalReceipts} available receipt${totalReceipts !== 1 ? 's' : ''} |
-                Total Available: ₦${formatMoney(totalAvailable)}
-            `);
-
-            let html = '';
-            receipts.forEach(function(receipt, index) {
-                const formattedAmount = formatMoney(receipt.amount);
-                const formattedBalance = formatMoney(receipt.remaining_balance);
-                const receiptDate = new Date(receipt.date).toLocaleDateString();
-
-                html += `
-                    <div class="receipt-item" style="margin-bottom: 8px; padding: 6px; border: 1px solid #eee; border-radius: 4px; background: ${index % 2 === 0 ? '#fafafa' : '#ffffff'};">
-                        <label style="cursor: pointer; display: block; margin: 0;">
-                            <input type="checkbox" class="receipt-checkbox" data-receipt-id="${receipt.id}"
-                                   data-remaining-balance="${receipt.remaining_balance}"
-                                   style="margin-right: 6px;">
-                            <strong style="font-size: 11px;">${receipt.receipt_no}</strong>
-                            <span style="font-size: 10px; color: #666;"> - ${receiptDate}</span>
-                            <br>
-                            <small class="text-muted" style="font-size: 10px;">${receipt.description || 'No description'}</small>
-                            <br>
-                            <span class="text-info" style="font-size: 10px;">Total: ₦${formattedAmount}</span> |
-                            <span class="text-success" style="font-size: 10px;"><strong>Available: ₦${formattedBalance}</strong></span>
-                        </label>
-                        <div class="applied-amount-section" style="display: none; margin-top: 4px;">
-                            <label style="font-size: 10px; margin-bottom: 2px;">Apply Amount:</label>
-                            <input type="number" class="form-control applied-amount-input"
-                                   data-receipt-id="${receipt.id}"
-                                   style="font-size: 10px; height: 25px; padding: 2px 4px;"
-                                   max="${receipt.remaining_balance}"
-                                   step="0.01" placeholder="Enter amount">
-                        </div>
-                    </div>
-                `;
-            });
-
-            $('#customer_receipts_container').html(html);
-
-            // Auto-select receipts with optimal selection
-            autoSelectReceipts();
-        }
-
-        // Auto-select receipts function with optimal application
-        function autoSelectReceipts() {
-            // Get current cart total (invoice total)
-            const cartTotal = getCartTotal();
-
-            // Debug logging
-            console.log('Cart total detected:', cartTotal);
-
-            if (cartTotal <= 0) {
-                // No cart items, don't select any receipts
-                console.log('No cart total detected, skipping receipt optimization');
-                return;
-            }
-
-            let remainingInvoiceAmount = cartTotal;
-            const receipts = [];
-
-            // Collect all receipts with their data
-            $('.receipt-checkbox').each(function() {
-                const checkbox = $(this);
-                receipts.push({
-                    element: checkbox,
-                    id: checkbox.data('receipt-id'),
-                    balance: parseFloat(checkbox.data('remaining-balance'))
-                });
-            });
-
-            // Debug logging
-            console.log('Available receipts:', receipts.map(r => ({id: r.id, balance: r.balance})));
-            console.log('Invoice amount to cover:', cartTotal);
-
-            // Smart optimization algorithm
-            const optimalSelection = findOptimalReceiptCombination(receipts, cartTotal);
-
-            // Apply the optimal selection
-            receipts.forEach(function(receipt) {
-                const optimalReceipt = optimalSelection.find(r => r.id === receipt.id);
-
-                if (optimalReceipt && optimalReceipt.amount > 0) {
-                    // This receipt should be used
-                    receipt.element.prop('checked', true);
-                    const amountInput = $(`.applied-amount-section input[data-receipt-id="${receipt.id}"]`);
-                    amountInput.val(optimalReceipt.amount.toFixed(2));
-                    receipt.element.closest('.receipt-item').find('.applied-amount-section').show();
-                } else {
-                    // This receipt should not be used
-                    receipt.element.prop('checked', false);
-                    receipt.element.closest('.receipt-item').find('.applied-amount-section').hide();
-                }
-            });
-
-            remainingInvoiceAmount = cartTotal - optimalSelection.reduce((sum, r) => sum + r.amount, 0);
-
-            updateSelectedReceipts();
-
-            // Show optimization results
-            const selectedCount = optimalSelection.length;
-            const totalCovered = optimalSelection.reduce((sum, r) => sum + r.amount, 0);
-
-            let resultHtml = '';
-            if (remainingInvoiceAmount > 0) {
-                const formattedRemaining = formatMoney(remainingInvoiceAmount);
-                resultHtml = `
-                    <div class="alert alert-warning" style="margin-top: 10px; padding: 6px; font-size: 11px;">
-                        <strong>⚠️ Partial Coverage:</strong><br>
-                        Invoice: ₦${formatMoney(cartTotal)} |
-                        Covered: ₦${formatMoney(totalCovered)} (${selectedCount} receipt${selectedCount !== 1 ? 's' : ''})<br>
-                        <span class="text-danger">Still Need: ₦${formattedRemaining}</span>
-                    </div>
-                `;
-            } else if (remainingInvoiceAmount === 0) {
-                resultHtml = `
-                    <div class="alert alert-success" style="margin-top: 10px; padding: 6px; font-size: 11px;">
-                        <strong>✅ Perfect Coverage!</strong><br>
-                        Invoice: ₦${formatMoney(cartTotal)} - Covered by ${selectedCount} receipt${selectedCount !== 1 ? 's' : ''}
-                    </div>
-                `;
-            } else {
-                // Over coverage (shouldn't happen with good optimization)
-                resultHtml = `
-                    <div class="alert alert-info" style="margin-top: 10px; padding: 6px; font-size: 11px;">
-                        <strong>ℹ️ Over Coverage:</strong><br>
-                        Invoice: ₦${formatMoney(cartTotal)} |
-                        Applied: ₦${formatMoney(totalCovered)} (${selectedCount} receipt${selectedCount !== 1 ? 's' : ''})
-                    </div>
-                `;
-            }
-
-            $('#customer_receipts_container').append(resultHtml);
-        }
-
-        // Get current cart total
-        function getCartTotal() {
-            // Try to get from cart total display (.totalCart)
-            const totalCartElement = $('.totalCart');
-            if (totalCartElement.length > 0) {
-                const totalText = totalCartElement.text().replace(/[^\d.]/g, '');
-                const total = parseFloat(totalText);
-                if (!isNaN(total) && total > 0) {
-                    return total;
-                }
-            }
-
-            // Fallback: try other common total selectors
-            const otherTotalElements = $('#total, #subtotal, .cart-total, .total, .subtotal');
-            if (otherTotalElements.length > 0) {
-                const totalText = otherTotalElements.first().text().replace(/[^\d.]/g, '');
-                const total = parseFloat(totalText);
-                if (!isNaN(total) && total > 0) {
-                    return total;
-                }
-            }
-
-            // Fallback: calculate from cart subtotals
-            let total = 0;
-            $('[class*="subtotal"]').each(function() {
-                const itemTotal = parseFloat($(this).text().replace(/[^\d.]/g, '')) || 0;
-                total += itemTotal;
-            });
-
-            return total;
-        }
-
-        // Handle receipt selection
-        $(document).on('change', '.receipt-checkbox', function() {
-            const receiptId = $(this).data('receipt-id');
-            const remainingBalance = parseFloat($(this).data('remaining-balance'));
-            const amountSection = $(this).closest('.receipt-item').find('.applied-amount-section');
-            const amountInput = amountSection.find('.applied-amount-input');
-
-            if ($(this).is(':checked')) {
-                amountSection.show();
-                amountInput.val(remainingBalance); // Auto-fill with full remaining balance
-            } else {
-                amountSection.hide();
-                amountInput.val('');
-            }
-
-            updateSelectedReceipts();
-        });
-
-        // Handle amount input changes
-        $(document).on('input', '.applied-amount-input', function() {
-            const max = parseFloat($(this).attr('max'));
-            let value = parseFloat($(this).val()) || 0;
-
-            if (value > max) {
-                $(this).val(max);
-                alert('Amount cannot exceed available balance');
-            }
-
-            updateSelectedReceipts();
-        });
-
-        // Update selected receipts hidden field
-        function updateSelectedReceipts() {
-            const selectedReceipts = [];
-
-            $('.receipt-checkbox:checked').each(function() {
-                const receiptId = $(this).data('receipt-id');
-                const appliedAmount = parseFloat($(`.applied-amount-input[data-receipt-id="${receiptId}"]`).val()) || 0;
-
-                if (appliedAmount > 0) {
-                    selectedReceipts.push({
-                        receipt_id: receiptId,
-                        applied_amount: appliedAmount
-                    });
-                }
-            });
-
-            $('#selected_receipts').val(JSON.stringify(selectedReceipts));
-        }
-
-        // Smart receipt optimization algorithm
-        function findOptimalReceiptCombination(receipts, targetAmount) {
-            if (targetAmount <= 0 || receipts.length === 0) {
-                return [];
-            }
-
-            // Try different strategies and pick the best one
-            const strategies = [
-                findExactMatch,
-                findMinimalCombination,
-                findGreedyLargestFirst,
-                findGreedySmallestFirst
-            ];
-
-            let bestResult = [];
-            let bestScore = -1;
-
-            for (let strategy of strategies) {
-                const result = strategy(receipts, targetAmount);
-                const score = evaluateResult(result, targetAmount);
-
-                console.log('Strategy result:', {
-                    strategy: strategy.name,
-                    receiptsUsed: result.length,
-                    totalAmount: result.reduce((sum, r) => sum + r.amount, 0),
-                    score: score
-                });
-
-                if (score > bestScore) {
-                    bestResult = result;
-                    bestScore = score;
-                }
-            }
-
-            console.log('Best strategy selected:', bestResult);
-            return bestResult;
-        }
-
-        // Strategy 1: Look for exact matches (single receipt that covers full amount)
-        function findExactMatch(receipts, targetAmount) {
-            for (let receipt of receipts) {
-                if (receipt.balance >= targetAmount) {
-                    return [{id: receipt.id, amount: targetAmount}];
-                }
-            }
-            return [];
-        }
-
-        // Strategy 2: Find minimal number of receipts
-        function findMinimalCombination(receipts, targetAmount) {
-            // Sort by balance descending for minimal combination
-            const sortedReceipts = [...receipts].sort((a, b) => b.balance - a.balance);
-            let remaining = targetAmount;
-            let result = [];
-
-            for (let receipt of sortedReceipts) {
-                if (remaining <= 0) break;
-
-                const useAmount = Math.min(remaining, receipt.balance);
-                if (useAmount > 0) {
-                    result.push({id: receipt.id, amount: useAmount});
-                    remaining -= useAmount;
-                }
-            }
-
-            return result;
-        }
-
-        // Strategy 3: Largest receipts first
-        function findGreedyLargestFirst(receipts, targetAmount) {
-            const sortedReceipts = [...receipts].sort((a, b) => b.balance - a.balance);
-            return applyGreedyStrategy(sortedReceipts, targetAmount);
-        }
-
-        // Strategy 4: Smallest receipts first (consume older/smaller receipts)
-        function findGreedySmallestFirst(receipts, targetAmount) {
-            const sortedReceipts = [...receipts].sort((a, b) => a.balance - b.balance);
-            return applyGreedyStrategy(sortedReceipts, targetAmount);
-        }
-
-        function applyGreedyStrategy(sortedReceipts, targetAmount) {
-            let remaining = targetAmount;
-            let result = [];
-
-            for (let receipt of sortedReceipts) {
-                if (remaining <= 0) break;
-
-                const useAmount = Math.min(remaining, receipt.balance);
-                if (useAmount > 0) {
-                    result.push({id: receipt.id, amount: useAmount});
-                    remaining -= useAmount;
-                }
-            }
-
-            return result;
-        }
-
-        // Evaluate how good a result is
-        function evaluateResult(result, targetAmount) {
-            if (result.length === 0) return -1;
-
-            const totalAmount = result.reduce((sum, r) => sum + r.amount, 0);
-            const coverage = totalAmount / targetAmount;
-
-            // Perfect match gets highest score
-            if (totalAmount === targetAmount) {
-                return 1000 - result.length; // Prefer fewer receipts for exact matches
-            }
-
-            // Partial coverage gets lower score
-            if (totalAmount < targetAmount) {
-                return coverage * 100 - result.length; // Coverage is important, but fewer receipts is better
-            }
-
-            // Over-coverage gets lowest score
-            return 50 - result.length;
-        }
-
-        // Re-optimize receipts when cart changes
-        function reOptimizeReceipts() {
-            // Clear any previous alerts and results
-            $('#customer_receipts_container .alert').remove();
-
-            // Re-run optimization if receipts are loaded
-            if ($('.receipt-checkbox').length > 0) {
-                console.log('Re-optimizing receipts due to cart change...');
-                autoSelectReceipts();
-            }
-        }
-
-        // Monitor cart changes using MutationObserver
-        $(document).ready(function() {
-            const cartContainer = document.querySelector('.cart-container');
-            if (cartContainer) {
-                const observer = new MutationObserver(function(mutations) {
-                    mutations.forEach(function(mutation) {
-                        if (mutation.type === 'childList' || mutation.type === 'subtree') {
-                            // Debounce the re-optimization
-                            clearTimeout(window.receiptOptimizeTimeout);
-                            window.receiptOptimizeTimeout = setTimeout(reOptimizeReceipts, 500);
-                        }
-                    });
-                });
-
-                observer.observe(cartContainer, {
-                    childList: true,
-                    subtree: true,
-                    characterData: true
-                });
-            }
-        });
-
-        // Also trigger re-optimization on specific cart events
-        $(document).on('DOMSubtreeModified', '.cart-container', function() {
-            // Fallback for older browsers
-            clearTimeout(window.receiptOptimizeTimeout);
-            window.receiptOptimizeTimeout = setTimeout(reOptimizeReceipts, 500);
-        });
-
-        // Handle barcode input field directly
-        $('#barcode_input').on('keypress', function(e) {
-            if (e.which === 13) { // Enter key
-                const barcodeValue = $(this).val().trim();
-                if (barcodeValue.length >= 3) {
-                    searchProductByBarcode(barcodeValue);
-                }
-            }
-        });
-
-        // Function to search product by barcode
-        function searchProductByBarcode(barcode) {
-            $.ajax({
-                url: "{{ route('barcode.search.product') }}",
-                type: 'GET',
-                data: {
-                    barcode: barcode
-                },
-                dataType: 'html',
-                success: function (response) {
-                    // update the cart items container with the new cart data
-                    $('#load_cart').html(response);
-                    $('#barcode_input').val("");
-
-                    // Show success feedback
-                    $('#barcode_input').css('border-color', '#28a745');
-                    setTimeout(function() {
-                        $('#barcode_input').css('border-color', '#007bff');
-                    }, 1000);
-                },
-                error: function (xhr, status, error) {
-                    // display an error message and visual feedback
-                    $('#barcode_input').css('border-color', '#dc3545');
-                    $('#barcode_input').attr('placeholder', 'Product not found - try again');
-
-                    setTimeout(function() {
-                        $('#barcode_input').css('border-color', '#007bff');
-                        $('#barcode_input').attr('placeholder', 'Scan barcode or search product...');
-                    }, 2000);
-                }
-            });
-        }
     </script>
 @endpush

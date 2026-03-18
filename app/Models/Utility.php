@@ -6,6 +6,11 @@ namespace App\Models;
 class Utility
 {
     public function convertNumberToWords($number) {
+        // Handle null values
+        if ($number === null) {
+            return 'Zero';
+        }
+
         $hyphen = '-';
         $conjunction = ' and ';
         $separator = ', ';

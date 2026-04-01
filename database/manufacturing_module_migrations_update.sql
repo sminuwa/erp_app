@@ -1,8 +1,72 @@
 -- ============================================================================
--- Manufacturing Module Migrations
+-- Manufacturing Module Migrations (IDEMPOTENT — safe to re-run)
 -- Run these in order. Each section corresponds to one Laravel migration.
 -- Generated from migrations: 2026_03_30_100000 through 2026_03_30_100007
 -- ============================================================================
+
+
+-- ============================================================================
+-- Helper procedures for idempotent DDL operations
+-- ============================================================================
+
+DROP PROCEDURE IF EXISTS drop_fk_if_exists;
+DELIMITER //
+CREATE PROCEDURE drop_fk_if_exists(IN tbl VARCHAR(255), IN fk VARCHAR(255))
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.TABLE_CONSTRAINTS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = tbl
+          AND CONSTRAINT_NAME = fk AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+    ) THEN
+        SET @q = CONCAT('ALTER TABLE `', tbl, '` DROP FOREIGN KEY `', fk, '`');
+        PREPARE stmt FROM @q; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+    END IF;
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS drop_col_if_exists;
+DELIMITER //
+CREATE PROCEDURE drop_col_if_exists(IN tbl VARCHAR(255), IN col VARCHAR(255))
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = tbl AND COLUMN_NAME = col
+    ) THEN
+        SET @q = CONCAT('ALTER TABLE `', tbl, '` DROP COLUMN `', col, '`');
+        PREPARE stmt FROM @q; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+    END IF;
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS add_col_if_not_exists;
+DELIMITER //
+CREATE PROCEDURE add_col_if_not_exists(IN tbl VARCHAR(255), IN col VARCHAR(255), IN col_def TEXT)
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = tbl AND COLUMN_NAME = col
+    ) THEN
+        SET @q = CONCAT('ALTER TABLE `', tbl, '` ADD COLUMN ', col_def);
+        PREPARE stmt FROM @q; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+    END IF;
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS add_fk_if_not_exists;
+DELIMITER //
+CREATE PROCEDURE add_fk_if_not_exists(IN fk_name VARCHAR(255), IN fk_def TEXT)
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.TABLE_CONSTRAINTS
+        WHERE TABLE_SCHEMA = DATABASE() AND CONSTRAINT_NAME = fk_name
+          AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+    ) THEN
+        SET @q = fk_def;
+        PREPARE stmt FROM @q; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+    END IF;
+END //
+DELIMITER ;
+
 
 -- ============================================================================
 -- 0. Fix ENUM status columns to accept new status values
@@ -39,19 +103,17 @@ ALTER TABLE `manufacturing_reworks`
 -- Migration: 2026_03_30_100000_add_reject_adjust_to_production_orders
 -- ============================================================================
 
-ALTER TABLE `production_orders`
-    ADD COLUMN `rejected_by` BIGINT UNSIGNED NULL AFTER `closed_at`,
-    ADD COLUMN `rejected_at` TIMESTAMP NULL AFTER `rejected_by`,
-    ADD COLUMN `rejection_reason` TEXT NULL AFTER `rejected_at`,
-    ADD COLUMN `adjusted_by` BIGINT UNSIGNED NULL AFTER `rejection_reason`,
-    ADD COLUMN `adjusted_at` TIMESTAMP NULL AFTER `adjusted_by`,
-    ADD COLUMN `adjustment_reason` TEXT NULL AFTER `adjusted_at`;
+CALL add_col_if_not_exists('production_orders', 'rejected_by',      '`rejected_by` BIGINT UNSIGNED NULL AFTER `closed_at`');
+CALL add_col_if_not_exists('production_orders', 'rejected_at',      '`rejected_at` TIMESTAMP NULL AFTER `rejected_by`');
+CALL add_col_if_not_exists('production_orders', 'rejection_reason', '`rejection_reason` TEXT NULL AFTER `rejected_at`');
+CALL add_col_if_not_exists('production_orders', 'adjusted_by',      '`adjusted_by` BIGINT UNSIGNED NULL AFTER `rejection_reason`');
+CALL add_col_if_not_exists('production_orders', 'adjusted_at',      '`adjusted_at` TIMESTAMP NULL AFTER `adjusted_by`');
+CALL add_col_if_not_exists('production_orders', 'adjustment_reason','`adjustment_reason` TEXT NULL AFTER `adjusted_at`');
 
-ALTER TABLE `production_orders`
-    ADD CONSTRAINT `production_orders_rejected_by_foreign`
-        FOREIGN KEY (`rejected_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
-    ADD CONSTRAINT `production_orders_adjusted_by_foreign`
-        FOREIGN KEY (`adjusted_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+CALL add_fk_if_not_exists('production_orders_rejected_by_foreign',
+    'ALTER TABLE `production_orders` ADD CONSTRAINT `production_orders_rejected_by_foreign` FOREIGN KEY (`rejected_by`) REFERENCES `users` (`id`) ON DELETE SET NULL');
+CALL add_fk_if_not_exists('production_orders_adjusted_by_foreign',
+    'ALTER TABLE `production_orders` ADD CONSTRAINT `production_orders_adjusted_by_foreign` FOREIGN KEY (`adjusted_by`) REFERENCES `users` (`id`) ON DELETE SET NULL');
 
 
 -- ============================================================================
@@ -59,7 +121,7 @@ ALTER TABLE `production_orders`
 -- Migration: 2026_03_30_100001_create_production_order_checklists_table
 -- ============================================================================
 
-CREATE TABLE `production_order_checklists` (
+CREATE TABLE IF NOT EXISTS `production_order_checklists` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `production_order_id` BIGINT UNSIGNED NOT NULL,
     `category` VARCHAR(255) NOT NULL,
@@ -76,6 +138,7 @@ CREATE TABLE `production_order_checklists` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data migration: create checklist rows for ALL existing production orders (pre-checked so they are not blocked)
+-- Only inserts for production_orders that don't already have checklist rows
 INSERT INTO `production_order_checklists` (`production_order_id`, `category`, `label`, `is_checked`, `checked_by`, `checked_at`, `created_at`, `updated_at`)
 SELECT
     po.`id`,
@@ -95,7 +158,11 @@ CROSS JOIN (
     SELECT 'raw_materials', 'Raw materials are in stock and ready'
     UNION ALL
     SELECT 'factory_condition', 'Factory conditions are safe and ready'
-) cat;
+) cat
+WHERE NOT EXISTS (
+    SELECT 1 FROM `production_order_checklists` poc
+    WHERE poc.`production_order_id` = po.`id` AND poc.`category` = cat.`category`
+);
 
 
 -- ============================================================================
@@ -103,24 +170,20 @@ CROSS JOIN (
 -- Migration: 2026_03_30_100002_update_daily_manufacturing_schedules
 -- ============================================================================
 
--- Drop foreign keys first
-ALTER TABLE `daily_manufacturing_schedules`
-    DROP FOREIGN KEY `daily_manufacturing_schedules_team_id_foreign`;
+-- Drop foreign keys first (safe if they don't exist)
+CALL drop_fk_if_exists('daily_manufacturing_schedules', 'daily_manufacturing_schedules_team_id_foreign');
+CALL drop_fk_if_exists('daily_manufacturing_schedules', 'daily_manufacturing_schedules_machine_id_foreign');
 
-ALTER TABLE `daily_manufacturing_schedules`
-    DROP FOREIGN KEY `daily_manufacturing_schedules_machine_id_foreign`;
+-- Drop columns (safe if they don't exist)
+CALL drop_col_if_exists('daily_manufacturing_schedules', 'team_id');
+CALL drop_col_if_exists('daily_manufacturing_schedules', 'machine_id');
 
-ALTER TABLE `daily_manufacturing_schedules`
-    DROP COLUMN `team_id`,
-    DROP COLUMN `machine_id`;
+-- Add new columns
+CALL add_col_if_not_exists('daily_manufacturing_schedules', 'received_by', '`received_by` BIGINT UNSIGNED NULL AFTER `approved_at`');
+CALL add_col_if_not_exists('daily_manufacturing_schedules', 'received_at', '`received_at` TIMESTAMP NULL AFTER `received_by`');
 
-ALTER TABLE `daily_manufacturing_schedules`
-    ADD COLUMN `received_by` BIGINT UNSIGNED NULL AFTER `approved_at`,
-    ADD COLUMN `received_at` TIMESTAMP NULL AFTER `received_by`;
-
-ALTER TABLE `daily_manufacturing_schedules`
-    ADD CONSTRAINT `daily_manufacturing_schedules_received_by_foreign`
-        FOREIGN KEY (`received_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+CALL add_fk_if_not_exists('daily_manufacturing_schedules_received_by_foreign',
+    'ALTER TABLE `daily_manufacturing_schedules` ADD CONSTRAINT `daily_manufacturing_schedules_received_by_foreign` FOREIGN KEY (`received_by`) REFERENCES `users` (`id`) ON DELETE SET NULL');
 
 
 -- ============================================================================
@@ -128,7 +191,7 @@ ALTER TABLE `daily_manufacturing_schedules`
 -- Migration: 2026_03_30_100003_create_manufacturing_work_orders_table
 -- ============================================================================
 
-CREATE TABLE `manufacturing_work_orders` (
+CREATE TABLE IF NOT EXISTS `manufacturing_work_orders` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `reference` VARCHAR(255) NOT NULL,
     `work_order_date` DATE NOT NULL,
@@ -164,7 +227,7 @@ CREATE TABLE `manufacturing_work_orders` (
 -- Migration: 2026_03_30_100004_create_manufacturing_work_order_items_table
 -- ============================================================================
 
-CREATE TABLE `manufacturing_work_order_items` (
+CREATE TABLE IF NOT EXISTS `manufacturing_work_order_items` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `work_order_id` BIGINT UNSIGNED NOT NULL,
     `schedule_item_id` BIGINT UNSIGNED NOT NULL,
@@ -183,18 +246,17 @@ CREATE TABLE `manufacturing_work_order_items` (
 -- Migration: 2026_03_30_100005_update_materials_requisitions
 -- ============================================================================
 
-ALTER TABLE `materials_requisitions`
-    ADD COLUMN `work_order_id` BIGINT UNSIGNED NULL AFTER `schedule_id`,
-    ADD COLUMN `verified_by` BIGINT UNSIGNED NULL AFTER `received_at`,
-    ADD COLUMN `verified_at` TIMESTAMP NULL AFTER `verified_by`;
+CALL add_col_if_not_exists('materials_requisitions', 'work_order_id', '`work_order_id` BIGINT UNSIGNED NULL AFTER `schedule_id`');
+CALL add_col_if_not_exists('materials_requisitions', 'verified_by',   '`verified_by` BIGINT UNSIGNED NULL AFTER `received_at`');
+CALL add_col_if_not_exists('materials_requisitions', 'verified_at',   '`verified_at` TIMESTAMP NULL AFTER `verified_by`');
 
-ALTER TABLE `materials_requisitions`
-    ADD CONSTRAINT `materials_requisitions_work_order_id_foreign`
-        FOREIGN KEY (`work_order_id`) REFERENCES `manufacturing_work_orders` (`id`) ON DELETE SET NULL,
-    ADD CONSTRAINT `materials_requisitions_verified_by_foreign`
-        FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+CALL add_fk_if_not_exists('materials_requisitions_work_order_id_foreign',
+    'ALTER TABLE `materials_requisitions` ADD CONSTRAINT `materials_requisitions_work_order_id_foreign` FOREIGN KEY (`work_order_id`) REFERENCES `manufacturing_work_orders` (`id`) ON DELETE SET NULL');
+CALL add_fk_if_not_exists('materials_requisitions_verified_by_foreign',
+    'ALTER TABLE `materials_requisitions` ADD CONSTRAINT `materials_requisitions_verified_by_foreign` FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL');
 
 -- Data migration: promote all ISSUED requisitions to VERIFIED so they can still be received
+-- (idempotent: re-running won't affect already-verified rows)
 UPDATE `materials_requisitions`
 SET `status` = 'verified',
     `verified_by` = `issued_by`,
@@ -208,31 +270,22 @@ WHERE `status` = 'issued';
 -- ============================================================================
 
 -- Single Product Manufacturing
-ALTER TABLE `single_product_manufacturing`
-    ADD COLUMN `qc_verified_by` BIGINT UNSIGNED NULL AFTER `status`,
-    ADD COLUMN `qc_verified_at` TIMESTAMP NULL AFTER `qc_verified_by`;
-
-ALTER TABLE `single_product_manufacturing`
-    ADD CONSTRAINT `single_product_manufacturing_qc_verified_by_foreign`
-        FOREIGN KEY (`qc_verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+CALL add_col_if_not_exists('single_product_manufacturing', 'qc_verified_by', '`qc_verified_by` BIGINT UNSIGNED NULL AFTER `status`');
+CALL add_col_if_not_exists('single_product_manufacturing', 'qc_verified_at', '`qc_verified_at` TIMESTAMP NULL AFTER `qc_verified_by`');
+CALL add_fk_if_not_exists('single_product_manufacturing_qc_verified_by_foreign',
+    'ALTER TABLE `single_product_manufacturing` ADD CONSTRAINT `single_product_manufacturing_qc_verified_by_foreign` FOREIGN KEY (`qc_verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL');
 
 -- Batch Productions
-ALTER TABLE `batch_productions`
-    ADD COLUMN `qc_verified_by` BIGINT UNSIGNED NULL AFTER `status`,
-    ADD COLUMN `qc_verified_at` TIMESTAMP NULL AFTER `qc_verified_by`;
-
-ALTER TABLE `batch_productions`
-    ADD CONSTRAINT `batch_productions_qc_verified_by_foreign`
-        FOREIGN KEY (`qc_verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+CALL add_col_if_not_exists('batch_productions', 'qc_verified_by', '`qc_verified_by` BIGINT UNSIGNED NULL AFTER `status`');
+CALL add_col_if_not_exists('batch_productions', 'qc_verified_at', '`qc_verified_at` TIMESTAMP NULL AFTER `qc_verified_by`');
+CALL add_fk_if_not_exists('batch_productions_qc_verified_by_foreign',
+    'ALTER TABLE `batch_productions` ADD CONSTRAINT `batch_productions_qc_verified_by_foreign` FOREIGN KEY (`qc_verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL');
 
 -- Manufacturing Reworks
-ALTER TABLE `manufacturing_reworks`
-    ADD COLUMN `qc_verified_by` BIGINT UNSIGNED NULL AFTER `status`,
-    ADD COLUMN `qc_verified_at` TIMESTAMP NULL AFTER `qc_verified_by`;
-
-ALTER TABLE `manufacturing_reworks`
-    ADD CONSTRAINT `manufacturing_reworks_qc_verified_by_foreign`
-        FOREIGN KEY (`qc_verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+CALL add_col_if_not_exists('manufacturing_reworks', 'qc_verified_by', '`qc_verified_by` BIGINT UNSIGNED NULL AFTER `status`');
+CALL add_col_if_not_exists('manufacturing_reworks', 'qc_verified_at', '`qc_verified_at` TIMESTAMP NULL AFTER `qc_verified_by`');
+CALL add_fk_if_not_exists('manufacturing_reworks_qc_verified_by_foreign',
+    'ALTER TABLE `manufacturing_reworks` ADD CONSTRAINT `manufacturing_reworks_qc_verified_by_foreign` FOREIGN KEY (`qc_verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL');
 
 
 -- ============================================================================
@@ -240,13 +293,11 @@ ALTER TABLE `manufacturing_reworks`
 -- Migration: 2026_03_30_100007_add_margin_to_manufacturing_boms
 -- ============================================================================
 
-ALTER TABLE `manufacturing_boms`
-    ADD COLUMN `margin_per_piece` DECIMAL(15,4) NULL AFTER `total_cost_per_unit`,
-    ADD COLUMN `margin_gl_account_id` BIGINT UNSIGNED NULL AFTER `margin_per_piece`;
+CALL add_col_if_not_exists('manufacturing_boms', 'margin_per_piece',      '`margin_per_piece` DECIMAL(15,4) NULL AFTER `total_cost_per_unit`');
+CALL add_col_if_not_exists('manufacturing_boms', 'margin_gl_account_id',  '`margin_gl_account_id` BIGINT UNSIGNED NULL AFTER `margin_per_piece`');
 
-ALTER TABLE `manufacturing_boms`
-    ADD CONSTRAINT `manufacturing_boms_margin_gl_account_id_foreign`
-        FOREIGN KEY (`margin_gl_account_id`) REFERENCES `general_accounts` (`id`) ON DELETE SET NULL;
+CALL add_fk_if_not_exists('manufacturing_boms_margin_gl_account_id_foreign',
+    'ALTER TABLE `manufacturing_boms` ADD CONSTRAINT `manufacturing_boms_margin_gl_account_id_foreign` FOREIGN KEY (`margin_gl_account_id`) REFERENCES `general_accounts` (`id`) ON DELETE SET NULL');
 
 
 -- ============================================================================
@@ -254,7 +305,7 @@ ALTER TABLE `manufacturing_boms`
 -- ============================================================================
 
 -- Work Orders (new module - all permissions are new)
-INSERT INTO `permissions` (`name`, `description`, `guard_name`, `active`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `permissions` (`name`, `description`, `guard_name`, `active`, `created_at`, `updated_at`) VALUES
 ('manufacturing.work_orders.index',   'View Work Orders List',      'web', 1, NOW(), NOW()),
 ('manufacturing.work_orders.create',  'Create Work Order',          'web', 1, NOW(), NOW()),
 ('manufacturing.work_orders.show',    'View Work Order Details',    'web', 1, NOW(), NOW()),
@@ -262,12 +313,12 @@ INSERT INTO `permissions` (`name`, `description`, `guard_name`, `active`, `creat
 ('manufacturing.work_orders.delete',  'Delete Work Order',          'web', 1, NOW(), NOW());
 
 -- Production Orders: reject & adjust
-INSERT INTO `permissions` (`name`, `description`, `guard_name`, `active`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `permissions` (`name`, `description`, `guard_name`, `active`, `created_at`, `updated_at`) VALUES
 ('manufacturing.production_orders.reject', 'Reject Production Order', 'web', 1, NOW(), NOW()),
 ('manufacturing.production_orders.adjust', 'Request Adjustment on Production Order', 'web', 1, NOW(), NOW());
 
 -- QC Verify permissions
-INSERT INTO `permissions` (`name`, `description`, `guard_name`, `active`, `created_at`, `updated_at`) VALUES
+INSERT IGNORE INTO `permissions` (`name`, `description`, `guard_name`, `active`, `created_at`, `updated_at`) VALUES
 ('manufacturing.single_manufacturing.qc_verify', 'QC Verify Single Product Manufacturing', 'web', 1, NOW(), NOW()),
 ('manufacturing.batch_production.qc_verify',     'QC Verify Batch Production',             'web', 1, NOW(), NOW()),
 ('manufacturing.reworks.qc_verify',              'QC Verify Manufacturing Rework',         'web', 1, NOW(), NOW());
@@ -304,15 +355,32 @@ WHERE p.`name` IN (
 
 
 -- ============================================================================
--- Record migrations in Laravel's migrations table (optional, keeps artisan in sync)
+-- Record migrations in Laravel's migrations table
+-- (uses NOT EXISTS to skip rows that were already recorded)
 -- ============================================================================
 
-INSERT INTO `migrations` (`migration`, `batch`) VALUES
-('2026_03_30_100000_add_reject_adjust_to_production_orders', (SELECT COALESCE(MAX(batch), 0) + 1 FROM (SELECT batch FROM `migrations`) AS m)),
-('2026_03_30_100001_create_production_order_checklists_table', (SELECT COALESCE(MAX(batch), 0) + 1 FROM (SELECT batch FROM `migrations`) AS m)),
-('2026_03_30_100002_update_daily_manufacturing_schedules', (SELECT COALESCE(MAX(batch), 0) + 1 FROM (SELECT batch FROM `migrations`) AS m)),
-('2026_03_30_100003_create_manufacturing_work_orders_table', (SELECT COALESCE(MAX(batch), 0) + 1 FROM (SELECT batch FROM `migrations`) AS m)),
-('2026_03_30_100004_create_manufacturing_work_order_items_table', (SELECT COALESCE(MAX(batch), 0) + 1 FROM (SELECT batch FROM `migrations`) AS m)),
-('2026_03_30_100005_update_materials_requisitions', (SELECT COALESCE(MAX(batch), 0) + 1 FROM (SELECT batch FROM `migrations`) AS m)),
-('2026_03_30_100006_add_qc_verified_to_manufacturing_tables', (SELECT COALESCE(MAX(batch), 0) + 1 FROM (SELECT batch FROM `migrations`) AS m)),
-('2026_03_30_100007_add_margin_to_manufacturing_boms', (SELECT COALESCE(MAX(batch), 0) + 1 FROM (SELECT batch FROM `migrations`) AS m));
+INSERT INTO `migrations` (`migration`, `batch`)
+SELECT m.`migration`, (SELECT COALESCE(MAX(batch), 0) + 1 FROM `migrations`) AS `batch`
+FROM (
+    SELECT '2026_03_30_100000_add_reject_adjust_to_production_orders' AS `migration`
+    UNION ALL SELECT '2026_03_30_100001_create_production_order_checklists_table'
+    UNION ALL SELECT '2026_03_30_100002_update_daily_manufacturing_schedules'
+    UNION ALL SELECT '2026_03_30_100003_create_manufacturing_work_orders_table'
+    UNION ALL SELECT '2026_03_30_100004_create_manufacturing_work_order_items_table'
+    UNION ALL SELECT '2026_03_30_100005_update_materials_requisitions'
+    UNION ALL SELECT '2026_03_30_100006_add_qc_verified_to_manufacturing_tables'
+    UNION ALL SELECT '2026_03_30_100007_add_margin_to_manufacturing_boms'
+) m
+WHERE NOT EXISTS (
+    SELECT 1 FROM `migrations` ex WHERE ex.`migration` = m.`migration`
+);
+
+
+-- ============================================================================
+-- Cleanup: remove helper procedures
+-- ============================================================================
+
+DROP PROCEDURE IF EXISTS drop_fk_if_exists;
+DROP PROCEDURE IF EXISTS drop_col_if_exists;
+DROP PROCEDURE IF EXISTS add_col_if_not_exists;
+DROP PROCEDURE IF EXISTS add_fk_if_not_exists;

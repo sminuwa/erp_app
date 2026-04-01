@@ -28,10 +28,30 @@ DROP PROCEDURE IF EXISTS drop_col_if_exists;
 DELIMITER //
 CREATE PROCEDURE drop_col_if_exists(IN tbl VARCHAR(255), IN col VARCHAR(255))
 BEGIN
+    DECLARE fk_name VARCHAR(255);
+    DECLARE done INT DEFAULT 0;
+    DECLARE fk_cursor CURSOR FOR
+        SELECT CONSTRAINT_NAME
+        FROM information_schema.KEY_COLUMN_USAGE
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = tbl AND COLUMN_NAME = col
+          AND REFERENCED_TABLE_NAME IS NOT NULL;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
     IF EXISTS (
         SELECT 1 FROM information_schema.COLUMNS
         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = tbl AND COLUMN_NAME = col
     ) THEN
+        -- First drop any foreign keys that reference this column (regardless of FK name)
+        OPEN fk_cursor;
+        fk_loop: LOOP
+            FETCH fk_cursor INTO fk_name;
+            IF done THEN LEAVE fk_loop; END IF;
+            SET @q = CONCAT('ALTER TABLE `', tbl, '` DROP FOREIGN KEY `', fk_name, '`');
+            PREPARE stmt FROM @q; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+        END LOOP;
+        CLOSE fk_cursor;
+
+        -- Now drop the column
         SET @q = CONCAT('ALTER TABLE `', tbl, '` DROP COLUMN `', col, '`');
         PREPARE stmt FROM @q; EXECUTE stmt; DEALLOCATE PREPARE stmt;
     END IF;

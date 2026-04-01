@@ -13,8 +13,18 @@
                 <div class="card-header">
                     <h3 class="card-title">Single Product Manufacturing: {{ $record->reference }}</h3>
                     <div class="card-tools">
+                        @can('manufacturing.single_manufacturing.qc_verify')
+                        @if($record->canBeQcVerified())
+                        <form action="{{ route('manufacturing.single_manufacturing.qc_verify', $record->id) }}" method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-info btn-sm" onclick="return confirm('QC verify this manufacturing record?')">
+                                <i class="fa fa-check-circle"></i> QC Verify
+                            </button>
+                        </form>
+                        @endif
+                        @endcan
                         @can('manufacturing.single_manufacturing.post')
-                        @if($record->isPending())
+                        @if($record->canBePosted())
                         <form action="{{ route('manufacturing.single_manufacturing.post', $record->id) }}" method="POST" style="display:inline;">
                             @csrf
                             <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Post this manufacturing record?')">
@@ -63,6 +73,8 @@
                             <p>
                                 @if($record->status == 'pending')
                                     <span class="badge badge-warning">Pending</span>
+                                @elseif($record->status == 'qc_verified')
+                                    <span class="badge badge-info">QC Verified</span>
                                 @elseif($record->status == 'posted')
                                     <span class="badge badge-success">Posted</span>
                                 @else

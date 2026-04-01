@@ -1101,6 +1101,14 @@
                                                 </a>
                                             </li>
                                         @endcan
+                                        @can('manufacturing.work_orders.index')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.work_orders.index') }}" class="nav-link">
+                                                    <i class="fa fa-wrench"></i>
+                                                    <p>Work Orders</p>
+                                                </a>
+                                            </li>
+                                        @endcan
                                         @can('manufacturing.requisitions.index')
                                             <li class="nav-item">
                                                 <a href="{{ route('manufacturing.requisitions.index') }}" class="nav-link">

@@ -11,6 +11,8 @@ class ProductionOrder extends Model
     const STATUS_CONFIRMED = 'confirmed';
     const STATUS_APPROVED = 'approved';
     const STATUS_CLOSED = 'closed';
+    const STATUS_REJECTED = 'rejected';
+    const STATUS_ADJUSTMENT_NEEDED = 'adjustment_needed';
 
     protected $table = 'production_orders';
 
@@ -34,7 +36,13 @@ class ProductionOrder extends Model
         'approved_by',
         'approved_at',
         'closed_by',
-        'closed_at'
+        'closed_at',
+        'rejected_by',
+        'rejected_at',
+        'rejection_reason',
+        'adjusted_by',
+        'adjusted_at',
+        'adjustment_reason',
     ];
 
     protected $dates = [
@@ -42,13 +50,17 @@ class ProductionOrder extends Model
         'end_date',
         'confirmed_at',
         'approved_at',
-        'closed_at'
+        'closed_at',
+        'rejected_at',
+        'adjusted_at',
     ];
 
     protected $casts = [
         'total_finish_goods_qty' => 'decimal:4',
         'processed_qty' => 'decimal:4',
     ];
+
+    // ── Relationships ──────────────────────────────────────
 
     public function branch()
     {
@@ -75,6 +87,16 @@ class ProductionOrder extends Model
         return $this->belongsTo(User::class, 'closed_by', 'id');
     }
 
+    public function rejectedBy()
+    {
+        return $this->belongsTo(User::class, 'rejected_by', 'id');
+    }
+
+    public function adjustedBy()
+    {
+        return $this->belongsTo(User::class, 'adjusted_by', 'id');
+    }
+
     public function items()
     {
         return $this->hasMany(ProductionOrderItem::class, 'production_order_id', 'id');
@@ -89,6 +111,13 @@ class ProductionOrder extends Model
     {
         return $this->hasMany(DailyManufacturingSchedule::class, 'production_order_id', 'id');
     }
+
+    public function checklist()
+    {
+        return $this->hasMany(ProductionOrderChecklist::class, 'production_order_id', 'id');
+    }
+
+    // ── Reference Generator ────────────────────────────────
 
     public static function generateNewNumber($prefix = 'PRO', $length = 4)
     {
@@ -110,6 +139,8 @@ class ProductionOrder extends Model
         });
     }
 
+    // ── Status Checks ──────────────────────────────────────
+
     public function isPending()
     {
         return $this->status === self::STATUS_PENDING;
@@ -130,14 +161,37 @@ class ProductionOrder extends Model
         return $this->status === self::STATUS_CLOSED;
     }
 
+    public function isRejected()
+    {
+        return $this->status === self::STATUS_REJECTED;
+    }
+
+    public function isAdjustmentNeeded()
+    {
+        return $this->status === self::STATUS_ADJUSTMENT_NEEDED;
+    }
+
+    // ── Checklist ──────────────────────────────────────────
+
+    public function checklistComplete()
+    {
+        $total = $this->checklist()->count();
+        if ($total === 0) {
+            return false;
+        }
+        return $this->checklist()->where('is_checked', true)->count() === $total;
+    }
+
+    // ── Ability Checks ─────────────────────────────────────
+
     public function canBeEdited()
     {
-        return $this->isPending();
+        return $this->isPending() || $this->isRejected() || $this->isAdjustmentNeeded();
     }
 
     public function canBeConfirmed()
     {
-        return $this->isPending();
+        return $this->isPending() && $this->checklistComplete();
     }
 
     public function canBeApproved()
@@ -149,6 +203,23 @@ class ProductionOrder extends Model
     {
         return $this->isApproved() && $this->schedules()->count() == 0;
     }
+
+    public function canBeRejected()
+    {
+        return $this->isPending();
+    }
+
+    public function canBeAdjusted()
+    {
+        return $this->isPending();
+    }
+
+    public function canBeResubmitted()
+    {
+        return $this->isRejected() || $this->isAdjustmentNeeded();
+    }
+
+    // ── State Transitions ──────────────────────────────────
 
     public function confirm()
     {
@@ -186,10 +257,65 @@ class ProductionOrder extends Model
         return $this->save();
     }
 
+    public function reject($reason)
+    {
+        if (!$this->canBeRejected()) {
+            return false;
+        }
+
+        $this->status = self::STATUS_REJECTED;
+        $this->rejected_by = auth()->id();
+        $this->rejected_at = now();
+        $this->rejection_reason = $reason;
+        return $this->save();
+    }
+
+    public function adjust($reason)
+    {
+        if (!$this->canBeAdjusted()) {
+            return false;
+        }
+
+        $this->status = self::STATUS_ADJUSTMENT_NEEDED;
+        $this->adjusted_by = auth()->id();
+        $this->adjusted_at = now();
+        $this->adjustment_reason = $reason;
+        return $this->save();
+    }
+
+    public function resubmit()
+    {
+        if (!$this->canBeResubmitted()) {
+            return false;
+        }
+
+        $this->status = self::STATUS_PENDING;
+        // Clear reject/adjust tracking
+        $this->rejected_by = null;
+        $this->rejected_at = null;
+        $this->rejection_reason = null;
+        $this->adjusted_by = null;
+        $this->adjusted_at = null;
+        $this->adjustment_reason = null;
+
+        // Reset checklist
+        $this->checklist()->update([
+            'is_checked' => false,
+            'checked_by' => null,
+            'checked_at' => null,
+        ]);
+
+        return $this->save();
+    }
+
+    // ── Helpers ─────────────────────────────────────────────
+
     public function getUnproducedQty()
     {
         return $this->total_finish_goods_qty - $this->processed_qty;
     }
+
+    // ── Scopes ──────────────────────────────────────────────
 
     public function scopePending($query)
     {

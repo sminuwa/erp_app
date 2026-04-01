@@ -30,6 +30,8 @@ class ManufacturingBom extends Model
         'total_material_cost',
         'total_other_cost',
         'total_cost_per_unit',
+        'margin_per_piece',
+        'margin_gl_account_id',
         'branch_id',
         'status',
         'created_by',
@@ -46,6 +48,7 @@ class ManufacturingBom extends Model
         'total_material_cost' => 'decimal:2',
         'total_other_cost' => 'decimal:2',
         'total_cost_per_unit' => 'decimal:2',
+        'margin_per_piece' => 'decimal:4',
     ];
 
     public function category()
@@ -66,6 +69,11 @@ class ManufacturingBom extends Model
     public function mainRawMaterial()
     {
         return $this->belongsTo(Product::class, 'main_raw_material_id', 'id');
+    }
+
+    public function marginGlAccount()
+    {
+        return $this->belongsTo(GeneralAccount::class, 'margin_gl_account_id', 'id');
     }
 
     public function branch()

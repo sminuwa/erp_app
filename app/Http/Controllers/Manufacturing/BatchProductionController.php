@@ -279,12 +279,29 @@ class BatchProductionController extends Controller
         ]);
     }
 
+    public function qcVerify(BatchProduction $batch)
+    {
+        $this->authorize('manufacturing.batch_production.qc_verify');
+
+        if (!$batch->canBeQcVerified()) {
+            session()->flash('app_error', 'Only pending records can be QC verified.');
+            return redirect()->back();
+        }
+
+        $batch->qcVerify();
+
+        AuditLog::auditLog(Auth::id(), "QC verified batch production: " . $batch->reference);
+        session()->flash('app_message', 'Batch Production QC verified successfully');
+
+        return redirect()->back();
+    }
+
     public function post(BatchProduction $batch)
     {
         $this->authorize('manufacturing.batch_production.post');
 
-        if (!$batch->isPending()) {
-            session()->flash('app_error', 'Only pending records can be posted.');
+        if (!$batch->canBePosted()) {
+            session()->flash('app_error', 'Only QC verified records can be posted.');
             return redirect()->back();
         }
 

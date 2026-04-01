@@ -29,6 +29,14 @@
                             </button>
                         </form>
                         @endif
+                        @if($record->isApproved())
+                        <form action="{{ route('manufacturing.schedules.receive', $record->id) }}" method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-info btn-sm" onclick="return confirm('Mark this schedule as received?')">
+                                <i class="fa fa-box"></i> Receive
+                            </button>
+                        </form>
+                        @endif
                         @endcan
                         @can('manufacturing.schedules.delete')
                         @if($record->isPending())
@@ -67,6 +75,8 @@
                                     <span class="badge badge-warning">Pending</span>
                                 @elseif($record->status == 'approved')
                                     <span class="badge badge-success">Approved</span>
+                                @elseif($record->status == 'received')
+                                    <span class="badge badge-success">Received</span>
                                 @else
                                     <span class="badge badge-secondary">{{ ucfirst($record->status) }}</span>
                                 @endif
@@ -75,14 +85,6 @@
                     </div>
                     <div class="row">
                         <div class="col-md-3">
-                            <strong>Team:</strong>
-                            <p>{{ $record->team->name ?? 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Machine:</strong>
-                            <p>{{ $record->machine->code ?? 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-3">
                             <strong>Created By:</strong>
                             <p>{{ $record->createdBy->name ?? 'N/A' }}</p>
                         </div>
@@ -90,6 +92,12 @@
                             <strong>Approved By:</strong>
                             <p>{{ $record->approvedBy->name ?? 'N/A' }}</p>
                         </div>
+                        @if($record->received_by)
+                        <div class="col-md-3">
+                            <strong>Received By:</strong>
+                            <p>{{ $record->receivedBy->name ?? 'N/A' }}</p>
+                        </div>
+                        @endif
                     </div>
                     @if($record->notes)
                     <div class="row">

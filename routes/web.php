@@ -1334,6 +1334,10 @@ Route::middleware('auth')->group(function () {
                 Route::post('/confirm/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'confirm'])->name('manufacturing.production_orders.confirm');
                 Route::post('/approve/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'approve'])->name('manufacturing.production_orders.approve');
                 Route::post('/close/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'close'])->name('manufacturing.production_orders.close');
+                Route::post('/reject/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'reject'])->name('manufacturing.production_orders.reject');
+                Route::post('/adjust/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'adjust'])->name('manufacturing.production_orders.adjust');
+                Route::post('/resubmit/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'resubmit'])->name('manufacturing.production_orders.resubmit');
+                Route::post('/toggle-checklist/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'toggleChecklist'])->name('manufacturing.production_orders.toggle_checklist');
                 Route::delete('/delete/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'destroy'])->name('manufacturing.production_orders.destroy');
                 Route::get('/print/{production_order}', [\App\Http\Controllers\Manufacturing\ProductionOrderController::class, 'print'])->name('manufacturing.production_orders.print');
             });
@@ -1347,8 +1351,20 @@ Route::middleware('auth')->group(function () {
                 Route::get('/edit/{schedule}', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'edit'])->name('manufacturing.schedules.edit');
                 Route::put('/update/{schedule}', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'update'])->name('manufacturing.schedules.update');
                 Route::post('/approve/{schedule}', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'approve'])->name('manufacturing.schedules.approve');
+                Route::post('/receive/{schedule}', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'receive'])->name('manufacturing.schedules.receive');
                 Route::post('/get-order-items', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'getOrderItems'])->name('manufacturing.schedules.get_order_items');
                 Route::delete('/delete/{schedule}', [\App\Http\Controllers\Manufacturing\DailyScheduleController::class, 'destroy'])->name('manufacturing.schedules.destroy');
+            });
+
+            // Work Orders
+            Route::prefix('work-orders')->group(function () {
+                Route::get('/index', [\App\Http\Controllers\Manufacturing\WorkOrderController::class, 'index'])->name('manufacturing.work_orders.index');
+                Route::get('/create', [\App\Http\Controllers\Manufacturing\WorkOrderController::class, 'create'])->name('manufacturing.work_orders.create');
+                Route::post('/store', [\App\Http\Controllers\Manufacturing\WorkOrderController::class, 'store'])->name('manufacturing.work_orders.store');
+                Route::get('/show/{work_order}', [\App\Http\Controllers\Manufacturing\WorkOrderController::class, 'show'])->name('manufacturing.work_orders.show');
+                Route::post('/post/{work_order}', [\App\Http\Controllers\Manufacturing\WorkOrderController::class, 'post'])->name('manufacturing.work_orders.post');
+                Route::delete('/delete/{work_order}', [\App\Http\Controllers\Manufacturing\WorkOrderController::class, 'destroy'])->name('manufacturing.work_orders.destroy');
+                Route::get('/get-schedule-items', [\App\Http\Controllers\Manufacturing\WorkOrderController::class, 'getScheduleItems'])->name('manufacturing.work_orders.get_schedule_items');
             });
 
             // Materials Requisitions
@@ -1359,6 +1375,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('/show/{requisition}', [\App\Http\Controllers\Manufacturing\MaterialsRequisitionController::class, 'show'])->name('manufacturing.requisitions.show');
                 Route::post('/approve/{requisition}', [\App\Http\Controllers\Manufacturing\MaterialsRequisitionController::class, 'approve'])->name('manufacturing.requisitions.approve');
                 Route::post('/issue/{requisition}', [\App\Http\Controllers\Manufacturing\MaterialsRequisitionController::class, 'issue'])->name('manufacturing.requisitions.issue');
+                Route::post('/verify/{requisition}', [\App\Http\Controllers\Manufacturing\MaterialsRequisitionController::class, 'verify'])->name('manufacturing.requisitions.verify');
                 Route::post('/receive/{requisition}', [\App\Http\Controllers\Manufacturing\MaterialsRequisitionController::class, 'receive'])->name('manufacturing.requisitions.receive');
                 Route::delete('/delete/{requisition}', [\App\Http\Controllers\Manufacturing\MaterialsRequisitionController::class, 'destroy'])->name('manufacturing.requisitions.destroy');
             });
@@ -1369,6 +1386,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('/create', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'create'])->name('manufacturing.single_manufacturing.create');
                 Route::post('/store', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'store'])->name('manufacturing.single_manufacturing.store');
                 Route::get('/show/{spm}', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'show'])->name('manufacturing.single_manufacturing.show');
+                Route::post('/qc-verify/{spm}', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'qcVerify'])->name('manufacturing.single_manufacturing.qc_verify');
                 Route::post('/post/{spm}', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'post'])->name('manufacturing.single_manufacturing.post');
                 Route::delete('/delete/{spm}', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'destroy'])->name('manufacturing.single_manufacturing.destroy');
                 Route::get('/print/{spm}', [\App\Http\Controllers\Manufacturing\SingleProductManufacturingController::class, 'print'])->name('manufacturing.single_manufacturing.print');
@@ -1381,6 +1399,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('/create', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'create'])->name('manufacturing.batch_production.create');
                 Route::post('/store', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'store'])->name('manufacturing.batch_production.store');
                 Route::get('/show/{batch}', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'show'])->name('manufacturing.batch_production.show');
+                Route::post('/qc-verify/{batch}', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'qcVerify'])->name('manufacturing.batch_production.qc_verify');
                 Route::post('/post/{batch}', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'post'])->name('manufacturing.batch_production.post');
                 Route::delete('/delete/{batch}', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'destroy'])->name('manufacturing.batch_production.destroy');
                 Route::get('/print/{batch}', [\App\Http\Controllers\Manufacturing\BatchProductionController::class, 'print'])->name('manufacturing.batch_production.print');
@@ -1437,6 +1456,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('/create', [\App\Http\Controllers\Manufacturing\ManufacturingReworkController::class, 'create'])->name('manufacturing.reworks.create');
                 Route::post('/store', [\App\Http\Controllers\Manufacturing\ManufacturingReworkController::class, 'store'])->name('manufacturing.reworks.store');
                 Route::get('/show/{rework}', [\App\Http\Controllers\Manufacturing\ManufacturingReworkController::class, 'show'])->name('manufacturing.reworks.show');
+                Route::post('/qc-verify/{rework}', [\App\Http\Controllers\Manufacturing\ManufacturingReworkController::class, 'qcVerify'])->name('manufacturing.reworks.qc_verify');
                 Route::post('/post/{rework}', [\App\Http\Controllers\Manufacturing\ManufacturingReworkController::class, 'post'])->name('manufacturing.reworks.post');
                 Route::delete('/delete/{rework}', [\App\Http\Controllers\Manufacturing\ManufacturingReworkController::class, 'destroy'])->name('manufacturing.reworks.destroy');
             });

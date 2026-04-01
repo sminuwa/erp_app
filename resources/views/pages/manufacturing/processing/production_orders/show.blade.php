@@ -38,19 +38,45 @@
                 <span class="fa fa-print"></span> Print
             </a>
 
-            @if($record->isPending())
+            @if($record->canBeEdited())
                 @can('manufacturing.production_orders.create')
                     <a href="{{ route('manufacturing.production_orders.edit', $record->id) }}" class="btn btn-primary btn-sm">
                         <i class="fa fa-edit"></i> Edit
                     </a>
                 @endcan
+            @endif
+
+            @if($record->isRejected() || $record->isAdjustmentNeeded())
+                @can('manufacturing.production_orders.create')
+                    <form action="{{ route('manufacturing.production_orders.resubmit', $record->id) }}" method="POST" style="display: inline" onsubmit="return confirm('Resubmit this order for review?')">
+                        {{ csrf_field() }}
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="fa fa-refresh"></i> Resubmit
+                        </button>
+                    </form>
+                @endcan
+            @endif
+
+            @if($record->isPending())
+                @can('manufacturing.production_orders.reject')
+                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#rejectModal">
+                        <i class="fa fa-times"></i> Reject
+                    </button>
+                @endcan
+                @can('manufacturing.production_orders.adjust')
+                    <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#adjustModal">
+                        <i class="fa fa-exclamation-triangle"></i> Needs Adjustment
+                    </button>
+                @endcan
                 @can('manufacturing.production_orders.confirm')
+                    @if($record->canBeConfirmed())
                     <form action="{{ route('manufacturing.production_orders.confirm', $record->id) }}" method="POST" style="display: inline" onsubmit="return confirm('Are you sure you want to confirm this order?')">
                         {{ csrf_field() }}
                         <button type="submit" class="btn btn-info btn-sm">
                             <i class="fa fa-check-circle"></i> Confirm
                         </button>
                     </form>
+                    @endif
                 @endcan
             @endif
 
@@ -110,6 +136,10 @@
                                         <td>
                                             @if($record->status == 'pending')
                                                 <span class="badge badge-warning">Pending</span>
+                                            @elseif($record->status == 'rejected')
+                                                <span class="badge badge-danger">Rejected</span>
+                                            @elseif($record->status == 'adjustment_needed')
+                                                <span class="badge badge-warning">Adjustment Needed</span>
                                             @elseif($record->status == 'confirmed')
                                                 <span class="badge badge-info">Confirmed</span>
                                             @elseif($record->status == 'approved')
@@ -141,10 +171,66 @@
                                             <td>{{ $record->notes }}</td>
                                         </tr>
                                     @endif
+                                    @if($record->rejected_by)
+                                        <tr>
+                                            <th>Rejected By</th>
+                                            <td>{{ $record->rejectedBy->name ?? '-' }} at {{ $record->rejected_at ? date('d-M-Y H:i', strtotime($record->rejected_at)) : '' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Rejection Reason</th>
+                                            <td class="text-danger">{{ $record->rejection_reason }}</td>
+                                        </tr>
+                                    @endif
+                                    @if($record->adjusted_by)
+                                        <tr>
+                                            <th>Adjustment By</th>
+                                            <td>{{ $record->adjustedBy->name ?? '-' }} at {{ $record->adjusted_at ? date('d-M-Y H:i', strtotime($record->adjusted_at)) : '' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Adjustment Reason</th>
+                                            <td class="text-warning">{{ $record->adjustment_reason }}</td>
+                                        </tr>
+                                    @endif
                                 </table>
                             </div>
                         </div>
                     </div>
+
+                    {{-- Checklist Panel --}}
+                    @if($record->isPending() && $record->checklist && $record->checklist->count() > 0)
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Pre-Confirmation Checklist</h5>
+                            </div>
+                            <div class="card-body">
+                                @foreach($record->checklist as $item)
+                                <div class="custom-control custom-checkbox mb-2">
+                                    <input type="checkbox" class="custom-control-input checklist-toggle"
+                                           id="checklist_{{ $item->id }}"
+                                           data-id="{{ $item->id }}"
+                                           {{ $item->is_checked ? 'checked' : '' }}
+                                           @cannot('manufacturing.production_orders.confirm') disabled @endcannot>
+                                    <label class="custom-control-label" for="checklist_{{ $item->id }}">
+                                        {{ $item->label }}
+                                        @if($item->is_checked && $item->checkedBy)
+                                            <small class="text-muted">({{ $item->checkedBy->name }} at {{ date('d-M-Y H:i', strtotime($item->checked_at)) }})</small>
+                                        @endif
+                                    </label>
+                                </div>
+                                @endforeach
+                                <hr>
+                                <div id="checklist-status">
+                                    @if($record->checklistComplete())
+                                        <span class="text-success"><i class="fa fa-check-circle"></i> All items verified - Confirm button is available</span>
+                                    @else
+                                        <span class="text-warning"><i class="fa fa-exclamation-circle"></i> Complete all checklist items to enable Confirm</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
 
                 <div class="row mt-3">
@@ -237,7 +323,87 @@
             </div>
         </section>
     </div>
+
+    {{-- Reject Modal --}}
+    <div class="modal fade" id="rejectModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form action="{{ route('manufacturing.production_orders.reject', $record->id) }}" method="POST">
+                {{ csrf_field() }}
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">Reject Production Order</h5>
+                        <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Reason for Rejection <span class="text-danger">*</span></label>
+                            <textarea name="rejection_reason" class="form-control" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Reject Order</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- Adjust Modal --}}
+    <div class="modal fade" id="adjustModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form action="{{ route('manufacturing.production_orders.adjust', $record->id) }}" method="POST">
+                {{ csrf_field() }}
+                <div class="modal-content">
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title">Request Adjustment</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Adjustment Details <span class="text-danger">*</span></label>
+                            <textarea name="adjustment_reason" class="form-control" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-warning">Request Adjustment</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @push('js')
+<script>
+$(document).ready(function() {
+    $('.checklist-toggle').on('change', function() {
+        var checkbox = $(this);
+        var checklistId = checkbox.data('id');
+
+        $.ajax({
+            url: '{{ route("manufacturing.production_orders.toggle_checklist", $record->id) }}',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                checklist_id: checklistId
+            },
+            success: function(response) {
+                if (response.checklist_complete) {
+                    $('#checklist-status').html('<span class="text-success"><i class="fa fa-check-circle"></i> All items verified - Confirm button is available</span>');
+                    location.reload();
+                } else {
+                    $('#checklist-status').html('<span class="text-warning"><i class="fa fa-exclamation-circle"></i> Complete all checklist items to enable Confirm</span>');
+                    location.reload();
+                }
+            },
+            error: function() {
+                checkbox.prop('checked', !checkbox.prop('checked'));
+                alert('Error updating checklist item.');
+            }
+        });
+    });
+});
+</script>
 @endpush

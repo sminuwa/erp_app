@@ -264,12 +264,29 @@ class SingleProductManufacturingController extends Controller
         ]);
     }
 
+    public function qcVerify(SingleProductManufacturing $spm)
+    {
+        $this->authorize('manufacturing.single_manufacturing.qc_verify');
+
+        if (!$spm->canBeQcVerified()) {
+            session()->flash('app_error', 'Only pending records can be QC verified.');
+            return redirect()->back();
+        }
+
+        $spm->qcVerify();
+
+        AuditLog::auditLog(Auth::id(), "QC verified single product manufacturing: " . $spm->reference);
+        session()->flash('app_message', 'Single Product Manufacturing QC verified successfully');
+
+        return redirect()->back();
+    }
+
     public function post(SingleProductManufacturing $spm)
     {
         $this->authorize('manufacturing.single_manufacturing.post');
 
-        if (!$spm->isPending()) {
-            session()->flash('app_error', 'Only pending records can be posted.');
+        if (!$spm->canBePosted()) {
+            session()->flash('app_error', 'Only QC verified records can be posted.');
             return redirect()->back();
         }
 

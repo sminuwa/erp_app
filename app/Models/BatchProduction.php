@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 class BatchProduction extends Model
 {
     const STATUS_PENDING = 'pending';
+    const STATUS_QC_VERIFIED = 'qc_verified';
     const STATUS_POSTED = 'posted';
     const STATUS_FULLY_CONVERTED = 'fully_converted';
 
@@ -37,12 +38,15 @@ class BatchProduction extends Model
     protected $guarded = [
         'id',
         'status',
+        'qc_verified_by',
+        'qc_verified_at',
         'posted_by',
         'posted_at'
     ];
 
     protected $dates = [
         'production_date',
+        'qc_verified_at',
         'posted_at'
     ];
 
@@ -90,6 +94,11 @@ class BatchProduction extends Model
     public function postedBy()
     {
         return $this->belongsTo(User::class, 'posted_by', 'id');
+    }
+
+    public function qcVerifiedBy()
+    {
+        return $this->belongsTo(User::class, 'qc_verified_by', 'id');
     }
 
     public function materials()
@@ -142,6 +151,11 @@ class BatchProduction extends Model
         return $this->status === self::STATUS_PENDING;
     }
 
+    public function isQcVerified()
+    {
+        return $this->status === self::STATUS_QC_VERIFIED;
+    }
+
     public function isPosted()
     {
         return $this->status === self::STATUS_POSTED;
@@ -157,9 +171,14 @@ class BatchProduction extends Model
         return $this->isPending();
     }
 
-    public function canBePosted()
+    public function canBeQcVerified()
     {
         return $this->isPending();
+    }
+
+    public function canBePosted()
+    {
+        return $this->isQcVerified();
     }
 
     public function canBeDeleted()
@@ -170,6 +189,18 @@ class BatchProduction extends Model
     public function canBeConverted()
     {
         return $this->isPosted() && $this->remaining_qty > 0;
+    }
+
+    public function qcVerify()
+    {
+        if (!$this->canBeQcVerified()) {
+            return false;
+        }
+
+        $this->status = self::STATUS_QC_VERIFIED;
+        $this->qc_verified_by = auth()->id();
+        $this->qc_verified_at = now();
+        return $this->save();
     }
 
     public function post()

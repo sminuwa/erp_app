@@ -8,6 +8,7 @@ use App\Http\Requests\Manufacturing\DailySchedules\Create;
 use App\Http\Requests\Manufacturing\DailySchedules\Store;
 use App\Http\Requests\Manufacturing\DailySchedules\Show;
 use App\Http\Requests\Manufacturing\DailySchedules\Approve;
+use App\Http\Requests\Manufacturing\DailySchedules\Receive;
 use App\Http\Requests\Manufacturing\DailySchedules\Destroy;
 use App\Models\DailyManufacturingSchedule;
 use App\Models\DailyManufacturingScheduleItem;
@@ -25,7 +26,7 @@ class DailyScheduleController extends Controller
     public function index(Index $request)
     {
         $user = Auth::user();
-        $records = DailyManufacturingSchedule::with(['productionOrder', 'team', 'branch', 'createdBy'])
+        $records = DailyManufacturingSchedule::with(['productionOrder', 'branch', 'createdBy'])
             ->forBranch($user->branch_id)
             ->orderBy('created_at', 'desc')
             ->paginate(50);
@@ -56,8 +57,6 @@ class DailyScheduleController extends Controller
         return view('pages.manufacturing.processing.schedules.create', [
             'model' => $model,
             'productionOrders' => $orders,
-            'teams' => \App\Models\ManufacturingTeam::active()->forBranch($user->branch_id)->get(),
-            'machines' => \App\Models\ManufacturingMachine::active()->forBranch($user->branch_id)->get()
         ]);
     }
 
@@ -75,12 +74,14 @@ class DailyScheduleController extends Controller
             }
 
             // Validate: qty does not exceed remaining for each item
+            // Also aggregate materials for availability check
+            $allMaterials = [];
             foreach ($request->items as $item) {
                 if (empty($item['order_item_id']) || empty($item['quantity'])) {
                     continue;
                 }
 
-                $orderItem = ProductionOrderItem::find($item['order_item_id']);
+                $orderItem = ProductionOrderItem::with('bom')->find($item['order_item_id']);
                 if (!$orderItem) {
                     throw new \Exception('Invalid order item selected.');
                 }
@@ -90,14 +91,50 @@ class DailyScheduleController extends Controller
                     $bomRef = $orderItem->bom->reference ?? 'Unknown';
                     throw new \Exception("Schedule quantity ({$item['quantity']}) for BOM {$bomRef} exceeds remaining quantity ({$remaining}). Already scheduled: {$orderItem->scheduled_qty}");
                 }
+
+                // Calculate required materials for availability check
+                $materialsData = ProductionCalculator::calculateMaterials(
+                    $orderItem->bom_id,
+                    $item['quantity'],
+                    $user->branch_id
+                );
+
+                foreach ($materialsData['materials'] as $material) {
+                    $key = $material['product_id'] . '_' . $material['store_id'];
+                    if (!isset($allMaterials[$key])) {
+                        $allMaterials[$key] = [
+                            'product_id' => $material['product_id'],
+                            'store_id' => $material['store_id'],
+                            'qty' => $material['quantity'],
+                        ];
+                    } else {
+                        $allMaterials[$key]['qty'] += $material['quantity'];
+                    }
+                }
+            }
+
+            // Check raw material availability before allowing creation
+            if (!empty($allMaterials)) {
+                $availability = InventoryReservationService::validateAvailability(array_values($allMaterials));
+                if (!$availability['status']) {
+                    $shortageMsg = "Insufficient raw materials:\n";
+                    if (isset($availability['insufficient']) && is_array($availability['insufficient'])) {
+                        foreach ($availability['insufficient'] as $shortage) {
+                            $product = \App\Models\Product::find($shortage['product_id']);
+                            $productName = $product ? $product->name : "Product #{$shortage['product_id']}";
+                            $shortageMsg .= "- {$productName}: Required {$shortage['required']}, Available {$shortage['available']}\n";
+                        }
+                    } else {
+                        $shortageMsg .= $availability['message'] ?? 'One or more materials are insufficient.';
+                    }
+                    throw new \Exception($shortageMsg);
+                }
             }
 
             $model = new DailyManufacturingSchedule;
             $model->reference = $request->reference;
             $model->schedule_date = $request->schedule_date;
             $model->production_order_id = $request->order_id;
-            $model->team_id = $request->team_id;
-            $model->machine_id = $request->machine_id;
             $model->notes = $request->notes;
             $model->branch_id = $user->branch_id;
             $model->status = DailyManufacturingSchedule::STATUS_PENDING;
@@ -130,9 +167,9 @@ class DailyScheduleController extends Controller
     public function show(Show $request, DailyManufacturingSchedule $schedule)
     {
         $schedule->load([
-            'productionOrder', 'team', 'machine',
+            'productionOrder',
             'items.productionOrderItem.bom.finishProduct',
-            'branch', 'createdBy', 'approvedBy'
+            'branch', 'createdBy', 'approvedBy', 'receivedBy'
         ]);
 
         return view('pages.manufacturing.processing.schedules.show', [
@@ -169,8 +206,6 @@ class DailyScheduleController extends Controller
         return view('pages.manufacturing.processing.schedules.edit', [
             'model' => $schedule,
             'productionOrders' => $orders,
-            'teams' => \App\Models\ManufacturingTeam::active()->forBranch($user->branch_id)->get(),
-            'machines' => \App\Models\ManufacturingMachine::active()->forBranch($user->branch_id)->get()
         ]);
     }
 
@@ -186,8 +221,6 @@ class DailyScheduleController extends Controller
         $request->validate([
             'schedule_date' => 'required|date',
             'order_id' => 'required|exists:production_orders,id',
-            'team_id' => 'required|exists:manufacturing_teams,id',
-            'machine_id' => 'nullable|exists:manufacturing_machines,id',
             'items' => 'required|array|min:1',
             'items.*.order_item_id' => 'required|exists:production_order_items,id',
             'items.*.quantity' => 'required|numeric|min:0.0001',
@@ -196,6 +229,8 @@ class DailyScheduleController extends Controller
         DB::beginTransaction();
 
         try {
+            $user = Auth::user();
+
             // Validate: no duplicate order items
             $orderItemIds = array_column($request->items, 'order_item_id');
             if (count($orderItemIds) !== count(array_unique($orderItemIds))) {
@@ -205,13 +240,14 @@ class DailyScheduleController extends Controller
             // Get existing schedule items to calculate remaining correctly
             $existingItems = $schedule->items->keyBy('production_order_item_id');
 
-            // Validate: qty does not exceed remaining for each item
+            // Validate qty and aggregate materials for availability check
+            $allMaterials = [];
             foreach ($request->items as $item) {
                 if (empty($item['order_item_id']) || empty($item['quantity'])) {
                     continue;
                 }
 
-                $orderItem = ProductionOrderItem::find($item['order_item_id']);
+                $orderItem = ProductionOrderItem::with('bom')->find($item['order_item_id']);
                 if (!$orderItem) {
                     throw new \Exception('Invalid order item selected.');
                 }
@@ -226,13 +262,49 @@ class DailyScheduleController extends Controller
                     $bomRef = $orderItem->bom->reference ?? 'Unknown';
                     throw new \Exception("Schedule quantity ({$item['quantity']}) for BOM {$bomRef} exceeds remaining quantity ({$remaining}).");
                 }
+
+                // Calculate required materials for availability check
+                $materialsData = ProductionCalculator::calculateMaterials(
+                    $orderItem->bom_id,
+                    $item['quantity'],
+                    $user->branch_id
+                );
+
+                foreach ($materialsData['materials'] as $material) {
+                    $key = $material['product_id'] . '_' . $material['store_id'];
+                    if (!isset($allMaterials[$key])) {
+                        $allMaterials[$key] = [
+                            'product_id' => $material['product_id'],
+                            'store_id' => $material['store_id'],
+                            'qty' => $material['quantity'],
+                        ];
+                    } else {
+                        $allMaterials[$key]['qty'] += $material['quantity'];
+                    }
+                }
+            }
+
+            // Check raw material availability
+            if (!empty($allMaterials)) {
+                $availability = InventoryReservationService::validateAvailability(array_values($allMaterials));
+                if (!$availability['status']) {
+                    $shortageMsg = "Insufficient raw materials:\n";
+                    if (isset($availability['insufficient']) && is_array($availability['insufficient'])) {
+                        foreach ($availability['insufficient'] as $shortage) {
+                            $product = \App\Models\Product::find($shortage['product_id']);
+                            $productName = $product ? $product->name : "Product #{$shortage['product_id']}";
+                            $shortageMsg .= "- {$productName}: Required {$shortage['required']}, Available {$shortage['available']}\n";
+                        }
+                    } else {
+                        $shortageMsg .= $availability['message'] ?? 'One or more materials are insufficient.';
+                    }
+                    throw new \Exception($shortageMsg);
+                }
             }
 
             // Update schedule header
             $schedule->schedule_date = $request->schedule_date;
             $schedule->production_order_id = $request->order_id;
-            $schedule->team_id = $request->team_id;
-            $schedule->machine_id = $request->machine_id;
             $schedule->notes = $request->notes;
             $schedule->save();
 
@@ -320,6 +392,33 @@ class DailyScheduleController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Receive the schedule (marks it as ready for work orders).
+     */
+    public function receive(Receive $request, DailyManufacturingSchedule $schedule)
+    {
+        if (!$schedule->canBeReceived()) {
+            session()->flash('app_error', 'Only approved schedules can be received.');
+            return redirect()->back();
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $schedule->receive();
+
+            DB::commit();
+
+            AuditLog::auditLog(Auth::id(), "Received daily schedule: " . $schedule->reference);
+            session()->flash('app_message', 'Daily Schedule received successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('app_error', 'Error: ' . $e->getMessage());
+        }
+
+        return redirect()->back();
+    }
+
     public function destroy(Destroy $request, DailyManufacturingSchedule $schedule)
     {
         if (!$schedule->isPending()) {
@@ -347,7 +446,7 @@ class DailyScheduleController extends Controller
     }
 
     /**
-     * AJAX: Get order items with scheduling data
+     * AJAX: Get order items with scheduling data and material requirements.
      */
     public function getOrderItems(Request $request)
     {
@@ -357,8 +456,11 @@ class DailyScheduleController extends Controller
         ]);
 
         $order = ProductionOrder::with(['items.bom.finishProduct'])->find($request->order_id);
+        $branchId = Auth::user()->branch_id;
 
         $items = [];
+        $allMaterials = [];
+
         foreach ($order->items as $item) {
             $scheduledQty = (float) $item->scheduled_qty;
 
@@ -383,11 +485,31 @@ class DailyScheduleController extends Controller
                 'remaining' => $remaining,
                 'output' => (float) $item->quantity_to_produce * ($item->bom->actual_output ?? 1),
             ];
+
+            // Calculate materials for the full remaining qty (used to display at bottom)
+            if ($remaining > 0) {
+                $materialsData = ProductionCalculator::calculateMaterials($item->bom_id, $remaining, $branchId);
+                foreach ($materialsData['materials'] as $material) {
+                    $key = $material['product_id'] . '_' . $material['store_id'];
+                    if (!isset($allMaterials[$key])) {
+                        $allMaterials[$key] = $material;
+                        // Add product name for display
+                        $product = \App\Models\Product::find($material['product_id']);
+                        $store = \App\Models\Store::find($material['store_id']);
+                        $allMaterials[$key]['product_name'] = $product ? $product->name : '';
+                        $allMaterials[$key]['store_name'] = $store ? $store->name : '';
+                    } else {
+                        $allMaterials[$key]['quantity'] += $material['quantity'];
+                        $allMaterials[$key]['total_cost'] += $material['total_cost'];
+                    }
+                }
+            }
         }
 
         return response()->json([
             'status' => true,
-            'data' => $items
+            'data' => $items,
+            'materials' => array_values($allMaterials),
         ]);
     }
 }

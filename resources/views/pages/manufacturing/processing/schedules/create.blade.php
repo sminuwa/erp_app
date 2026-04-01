@@ -66,30 +66,6 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label>Team <span class="text-danger">*</span></label>
-                                    <select name="team_id" class="form-control select2-single" required>
-                                        <option value="">Select Team</option>
-                                        @foreach($teams as $team)
-                                        <option value="{{ $team->id }}">{{ $team->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Machine</label>
-                                    <select name="machine_id" class="form-control select2-single">
-                                        <option value="">Select Machine</option>
-                                        @foreach($machines as $machine)
-                                        <option value="{{ $machine->id }}">{{ $machine->code }} - {{ $machine->description }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="form-group">
                                     <label>Notes</label>
                                     <textarea name="notes" class="form-control" rows="1">{{ old('notes') }}</textarea>
                                 </div>
@@ -130,6 +106,17 @@
                 </div>
             </div>
         </div>
+        <div id="materials-panel" style="display:none;" class="mt-3">
+            <div class="card">
+                <div class="card-header"><h5 class="card-title">Required Raw Materials</h5></div>
+                <div class="card-body">
+                    <table class="table table-bordered table-sm" id="materials-table">
+                        <thead><tr><th>#</th><th>Product</th><th>Store</th><th class="text-right">Required Qty</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </form>
     </section>
 </div>
@@ -154,6 +141,8 @@ $(document).ready(function() {
 
         if (!orderId) {
             $('#items-body').append('<tr class="empty-row"><td colspan="8" class="text-center text-muted">Please select a Production Order to load items</td></tr>');
+            $('#materials-panel').hide();
+            $('#materials-table tbody').empty();
             return;
         }
 
@@ -174,6 +163,25 @@ $(document).ready(function() {
                 if (response.status && response.data) {
                     orderItems = response.data;
                     loadAllItems();
+                }
+
+                // Populate materials panel
+                var materialsBody = $('#materials-table tbody');
+                materialsBody.empty();
+                if (response.materials && response.materials.length > 0) {
+                    $.each(response.materials, function(i, mat) {
+                        materialsBody.append(
+                            '<tr>' +
+                            '<td>' + (i + 1) + '</td>' +
+                            '<td>' + mat.product_name + '</td>' +
+                            '<td>' + mat.store_name + '</td>' +
+                            '<td class="text-right">' + formatNum(mat.quantity) + '</td>' +
+                            '</tr>'
+                        );
+                    });
+                    $('#materials-panel').show();
+                } else {
+                    $('#materials-panel').hide();
                 }
             },
             error: function() {

@@ -20,7 +20,9 @@ use App\Http\Requests\Manufacturing\Requisitions\Show;
 use App\Http\Requests\Manufacturing\Requisitions\Approve;
 use App\Http\Requests\Manufacturing\Requisitions\Issue;
 use App\Http\Requests\Manufacturing\Requisitions\Receive;
+use App\Http\Requests\Manufacturing\Requisitions\Verify;
 use App\Http\Requests\Manufacturing\Requisitions\Destroy;
+use App\Models\ManufacturingWorkOrder;
 
 class MaterialsRequisitionController extends Controller
 {
@@ -50,8 +52,17 @@ class MaterialsRequisitionController extends Controller
         // Exclude schedules already linked to a requisition
         $usedScheduleIds = MaterialsRequisition::whereNotNull('schedule_id')->pluck('schedule_id');
 
+        // Get posted work orders for work-order-based requisitions
+        $usedWorkOrderIds = MaterialsRequisition::whereNotNull('work_order_id')->pluck('work_order_id');
+        $workOrders = ManufacturingWorkOrder::where('status', ManufacturingWorkOrder::STATUS_POSTED)
+            ->where('branch_id', $user->branch_id)
+            ->whereNotIn('id', $usedWorkOrderIds)
+            ->with('schedule')
+            ->get();
+
         return view('pages.manufacturing.processing.requisitions.create', [
             'model' => $model,
+            'workOrders' => $workOrders,
             'schedules' => DailyManufacturingSchedule::approved()->forBranch($user->branch_id)->whereNotIn('id', $usedScheduleIds)->get(),
             'boms' => ManufacturingBom::active()->forBranch($user->branch_id)->get(),
             'products' => \App\Models\Product::orderBy('name')->get(),
@@ -66,17 +77,19 @@ class MaterialsRequisitionController extends Controller
         $request->validate([
             'reference' => 'required|unique:materials_requisitions,reference',
             'requisition_date' => 'required|date',
-            'schedule_id' => 'nullable|exists:daily_manufacturing_schedules,id|required_without:bom_id',
-            'bom_id' => 'nullable|exists:manufacturing_boms,id|required_without:schedule_id',
+            'schedule_id' => 'nullable|exists:daily_manufacturing_schedules,id|required_without_all:bom_id,work_order_id',
+            'bom_id' => 'nullable|exists:manufacturing_boms,id|required_without_all:schedule_id,work_order_id',
+            'work_order_id' => 'nullable|exists:manufacturing_work_orders,id',
             'quantity' => 'nullable|numeric|min:0.0001',
         ], [
-            'schedule_id.required_without' => 'Either a Daily Schedule or BOM must be selected.',
-            'bom_id.required_without' => 'Either a Daily Schedule or BOM must be selected.',
+            'schedule_id.required_without_all' => 'Either a Daily Schedule, Work Order, or BOM must be selected.',
+            'bom_id.required_without_all' => 'Either a Daily Schedule, Work Order, or BOM must be selected.',
         ]);
 
-        if ($request->filled('schedule_id') && $request->filled('bom_id')) {
+        $filledSources = collect(['schedule_id', 'bom_id', 'work_order_id'])->filter(fn($f) => $request->filled($f));
+        if ($filledSources->count() > 1) {
             return redirect()->back()->withInput()->withErrors([
-                'schedule_id' => 'Select either a Daily Schedule or a BOM, not both.'
+                'schedule_id' => 'Select only one source: Daily Schedule, Work Order, or BOM.'
             ]);
         }
 
@@ -99,6 +112,7 @@ class MaterialsRequisitionController extends Controller
             $model->reference = $request->reference;
             $model->requisition_date = $request->requisition_date;
             $model->schedule_id = $request->schedule_id;
+            $model->work_order_id = $request->work_order_id;
             $model->bom_id = $request->bom_id;
             // For schedule-based requisitions, auto-calculate total quantity from schedule items
             if ($request->schedule_id) {
@@ -113,9 +127,28 @@ class MaterialsRequisitionController extends Controller
             $model->created_by = Auth::id();
             $model->save();
 
-            // Calculate and save materials based on schedule or BOM
+            // Calculate and save materials based on work order, schedule, or BOM
             $materials = [];
-            if ($model->schedule_id) {
+            if ($model->work_order_id) {
+                // Get materials from work order items
+                $workOrder = ManufacturingWorkOrder::with('items.scheduleItem.productionOrderItem.bom')->find($model->work_order_id);
+                foreach ($workOrder->items as $woItem) {
+                    $materialsData = ProductionCalculator::calculateMaterials(
+                        $woItem->scheduleItem->productionOrderItem->bom_id,
+                        $woItem->planned_qty,
+                        $model->branch_id
+                    );
+                    foreach ($materialsData['materials'] as $m) {
+                        $key = $m['product_id'] . '_' . $m['store_id'];
+                        if (!isset($materials[$key])) {
+                            $materials[$key] = $m;
+                        } else {
+                            $materials[$key]['quantity'] += $m['quantity'];
+                            $materials[$key]['total_cost'] += $m['total_cost'];
+                        }
+                    }
+                }
+            } elseif ($model->schedule_id) {
                 // Get materials from schedule's BOMs
                 $schedule = DailyManufacturingSchedule::with('items.productionOrderItem.bom')->find($model->schedule_id);
                 foreach ($schedule->items as $item) {
@@ -190,11 +223,12 @@ class MaterialsRequisitionController extends Controller
         $this->authorize('manufacturing.requisitions.show');
 
         $requisition->load([
-            'schedule.team', 'schedule.machine', 'schedule.productionOrder',
+            'schedule.productionOrder',
             'schedule.items.productionOrderItem.bom.finishProduct',
+            'workOrder.schedule', 'workOrder.machine', 'workOrder.team',
             'bom.finishProduct', 'bom.outputStore', 'bom.materials.product',
             'items.product', 'items.sourceStore',
-            'branch', 'createdBy', 'approvedBy', 'issuedBy', 'receivedBy',
+            'branch', 'createdBy', 'approvedBy', 'issuedBy', 'verifiedBy', 'receivedBy',
             'singleProductManufacturing', 'batchProductions'
         ]);
 
@@ -294,8 +328,8 @@ class MaterialsRequisitionController extends Controller
     {
         $this->authorize('manufacturing.requisitions.receive');
 
-        if ($requisition->status !== MaterialsRequisition::STATUS_ISSUED) {
-            session()->flash('app_error', 'Only issued requisitions can be received.');
+        if (!$requisition->canBeReceived()) {
+            session()->flash('app_error', 'Only verified requisitions can be received.');
             return redirect()->back();
         }
 
@@ -312,6 +346,21 @@ class MaterialsRequisitionController extends Controller
 
         AuditLog::auditLog(Auth::id(), "Received materials requisition: " . $requisition->reference);
         session()->flash('app_message', 'Materials Requisition received successfully');
+
+        return redirect()->back();
+    }
+
+    public function verify(Verify $request, MaterialsRequisition $requisition)
+    {
+        if (!$requisition->canBeVerified()) {
+            session()->flash('app_error', 'Only issued requisitions can be verified.');
+            return redirect()->back();
+        }
+
+        $requisition->verify();
+
+        AuditLog::auditLog(Auth::id(), "Verified materials requisition: " . $requisition->reference);
+        session()->flash('app_message', 'Materials Requisition verified successfully');
 
         return redirect()->back();
     }

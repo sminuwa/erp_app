@@ -33,8 +33,18 @@
                         </form>
                         @endif
                         @endcan
-                        @can('manufacturing.requisitions.receive')
+                        @can('manufacturing.requisitions.issue')
                         @if($record->isIssued())
+                        <form action="{{ route('manufacturing.requisitions.verify', $record->id) }}" method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Verify this requisition?')">
+                                <i class="fa fa-clipboard-check"></i> Verify
+                            </button>
+                        </form>
+                        @endif
+                        @endcan
+                        @can('manufacturing.requisitions.receive')
+                        @if($record->canBeReceived())
                         <form action="{{ route('manufacturing.requisitions.receive', $record->id) }}" method="POST" style="display:inline;">
                             @csrf
                             <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Mark materials as received?')">
@@ -70,8 +80,18 @@
                             <p>{{ date('d M Y', strtotime($record->requisition_date)) }}</p>
                         </div>
                         <div class="col-md-3">
-                            <strong>Schedule:</strong>
-                            <p>{{ $record->schedule->reference ?? 'N/A' }}</p>
+                            <strong>Source:</strong>
+                            <p>
+                                @if($record->workOrder)
+                                    WO: {{ $record->workOrder->reference }}
+                                @elseif($record->schedule)
+                                    Schedule: {{ $record->schedule->reference }}
+                                @elseif($record->bom)
+                                    BOM: {{ $record->bom->reference }}
+                                @else
+                                    N/A
+                                @endif
+                            </p>
                         </div>
                         <div class="col-md-3">
                             <strong>Status:</strong>
@@ -82,6 +102,8 @@
                                     <span class="badge badge-info">Approved</span>
                                 @elseif($record->status == 'issued')
                                     <span class="badge badge-primary">Issued</span>
+                                @elseif($record->status == 'verified')
+                                    <span class="badge badge-warning">Verified</span>
                                 @elseif($record->status == 'received')
                                     <span class="badge badge-success">Received</span>
                                 @else
@@ -104,6 +126,12 @@
                             <p>{{ $record->issuedBy->name ?? 'N/A' }}</p>
                         </div>
                         <div class="col-md-3">
+                            <strong>Verified By:</strong>
+                            <p>{{ $record->verifiedBy->name ?? 'N/A' }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
                             <strong>Received By:</strong>
                             <p>{{ $record->receivedBy->name ?? 'N/A' }}</p>
                         </div>
@@ -117,8 +145,41 @@
                     </div>
                     @endif
 
-                    {{-- Production Details Section (Schedule-based) --}}
-                    @if(!$record->bom && $record->schedule)
+                    {{-- Production Details Section (Work Order-based) --}}
+                    @if(!$record->bom && $record->workOrder)
+                    <hr>
+                    <h5><i class="fa fa-industry"></i> Production Details (from Work Order)</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Work Order:</strong>
+                            <p>{{ $record->workOrder->reference ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Work Order Date:</strong>
+                            <p>{{ $record->workOrder->work_order_date ? date('d M Y', strtotime($record->workOrder->work_order_date)) : 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Team:</strong>
+                            <p>{{ $record->workOrder->team->name ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Machine:</strong>
+                            <p>{{ $record->workOrder->machine->code ?? '' }} {{ $record->workOrder->machine->description ?? 'N/A' }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Schedule:</strong>
+                            <p>{{ $record->workOrder->schedule->reference ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Total Qty:</strong>
+                            <p>{{ number_format($record->quantity ?? 0, 4) }}</p>
+                        </div>
+                    </div>
+
+                    {{-- Production Details Section (Schedule-based, legacy) --}}
+                    @elseif(!$record->bom && $record->schedule)
                     <hr>
                     <h5><i class="fa fa-industry"></i> Production Details (from Schedule)</h5>
                     <div class="row">
@@ -129,20 +190,6 @@
                         <div class="col-md-3">
                             <strong>Schedule Date:</strong>
                             <p>{{ $record->schedule->schedule_date ? date('d M Y', strtotime($record->schedule->schedule_date)) : 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Team:</strong>
-                            <p>{{ $record->schedule->team->name ?? 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Machine:</strong>
-                            <p>{{ $record->schedule->machine->code ?? '' }} {{ $record->schedule->machine->description ?? 'N/A' }}</p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3">
-                            <strong>Production Order:</strong>
-                            <p>{{ $record->schedule->productionOrder->reference ?? 'N/A' }}</p>
                         </div>
                         <div class="col-md-3">
                             <strong>Total Scheduled Qty:</strong>
@@ -235,8 +282,27 @@
                         </div>
                     </div>
 
-                    {{-- Schedule Details --}}
-                    @if($record->schedule)
+                    {{-- Work Order / Schedule Details --}}
+                    @if($record->workOrder)
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Work Order:</strong>
+                            <p>{{ $record->workOrder->reference ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Schedule:</strong>
+                            <p>{{ $record->workOrder->schedule->reference ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Team:</strong>
+                            <p>{{ $record->workOrder->team->name ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Machine:</strong>
+                            <p>{{ $record->workOrder->machine->code ?? '' }} {{ $record->workOrder->machine->description ?? 'N/A' }}</p>
+                        </div>
+                    </div>
+                    @elseif($record->schedule)
                     <div class="row">
                         <div class="col-md-3">
                             <strong>Schedule:</strong>
@@ -245,14 +311,6 @@
                         <div class="col-md-3">
                             <strong>Schedule Date:</strong>
                             <p>{{ $record->schedule->schedule_date ? date('d M Y', strtotime($record->schedule->schedule_date)) : 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Team:</strong>
-                            <p>{{ $record->schedule->team->name ?? 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Machine:</strong>
-                            <p>{{ $record->schedule->machine->code ?? '' }} {{ $record->schedule->machine->description ?? 'N/A' }}</p>
                         </div>
                     </div>
                     @endif

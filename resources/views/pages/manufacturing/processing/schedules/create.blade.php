@@ -133,6 +133,52 @@ $(document).ready(function() {
         return parseFloat(num || 0).toFixed(4);
     }
 
+    function recalculateMaterials() {
+        var aggregated = {};
+        $('.item-row').each(function() {
+            var itemId = $(this).data('item-id');
+            var qty = parseFloat($(this).find('.item-qty').val()) || 0;
+            if (qty <= 0) return;
+
+            // Find matching orderItem
+            var item = orderItems.find(function(oi) { return oi.id == itemId; });
+            if (!item || !item.bom_materials) return;
+
+            $.each(item.bom_materials, function(_, mat) {
+                var key = mat.product_id + '_' + mat.store_id;
+                var materialQty = mat.bom_qty * qty;
+                if (aggregated[key]) {
+                    aggregated[key].quantity += materialQty;
+                } else {
+                    aggregated[key] = {
+                        product_name: mat.product_name,
+                        store_name: mat.store_name,
+                        quantity: materialQty
+                    };
+                }
+            });
+        });
+
+        var materialsBody = $('#materials-table tbody');
+        materialsBody.empty();
+        var values = Object.values(aggregated);
+        if (values.length > 0) {
+            $.each(values, function(i, mat) {
+                materialsBody.append(
+                    '<tr>' +
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td>' + mat.product_name + '</td>' +
+                    '<td>' + mat.store_name + '</td>' +
+                    '<td class="text-right">' + formatNum(mat.quantity) + '</td>' +
+                    '</tr>'
+                );
+            });
+            $('#materials-panel').show();
+        } else {
+            $('#materials-panel').hide();
+        }
+    }
+
     // Load order items via AJAX when order is selected
     $('#order_id').on('change', function() {
         var orderId = $(this).val();
@@ -163,25 +209,7 @@ $(document).ready(function() {
                 if (response.status && response.data) {
                     orderItems = response.data;
                     loadAllItems();
-                }
-
-                // Populate materials panel
-                var materialsBody = $('#materials-table tbody');
-                materialsBody.empty();
-                if (response.materials && response.materials.length > 0) {
-                    $.each(response.materials, function(i, mat) {
-                        materialsBody.append(
-                            '<tr>' +
-                            '<td>' + (i + 1) + '</td>' +
-                            '<td>' + mat.product_name + '</td>' +
-                            '<td>' + mat.store_name + '</td>' +
-                            '<td class="text-right">' + formatNum(mat.quantity) + '</td>' +
-                            '</tr>'
-                        );
-                    });
-                    $('#materials-panel').show();
-                } else {
-                    $('#materials-panel').hide();
+                    recalculateMaterials();
                 }
             },
             error: function() {
@@ -248,9 +276,10 @@ $(document).ready(function() {
         if ($('.item-row').length === 0) {
             $('#items-body').append('<tr class="empty-row"><td colspan="8" class="text-center text-muted">No items. Select a Production Order to reload.</td></tr>');
         }
+        recalculateMaterials();
     });
 
-    // Validate qty on change
+    // Validate qty on change and recalculate materials
     $(document).on('change', '.item-qty', function() {
         var max = parseFloat($(this).data('remaining')) || 0;
         var val = parseFloat($(this).val()) || 0;
@@ -261,6 +290,10 @@ $(document).ready(function() {
         if (val <= 0) {
             $(this).val(formatNum(0.0001));
         }
+        recalculateMaterials();
+    });
+    $(document).on('input', '.item-qty', function() {
+        recalculateMaterials();
     });
 
     // Form submit validation

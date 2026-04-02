@@ -53,7 +53,7 @@ class BatchProductionController extends Controller
             })->orWhereHas('schedule.items.productionOrderItem.bom', function($q) {
                 $q->where('bom_type', 'batch');
             });
-        })->received()
+        })->availableForManufacturing()
           ->forBranch($user->branch_id)
           ->with(['bom.finishProduct', 'schedule.items.productionOrderItem.bom.finishProduct'])
           ->get();

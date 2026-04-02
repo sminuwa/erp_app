@@ -196,7 +196,7 @@
                             @if (isset($glAccounts))
                                 @foreach ($glAccounts as $glAccount)
                                     <option value="{{ $glAccount->id }}" {{ old('margin_gl_account_id', $model->margin_gl_account_id) == $glAccount->id ? 'selected' : '' }}>
-                                        {{ $glAccount->number }} - {{ $glAccount->name }}
+                                        {{ $glAccount->number }} - {{ $glAccount->description }}
                                     </option>
                                 @endforeach
                             @endif

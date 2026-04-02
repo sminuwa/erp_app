@@ -307,7 +307,7 @@ class MaterialsRequisition extends Model
 
     public function scopeAvailableForManufacturing($query)
     {
-        return $query->where('status', self::STATUS_RECEIVED);
+        return $query->whereIn('status', [self::STATUS_VERIFIED, self::STATUS_RECEIVED]);
     }
 
     public function scopeForBranch($query, $branch_id = null)

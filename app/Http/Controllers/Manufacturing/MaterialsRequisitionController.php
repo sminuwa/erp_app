@@ -226,6 +226,7 @@ class MaterialsRequisitionController extends Controller
             'schedule.productionOrder',
             'schedule.items.productionOrderItem.bom.finishProduct',
             'workOrder.schedule', 'workOrder.machine', 'workOrder.team',
+            'workOrder.items.scheduleItem.productionOrderItem.bom.finishProduct',
             'bom.finishProduct', 'bom.outputStore', 'bom.materials.product',
             'items.product', 'items.sourceStore',
             'branch', 'createdBy', 'approvedBy', 'issuedBy', 'verifiedBy', 'receivedBy',

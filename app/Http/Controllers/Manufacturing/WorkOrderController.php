@@ -46,9 +46,12 @@ class WorkOrderController extends Controller
 
         $user = Auth::user();
 
-        // Only show RECEIVED daily schedules
+        // Only show RECEIVED daily schedules that still have unallocated items
         $schedules = DailyManufacturingSchedule::received()
             ->forBranch($user->branch_id)
+            ->whereHas('items', function ($query) {
+                $query->whereRaw('scheduled_qty > COALESCE((SELECT SUM(planned_qty) FROM manufacturing_work_order_items WHERE manufacturing_work_order_items.schedule_item_id = daily_manufacturing_schedule_items.id), 0)');
+            })
             ->with('productionOrder')
             ->orderBy('reference')
             ->get();
@@ -229,12 +232,12 @@ class WorkOrderController extends Controller
         ]);
 
         $schedule = DailyManufacturingSchedule::with([
-            'items.productionOrderItem.bom.finishProduct'
+            'items.productionOrderItem.bom.finishProduct',
+            'items.productionOrderItem.bom.materials.product',
+            'items.productionOrderItem.bom.materials.sourceStore',
         ])->find($request->schedule_id);
 
-        $branchId = Auth::user()->branch_id;
         $items = [];
-        $allMaterials = [];
 
         // Calculate how much of each schedule item has been allocated to existing work orders
         $existingAllocations = ManufacturingWorkOrderItem::whereHas('workOrder', function ($q) use ($schedule) {
@@ -248,6 +251,22 @@ class WorkOrderController extends Controller
                 : 0;
             $remainingQty = (float) $item->scheduled_qty - (float) $allocatedQty;
 
+            if ($remainingQty <= 0) continue;
+
+            // Build per-unit bom_materials array for dynamic JS recalculation
+            $bomMaterials = [];
+            if ($bom && $bom->materials) {
+                foreach ($bom->materials as $bomMat) {
+                    $bomMaterials[] = [
+                        'product_id' => $bomMat->product_id,
+                        'product_name' => $bomMat->product->name ?? '',
+                        'store_id' => $bomMat->store_id,
+                        'store_name' => $bomMat->sourceStore->name ?? '',
+                        'bom_qty' => (float) $bomMat->quantity,
+                    ];
+                }
+            }
+
             $items[] = [
                 'schedule_item_id' => $item->id,
                 'bom_reference' => $bom->reference ?? '',
@@ -255,35 +274,13 @@ class WorkOrderController extends Controller
                 'bom_type' => $bom->bom_type ?? '',
                 'scheduled_qty' => (float) $item->scheduled_qty,
                 'remaining_qty' => $remainingQty,
+                'bom_materials' => $bomMaterials,
             ];
-
-            // Calculate materials for each item
-            if ($bom) {
-                $materialsData = ProductionCalculator::calculateMaterials(
-                    $bom->id,
-                    $item->scheduled_qty,
-                    $branchId
-                );
-                foreach ($materialsData['materials'] as $material) {
-                    $key = $material['product_id'] . '_' . $material['store_id'];
-                    if (!isset($allMaterials[$key])) {
-                        $allMaterials[$key] = $material;
-                        $product = Product::find($material['product_id']);
-                        $store = StoreModel::find($material['store_id']);
-                        $allMaterials[$key]['product_name'] = $product ? $product->name : '';
-                        $allMaterials[$key]['store_name'] = $store ? $store->name : '';
-                    } else {
-                        $allMaterials[$key]['quantity'] += $material['quantity'];
-                        $allMaterials[$key]['total_cost'] += $material['total_cost'];
-                    }
-                }
-            }
         }
 
         return response()->json([
             'status' => true,
             'items' => $items,
-            'materials' => array_values($allMaterials),
         ]);
     }
 }

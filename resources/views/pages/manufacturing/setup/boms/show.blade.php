@@ -119,7 +119,7 @@
                                     @if($record->marginGlAccount)
                                     <tr>
                                         <th>Margin GL Account</th>
-                                        <td>{{ $record->marginGlAccount->number }} - {{ $record->marginGlAccount->name }}</td>
+                                        <td>{{ $record->marginGlAccount->number }} - {{ $record->marginGlAccount->description }}</td>
                                     </tr>
                                     @endif
                                 </table>

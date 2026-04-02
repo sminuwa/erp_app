@@ -122,7 +122,7 @@ class DailyScheduleController extends Controller
                         foreach ($availability['insufficient'] as $shortage) {
                             $product = \App\Models\Product::find($shortage['product_id']);
                             $productName = $product ? $product->name : "Product #{$shortage['product_id']}";
-                            $shortageMsg .= "- {$productName}: Required {$shortage['required']}, Available {$shortage['available']}\n";
+                            $shortageMsg .= "- {$productName}: Required {$shortage['required_qty']}, Available {$shortage['available_qty']}\n";
                         }
                     } else {
                         $shortageMsg .= $availability['message'] ?? 'One or more materials are insufficient.';
@@ -293,7 +293,7 @@ class DailyScheduleController extends Controller
                         foreach ($availability['insufficient'] as $shortage) {
                             $product = \App\Models\Product::find($shortage['product_id']);
                             $productName = $product ? $product->name : "Product #{$shortage['product_id']}";
-                            $shortageMsg .= "- {$productName}: Required {$shortage['required']}, Available {$shortage['available']}\n";
+                            $shortageMsg .= "- {$productName}: Required {$shortage['required_qty']}, Available {$shortage['available_qty']}\n";
                         }
                     } else {
                         $shortageMsg .= $availability['message'] ?? 'One or more materials are insufficient.';
@@ -455,11 +455,13 @@ class DailyScheduleController extends Controller
             'schedule_id' => 'nullable|exists:daily_manufacturing_schedules,id'
         ]);
 
-        $order = ProductionOrder::with(['items.bom.finishProduct'])->find($request->order_id);
-        $branchId = Auth::user()->branch_id;
+        $order = ProductionOrder::with([
+            'items.bom.finishProduct',
+            'items.bom.materials.product',
+            'items.bom.materials.sourceStore',
+        ])->find($request->order_id);
 
         $items = [];
-        $allMaterials = [];
 
         foreach ($order->items as $item) {
             $scheduledQty = (float) $item->scheduled_qty;
@@ -474,6 +476,20 @@ class DailyScheduleController extends Controller
 
             $remaining = (float) $item->quantity_to_produce - $scheduledQty;
 
+            // Build per-unit bom_materials for dynamic JS recalculation
+            $bomMaterials = [];
+            if ($item->bom && $item->bom->materials) {
+                foreach ($item->bom->materials as $bomMat) {
+                    $bomMaterials[] = [
+                        'product_id' => $bomMat->product_id,
+                        'product_name' => $bomMat->product->name ?? '',
+                        'store_id' => $bomMat->store_id,
+                        'store_name' => $bomMat->sourceStore->name ?? '',
+                        'bom_qty' => (float) $bomMat->quantity,
+                    ];
+                }
+            }
+
             $items[] = [
                 'id' => $item->id,
                 'bom_id' => $item->bom_id,
@@ -484,32 +500,13 @@ class DailyScheduleController extends Controller
                 'scheduled_qty' => $scheduledQty,
                 'remaining' => $remaining,
                 'output' => (float) $item->quantity_to_produce * ($item->bom->actual_output ?? 1),
+                'bom_materials' => $bomMaterials,
             ];
-
-            // Calculate materials for the full remaining qty (used to display at bottom)
-            if ($remaining > 0) {
-                $materialsData = ProductionCalculator::calculateMaterials($item->bom_id, $remaining, $branchId);
-                foreach ($materialsData['materials'] as $material) {
-                    $key = $material['product_id'] . '_' . $material['store_id'];
-                    if (!isset($allMaterials[$key])) {
-                        $allMaterials[$key] = $material;
-                        // Add product name for display
-                        $product = \App\Models\Product::find($material['product_id']);
-                        $store = \App\Models\Store::find($material['store_id']);
-                        $allMaterials[$key]['product_name'] = $product ? $product->name : '';
-                        $allMaterials[$key]['store_name'] = $store ? $store->name : '';
-                    } else {
-                        $allMaterials[$key]['quantity'] += $material['quantity'];
-                        $allMaterials[$key]['total_cost'] += $material['total_cost'];
-                    }
-                }
-            }
         }
 
         return response()->json([
             'status' => true,
             'data' => $items,
-            'materials' => array_values($allMaterials),
         ]);
     }
 }

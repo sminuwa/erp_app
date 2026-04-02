@@ -150,11 +150,57 @@
 $(document).ready(function() {
     $('.select2-single').select2();
 
+    var scheduleItemsData = [];
+
     // Select all checkbox
     $('#select-all').change(function() {
         var checked = $(this).is(':checked');
         $('#items-tbody .item-checkbox').prop('checked', checked);
+        recalculateMaterials();
     });
+
+    function recalculateMaterials() {
+        var aggregated = {};
+        $('#items-tbody tr').each(function(index) {
+            var checkbox = $(this).find('.item-checkbox');
+            if (!checkbox.is(':checked')) return;
+
+            var plannedQty = parseFloat($(this).find('input[type="number"]').val()) || 0;
+            if (plannedQty <= 0 || !scheduleItemsData[index]) return;
+
+            var bomMaterials = scheduleItemsData[index].bom_materials || [];
+            $.each(bomMaterials, function(_, mat) {
+                var key = mat.product_id + '_' + mat.store_id;
+                var qty = mat.bom_qty * plannedQty;
+                if (aggregated[key]) {
+                    aggregated[key].quantity += qty;
+                } else {
+                    aggregated[key] = {
+                        product_name: mat.product_name,
+                        store_name: mat.store_name,
+                        quantity: qty
+                    };
+                }
+            });
+        });
+
+        $('#materials-tbody').empty();
+        var values = Object.values(aggregated);
+        if (values.length > 0) {
+            $.each(values, function(index, mat) {
+                var row = '<tr>' +
+                    '<td>' + (index + 1) + '</td>' +
+                    '<td>' + mat.product_name + '</td>' +
+                    '<td>' + mat.store_name + '</td>' +
+                    '<td>' + mat.quantity.toFixed(4) + '</td>' +
+                    '</tr>';
+                $('#materials-tbody').append(row);
+            });
+            $('#materials-section').show();
+        } else {
+            $('#materials-section').hide();
+        }
+    }
 
     // Load schedule items on schedule change
     $('#daily_schedule_id').change(function() {
@@ -165,6 +211,7 @@ $(document).ready(function() {
         $('#materials-tbody').empty();
         $('#schedule-items-section').hide();
         $('#materials-section').hide();
+        scheduleItemsData = [];
 
         if (!scheduleId) return;
 
@@ -173,6 +220,8 @@ $(document).ready(function() {
             type: 'GET',
             data: { schedule_id: scheduleId },
             success: function(response) {
+                scheduleItemsData = response.items || [];
+
                 // Populate items table
                 if (response.items && response.items.length > 0) {
                     $.each(response.items, function(index, item) {
@@ -182,31 +231,25 @@ $(document).ready(function() {
                             '<td>' + item.finish_product + '</td>' +
                             '<td>' + item.scheduled_qty + '</td>' +
                             '<td>' + item.remaining_qty + '</td>' +
-                            '<td><input type="number" name="items[' + index + '][planned_qty]" class="form-control form-control-sm" step="0.0001" min="0.0001" max="' + item.remaining_qty + '" value="' + item.remaining_qty + '"></td>' +
+                            '<td><input type="number" name="items[' + index + '][planned_qty]" class="form-control form-control-sm planned-qty" step="0.0001" min="0.0001" max="' + item.remaining_qty + '" value="' + item.remaining_qty + '"></td>' +
                             '</tr>';
                         $('#items-tbody').append(row);
                     });
                     $('#schedule-items-section').show();
-                }
-
-                // Populate materials table
-                if (response.materials && response.materials.length > 0) {
-                    $.each(response.materials, function(index, material) {
-                        var row = '<tr>' +
-                            '<td>' + (index + 1) + '</td>' +
-                            '<td>' + material.product_name + '</td>' +
-                            '<td>' + material.store_name + '</td>' +
-                            '<td>' + material.quantity + '</td>' +
-                            '</tr>';
-                        $('#materials-tbody').append(row);
-                    });
-                    $('#materials-section').show();
                 }
             },
             error: function() {
                 alert('Failed to load schedule items.');
             }
         });
+    });
+
+    // Recalculate materials on checkbox or planned qty change
+    $(document).on('change', '.item-checkbox', function() {
+        recalculateMaterials();
+    });
+    $(document).on('input change', '.planned-qty', function() {
+        recalculateMaterials();
     });
 });
 </script>

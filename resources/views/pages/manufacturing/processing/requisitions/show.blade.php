@@ -178,6 +178,39 @@
                         </div>
                     </div>
 
+                    @if($record->workOrder->items && $record->workOrder->items->count() > 0)
+                    <h6 class="mt-3">Items to Produce</h6>
+                    <table class="table table-bordered table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>#</th>
+                                <th>BOM Reference</th>
+                                <th>Finish Product</th>
+                                <th>BOM Type</th>
+                                <th class="text-right">Planned Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($record->workOrder->items as $index => $woItem)
+                            @php $bom = $woItem->scheduleItem->productionOrderItem->bom ?? null; @endphp
+                            @if($bom)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $bom->reference ?? '-' }}</td>
+                                <td>{{ $bom->finishProduct->name ?? '-' }}</td>
+                                <td>
+                                    <span class="badge badge-{{ ($bom->bom_type ?? '') == 'batch' ? 'primary' : 'success' }}">
+                                        {{ ucfirst($bom->bom_type ?? '') }}
+                                    </span>
+                                </td>
+                                <td class="text-right">{{ number_format($woItem->planned_qty, 4) }}</td>
+                            </tr>
+                            @endif
+                            @endforeach
+                        </tbody>
+                    </table>
+                    @endif
+
                     {{-- Production Details Section (Schedule-based, legacy) --}}
                     @elseif(!$record->bom && $record->schedule)
                     <hr>

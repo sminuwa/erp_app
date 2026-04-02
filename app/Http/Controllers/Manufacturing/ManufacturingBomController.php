@@ -82,7 +82,7 @@ class ManufacturingBomController extends Controller
             'branches' => Branch::orderBy('name')->get(),
             'stores' => Store::where('branch_id', $user->branch_id)->orderBy('name')->get(),
             'products' => Product::select('id', 'code', 'name')->orderBy('code', 'asc')->get(),
-            'glAccounts' => GeneralAccount::orderBy('name')->get(['id', 'code', 'name'])
+            'glAccounts' => GeneralAccount::orderBy('number')->get(['id', 'number', 'description'])
         ]);
     }
 
@@ -220,7 +220,7 @@ class ManufacturingBomController extends Controller
             'branches' => Branch::orderBy('name')->get(),
             'stores' => Store::where('branch_id', $bom->branch_id)->orderBy('name')->get(),
             'products' => Product::select('id', 'code', 'name')->orderBy('code', 'asc')->get(),
-            'glAccounts' => GeneralAccount::orderBy('name')->get(['id', 'code', 'name'])
+            'glAccounts' => GeneralAccount::orderBy('number')->get(['id', 'number', 'description'])
         ]);
     }
 

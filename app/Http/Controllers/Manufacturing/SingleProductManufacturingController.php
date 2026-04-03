@@ -51,10 +51,12 @@ class SingleProductManufacturingController extends Controller
                 $q->where('bom_type', 'single');
             })->orWhereHas('schedule.items.productionOrderItem.bom', function($q) {
                 $q->where('bom_type', 'single');
+            })->orWhereHas('workOrder.items.scheduleItem.productionOrderItem.bom', function($q) {
+                $q->where('bom_type', 'single');
             });
         })->availableForManufacturing()
           ->forBranch($user->branch_id)
-          ->with(['bom.finishProduct', 'schedule.items.productionOrderItem.bom.finishProduct'])
+          ->with(['bom.finishProduct', 'schedule.items.productionOrderItem.bom.finishProduct', 'workOrder.items.scheduleItem.productionOrderItem.bom.finishProduct'])
           ->get();
 
         // Calculate already-manufactured qty per requisition

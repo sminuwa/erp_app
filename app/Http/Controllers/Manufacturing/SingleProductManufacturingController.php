@@ -319,6 +319,11 @@ class SingleProductManufacturingController extends Controller
             $outputQty = $spm->quantity * $bom->actual_output;
             $totalCost = $spm->total_material_cost + ($bom->labor_cost + $bom->power_cost + $bom->other_cost) * $spm->quantity;
 
+            // Add margin to total cost
+            $marginPerPiece = (float) ($bom->margin_per_piece ?? 0);
+            $totalMargin = $marginPerPiece * $outputQty;
+            $totalCost += $totalMargin;
+
             $result = ManufacturingCostPrice::addFinishedGoods(
                 $bom->finish_product_id,
                 $bom->output_store_id,

@@ -137,7 +137,7 @@
                 "closeButton": true,
                 "progressBar": true
             }
-            toastr.success("{{ session('app_message') }}");
+            toastr.success({!! json_encode(session('app_message')) !!});
         @endif
 
         @if (Session::has('app_error'))
@@ -145,7 +145,7 @@
                 "closeButton": true,
                 "progressBar": true
             }
-            toastr.error("{{ session('app_error') }}");
+            toastr.error({!! json_encode(session('app_error')) !!});
         @endif
 
         @if (Session::has('info'))
@@ -153,7 +153,7 @@
                 "closeButton": true,
                 "progressBar": true
             }
-            toastr.info("{{ session('info') }}");
+            toastr.info({!! json_encode(session('info')) !!});
         @endif
 
         @if (Session::has('warning'))
@@ -161,7 +161,7 @@
                 "closeButton": true,
                 "progressBar": true
             }
-            toastr.warning("{{ session('warning') }}");
+            toastr.warning({!! json_encode(session('warning')) !!});
         @endif
 
 

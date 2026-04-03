@@ -162,6 +162,14 @@ class BatchConversionController extends Controller
                 }
             }
 
+            // Add margin to conversion cost
+            $marginPerPiece = (float) ($bom->margin_per_piece ?? 0);
+            $totalMargin = $marginPerPiece * $conversion->produced_qty;
+            if ($totalMargin > 0) {
+                $conversion->total_cost += $totalMargin;
+                $conversion->save();
+            }
+
             // Add finished goods to inventory
             $result = ManufacturingCostPrice::addFinishedGoods(
                 $conversion->finish_product_id,

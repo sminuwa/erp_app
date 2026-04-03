@@ -117,16 +117,15 @@ class DailyScheduleController extends Controller
             if (!empty($allMaterials)) {
                 $availability = InventoryReservationService::validateAvailability(array_values($allMaterials));
                 if (!$availability['status']) {
-                    $shortageMsg = "Insufficient raw materials:\n";
+                    $shortageItems = [];
                     if (isset($availability['insufficient']) && is_array($availability['insufficient'])) {
                         foreach ($availability['insufficient'] as $shortage) {
                             $product = \App\Models\Product::find($shortage['product_id']);
                             $productName = $product ? $product->name : "Product #{$shortage['product_id']}";
-                            $shortageMsg .= "- {$productName}: Required {$shortage['required_qty']}, Available {$shortage['available_qty']}\n";
+                            $shortageItems[] = "{$productName} (Required: {$shortage['required_qty']}, Available: {$shortage['available_qty']})";
                         }
-                    } else {
-                        $shortageMsg .= $availability['message'] ?? 'One or more materials are insufficient.';
                     }
+                    $shortageMsg = 'Insufficient raw materials: ' . (!empty($shortageItems) ? implode('; ', $shortageItems) : ($availability['message'] ?? 'One or more materials are insufficient.'));
                     throw new \Exception($shortageMsg);
                 }
             }
@@ -288,16 +287,15 @@ class DailyScheduleController extends Controller
             if (!empty($allMaterials)) {
                 $availability = InventoryReservationService::validateAvailability(array_values($allMaterials));
                 if (!$availability['status']) {
-                    $shortageMsg = "Insufficient raw materials:\n";
+                    $shortageItems = [];
                     if (isset($availability['insufficient']) && is_array($availability['insufficient'])) {
                         foreach ($availability['insufficient'] as $shortage) {
                             $product = \App\Models\Product::find($shortage['product_id']);
                             $productName = $product ? $product->name : "Product #{$shortage['product_id']}";
-                            $shortageMsg .= "- {$productName}: Required {$shortage['required_qty']}, Available {$shortage['available_qty']}\n";
+                            $shortageItems[] = "{$productName} (Required: {$shortage['required_qty']}, Available: {$shortage['available_qty']})";
                         }
-                    } else {
-                        $shortageMsg .= $availability['message'] ?? 'One or more materials are insufficient.';
                     }
+                    $shortageMsg = 'Insufficient raw materials: ' . (!empty($shortageItems) ? implode('; ', $shortageItems) : ($availability['message'] ?? 'One or more materials are insufficient.'));
                     throw new \Exception($shortageMsg);
                 }
             }

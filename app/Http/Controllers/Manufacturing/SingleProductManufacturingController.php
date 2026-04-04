@@ -8,6 +8,7 @@ use App\Models\SingleProductManufacturingMaterial;
 use App\Models\MaterialsRequisition;
 use App\Models\ManufacturingTeam;
 use App\Models\ManufacturingMachine;
+use App\Models\ManufacturingBom;
 use App\Classes\Manufacturing\ManufacturingTransaction;
 use App\Classes\Manufacturing\ManufacturingCostPrice;
 use App\Classes\Manufacturing\ProductionCalculator;
@@ -56,7 +57,7 @@ class SingleProductManufacturingController extends Controller
             });
         })->availableForManufacturing()
           ->forBranch($user->branch_id)
-          ->with(['bom.finishProduct', 'schedule.items.productionOrderItem.bom.finishProduct', 'workOrder.items.scheduleItem.productionOrderItem.bom.finishProduct'])
+          ->with(['bom.finishProduct', 'schedule.items.productionOrderItem.bom.finishProduct', 'workOrder.items.scheduleItem.productionOrderItem.bom.finishProduct', 'workOrder.team', 'workOrder.machine'])
           ->get();
 
         // Calculate already-manufactured qty per requisition
@@ -112,7 +113,14 @@ class SingleProductManufacturingController extends Controller
             if ($req->bom_id) {
                 $allBomIds->push($req->bom_id);
             }
-            if ($req->schedule) {
+            if ($req->workOrder) {
+                foreach ($req->workOrder->items as $woItem) {
+                    $bom = $woItem->scheduleItem->productionOrderItem->bom ?? null;
+                    if ($bom && $bom->bom_type === 'single') {
+                        $allBomIds->push($bom->id);
+                    }
+                }
+            } elseif ($req->schedule) {
                 foreach ($req->schedule->items as $item) {
                     $bom = $item->productionOrderItem->bom ?? null;
                     if ($bom && $bom->bom_type === 'single') {
@@ -163,6 +171,19 @@ class SingleProductManufacturingController extends Controller
                     // Direct BOM requisition: use requisition quantity
                     $maxQty = $requisition->quantity;
                     $alreadyManufactured = SingleProductManufacturing::where('requisition_id', $request->requisition_id)
+                        ->sum('quantity');
+                } elseif ($requisition->work_order_id) {
+                    // Work-order-based: get per-BOM planned qty from work order items
+                    $maxQty = 0;
+                    $requisition->load('workOrder.items.scheduleItem.productionOrderItem.bom');
+                    foreach ($requisition->workOrder->items as $woItem) {
+                        $itemBom = $woItem->scheduleItem->productionOrderItem->bom ?? null;
+                        if ($itemBom && $itemBom->id == $bomId) {
+                            $maxQty += $woItem->planned_qty;
+                        }
+                    }
+                    $alreadyManufactured = SingleProductManufacturing::where('requisition_id', $request->requisition_id)
+                        ->where('bom_id', $bomId)
                         ->sum('quantity');
                 } elseif ($requisition->schedule) {
                     // Schedule-based: get per-BOM scheduled qty
@@ -239,8 +260,15 @@ class SingleProductManufacturingController extends Controller
             $model->power_cost = $costData['power_cost'];
             $model->other_cost = $costData['other_cost'];
             $model->total_other_cost = $costData['total_other_cost'];
-            $model->total_cost = $costData['total_cost'];
-            $model->unit_cost = $costData['unit_cost'];
+
+            // Include margin in total cost
+            $bom = ManufacturingBom::find($model->bom_id);
+            $marginPerPiece = (float) ($bom->margin_per_piece ?? 0);
+            $outputQty = $model->quantity * ($bom->actual_output ?? 1);
+            $totalMargin = $marginPerPiece * $outputQty;
+
+            $model->total_cost = $costData['total_cost'] + $totalMargin;
+            $model->unit_cost = $costData['expected_output'] > 0 ? $model->total_cost / $costData['expected_output'] : 0;
             $model->save();
 
             DB::commit();

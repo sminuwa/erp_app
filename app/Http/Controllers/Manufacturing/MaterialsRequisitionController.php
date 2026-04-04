@@ -30,7 +30,7 @@ class MaterialsRequisitionController extends Controller
     {
         $this->authorize('manufacturing.requisitions.index');
 
-        $records = MaterialsRequisition::with(['schedule', 'bom', 'branch', 'createdBy'])
+        $records = MaterialsRequisition::with(['schedule', 'workOrder.schedule', 'bom', 'branch', 'createdBy'])
             ->orderBy('created_at', 'desc')
             ->get();
 

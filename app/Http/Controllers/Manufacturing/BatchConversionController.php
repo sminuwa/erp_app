@@ -99,7 +99,11 @@ class BatchConversionController extends Controller
                 $materialCost = $model->material_cost;
             }
 
-            $totalCost = $wipCostDeducted + $materialCost;
+            // Calculate margin based on produced quantity
+            $marginPerPiece = (float) ($bom->margin_per_piece ?? 0);
+            $totalMargin = $marginPerPiece * $request->produced_qty;
+
+            $totalCost = $wipCostDeducted + $materialCost + $totalMargin;
             $model->total_cost = $totalCost;
             $model->unit_cost  = $request->produced_qty > 0 ? $totalCost / $request->produced_qty : 0;
 
@@ -160,14 +164,6 @@ class BatchConversionController extends Controller
                 if (!$deductResult['status']) {
                     throw new \Exception('Packaging material deduction failed: ' . $deductResult['message']);
                 }
-            }
-
-            // Add margin to conversion cost
-            $marginPerPiece = (float) ($bom->margin_per_piece ?? 0);
-            $totalMargin = $marginPerPiece * $conversion->produced_qty;
-            if ($totalMargin > 0) {
-                $conversion->total_cost += $totalMargin;
-                $conversion->save();
             }
 
             // Add finished goods to inventory

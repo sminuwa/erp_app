@@ -247,6 +247,87 @@
                             </div>
                         </div>
                     </div>
+
+                    {{-- Additional Costs Section - visible at destination branch when status >= 1 --}}
+                    @if($record->destination_branch_id == auth()->user()->branch->id && $record->status >= 1)
+                    <div class="col-sm-12">
+                        <div class="card">
+                            <div class="card-header">
+                                Additional Costs
+                                @if($record->status == 1)
+                                    @can('intersite.additional_cost.create')
+                                    <div class="float-right">
+                                        <a href="{{ route('intersite.additional_cost.create', ['intersite_id' => $record->id]) }}"
+                                           class="btn btn-sm btn-primary">
+                                            <i class="fa fa-plus"></i> Add Cost
+                                        </a>
+                                    </div>
+                                    @endcan
+                                @endif
+                            </div>
+                            <div class="card-body table-responsive">
+                                @php
+                                    $additionalCosts = \App\Models\IntersiteAdditionalCost::where('intersite_transfer_id', $record->id)
+                                        ->with('supplier')
+                                        ->orderBy('created_at', 'desc')
+                                        ->get();
+                                    $totalAdditionalCost = $additionalCosts->where('status', 'posted')->sum('amount');
+                                @endphp
+                                @if($additionalCosts->count() > 0)
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>S/N</th>
+                                            <th>Reference</th>
+                                            <th>Date</th>
+                                            <th>Supplier</th>
+                                            <th>Cost Mode</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($additionalCosts as $ac)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $ac->reference }}</td>
+                                            <td>{{ $ac->date }}</td>
+                                            <td>{{ $ac->supplier->name ?? 'N/A' }}</td>
+                                            <td>{{ $ac->cost_mode == 'by_amount' ? 'By Amount' : 'By Qty' }}</td>
+                                            <td class="text-right">&#8358;{{ number_format($ac->amount, 2) }}</td>
+                                            <td>
+                                                @if($ac->status == 'pending')
+                                                    <span class="badge badge-warning">Pending</span>
+                                                @elseif($ac->status == 'posted')
+                                                    <span class="badge badge-success">Posted</span>
+                                                @elseif($ac->status == 'reversed')
+                                                    <span class="badge badge-danger">Reversed</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <a href="{{ route('intersite.additional_cost.show', $ac->id) }}" class="btn btn-info btn-sm" title="View">
+                                                    <i class="fa fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="5" class="text-right">Total Posted Additional Cost:</th>
+                                            <th class="text-right">&#8358;{{ number_format($totalAdditionalCost, 2) }}</th>
+                                            <th colspan="2"></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                                @else
+                                <p class="text-muted">No additional costs recorded for this intersite transfer.</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div><!-- /.container-fluid -->
         </section>

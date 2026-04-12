@@ -125,6 +125,11 @@ class IntersiteTransfer extends Model
         return $this->hasMany(IntersiteTransferReceive::class);
     }
 
+    public function additionalCosts()
+    {
+        return $this->hasMany(IntersiteAdditionalCost::class, 'intersite_transfer_id');
+    }
+
     public static function generateNewNumber($prefix = 'ITB', $length = 4)
     {
         $prefix = $prefix . date('ym') . auth()->user()->branch->code;

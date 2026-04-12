@@ -23,6 +23,7 @@ use App\Http\Controllers\BranchProductPriceController;
 use App\Http\Controllers\MisController;
 use App\Http\Controllers\InterStoreTransferController;
 use App\Http\Controllers\InterSiteTransferController;
+use App\Http\Controllers\IntersiteAdditionalCostController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\InvoiceController;
@@ -1183,6 +1184,20 @@ Route::middleware('auth')->group(function () {
             Route::post('/post/{intersite}', [InterSiteTransferController::class, 'post'])->name('intersite.post');
             Route::post('/receive/{intersite}', [InterSiteTransferController::class, 'receive'])->name('intersite.receive');
             Route::post('/add-to-store', [InterSiteTransferController::class, 'addToStore'])->name('intersite.add-to-store');
+
+            Route::group(['prefix' => 'additional-cost'], function () {
+                Route::get('/index', [IntersiteAdditionalCostController::class, 'index'])->name('intersite.additional_cost.index');
+                Route::get('/create', [IntersiteAdditionalCostController::class, 'create'])->name('intersite.additional_cost.create');
+                Route::post('/store', [IntersiteAdditionalCostController::class, 'store'])->name('intersite.additional_cost.store');
+                Route::get('/show/{cost}', [IntersiteAdditionalCostController::class, 'show'])->name('intersite.additional_cost.show');
+                Route::get('/edit/{cost}', [IntersiteAdditionalCostController::class, 'edit'])->name('intersite.additional_cost.edit');
+                Route::put('/update/{cost}', [IntersiteAdditionalCostController::class, 'update'])->name('intersite.additional_cost.update');
+                Route::post('/post/{cost}', [IntersiteAdditionalCostController::class, 'post'])->name('intersite.additional_cost.post');
+                Route::post('/reverse/{cost}', [IntersiteAdditionalCostController::class, 'reverse'])->name('intersite.additional_cost.reverse');
+                Route::delete('/delete/{cost}', [IntersiteAdditionalCostController::class, 'destroy'])->name('intersite.additional_cost.destroy');
+                Route::get('/search-intersite', [IntersiteAdditionalCostController::class, 'searchIntersite'])->name('intersite.additional_cost.search_intersite');
+                Route::get('/intersite-details/{intersiteTransfer}', [IntersiteAdditionalCostController::class, 'intersiteDetails'])->name('intersite.additional_cost.intersite_details');
+            });
         });
         Route::group(['prefix' => 'user_entries'], function () {
             //User Entries

@@ -187,6 +187,14 @@
                                     </a>
                                 </li>
                             @endcan
+                            @can('intersite.additional_cost.index')
+                                <li class="nav-item">
+                                    <a href="{{ route('intersite.additional_cost.index') }}" class="nav-link ">
+                                        <i class="ion-card"></i>
+                                        <p>Intersite Additional Cost</p>
+                                    </a>
+                                </li>
+                            @endcan
                             @can('interstore.index')
                                 <li class="nav-item">
                                     <a href="{{ route('interstore.index') }}" class="nav-link ">

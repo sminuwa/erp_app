@@ -42,7 +42,6 @@ class IntersiteAdditionalCostController extends Controller
         $user = Auth::user();
 
         $intersites = IntersiteTransfer::where('status', 1)
-            ->where('destination_branch_id', User::userBranchAction())
             ->with('source')
             ->orderBy('reference', 'desc')
             ->get();
@@ -134,7 +133,6 @@ class IntersiteAdditionalCostController extends Controller
         $user = Auth::user();
 
         $intersites = IntersiteTransfer::where('status', 1)
-            ->where('destination_branch_id', User::userBranchAction())
             ->with('source')
             ->orderBy('reference', 'desc')
             ->get();
@@ -297,7 +295,6 @@ class IntersiteAdditionalCostController extends Controller
         $term = $request->get('term', '');
 
         $intersites = IntersiteTransfer::where('status', 1)
-            ->where('destination_branch_id', User::userBranchAction())
             ->where(function ($query) use ($term) {
                 $query->where('reference', 'LIKE', '%' . $term . '%')
                     ->orWhereHas('source', function ($q) use ($term) {

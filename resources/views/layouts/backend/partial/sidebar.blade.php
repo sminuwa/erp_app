@@ -390,6 +390,13 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
+                                            <a href="{{ route('intersite.additional_cost.reports') }}"
+                                                class="nav-link {{ Request::is('reports/intersite/additional-cost*') ? 'active' : '' }}">
+                                                <i class="ion-code-working"></i>
+                                                <p>Intersite Additional Cost Reports</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
                                             <a href="{{ route('interstore.transfer.reports') }}"
                                                 class="nav-link {{ Request::is('reports/sc/interstore/transfer*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>

@@ -7,6 +7,7 @@ use App\Models\ChartOfAccount;
 use App\Models\CreditNote;
 use App\Models\GeneralAccountLedger;
 use App\Models\GeneralAccount;
+use App\Models\IntersiteAdditionalCost;
 use App\Models\IntersiteTransfer;
 use App\Models\InterstoreTransfer;
 use App\Models\OrderInvoice;
@@ -159,6 +160,60 @@ class ReportController extends Controller
         $transfers = $query->get();
         //$query2 = $query;
         return view('pages.reports.stock_control.print_intersite_stock_transfer', compact('transfers', 'from_date', 'to_date'));
+    }
+
+    public function intersiteAdditionalCostReport()
+    {
+        return view('pages.reports.stock_control.intersite_additional_cost_report', [
+            'suppliers' => Supplier::orderBy('name')->get(),
+        ]);
+    }
+
+    public function loadIntersiteAdditionalCostReport(Request $request)
+    {
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
+        $supplier_id = $request->supplier_id;
+        $status = $request->status;
+
+        $query = IntersiteAdditionalCost::with(['intersiteTransfer.source', 'intersiteTransfer.destination', 'supplier', 'createdBy', 'postedBy', 'items.product'])
+            ->whereBetween('date', [$from_date, $to_date]);
+
+        if ($supplier_id && $supplier_id != 'all') {
+            $query->where('supplier_id', $supplier_id);
+        }
+
+        if ($status && $status != 'all') {
+            $query->where('status', $status);
+        }
+
+        $records = $query->orderBy('date', 'desc')->get();
+
+        // Convert back to 'all' for view
+        if (!$supplier_id || $supplier_id == '') $supplier_id = 'all';
+        if (!$status || $status == '') $status = 'all';
+
+        return view('pages.reports.stock_control.load_intersite_additional_cost_report',
+            compact('records', 'from_date', 'to_date', 'supplier_id', 'status'));
+    }
+
+    public function printIntersiteAdditionalCostReport($from_date, $to_date, $supplier_id, $status)
+    {
+        $query = IntersiteAdditionalCost::with(['intersiteTransfer.source', 'intersiteTransfer.destination', 'supplier', 'createdBy', 'postedBy', 'items.product'])
+            ->whereBetween('date', [$from_date, $to_date]);
+
+        if ($supplier_id && $supplier_id != 'all') {
+            $query->where('supplier_id', $supplier_id);
+        }
+
+        if ($status && $status != 'all') {
+            $query->where('status', $status);
+        }
+
+        $records = $query->orderBy('date', 'desc')->get();
+
+        return view('pages.reports.stock_control.print_intersite_additional_cost_report',
+            compact('records', 'from_date', 'to_date'));
     }
 
     public function interstoreTransfer()

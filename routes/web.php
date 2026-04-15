@@ -700,6 +700,11 @@ Route::middleware('auth')->group(function () {
             Route::get('/intersite/transfer/load', [ReportController::class, 'loadIntersiteTransferReport'])->name('ajax.load.intersite.transfer.reports');
             Route::get('/intersite/transfer/print/{from_date}/{to_date}/{source_branch_id}/{destination_branch_id}/{category_id}/{product_id}', [ReportController::class, 'printIntersiteTransfer'])->name('ajax.print.intersite.transfer.reports');
 
+            //Intersite Additional Cost Report
+            Route::get('/intersite/additional-cost', [ReportController::class, 'intersiteAdditionalCostReport'])->name('intersite.additional_cost.reports');
+            Route::get('/intersite/additional-cost/load', [ReportController::class, 'loadIntersiteAdditionalCostReport'])->name('ajax.load.intersite.additional_cost.reports');
+            Route::get('/intersite/additional-cost/print/{from_date}/{to_date}/{supplier_id}/{status}', [ReportController::class, 'printIntersiteAdditionalCostReport'])->name('ajax.print.intersite.additional_cost.reports');
+
             Route::get('/interstore/transfer', [ReportController::class, 'interstoreTransfer'])->name('interstore.transfer.reports');
             Route::get('/interstore/transfer/load', [ReportController::class, 'loadInterstoreTransferReport'])->name('ajax.load.interstore.transfer.reports');
             Route::get('/interstore/transfer/print/{from_date}/{to_date}/{company_id}/{branch_id}/{source_store_id}/{destination_store_id}/{category_id}/{product_id}', [ReportController::class, 'printInterstoreTransfer'])->name('ajax.print.interstore.transfer.reports');

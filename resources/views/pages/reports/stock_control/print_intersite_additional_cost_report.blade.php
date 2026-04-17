@@ -37,7 +37,13 @@
                             <img src="{{ asset('assets/backend/img/logo.png') }}" style="width:50px;height:50px;"
                                 alt="Logo" class="img-circle elevation-3" style="opacity: .8">
                             <h3>
-                                {{ App\Models\User::UserBranchName()->long_name }}
+                                @if (!empty($branch))
+                                    {{ $branch->long_name ?? $branch->name }}
+                                @elseif (!empty($company))
+                                    {{ $company->name }}
+                                @else
+                                    {{ App\Models\User::UserBranchName()->long_name }}
+                                @endif
                             </h3>
                             <h5 style="text-align: center;">INTERSITE ADDITIONAL COST REPORT
                             </h5>
@@ -45,6 +51,16 @@
                                 {{ Carbon\Carbon::parse($from_date)->toFormattedDateString() }} AND
                                 {{ Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
                             </h5>
+                            @if (!empty($company) || !empty($branch))
+                                <h6 style="text-align: center;">
+                                    @if (!empty($company))
+                                        Company: {{ $company->name }}
+                                    @endif
+                                    @if (!empty($branch))
+                                        &nbsp;|&nbsp; Branch: {{ $branch->name }}
+                                    @endif
+                                </h6>
+                            @endif
 
                         </div>
                         <!-- /.col -->

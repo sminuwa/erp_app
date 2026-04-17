@@ -254,7 +254,7 @@
                         <div class="card">
                             <div class="card-header">
                                 Additional Costs
-                                @if($record->status == 1)
+                                {{-- @if($record->status == 1)
                                     @can('intersite.additional_cost.create')
                                     <div class="float-right">
                                         <a href="{{ route('intersite.additional_cost.create', ['intersite_id' => $record->id]) }}"
@@ -263,7 +263,7 @@
                                         </a>
                                     </div>
                                     @endcan
-                                @endif
+                                @endif --}}
                             </div>
                             <div class="card-body table-responsive">
                                 @php

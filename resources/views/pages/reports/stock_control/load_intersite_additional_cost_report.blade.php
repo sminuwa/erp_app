@@ -1,3 +1,9 @@
+<div class="row mb-2">
+    <div class="col-12 text-right">
+        <a href="{{ route('ajax.print.intersite.additional_cost.reports', [$from_date, $to_date, $company_id, $branch_id, $supplier_id, $status]) }}"
+           target="_BLANK" class="btn btn-sm btn-secondary">Print</a>
+    </div>
+</div>
 <table class="display table table-bordered caption" id="example1" data-ordering="true">
     <caption style="caption-size:top">
         <h5 style="text-align: center;">Intersite Additional Cost Report
@@ -5,6 +11,16 @@
             {{ Carbon\Carbon::parse($from_date)->toFormattedDateString() }} to
             {{ Carbon\Carbon::parse($to_date)->toFormattedDateString() }}
         </h5>
+        @if ($company_id != 'all' || $branch_id != 'all')
+            <h6 style="text-align: center;">
+                @if ($company_id != 'all')
+                    Company: {{ \App\Models\Company::find($company_id)->name ?? '' }}
+                @endif
+                @if ($branch_id != 'all')
+                    &nbsp;|&nbsp; Branch: {{ \App\Models\Branch::find($branch_id)->name ?? '' }}
+                @endif
+            </h6>
+        @endif
     </caption>
     <thead>
     <tr>

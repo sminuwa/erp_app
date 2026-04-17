@@ -37,19 +37,31 @@
             <div class="container-fluid">
                 <form method="POST">
                     <div class="row mb-2">
-                        <div class="col-sm-3">
+                        <div class="col-sm-2">
                             <label for="from_date">From Date</label>
                             <input type="text" autocomplete="off"
                                 class="form-control datepicker {{ $errors->has('from_date') ? ' is-invalid' : '' }}"
                                 name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="">
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-2">
                             <label for="to_date">To Date</label>
                             <input type="text" autocomplete="off"
                                 class="form-control datepicker {{ $errors->has('to_date') ? ' is-invalid' : '' }}"
                                 name="to_date" id="to_date" value="{{ old('to_date') }}" placeholder="">
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-2">
+                            <label for="company_id">Company</label>
+                            <select class="form-control select2-single ajax-companies {{ $errors->has('company_id') ? ' is-invalid' : '' }}"
+                                name="company_id" id="company_id">
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <label for="branch_id">Branch</label>
+                            <select class="form-control select2-single ajax-branches {{ $errors->has('branch_id') ? ' is-invalid' : '' }}"
+                                name="branch_id" id="branch_id">
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
                             <label for="supplier_id">Supplier</label>
                             <select class="form-control select2-single {{ $errors->has('supplier_id') ? ' is-invalid' : '' }}"
                                 name="supplier_id" id="supplier_id">
@@ -59,7 +71,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-sm-2">
+                        <div class="col-sm-1">
                             <label for="status">Status</label>
                             <select class="form-control {{ $errors->has('status') ? ' is-invalid' : '' }}"
                                 name="status" id="status">
@@ -92,6 +104,8 @@
             $('#generate').on("click", function() {
                 from_date = $('#from_date').val();
                 to_date = $('#to_date').val();
+                company_id = $('#company_id').val();
+                branch_id = $('#branch_id').val();
                 supplier_id = $('#supplier_id').val();
                 status = $('#status').val();
                 $.ajax({
@@ -101,6 +115,8 @@
                         _token: "{{ csrf_token() }}",
                         from_date: from_date,
                         to_date: to_date,
+                        company_id: company_id,
+                        branch_id: branch_id,
                         supplier_id: supplier_id,
                         status: status
                     }

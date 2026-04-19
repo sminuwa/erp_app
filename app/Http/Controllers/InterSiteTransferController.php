@@ -25,6 +25,7 @@ use App\Models\Store;
 use Illuminate\Support\Facades\DB;
 use App\Models\StoreProduct;
 use App\Models\StockCard;
+use App\Models\IntersiteAdditionalCostItem;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\AuditLog;
@@ -175,12 +176,20 @@ class InterSiteTransferController extends Controller
                 $receive->product_id = $product->product_id;
                 $receive->store_id = $store_id;
                 $receive->quantity = $product->quantity;
-                $receive->cost_price = $product->cost_price;
+                // Include posted additional costs in the receive cost price
+                $additional_per_unit = IntersiteAdditionalCostItem::whereHas('additionalCost', function ($q) use ($intersite) {
+                    $q->where('intersite_transfer_id', $intersite->id)
+                      ->where('status', 'posted');
+                })->where('product_id', $product->product_id)->sum('additional_unit_cost');
+
+                $adjusted_cost = $product->cost_price + $additional_per_unit;
+
+                $receive->cost_price = $adjusted_cost;
                 $receive->status = 1;
                 $receive->save();
                 $new_cost_price[$product->product_id] = [
                     'quantity' => $product->quantity,
-                    'price' => $product->cost_price,
+                    'price' => $adjusted_cost,
                     'store_id' => $store_id,
                     'expiry_date' => '',
                 ];

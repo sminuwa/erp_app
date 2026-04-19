@@ -26,7 +26,7 @@ class ManufacturingTransaction
         $user = auth()->user();
         $branch = $user->branch;
 
-        $manufacturing = SingleProductManufacturing::with(['materials.product.category', 'finishProduct.category'])
+        $manufacturing = SingleProductManufacturing::with(['materials.product.category', 'finishProduct.category', 'bom'])
             ->find($manufacturing_id);
 
         if (!$manufacturing) {
@@ -131,6 +131,27 @@ class ManufacturingTransaction
             ];
         }
 
+        // Margin entry (credit the BOM's margin GL account)
+        $margin_entry = [];
+        $bom = $manufacturing->bom;
+        $marginPerPiece = (float) ($bom->margin_per_piece ?? 0);
+        if ($marginPerPiece > 0 && $bom->margin_gl_account_id) {
+            $outputQty = $manufacturing->quantity * ($bom->actual_output ?? 1);
+            $totalMargin = $marginPerPiece * $outputQty;
+            $margin_entry[] = [
+                'model_id' => $bom->margin_gl_account_id,
+                'model_name' => 'GeneralAccount',
+                'branch_id' => $branch->id,
+                'description' => 'Manufacturing margin - ' . $manufacturing->reference,
+                'reference' => $manufacturing->reference,
+                'credit' => $totalMargin,
+                'debit' => 0,
+                'date' => $manufacturing->manufacturing_date,
+                'user_id' => $user->id,
+                'receipt_no' => 'MFG_MGN_' . $manufacturing->reference
+            ];
+        }
+
         // Create debit entry for finished goods asset account
         $finish_product_category = $manufacturing->finishProduct->category;
         $finish_goods_entry = [
@@ -146,7 +167,7 @@ class ManufacturingTransaction
             'receipt_no' => 'MFG_FG_' . $manufacturing->reference
         ];
 
-        $general_account_ledger = array_merge($raw_material_entries, $overhead_entries, [$finish_goods_entry]);
+        $general_account_ledger = array_merge($raw_material_entries, $overhead_entries, $margin_entry, [$finish_goods_entry]);
 
         if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
             return ['status' => true, 'message' => 'success'];
@@ -315,7 +336,7 @@ class ManufacturingTransaction
         $user = auth()->user();
         $branch = $user->branch;
 
-        $conversion = BatchConversion::with(['finishProduct.category', 'batchProduction', 'materialProduct.category'])
+        $conversion = BatchConversion::with(['finishProduct.category', 'batchProduction.bom', 'materialProduct.category'])
             ->find($conversion_id);
 
         if (!$conversion) {
@@ -364,6 +385,28 @@ class ManufacturingTransaction
             }
         }
 
+        // Margin entry (credit the BOM's margin GL account)
+        $margin_entry = [];
+        $bom = $conversion->batchProduction->bom ?? null;
+        if ($bom) {
+            $marginPerPiece = (float) ($bom->margin_per_piece ?? 0);
+            if ($marginPerPiece > 0 && $bom->margin_gl_account_id) {
+                $totalMargin = $marginPerPiece * $conversion->produced_qty;
+                $margin_entry[] = [
+                    'model_id' => $bom->margin_gl_account_id,
+                    'model_name' => 'GeneralAccount',
+                    'branch_id' => $branch->id,
+                    'description' => 'Batch conversion margin - ' . $conversion->reference,
+                    'reference' => $conversion->reference,
+                    'credit' => $totalMargin,
+                    'debit' => 0,
+                    'date' => $conversion->conversion_date,
+                    'user_id' => $user->id,
+                    'receipt_no' => 'BCN_MGN_' . $conversion->reference
+                ];
+            }
+        }
+
         // Debit finished goods asset account
         $finish_product_category = $conversion->finishProduct->category;
         if (!$finish_product_category || !$finish_product_category->asset_account) {
@@ -383,7 +426,7 @@ class ManufacturingTransaction
             'receipt_no' => 'BCN_FG_' . $conversion->reference
         ];
 
-        $general_account_ledger = array_merge([$wip_entry], $material_entry, [$finish_goods_entry]);
+        $general_account_ledger = array_merge([$wip_entry], $material_entry, $margin_entry, [$finish_goods_entry]);
 
         if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
             return ['status' => true, 'message' => 'success'];

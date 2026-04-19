@@ -70,6 +70,17 @@
                                             if ($bomId) {
                                                 $bomIds[] = $bomId;
                                                 $bomQtys[$bomId] = $reqQty;
+                                            } elseif ($requisition->workOrder) {
+                                                foreach ($requisition->workOrder->items as $woItem) {
+                                                    $itemBom = $woItem->scheduleItem->productionOrderItem->bom ?? null;
+                                                    if ($itemBom && $itemBom->bom_type === 'single') {
+                                                        $bomIds[] = $itemBom->id;
+                                                        $bomQtys[$itemBom->id] = ($bomQtys[$itemBom->id] ?? 0) + $woItem->planned_qty;
+                                                        if (!$bomLabel) $bomLabel = $itemBom->finishProduct->name ?? 'N/A';
+                                                    }
+                                                }
+                                                $bomIds = array_unique($bomIds);
+                                                if (count($bomIds) === 1) $bomId = $bomIds[0];
                                             } elseif ($requisition->schedule) {
                                                 foreach ($requisition->schedule->items as $schedItem) {
                                                     $itemBom = $schedItem->productionOrderItem->bom ?? null;
@@ -96,8 +107,8 @@
                                             data-bom-ids="{{ json_encode(array_values($bomIds)) }}"
                                             data-bom-qtys="{{ json_encode($bomQtys) }}"
                                             data-bom-manufactured="{{ json_encode($bomManufactured) }}"
-                                            data-team-id="{{ $requisition->schedule->team_id ?? '' }}"
-                                            data-machine-id="{{ $requisition->schedule->machine_id ?? '' }}"
+                                            data-team-id="{{ $requisition->workOrder->team_id ?? '' }}"
+                                            data-machine-id="{{ $requisition->workOrder->machine_id ?? '' }}"
                                             data-req-qty="{{ $reqQty }}"
                                             data-manufactured="{{ $manufactured }}"
                                             data-remaining="{{ $remaining }}">

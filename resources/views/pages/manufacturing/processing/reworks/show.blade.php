@@ -32,8 +32,18 @@
                 <div class="card-header">
                     <h3 class="card-title">Rework Details</h3>
                     <div class="card-tools">
+                        @can('manufacturing.reworks.qc_verify')
+                        @if($record->canBeQcVerified())
+                        <form action="{{ route('manufacturing.reworks.qc_verify', $record->id) }}" method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-info btn-sm" onclick="return confirm('QC verify this rework?')">
+                                <i class="fa fa-check-circle"></i> QC Verify
+                            </button>
+                        </form>
+                        @endif
+                        @endcan
                         @can('manufacturing.reworks.post')
-                        @if($record->isPending())
+                        @if($record->canBePosted())
                         <form action="{{ route('manufacturing.reworks.post', $record->id) }}" method="POST" style="display:inline;">
                             @csrf
                             <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Post this rework? This will debit materials and add costs to the finished product.')">
@@ -78,6 +88,8 @@
                                 <p>
                                     @if($record->status == 'pending')
                                         <span class="badge badge-warning">Pending</span>
+                                    @elseif($record->status == 'qc_verified')
+                                        <span class="badge badge-info">QC Verified</span>
                                     @elseif($record->status == 'posted')
                                         <span class="badge badge-success">Posted</span>
                                     @else

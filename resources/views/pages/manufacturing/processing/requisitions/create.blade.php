@@ -50,9 +50,25 @@
                                     <label>Link Type <span class="text-danger">*</span></label>
                                     <select id="link_type" class="form-control" required>
                                         <option value="">Select Type</option>
+                                        <option value="work_order" {{ request('work_order_id') ? 'selected' : '' }}>Work Order</option>
                                         <option value="schedule">Daily Schedule</option>
                                         <option value="bom">BOM (Direct)</option>
                                     </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="work-order-section" style="{{ request('work_order_id') ? '' : 'display:none;' }}">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label>Work Order</label>
+                                    <select name="work_order_id" id="work_order_id" class="form-control select2-single">
+                                        <option value="">Select Work Order</option>
+                                        @foreach($workOrders as $wo)
+                                        <option value="{{ $wo->id }}" {{ request('work_order_id') == $wo->id ? 'selected' : '' }}>{{ $wo->reference }} - {{ date('d M Y', strtotime($wo->work_order_date)) }}</option>
+                                        @endforeach
+                                    </select>
+                                    <small class="text-muted">Materials will be auto-calculated from the selected work order.</small>
                                 </div>
                             </div>
                         </div>
@@ -121,18 +137,27 @@ $(document).ready(function() {
 
     $('#link_type').change(function() {
         var type = $(this).val();
+        $('#work-order-section').hide();
         $('#schedule-section').hide();
         $('#bom-section').hide();
         // Clear hidden fields when switching
+        $('#work_order_id').val(null).trigger('change');
         $('#schedule_id').val(null).trigger('change');
         $('#bom_id').val(null).trigger('change');
 
-        if (type === 'schedule') {
+        if (type === 'work_order') {
+            $('#work-order-section').show();
+        } else if (type === 'schedule') {
             $('#schedule-section').show();
         } else if (type === 'bom') {
             $('#bom-section').show();
         }
     });
+
+    // Auto-trigger if work_order_id is pre-selected
+    if ($('#link_type').val()) {
+        $('#link_type').trigger('change');
+    }
 });
 </script>
 @endpush

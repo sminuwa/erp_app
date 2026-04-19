@@ -187,6 +187,14 @@
                                     </a>
                                 </li>
                             @endcan
+                            @can('intersite.additional_cost.index')
+                                <li class="nav-item">
+                                    <a href="{{ route('intersite.additional_cost.index') }}" class="nav-link ">
+                                        <i class="ion-card"></i>
+                                        <p>Intersite Additional Cost</p>
+                                    </a>
+                                </li>
+                            @endcan
                             @can('interstore.index')
                                 <li class="nav-item">
                                     <a href="{{ route('interstore.index') }}" class="nav-link ">
@@ -379,6 +387,13 @@
                                                 class="nav-link {{ Request::is('reports/sc/intersite/transfer*') ? 'active' : '' }}">
                                                 <i class="ion-code-working"></i>
                                                 <p>Intersite Transfer Reports</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('intersite.additional_cost.reports') }}"
+                                                class="nav-link {{ Request::is('reports/intersite/additional-cost*') ? 'active' : '' }}">
+                                                <i class="ion-code-working"></i>
+                                                <p>Intersite Additional Cost Reports</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -1098,6 +1113,14 @@
                                                 <a href="{{ route('manufacturing.schedules.index') }}" class="nav-link">
                                                     <i class="fa fa-calendar"></i>
                                                     <p>Daily Schedules</p>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('manufacturing.work_orders.index')
+                                            <li class="nav-item">
+                                                <a href="{{ route('manufacturing.work_orders.index') }}" class="nav-link">
+                                                    <i class="fa fa-wrench"></i>
+                                                    <p>Work Orders</p>
                                                 </a>
                                             </li>
                                         @endcan

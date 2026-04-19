@@ -99,7 +99,11 @@ class BatchConversionController extends Controller
                 $materialCost = $model->material_cost;
             }
 
-            $totalCost = $wipCostDeducted + $materialCost;
+            // Calculate margin based on produced quantity
+            $marginPerPiece = (float) ($bom->margin_per_piece ?? 0);
+            $totalMargin = $marginPerPiece * $request->produced_qty;
+
+            $totalCost = $wipCostDeducted + $materialCost + $totalMargin;
             $model->total_cost = $totalCost;
             $model->unit_cost  = $request->produced_qty > 0 ? $totalCost / $request->produced_qty : 0;
 

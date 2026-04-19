@@ -8,6 +8,7 @@ class DailyManufacturingSchedule extends Model
 {
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
+    const STATUS_RECEIVED = 'received';
 
     protected $table = 'daily_manufacturing_schedules';
 
@@ -15,19 +16,20 @@ class DailyManufacturingSchedule extends Model
         'reference',
         'schedule_date',
         'production_order_id',
-        'team_id',
-        'machine_id',
         'branch_id',
         'status',
         'notes',
         'approved_by',
         'approved_at',
+        'received_by',
+        'received_at',
         'created_by'
     ];
 
     protected $dates = [
         'schedule_date',
-        'approved_at'
+        'approved_at',
+        'received_at',
     ];
 
     public function productionOrder()
@@ -50,14 +52,9 @@ class DailyManufacturingSchedule extends Model
         return $this->belongsTo(User::class, 'approved_by', 'id');
     }
 
-    public function team()
+    public function receivedBy()
     {
-        return $this->belongsTo(\App\Models\ManufacturingTeam::class, 'team_id', 'id');
-    }
-
-    public function machine()
-    {
-        return $this->belongsTo(\App\Models\ManufacturingMachine::class, 'machine_id', 'id');
+        return $this->belongsTo(User::class, 'received_by', 'id');
     }
 
     public function items()
@@ -68,6 +65,11 @@ class DailyManufacturingSchedule extends Model
     public function requisitions()
     {
         return $this->hasMany(MaterialsRequisition::class, 'schedule_id', 'id');
+    }
+
+    public function workOrders()
+    {
+        return $this->hasMany(ManufacturingWorkOrder::class, 'daily_schedule_id', 'id');
     }
 
     public function reservations()
@@ -98,6 +100,11 @@ class DailyManufacturingSchedule extends Model
         return $this->status === self::STATUS_APPROVED;
     }
 
+    public function isReceived()
+    {
+        return $this->status === self::STATUS_RECEIVED;
+    }
+
     public function canBeEdited()
     {
         return $this->isPending();
@@ -106,6 +113,11 @@ class DailyManufacturingSchedule extends Model
     public function canBeApproved()
     {
         return $this->isPending();
+    }
+
+    public function canBeReceived()
+    {
+        return $this->isApproved();
     }
 
     public function approve()
@@ -120,6 +132,18 @@ class DailyManufacturingSchedule extends Model
         return $this->save();
     }
 
+    public function receive()
+    {
+        if (!$this->canBeReceived()) {
+            return false;
+        }
+
+        $this->status = self::STATUS_RECEIVED;
+        $this->received_by = auth()->id();
+        $this->received_at = now();
+        return $this->save();
+    }
+
     public function scopePending($query)
     {
         return $query->where('status', self::STATUS_PENDING);
@@ -128,6 +152,11 @@ class DailyManufacturingSchedule extends Model
     public function scopeApproved($query)
     {
         return $query->where('status', self::STATUS_APPROVED);
+    }
+
+    public function scopeReceived($query)
+    {
+        return $query->where('status', self::STATUS_RECEIVED);
     }
 
     public function scopeForBranch($query, $branch_id = null)

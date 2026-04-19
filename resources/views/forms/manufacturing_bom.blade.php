@@ -173,6 +173,43 @@
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="margin_per_piece">Margin per Piece <small class="text-muted">(optional)</small></label>
+                        <input type="number" step="0.0001" class="form-control {{ $errors->has('margin_per_piece') ? ' is-invalid' : '' }}"
+                            name="margin_per_piece" id="margin_per_piece" value="{{ old('margin_per_piece', $model->margin_per_piece) }}"
+                            placeholder="0.0000" min="0">
+                        @if ($errors->has('margin_per_piece'))
+                            <div class="invalid-feedback">
+                                <strong>{{ $errors->first('margin_per_piece') }}</strong>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="margin_gl_account_id">Margin GL Account <small class="text-muted">(optional)</small></label>
+                        <select class="form-control select2-single {{ $errors->has('margin_gl_account_id') ? ' is-invalid' : '' }}"
+                            name="margin_gl_account_id" id="margin_gl_account_id">
+                            <option value="">Select GL Account...</option>
+                            @if (isset($glAccounts))
+                                @foreach ($glAccounts as $glAccount)
+                                    <option value="{{ $glAccount->id }}" {{ old('margin_gl_account_id', $model->margin_gl_account_id) == $glAccount->id ? 'selected' : '' }}>
+                                        {{ $glAccount->number }} - {{ $glAccount->description }}
+                                    </option>
+                                @endforeach
+                            @endif
+                        </select>
+                        @if ($errors->has('margin_gl_account_id'))
+                            <div class="invalid-feedback">
+                                <strong>{{ $errors->first('margin_gl_account_id') }}</strong>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label>Status</label>
                 <div class="form-check">

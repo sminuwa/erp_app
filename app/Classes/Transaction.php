@@ -12,10 +12,12 @@ use App\Models\ProductUnitMeasure;
 use App\Models\Purchase;
 use App\Models\PurchaseExpense;
 use App\Models\ReturnDebit;
+use App\Models\IntersiteAdditionalCost;
 use App\Models\StockAdjustment;
 use App\Models\Store;
 use App\Models\StoreProduct;
 use App\Models\Supplier;
+use App\Models\SupplierLedger;
 
 class Transaction
 {
@@ -307,20 +309,32 @@ class Transaction
         $amount = $expense_amount = 0;
         $product_categories = $product_amounts = [];
         $products = $categories = [];
+
+        // Get additional cost allocations per product (from posted additional costs)
+        $additionalCostByProduct = \App\Models\IntersiteAdditionalCostItem::whereHas('additionalCost', function ($q) use ($intersite) {
+            $q->where('intersite_transfer_id', $intersite->id)->where('status', 'posted');
+        })->get()->groupBy('product_id')->map(function ($items) {
+            return $items->sum('additional_unit_cost');
+        });
+
         foreach ($items as $item) {
+            $additional_per_unit = $additionalCostByProduct->get($item->product_id, 0);
+            $adjusted_cost = $item->cost_price + $additional_per_unit;
+            $item_amount = $adjusted_cost * $item->quantity;
+
             $product_categories[] = [
                 'id' => $item->product_id,
                 'category_id' => $item->product->category->id,
                 'category_name' => $item->product->category->name,
                 'asset_account_id' => $item->product->category->asset_account,
                 'cost_account_id' => $item->product->category->cost_account,
-                'amount' => ($item->cost_price * $item->quantity),
+                'amount' => $item_amount,
             ];
             $product_amounts[] = [
                 'id' => $item->product_id,
-                'amount' => ($item->cost_price * $item->quantity)
+                'amount' => $item_amount,
             ];
-            $amount += ($item->cost_price * $item->quantity);
+            $amount += $item_amount;
         }
 
         foreach ($product_categories as $key => $value) {
@@ -374,6 +388,134 @@ class Transaction
         }
         return ['status' => false, 'message' => 'Something went wrong.'];
 
+    }
+
+    public static function intersite_additional_cost_post($cost_id)
+    {
+        $user = auth()->user();
+        $branch = $user->branch;
+
+        $cost = IntersiteAdditionalCost::find($cost_id);
+
+        if (!$cost) {
+            return ['status' => false, 'message' => 'Additional cost record not found.'];
+        }
+
+        $control_account = GeneralAccountControl::where('code', 'intersite')->first();
+
+        if (!$control_account) {
+            return ['status' => false, 'message' => 'Intersite control account not found.'];
+        }
+
+        // Credit Supplier account
+        $supplier_entry = [
+            'model_id' => $cost->supplier_id,
+            'model_name' => 'Supplier',
+            'branch_id' => $branch->id,
+            'description' => 'Intersite Additional Cost - ' . $cost->reference,
+            'reference' => $cost->reference,
+            'credit' => $cost->amount,
+            'debit' => 0,
+            'date' => $cost->date,
+            'user_id' => $user->id,
+            'receipt_no' => 'IAC_SUP_' . $cost->reference,
+        ];
+
+        // Debit Goods in Transit (Intersite Control Account)
+        $control_entry = [
+            'model_id' => $control_account->general_account_id,
+            'model_name' => 'GeneralAccount',
+            'branch_id' => $branch->id,
+            'description' => 'Intersite Additional Cost - ' . $cost->reference,
+            'reference' => $cost->reference,
+            'credit' => 0,
+            'debit' => $cost->amount,
+            'date' => $cost->date,
+            'user_id' => $user->id,
+            'receipt_no' => 'IAC_GIT_' . $cost->reference,
+        ];
+
+        $general_account_ledger = [$supplier_entry, $control_entry];
+
+        if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
+            // Create supplier ledger entry
+            SupplierLedger::create([
+                'supplier_id' => $cost->supplier_id,
+                'cr' => $cost->amount,
+                'dr' => 0,
+                'description' => 'Intersite Additional Cost - ' . $cost->reference,
+                'Ref' => $cost->reference,
+                'date' => $cost->date,
+            ]);
+
+            return ['status' => true, 'message' => 'success'];
+        }
+
+        return ['status' => false, 'message' => 'Something went wrong.'];
+    }
+
+    public static function intersite_additional_cost_reverse($cost_id)
+    {
+        $user = auth()->user();
+        $branch = $user->branch;
+
+        $cost = IntersiteAdditionalCost::find($cost_id);
+
+        if (!$cost) {
+            return ['status' => false, 'message' => 'Additional cost record not found.'];
+        }
+
+        $control_account = GeneralAccountControl::where('code', 'intersite')->first();
+
+        if (!$control_account) {
+            return ['status' => false, 'message' => 'Intersite control account not found.'];
+        }
+
+        // Debit Supplier account (reverse original credit)
+        $supplier_entry = [
+            'model_id' => $cost->supplier_id,
+            'model_name' => 'Supplier',
+            'branch_id' => $branch->id,
+            'description' => 'Reversal: Intersite Additional Cost - ' . $cost->reference,
+            'reference' => $cost->reference,
+            'credit' => 0,
+            'debit' => $cost->amount,
+            'date' => now()->format('Y-m-d'),
+            'user_id' => $user->id,
+            'receipt_no' => 'IAC_REV_SUP_' . $cost->reference,
+        ];
+
+        // Credit Goods in Transit (reverse original debit)
+        $control_entry = [
+            'model_id' => $control_account->general_account_id,
+            'model_name' => 'GeneralAccount',
+            'branch_id' => $branch->id,
+            'description' => 'Reversal: Intersite Additional Cost - ' . $cost->reference,
+            'reference' => $cost->reference,
+            'credit' => $cost->amount,
+            'debit' => 0,
+            'date' => now()->format('Y-m-d'),
+            'user_id' => $user->id,
+            'receipt_no' => 'IAC_REV_GIT_' . $cost->reference,
+        ];
+
+        $general_account_ledger = [$supplier_entry, $control_entry];
+
+        if (GeneralAccountLedger::upsert($general_account_ledger, ['model_id', 'model_name', 'branch_id', 'receipt_no'])) {
+            // Create reverse supplier ledger entry
+            SupplierLedger::create([
+                'supplier_id' => $cost->supplier_id,
+                'cr' => 0,
+                'dr' => $cost->amount,
+                'description' => 'Reversal: Intersite Additional Cost - ' . $cost->reference,
+                'Ref' => $cost->reference,
+                'date' => now()->format('Y-m-d'),
+            ]);
+
+            return ['status' => true, 'message' => 'success'];
+        }
+
+        return ['status' => false, 'message' => 'Something went wrong.'];
     }
 
     public static function stock_adjustment($stock_adjustment_id)

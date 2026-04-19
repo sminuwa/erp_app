@@ -21,6 +21,7 @@ use App\Http\Requests\Manufacturing\Boms\Edit as BomEditRequest;
 use App\Http\Requests\Manufacturing\Boms\Update as BomUpdateRequest;
 use App\Http\Requests\Manufacturing\Boms\Destroy as BomDestroyRequest;
 use App\Classes\Manufacturing\ProductionCalculator;
+use App\Models\GeneralAccount;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -80,7 +81,8 @@ class ManufacturingBomController extends Controller
             'model' => $model,
             'branches' => Branch::orderBy('name')->get(),
             'stores' => Store::where('branch_id', $user->branch_id)->orderBy('name')->get(),
-            'products' => Product::select('id', 'code', 'name')->orderBy('code', 'asc')->get()
+            'products' => Product::select('id', 'code', 'name')->orderBy('code', 'asc')->get(),
+            'glAccounts' => GeneralAccount::orderBy('number')->get(['id', 'number', 'description'])
         ]);
     }
 
@@ -110,6 +112,8 @@ class ManufacturingBomController extends Controller
             $model->labor_cost = $request->labor_cost ?? 0;
             $model->power_cost = $request->power_cost ?? 0;
             $model->other_cost = $request->other_cost ?? 0;
+            $model->margin_per_piece = $request->margin_per_piece;
+            $model->margin_gl_account_id = $request->margin_gl_account_id;
             $model->branch_id = Auth::user()->branch_id;
             $model->status = $request->status;
             $model->created_by = Auth::id();
@@ -165,7 +169,7 @@ class ManufacturingBomController extends Controller
      */
     public function show(BomShowRequest $request, ManufacturingBom $bom)
     {
-        $bom->load(['finishProduct', 'outputStore', 'mainRawMaterial', 'branch', 'category', 'materials.product', 'materials.sourceStore']);
+        $bom->load(['finishProduct', 'outputStore', 'mainRawMaterial', 'branch', 'category', 'materials.product', 'materials.sourceStore', 'marginGlAccount']);
 
         // Dynamically recalculate material costs from current BranchProductPrice
         $totalMaterialCost = 0;
@@ -215,7 +219,8 @@ class ManufacturingBomController extends Controller
             'model' => $bom,
             'branches' => Branch::orderBy('name')->get(),
             'stores' => Store::where('branch_id', $bom->branch_id)->orderBy('name')->get(),
-            'products' => Product::select('id', 'code', 'name')->orderBy('code', 'asc')->get()
+            'products' => Product::select('id', 'code', 'name')->orderBy('code', 'asc')->get(),
+            'glAccounts' => GeneralAccount::orderBy('number')->get(['id', 'number', 'description'])
         ]);
     }
 
@@ -244,6 +249,8 @@ class ManufacturingBomController extends Controller
             $bom->labor_cost = $request->labor_cost ?? 0;
             $bom->power_cost = $request->power_cost ?? 0;
             $bom->other_cost = $request->other_cost ?? 0;
+            $bom->margin_per_piece = $request->margin_per_piece;
+            $bom->margin_gl_account_id = $request->margin_gl_account_id;
             $bom->status = $request->status;
             $bom->updated_by = Auth::id();
             $bom->save();

@@ -52,10 +52,12 @@ class BatchProductionController extends Controller
                 $q->where('bom_type', 'batch');
             })->orWhereHas('schedule.items.productionOrderItem.bom', function($q) {
                 $q->where('bom_type', 'batch');
+            })->orWhereHas('workOrder.items.scheduleItem.productionOrderItem.bom', function($q) {
+                $q->where('bom_type', 'batch');
             });
-        })->received()
+        })->availableForManufacturing()
           ->forBranch($user->branch_id)
-          ->with(['bom.finishProduct', 'schedule.items.productionOrderItem.bom.finishProduct'])
+          ->with(['bom.finishProduct', 'schedule.items.productionOrderItem.bom.finishProduct', 'workOrder.items.scheduleItem.productionOrderItem.bom.finishProduct', 'workOrder.team', 'workOrder.machine'])
           ->get();
 
         // Calculate already-manufactured qty per requisition
@@ -81,15 +83,26 @@ class BatchProductionController extends Controller
         // Filter out exhausted requisitions (remaining qty <= 0)
         $requisitions = $requisitions->filter(function($req) use ($manufacturedQtyByRequisition, $manufacturedQtyByReqAndBom) {
             if ($req->bom_id) {
-                // Direct BOM: simple quantity check
                 $reqQty = $req->quantity ?? 0;
                 if ($reqQty <= 0) return true;
                 $remaining = $reqQty - ($manufacturedQtyByRequisition[$req->id] ?? 0);
                 return $remaining > 0;
             }
 
+            if ($req->workOrder) {
+                $totalPlanned = 0;
+                foreach ($req->workOrder->items as $woItem) {
+                    $bom = $woItem->scheduleItem->productionOrderItem->bom ?? null;
+                    if ($bom && $bom->bom_type === 'batch') {
+                        $totalPlanned += $woItem->planned_qty;
+                    }
+                }
+                if ($totalPlanned <= 0) return true;
+                $totalManufactured = array_sum($manufacturedQtyByReqAndBom[$req->id] ?? []);
+                return $totalPlanned > $totalManufactured;
+            }
+
             if ($req->schedule) {
-                // Schedule-based: sum per-BOM scheduled quantities and compare to manufactured
                 $totalScheduled = 0;
                 foreach ($req->schedule->items as $item) {
                     $bom = $item->productionOrderItem->bom ?? null;
@@ -102,7 +115,7 @@ class BatchProductionController extends Controller
                 return $totalScheduled > $totalManufactured;
             }
 
-            return true; // Keep if we can't determine
+            return true;
         });
 
         // Collect only BOM IDs referenced by the available requisitions
@@ -111,7 +124,14 @@ class BatchProductionController extends Controller
             if ($req->bom_id) {
                 $allBomIds->push($req->bom_id);
             }
-            if ($req->schedule) {
+            if ($req->workOrder) {
+                foreach ($req->workOrder->items as $woItem) {
+                    $bom = $woItem->scheduleItem->productionOrderItem->bom ?? null;
+                    if ($bom && $bom->bom_type === 'batch') {
+                        $allBomIds->push($bom->id);
+                    }
+                }
+            } elseif ($req->schedule) {
                 foreach ($req->schedule->items as $item) {
                     $bom = $item->productionOrderItem->bom ?? null;
                     if ($bom && $bom->bom_type === 'batch') {
@@ -162,6 +182,19 @@ class BatchProductionController extends Controller
                     // Direct BOM requisition: use requisition quantity
                     $maxQty = $requisition->quantity;
                     $alreadyManufactured = BatchProduction::where('requisition_id', $request->requisition_id)
+                        ->sum('quantity');
+                } elseif ($requisition->work_order_id) {
+                    // Work-order-based: get per-BOM planned qty from work order items
+                    $maxQty = 0;
+                    $requisition->load('workOrder.items.scheduleItem.productionOrderItem.bom');
+                    foreach ($requisition->workOrder->items as $woItem) {
+                        $itemBom = $woItem->scheduleItem->productionOrderItem->bom ?? null;
+                        if ($itemBom && $itemBom->id == $bomId) {
+                            $maxQty += $woItem->planned_qty;
+                        }
+                    }
+                    $alreadyManufactured = BatchProduction::where('requisition_id', $request->requisition_id)
+                        ->where('bom_id', $bomId)
                         ->sum('quantity');
                 } elseif ($requisition->schedule) {
                     // Schedule-based: get per-BOM scheduled qty
@@ -279,12 +312,29 @@ class BatchProductionController extends Controller
         ]);
     }
 
+    public function qcVerify(BatchProduction $batch)
+    {
+        $this->authorize('manufacturing.batch_production.qc_verify');
+
+        if (!$batch->canBeQcVerified()) {
+            session()->flash('app_error', 'Only pending records can be QC verified.');
+            return redirect()->back();
+        }
+
+        $batch->qcVerify();
+
+        AuditLog::auditLog(Auth::id(), "QC verified batch production: " . $batch->reference);
+        session()->flash('app_message', 'Batch Production QC verified successfully');
+
+        return redirect()->back();
+    }
+
     public function post(BatchProduction $batch)
     {
         $this->authorize('manufacturing.batch_production.post');
 
-        if (!$batch->isPending()) {
-            session()->flash('app_error', 'Only pending records can be posted.');
+        if (!$batch->canBePosted()) {
+            session()->flash('app_error', 'Only QC verified records can be posted.');
             return redirect()->back();
         }
 

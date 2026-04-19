@@ -182,12 +182,29 @@ class ManufacturingReworkController extends Controller
         ]);
     }
 
+    public function qcVerify(ManufacturingRework $rework)
+    {
+        $this->authorize('manufacturing.reworks.qc_verify');
+
+        if (!$rework->canBeQcVerified()) {
+            session()->flash('app_error', 'Only pending reworks can be QC verified.');
+            return redirect()->back();
+        }
+
+        $rework->qcVerify();
+
+        AuditLog::auditLog(Auth::id(), "QC verified rework: " . $rework->reference);
+        session()->flash('app_message', 'Rework QC verified successfully');
+
+        return redirect()->back();
+    }
+
     public function post(ManufacturingRework $rework)
     {
         $this->authorize('manufacturing.reworks.post');
 
-        if (!$rework->isPending()) {
-            session()->flash('app_error', 'Only pending reworks can be posted.');
+        if (!$rework->canBePosted()) {
+            session()->flash('app_error', 'Only QC verified reworks can be posted.');
             return redirect()->back();
         }
 

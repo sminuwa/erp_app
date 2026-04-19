@@ -66,30 +66,6 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label>Team <span class="text-danger">*</span></label>
-                                    <select name="team_id" class="form-control select2-single" required>
-                                        <option value="">Select Team</option>
-                                        @foreach($teams as $team)
-                                        <option value="{{ $team->id }}">{{ $team->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Machine</label>
-                                    <select name="machine_id" class="form-control select2-single">
-                                        <option value="">Select Machine</option>
-                                        @foreach($machines as $machine)
-                                        <option value="{{ $machine->id }}">{{ $machine->code }} - {{ $machine->description }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="form-group">
                                     <label>Notes</label>
                                     <textarea name="notes" class="form-control" rows="1">{{ old('notes') }}</textarea>
                                 </div>
@@ -130,6 +106,17 @@
                 </div>
             </div>
         </div>
+        <div id="materials-panel" style="display:none;" class="mt-3">
+            <div class="card">
+                <div class="card-header"><h5 class="card-title">Required Raw Materials</h5></div>
+                <div class="card-body">
+                    <table class="table table-bordered table-sm" id="materials-table">
+                        <thead><tr><th>#</th><th>Product</th><th>Store</th><th class="text-right">Required Qty</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </form>
     </section>
 </div>
@@ -146,6 +133,52 @@ $(document).ready(function() {
         return parseFloat(num || 0).toFixed(4);
     }
 
+    function recalculateMaterials() {
+        var aggregated = {};
+        $('.item-row').each(function() {
+            var itemId = $(this).data('item-id');
+            var qty = parseFloat($(this).find('.item-qty').val()) || 0;
+            if (qty <= 0) return;
+
+            // Find matching orderItem
+            var item = orderItems.find(function(oi) { return oi.id == itemId; });
+            if (!item || !item.bom_materials) return;
+
+            $.each(item.bom_materials, function(_, mat) {
+                var key = mat.product_id + '_' + mat.store_id;
+                var materialQty = mat.bom_qty * qty;
+                if (aggregated[key]) {
+                    aggregated[key].quantity += materialQty;
+                } else {
+                    aggregated[key] = {
+                        product_name: mat.product_name,
+                        store_name: mat.store_name,
+                        quantity: materialQty
+                    };
+                }
+            });
+        });
+
+        var materialsBody = $('#materials-table tbody');
+        materialsBody.empty();
+        var values = Object.values(aggregated);
+        if (values.length > 0) {
+            $.each(values, function(i, mat) {
+                materialsBody.append(
+                    '<tr>' +
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td>' + mat.product_name + '</td>' +
+                    '<td>' + mat.store_name + '</td>' +
+                    '<td class="text-right">' + formatNum(mat.quantity) + '</td>' +
+                    '</tr>'
+                );
+            });
+            $('#materials-panel').show();
+        } else {
+            $('#materials-panel').hide();
+        }
+    }
+
     // Load order items via AJAX when order is selected
     $('#order_id').on('change', function() {
         var orderId = $(this).val();
@@ -154,6 +187,8 @@ $(document).ready(function() {
 
         if (!orderId) {
             $('#items-body').append('<tr class="empty-row"><td colspan="8" class="text-center text-muted">Please select a Production Order to load items</td></tr>');
+            $('#materials-panel').hide();
+            $('#materials-table tbody').empty();
             return;
         }
 
@@ -174,6 +209,7 @@ $(document).ready(function() {
                 if (response.status && response.data) {
                     orderItems = response.data;
                     loadAllItems();
+                    recalculateMaterials();
                 }
             },
             error: function() {
@@ -240,9 +276,10 @@ $(document).ready(function() {
         if ($('.item-row').length === 0) {
             $('#items-body').append('<tr class="empty-row"><td colspan="8" class="text-center text-muted">No items. Select a Production Order to reload.</td></tr>');
         }
+        recalculateMaterials();
     });
 
-    // Validate qty on change
+    // Validate qty on change and recalculate materials
     $(document).on('change', '.item-qty', function() {
         var max = parseFloat($(this).data('remaining')) || 0;
         var val = parseFloat($(this).val()) || 0;
@@ -253,6 +290,10 @@ $(document).ready(function() {
         if (val <= 0) {
             $(this).val(formatNum(0.0001));
         }
+        recalculateMaterials();
+    });
+    $(document).on('input', '.item-qty', function() {
+        recalculateMaterials();
     });
 
     // Form submit validation

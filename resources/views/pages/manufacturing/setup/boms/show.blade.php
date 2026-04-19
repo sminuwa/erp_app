@@ -110,6 +110,18 @@
                                         <th>Status</th>
                                         <td>{{ $record->status == 1 ? 'Active' : 'Inactive' }}</td>
                                     </tr>
+                                    @if($record->margin_per_piece)
+                                    <tr>
+                                        <th>Margin per Piece</th>
+                                        <td>{{ number_format($record->margin_per_piece, 4) }}</td>
+                                    </tr>
+                                    @endif
+                                    @if($record->marginGlAccount)
+                                    <tr>
+                                        <th>Margin GL Account</th>
+                                        <td>{{ $record->marginGlAccount->number }} - {{ $record->marginGlAccount->description }}</td>
+                                    </tr>
+                                    @endif
                                 </table>
                             </div>
                         </div>

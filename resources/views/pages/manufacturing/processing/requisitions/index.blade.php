@@ -38,7 +38,7 @@
                                 <tr>
                                     <th>Reference</th>
                                     <th>Date</th>
-                                    <th>Schedule</th>
+                                    <th>Source</th>
                                     <th>Status</th>
                                     <th>Created By</th>
                                     <th width="120">Actions</th>
@@ -49,7 +49,17 @@
                                 <tr>
                                     <td>{{ $record->reference }}</td>
                                     <td>{{ date('d M Y', strtotime($record->requisition_date)) }}</td>
-                                    <td>{{ $record->schedule->reference ?? 'N/A' }}</td>
+                                    <td>
+                                        @if($record->workOrder)
+                                            WO: {{ $record->workOrder->reference }}
+                                        @elseif($record->schedule)
+                                            {{ $record->schedule->reference }}
+                                        @elseif($record->bom)
+                                            BOM: {{ $record->bom->reference }}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
                                     <td>
                                         @if($record->status == 'pending')
                                             <span class="badge badge-warning">Pending</span>

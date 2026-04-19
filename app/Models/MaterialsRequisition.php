@@ -10,6 +10,7 @@ class MaterialsRequisition extends Model
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
     const STATUS_ISSUED = 'issued';
+    const STATUS_VERIFIED = 'verified';
     const STATUS_RECEIVED = 'received';
 
     protected $table = 'materials_requisitions';
@@ -18,6 +19,7 @@ class MaterialsRequisition extends Model
         'reference',
         'requisition_date',
         'schedule_id',
+        'work_order_id',
         'bom_id',
         'quantity',
         'branch_id',
@@ -32,6 +34,8 @@ class MaterialsRequisition extends Model
         'approved_at',
         'issued_by',
         'issued_at',
+        'verified_by',
+        'verified_at',
         'received_by',
         'received_at'
     ];
@@ -40,12 +44,18 @@ class MaterialsRequisition extends Model
         'requisition_date',
         'approved_at',
         'issued_at',
+        'verified_at',
         'received_at'
     ];
 
     public function schedule()
     {
         return $this->belongsTo(DailyManufacturingSchedule::class, 'schedule_id', 'id');
+    }
+
+    public function workOrder()
+    {
+        return $this->belongsTo(ManufacturingWorkOrder::class, 'work_order_id', 'id');
     }
 
     public function bom()
@@ -76,6 +86,11 @@ class MaterialsRequisition extends Model
     public function receivedBy()
     {
         return $this->belongsTo(User::class, 'received_by', 'id');
+    }
+
+    public function verifiedBy()
+    {
+        return $this->belongsTo(User::class, 'verified_by', 'id');
     }
 
     public function items()
@@ -134,6 +149,11 @@ class MaterialsRequisition extends Model
         return $this->status === self::STATUS_ISSUED;
     }
 
+    public function isVerified()
+    {
+        return $this->status === self::STATUS_VERIFIED;
+    }
+
     public function isReceived()
     {
         return $this->status === self::STATUS_RECEIVED;
@@ -154,9 +174,14 @@ class MaterialsRequisition extends Model
         return $this->isApproved();
     }
 
-    public function canBeReceived()
+    public function canBeVerified()
     {
         return $this->isIssued();
+    }
+
+    public function canBeReceived()
+    {
+        return $this->isVerified();
     }
 
     public function approve()
@@ -183,6 +208,18 @@ class MaterialsRequisition extends Model
         return $this->save();
     }
 
+    public function verify()
+    {
+        if (!$this->canBeVerified()) {
+            return false;
+        }
+
+        $this->status = self::STATUS_VERIFIED;
+        $this->verified_by = auth()->id();
+        $this->verified_at = now();
+        return $this->save();
+    }
+
     public function receive()
     {
         if (!$this->canBeReceived()) {
@@ -200,6 +237,11 @@ class MaterialsRequisition extends Model
         return !is_null($this->schedule_id);
     }
 
+    public function isLinkedToWorkOrder()
+    {
+        return !is_null($this->work_order_id);
+    }
+
     public function isLinkedToBom()
     {
         return !is_null($this->bom_id);
@@ -209,6 +251,13 @@ class MaterialsRequisition extends Model
     {
         if ($this->isLinkedToBom()) {
             return $this->bom->bom_type;
+        }
+
+        if ($this->isLinkedToWorkOrder()) {
+            $firstItem = $this->workOrder->items()->first();
+            if ($firstItem && $firstItem->scheduleItem && $firstItem->scheduleItem->productionOrderItem && $firstItem->scheduleItem->productionOrderItem->bom) {
+                return $firstItem->scheduleItem->productionOrderItem->bom->bom_type;
+            }
         }
 
         if ($this->isLinkedToSchedule()) {
@@ -246,6 +295,11 @@ class MaterialsRequisition extends Model
         return $query->where('status', self::STATUS_ISSUED);
     }
 
+    public function scopeVerified($query)
+    {
+        return $query->where('status', self::STATUS_VERIFIED);
+    }
+
     public function scopeReceived($query)
     {
         return $query->where('status', self::STATUS_RECEIVED);
@@ -253,7 +307,7 @@ class MaterialsRequisition extends Model
 
     public function scopeAvailableForManufacturing($query)
     {
-        return $query->where('status', self::STATUS_RECEIVED);
+        return $query->whereIn('status', [self::STATUS_VERIFIED, self::STATUS_RECEIVED]);
     }
 
     public function scopeForBranch($query, $branch_id = null)

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 class ManufacturingRework extends Model
 {
     const STATUS_PENDING = 'pending';
+    const STATUS_QC_VERIFIED = 'qc_verified';
     const STATUS_POSTED = 'posted';
 
     const PRODUCTION_TYPE_SINGLE = 'single_product';
@@ -33,12 +34,15 @@ class ManufacturingRework extends Model
     protected $guarded = [
         'id',
         'status',
+        'qc_verified_by',
+        'qc_verified_at',
         'posted_by',
         'posted_at'
     ];
 
     protected $dates = [
         'rework_date',
+        'qc_verified_at',
         'posted_at'
     ];
 
@@ -63,6 +67,11 @@ class ManufacturingRework extends Model
     public function postedBy()
     {
         return $this->belongsTo(User::class, 'posted_by', 'id');
+    }
+
+    public function qcVerifiedBy()
+    {
+        return $this->belongsTo(User::class, 'qc_verified_by', 'id');
     }
 
     public function materials()
@@ -118,6 +127,11 @@ class ManufacturingRework extends Model
         return $this->status === self::STATUS_PENDING;
     }
 
+    public function isQcVerified()
+    {
+        return $this->status === self::STATUS_QC_VERIFIED;
+    }
+
     public function isPosted()
     {
         return $this->status === self::STATUS_POSTED;
@@ -128,14 +142,31 @@ class ManufacturingRework extends Model
         return $this->isPending();
     }
 
-    public function canBePosted()
+    public function canBeQcVerified()
     {
         return $this->isPending();
+    }
+
+    public function canBePosted()
+    {
+        return $this->isQcVerified();
     }
 
     public function canBeDeleted()
     {
         return $this->isPending();
+    }
+
+    public function qcVerify()
+    {
+        if (!$this->canBeQcVerified()) {
+            return false;
+        }
+
+        $this->status = self::STATUS_QC_VERIFIED;
+        $this->qc_verified_by = auth()->id();
+        $this->qc_verified_at = now();
+        return $this->save();
     }
 
     public function post()

@@ -65,8 +65,13 @@ Route::get('/', function () {
     return view('auth/login');
 });
 
-Route::middleware('auth')->group(function () {
+// TEMP — manufacturing reservation cleanup runner (PUBLIC, no auth). REMOVE after one-off cleanup is run.
+Route::get('/admin/temp/reservation-cleanup', [\App\Http\Controllers\Admin\TempReservationCleanupController::class, 'index'])
+    ->name('admin.temp.reservation_cleanup');
+Route::post('/admin/temp/reservation-cleanup', [\App\Http\Controllers\Admin\TempReservationCleanupController::class, 'run']);
+// /TEMP
 
+Route::middleware('auth')->group(function () {
 
     Route::prefix('opening-balance')->group(function () {
         Route::match(['GET', 'POST'], '/customer-balance', [OpeningBalanceController::class, 'customerBalance'])->name('opening-balance.customer.balance');

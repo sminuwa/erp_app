@@ -374,6 +374,14 @@ class SingleProductManufacturingController extends Controller
             // Consume reservations
             InventoryReservationService::consumeAllForReference('requisition', $spm->requisition_id);
 
+            $spm->loadMissing('requisition');
+            if ($spm->requisition && $spm->requisition->schedule_id) {
+                InventoryReservationService::consumeAllForReference(
+                    'daily_schedule',
+                    $spm->requisition->schedule_id
+                );
+            }
+
             // Update status and costs
             $spm->total_cost = $totalCost;
             $spm->unit_cost = $spm->quantity > 0 ? $totalCost / $spm->quantity : 0;

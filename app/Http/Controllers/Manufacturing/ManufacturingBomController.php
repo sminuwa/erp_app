@@ -43,11 +43,20 @@ class ManufacturingBomController extends Controller
             ->orderBy('reference', 'desc')
             ->paginate(50);
 
-        // Dynamically recalculate cost_per_unit from current BranchProductPrice
+        // Dynamically recalculate cost_per_unit from current BranchProductPrice.
+        // Bulk-resolve all (branch_id, product_id) pairs up front to avoid N+1 queries.
+        $pairs = [];
+        foreach ($records as $record) {
+            foreach ($record->materials as $material) {
+                $pairs[] = [$record->branch_id, $material->product_id];
+            }
+        }
+        $costMap = ProductionCalculator::getCurrentCostPrices($pairs);
+
         foreach ($records as $record) {
             $totalMaterialCost = 0;
             foreach ($record->materials as $material) {
-                $currentCost = ProductionCalculator::getCurrentCostPrice($material->product_id, $record->branch_id);
+                $currentCost = $costMap[$record->branch_id . '|' . $material->product_id] ?? 0;
                 $totalMaterialCost += $material->quantity * $currentCost;
             }
             $record->total_material_cost = $totalMaterialCost;
@@ -202,9 +211,16 @@ class ManufacturingBomController extends Controller
     {
         $bom->load(['materials.product', 'materials.sourceStore']);
 
-        // Refresh material costs to current average cost prices (only update if new cost > 0)
+        // Refresh material costs to current average cost prices (only update if new cost > 0).
+        // Bulk-resolve all material costs in one go to avoid N+1 queries.
+        $pairs = [];
         foreach ($bom->materials as $material) {
-            $currentCost = $this->getProductCost($material->product_id, $bom->branch_id);
+            $pairs[] = [$bom->branch_id, $material->product_id];
+        }
+        $costMap = ProductionCalculator::getCurrentCostPrices($pairs);
+
+        foreach ($bom->materials as $material) {
+            $currentCost = $costMap[$bom->branch_id . '|' . $material->product_id] ?? 0;
             if ($currentCost > 0 && $currentCost != $material->unit_cost) {
                 $material->unit_cost = $currentCost;
                 $material->total_cost = $material->quantity * $currentCost;

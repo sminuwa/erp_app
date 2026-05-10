@@ -227,10 +227,7 @@ class BatchProduction extends Model
         $this->converted_qty += $qty;
         $this->remaining_qty -= $qty;
         $this->wip_value -= $cost_deducted;
-
-        if ($this->remaining_qty <= 0) {
-            $this->status = self::STATUS_FULLY_CONVERTED;
-        }
+        $this->status = self::STATUS_FULLY_CONVERTED;
 
         return $this->save();
     }
@@ -254,7 +251,8 @@ class BatchProduction extends Model
     public function scopeAvailableForConversion($query)
     {
         return $query->where('status', self::STATUS_POSTED)
-            ->where('remaining_qty', '>', 0);
+            ->where('remaining_qty', '>', 0)
+            ->whereDoesntHave('conversions');
     }
 
     public function scopeForBranch($query, $branch_id = null)

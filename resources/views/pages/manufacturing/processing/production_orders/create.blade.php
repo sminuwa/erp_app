@@ -148,6 +148,7 @@
 $(function() {
     var rowIndex = 1;
     var boms = @json($boms);
+    var oldItems = @json(old('items', []));
 
     $('.select2-single').select2({ width: '100%' });
 
@@ -221,6 +222,51 @@ $(function() {
         var qty = parseFloat(row.find('.item-qty').val()) || 0;
         var expectedOutput = qty * bomOutput;
         row.find('.item-output').text(expectedOutput.toFixed(4));
+    }
+
+    function buildBomOptions(selectedId) {
+        var html = '<option value="">Select BOM...</option>';
+        boms.forEach(function(b) {
+            var productName = b.finish_product ? b.finish_product.name : '';
+            var sel = (b.id == selectedId) ? ' selected' : '';
+            html += '<option value="' + b.id + '" data-product="' + productName + '" data-output="' + b.actual_output + '"' + sel + '>' +
+                b.reference + ' - ' + b.description + ' (' + b.bom_type.charAt(0).toUpperCase() + b.bom_type.slice(1) + ')' +
+                '</option>';
+        });
+        return html;
+    }
+
+    if (oldItems.length > 0) {
+        $('#items-body').empty();
+        rowIndex = 0;
+        oldItems.forEach(function(item) {
+            if (!item) return;
+            var row = $(`
+                <tr class="item-row" data-row="${rowIndex}">
+                    <td>${rowIndex + 1}</td>
+                    <td>
+                        <select class="form-control select2-single item-bom" name="items[${rowIndex}][bom_id]" required>
+                            ${buildBomOptions(item.bom_id)}
+                        </select>
+                    </td>
+                    <td class="item-product">-</td>
+                    <td>
+                        <input type="number" step="0.0001" class="form-control item-qty" name="items[${rowIndex}][quantity]" min="0.0001" value="${item.quantity || ''}" required>
+                    </td>
+                    <td class="item-output">-</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm remove-item"><i class="fa fa-trash"></i></button>
+                    </td>
+                </tr>
+            `);
+            $('#items-body').append(row);
+            var select = row.find('.select2-single');
+            select.select2({ width: '100%' });
+            select.trigger('change');
+            row.find('.item-qty').trigger('input');
+            rowIndex++;
+        });
+        renumberRows();
     }
 });
 </script>

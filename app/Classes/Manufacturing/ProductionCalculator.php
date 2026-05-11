@@ -174,26 +174,83 @@ class ProductionCalculator
      */
     public static function getCurrentCostPrice($product_id, $branch_id)
     {
-        $branchPrice = BranchProductPrice::where([
-            'product_id' => $product_id,
-            'branch_id' => $branch_id
-        ])->first();
+        $map = self::getCurrentCostPrices([[$branch_id, $product_id]]);
+        return $map[$branch_id . '|' . $product_id] ?? 0;
+    }
 
-        if ($branchPrice && (float) $branchPrice->cost_price > 0) {
-            return (float) $branchPrice->cost_price;
+    /**
+     * Bulk-resolve current cost prices for many (branch_id, product_id) pairs in two queries.
+     *
+     * Returns a map keyed "branch_id|product_id" => float, applying the same precedence as
+     * getCurrentCostPrice(): branch-specific cost > 0, else any-branch cost > 0, else 0.
+     *
+     * @param array $pairs Array of [branch_id, product_id] tuples.
+     * @return array<string, float>
+     */
+    public static function getCurrentCostPrices(array $pairs): array
+    {
+        $result = [];
+        if (empty($pairs)) {
+            return $result;
         }
 
-        // Fallback: check any branch with cost > 0
-        $anyBranchPrice = BranchProductPrice::where('product_id', $product_id)
+        $branchIds = [];
+        $productIds = [];
+        $uniquePairs = [];
+        foreach ($pairs as $pair) {
+            $branchId = (int) $pair[0];
+            $productId = (int) $pair[1];
+            $key = $branchId . '|' . $productId;
+            if (isset($uniquePairs[$key])) {
+                continue;
+            }
+            $uniquePairs[$key] = [$branchId, $productId];
+            $branchIds[$branchId] = true;
+            $productIds[$productId] = true;
+        }
+
+        $branchIds = array_keys($branchIds);
+        $productIds = array_keys($productIds);
+
+        // Primary: branch-specific prices.
+        $primary = [];
+        BranchProductPrice::whereIn('branch_id', $branchIds)
+            ->whereIn('product_id', $productIds)
+            ->get(['branch_id', 'product_id', 'cost_price'])
+            ->each(function ($row) use (&$primary) {
+                $primary[$row->branch_id . '|' . $row->product_id] = (float) $row->cost_price;
+            });
+
+        // Fallback: any-branch price > 0 per product (mirrors ->first() ordering by id ASC).
+        $fallback = [];
+        BranchProductPrice::whereIn('product_id', $productIds)
             ->where('cost_price', '>', 0)
-            ->first();
+            ->orderBy('id')
+            ->get(['id', 'branch_id', 'product_id', 'cost_price'])
+            ->each(function ($row) use (&$fallback) {
+                if (!isset($fallback[$row->product_id])) {
+                    $fallback[$row->product_id] = $row;
+                }
+            });
 
-        if ($anyBranchPrice) {
-            \Log::warning("ProductionCalculator: Using fallback cost price from branch {$anyBranchPrice->branch_id} for product {$product_id} (no price in branch {$branch_id})");
-            return (float) $anyBranchPrice->cost_price;
+        foreach ($uniquePairs as $key => [$branchId, $productId]) {
+            $cost = $primary[$key] ?? 0;
+            if ($cost > 0) {
+                $result[$key] = $cost;
+                continue;
+            }
+
+            if (isset($fallback[$productId])) {
+                $row = $fallback[$productId];
+                \Log::warning("ProductionCalculator: Using fallback cost price from branch {$row->branch_id} for product {$productId} (no price in branch {$branchId})");
+                $result[$key] = (float) $row->cost_price;
+                continue;
+            }
+
+            $result[$key] = 0;
         }
 
-        return 0;
+        return $result;
     }
 
     /**

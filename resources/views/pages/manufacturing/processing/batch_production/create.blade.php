@@ -155,7 +155,7 @@
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Number of Batches <span class="text-danger">*</span></label>
-                                        <input type="number" name="quantity" id="quantity" class="form-control" step="1" min="1" value="1" required>
+                                        <input type="number" name="quantity" id="quantity" class="form-control" step="0.0001" min="0.0001" value="1" required>
                                         <small class="text-muted">
                                             Req. Qty: <span id="req-qty-display">-</span> |
                                             Manufactured: <span id="manufactured-display">-</span> |

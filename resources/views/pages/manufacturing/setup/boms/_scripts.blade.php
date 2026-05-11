@@ -242,53 +242,6 @@ $(function() {
         }
     });
 
-    // Auto-refresh all material costs on page load (edit mode)
-    @if(isset($model->id))
-    (function() {
-        var pending = 0;
-        var done = 0;
-        var updated = 0;
-
-        $('.material-row').each(function() {
-            var row = $(this);
-            var productId = row.find('.material-product').val();
-            if (productId) {
-                pending++;
-                $.ajax({
-                    url: '{{ route("manufacturing.ajax.product-cost") }}',
-                    type: 'GET',
-                    data: { product_id: productId },
-                    success: function(response) {
-                        if (response.status) {
-                            var cost = parseFloat(response.cost) || 0;
-                            var currentCost = parseFloat(row.find('.material-unit-cost').val()) || 0;
-                            // Only update if AJAX returned a valid cost > 0, or if current cost is already 0
-                            if (cost > 0) {
-                                row.find('.material-unit-cost').val(cost.toFixed(2));
-                                calculateRowTotal(row);
-                                updated++;
-                            } else if (currentCost > 0) {
-                                // Keep existing cost, just recalculate totals
-                                calculateRowTotal(row);
-                            }
-                        }
-                    },
-                    error: function() {
-                        // Keep existing values on error, just recalculate
-                        calculateRowTotal(row);
-                    },
-                    complete: function() {
-                        done++;
-                        if (done >= pending) {
-                            calculateTotals();
-                        }
-                    }
-                });
-            }
-        });
-    })();
-    @endif
-
     // Initial calculation
     calculateTotals();
 });

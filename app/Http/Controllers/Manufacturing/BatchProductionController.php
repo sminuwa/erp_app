@@ -164,7 +164,7 @@ class BatchProductionController extends Controller
             'requisition_id' => 'required|exists:materials_requisitions,id',
             'team_id' => 'required|exists:manufacturing_teams,id',
             'machine_id' => 'nullable|exists:manufacturing_machines,id',
-            'quantity' => 'required|numeric|min:1'
+            'quantity' => 'required|numeric|min:0.0001'
         ]);
 
         DB::beginTransaction();
@@ -460,7 +460,7 @@ class BatchProductionController extends Controller
     {
         $request->validate([
             'bom_id' => 'required|exists:manufacturing_boms,id',
-            'quantity' => 'required|numeric|min:1'
+            'quantity' => 'required|numeric|min:0.0001'
         ]);
 
         $user = Auth::user();

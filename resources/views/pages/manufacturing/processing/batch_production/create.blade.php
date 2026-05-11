@@ -313,7 +313,7 @@ $(document).ready(function() {
 
     function calculateCosts() {
         var bomId = $('#bom_id').val();
-        var quantity = parseInt($('#quantity').val()) || 0;
+        var quantity = parseFloat($('#quantity').val()) || 0;
 
         if (!bomId || quantity < 1) {
             $('#materials-table').hide();
@@ -413,7 +413,7 @@ $(document).ready(function() {
             $('#remaining-display').text(remaining);
             $('#quantity').attr('max', remaining);
 
-            if (parseInt($('#quantity').val()) > remaining) {
+            if (parseFloat($('#quantity').val()) > remaining) {
                 $('#quantity').val(Math.min(1, remaining));
             }
         } else {
@@ -526,7 +526,7 @@ $(document).ready(function() {
             manufactured = parseFloat(reqSelected.data('manufactured')) || 0;
         }
 
-        var qty = parseInt($('#quantity').val()) || 0;
+        var qty = parseFloat($('#quantity').val()) || 0;
         if (remaining > 0 && qty > remaining) {
             e.preventDefault();
             alert('Quantity (' + qty + ') exceeds the remaining quantity (' + remaining + ').\nAlready manufactured: ' + manufactured);

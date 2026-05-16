@@ -110,7 +110,7 @@ class MaterialsRequisition extends Model
 
     public function reservations()
     {
-        return InventoryReservation::where('reference_type', 'MaterialsRequisition')
+        return InventoryReservation::where('reference_type', 'requisition')
             ->where('reference_id', $this->id);
     }
 

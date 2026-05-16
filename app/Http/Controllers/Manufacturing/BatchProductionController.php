@@ -385,12 +385,11 @@ class BatchProductionController extends Controller
             // Consume reservations
             InventoryReservationService::consumeAllForReference('requisition', $batch->requisition_id);
 
-            $batch->loadMissing('requisition');
-            if ($batch->requisition && $batch->requisition->schedule_id) {
-                InventoryReservationService::consumeAllForReference(
-                    'daily_schedule',
-                    $batch->requisition->schedule_id
-                );
+            $batch->loadMissing(['requisition', 'requisition.workOrder']);
+            $scheduleId = $batch->requisition?->schedule_id
+                ?? $batch->requisition?->workOrder?->daily_schedule_id;
+            if ($scheduleId) {
+                InventoryReservationService::consumeAllForReference('daily_schedule', $scheduleId);
             }
 
             // Update status (WIP value is calculated in post() method)

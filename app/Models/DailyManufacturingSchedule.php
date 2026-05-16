@@ -74,7 +74,7 @@ class DailyManufacturingSchedule extends Model
 
     public function reservations()
     {
-        return InventoryReservation::where('reference_type', 'DailyManufacturingSchedule')
+        return InventoryReservation::where('reference_type', 'daily_schedule')
             ->where('reference_id', $this->id);
     }
 

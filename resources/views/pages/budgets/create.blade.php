@@ -74,17 +74,17 @@
                                 
                                 <div class="form-group">
                                     <label for="month1">Month 1</label>
-                                    <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '');" name="month1" id="month1" class="form-control" value="{{ isset($budget) ? $budget->month1 : old('month1') }}" required oninput="calculateTotal()">
+                                    <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); calculateTotal();" name="month1" id="month1" class="form-control" value="{{ isset($budget) ? $budget->month1 : old('month1') }}" required>
                                 </div>
                                 
                                 <div class="form-group">
                                     <label for="month2">Month 2</label>
-                                    <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '');" name="month2" id="month2" step="0.2" class="form-control" value="{{ isset($budget) ? $budget->month2 : old('month2') }}" required oninput="calculateTotal()">
+                                    <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); calculateTotal();" name="month2" id="month2" step="0.2" class="form-control" value="{{ isset($budget) ? $budget->month2 : old('month2') }}" required>
                                 </div>
                                 
                                 <div class="form-group">
                                     <label for="month3">Month 3</label>
-                                    <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '');" name="month3" id="month3" step="0.2" class="form-control" value="{{ isset($budget) ? $budget->month3 : old('month3') }}" required oninput="calculateTotal()">
+                                    <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); calculateTotal();" name="month3" id="month3" step="0.2" class="form-control" value="{{ isset($budget) ? $budget->month3 : old('month3') }}" required>
                                 </div>
                                 
                                 <div class="form-group">
